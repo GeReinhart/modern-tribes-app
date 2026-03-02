@@ -1,0 +1,1044 @@
+# Advanced Multi-Theme System with Entity Support
+
+## 1. **Enhanced Theme Configuration** (`themes.ts`)
+
+```typescript
+// themes.ts
+export interface Theme {
+  id?: string;
+  name: string;
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
+}
+
+export interface EntityTheme {
+  entityId: string;
+  entityType: string;
+  theme: Theme;
+}
+
+// Predefined themes
+export const predefinedThemes: Record<string, Theme> = {
+  default: {
+    name: 'Default',
+    colors: {
+      primary: '#61DAFB',
+      secondary: '#BB86FC',
+      accent: '#FF6B9D',
+    },
+  },
+  ocean: {
+    name: 'Ocean Blue',
+    colors: {
+      primary: 'dodgerblue',
+      secondary: 'mediumslateblue',
+      accent: 'deepskyblue',
+    },
+  },
+  sunset: {
+    name: 'Sunset Warm',
+    colors: {
+      primary: 'coral',
+      secondary: 'tomato',
+      accent: 'orange',
+    },
+  },
+  forest: {
+    name: 'Forest Green',
+    colors: {
+      primary: 'mediumseagreen',
+      secondary: 'limegreen',
+      accent: 'springgreen',
+    },
+  },
+  purple: {
+    name: 'Purple Royale',
+    colors: {
+      primary: 'mediumorchid',
+      secondary: 'mediumpurple',
+      accent: 'violet',
+    },
+  },
+  neon: {
+    name: 'Tech Neon',
+    colors: {
+      primary: 'cyan',
+      secondary: 'magenta',
+      accent: 'lime',
+    },
+  },
+  corporate: {
+    name: 'Corporate Blue',
+    colors: {
+      primary: 'steelblue',
+      secondary: 'royalblue',
+      accent: 'cornflowerblue',
+    },
+  },
+  autumn: {
+    name: 'Autumn Harvest',
+    colors: {
+      primary: 'darkorange',
+      secondary: 'goldenrod',
+      accent: 'sandybrown',
+    },
+  },
+  mint: {
+    name: 'Mint Fresh',
+    colors: {
+      primary: 'mediumaquamarine',
+      secondary: 'turquoise',
+      accent: 'paleturquoise',
+    },
+  },
+  berry: {
+    name: 'Berry Blend',
+    colors: {
+      primary: 'hotpink',
+      secondary: 'orchid',
+      accent: 'deeppink',
+    },
+  },
+  mono: {
+    name: 'Monochrome Gray',
+    colors: {
+      primary: 'slategray',
+      secondary: 'silver',
+      accent: 'darkgray',
+    },
+  },
+};
+
+export const themeKeys = Object.keys(predefinedThemes);
+```
+
+## 2. **Theme Registry & Factory** (`themeRegistry.ts`)
+
+```typescript
+// themeRegistry.ts
+import { Theme } from './themes';
+
+class ThemeRegistry {
+  private themes: Map<string, Theme> = new Map();
+  private entityThemes: Map<string, Theme> = new Map();
+
+  // Register a custom theme
+  registerTheme(id: string, theme: Theme): void {
+    this.themes.set(id, { ...theme, id });
+  }
+
+  // Register theme for specific entity
+  registerEntityTheme(entityId: string, theme: Theme): void {
+    this.entityThemes.set(entityId, { ...theme, id: `entity-${entityId}` });
+  }
+
+  // Get theme by ID
+  getTheme(id: string): Theme | undefined {
+    return this.themes.get(id);
+  }
+
+  // Get theme for entity
+  getEntityTheme(entityId: string): Theme | undefined {
+    return this.entityThemes.get(entityId);
+  }
+
+  // Create theme from entity data
+  createThemeFromEntity(entity: any): Theme {
+    const theme: Theme = {
+      id: `entity-${entity.id}`,
+      name: entity.name || 'Custom Theme',
+      colors: {
+        primary: entity.primaryColor || entity.brandColor || '#61DAFB',
+        secondary: entity.secondaryColor || entity.accentColor || '#BB86FC',
+        accent: entity.accentColor || entity.highlightColor || '#FF6B9D',
+      },
+    };
+
+    this.registerEntityTheme(entity.id, theme);
+    return theme;
+  }
+
+  // Remove entity theme
+  removeEntityTheme(entityId: string): void {
+    this.entityThemes.delete(entityId);
+  }
+
+  // Get all registered themes
+  getAllThemes(): Theme[] {
+    return Array.from(this.themes.values());
+  }
+
+  // Clear all entity themes
+  clearEntityThemes(): void {
+    this.entityThemes.clear();
+  }
+}
+
+export const themeRegistry = new ThemeRegistry();
+```
+
+## 3. **Enhanced Theme Context** (`ThemeContext.tsx`)
+
+```tsx
+// ThemeContext.tsx
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { Theme, predefinedThemes } from './themes';
+import { themeRegistry } from './themeRegistry';
+
+interface ThemeContextType {
+  theme: Theme;
+  setTheme: (themeKeyOrTheme: string | Theme) => void;
+  currentThemeKey: string;
+  registerEntityTheme: (entityId: string, theme: Theme) => void;
+  getEntityTheme: (entityId: string) => Theme | undefined;
+  createThemeFromEntity: (entity: any) => Theme;
+}
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export const ThemeProvider: React.FC<{
+  children: ReactNode;
+  defaultTheme?: string | Theme;
+  entityId?: string; // Optional: for entity-specific theme
+}> = ({ children, defaultTheme = 'default', entityId }) => {
+  const [currentThemeKey, setCurrentThemeKey] = useState<string>(
+    typeof defaultTheme === 'string' ? defaultTheme : 'custom'
+  );
+  const [theme, setThemeState] = useState<Theme>(() => {
+    // Initialize with entity theme if entityId provided
+    if (entityId) {
+      const entityTheme = themeRegistry.getEntityTheme(entityId);
+      if (entityTheme) return entityTheme;
+    }
+
+    // Initialize with default theme
+    if (typeof defaultTheme === 'string') {
+      return predefinedThemes[defaultTheme] || predefinedThemes.default;
+    }
+    return defaultTheme;
+  });
+
+  // Update theme when entityId changes
+  useEffect(() => {
+    if (entityId) {
+      const entityTheme = themeRegistry.getEntityTheme(entityId);
+      if (entityTheme) {
+        setThemeState(entityTheme);
+        setCurrentThemeKey(`entity-${entityId}`);
+      }
+    }
+  }, [entityId]);
+
+  const setTheme = (themeKeyOrTheme: string | Theme) => {
+    if (typeof themeKeyOrTheme === 'string') {
+      // Try predefined themes first
+      if (predefinedThemes[themeKeyOrTheme]) {
+        setThemeState(predefinedThemes[themeKeyOrTheme]);
+        setCurrentThemeKey(themeKeyOrTheme);
+      } else {
+        // Try registry
+        const registeredTheme = themeRegistry.getTheme(themeKeyOrTheme);
+        if (registeredTheme) {
+          setThemeState(registeredTheme);
+          setCurrentThemeKey(themeKeyOrTheme);
+        }
+      }
+    } else {
+      // Direct theme object
+      setThemeState(themeKeyOrTheme);
+      setCurrentThemeKey(themeKeyOrTheme.id || 'custom');
+    }
+  };
+
+  const registerEntityTheme = (entityId: string, theme: Theme) => {
+    themeRegistry.registerEntityTheme(entityId, theme);
+  };
+
+  const getEntityTheme = (entityId: string): Theme | undefined => {
+    return themeRegistry.getEntityTheme(entityId);
+  };
+
+  const createThemeFromEntity = (entity: any): Theme => {
+    return themeRegistry.createThemeFromEntity(entity);
+  };
+
+  return (
+    <ThemeContext.Provider
+      value={{
+        theme,
+        setTheme,
+        currentThemeKey,
+        registerEntityTheme,
+        getEntityTheme,
+        createThemeFromEntity,
+      }}
+    >
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
+};
+```
+
+## 4. **Theme-Aware Section Component** (`ThemedSection.tsx`)
+
+```tsx
+// ThemedSection.tsx
+import React, { ReactNode } from 'react';
+import { ThemeProvider } from './ThemeContext';
+import { Theme } from './themes';
+
+interface ThemedSectionProps {
+  children: ReactNode;
+  theme?: string | Theme;
+  entityId?: string;
+  entity?: any; // Entity object with color properties
+  style?: React.CSSProperties;
+  className?: string;
+}
+
+export const ThemedSection: React.FC<ThemedSectionProps> = ({
+  children,
+  theme,
+  entityId,
+  entity,
+  style,
+  className,
+}) => {
+  // If entity is provided, create theme from it
+  const effectiveTheme = entity
+    ? {
+        name: entity.name || 'Custom',
+        colors: {
+          primary: entity.primaryColor || entity.brandColor || '#61DAFB',
+          secondary: entity.secondaryColor || entity.accentColor || '#BB86FC',
+          accent: entity.accentColor || entity.highlightColor || '#FF6B9D',
+        },
+      }
+    : theme;
+
+  const effectiveEntityId = entity?.id || entityId;
+
+  return (
+    <ThemeProvider
+      defaultTheme={effectiveTheme}
+      entityId={effectiveEntityId}
+    >
+      <div className={className} style={style}>
+        {children}
+      </div>
+    </ThemeProvider>
+  );
+};
+```
+
+## 5. **Updated Themed Components** (`ThemedComponents.tsx`)
+
+```tsx
+// ThemedComponents.tsx
+import React, { CSSProperties } from 'react';
+import { useTheme } from './ThemeContext';
+
+export const ThemedButton: React.FC<{
+  children: React.ReactNode;
+  onClick?: () => void;
+  variant?: 'primary' | 'secondary' | 'accent';
+  fullWidth?: boolean;
+}> = ({ children, onClick, variant = 'primary', fullWidth = false }) => {
+  const { theme } = useTheme();
+
+  const style: CSSProperties = {
+    backgroundColor: theme.colors[variant],
+    color: 'white',
+    border: 'none',
+    padding: '12px 24px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    width: fullWidth ? '100%' : 'auto',
+  };
+
+  return (
+    <button
+      style={style}
+      onClick={onClick}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+      }}
+    >
+      {children}
+    </button>
+  );
+};
+
+export const ThemedText: React.FC<{
+  children: React.ReactNode;
+  variant?: 'primary' | 'secondary' | 'accent';
+  size?: 'small' | 'medium' | 'large';
+  as?: 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'span';
+}> = ({ children, variant = 'primary', size = 'medium', as: Component = 'p' }) => {
+  const { theme } = useTheme();
+
+  const sizes = {
+    small: '14px',
+    medium: '18px',
+    large: '24px',
+  };
+
+  const style: CSSProperties = {
+    color: theme.colors[variant],
+    fontSize: sizes[size],
+    fontWeight: '600',
+    margin: '8px 0',
+  };
+
+  return <Component style={style}>{children}</Component>;
+};
+
+export const ThemedCard: React.FC<{
+  children: React.ReactNode;
+  variant?: 'primary' | 'secondary' | 'accent';
+  bordered?: boolean;
+}> = ({ children, variant = 'primary', bordered = true }) => {
+  const { theme } = useTheme();
+
+  const style: CSSProperties = {
+    border: bordered ? `3px solid ${theme.colors[variant]}` : 'none',
+    borderRadius: '12px',
+    padding: '24px',
+    background: `linear-gradient(135deg, ${theme.colors.primary}08, ${theme.colors.accent}08)`,
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+    margin: '16px 0',
+  };
+
+  return <div style={style}>{children}</div>;
+};
+
+export const ThemedBadge: React.FC<{
+  children: React.ReactNode;
+  variant?: 'primary' | 'secondary' | 'accent';
+}> = ({ children, variant = 'secondary' }) => {
+  const { theme } = useTheme();
+
+  const style: CSSProperties = {
+    backgroundColor: theme.colors[variant],
+    color: 'white',
+    padding: '4px 12px',
+    borderRadius: '16px',
+    fontSize: '12px',
+    fontWeight: 'bold',
+    display: 'inline-block',
+    margin: '0 4px',
+  };
+
+  return <span style={style}>{children}</span>;
+};
+
+export const ThemedDivider: React.FC<{
+  variant?: 'primary' | 'secondary' | 'accent';
+}> = ({ variant = 'primary' }) => {
+  const { theme } = useTheme();
+
+  const style: CSSProperties = {
+    height: '2px',
+    background: `linear-gradient(to right, transparent, ${theme.colors[variant]}, transparent)`,
+    border: 'none',
+    margin: '20px 0',
+  };
+
+  return <hr style={style} />;
+};
+```
+
+## 6. **Entity Type Definitions** (`entities.ts`)
+
+```typescript
+// entities.ts
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  primaryColor: string;
+  secondaryColor: string;
+  accentColor: string;
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  brandColor: string;
+  accentColor?: string;
+  highlightColor?: string;
+}
+
+export interface Project {
+  id: string;
+  title: string;
+  description: string;
+  themeColors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
+}
+
+// Mock data
+export const mockUsers: User[] = [
+  {
+    id: 'user-1',
+    name: 'Alice Johnson',
+    email: 'alice@example.com',
+    primaryColor: 'dodgerblue',
+    secondaryColor: 'mediumslateblue',
+    accentColor: 'deepskyblue',
+  },
+  {
+    id: 'user-2',
+    name: 'Bob Smith',
+    email: 'bob@example.com',
+    primaryColor: 'coral',
+    secondaryColor: 'tomato',
+    accentColor: 'orange',
+  },
+  {
+    id: 'user-3',
+    name: 'Charlie Brown',
+    email: 'charlie@example.com',
+    primaryColor: 'mediumseagreen',
+    secondaryColor: 'limegreen',
+    accentColor: 'springgreen',
+  },
+];
+
+export const mockOrganizations: Organization[] = [
+  {
+    id: 'org-1',
+    name: 'Tech Innovators Inc.',
+    brandColor: 'steelblue',
+    accentColor: 'royalblue',
+    highlightColor: 'cornflowerblue',
+  },
+  {
+    id: 'org-2',
+    name: 'Creative Solutions Ltd.',
+    brandColor: 'hotpink',
+    accentColor: 'orchid',
+    highlightColor: 'deeppink',
+  },
+];
+
+export const mockProjects: Project[] = [
+  {
+    id: 'project-1',
+    title: 'Website Redesign',
+    description: 'Complete overhaul of company website',
+    themeColors: {
+      primary: 'mediumorchid',
+      secondary: 'mediumpurple',
+      accent: 'violet',
+    },
+  },
+  {
+    id: 'project-2',
+    title: 'Mobile App Launch',
+    description: 'New mobile application for customers',
+    themeColors: {
+      primary: 'darkorange',
+      secondary: 'goldenrod',
+      accent: 'sandybrown',
+    },
+  },
+];
+```
+
+## 7. **Example Components Using Entities** (`EntityComponents.tsx`)
+
+```tsx
+// EntityComponents.tsx
+import React from 'react';
+import { ThemedSection } from './ThemedSection';
+import { ThemedCard, ThemedText, ThemedButton, ThemedBadge } from './ThemedComponents';
+import { User, Organization, Project } from './entities';
+import { Logo } from './Logo';
+
+export const UserCard: React.FC<{ user: User }> = ({ user }) => {
+  return (
+    <ThemedSection entity={user}>
+      <ThemedCard>
+        <ThemedText variant="primary" size="large" as="h3">
+          {user.name}
+        </ThemedText>
+        <ThemedText variant="secondary" size="small">
+          {user.email}
+        </ThemedText>
+        <div style={{ marginTop: '16px' }}>
+          <ThemedBadge variant="primary">User Profile</ThemedBadge>
+          <ThemedBadge variant="accent">Active</ThemedBadge>
+        </div>
+        <div style={{ marginTop: '16px' }}>
+          <ThemedButton variant="primary" onClick={() => alert(`View ${user.name}'s profile`)}>
+            View Profile
+          </ThemedButton>
+        </div>
+      </ThemedCard>
+    </ThemedSection>
+  );
+};
+
+export const OrganizationCard: React.FC<{ organization: Organization }> = ({ organization }) => {
+  return (
+    <ThemedSection entity={organization}>
+      <ThemedCard variant="primary">
+        <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ transform: 'scale(0.5)', transformOrigin: 'top center' }}>
+            <Logo />
+          </div>
+        </div>
+        <ThemedText variant="primary" size="large" as="h3">
+          {organization.name}
+        </ThemedText>
+        <div style={{ marginTop: '16px' }}>
+          <ThemedBadge variant="primary">Organization</ThemedBadge>
+        </div>
+        <div style={{ marginTop: '16px' }}>
+          <ThemedButton variant="accent" fullWidth>
+            Visit Dashboard
+          </ThemedButton>
+        </div>
+      </ThemedCard>
+    </ThemedSection>
+  );
+};
+
+export const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
+  const projectEntity = {
+    id: project.id,
+    name: project.title,
+    primaryColor: project.themeColors.primary,
+    secondaryColor: project.themeColors.secondary,
+    accentColor: project.themeColors.accent,
+  };
+
+  return (
+    <ThemedSection entity={projectEntity}>
+      <ThemedCard variant="secondary">
+        <ThemedText variant="primary" size="large" as="h3">
+          {project.title}
+        </ThemedText>
+        <ThemedText variant="secondary" size="medium">
+          {project.description}
+        </ThemedText>
+        <div style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
+          <ThemedButton variant="primary">View Details</ThemedButton>
+          <ThemedButton variant="secondary">Edit</ThemedButton>
+          <ThemedButton variant="accent">Share</ThemedButton>
+        </div>
+      </ThemedCard>
+    </ThemedSection>
+  );
+};
+```
+
+## 8. **Comprehensive Demo App** (`App.tsx`)
+
+```tsx
+// App.tsx
+import React, { useState } from 'react';
+import { ThemeProvider, useTheme } from './ThemeContext';
+import { Logo } from './Logo';
+import { ThemeSwitcher } from './ThemeSwitcher';
+import { ThemedSection } from './ThemedSection';
+import {
+  ThemedButton,
+  ThemedText,
+  ThemedCard,
+  ThemedDivider,
+} from './ThemedComponents';
+import { UserCard, OrganizationCard, ProjectCard } from './EntityComponents';
+import { mockUsers, mockOrganizations, mockProjects } from './entities';
+
+const AppContent: React.FC = () => {
+  const { theme } = useTheme();
+  const [selectedView, setSelectedView] = useState<'global' | 'users' | 'orgs' | 'projects'>('global');
+
+  const containerStyle: React.CSSProperties = {
+    padding: '40px',
+    fontFamily: 'Arial, sans-serif',
+    maxWidth: '1400px',
+    margin: '0 auto',
+    backgroundColor: '#f9f9f9',
+    minHeight: '100vh',
+  };
+
+  const headerStyle: React.CSSProperties = {
+    backgroundColor: 'white',
+    padding: '20px',
+    borderRadius: '12px',
+    marginBottom: '30px',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+  };
+
+  const navigationStyle: React.CSSProperties = {
+    display: 'flex',
+    gap: '12px',
+    marginTop: '20px',
+    flexWrap: 'wrap',
+  };
+
+  return (
+    <div style={containerStyle}>
+      {/* Global Header with Global Theme */}
+      <div style={headerStyle}>
+        <Logo />
+        <ThemedDivider />
+        <ThemedText variant="primary" size="large" as="h2">
+          Multi-Theme System Demo
+        </ThemedText>
+        <ThemedText variant="secondary" size="small">
+          Different sections can have different themes based on entities
+        </ThemedText>
+
+        {/* Navigation */}
+        <div style={navigationStyle}>
+          <ThemedButton
+            variant={selectedView === 'global' ? 'primary' : 'secondary'}
+            onClick={() => setSelectedView('global')}
+          >
+            Global Theme
+          </ThemedButton>
+          <ThemedButton
+            variant={selectedView === 'users' ? 'primary' : 'secondary'}
+            onClick={() => setSelectedView('users')}
+          >
+            User Themes
+          </ThemedButton>
+          <ThemedButton
+            variant={selectedView === 'orgs' ? 'primary' : 'secondary'}
+            onClick={() => setSelectedView('orgs')}
+          >
+            Organization Themes
+          </ThemedButton>
+          <ThemedButton
+            variant={selectedView === 'projects' ? 'primary' : 'secondary'}
+            onClick={() => setSelectedView('projects')}
+          >
+            Project Themes
+          </ThemedButton>
+        </div>
+      </div>
+
+      {/* Global Theme Controls */}
+      {selectedView === 'global' && (
+        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '12px', marginBottom: '20px' }}>
+          <ThemeSwitcher />
+
+          <ThemedCard>
+            <ThemedText variant="primary" size="large" as="h3">
+              Global Theme: {theme.name}
+            </ThemedText>
+            <ThemedText variant="secondary">
+              This theme applies to the entire page unless overridden by a section-specific theme.
+            </ThemedText>
+          </ThemedCard>
+        </div>
+      )}
+
+      {/* User Entity Themes */}
+      {selectedView === 'users' && (
+        <div>
+          <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '12px', marginBottom: '20px' }}>
+            <ThemedText variant="primary" size="large" as="h2">
+              User Profiles - Each with Custom Theme
+            </ThemedText>
+            <ThemedText variant="secondary">
+              Each user card below has its own theme based on user preferences
+            </ThemedText>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+            {mockUsers.map(user => (
+              <UserCard key={user.id} user={user} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Organization Entity Themes */}
+      {selectedView === 'orgs' && (
+        <div>
+          <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '12px', marginBottom: '20px' }}>
+            <ThemedText variant="primary" size="large" as="h2">
+              Organizations - Branded Themes
+            </ThemedText>
+            <ThemedText variant="secondary">
+              Each organization has its brand colors applied as a theme
+            </ThemedText>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px' }}>
+            {mockOrganizations.map(org => (
+              <OrganizationCard key={org.id} organization={org} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Project Entity Themes */}
+      {selectedView === 'projects' && (
+        <div>
+          <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '12px', marginBottom: '20px' }}>
+            <ThemedText variant="primary" size="large" as="h2">
+              Projects - Custom Color Schemes
+            </ThemedText>
+            <ThemedText variant="secondary">
+              Each project can have its own color scheme
+            </ThemedText>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px' }}>
+            {mockProjects.map(project => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Multi-Section Demo */}
+      <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '12px', marginTop: '30px' }}>
+        <ThemedText variant="primary" size="large" as="h2">
+          Mixed Sections Demo
+        </ThemedText>
+        <ThemedText variant="secondary" size="small">
+          Different sections on the same page with different themes
+        </ThemedText>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginTop: '20px' }}>
+          <ThemedSection theme="ocean">
+            <ThemedCard>
+              <ThemedText variant="primary" size="medium" as="h4">Ocean Section</ThemedText>
+              <ThemedText variant="secondary" size="small">This section uses the ocean theme</ThemedText>
+              <ThemedButton variant="accent">Ocean Button</ThemedButton>
+            </ThemedCard>
+          </ThemedSection>
+
+          <ThemedSection theme="sunset">
+            <ThemedCard>
+              <ThemedText variant="primary" size="medium" as="h4">Sunset Section</ThemedText>
+              <ThemedText variant="secondary" size="small">This section uses the sunset theme</ThemedText>
+              <ThemedButton variant="accent">Sunset Button</ThemedButton>
+            </ThemedCard>
+          </ThemedSection>
+
+          <ThemedSection theme="forest">
+            <ThemedCard>
+              <ThemedText variant="primary" size="medium" as="h4">Forest Section</ThemedText>
+              <ThemedText variant="secondary" size="small">This section uses the forest theme</ThemedText>
+              <ThemedButton variant="accent">Forest Button</ThemedButton>
+            </ThemedCard>
+          </ThemedSection>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <ThemeProvider defaultTheme="default">
+      <AppContent />
+    </ThemeProvider>
+  );
+};
+
+export default App;
+```
+
+## 9. **API Integration Example** (`apiIntegration.ts`)
+
+```typescript
+// apiIntegration.ts
+import { Theme } from './themes';
+import { themeRegistry } from './themeRegistry';
+
+// Simulate API response
+export interface ApiEntity {
+  id: string;
+  name: string;
+  theme?: {
+    primary: string;
+    secondary: string;
+    accent: string;
+  };
+  // Or flat structure
+  primaryColor?: string;
+  secondaryColor?: string;
+  accentColor?: string;
+}
+
+// Convert API entity to theme
+export const createThemeFromApiEntity = (entity: ApiEntity): Theme => {
+  const theme: Theme = {
+    id: `api-${entity.id}`,
+    name: entity.name,
+    colors: entity.theme || {
+      primary: entity.primaryColor || '#61DAFB',
+      secondary: entity.secondaryColor || '#BB86FC',
+      accent: entity.accentColor || '#FF6B9D',
+    },
+  };
+
+  themeRegistry.registerEntityTheme(entity.id, theme);
+  return theme;
+};
+
+// Fetch entity with theme from API
+export const fetchEntityWithTheme = async (entityId: string): Promise<Theme> => {
+  // Simulate API call
+  const response = await fetch(`/api/entities/${entityId}`);
+  const entity: ApiEntity = await response.json();
+
+  return createThemeFromApiEntity(entity);
+};
+
+// Batch load entities and register their themes
+export const loadEntitiesWithThemes = async (entityIds: string[]): Promise<Map<string, Theme>> => {
+  const themes = new Map<string, Theme>();
+
+  const entities = await Promise.all(
+    entityIds.map(id => fetch(`/api/entities/${id}`).then(r => r.json()))
+  );
+
+  entities.forEach(entity => {
+    const theme = createThemeFromApiEntity(entity);
+    themes.set(entity.id, theme);
+  });
+
+  return themes;
+};
+```
+
+## 10. **Hook for Entity Themes** (`useEntityTheme.ts`)
+
+```typescript
+// useEntityTheme.ts
+import { useState, useEffect } from 'react';
+import { Theme } from './themes';
+import { themeRegistry } from './themeRegistry';
+
+export const useEntityTheme = (entityId: string | undefined, entity?: any) => {
+  const [theme, setTheme] = useState<Theme | undefined>();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!entityId && !entity) {
+      setLoading(false);
+      return;
+    }
+
+    // If entity object is provided, create theme immediately
+    if (entity) {
+      const newTheme = themeRegistry.createThemeFromEntity(entity);
+      setTheme(newTheme);
+      setLoading(false);
+      return;
+    }
+
+    // If only entityId is provided, try to get from registry
+    if (entityId) {
+      const existingTheme = themeRegistry.getEntityTheme(entityId);
+      if (existingTheme) {
+        setTheme(existingTheme);
+        setLoading(false);
+      } else {
+        // Could fetch from API here
+        setLoading(false);
+      }
+    }
+  }, [entityId, entity]);
+
+  return { theme, loading };
+};
+```
+
+## File Structure
+
+```
+src/
+├── themes/
+│   ├── themes.ts
+│   ├── themeRegistry.ts
+│   ├── ThemeContext.tsx
+│   ├── ThemedSection.tsx
+│   └── useEntityTheme.ts
+├── components/
+│   ├── Logo.tsx
+│   ├── ThemeSwitcher.tsx
+│   ├── ThemedComponents.tsx
+│   └── EntityComponents.tsx
+├── types/
+│   └── entities.ts
+├── api/
+│   └── apiIntegration.ts
+└── App.tsx
+```
+
+## Key Features
+
+✅ **Multi-level theming** - Global, section, and entity-specific themes
+✅ **Entity-based themes** - Themes can come from any entity (User, Org, Project)
+✅ **Nested theme providers** - Different sections can have different themes
+✅ **Dynamic theme creation** - Create themes from API responses or entity data
+✅ **Theme registry** - Centralized theme management
+✅ **Type-safe** - Full TypeScript support
+✅ **Flexible** - Support for both predefined and custom themes
+✅ **Performance** - Themes are cached and reused
+
+## Usage Examples
+
+```tsx
+// Global theme
+<ThemeProvider defaultTheme="ocean">
+  <App />
+</ThemeProvider>
+
+// Section-specific theme
+<ThemedSection theme="sunset">
+  <MyComponent />
+</ThemedSection>
+
+// Entity-based theme
+<ThemedSection entity={user}>
+  <UserProfile />
+</ThemedSection>
+
+// Multiple sections with different themes
+<div>
+  <ThemedSection theme="ocean">
+    <Section1 />
+  </ThemedSection>
+  <ThemedSection theme="forest">
+    <Section2 />
+  </ThemedSection>
+  <ThemedSection entity={organization}>
+    <Section3 />
+  </ThemedSection>
+</div>
+```

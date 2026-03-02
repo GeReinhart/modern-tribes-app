@@ -1,0 +1,68 @@
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from typing import Optional, List
+from datetime import datetime
+
+from .roles import Role
+from ..auth.auth import UserSession
+
+# User Models
+class UserBase(BaseModel):
+    login: str
+    email: EmailStr
+    role_ids: Optional[List[str]] = []
+    person_id: Optional[str] = None
+    sessions: List[UserSession] = []
+
+class UserCreate(UserBase):
+    pass
+
+
+class UserUpdate(BaseModel):
+    login: Optional[str] = None
+    email: Optional[EmailStr] = None
+    role_ids: Optional[List[str]] = None
+    person_id: Optional[str] = None
+    sessions: List[UserSession] = []
+
+
+class User(UserBase):
+    id: str
+    created_at: datetime
+    updated_at: datetime
+    sessions: List[UserSession] = []
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        json_schema_extra={
+            "example": {
+                "id": "507f1f77-bcf8-6cd7-9943-9014abcd1234",
+                "login": "Alain",
+                "role_ids": ["507f1f77-bcf8-6cd7-9943-9012abcd1234"],
+                "created_at": "2024-01-01T00:00:00",
+                "updated_at": "2024-01-01T00:00:00"
+            }
+        }
+    )
+
+
+class UserWithRoles(User):
+    roles: Optional[List[Role]] = []
+    permissions: Optional[List[str]] = []
+
+
+class UserWithPermissions(User):
+    permissions: Optional[List[str]] = []
+
+    def has_permission(self, permission: str) -> bool:
+        """Check if user has a specific permission"""
+        return permission in self.permissions
+
+    def has_any_permission(self, permissions: List[str]) -> bool:
+        """Check if user has any of the specified permissions"""
+        user_perms = set(self.permissions)
+        return bool(user_perms.intersection(set(permissions)))
+
+    def has_all_permissions(self, permissions: List[str]) -> bool:
+        """Check if user has all specified permissions"""
+        user_perms = set(self.permissions)
+        return set(permissions).issubset(user_perms)

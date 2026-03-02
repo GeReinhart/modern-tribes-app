@@ -1,0 +1,94 @@
+# Color Scheme Options Using Named CSS Colors
+
+## 1. **Ocean Blue** (Professional & Trustworthy)
+```css
+--color-1: dodgerblue      /* #1E90FF */
+--color-2: mediumslateblue /* #7B68EE */
+--color-3: deepskyblue     /* #00BFFF */
+```
+
+## 2. **Sunset Warm** (Energetic & Creative)
+```css
+--color-1: coral           /* #FF7F50 */
+--color-2: tomato          /* #FF6347 */
+--color-3: orange          /* #FFA500 */
+```
+
+## 3. **Forest Green** (Natural & Growth)
+```css
+--color-1: mediumseagreen  /* #3CB371 */
+--color-2: limegreen       /* #32CD32 */
+--color-3: springgreen     /* #00FF7F */
+```
+
+## 4. **Purple Royale** (Luxury & Sophisticated)
+```css
+--color-1: mediumorchid    /* #BA55D3 */
+--color-2: mediumpurple    /* #9370DB */
+--color-3: violet          /* #EE82EE */
+```
+
+## 5. **Tech Neon** (Modern & Digital)
+```css
+--color-1: cyan            /* #00FFFF */
+--color-2: magenta         /* #FF00FF */
+--color-3: lime            /* #00FF00 */
+```
+
+## 6. **Corporate Blue** (Professional & Stable)
+```css
+--color-1: steelblue       /* #4682B4 */
+--color-2: royalblue       /* #4169E1 */
+--color-3: cornflowerblue  /* #6495ED */
+```
+
+## 7. **Autumn Harvest** (Warm & Welcoming)
+```css
+--color-1: darkorange      /* #FF8C00 */
+--color-2: goldenrod       /* #DAA520 */
+--color-3: sandybrown      /* #F4A460 */
+```
+
+## 8. **Mint Fresh** (Clean & Modern)
+```css
+--color-1: mediumaquamarine /* #66CDAA */
+--color-2: turquoise        /* #40E0D0 */
+--color-3: paleturquoise    /* #AFEEEE */
+```
+
+## 9. **Berry Blend** (Playful & Bold)
+```css
+--color-1: hotpink         /* #FF69B4 */
+--color-2: orchid          /* #DA70D6 */
+--color-3: deeppink        /* #FF1493 */
+```
+
+## 10. **Monochrome Gray** (Minimal & Elegant)
+```css
+--color-1: slategray       /* #708090 */
+--color-2: silver          /* #C0C0C0 */
+--color-3: darkgray        /* #A9A9A9 */
+```
+
+## Example React Implementation:
+
+```jsx
+const colorSchemes = {
+  ocean: {
+    primary: 'dodgerblue',
+    secondary: 'mediumslateblue',
+    accent: 'deepskyblue'
+  },
+  sunset: {
+    primary: 'coral',
+    secondary: 'tomato',
+    accent: 'orange'
+  },
+  // ... add more schemes
+};
+
+// Usage in your SVG component
+<circle cx="70" cy="90" r="22" fill={colorSchemes.ocean.primary}/>
+```
+
+Would you like me to show you the full SVG with any specific color scheme applied?
