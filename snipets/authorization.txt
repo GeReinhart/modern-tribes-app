@@ -1,0 +1,1016 @@
+# Role-Based Access Control (RBAC) Implementation
+
+## Backend (FastAPI + MongoDB)
+
+### 1. Define Permission Models
+
+```python
+# backend/app/models/permissions.py
+from enum import Enum
+from typing import List, Optional
+from pydantic import BaseModel, Field
+from datetime import datetime
+
+class Permission(str, Enum):
+    # User permissions
+    USER_READ = "user:read"
+    USER_WRITE = "user:write"
+    USER_DELETE = "user:delete"
+
+    # Admin permissions
+    ADMIN_ACCESS = "admin:access"
+    ADMIN_USERS_MANAGE = "admin:users:manage"
+
+    # Content permissions
+    CONTENT_READ = "content:read"
+    CONTENT_WRITE = "content:write"
+    CONTENT_DELETE = "content:delete"
+    CONTENT_PUBLISH = "content:publish"
+
+    # Settings permissions
+    SETTINGS_READ = "settings:read"
+    SETTINGS_WRITE = "settings:write"
+
+class Role(str, Enum):
+    SUPER_ADMIN = "super_admin"
+    ADMIN = "admin"
+    EDITOR = "editor"
+    USER = "user"
+    GUEST = "guest"
+
+# Role to permissions mapping
+ROLE_PERMISSIONS = {
+    Role.SUPER_ADMIN: [p.value for p in Permission],
+    Role.ADMIN: [
+        Permission.USER_READ,
+        Permission.USER_WRITE,
+        Permission.CONTENT_READ,
+        Permission.CONTENT_WRITE,
+        Permission.CONTENT_DELETE,
+        Permission.CONTENT_PUBLISH,
+        Permission.SETTINGS_READ,
+        Permission.SETTINGS_WRITE,
+    ],
+    Role.EDITOR: [
+        Permission.USER_READ,
+        Permission.CONTENT_READ,
+        Permission.CONTENT_WRITE,
+        Permission.CONTENT_PUBLISH,
+    ],
+    Role.USER: [
+        Permission.USER_READ,
+        Permission.CONTENT_READ,
+        Permission.CONTENT_WRITE,
+    ],
+    Role.GUEST: [
+        Permission.CONTENT_READ,
+    ],
+}
+```
+
+### 2. Update User Model
+
+```python
+# backend/app/models/user.py
+from pydantic import BaseModel, EmailStr, Field
+from typing import List, Optional
+from datetime import datetime
+from bson import ObjectId
+from .permissions import Role, Permission, ROLE_PERMISSIONS
+
+class PyObjectId(ObjectId):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not ObjectId.is_valid(v):
+            raise ValueError("Invalid ObjectId")
+        return ObjectId(v)
+
+class UserBase(BaseModel):
+    email: EmailStr
+    username: str
+    full_name: Optional[str] = None
+    is_active: bool = True
+    role: Role = Role.USER
+    custom_permissions: List[str] = Field(default_factory=list)
+
+class UserInDB(UserBase):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    hashed_password: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        populate_by_name = True
+
+    def get_permissions(self) -> List[str]:
+        """Get all permissions for the user (role + custom)"""
+        role_perms = ROLE_PERMISSIONS.get(self.role, [])
+        return list(set(role_perms + self.custom_permissions))
+
+    def has_permission(self, permission: str) -> bool:
+        """Check if user has a specific permission"""
+        return permission in self.get_permissions()
+
+    def has_any_permission(self, permissions: List[str]) -> bool:
+        """Check if user has any of the specified permissions"""
+        user_perms = set(self.get_permissions())
+        return bool(user_perms.intersection(set(permissions)))
+
+    def has_all_permissions(self, permissions: List[str]) -> bool:
+        """Check if user has all specified permissions"""
+        user_perms = set(self.get_permissions())
+        return set(permissions).issubset(user_perms)
+
+class UserResponse(BaseModel):
+    id: str
+    email: EmailStr
+    username: str
+    full_name: Optional[str]
+    is_active: bool
+    role: Role
+    permissions: List[str]
+    created_at: datetime
+```
+
+### 3. Permission Dependencies
+
+```python
+# backend/app/dependencies/permissions.py
+from fastapi import Depends, HTTPException, status
+from typing import List, Optional
+from ..models.user import UserInDB
+from ..models.permissions import Permission, Role
+from .auth import get_current_active_user
+
+class PermissionChecker:
+    def __init__(
+        self,
+        required_permissions: Optional[List[str]] = None,
+        require_all: bool = True,
+        required_roles: Optional[List[Role]] = None,
+    ):
+        self.required_permissions = required_permissions or []
+        self.require_all = require_all
+        self.required_roles = required_roles or []
+
+    def __call__(self, user: UserInDB = Depends(get_current_active_user)) -> UserInDB:
+        # Check if user is active
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Inactive user"
+            )
+
+        # Check role if specified
+        if self.required_roles and user.role not in self.required_roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Required role: {', '.join([r.value for r in self.required_roles])}"
+            )
+
+        # Check permissions if specified
+        if self.required_permissions:
+            if self.require_all:
+                has_permission = user.has_all_permissions(self.required_permissions)
+                error_detail = f"Required permissions: {', '.join(self.required_permissions)}"
+            else:
+                has_permission = user.has_any_permission(self.required_permissions)
+                error_detail = f"Required any of: {', '.join(self.required_permissions)}"
+
+            if not has_permission:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=error_detail
+                )
+
+        return user
+
+# Convenience functions
+def require_permission(permission: str):
+    return PermissionChecker(required_permissions=[permission])
+
+def require_any_permission(*permissions: str):
+    return PermissionChecker(required_permissions=list(permissions), require_all=False)
+
+def require_all_permissions(*permissions: str):
+    return PermissionChecker(required_permissions=list(permissions), require_all=True)
+
+def require_role(*roles: Role):
+    return PermissionChecker(required_roles=list(roles))
+
+# Specific permission checkers
+RequireSuperAdmin = lambda: require_role(Role.SUPER_ADMIN)
+RequireAdmin = lambda: require_role(Role.SUPER_ADMIN, Role.ADMIN)
+RequireEditor = lambda: require_role(Role.SUPER_ADMIN, Role.ADMIN, Role.EDITOR)
+```
+
+### 4. Protected API Endpoints
+
+```python
+# backend/app/routers/users.py
+from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List
+from ..models.user import UserInDB, UserResponse
+from ..models.permissions import Permission
+from ..dependencies.permissions import (
+    require_permission,
+    require_any_permission,
+    RequireAdmin,
+    PermissionChecker
+)
+from ..dependencies.auth import get_current_active_user
+
+router = APIRouter(prefix="/api/users", tags=["users"])
+
+# Public endpoint - only authenticated
+@router.get("/me", response_model=UserResponse)
+async def get_current_user(
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    return UserResponse(
+        id=str(current_user.id),
+        email=current_user.email,
+        username=current_user.username,
+        full_name=current_user.full_name,
+        is_active=current_user.is_active,
+        role=current_user.role,
+        permissions=current_user.get_permissions(),
+        created_at=current_user.created_at
+    )
+
+# Requires USER_READ permission
+@router.get("/", response_model=List[UserResponse])
+async def list_users(
+    current_user: UserInDB = Depends(require_permission(Permission.USER_READ))
+):
+    # Your logic here
+    pass
+
+# Requires ADMIN role
+@router.post("/", response_model=UserResponse)
+async def create_user(
+    user_data: dict,
+    current_user: UserInDB = Depends(RequireAdmin())
+):
+    # Your logic here
+    pass
+
+# Requires USER_WRITE permission
+@router.put("/{user_id}", response_model=UserResponse)
+async def update_user(
+    user_id: str,
+    user_data: dict,
+    current_user: UserInDB = Depends(require_permission(Permission.USER_WRITE))
+):
+    # Your logic here
+    pass
+
+# Requires USER_DELETE permission OR SUPER_ADMIN role
+@router.delete("/{user_id}")
+async def delete_user(
+    user_id: str,
+    current_user: UserInDB = Depends(
+        require_any_permission(Permission.USER_DELETE, Permission.ADMIN_ACCESS)
+    )
+):
+    # Your logic here
+    pass
+
+# Requires multiple permissions
+@router.post("/{user_id}/change-role")
+async def change_user_role(
+    user_id: str,
+    role: str,
+    current_user: UserInDB = Depends(
+        PermissionChecker(
+            required_permissions=[
+                Permission.ADMIN_USERS_MANAGE,
+                Permission.USER_WRITE
+            ],
+            require_all=True
+        )
+    )
+):
+    # Your logic here
+    pass
+```
+
+```python
+# backend/app/routers/content.py
+from fastapi import APIRouter, Depends
+from ..models.permissions import Permission
+from ..dependencies.permissions import require_permission, require_any_permission
+from ..models.user import UserInDB
+
+router = APIRouter(prefix="/api/content", tags=["content"])
+
+@router.get("/")
+async def get_content(
+    current_user: UserInDB = Depends(require_permission(Permission.CONTENT_READ))
+):
+    pass
+
+@router.post("/")
+async def create_content(
+    content_data: dict,
+    current_user: UserInDB = Depends(require_permission(Permission.CONTENT_WRITE))
+):
+    pass
+
+@router.put("/{content_id}")
+async def update_content(
+    content_id: str,
+    content_data: dict,
+    current_user: UserInDB = Depends(require_permission(Permission.CONTENT_WRITE))
+):
+    pass
+
+@router.delete("/{content_id}")
+async def delete_content(
+    content_id: str,
+    current_user: UserInDB = Depends(require_permission(Permission.CONTENT_DELETE))
+):
+    pass
+
+@router.post("/{content_id}/publish")
+async def publish_content(
+    content_id: str,
+    current_user: UserInDB = Depends(require_permission(Permission.CONTENT_PUBLISH))
+):
+    pass
+```
+
+## Frontend (React + TypeScript)
+
+### 1. Permission Types & Constants
+
+```typescript
+// frontend/src/types/permissions.ts
+export enum Permission {
+  // User permissions
+  USER_READ = 'user:read',
+  USER_WRITE = 'user:write',
+  USER_DELETE = 'user:delete',
+
+  // Admin permissions
+  ADMIN_ACCESS = 'admin:access',
+  ADMIN_USERS_MANAGE = 'admin:users:manage',
+
+  // Content permissions
+  CONTENT_READ = 'content:read',
+  CONTENT_WRITE = 'content:write',
+  CONTENT_DELETE = 'content:delete',
+  CONTENT_PUBLISH = 'content:publish',
+
+  // Settings permissions
+  SETTINGS_READ = 'settings:read',
+  SETTINGS_WRITE = 'settings:write',
+}
+
+export enum Role {
+  SUPER_ADMIN = 'super_admin',
+  ADMIN = 'admin',
+  EDITOR = 'editor',
+  USER = 'user',
+  GUEST = 'guest',
+}
+
+export interface User {
+  id: string;
+  email: string;
+  username: string;
+  full_name?: string;
+  is_active: boolean;
+  role: Role;
+  permissions: string[];
+  created_at: string;
+}
+```
+
+### 2. Auth Context with Permissions
+
+```typescript
+// frontend/src/contexts/AuthContext.tsx
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { User, Permission, Role } from '../types/permissions';
+import api from '../services/api';
+
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+  hasPermission: (permission: Permission | string) => boolean;
+  hasAnyPermission: (permissions: (Permission | string)[]) => boolean;
+  hasAllPermissions: (permissions: (Permission | string)[]) => boolean;
+  hasRole: (role: Role | Role[]) => boolean;
+  isAdmin: boolean;
+  isSuperAdmin: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Load user on mount
+  useEffect(() => {
+    loadUser();
+  }, []);
+
+  const loadUser = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const response = await api.get('/users/me');
+        setUser(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to load user:', error);
+      localStorage.removeItem('token');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    const response = await api.post('/auth/login', { email, password });
+    const { access_token, user: userData } = response.data;
+    localStorage.setItem('token', access_token);
+    setUser(userData);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+  };
+
+  const hasPermission = (permission: Permission | string): boolean => {
+    if (!user) return false;
+    return user.permissions.includes(permission);
+  };
+
+  const hasAnyPermission = (permissions: (Permission | string)[]): boolean => {
+    if (!user) return false;
+    return permissions.some(permission => user.permissions.includes(permission));
+  };
+
+  const hasAllPermissions = (permissions: (Permission | string)[]): boolean => {
+    if (!user) return false;
+    return permissions.every(permission => user.permissions.includes(permission));
+  };
+
+  const hasRole = (role: Role | Role[]): boolean => {
+    if (!user) return false;
+    const roles = Array.isArray(role) ? role : [role];
+    return roles.includes(user.role);
+  };
+
+  const isAdmin = hasRole([Role.SUPER_ADMIN, Role.ADMIN]);
+  const isSuperAdmin = hasRole(Role.SUPER_ADMIN);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+        hasPermission,
+        hasAnyPermission,
+        hasAllPermissions,
+        hasRole,
+        isAdmin,
+        isSuperAdmin,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+```
+
+### 3. Permission Components
+
+```typescript
+// frontend/src/components/auth/CanAccess.tsx
+import { ReactNode } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
+import { Permission, Role } from '../../types/permissions';
+
+interface CanAccessProps {
+  children: ReactNode;
+  permission?: Permission | string;
+  permissions?: (Permission | string)[];
+  requireAll?: boolean;
+  role?: Role | Role[];
+  fallback?: ReactNode;
+}
+
+export const CanAccess: React.FC<CanAccessProps> = ({
+  children,
+  permission,
+  permissions,
+  requireAll = false,
+  role,
+  fallback = null,
+}) => {
+  const { hasPermission, hasAnyPermission, hasAllPermissions, hasRole } = useAuth();
+
+  let hasAccess = true;
+
+  // Check role
+  if (role !== undefined) {
+    hasAccess = hasRole(role);
+  }
+
+  // Check single permission
+  if (permission !== undefined) {
+    hasAccess = hasAccess && hasPermission(permission);
+  }
+
+  // Check multiple permissions
+  if (permissions !== undefined && permissions.length > 0) {
+    hasAccess = hasAccess && (
+      requireAll
+        ? hasAllPermissions(permissions)
+        : hasAnyPermission(permissions)
+    );
+  }
+
+  return hasAccess ? <>{children}</> : <>{fallback}</>;
+};
+```
+
+```typescript
+// frontend/src/components/auth/RequireAuth.tsx
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { Permission, Role } from '../../types/permissions';
+
+interface RequireAuthProps {
+  children: JSX.Element;
+  permission?: Permission | string;
+  permissions?: (Permission | string)[];
+  requireAll?: boolean;
+  role?: Role | Role[];
+  redirectTo?: string;
+}
+
+export const RequireAuth: React.FC<RequireAuthProps> = ({
+  children,
+  permission,
+  permissions,
+  requireAll = false,
+  role,
+  redirectTo = '/login',
+}) => {
+  const { user, loading, hasPermission, hasAnyPermission, hasAllPermissions, hasRole } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return <div>Loading...</div>; // Or your loading component
+  }
+
+  if (!user) {
+    return <Navigate to={redirectTo} state={{ from: location }} replace />;
+  }
+
+  let hasAccess = true;
+
+  // Check role
+  if (role !== undefined) {
+    hasAccess = hasRole(role);
+  }
+
+  // Check single permission
+  if (permission !== undefined) {
+    hasAccess = hasAccess && hasPermission(permission);
+  }
+
+  // Check multiple permissions
+  if (permissions !== undefined && permissions.length > 0) {
+    hasAccess = hasAccess && (
+      requireAll
+        ? hasAllPermissions(permissions)
+        : hasAnyPermission(permissions)
+    );
+  }
+
+  if (!hasAccess) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return children;
+};
+```
+
+### 4. Protected Routes
+
+```typescript
+// frontend/src/routes/index.tsx
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { RequireAuth } from '../components/auth/RequireAuth';
+import { Permission, Role } from '../types/permissions';
+
+// Pages
+import Login from '../pages/Login';
+import Dashboard from '../pages/Dashboard';
+import Users from '../pages/Users';
+import Content from '../pages/Content';
+import Settings from '../pages/Settings';
+import Unauthorized from '../pages/Unauthorized';
+
+export const AppRoutes = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
+
+        {/* Protected route - requires authentication only */}
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <Dashboard />
+            </RequireAuth>
+          }
+        />
+
+        {/* Requires specific permission */}
+        <Route
+          path="/users"
+          element={
+            <RequireAuth permission={Permission.USER_READ}>
+              <Users />
+            </RequireAuth>
+          }
+        />
+
+        {/* Requires specific role */}
+        <Route
+          path="/admin"
+          element={
+            <RequireAuth role={[Role.SUPER_ADMIN, Role.ADMIN]}>
+              <AdminPanel />
+            </RequireAuth>
+          }
+        />
+
+        {/* Requires multiple permissions (any) */}
+        <Route
+          path="/content"
+          element={
+            <RequireAuth
+              permissions={[Permission.CONTENT_READ, Permission.CONTENT_WRITE]}
+              requireAll={false}
+            >
+              <Content />
+            </RequireAuth>
+          }
+        />
+
+        {/* Requires multiple permissions (all) */}
+        <Route
+          path="/settings"
+          element={
+            <RequireAuth
+              permissions={[Permission.SETTINGS_READ, Permission.SETTINGS_WRITE]}
+              requireAll={true}
+            >
+              <Settings />
+            </RequireAuth>
+          }
+        />
+
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
+```
+
+### 5. UI Components with Permission Checks
+
+```typescript
+// frontend/src/components/UserList.tsx
+import { CanAccess } from './auth/CanAccess';
+import { Permission } from '../types/permissions';
+import { useAuth } from '../contexts/AuthContext';
+
+export const UserList = () => {
+  const { hasPermission } = useAuth();
+
+  return (
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Users</h1>
+
+        {/* Show button only if user has permission */}
+        <CanAccess permission={Permission.USER_WRITE}>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded">
+            Add User
+          </button>
+        </CanAccess>
+      </div>
+
+      <table className="w-full">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <CanAccess permission={Permission.USER_WRITE}>
+              <th>Actions</th>
+            </CanAccess>
+          </tr>
+        </thead>
+        <tbody>
+          {/* User rows */}
+          <tr>
+            <td>John Doe</td>
+            <td>john@example.com</td>
+            <td>User</td>
+            <CanAccess permission={Permission.USER_WRITE}>
+              <td>
+                <button className="text-blue-500 mr-2">Edit</button>
+                <CanAccess permission={Permission.USER_DELETE}>
+                  <button className="text-red-500">Delete</button>
+                </CanAccess>
+              </td>
+            </CanAccess>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+};
+```
+
+```typescript
+// frontend/src/components/Navigation.tsx
+import { Link } from 'react-router-dom';
+import { CanAccess } from './auth/CanAccess';
+import { Permission, Role } from '../types/permissions';
+import { useAuth } from '../contexts/AuthContext';
+
+export const Navigation = () => {
+  const { user, logout, isAdmin } = useAuth();
+
+  return (
+    <nav className="bg-gray-800 text-white p-4">
+      <div className="container mx-auto flex justify-between items-center">
+        <div className="flex space-x-4">
+          <Link to="/dashboard" className="hover:text-gray-300">
+            Dashboard
+          </Link>
+
+          <CanAccess permission={Permission.CONTENT_READ}>
+            <Link to="/content" className="hover:text-gray-300">
+              Content
+            </Link>
+          </CanAccess>
+
+          <CanAccess permission={Permission.USER_READ}>
+            <Link to="/users" className="hover:text-gray-300">
+              Users
+            </Link>
+          </CanAccess>
+
+          <CanAccess role={[Role.SUPER_ADMIN, Role.ADMIN]}>
+            <Link to="/admin" className="hover:text-gray-300">
+              Admin Panel
+            </Link>
+          </CanAccess>
+
+          <CanAccess permission={Permission.SETTINGS_READ}>
+            <Link to="/settings" className="hover:text-gray-300">
+              Settings
+            </Link>
+          </CanAccess>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <span>{user?.username}</span>
+          {isAdmin && (
+            <span className="bg-red-500 px-2 py-1 rounded text-xs">
+              Admin
+            </span>
+          )}
+          <button
+            onClick={logout}
+            className="bg-red-600 px-4 py-2 rounded hover:bg-red-700"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+    </nav>
+  );
+};
+```
+
+### 6. Custom Hook for Permissions
+
+```typescript
+// frontend/src/hooks/usePermission.ts
+import { useAuth } from '../contexts/AuthContext';
+import { Permission, Role } from '../types/permissions';
+
+export const usePermission = () => {
+  const {
+    hasPermission,
+    hasAnyPermission,
+    hasAllPermissions,
+    hasRole,
+    isAdmin,
+    isSuperAdmin,
+  } = useAuth();
+
+  const can = (permission: Permission | string): boolean => {
+    return hasPermission(permission);
+  };
+
+  const canAny = (permissions: (Permission | string)[]): boolean => {
+    return hasAnyPermission(permissions);
+  };
+
+  const canAll = (permissions: (Permission | string)[]): boolean => {
+    return hasAllPermissions(permissions);
+  };
+
+  const is = (role: Role | Role[]): boolean => {
+    return hasRole(role);
+  };
+
+  return {
+    can,
+    canAny,
+    canAll,
+    is,
+    isAdmin,
+    isSuperAdmin,
+  };
+};
+
+// Usage example:
+// const { can, isAdmin } = usePermission();
+// if (can(Permission.USER_WRITE)) { ... }
+```
+
+### 7. API Interceptor for Error Handling
+
+```typescript
+// frontend/src/services/api.ts
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+});
+
+// Request interceptor to add token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor for error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Unauthorized - redirect to login
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    } else if (error.response?.status === 403) {
+      // Forbidden - show error or redirect to unauthorized page
+      console.error('Permission denied:', error.response.data.detail);
+      window.location.href = '/unauthorized';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;
+```
+
+### 8. Unauthorized Page
+
+```typescript
+// frontend/src/pages/Unauthorized.tsx
+import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+
+export const Unauthorized = () => {
+  const { user } = useAuth();
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8 text-center">
+        <div className="text-6xl mb-4">🚫</div>
+        <h1 className="text-3xl font-bold text-gray-800 mb-4">
+          Access Denied
+        </h1>
+        <p className="text-gray-600 mb-6">
+          You don't have permission to access this resource.
+        </p>
+        {user && (
+          <div className="bg-gray-100 p-4 rounded mb-6">
+            <p className="text-sm text-gray-600">
+              Current role: <span className="font-semibold">{user.role}</span>
+            </p>
+          </div>
+        )}
+        <Link
+          to="/dashboard"
+          className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 inline-block"
+        >
+          Go to Dashboard
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+export default Unauthorized;
+```
+
+## Usage Examples
+
+### Backend Example
+
+```python
+# Create content endpoint with permission check
+@router.post("/content", response_model=ContentResponse)
+async def create_content(
+    content: ContentCreate,
+    current_user: UserInDB = Depends(require_permission(Permission.CONTENT_WRITE))
+):
+    # Only users with CONTENT_WRITE permission can access this
+    new_content = await content_service.create(content, current_user.id)
+    return new_content
+```
+
+### Frontend Example
+
+```typescript
+// In a component
+import { CanAccess } from './components/auth/CanAccess';
+import { Permission } from './types/permissions';
+
+function ContentPage() {
+  return (
+    <div>
+      <h1>Content</h1>
+
+      {/* Button only visible to users with write permission */}
+      <CanAccess permission={Permission.CONTENT_WRITE}>
+        <button onClick={handleCreate}>Create Content</button>
+      </CanAccess>
+
+      {/* Publish button for specific permission */}
+      <CanAccess permission={Permission.CONTENT_PUBLISH}>
+        <button onClick={handlePublish}>Publish</button>
+      </CanAccess>
+
+      {/* Delete button for admin or user with delete permission */}
+      <CanAccess
+        permissions={[Permission.CONTENT_DELETE, Permission.ADMIN_ACCESS]}
+        requireAll={false}
+      >
+        <button onClick={handleDelete}>Delete</button>
+      </CanAccess>
+    </div>
+  );
+}
+```
+
+This implementation provides:
+- ✅ Backend permission checks at API level (security)
+- ✅ Frontend permission checks for UX (hiding unavailable actions)
+- ✅ Role-based and permission-based access control
+- ✅ Flexible permission system (role + custom permissions)
+- ✅ Type-safe implementation with TypeScript
+- ✅ Easy to extend with new permissions
+- ✅ Comprehensive error handling

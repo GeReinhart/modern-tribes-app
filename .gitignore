@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.env
+*.log
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+dist/
+.cache/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.sqlite
+mongodb_data/
+
+# Build
+build/
+*.egg-info/
+/backend/data/uploads/
+/output.txt
+/ai_prompt.txt
+/extract/
+/backend/data/
+/.claude/
+/frontend/.vite/
