@@ -1,9 +1,9 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { storage } from '@/utils/storage';
-import { API_BASE_URL } from '@/config/env';
+import { getAPIBaseUrl } from '@/config/env';
 
 export const api = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: getAPIBaseUrl(),
     headers: {
         'Content-Type': 'application/json',
     },

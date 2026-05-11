@@ -30,15 +30,19 @@ async def get_user_roles(pool, user_id: str) -> list[str]:
 async def create_session(
     pool, user_id: str, session_id: str,
     user_agent: str | None, ip_address: str | None,
-    expires_at: datetime
+    expires_at: datetime,
+    refresh_token_hash: str | None = None,
+    refresh_token_expires_at: datetime | None = None,
 ) -> None:
     now = datetime.now(timezone.utc)
     async with pool.acquire() as conn:
         await conn.execute(
             """INSERT INTO user_sessions
-               (user_id, session_id, user_agent, ip_address, expires_at, last_activity, created_at)
-               VALUES ($1, $2, $3, $4, $5, $6, $7)""",
-            UUID(user_id), session_id, user_agent, ip_address, expires_at, now, now
+               (user_id, session_id, user_agent, ip_address, expires_at, last_activity, created_at,
+                refresh_token_hash, refresh_token_expires_at)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)""",
+            UUID(user_id), session_id, user_agent, ip_address, expires_at, now, now,
+            refresh_token_hash, refresh_token_expires_at,
         )
 
 
@@ -79,6 +83,27 @@ async def cleanup_old_sessions(pool, user_id: str, max_sessions: int = 5) -> Non
         await conn.execute(
             "DELETE FROM user_sessions WHERE user_id = $1 AND id != ALL($2)",
             UUID(user_id), ids_to_keep
+        )
+
+
+async def get_session_by_refresh_token_hash(pool, token_hash: str) -> dict | None:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT * FROM user_sessions WHERE refresh_token_hash = $1",
+            token_hash
+        )
+    return row_to_dict(row) if row else None
+
+
+async def rotate_refresh_token(
+    pool, session_pk: str, new_hash: str, new_expires_at: datetime
+) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute(
+            """UPDATE user_sessions
+               SET refresh_token_hash = $1, refresh_token_expires_at = $2, last_activity = $3
+               WHERE id = $4""",
+            new_hash, new_expires_at, datetime.now(timezone.utc), UUID(session_pk),
         )
 
 

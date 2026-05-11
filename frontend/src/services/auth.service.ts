@@ -1,17 +1,17 @@
 import {Authorization, PermissionEnum} from "@/types/authorization.types.ts";
 import {apiService} from "@/services/api.service.ts";
-import { API_BASE_URL } from '@/config/env';
+import {getAPIBaseUrl} from '@/config/env';
 
 export const authService = {
     sendMagicLink: async (email: string): Promise<void> => {
         const response = await fetch(
-            `${API_BASE_URL}/auth/magic-link`,
+            `${getAPIBaseUrl()}/auth/magic-link`,
             {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email }),
+                body: JSON.stringify({email}),
             }
         );
 
@@ -21,17 +21,33 @@ export const authService = {
         }
     },
 
-    verifyToken: async (token: string): Promise<{ access_token: string }> => {
+    verifyToken: async (token: string): Promise<{ access_token: string; refresh_token: string }> => {
         const response = await fetch(
-            `${API_BASE_URL}/auth/verify?token=${token}`,
-            {
-                method: 'POST',
-            }
+            `${getAPIBaseUrl()}/auth/verify?token=${token}`,
+            { method: 'POST' }
         );
 
         if (!response.ok) {
             const data = await response.json();
             throw new Error(data.detail || 'Verification failed');
+        }
+
+        return response.json();
+    },
+
+    refreshToken: async (refreshToken: string): Promise<{ access_token: string; refresh_token: string }> => {
+        const response = await fetch(
+            `${getAPIBaseUrl()}/auth/refresh`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refresh_token: refreshToken }),
+            }
+        );
+
+        if (!response.ok) {
+            const data = await response.json().catch(() => ({}));
+            throw new Error(data.detail || 'Token refresh failed');
         }
 
         return response.json();
@@ -56,7 +72,6 @@ export const authService = {
 
         return apiService.get<Authorization>(url);
     }
-
 
 
 };

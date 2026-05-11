@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { adminMainThemeId, AdminNavigation } from '@/components/layout/AdminNavigation';
@@ -16,44 +17,55 @@ import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDia
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage';
 
-const POSITION_LABELS: Record<string, string> = { chief: 'Chief', member: 'Member', invite: 'Guest' };
-const getPositionLabel = (code: string) => POSITION_LABELS[code] || code;
-
-const breadcrumbs = [{ label: 'Home', path: '/app' }, { label: 'Admin', path: '/admin' }, { label: 'Positions' }];
-
 const PositionsCrudPageContent: React.FC = () => {
+    const { t } = useTranslation();
     const { positions, loading, error, refetch } = usePositions();
     const { createPosition, updatePosition, deletePosition, loading: mutationLoading } = usePositionMutations();
     const crud = useCrudPage<Position, PositionCreate, PositionUpdate>(refetch, createPosition, updatePosition, deletePosition);
+
+    const breadcrumbs = useMemo(() => [
+        { label: t('common.home'), path: '/app' },
+        { label: t('common.admin'), path: '/admin' },
+        { label: t('admin.positions') },
+    ], [t]);
+
+    const getPositionLabel = (code: string) => {
+        const labels: Record<string, string> = {
+            chief: t('positions.chief'),
+            member: t('positions.member'),
+            invite: t('positions.guest'),
+        };
+        return labels[code] || code;
+    };
 
     const filteredPositions = useMemo(() => {
         if (!crud.filter.trim()) return positions;
         const term = crud.filter.toLowerCase();
         return positions.filter(p => getPositionLabel(p.position).toLowerCase().includes(term));
-    }, [positions, crud.filter]);
+    }, [positions, crud.filter, t]);
 
-    const columns = [
-        { key: 'tribe', header: 'Tribe', render: (p: Position) => <PositionTribeBadge tribeId={p.tribe_id || null} /> },
-        { key: 'position', header: 'Position', render: (p: Position) => <div style={{ fontWeight: 500 }}>{getPositionLabel(p.position)}</div> },
-        { key: 'person', header: 'Person', render: (p: Position) => <PositionPersonBadge personId={p.person_id || null} /> },
-        { key: 'created_at', header: 'Created', render: (p: Position) => new Date(p.created_at).toLocaleDateString() },
+    const columns = useMemo(() => [
+        { key: 'tribe', header: t('admin.columnTribe'), render: (p: Position) => <PositionTribeBadge tribeId={p.tribe_id || null} /> },
+        { key: 'position', header: t('admin.columnPosition'), render: (p: Position) => <div style={{ fontWeight: 500 }}>{getPositionLabel(p.position)}</div> },
+        { key: 'person', header: t('admin.columnPerson'), render: (p: Position) => <PositionPersonBadge personId={p.person_id || null} /> },
+        { key: 'created_at', header: t('common.created'), render: (p: Position) => new Date(p.created_at).toLocaleDateString() },
         {
-            key: 'actions', header: 'Actions',
+            key: 'actions', header: t('common.actions'),
             render: (p: Position) => (
                 <div style={{ display: 'flex', gap: '8px' }} onClick={e => e.stopPropagation()}>
-                    <ThemedButton variant="secondary" onClick={() => crud.openEdit(p)}>Edit</ThemedButton>
-                    <ThemedButton variant="danger" onClick={() => crud.openDeleteSingle(p)}>Delete</ThemedButton>
+                    <ThemedButton variant="secondary" onClick={() => crud.openEdit(p)}>{t('common.edit')}</ThemedButton>
+                    <ThemedButton variant="danger" onClick={() => crud.openDeleteSingle(p)}>{t('common.delete')}</ThemedButton>
                 </div>
             ),
         },
-    ];
+    ], [t, crud]);
 
     const secondaryActions = (
         <>
-            <ThemedButton variant="secondary" onClick={crud.openCreate}>Add Position</ThemedButton>
+            <ThemedButton variant="secondary" onClick={crud.openCreate}>{t('admin.addPosition')}</ThemedButton>
             {crud.selectedRows.size > 0 && (
                 <ThemedButton variant="danger" onClick={crud.handleDeleteSelected}>
-                    Delete Selected ({crud.selectedRows.size})
+                    {t('admin.deleteSelected', { count: crud.selectedRows.size })}
                 </ThemedButton>
             )}
         </>
@@ -69,13 +81,13 @@ const PositionsCrudPageContent: React.FC = () => {
     return (
         <AppLayout breadcrumbs={breadcrumbs} headerActions={headerActions} secondaryActions={secondaryActions}>
             <ThemedCard>
-                <ThemedText variant="primary" size="large" as="h1">Positions</ThemedText>
-                <ThemedText size="small">Manage positions</ThemedText>
+                <ThemedText variant="primary" size="large" as="h1">{t('admin.positions')}</ThemedText>
+                <ThemedText size="small">{t('admin.positionsSubtitle')}</ThemedText>
             </ThemedCard>
             {error && <ThemedCard variant="danger"><ThemedText variant="danger">{error}</ThemedText></ThemedCard>}
             <ThemedCard>
-                <ThemedInput label="Filter" value={crud.filter} onChange={e => crud.setFilter(e.target.value)}
-                    placeholder="Search by position type..." variant="primary" />
+                <ThemedInput label={t('common.filter')} value={crud.filter} onChange={e => crud.setFilter(e.target.value)}
+                    placeholder={t('admin.searchPositionType')} variant="primary" />
             </ThemedCard>
             <ThemedCard>
                 <ThemedTable data={filteredPositions} columns={columns} getRowId={p => p.id}
@@ -85,11 +97,11 @@ const PositionsCrudPageContent: React.FC = () => {
                 position={crud.modalState.entity} mode={crud.modalState.mode} onSubmit={crud.handleSubmit} />
             <ThemedConfirmDialog isOpen={crud.deleteDialog.isOpen} onClose={crud.closeDeleteDialog}
                 onConfirm={crud.confirmDelete}
-                title={crud.deleteDialog.isMultiple ? 'Delete Selected Positions' : 'Delete Position'}
+                title={crud.deleteDialog.isMultiple ? t('admin.deleteSelectedPositions') : t('admin.deletePosition')}
                 message={crud.deleteDialog.isMultiple
-                    ? `Are you sure you want to delete ${crud.selectedRows.size} position(s)?`
-                    : 'Are you sure you want to delete this position?'}
-                confirmText="Delete" variant="danger" isLoading={mutationLoading} />
+                    ? t('admin.confirmDeleteSelected', { count: crud.selectedRows.size })
+                    : t('admin.confirmDeletePosition')}
+                confirmText={t('common.delete')} variant="danger" isLoading={mutationLoading} />
         </AppLayout>
     );
 };

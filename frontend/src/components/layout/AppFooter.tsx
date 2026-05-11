@@ -1,11 +1,10 @@
-// @/components/layout/AppFooter.tsx
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
-import {ThemedText} from "@/components/common/layout/ThemedText.tsx";
-
-
+import { ThemedText } from "@/components/common/layout/ThemedText.tsx";
 
 export const AppFooter: React.FC = () => {
+    const { t } = useTranslation();
     const { theme } = useTheme();
 
     const footerStyle: React.CSSProperties = {
@@ -13,7 +12,7 @@ export const AppFooter: React.FC = () => {
         backgroundColor: theme.colors.surface,
         borderTop: `1px solid ${theme.colors.border}`,
         textAlign: 'center',
-        marginTop: 'auto', // Pushes footer to bottom
+        marginTop: 'auto',
     };
 
     const linksStyle: React.CSSProperties = {
@@ -36,46 +35,34 @@ export const AppFooter: React.FC = () => {
     return (
         <footer style={footerStyle}>
             <ThemedText variant="secondary" size="small" as="div">
-                © {currentYear} Modern Tribes. All rights reserved.
+                {t('footer.allRightsReserved', { year: currentYear })}
             </ThemedText>
             <div style={linksStyle}>
                 <a
                     href="#"
                     style={linkStyle}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.color = theme.colors.primary;
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.color = theme.colors.text;
-                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = theme.colors.primary; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = theme.colors.text; }}
                 >
-                    Privacy
+                    {t('footer.privacy')}
                 </a>
                 <span style={{ color: theme.colors.text, fontSize: '11px' }}>•</span>
                 <a
                     href="#"
                     style={linkStyle}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.color = theme.colors.primary;
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.color = theme.colors.text;
-                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = theme.colors.primary; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = theme.colors.text; }}
                 >
-                    Terms
+                    {t('footer.terms')}
                 </a>
                 <span style={{ color: theme.colors.text, fontSize: '11px' }}>•</span>
                 <a
                     href="#"
                     style={linkStyle}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.color = theme.colors.primary;
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.color = theme.colors.text;
-                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = theme.colors.primary; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = theme.colors.text; }}
                 >
-                    Help
+                    {t('footer.help')}
                 </a>
             </div>
         </footer>

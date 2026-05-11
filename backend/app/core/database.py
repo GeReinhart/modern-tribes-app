@@ -18,8 +18,8 @@ async def connect_to_postgres():
         database=settings.POSTGRES_DB,
         host=settings.POSTGRES_HOST,
         port=settings.POSTGRES_PORT,
-        min_size=10,
-        max_size=20,
+        min_size=settings.POSTGRES_POOL_MIN,
+        max_size=settings.POSTGRES_POOL_MAX,
     )
     print(f"Connected to PostgreSQL")
 

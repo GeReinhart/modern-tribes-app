@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { adminMainThemeId, AdminNavigation } from '@/components/layout/AdminNavigation';
@@ -14,48 +15,53 @@ import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDia
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage';
 
-const breadcrumbs = [{ label: 'Home', path: '/app' }, { label: 'Admin', path: '/admin' }, { label: 'Tribes' }];
-
 const TribesCrudPageContent: React.FC = () => {
+    const { t } = useTranslation();
     const { theme } = useTheme();
     const { tribes, loading, error, refetch } = useTribes();
     const { createTribe, updateTribe, deleteTribe, loading: mutationLoading } = useTribeMutations();
     const crud = useCrudPage<Tribe, TribeCreate, TribeUpdate>(refetch, createTribe, updateTribe, deleteTribe);
 
+    const breadcrumbs = useMemo(() => [
+        { label: t('common.home'), path: '/app' },
+        { label: t('common.admin'), path: '/admin' },
+        { label: t('admin.tribes') },
+    ], [t]);
+
     const filteredTribes = useMemo(() => {
         if (!crud.filter.trim()) return tribes;
         const term = crud.filter.toLowerCase();
-        return tribes.filter(t => t.name.toLowerCase().includes(term));
+        return tribes.filter(tr => tr.name.toLowerCase().includes(term));
     }, [tribes, crud.filter]);
 
-    const columns = [
-        { key: 'name', header: 'Name', render: (t: Tribe) => <div style={{ fontWeight: 500 }}>{t.name}</div> },
+    const columns = useMemo(() => [
+        { key: 'name', header: t('common.name'), render: (tr: Tribe) => <div style={{ fontWeight: 500 }}>{tr.name}</div> },
         {
-            key: 'document', header: 'Document',
-            render: (t: Tribe) => (
+            key: 'document', header: t('admin.columnDocument'),
+            render: (tr: Tribe) => (
                 <span style={{ fontSize: '12px', color: theme.colors.secondary }}>
-                    {t.document_id ? <span style={{ color: theme.colors.primary }}>✓ Attached</span> : 'None'}
+                    {tr.document_id ? <span style={{ color: theme.colors.primary }}>{t('admin.attached')}</span> : t('admin.none')}
                 </span>
             ),
         },
-        { key: 'created_at', header: 'Created', render: (t: Tribe) => new Date(t.created_at).toLocaleDateString() },
+        { key: 'created_at', header: t('common.created'), render: (tr: Tribe) => new Date(tr.created_at).toLocaleDateString() },
         {
-            key: 'actions', header: 'Actions',
-            render: (t: Tribe) => (
+            key: 'actions', header: t('common.actions'),
+            render: (tr: Tribe) => (
                 <div style={{ display: 'flex', gap: '8px' }} onClick={e => e.stopPropagation()}>
-                    <ThemedButton variant="secondary" onClick={() => crud.openEdit(t)}>Edit</ThemedButton>
-                    <ThemedButton variant="danger" onClick={() => crud.openDeleteSingle(t)}>Delete</ThemedButton>
+                    <ThemedButton variant="secondary" onClick={() => crud.openEdit(tr)}>{t('common.edit')}</ThemedButton>
+                    <ThemedButton variant="danger" onClick={() => crud.openDeleteSingle(tr)}>{t('common.delete')}</ThemedButton>
                 </div>
             ),
         },
-    ];
+    ], [t, theme.colors.secondary, theme.colors.primary, crud]);
 
     const secondaryActions = (
         <>
-            <ThemedButton variant="secondary" onClick={crud.openCreate}>Add Tribe</ThemedButton>
+            <ThemedButton variant="secondary" onClick={crud.openCreate}>{t('admin.addTribe')}</ThemedButton>
             {crud.selectedRows.size > 0 && (
                 <ThemedButton variant="danger" onClick={crud.handleDeleteSelected}>
-                    Delete Selected ({crud.selectedRows.size})
+                    {t('admin.deleteSelected', { count: crud.selectedRows.size })}
                 </ThemedButton>
             )}
         </>
@@ -71,27 +77,27 @@ const TribesCrudPageContent: React.FC = () => {
     return (
         <AppLayout breadcrumbs={breadcrumbs} headerActions={headerActions} secondaryActions={secondaryActions}>
             <ThemedCard>
-                <ThemedText variant="primary" size="large" as="h1">Tribes</ThemedText>
-                <ThemedText size="small">Manage tribes</ThemedText>
+                <ThemedText variant="primary" size="large" as="h1">{t('admin.tribes')}</ThemedText>
+                <ThemedText size="small">{t('admin.tribesSubtitle')}</ThemedText>
             </ThemedCard>
             {error && <ThemedCard variant="danger"><ThemedText variant="danger">{error}</ThemedText></ThemedCard>}
             <ThemedCard>
-                <ThemedInput label="Filter" value={crud.filter} onChange={e => crud.setFilter(e.target.value)}
-                    placeholder="Search by name..." variant="primary" />
+                <ThemedInput label={t('common.filter')} value={crud.filter} onChange={e => crud.setFilter(e.target.value)}
+                    placeholder={t('admin.searchName')} variant="primary" />
             </ThemedCard>
             <ThemedCard>
-                <ThemedTable data={filteredTribes} columns={columns} getRowId={t => t.id}
-                    onRowClick={t => crud.openView(t)} selectedRows={crud.selectedRows} onRowSelect={crud.handleRowSelect} />
+                <ThemedTable data={filteredTribes} columns={columns} getRowId={tr => tr.id}
+                    onRowClick={tr => crud.openView(tr)} selectedRows={crud.selectedRows} onRowSelect={crud.handleRowSelect} />
             </ThemedCard>
             <TribeModal isOpen={crud.modalState.isOpen} onClose={crud.closeModal}
                 tribe={crud.modalState.entity} mode={crud.modalState.mode} onSubmit={crud.handleSubmit} />
             <ThemedConfirmDialog isOpen={crud.deleteDialog.isOpen} onClose={crud.closeDeleteDialog}
                 onConfirm={crud.confirmDelete}
-                title={crud.deleteDialog.isMultiple ? 'Delete Selected Tribes' : 'Delete Tribe'}
+                title={crud.deleteDialog.isMultiple ? t('admin.deleteSelectedTribes') : t('admin.deleteTribe')}
                 message={crud.deleteDialog.isMultiple
-                    ? `Are you sure you want to delete ${crud.selectedRows.size} tribe(s)?`
-                    : `Are you sure you want to delete "${crud.deleteDialog.entity?.name}"?`}
-                confirmText="Delete" variant="danger" isLoading={mutationLoading} />
+                    ? t('admin.confirmDeleteSelected', { count: crud.selectedRows.size })
+                    : t('admin.confirmDeleteNamed', { name: crud.deleteDialog.entity?.name })}
+                confirmText={t('common.delete')} variant="danger" isLoading={mutationLoading} />
         </AppLayout>
     );
 };

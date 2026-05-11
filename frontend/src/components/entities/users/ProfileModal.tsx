@@ -1,14 +1,15 @@
 import { X } from 'lucide-react';
-import { UserWithRolesAndPermissions} from '@/types/user.types.ts';
+import { useTranslation } from 'react-i18next';
+import { UserWithRolesAndPermissions } from '@/types/user.types.ts';
 import { Person } from '@/types/person.types.ts';
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from '@/contexts/ThemeContext.tsx';
-import {ThemedText} from "@/components/common/layout/ThemedText.tsx";
-import {ThemedDivider} from "@/components/common/layout/ThemedDivider.tsx";
-import {ThemedCard} from "@/components/common/layout/ThemedCard.tsx";
-import {ThemedBadge} from "@/components/common/layout/ThemedBadge.tsx";
-import {ThemedButton} from "@/components/common/form/ThemedButton.tsx";
+import { ThemedText } from "@/components/common/layout/ThemedText.tsx";
+import { ThemedDivider } from "@/components/common/layout/ThemedDivider.tsx";
+import { ThemedCard } from "@/components/common/layout/ThemedCard.tsx";
+import { ThemedBadge } from "@/components/common/layout/ThemedBadge.tsx";
+import { ThemedButton } from "@/components/common/form/ThemedButton.tsx";
 
 interface ProfileModalProps {
     isOpen: boolean;
@@ -18,6 +19,7 @@ interface ProfileModalProps {
 }
 
 function ProfileModal({ isOpen, onClose, user, person }: ProfileModalProps) {
+    const { t, i18n } = useTranslation();
     const { logout } = useAuth();
     const navigate = useNavigate();
     const { theme } = useTheme();
@@ -28,9 +30,27 @@ function ProfileModal({ isOpen, onClose, user, person }: ProfileModalProps) {
         navigate('/auth/login');
     };
 
+    const handleLanguageChange = (lang: string) => {
+        i18n.changeLanguage(lang);
+        localStorage.setItem('user_language', lang);
+    };
+
     if (!isOpen) return null;
 
     const initials = person ? `${person.first_name[0]}${person.last_name[0]}` : user?.login.substring(0, 2).toUpperCase();
+    const currentLang = i18n.language.startsWith('fr') ? 'fr' : 'en';
+
+    const langButtonStyle = (lang: string): React.CSSProperties => ({
+        padding: '6px 16px',
+        borderRadius: '6px',
+        border: `2px solid ${currentLang === lang ? theme.colors.primary : theme.colors.border}`,
+        backgroundColor: currentLang === lang ? theme.colors.primary : 'transparent',
+        color: currentLang === lang ? 'white' : theme.colors.text,
+        cursor: 'pointer',
+        fontSize: '13px',
+        fontWeight: currentLang === lang ? 600 : 400,
+        transition: 'all 0.2s ease',
+    });
 
     return (
         <>
@@ -46,7 +66,7 @@ function ProfileModal({ isOpen, onClose, user, person }: ProfileModalProps) {
                     {/* Header */}
                     <div className="flex items-center justify-between p-6 border-b">
                         <ThemedText variant="primary" size="large" as="h2">
-                            Profile
+                            {t('profile.title')}
                         </ThemedText>
                         <button
                             onClick={onClose}
@@ -77,28 +97,48 @@ function ProfileModal({ isOpen, onClose, user, person }: ProfileModalProps) {
 
                         <ThemedDivider variant="secondary" />
 
+                        {/* Language Switcher */}
+                        <ThemedCard variant="secondary" bordered>
+                            <ThemedText variant="primary" size="medium" as="h4">
+                                {t('profile.language')}
+                            </ThemedText>
+                            <div className="mt-3">
+                                <ThemedText variant="secondary" size="small">
+                                    {t('profile.languageLabel')}
+                                </ThemedText>
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                                    <button style={langButtonStyle('en')} onClick={() => handleLanguageChange('en')}>
+                                        English
+                                    </button>
+                                    <button style={langButtonStyle('fr')} onClick={() => handleLanguageChange('fr')}>
+                                        Français
+                                    </button>
+                                </div>
+                            </div>
+                        </ThemedCard>
+
                         {/* Personal Information */}
                         {person && (
                             <ThemedCard variant="secondary" bordered>
                                 <ThemedText variant="primary" size="medium" as="h4">
-                                    Personal Information
+                                    {t('profile.personalInfo')}
                                 </ThemedText>
                                 <div className="space-y-2 mt-3">
                                     <div className="flex justify-between items-center">
-                                        <ThemedText variant="secondary" size="small">First Name:</ThemedText>
+                                        <ThemedText variant="secondary" size="small">{t('profile.firstName')}</ThemedText>
                                         <ThemedText variant="text" size="small">{person.first_name}</ThemedText>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <ThemedText variant="secondary" size="small">Last Name:</ThemedText>
+                                        <ThemedText variant="secondary" size="small">{t('profile.lastName')}</ThemedText>
                                         <ThemedText variant="text" size="small">{person.last_name}</ThemedText>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <ThemedText variant="secondary" size="small">Gender:</ThemedText>
+                                        <ThemedText variant="secondary" size="small">{t('profile.gender')}</ThemedText>
                                         <ThemedBadge variant="accent">{person.gender}</ThemedBadge>
                                     </div>
                                     {person.document_id && (
                                         <div className="flex justify-between items-center">
-                                            <ThemedText variant="secondary" size="small">Document ID:</ThemedText>
+                                            <ThemedText variant="secondary" size="small">{t('profile.documentId')}</ThemedText>
                                             <ThemedText variant="text" size="small">{person.document_id}</ThemedText>
                                         </div>
                                     )}
@@ -109,19 +149,19 @@ function ProfileModal({ isOpen, onClose, user, person }: ProfileModalProps) {
                         {/* Account Information */}
                         <ThemedCard variant="primary" bordered>
                             <ThemedText variant="primary" size="medium" as="h4">
-                                Account Information
+                                {t('profile.accountInfo')}
                             </ThemedText>
                             <div className="space-y-2 mt-3">
                                 <div className="flex justify-between items-center">
-                                    <ThemedText variant="secondary" size="small">Login:</ThemedText>
+                                    <ThemedText variant="secondary" size="small">{t('profile.login')}</ThemedText>
                                     <ThemedText variant="text" size="small">{user?.login}</ThemedText>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <ThemedText variant="secondary" size="small">Email:</ThemedText>
+                                    <ThemedText variant="secondary" size="small">{t('profile.email')}</ThemedText>
                                     <ThemedText variant="text" size="small">{user?.email}</ThemedText>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <ThemedText variant="secondary" size="small">Roles:</ThemedText>
+                                    <ThemedText variant="secondary" size="small">{t('profile.roles')}</ThemedText>
                                     <div className="flex gap-1">
                                         {user?.roles.map((role, idx) => (
                                             <ThemedBadge key={idx} variant="success">{role.name}</ThemedBadge>
@@ -134,19 +174,11 @@ function ProfileModal({ isOpen, onClose, user, person }: ProfileModalProps) {
 
                     {/* Footer */}
                     <div className="p-6 border-t bg-gray-50 flex gap-3">
-                        <ThemedButton
-                            onClick={handleLogout}
-                            variant="danger"
-                            fullWidth
-                        >
-                            Logout
+                        <ThemedButton onClick={handleLogout} variant="danger" fullWidth>
+                            {t('profile.logout')}
                         </ThemedButton>
-                        <ThemedButton
-                            onClick={onClose}
-                            variant="secondary"
-                            fullWidth
-                        >
-                            Close
+                        <ThemedButton onClick={onClose} variant="secondary" fullWidth>
+                            {t('profile.close')}
                         </ThemedButton>
                     </div>
                 </div>

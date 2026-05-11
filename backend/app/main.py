@@ -1,11 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import logging
-from pathlib import Path
+import os
 from .core.config import settings
 from .core.database import connect_to_postgres, close_postgres_connection
-from fastapi.staticfiles import StaticFiles
 from .routers.uploads import (
     uploads,
 )
@@ -45,11 +46,6 @@ async def lifespan(app: FastAPI):
     logger.info("Starting application...")
     await connect_to_postgres()
 
-    # Create upload directories
-    Path(settings.UPLOAD_DIR).mkdir(exist_ok=True)
-    Path(f"{settings.UPLOAD_DIR}/images").mkdir(exist_ok=True)
-    Path(f"{settings.UPLOAD_DIR}/files").mkdir(exist_ok=True)
-
     logger.info("Application started successfully")
 
     yield
@@ -77,13 +73,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    logger.exception("Unhandled exception: %s", exc)
+    origin = request.headers.get("origin", "")
+    headers = {}
+    if origin in settings.cors_origins_list:
+        headers["Access-Control-Allow-Origin"] = origin
+        headers["Access-Control-Allow-Credentials"] = "true"
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"},
+        headers=headers,
+    )
 
-# Mount static files (uploads)
-app.mount(
-    "/uploads",
-    StaticFiles(directory=settings.UPLOAD_DIR),
-    name="uploads"
-)
 
 # Include routers
 app.include_router(users.router, prefix="/api/crud")
@@ -107,6 +110,10 @@ app.include_router(tribes_with_positions.router, prefix="/api")
 
 app.include_router(query_tribes.router, prefix="/api/query")
 app.include_router(query_users.router, prefix="/api/query")
+
+os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
+
 
 @app.get("/")
 async def root():

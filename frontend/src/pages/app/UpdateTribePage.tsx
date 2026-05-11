@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext.tsx';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedCard } from '@/components/common/layout/ThemedCard';
@@ -38,6 +39,7 @@ interface SelectedPerson {
 }
 
 const UpdateTribePageContent: React.FC = () => {
+    const { t } = useTranslation();
     const { theme } = useTheme();
     const navigate = useNavigate();
     const { tribeId } = useParams<{ tribeId: string }>();
@@ -48,6 +50,7 @@ const UpdateTribePageContent: React.FC = () => {
     const { updateTribeWithPositions, loading: updateLoading, error: updateError } = useTribeWithPositionsMutations();
 
     // State
+    const [initialized, setInitialized] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,25 +83,23 @@ const UpdateTribePageContent: React.FC = () => {
             setAttachments(tribe.document_attachments || []);
             setOriginalAttachments(tribe.document_attachments || []);
 
-            console.log("Tribe:", tribe);
-
-
             const persons = tribe.persons.map(p => ({
                 person_id: p.id,
                 position: p.position
             }));
             setSelectedPersons(persons);
             setOriginalPersons(persons);
+            setInitialized(true);
         }
     }, [tribe]);
 
     // ✅ MOVE BREADCRUMBS HERE - BEFORE ANY EARLY RETURNS
     const breadcrumbs = React.useMemo(() => [
-        { label: 'Home', path: '/app' },
-        { label: 'Tribes', path: '/app/tribes' },
-        { label: tribe?.name || 'Loading...', path: `/app/tribes/${tribeId}` },
-        { label: 'Edit' }
-    ], [tribe?.name, tribeId]);
+        { label: t('common.home'), path: '/app' },
+        { label: t('tribes.title'), path: '/app/tribes' },
+        { label: tribe?.name || t('common.loading'), path: `/app/tribes/${tribeId}` },
+        { label: t('common.edit') }
+    ], [tribe?.name, tribeId, t]);
 
     // ✅ MOVE HEADER ACTIONS HERE - AFTER BREADCRUMBS
     const headerActions = (
@@ -107,7 +108,7 @@ const UpdateTribePageContent: React.FC = () => {
             onClick={() => navigate(`/app/tribes/${tribeId}`)}
             disabled={isSubmitting}
         >
-            Cancel
+            {t('common.cancel')}
         </ThemedButton>
     );
 
@@ -164,28 +165,28 @@ const UpdateTribePageContent: React.FC = () => {
     // Validation
     const validateForm = (): boolean => {
         if (!tribeName.trim()) {
-            setError('Tribe name is required');
+            setError(t('validation.tribeNameRequired'));
             return false;
         }
 
         if (!documentContent.trim()) {
-            setError('Document content is required');
+            setError(t('validation.documentContentRequired'));
             return false;
         }
 
         if (selectedPersons.length === 0) {
-            setError('Please select at least one person for the tribe');
+            setError(t('validation.selectOnePerson'));
             return false;
         }
 
         const hasChief = selectedPersons.some(p => p.position === 'chief');
         if (!hasChief) {
-            setError('Please assign at least one person as Chief');
+            setError(t('validation.assignOneChief'));
             return false;
         }
 
         if (!hasChanges) {
-            setError('No changes detected');
+            setError(t('validation.noChanges'));
             return false;
         }
 
@@ -235,7 +236,7 @@ const UpdateTribePageContent: React.FC = () => {
                 throw new Error('Failed to update tribe');
             }
 
-            setSuccess('Tribe updated successfully!');
+            setSuccess(t('tribes.updateSuccess'));
 
             // Update original values
             setOriginalTribeName(tribeName);
@@ -248,7 +249,7 @@ const UpdateTribePageContent: React.FC = () => {
             }, 2000);
 
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to update tribe');
+            setError(err instanceof Error ? err.message : t('validation.failedUpdateTribe'));
             console.error('Error updating tribe:', err);
         } finally {
             setIsSubmitting(false);
@@ -336,8 +337,8 @@ const UpdateTribePageContent: React.FC = () => {
         <AppLayout headerActions={headerActions} breadcrumbs={breadcrumbs}>
             {isSubmitting && (
                 <ThemedLoadingOverlay
-                    message="Updating Tribe..."
-                    subMessage="Please wait while we save your changes"
+                    message={t('tribes.updatingTribe')}
+                    subMessage={t('tribes.updateWait')}
                 />
             )}
 
@@ -345,23 +346,23 @@ const UpdateTribePageContent: React.FC = () => {
                 {/* Page Title */}
                 <ThemedCard>
                     <ThemedText variant="primary" size="large" as="h1">
-                        Update Tribe
+                        {t('tribes.updateTitle')}
                     </ThemedText>
                     <ThemedText size="small">
-                        Modify the tribe information below
+                        {t('tribes.updateSubtitle')}
                     </ThemedText>
                 </ThemedCard>
 
                 {/* Error/Success Messages */}
                 {displayError && (
                     <div style={errorStyle}>
-                        <strong>Error:</strong> {displayError}
+                        <strong>{t('common.error')}</strong> {displayError}
                     </div>
                 )}
 
                 {success && (
                     <div style={successStyle}>
-                        <strong>Success!</strong> {success}
+                        <strong>{t('common.success')}</strong> {success}
                     </div>
                 )}
 
@@ -371,14 +372,14 @@ const UpdateTribePageContent: React.FC = () => {
                         {/* Tribe Name Section */}
                         <ThemedSection themeId="main_1">
                             <ThemedText size="medium" as="h3">
-                                Tribe Name *
+                                {t('tribes.tribeName')}
                             </ThemedText>
                             <input
                                 type="text"
                                 style={inputStyle}
                                 value={tribeName}
                                 onChange={(e) => setTribeName(e.target.value)}
-                                placeholder="Enter tribe name"
+                                placeholder={t('tribes.tribeName').replace(' *', '')}
                                 disabled={isLoading}
                             />
                         </ThemedSection>
@@ -386,13 +387,15 @@ const UpdateTribePageContent: React.FC = () => {
                         {/* Document Section */}
                         <ThemedSection themeId="main_1">
                             <ThemedText size="medium" as="h3">
-                                Description *
+                                {t('tribes.description')}
                             </ThemedText>
                             <div className="border border-gray-300 rounded-lg overflow-hidden">
-                                <JoditEditorComponent
-                                    content={documentContent}
-                                    onChange={setDocumentContent}
-                                />
+                                {initialized && (
+                                    <JoditEditorComponent
+                                        content={documentContent}
+                                        onChange={setDocumentContent}
+                                    />
+                                )}
                             </div>
 
                             <div className="mb-6">
@@ -408,16 +411,16 @@ const UpdateTribePageContent: React.FC = () => {
                         {/* Members Section */}
                         <ThemedSection themeId="main_2">
                             <ThemedText size="medium" as="h2">
-                                Members and Positions
+                                {t('tribes.membersAndPositions')}
                             </ThemedText>
                             <ThemedText variant="secondary" size="small">
-                                Select persons and assign their positions. At least one Chief is required.
+                                {t('tribes.membersAndPositionsHint')}
                             </ThemedText>
 
                             {/* Filter */}
                             <div style={filterHeaderStyle}>
                                 <ThemedText variant="accent" size="small" as="span">
-                                    Filter persons
+                                    {t('tribes.filterPersons')}
                                 </ThemedText>
                                 {(personFilter || showOnlySelected) && (
                                     <button
@@ -425,7 +428,7 @@ const UpdateTribePageContent: React.FC = () => {
                                         style={clearButtonStyle}
                                         onClick={handleClearFilter}
                                     >
-                                        Clear filters
+                                        {t('tribes.clearFilters')}
                                     </button>
                                 )}
                             </div>
@@ -434,7 +437,7 @@ const UpdateTribePageContent: React.FC = () => {
                                 style={filterInputStyle}
                                 value={personFilter}
                                 onChange={(e) => setPersonFilter(e.target.value)}
-                                placeholder="Search..."
+                                placeholder={t('common.filter')}
                                 disabled={isLoading}
                             />
 
@@ -462,7 +465,7 @@ const UpdateTribePageContent: React.FC = () => {
                                     }}
                                 />
                                 <ThemedText variant="primary" size="small" as="span">
-                                    Show only selected persons ({selectedPersons.length})
+                                    {t('tribes.showOnlySelected', { count: selectedPersons.length })}
                                 </ThemedText>
                             </label>
 
@@ -470,8 +473,8 @@ const UpdateTribePageContent: React.FC = () => {
                                 <div style={{ marginBottom: '12px' }}>
                                     <ThemedText variant="secondary" size="small" as="div">
                                         {showOnlySelected
-                                            ? `Showing ${filteredPersons.length} selected person(s)`
-                                            : `Found ${filteredPersons.length} person(s) matching "${personFilter}"`
+                                            ? t('tribes.showingSelected', { count: filteredPersons.length })
+                                            : t('tribes.foundPersons', { count: filteredPersons.length, search: personFilter })
                                         }
                                     </ThemedText>
                                 </div>
@@ -481,15 +484,15 @@ const UpdateTribePageContent: React.FC = () => {
                             <div style={personListContainerStyle}>
                                 {personsLoading && (
                                     <ThemedText variant="secondary" size="small">
-                                        Loading persons...
+                                        {t('tribes.loadingPersons')}
                                     </ThemedText>
                                 )}
 
                                 {!personsLoading && filteredPersons.length === 0 && (
                                     <ThemedText variant="secondary" size="small">
                                         {showOnlySelected
-                                            ? "No persons selected yet."
-                                            : "No persons found."
+                                            ? t('tribes.noPersonsSelectedShort')
+                                            : t('tribes.noPersonsFound')
                                         }
                                     </ThemedText>
                                 )}
@@ -541,9 +544,9 @@ const UpdateTribePageContent: React.FC = () => {
                                                     disabled={isLoading}
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
-                                                    <option value="member">Member</option>
-                                                    <option value="chief">Chief</option>
-                                                    <option value="guest">Guest</option>
+                                                    <option value="member">{t('positions.member')}</option>
+                                                    <option value="chief">{t('positions.chief')}</option>
+                                                    <option value="guest">{t('positions.guest')}</option>
                                                 </select>
                                             )}
                                         </div>
@@ -559,7 +562,7 @@ const UpdateTribePageContent: React.FC = () => {
                                 onClick={handleCancel}
                                 disabled={isSubmitting}
                             >
-                                Cancel
+                                {t('common.cancel')}
                             </ThemedButton>
                             <button
                                 type="submit"
@@ -567,7 +570,7 @@ const UpdateTribePageContent: React.FC = () => {
                                 disabled={isSubmitting || !hasChanges}
                             >
                                 {isSubmitting && <ThemedLoadingSpinner size="sm"  />}
-                                {isSubmitting ? 'Updating Tribe...' : 'Update Tribe'}
+                                {isSubmitting ? t('tribes.updatingTribe') : t('tribes.updateTitle')}
                             </button>
                         </div>
                     </div>

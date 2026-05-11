@@ -86,12 +86,23 @@ async def _validate_tribe_update(data: TribeWithPositionsUpdate, tribe: dict, tr
 async def _apply_tribe_updates(tribe_id: str, tribe: dict, data: TribeWithPositionsUpdate, pool) -> None:
     if data.name:
         await tribe_repo.update_tribe_name(pool, tribe_id, data.name)
+
     document_id = tribe.get("document_id")
-    if document_id:
+    has_document_changes = data.document_content_html is not None or data.document_attachments is not None
+
+    if not document_id and has_document_changes:
+        document = await create_document_with_attachments(
+            pool,
+            data.document_content_html or "",
+            data.document_attachments or []
+        )
+        await tribe_repo.update_tribe_document_id(pool, tribe_id, str(document["id"]))
+    elif document_id:
         if data.document_content_html is not None:
             await tribe_repo.update_tribe_document_content(pool, str(document_id), data.document_content_html)
         if data.document_attachments is not None:
             await update_document_attachments(pool, str(document_id), data.document_attachments)
+
     if data.positions is not None:
         current_positions = await tribe_repo.get_positions_by_tribe(pool, tribe_id)
         await tribe_repo.sync_positions(pool, tribe_id, data.positions, current_positions)

@@ -2,7 +2,7 @@ import { useRef, useMemo } from 'react';
 import JoditEditor from 'jodit-react';
 import { uploadImage } from '@/utils/uploadHelpers';
 import type { Jodit } from 'jodit';
-import { API_BASE_URL } from '@/config/env';
+import { getAPIBaseUrl } from '@/config/env';
 
 interface JoditEditorComponentProps {
     content: string;
@@ -19,7 +19,7 @@ const JoditEditorComponent = ({ content, onChange }: JoditEditorComponentProps) 
             uploader: {
                 insertImageAsBase64URI: false,
                 imagesExtensions: ['jpg', 'png', 'jpeg', 'gif', 'webp'],
-                url: `${API_BASE_URL}/uploads/image`,
+                url: `${getAPIBaseUrl()}/uploads/image`,
                 format: 'json',
                 prepareData: function (formData: FormData) {
                     return formData;

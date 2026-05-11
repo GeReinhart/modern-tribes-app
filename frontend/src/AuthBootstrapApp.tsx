@@ -1,5 +1,6 @@
 import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 import {AuthProvider} from '@/contexts/AuthContext.tsx';
+import {UserProfileProvider} from '@/contexts/UserProfileContext.tsx';
 import ProtectedRoute from '@/components/auth/ProtectedRoute.tsx';
 import Login from '@/pages/auth/LoginPage.tsx';
 import Verify from '@/pages/auth/VerifyPage.tsx';
@@ -26,6 +27,7 @@ function AuthBootstrapApp() {
         >
             <BrowserRouter>
                 <AuthProvider>
+                    <UserProfileProvider>
                     <Routes>
                         <Route path="/auth/login" element={<Login/>}/>
                         <Route path="/auth/verify" element={<Verify/>}/>
@@ -50,7 +52,9 @@ function AuthBootstrapApp() {
 
                         </Route>
                         <Route path="/" element={<Navigate to="/app/tribes" replace/>}/>
+                        <Route path="*" element={<Navigate to="/app/tribes" replace/>}/>
                     </Routes>
+                    </UserProfileProvider>
                 </AuthProvider>
             </BrowserRouter>
         </ErrorBoundary>

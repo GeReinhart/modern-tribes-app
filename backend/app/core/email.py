@@ -1,23 +1,24 @@
-from typing import List
+import httpx
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 from .config import settings
 
-conf = ConnectionConfig(
-    MAIL_USERNAME=settings.SMTP_USER,
-    MAIL_PASSWORD=settings.SMTP_PASSWORD,
-    MAIL_FROM=settings.EMAILS_FROM_EMAIL,
-    MAIL_PORT=settings.SMTP_PORT,
-    MAIL_SERVER=settings.SMTP_HOST,
-    MAIL_STARTTLS=False,
-    MAIL_SSL_TLS=False,
-    USE_CREDENTIALS=False,
-)
 
-fm = FastMail(conf)
+def _smtp_client() -> FastMail:
+    conf = ConnectionConfig(
+        MAIL_USERNAME=settings.SMTP_USER,
+        MAIL_PASSWORD=settings.SMTP_PASSWORD,
+        MAIL_FROM=settings.EMAILS_FROM_EMAIL,
+        MAIL_PORT=settings.SMTP_PORT,
+        MAIL_SERVER=settings.SMTP_HOST,
+        MAIL_STARTTLS=False,
+        MAIL_SSL_TLS=False,
+        USE_CREDENTIALS=False,
+    )
+    return FastMail(conf)
 
-async def send_magic_link(email: str, magic_link: str):
-    """Send magic link email"""
-    html = f"""
+
+def _magic_link_html(magic_link: str) -> str:
+    return f"""
     <!DOCTYPE html>
     <html>
     <head>
@@ -52,11 +53,44 @@ async def send_magic_link(email: str, magic_link: str):
     </html>
     """
 
-    message = MessageSchema(
-        subject=f"Sign in to {settings.APP_NAME}",
-        recipients=[email],
-        body=html,
-        subtype="html"
-    )
 
-    await fm.send_message(message)
+async def _send_via_mailpace(to: str, subject: str, html: str) -> None:
+    print(f"Sending email to {to} with subject {subject} by Mailpace")
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "https://app.mailpace.com/api/v1/send",
+            headers={
+                "MailPace-Server-Token": settings.MAILPACE_API_TOKEN,
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            json={
+                "from": settings.EMAILS_FROM_EMAIL,
+                "to": to,
+                "subject": subject,
+                "htmlbody": html,
+            },
+            timeout=10.0,
+        )
+        response.raise_for_status()
+
+
+async def _send_via_smtp(to: str, subject: str, html: str) -> None:
+    print(f"Sending email to {to} with subject {subject} by SMTP")
+    message = MessageSchema(
+        subject=subject,
+        recipients=[to],
+        body=html,
+        subtype="html",
+    )
+    await _smtp_client().send_message(message)
+
+
+async def send_magic_link(email: str, magic_link: str) -> None:
+    subject = f"Sign in to {settings.APP_NAME}"
+    html = _magic_link_html(magic_link)
+
+    if settings.MAILPACE_API_TOKEN:
+        await _send_via_mailpace(email, subject, html)
+    else:
+        await _send_via_smtp(email, subject, html)

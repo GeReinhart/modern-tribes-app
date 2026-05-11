@@ -1,4 +1,5 @@
 import { useState, useRef, ChangeEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AttachmentFile } from '@/types/document.types.ts';
 import { uploadFile, formatFileSize } from '@/utils/uploadHelpers';
 import {
@@ -20,6 +21,7 @@ const FileUploader = ({
                           maxFiles = 10,
                           maxFileSize = 10
                       }: FileUploaderProps) => {
+    const { t } = useTranslation();
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -28,7 +30,7 @@ const FileUploader = ({
         if (!files || files.length === 0) return;
 
         if (attachments.length + files.length > maxFiles) {
-            alert(`Maximum ${maxFiles} files allowed`);
+            alert(t('files.maxFilesError', { maxFiles }));
             return;
         }
 
@@ -37,7 +39,7 @@ const FileUploader = ({
         try {
             const uploadPromises = Array.from(files).map(async (file) => {
                 if (file.size > maxFileSize * 1024 * 1024) {
-                    throw new Error(`File ${file.name} exceeds ${maxFileSize}MB limit`);
+                    throw new Error(t('files.fileSizeError', { filename: file.name, maxFileSize }));
                 }
 
                 const url = await uploadFile(file);
@@ -56,7 +58,7 @@ const FileUploader = ({
             onAttachmentsChange([...attachments, ...newAttachments]);
         } catch (error) {
             console.error('Upload error:', error);
-            alert(error instanceof Error ? error.message : 'Upload failed');
+            alert(error instanceof Error ? error.message : t('files.uploadFailed'));
         } finally {
             setUploading(false);
             if (fileInputRef.current) {
@@ -81,7 +83,7 @@ const FileUploader = ({
         <div className="w-full">
             <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Attachments
+                    {t('files.attachments')}
                 </label>
 
                 <button
@@ -91,7 +93,7 @@ const FileUploader = ({
                     className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                     <PaperClipIcon className="h-5 w-5 mr-2" />
-                    {uploading ? 'Uploading...' : 'Attach Files'}
+                    {uploading ? t('files.uploading') : t('files.attachFiles')}
                 </button>
 
                 <input
@@ -104,7 +106,7 @@ const FileUploader = ({
                 />
 
                 <p className="mt-2 text-xs text-gray-500">
-                    Max {maxFiles} files, {maxFileSize}MB each
+                    {t('files.maxSize', { maxFiles, maxFileSize })}
                 </p>
             </div>
 
@@ -134,7 +136,7 @@ const FileUploader = ({
                                     href={file.url}
                                     download={file.name}
                                     className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                                    title="Download"
+                                    title={t('tribes.download')}
                                 >
                                     <ArrowDownTrayIcon className="h-5 w-5" />
                                 </a>
@@ -142,7 +144,7 @@ const FileUploader = ({
                                     type="button"
                                     onClick={() => handleRemove(file.id)}
                                     className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                                    title="Remove"
+                                    title={t('common.delete')}
                                 >
                                     <XMarkIcon className="h-5 w-5" />
                                 </button>

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { authService } from '@/services/auth.service';
 import { ThemedText} from '@/components/common/layout/ThemedText';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
 export default function Verify() {
+    const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { login } = useAuth();
@@ -17,24 +19,24 @@ export default function Verify() {
             const token = searchParams.get('token');
 
             if (!token) {
-                setError('Invalid verification link');
+                setError(t('auth.invalidLink'));
                 setIsVerifying(false);
                 return;
             }
 
             try {
                 const data = await authService.verifyToken(token);
-                await login(data.access_token);
+                await login(data.access_token, data.refresh_token);
                 navigate('/app', { replace: true });
             } catch (err) {
-                setError(err instanceof Error ? err.message : 'An error occurred during verification');
+                setError(err instanceof Error ? err.message : t('auth.verificationError'));
             } finally {
                 setIsVerifying(false);
             }
         };
 
         verifyToken();
-    }, [searchParams, login, navigate]);
+    }, [searchParams, login, navigate, t]);
 
     return (
         <ThemeProvider defaultTheme="default">
@@ -43,7 +45,7 @@ export default function Verify() {
                     {isVerifying ? (
                         <>
                             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-                            <ThemedText variant="secondary">Verifying your magic link...</ThemedText>
+                            <ThemedText variant="secondary">{t('auth.verifying')}</ThemedText>
                         </>
                     ) : error ? (
                         <>
@@ -54,7 +56,7 @@ export default function Verify() {
                                 onClick={() => navigate('/auth/login')}
                                 className="text-indigo-600 hover:text-indigo-500"
                             >
-                                <ThemedText variant="accent">Request a new magic link</ThemedText>
+                                <ThemedText variant="accent">{t('auth.requestNewLink')}</ThemedText>
                             </button>
                         </>
                     ) : null}

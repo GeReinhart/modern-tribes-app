@@ -1,10 +1,10 @@
-import { API_BASE_URL } from '@/config/env';
+import { getAPIBaseUrl } from '@/config/env';
 
 export const uploadImage = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('files', file);
 
-    const response = await fetch(`${API_BASE_URL}/uploads/image`, {
+    const response = await fetch(`${getAPIBaseUrl()}/uploads/image`, {
         method: 'POST',
         body: formData,
     });
@@ -27,7 +27,7 @@ export const uploadFile = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(`${API_BASE_URL}/uploads/file`, {
+    const response = await fetch(`${getAPIBaseUrl()}/uploads/file`, {
         method: 'POST',
         body: formData,
     });

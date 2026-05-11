@@ -36,6 +36,8 @@ When you encounter any of the following, refactor before continuing:
 - A function name contains "and" or describes multiple steps
 - A file imports from many unrelated modules (sign of mixed concerns)
 
+
+
 ---
 
 ## Backend
@@ -64,6 +66,11 @@ When you encounter any of the following, refactor before continuing:
 - backend/data: do not look here
 - backend/venv: do not look here
 
+## Dependencies
+
+- All dependencies must be declared in `requirements.txt` and pinned to specific versions.
+
+
 ## Frontend
 
 ### Technical stack
@@ -90,3 +97,7 @@ When you encounter any of the following, refactor before continuing:
 
 - frontend/dist: do not look here
 - frontend/node_modules: do not look here
+
+## Dependencies
+
+- All dependencies must be declared in `package.json` and pinned to specific versions.

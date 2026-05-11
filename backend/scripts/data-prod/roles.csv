@@ -1,0 +1,4 @@
+name,description,permissions
+Admin,Administrator role with full access,admin
+Advanced user,Can create tribes and have access to all elements of its tribes given its position,can_create_own_tribes|can_access_attached_tribes|can_manage_own_profile
+User,Can access to all elements of its tribes given its position,can_access_attached_tribes|can_manage_own_profile

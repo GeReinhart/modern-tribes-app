@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext.tsx';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedCard } from '@/components/common/layout/ThemedCard';
@@ -17,6 +18,7 @@ import {ThemedLoadingSpinner} from "@/components/common/layout/ThemedLoadingSpin
 import {useVerifyAuthorization} from "@/hooks/userVerifyAuthorization.ts";
 
 const ShowTribePageContent: React.FC = () => {
+    const { t } = useTranslation();
     const { theme } = useTheme();
     const navigate = useNavigate();
     const { tribeId } = useParams<{ tribeId: string }>();
@@ -46,10 +48,10 @@ const ShowTribePageContent: React.FC = () => {
     );
 
     const breadcrumbs = React.useMemo(() => [
-        { label: 'Home', path: '/app' },
-        { label: 'Tribes', path: '/app/tribes' },
-        { label: tribe?.name || 'Loading...' }
-    ], [tribe?.name]);
+        { label: t('common.home'), path: '/app' },
+        { label: t('tribes.title'), path: '/app/tribes' },
+        { label: tribe?.name || t('common.loading') }
+    ], [tribe?.name, t]);
 
     const memberCardStyle: React.CSSProperties = {
         padding: '12px 16px',
@@ -156,9 +158,10 @@ const ShowTribePageContent: React.FC = () => {
             {tribe.document_content_html && (
                 <ThemedSection themeId="main_1">
                     <ThemedText size="medium" as="h2">
-                        Description
+                        {t('tribes.descriptionSection')}
                     </ThemedText>
                     <div
+                        className="prose max-w-none"
                         style={{
                             padding: '16px',
                             backgroundColor: theme.colors.surface,
@@ -176,7 +179,7 @@ const ShowTribePageContent: React.FC = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                         <Paperclip size={20} color={theme.colors.secondary} />
                         <ThemedText size="small" as="h4">
-                            Attachments ({tribe.document_attachments.length})
+                            {t('tribes.attachmentsCount', { count: tribe.document_attachments.length })}
                         </ThemedText>
                     </div>
 
@@ -232,7 +235,7 @@ const ShowTribePageContent: React.FC = () => {
                                 }}
                             >
                                 <Download size={16} />
-                                Download
+                                {t('tribes.download')}
                             </a>
                         </div>
                     ))}
@@ -242,7 +245,7 @@ const ShowTribePageContent: React.FC = () => {
             {/* Members Section */}
             <ThemedSection themeId="main_2">
                 <ThemedText size="medium" as="h2">
-                    Members ({tribe.persons.length})
+                    {t('tribes.membersCount', { count: tribe.persons.length })}
                 </ThemedText>
 
                 {/* Chiefs */}
@@ -253,7 +256,7 @@ const ShowTribePageContent: React.FC = () => {
                                 <ThemedText variant="primary" size="small">
                                     {person.first_name} {person.last_name}
                                 </ThemedText>
-                                <span style={badgeStyle('chief')}>Chief</span>
+                                <span style={badgeStyle('chief')}>{t('positions.chief')}</span>
                             </div>
                         ))}
                     </div>
@@ -267,7 +270,7 @@ const ShowTribePageContent: React.FC = () => {
                                 <ThemedText variant="primary" size="small">
                                     {person.first_name} {person.last_name}
                                 </ThemedText>
-                                <span style={badgeStyle('member')}>Member</span>
+                                <span style={badgeStyle('member')}>{t('positions.member')}</span>
                             </div>
                         ))}
                     </div>
@@ -281,7 +284,7 @@ const ShowTribePageContent: React.FC = () => {
                                 <ThemedText variant="primary" size="small">
                                     {person.first_name} {person.last_name}
                                 </ThemedText>
-                                <span style={badgeStyle('guest')}>Guest</span>
+                                <span style={badgeStyle('guest')}>{t('positions.guest')}</span>
                             </div>
                         ))}
                     </div>
@@ -290,7 +293,7 @@ const ShowTribePageContent: React.FC = () => {
                 {/* No Members */}
                 {tribe.persons.length === 0 && (
                     <ThemedText variant="secondary" size="small">
-                        No members yet. Click "Edit Tribe" to add members.
+                        {t('tribes.noMembers')}
                     </ThemedText>
                 )}
             </ThemedSection>

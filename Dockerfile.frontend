@@ -1,0 +1,26 @@
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+COPY frontend/package*.json ./
+RUN rm -f package-lock.json && npm install --include=dev
+
+COPY frontend/ .
+
+# Passed at build time via CC_DOCKER_BUILD_ARGS on CleverCloud
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+ARG VITE_DEFAULT_LANGUAGE
+ENV VITE_DEFAULT_LANGUAGE=${VITE_DEFAULT_LANGUAGE}
+
+RUN npm run build
+
+FROM nginx:alpine
+
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 8080
+
+
+CMD ["nginx", "-g", "daemon off;"]

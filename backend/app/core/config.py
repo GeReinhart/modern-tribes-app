@@ -16,9 +16,9 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_HOST: str
     POSTGRES_PORT: int
-    POSTGRES_DATA_PATH: str
+    POSTGRES_POOL_MIN: int
+    POSTGRES_POOL_MAX: int
 
-    DATABASE_URL: str
     # File Upload
     UPLOAD_DIR: str = "./uploads"
     MAX_FILE_SIZE: int = 10485760  # 10MB
@@ -26,10 +26,11 @@ class Settings(BaseSettings):
     ALLOWED_FILE_EXTENSIONS: str = "pdf,txt"
 
     # JWT
-    SECRET_KEY: str = "1d8c9bc660bc50d75c57dffaee3a08230e3d3cb4449481bb44f19df50b284d6b" # Generate with: openssl rand -hex 32
+    SECRET_KEY: str
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 360  # 7 days
-    MAGIC_LINK_EXPIRE_MINUTES: int = 60 * 24 # 1 day
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60  # 1 hour
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30
+    MAGIC_LINK_EXPIRE_MINUTES: int = 60 * 24  # 1 day
 
     # Email
     SMTP_HOST: str = "localhost"
@@ -38,6 +39,7 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     EMAILS_FROM_EMAIL: str = "no-reply@modern-tribes.com"
     EMAILS_FROM_NAME: str = "no-reply-modern-tribes"
+    MAILPACE_API_TOKEN: str = ""
 
 
     # CORS
@@ -46,6 +48,12 @@ class Settings(BaseSettings):
     # Base URL
     BASE_URL: str = "http://localhost:8000"
     FRONTEND_URL: str = "http://localhost:3000"
+
+    # Cellar (S3-compatible object storage — CleverCloud)
+    CELLAR_ADDON_HOST: str = "cellar-c2.services.clever-cloud.com"
+    CELLAR_ADDON_KEY_ID: str = ""
+    CELLAR_ADDON_KEY_SECRET: str = ""
+    CELLAR_BUCKET_NAME: str = "uploads"
 
     @property
     def cors_origins_list(self) -> List[str]:
