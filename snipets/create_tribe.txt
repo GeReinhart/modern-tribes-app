@@ -1,0 +1,569 @@
+Here's a comprehensive `CreateTribeForm.tsx` component that matches your styling:
+
+```typescript
+import React, { useState, useEffect } from 'react';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext.tsx';
+import {
+    ThemedButton,
+    ThemedText,
+    ThemedCard,
+} from '@/components/themes/ThemedComponents.tsx';
+import { ThemedSection } from "@/components/themes/ThemedSection.tsx";
+import { ApplicationLogo } from "@/components/common/icons/ApplicationLogo";
+import { useNavigate } from 'react-router-dom';
+
+interface Person {
+    _id: string;
+    first_name: string;
+    last_name: string;
+    gender: string;
+    created_at: string;
+    updated_at: string;
+}
+
+interface SelectedPerson {
+    person_id: string;
+    position: 'chief' | 'member' | 'invite';
+}
+
+interface TribeFormData {
+    tribeName: string;
+    documentTitle: string;
+    documentContent: string;
+    selectedPersons: SelectedPerson[];
+}
+
+const CreateTribeFormContent: React.FC = () => {
+    const { theme } = useTheme();
+    const navigate = useNavigate();
+
+    const [persons, setPersons] = useState<Person[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState(false);
+
+    const [formData, setFormData] = useState<TribeFormData>({
+        tribeName: '',
+        documentTitle: '',
+        documentContent: '',
+        selectedPersons: []
+    });
+
+    const containerStyle: React.CSSProperties = {
+        padding: '8px',
+        fontFamily: 'Arial, sans-serif',
+        maxWidth: '1400px',
+        margin: '0 auto',
+        backgroundColor: '#f9f9f9',
+        minHeight: '100vh',
+    };
+
+    const navigationStyle: React.CSSProperties = {
+        display: 'flex',
+        gap: '12px',
+        marginTop: '8px',
+        marginBottom: '20px',
+        flexWrap: 'wrap',
+    };
+
+    const formContainerStyle: React.CSSProperties = {
+        backgroundColor: 'white',
+        padding: '30px',
+        borderRadius: '12px',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+    };
+
+    const inputStyle: React.CSSProperties = {
+        width: '100%',
+        padding: '12px',
+        fontSize: '16px',
+        borderRadius: '8px',
+        border: `2px solid ${theme.colors.secondary}`,
+        marginTop: '8px',
+        marginBottom: '16px',
+        fontFamily: 'Arial, sans-serif',
+        transition: 'border-color 0.3s ease',
+    };
+
+    const textareaStyle: React.CSSProperties = {
+        ...inputStyle,
+        minHeight: '150px',
+        resize: 'vertical',
+        fontFamily: 'Arial, sans-serif',
+    };
+
+    const personCardStyle: React.CSSProperties = {
+        padding: '16px',
+        borderRadius: '8px',
+        border: `2px solid ${theme.colors.secondary}20`,
+        marginBottom: '12px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        transition: 'all 0.3s ease',
+        backgroundColor: 'white',
+    };
+
+    const selectedPersonCardStyle: React.CSSProperties = {
+        ...personCardStyle,
+        backgroundColor: `${theme.colors.primary}10`,
+        border: `2px solid ${theme.colors.primary}`,
+    };
+
+    const positionSelectStyle: React.CSSProperties = {
+        padding: '8px 12px',
+        borderRadius: '6px',
+        border: `2px solid ${theme.colors.accent}`,
+        fontSize: '14px',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        marginLeft: '12px',
+    };
+
+    const errorStyle: React.CSSProperties = {
+        backgroundColor: '#fee',
+        border: '2px solid #f00',
+        color: '#c00',
+        padding: '16px',
+        borderRadius: '8px',
+        marginBottom: '20px',
+    };
+
+    const successStyle: React.CSSProperties = {
+        backgroundColor: '#efe',
+        border: '2px solid #0c0',
+        color: '#060',
+        padding: '16px',
+        borderRadius: '8px',
+        marginBottom: '20px',
+    };
+
+    // Fetch persons on component mount
+    useEffect(() => {
+        fetchPersons();
+    }, []);
+
+    const fetchPersons = async () => {
+        try {
+            const response = await fetch('/api/crud/persons/');
+            if (!response.ok) throw new Error('Failed to fetch persons');
+            const data = await response.json();
+            setPersons(data);
+        } catch (err) {
+            setError('Failed to load persons. Please try again.');
+            console.error('Error fetching persons:', err);
+        }
+    };
+
+    const handleInputChange = (field: keyof TribeFormData, value: string) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+        setError(null);
+    };
+
+    const togglePersonSelection = (personId: string) => {
+        setFormData(prev => {
+            const isSelected = prev.selectedPersons.some(p => p.person_id === personId);
+
+            if (isSelected) {
+                return {
+                    ...prev,
+                    selectedPersons: prev.selectedPersons.filter(p => p.person_id !== personId)
+                };
+            } else {
+                return {
+                    ...prev,
+                    selectedPersons: [...prev.selectedPersons, { person_id: personId, position: 'member' }]
+                };
+            }
+        });
+    };
+
+    const handlePositionChange = (personId: string, position: 'chief' | 'member' | 'invite') => {
+        setFormData(prev => ({
+            ...prev,
+            selectedPersons: prev.selectedPersons.map(p =>
+                p.person_id === personId ? { ...p, position } : p
+            )
+        }));
+    };
+
+    const isPersonSelected = (personId: string): boolean => {
+        return formData.selectedPersons.some(p => p.person_id === personId);
+    };
+
+    const getPersonPosition = (personId: string): string => {
+        const person = formData.selectedPersons.find(p => p.person_id === personId);
+        return person?.position || 'member';
+    };
+
+    const validateForm = (): boolean => {
+        if (!formData.tribeName.trim()) {
+            setError('Tribe name is required');
+            return false;
+        }
+        if (!formData.documentTitle.trim()) {
+            setError('Document title is required');
+            return false;
+        }
+        if (!formData.documentContent.trim()) {
+            setError('Document content is required');
+            return false;
+        }
+        if (formData.selectedPersons.length === 0) {
+            setError('Please select at least one person for the tribe');
+            return false;
+        }
+
+        const hasChief = formData.selectedPersons.some(p => p.position === 'chief');
+        if (!hasChief) {
+            setError('Please assign at least one person as Chief');
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!validateForm()) {
+            return;
+        }
+
+        setLoading(true);
+        setError(null);
+        setSuccess(false);
+
+        try {
+            // Step 1: Create Document
+            const documentResponse = await fetch('/api/crud/documents/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: formData.documentTitle,
+                    content_html: formData.documentContent,
+                    attachments: []
+                })
+            });
+
+            if (!documentResponse.ok) {
+                throw new Error('Failed to create document');
+            }
+
+            const document = await documentResponse.json();
+
+            // Step 2: Create Tribe
+            const tribeResponse = await fetch('/api/crud/tribes/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: formData.tribeName,
+                    document_id: document._id,
+                    project_ids: []
+                })
+            });
+
+            if (!tribeResponse.ok) {
+                throw new Error('Failed to create tribe');
+            }
+
+            const tribe = await tribeResponse.json();
+
+            // Step 3: Create Positions for each selected person
+            const positionPromises = formData.selectedPersons.map(selectedPerson =>
+                fetch('/api/crud/positions/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        tribe_id: tribe._id,
+                        person_id: selectedPerson.person_id,
+                        position: selectedPerson.position
+                    })
+                })
+            );
+
+            const positionResults = await Promise.all(positionPromises);
+
+            const failedPositions = positionResults.filter(r => !r.ok);
+            if (failedPositions.length > 0) {
+                throw new Error('Failed to create some positions');
+            }
+
+            setSuccess(true);
+
+            // Reset form
+            setFormData({
+                tribeName: '',
+                documentTitle: '',
+                documentContent: '',
+                selectedPersons: []
+            });
+
+            // Navigate after short delay
+            setTimeout(() => {
+                navigate('/admin');
+            }, 2000);
+
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An error occurred while creating the tribe');
+            console.error('Error creating tribe:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCancel = () => {
+        navigate('/admin');
+    };
+
+    return (
+        <div style={containerStyle}>
+            {/* Header Navigation */}
+            <div style={navigationStyle}>
+                <ApplicationLogo size="xs" />
+                <ThemedButton
+                    variant="secondary"
+                    onClick={handleCancel}
+                >
+                    ← Back to Admin
+                </ThemedButton>
+            </div>
+
+            {/* Page Title */}
+            <ThemedCard>
+                <ThemedText variant="primary" size="large" as="h1">
+                    Create New Tribe
+                </ThemedText>
+                <ThemedText variant="secondary" size="small">
+                    Fill in the form below to create a new tribe with its documentation and members
+                </ThemedText>
+            </ThemedCard>
+
+            {/* Error Message */}
+            {error && (
+                <div style={errorStyle}>
+                    <strong>Error:</strong> {error}
+                </div>
+            )}
+
+            {/* Success Message */}
+            {success && (
+                <div style={successStyle}>
+                    <strong>Success!</strong> Tribe created successfully. Redirecting...
+                </div>
+            )}
+
+            {/* Main Form */}
+            <form onSubmit={handleSubmit}>
+                <div style={formContainerStyle}>
+                    {/* Tribe Information Section */}
+                    <ThemedSection theme="main_1">
+                        <ThemedText variant="primary" size="medium" as="h2">
+                            1. Tribe Information
+                        </ThemedText>
+
+                        <label>
+                            <ThemedText variant="secondary" size="small" as="span">
+                                Tribe Name *
+                            </ThemedText>
+                            <input
+                                type="text"
+                                style={inputStyle}
+                                value={formData.tribeName}
+                                onChange={(e) => handleInputChange('tribeName', e.target.value)}
+                                placeholder="Enter tribe name (e.g., Engineering, Marketing)"
+                                disabled={loading}
+                            />
+                        </label>
+                    </ThemedSection>
+
+                    {/* Document Section */}
+                    <ThemedSection theme="main_2">
+                        <ThemedText variant="primary" size="medium" as="h2">
+                            2. Tribe Documentation
+                        </ThemedText>
+
+                        <label>
+                            <ThemedText variant="secondary" size="small" as="span">
+                                Document Title *
+                            </ThemedText>
+                            <input
+                                type="text"
+                                style={inputStyle}
+                                value={formData.documentTitle}
+                                onChange={(e) => handleInputChange('documentTitle', e.target.value)}
+                                placeholder="Enter document title"
+                                disabled={loading}
+                            />
+                        </label>
+
+                        <label>
+                            <ThemedText variant="secondary" size="small" as="span">
+                                Document Content (HTML) *
+                            </ThemedText>
+                            <textarea
+                                style={textareaStyle}
+                                value={formData.documentContent}
+                                onChange={(e) => handleInputChange('documentContent', e.target.value)}
+                                placeholder="Enter document content in HTML format"
+                                disabled={loading}
+                            />
+                        </label>
+                    </ThemedSection>
+
+                    {/* Person Selection Section */}
+                    <ThemedSection theme="main_3">
+                        <ThemedText variant="primary" size="medium" as="h2">
+                            3. Select Tribe Members
+                        </ThemedText>
+                        <ThemedText variant="secondary" size="small">
+                            Select persons and assign their positions. At least one Chief is required.
+                        </ThemedText>
+
+                        <div style={{ marginTop: '20px' }}>
+                            {persons.length === 0 ? (
+                                <ThemedText variant="secondary" size="small">
+                                    No persons available. Please create persons first.
+                                </ThemedText>
+                            ) : (
+                                persons.map(person => {
+                                    const selected = isPersonSelected(person._id);
+                                    const position = getPersonPosition(person._id);
+
+                                    return (
+                                        <div
+                                            key={person._id}
+                                            style={selected ? selectedPersonCardStyle : personCardStyle}
+                                            onClick={() => !loading && togglePersonSelection(person._id)}
+                                            onMouseEnter={(e) => {
+                                                if (!loading) {
+                                                    e.currentTarget.style.transform = 'translateX(4px)';
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.transform = 'translateX(0)';
+                                            }}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selected}
+                                                    onChange={() => {}}
+                                                    style={{
+                                                        width: '20px',
+                                                        height: '20px',
+                                                        marginRight: '12px',
+                                                        cursor: 'pointer'
+                                                    }}
+                                                    disabled={loading}
+                                                />
+                                                <div>
+                                                    <ThemedText variant="primary" size="small" as="span">
+                                                        {person.first_name} {person.last_name}
+                                                    </ThemedText>
+                                                    <ThemedText variant="secondary" size="small" as="div">
+                                                        Gender: {person.gender}
+                                                    </ThemedText>
+                                                </div>
+                                            </div>
+
+                                            {selected && (
+                                                <select
+                                                    value={position}
+                                                    onChange={(e) => {
+                                                        e.stopPropagation();
+                                                        handlePositionChange(
+                                                            person._id,
+                                                            e.target.value as 'chief' | 'member' | 'invite'
+                                                        );
+                                                    }}
+                                                    style={positionSelectStyle}
+                                                    disabled={loading}
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <option value="member">Member</option>
+                                                    <option value="chief">Chief</option>
+                                                    <option value="invite">Invite</option>
+                                                </select>
+                                            )}
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+
+                        {formData.selectedPersons.length > 0 && (
+                            <div style={{ marginTop: '20px', padding: '16px', backgroundColor: `${theme.colors.accent}10`, borderRadius: '8px' }}>
+                                <ThemedText variant="accent" size="small" as="div">
+                                    <strong>Selected:</strong> {formData.selectedPersons.length} person(s)
+                                </ThemedText>
+                                <ThemedText variant="secondary" size="small" as="div">
+                                    Chiefs: {formData.selectedPersons.filter(p => p.position === 'chief').length} |
+                                    Members: {formData.selectedPersons.filter(p => p.position === 'member').length} |
+                                    Invites: {formData.selectedPersons.filter(p => p.position === 'invite').length}
+                                </ThemedText>
+                            </div>
+                        )}
+                    </ThemedSection>
+
+                    {/* Form Actions */}
+                    <div style={{ display: 'flex', gap: '12px', marginTop: '30px', justifyContent: 'flex-end' }}>
+                        <ThemedButton
+                            variant="secondary"
+                            onClick={handleCancel}
+                        >
+                            Cancel
+                        </ThemedButton>
+                        <ThemedButton
+                            variant="primary"
+                            onClick={handleSubmit}
+                        >
+                            {loading ? 'Creating Tribe...' : 'Create Tribe'}
+                        </ThemedButton>
+                    </div>
+                </div>
+            </form>
+        </div>
+    );
+};
+
+const CreateTribeForm: React.FC = () => {
+    return (
+        <ThemeProvider defaultTheme="default">
+            <CreateTribeFormContent />
+        </ThemeProvider>
+    );
+};
+
+export default CreateTribeForm;
+```
+
+This component provides:
+
+1. **Three-section form** with themed sections:
+   - Section 1 (main_1): Tribe Information
+   - Section 2 (main_2): Document creation
+   - Section 3 (main_3): Person selection with position assignment
+
+2. **Features**:
+   - Fetches persons from the API on mount
+   - Multi-select with checkboxes for persons
+   - Position dropdown (Chief/Member/Invite) for each selected person
+   - Validation (requires at least one Chief)
+   - Error and success message displays
+   - Loading states
+   - Creates Document → Tribe → Positions in sequence
+   - Redirects to admin page after successful creation
+
+3. **Consistent styling** with your main page:
+   - Same themed components
+   - Same container styles
+   - Interactive hover effects
+   - Responsive layout
+
+4. **User Experience**:
+   - Clear step-by-step process
+   - Visual feedback for selection
+   - Position assignment inline
+   - Summary of selections
+   - Proper error handling

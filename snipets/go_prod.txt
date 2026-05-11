@@ -1,0 +1,713 @@
+# Production Deployment Guide
+
+## 1. 📋 Project Structure
+
+```
+your-app/
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   ├── config.py
+│   │   └── ...
+│   ├── requirements.txt
+│   └── Dockerfile
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   ├── vite.config.js
+│   └── Dockerfile
+├── docker-compose.yml
+├── docker-compose.prod.yml
+├── .env.example
+├── .gitignore
+├── nginx/
+│   └── nginx.conf
+└── README.md
+```
+
+## 2. 🔧 Remove Debug Settings
+
+### **backend/app/config.py**
+```python
+from pydantic_settings import BaseSettings
+from typing import Optional
+
+class Settings(BaseSettings):
+    # App
+    APP_NAME: str = "YourApp"
+    DEBUG: bool = False  # Set to False for production
+    ENV: str = "production"
+
+    # MongoDB
+    MONGODB_URL: str
+    MONGODB_DB_NAME: str
+
+    # Security
+    SECRET_KEY: str
+    CORS_ORIGINS: list[str] = ["https://yourdomain.com"]
+
+    # API
+    API_V1_PREFIX: str = "/api/v1"
+
+    class Config:
+        env_file = ".env"
+        case_sensitive = True
+
+settings = Settings()
+```
+
+### **backend/app/main.py**
+```python
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+from motor.motor_asyncio import AsyncIOMotorClient
+from app.config import settings
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    app.mongodb_client = AsyncIOMotorClient(settings.MONGODB_URL)
+    app.mongodb = app.mongodb_client[settings.MONGODB_DB_NAME]
+    yield
+    # Shutdown
+    app.mongodb_client.close()
+
+app = FastAPI(
+    title=settings.APP_NAME,
+    debug=settings.DEBUG,  # Uses settings
+    docs_url="/api/docs" if settings.DEBUG else None,  # Disable in prod
+    redoc_url="/api/redoc" if settings.DEBUG else None,
+    lifespan=lifespan
+)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+```
+
+### **frontend/vite.config.js**
+```javascript
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig(({ mode }) => ({
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}']
+      },
+      manifest: {
+        name: 'Your App',
+        short_name: 'App',
+        theme_color: '#ffffff',
+        icons: [
+          {
+            src: '/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
+      }
+    })
+  ],
+  build: {
+    sourcemap: mode !== 'production',
+    minify: 'esbuild',
+  },
+  server: {
+    proxy: mode === 'development' ? {
+      '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      }
+    } : undefined
+  }
+}))
+```
+
+## 3. 🐳 Docker Setup
+
+### **backend/Dockerfile**
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application
+COPY . .
+
+# Create non-root user
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
+
+# Expose port
+EXPOSE 8000
+
+# Run application
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+### **backend/requirements.txt**
+```txt
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+motor==3.3.2
+pydantic==2.5.3
+pydantic-settings==2.1.0
+python-dotenv==1.0.0
+pymongo==4.6.1
+```
+
+### **frontend/Dockerfile**
+```dockerfile
+# Build stage
+FROM node:20-alpine as build
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+# Production stage
+FROM nginx:alpine
+
+# Copy built assets
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copy nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+### **frontend/nginx.conf**
+```nginx
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Gzip compression
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    # API proxy
+    location /api {
+        proxy_pass http://backend:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # SPA routing
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Cache static assets
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+```
+
+### **docker-compose.yml** (Development)
+```yaml
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: app-mongodb-dev
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: devpassword
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+  backend:
+    build: ./backend
+    container_name: app-backend-dev
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=true
+      - MONGODB_URL=mongodb://admin:devpassword@mongodb:27017
+      - MONGODB_DB_NAME=appdb
+      - SECRET_KEY=dev-secret-key-change-in-production
+      - CORS_ORIGINS=["http://localhost:5173"]
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build: ./frontend
+    container_name: app-frontend-dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    command: npm run dev -- --host
+    networks:
+      - app-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  app-network:
+    driver: bridge
+```
+
+### **docker-compose.prod.yml** (Production)
+```yaml
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: app-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongodb_data:/data/db
+      - ./backups:/backups
+    networks:
+      - app-network
+    command: mongod --auth
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: app-backend
+    restart: unless-stopped
+    environment:
+      - DEBUG=false
+      - ENV=production
+      - MONGODB_URL=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017
+      - MONGODB_DB_NAME=${MONGO_DB_NAME}
+      - SECRET_KEY=${SECRET_KEY}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: app-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    volumes:
+      - ./ssl:/etc/nginx/ssl:ro  # For SSL certificates
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
+```
+
+## 4. 📝 Environment Files
+
+### **.env.example**
+```env
+# MongoDB
+MONGO_USERNAME=admin
+MONGO_PASSWORD=your-secure-password
+MONGO_DB_NAME=appdb
+
+# Backend
+SECRET_KEY=your-super-secret-key-min-32-chars
+DEBUG=false
+ENV=production
+CORS_ORIGINS=["https://yourdomain.com"]
+
+# Backup
+BACKUP_DIR=/backups
+```
+
+### **.gitignore**
+```gitignore
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+
+# Node
+node_modules/
+dist/
+build/
+.npm
+.eslintcache
+
+# Docker
+*.log
+
+# Backups
+backups/
+*.dump
+*.gz
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+```
+
+## 5. 📦 GitHub Publishing
+
+### **README.md**
+```markdown
+# Your App
+
+## Quick Start
+
+### Prerequisites
+- Docker & Docker Compose
+- Git
+
+### Installation
+
+1. Clone the repository:
+\`\`\`bash
+git clone https://github.com/yourusername/your-app.git
+cd your-app
+\`\`\`
+
+2. Copy environment file:
+\`\`\`bash
+cp .env.example .env
+\`\`\`
+
+3. Edit `.env` with your values
+
+4. Run the application:
+\`\`\`bash
+docker-compose -f docker-compose.prod.yml up -d
+\`\`\`
+
+## Documentation
+
+Visit `http://localhost/api/docs` for API documentation (dev mode only)
+
+## License
+
+MIT
+```
+
+### **Publishing to GitHub**
+```bash
+# Initialize git (if not already)
+git init
+
+# Add all files
+git add .
+
+# Commit
+git commit -m "Initial commit: Production-ready setup"
+
+# Add remote
+git remote add origin https://github.com/yourusername/your-app.git
+
+# Push
+git push -u origin main
+```
+
+## 6. 🚀 Commands to Run
+
+### **Development**
+```bash
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Rebuild after changes
+docker-compose up -d --build
+```
+
+### **Production**
+```bash
+# First time setup
+cp .env.example .env
+# Edit .env with production values
+
+# Start production
+docker-compose -f docker-compose.prod.yml up -d
+
+# View logs
+docker-compose -f docker-compose.prod.yml logs -f backend
+
+# Stop
+docker-compose -f docker-compose.prod.yml down
+
+# Restart specific service
+docker-compose -f docker-compose.prod.yml restart backend
+
+# Update and rebuild
+git pull
+docker-compose -f docker-compose.prod.yml up -d --build
+```
+
+## 7. 💾 MongoDB Backup Commands
+
+### **backup.sh**
+```bash
+#!/bin/bash
+
+# Configuration
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="./backups"
+CONTAINER_NAME="app-mongodb"
+DB_NAME="${MONGO_DB_NAME:-appdb}"
+MONGO_USER="${MONGO_USERNAME:-admin}"
+MONGO_PASS="${MONGO_PASSWORD}"
+
+# Create backup directory
+mkdir -p "$BACKUP_DIR"
+
+# Backup
+echo "Starting backup of $DB_NAME..."
+docker exec $CONTAINER_NAME mongodump \
+  --username="$MONGO_USER" \
+  --password="$MONGO_PASS" \
+  --db="$DB_NAME" \
+  --authenticationDatabase=admin \
+  --out="/backups/backup_$TIMESTAMP"
+
+# Compress
+echo "Compressing backup..."
+cd "$BACKUP_DIR"
+tar -czf "backup_${TIMESTAMP}.tar.gz" "backup_$TIMESTAMP"
+rm -rf "backup_$TIMESTAMP"
+
+# Keep only last 7 backups
+ls -t backup_*.tar.gz | tail -n +8 | xargs -r rm
+
+echo "Backup completed: backup_${TIMESTAMP}.tar.gz"
+```
+
+### **restore.sh**
+```bash
+#!/bin/bash
+
+# Configuration
+BACKUP_FILE=$1
+CONTAINER_NAME="app-mongodb"
+DB_NAME="${MONGO_DB_NAME:-appdb}"
+MONGO_USER="${MONGO_USERNAME:-admin}"
+MONGO_PASS="${MONGO_PASSWORD}"
+
+if [ -z "$BACKUP_FILE" ]; then
+    echo "Usage: ./restore.sh <backup_file.tar.gz>"
+    exit 1
+fi
+
+# Extract backup
+echo "Extracting backup..."
+BACKUP_DIR=$(basename "$BACKUP_FILE" .tar.gz)
+tar -xzf "$BACKUP_FILE" -C "./backups/"
+
+# Restore
+echo "Restoring $DB_NAME..."
+docker exec $CONTAINER_NAME mongorestore \
+  --username="$MONGO_USER" \
+  --password="$MONGO_PASS" \
+  --db="$DB_NAME" \
+  --authenticationDatabase=admin \
+  "/backups/$BACKUP_DIR/$DB_NAME"
+
+# Cleanup
+rm -rf "./backups/$BACKUP_DIR"
+
+echo "Restore completed!"
+```
+
+### **Make scripts executable**
+```bash
+chmod +x backup.sh restore.sh
+```
+
+### **Manual Backup Commands**
+```bash
+# Quick backup
+docker exec app-mongodb mongodump \
+  --username=admin \
+  --password=yourpassword \
+  --authenticationDatabase=admin \
+  --out=/backups/manual_backup
+
+# Export specific collection to JSON
+docker exec app-mongodb mongoexport \
+  --username=admin \
+  --password=yourpassword \
+  --authenticationDatabase=admin \
+  --db=appdb \
+  --collection=users \
+  --out=/backups/users.json
+
+# Restore from backup
+docker exec app-mongodb mongorestore \
+  --username=admin \
+  --password=yourpassword \
+  --authenticationDatabase=admin \
+  /backups/manual_backup
+
+# Copy backup from container to host
+docker cp app-mongodb:/backups/manual_backup ./backups/
+```
+
+### **Automated Backups with Cron**
+```bash
+# Edit crontab
+crontab -e
+
+# Add daily backup at 2 AM
+0 2 * * * cd /path/to/your-app && ./backup.sh >> ./backups/backup.log 2>&1
+```
+
+## 8. 🔐 Security Checklist
+
+- [ ] Change all default passwords
+- [ ] Generate strong `SECRET_KEY` (use `openssl rand -hex 32`)
+- [ ] Set `DEBUG=false` in production
+- [ ] Configure CORS properly
+- [ ] Use HTTPS (add SSL certificates)
+- [ ] Restrict MongoDB access
+- [ ] Enable MongoDB authentication
+- [ ] Set up firewall rules
+- [ ] Regular backups
+- [ ] Monitor logs
+- [ ] Keep dependencies updated
+
+## 9. 📊 Monitoring Commands
+
+```bash
+# Check container status
+docker-compose -f docker-compose.prod.yml ps
+
+# View resource usage
+docker stats
+
+# Check logs
+docker-compose -f docker-compose.prod.yml logs -f --tail=100
+
+# Check MongoDB status
+docker exec app-mongodb mongosh \
+  --username admin \
+  --password yourpassword \
+  --eval "db.serverStatus()"
+
+# Check database size
+docker exec app-mongodb mongosh \
+  --username admin \
+  --password yourpassword \
+  --eval "db.stats()"
+```
+
+## 10. 🔄 Update Workflow
+
+```bash
+# 1. Backup first!
+./backup.sh
+
+# 2. Pull latest changes
+git pull origin main
+
+# 3. Rebuild and restart
+docker-compose -f docker-compose.prod.yml up -d --build
+
+# 4. Check logs
+docker-compose -f docker-compose.prod.yml logs -f
+
+# 5. Test application
+curl http://localhost/health
+```
+
+---
+
+**Your application is now production-ready!** 🎉

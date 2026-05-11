@@ -1,0 +1,29 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="borderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#FF8C00;stop-opacity:0.5" />
+            <stop offset="50%" style="stop-color:#DAA520;stop-opacity:0.5" />
+            <stop offset="100%" style="stop-color:#F4A460;stop-opacity:0.5" />
+        </linearGradient>
+    </defs>
+
+    <rect width="256" height="256" rx="64" fill="white"/>
+
+    <!-- Border circle with gradient -->
+    <circle cx="128" cy="128" r="115" fill="none" stroke="url(#borderGradient)" stroke-width="12"/>
+
+    <!-- Connection lines -->
+    <line x1="70" y1="90" x2="128" y2="128" stroke="#FF8C00" stroke-width="6" opacity="0.5"/>
+    <line x1="186" y1="90" x2="128" y2="128" stroke="#DAA520" stroke-width="6" opacity="0.5"/>
+    <line x1="70" y1="166" x2="128" y2="128" stroke="#F4A460" stroke-width="6" opacity="0.5"/>
+    <line x1="186" y1="166" x2="128" y2="128" stroke="#FF8C00" stroke-width="6" opacity="0.5"/>
+    <line x1="70" y1="90" x2="186" y2="90" stroke="#DAA520" stroke-width="6" opacity="0.3"/>
+    <line x1="70" y1="166" x2="186" y2="166" stroke="#F4A460" stroke-width="6" opacity="0.3"/>
+
+    <!-- Nodes -->
+    <circle cx="70" cy="90" r="22" fill="#FF8C00"/>
+    <circle cx="186" cy="90" r="22" fill="#DAA520"/>
+    <circle cx="70" cy="166" r="22" fill="#F4A460"/>
+    <circle cx="186" cy="166" r="22" fill="#FF8C00"/>
+    <circle cx="128" cy="128" r="28" fill="#F4A460"/>
+</svg>

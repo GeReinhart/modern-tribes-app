@@ -1,0 +1,1050 @@
+# Relationship-Based Permissions (Object-Level Permissions)
+
+This extends the RBAC system with **entity-specific permissions** based on user relationships.
+
+## Backend Implementation
+
+### 1. Enhanced Permission Models
+
+```python
+# backend/app/models/permissions.py
+from enum import Enum
+from typing import List, Optional, Literal
+from pydantic import BaseModel
+
+class Permission(str, Enum):
+    # ... (keep existing permissions)
+
+    # Tribe permissions
+    TRIBE_READ = "tribe:read"
+    TRIBE_WRITE = "tribe:write"
+    TRIBE_DELETE = "tribe:delete"
+    TRIBE_MANAGE_MEMBERS = "tribe:manage_members"
+    TRIBE_CREATE = "tribe:create"
+
+class RelationshipRole(str, Enum):
+    """Roles within entity relationships"""
+    CHIEF = "chief"
+    ELDER = "elder"
+    MEMBER = "member"
+    VIEWER = "viewer"
+
+class EntityPermission(BaseModel):
+    """Permissions for a specific entity relationship"""
+    can_read: bool = False
+    can_write: bool = False
+    can_delete: bool = False
+    can_manage_members: bool = False
+    can_transfer_ownership: bool = False
+
+# Relationship role to entity permissions mapping
+RELATIONSHIP_PERMISSIONS = {
+    RelationshipRole.CHIEF: EntityPermission(
+        can_read=True,
+        can_write=True,
+        can_delete=True,
+        can_manage_members=True,
+        can_transfer_ownership=True,
+    ),
+    RelationshipRole.ELDER: EntityPermission(
+        can_read=True,
+        can_write=True,
+        can_delete=False,
+        can_manage_members=True,
+        can_transfer_ownership=False,
+    ),
+    RelationshipRole.MEMBER: EntityPermission(
+        can_read=True,
+        can_write=True,
+        can_delete=False,
+        can_manage_members=False,
+        can_transfer_ownership=False,
+    ),
+    RelationshipRole.VIEWER: EntityPermission(
+        can_read=True,
+        can_write=False,
+        can_delete=False,
+        can_manage_members=False,
+        can_transfer_ownership=False,
+    ),
+}
+```
+
+### 2. Entity Models with Relationships
+
+```python
+# backend/app/models/tribe.py
+from pydantic import BaseModel, Field
+from typing import List, Optional, Dict
+from datetime import datetime
+from bson import ObjectId
+from .permissions import RelationshipRole
+
+class TribeMember(BaseModel):
+    user_id: str
+    role: RelationshipRole
+    joined_at: datetime = Field(default_factory=datetime.utcnow)
+    permissions_override: Optional[Dict[str, bool]] = None  # Custom permissions
+
+class Tribe(BaseModel):
+    id: str = Field(default_factory=lambda: str(ObjectId()), alias="_id")
+    name: str
+    description: Optional[str] = None
+    chief_id: str  # Main owner
+    members: List[TribeMember] = Field(default_factory=list)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    is_public: bool = False  # Public tribes allow read access to everyone
+
+    class Config:
+        populate_by_name = True
+
+    def get_member(self, user_id: str) -> Optional[TribeMember]:
+        """Get member information for a user"""
+        return next((m for m in self.members if m.user_id == user_id), None)
+
+    def get_user_role(self, user_id: str) -> Optional[RelationshipRole]:
+        """Get user's role in the tribe"""
+        if self.chief_id == user_id:
+            return RelationshipRole.CHIEF
+
+        member = self.get_member(user_id)
+        return member.role if member else None
+
+    def is_chief(self, user_id: str) -> bool:
+        """Check if user is the chief"""
+        return self.chief_id == user_id
+
+    def is_member(self, user_id: str) -> bool:
+        """Check if user is a member"""
+        return self.is_chief(user_id) or any(m.user_id == user_id for m in self.members)
+
+class TribeCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    is_public: bool = False
+
+class TribeUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    is_public: Optional[bool] = None
+
+class TribeResponse(BaseModel):
+    id: str
+    name: str
+    description: Optional[str]
+    chief_id: str
+    members: List[TribeMember]
+    created_at: datetime
+    is_public: bool
+    user_role: Optional[RelationshipRole] = None  # Current user's role
+    user_permissions: Optional[Dict[str, bool]] = None  # Current user's permissions
+```
+
+### 3. Permission Service
+
+```python
+# backend/app/services/permission_service.py
+from typing import Optional, Literal
+from ..models.tribe import Tribe, TribeMember
+from ..models.user import UserInDB
+from ..models.permissions import (
+    RelationshipRole,
+    EntityPermission,
+    RELATIONSHIP_PERMISSIONS,
+    Permission,
+    Role
+)
+
+class PermissionService:
+    @staticmethod
+    def get_entity_permissions(
+        user: UserInDB,
+        tribe: Tribe
+    ) -> EntityPermission:
+        """Get user's permissions for a specific tribe"""
+
+        # Super admin has all permissions
+        if user.role == Role.SUPER_ADMIN:
+            return RELATIONSHIP_PERMISSIONS[RelationshipRole.CHIEF]
+
+        # Check if user is the chief
+        if tribe.is_chief(str(user.id)):
+            return RELATIONSHIP_PERMISSIONS[RelationshipRole.CHIEF]
+
+        # Check if user is a member and get their role
+        member = tribe.get_member(str(user.id))
+        if member:
+            # Get base permissions for the role
+            base_permissions = RELATIONSHIP_PERMISSIONS.get(
+                member.role,
+                EntityPermission()
+            )
+
+            # Apply custom permission overrides if any
+            if member.permissions_override:
+                return EntityPermission(
+                    can_read=member.permissions_override.get(
+                        'can_read', base_permissions.can_read
+                    ),
+                    can_write=member.permissions_override.get(
+                        'can_write', base_permissions.can_write
+                    ),
+                    can_delete=member.permissions_override.get(
+                        'can_delete', base_permissions.can_delete
+                    ),
+                    can_manage_members=member.permissions_override.get(
+                        'can_manage_members', base_permissions.can_manage_members
+                    ),
+                    can_transfer_ownership=member.permissions_override.get(
+                        'can_transfer_ownership', base_permissions.can_transfer_ownership
+                    ),
+                )
+
+            return base_permissions
+
+        # Public tribes allow read-only access
+        if tribe.is_public:
+            return EntityPermission(can_read=True)
+
+        # No access
+        return EntityPermission()
+
+    @staticmethod
+    def can_read_tribe(user: UserInDB, tribe: Tribe) -> bool:
+        """Check if user can read the tribe"""
+        permissions = PermissionService.get_entity_permissions(user, tribe)
+        return permissions.can_read
+
+    @staticmethod
+    def can_write_tribe(user: UserInDB, tribe: Tribe) -> bool:
+        """Check if user can write to the tribe"""
+        permissions = PermissionService.get_entity_permissions(user, tribe)
+        return permissions.can_write
+
+    @staticmethod
+    def can_delete_tribe(user: UserInDB, tribe: Tribe) -> bool:
+        """Check if user can delete the tribe"""
+        permissions = PermissionService.get_entity_permissions(user, tribe)
+        return permissions.can_delete
+
+    @staticmethod
+    def can_manage_members(user: UserInDB, tribe: Tribe) -> bool:
+        """Check if user can manage tribe members"""
+        permissions = PermissionService.get_entity_permissions(user, tribe)
+        return permissions.can_manage_members
+
+    @staticmethod
+    def can_transfer_ownership(user: UserInDB, tribe: Tribe) -> bool:
+        """Check if user can transfer ownership"""
+        permissions = PermissionService.get_entity_permissions(user, tribe)
+        return permissions.can_transfer_ownership
+```
+
+### 4. Enhanced Permission Dependencies
+
+```python
+# backend/app/dependencies/entity_permissions.py
+from fastapi import Depends, HTTPException, status
+from typing import Callable, Literal
+from bson import ObjectId
+from ..models.user import UserInDB
+from ..models.tribe import Tribe
+from ..database import get_database
+from ..dependencies.auth import get_current_active_user
+from ..services.permission_service import PermissionService
+
+async def get_tribe_by_id(tribe_id: str) -> Tribe:
+    """Get tribe by ID"""
+    if not ObjectId.is_valid(tribe_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid tribe ID"
+        )
+
+    db = await get_database()
+    tribe_data = await db.tribes.find_one({"_id": ObjectId(tribe_id)})
+
+    if not tribe_data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Tribe not found"
+        )
+
+    tribe_data["id"] = str(tribe_data.pop("_id"))
+    return Tribe(**tribe_data)
+
+class EntityPermissionChecker:
+    """Check entity-level permissions"""
+
+    def __init__(
+        self,
+        action: Literal["read", "write", "delete", "manage_members", "transfer_ownership"]
+    ):
+        self.action = action
+
+    async def __call__(
+        self,
+        tribe_id: str,
+        current_user: UserInDB = Depends(get_current_active_user),
+    ) -> tuple[UserInDB, Tribe]:
+        """Check if user has permission to perform action on tribe"""
+
+        # Get the tribe
+        tribe = await get_tribe_by_id(tribe_id)
+
+        # Get user's permissions for this tribe
+        permissions = PermissionService.get_entity_permissions(current_user, tribe)
+
+        # Check specific permission
+        has_permission = False
+        if self.action == "read":
+            has_permission = permissions.can_read
+        elif self.action == "write":
+            has_permission = permissions.can_write
+        elif self.action == "delete":
+            has_permission = permissions.can_delete
+        elif self.action == "manage_members":
+            has_permission = permissions.can_manage_members
+        elif self.action == "transfer_ownership":
+            has_permission = permissions.can_transfer_ownership
+
+        if not has_permission:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"You don't have permission to {self.action} this tribe"
+            )
+
+        return current_user, tribe
+
+# Convenience functions
+def require_tribe_read():
+    return EntityPermissionChecker("read")
+
+def require_tribe_write():
+    return EntityPermissionChecker("write")
+
+def require_tribe_delete():
+    return EntityPermissionChecker("delete")
+
+def require_tribe_manage_members():
+    return EntityPermissionChecker("manage_members")
+
+def require_tribe_transfer_ownership():
+    return EntityPermissionChecker("transfer_ownership")
+```
+
+### 5. Protected API Endpoints
+
+```python
+# backend/app/routers/tribes.py
+from fastapi import APIRouter, Depends, HTTPException, status, Body
+from typing import List
+from bson import ObjectId
+from ..models.user import UserInDB
+from ..models.tribe import Tribe, TribeCreate, TribeUpdate, TribeResponse, TribeMember
+from ..models.permissions import Permission, RelationshipRole
+from ..dependencies.auth import get_current_active_user
+from ..dependencies.permissions import require_permission
+from ..dependencies.entity_permissions import (
+    require_tribe_read,
+    require_tribe_write,
+    require_tribe_delete,
+    require_tribe_manage_members,
+    require_tribe_transfer_ownership,
+    get_tribe_by_id,
+)
+from ..services.permission_service import PermissionService
+from ..database import get_database
+
+router = APIRouter(prefix="/api/tribes", tags=["tribes"])
+
+@router.post("/", response_model=TribeResponse)
+async def create_tribe(
+    tribe_data: TribeCreate,
+    current_user: UserInDB = Depends(
+        require_permission(Permission.TRIBE_CREATE)
+    )
+):
+    """Create a new tribe (user becomes the chief)"""
+    db = await get_database()
+
+    tribe = Tribe(
+        **tribe_data.dict(),
+        chief_id=str(current_user.id),
+        members=[]
+    )
+
+    result = await db.tribes.insert_one(tribe.dict(by_alias=True))
+    tribe.id = str(result.inserted_id)
+
+    return TribeResponse(
+        **tribe.dict(),
+        user_role=RelationshipRole.CHIEF,
+        user_permissions=PermissionService.get_entity_permissions(
+            current_user, tribe
+        ).dict()
+    )
+
+@router.get("/{tribe_id}", response_model=TribeResponse)
+async def get_tribe(
+    user_and_tribe: tuple = Depends(require_tribe_read())
+):
+    """Get tribe details (requires read permission)"""
+    current_user, tribe = user_and_tribe
+
+    return TribeResponse(
+        **tribe.dict(),
+        user_role=tribe.get_user_role(str(current_user.id)),
+        user_permissions=PermissionService.get_entity_permissions(
+            current_user, tribe
+        ).dict()
+    )
+
+@router.put("/{tribe_id}", response_model=TribeResponse)
+async def update_tribe(
+    tribe_update: TribeUpdate,
+    user_and_tribe: tuple = Depends(require_tribe_write())
+):
+    """Update tribe (chief and elders only)"""
+    current_user, tribe = user_and_tribe
+    db = await get_database()
+
+    update_data = tribe_update.dict(exclude_unset=True)
+    if update_data:
+        update_data["updated_at"] = datetime.utcnow()
+        await db.tribes.update_one(
+            {"_id": ObjectId(tribe.id)},
+            {"$set": update_data}
+        )
+
+    # Refresh tribe data
+    updated_tribe = await get_tribe_by_id(tribe.id)
+
+    return TribeResponse(
+        **updated_tribe.dict(),
+        user_role=updated_tribe.get_user_role(str(current_user.id)),
+        user_permissions=PermissionService.get_entity_permissions(
+            current_user, updated_tribe
+        ).dict()
+    )
+
+@router.delete("/{tribe_id}")
+async def delete_tribe(
+    user_and_tribe: tuple = Depends(require_tribe_delete())
+):
+    """Delete tribe (chief only)"""
+    current_user, tribe = user_and_tribe
+    db = await get_database()
+
+    await db.tribes.delete_one({"_id": ObjectId(tribe.id)})
+
+    return {"message": "Tribe deleted successfully"}
+
+@router.post("/{tribe_id}/members")
+async def add_member(
+    member_data: dict = Body(...),
+    user_and_tribe: tuple = Depends(require_tribe_manage_members())
+):
+    """Add member to tribe (chief and elders only)"""
+    current_user, tribe = user_and_tribe
+    db = await get_database()
+
+    new_member = TribeMember(
+        user_id=member_data["user_id"],
+        role=RelationshipRole(member_data.get("role", RelationshipRole.MEMBER))
+    )
+
+    # Check if user is already a member
+    if tribe.is_member(new_member.user_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User is already a member"
+        )
+
+    await db.tribes.update_one(
+        {"_id": ObjectId(tribe.id)},
+        {"$push": {"members": new_member.dict()}}
+    )
+
+    return {"message": "Member added successfully"}
+
+@router.put("/{tribe_id}/members/{user_id}/role")
+async def update_member_role(
+    user_id: str,
+    role_data: dict = Body(...),
+    user_and_tribe: tuple = Depends(require_tribe_manage_members())
+):
+    """Update member role (chief and elders only)"""
+    current_user, tribe = user_and_tribe
+    db = await get_database()
+
+    new_role = RelationshipRole(role_data["role"])
+
+    # Chiefs can't change their own role
+    if tribe.is_chief(user_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot change chief role. Transfer ownership instead."
+        )
+
+    await db.tribes.update_one(
+        {"_id": ObjectId(tribe.id), "members.user_id": user_id},
+        {"$set": {"members.$.role": new_role}}
+    )
+
+    return {"message": "Member role updated successfully"}
+
+@router.delete("/{tribe_id}/members/{user_id}")
+async def remove_member(
+    user_id: str,
+    user_and_tribe: tuple = Depends(require_tribe_manage_members())
+):
+    """Remove member from tribe (chief and elders only)"""
+    current_user, tribe = user_and_tribe
+    db = await get_database()
+
+    # Can't remove the chief
+    if tribe.is_chief(user_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot remove the chief"
+        )
+
+    await db.tribes.update_one(
+        {"_id": ObjectId(tribe.id)},
+        {"$pull": {"members": {"user_id": user_id}}}
+    )
+
+    return {"message": "Member removed successfully"}
+
+@router.post("/{tribe_id}/transfer-ownership")
+async def transfer_ownership(
+    transfer_data: dict = Body(...),
+    user_and_tribe: tuple = Depends(require_tribe_transfer_ownership())
+):
+    """Transfer tribe ownership (chief only)"""
+    current_user, tribe = user_and_tribe
+    db = await get_database()
+
+    new_chief_id = transfer_data["new_chief_id"]
+
+    # New chief must be a member
+    if not tribe.is_member(new_chief_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New chief must be a tribe member"
+        )
+
+    # Update chief and move old chief to members
+    old_chief_member = TribeMember(
+        user_id=tribe.chief_id,
+        role=RelationshipRole.ELDER
+    )
+
+    await db.tribes.update_one(
+        {"_id": ObjectId(tribe.id)},
+        {
+            "$set": {"chief_id": new_chief_id},
+            "$pull": {"members": {"user_id": new_chief_id}},
+            "$push": {"members": old_chief_member.dict()}
+        }
+    )
+
+    return {"message": "Ownership transferred successfully"}
+
+@router.get("/", response_model=List[TribeResponse])
+async def list_tribes(
+    current_user: UserInDB = Depends(get_current_active_user)
+):
+    """List all tribes the user has access to"""
+    db = await get_database()
+
+    # Find tribes where user is chief or member, or public tribes
+    tribes_cursor = db.tribes.find({
+        "$or": [
+            {"chief_id": str(current_user.id)},
+            {"members.user_id": str(current_user.id)},
+            {"is_public": True}
+        ]
+    })
+
+    tribes = []
+    async for tribe_data in tribes_cursor:
+        tribe_data["id"] = str(tribe_data.pop("_id"))
+        tribe = Tribe(**tribe_data)
+
+        tribes.append(TribeResponse(
+            **tribe.dict(),
+            user_role=tribe.get_user_role(str(current_user.id)),
+            user_permissions=PermissionService.get_entity_permissions(
+                current_user, tribe
+            ).dict()
+        ))
+
+    return tribes
+```
+
+## Frontend Implementation
+
+### 1. Types
+
+```typescript
+// frontend/src/types/tribe.ts
+export enum RelationshipRole {
+  CHIEF = 'chief',
+  ELDER = 'elder',
+  MEMBER = 'member',
+  VIEWER = 'viewer',
+}
+
+export interface EntityPermission {
+  can_read: boolean;
+  can_write: boolean;
+  can_delete: boolean;
+  can_manage_members: boolean;
+  can_transfer_ownership: boolean;
+}
+
+export interface TribeMember {
+  user_id: string;
+  role: RelationshipRole;
+  joined_at: string;
+  permissions_override?: Partial<EntityPermission>;
+}
+
+export interface Tribe {
+  id: string;
+  name: string;
+  description?: string;
+  chief_id: string;
+  members: TribeMember[];
+  created_at: string;
+  is_public: boolean;
+  user_role?: RelationshipRole;
+  user_permissions?: EntityPermission;
+}
+```
+
+### 2. Entity Permission Hook
+
+```typescript
+// frontend/src/hooks/useEntityPermission.ts
+import { useMemo } from 'react';
+import { Tribe, EntityPermission } from '../types/tribe';
+
+export const useEntityPermission = (entity: Tribe | null) => {
+  const permissions: EntityPermission = useMemo(() => {
+    if (!entity || !entity.user_permissions) {
+      return {
+        can_read: false,
+        can_write: false,
+        can_delete: false,
+        can_manage_members: false,
+        can_transfer_ownership: false,
+      };
+    }
+    return entity.user_permissions;
+  }, [entity]);
+
+  return {
+    canRead: permissions.can_read,
+    canWrite: permissions.can_write,
+    canDelete: permissions.can_delete,
+    canManageMembers: permissions.can_manage_members,
+    canTransferOwnership: permissions.can_transfer_ownership,
+    isChief: entity?.user_role === 'chief',
+    isElder: entity?.user_role === 'elder',
+    isMember: entity?.user_role === 'member',
+    isViewer: entity?.user_role === 'viewer',
+    role: entity?.user_role,
+  };
+};
+```
+
+### 3. Entity-Based Permission Component
+
+```typescript
+// frontend/src/components/auth/CanAccessEntity.tsx
+import { ReactNode } from 'react';
+import { Tribe, EntityPermission } from '../../types/tribe';
+
+interface CanAccessEntityProps {
+  entity: Tribe | null;
+  action: keyof EntityPermission;
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+export const CanAccessEntity: React.FC<CanAccessEntityProps> = ({
+  entity,
+  action,
+  children,
+  fallback = null,
+}) => {
+  if (!entity || !entity.user_permissions) {
+    return <>{fallback}</>;
+  }
+
+  const hasAccess = entity.user_permissions[action];
+
+  return hasAccess ? <>{children}</> : <>{fallback}</>;
+};
+```
+
+### 4. Tribe Detail Component
+
+```typescript
+// frontend/src/pages/TribeDetail.tsx
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { CanAccessEntity } from '../components/auth/CanAccessEntity';
+import { useEntityPermission } from '../hooks/useEntityPermission';
+import { Tribe, RelationshipRole } from '../types/tribe';
+import api from '../services/api';
+
+export const TribeDetail = () => {
+  const { tribeId } = useParams<{ tribeId: string }>();
+  const navigate = useNavigate();
+  const [tribe, setTribe] = useState<Tribe | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const {
+    canRead,
+    canWrite,
+    canDelete,
+    canManageMembers,
+    canTransferOwnership,
+    isChief,
+    role,
+  } = useEntityPermission(tribe);
+
+  useEffect(() => {
+    loadTribe();
+  }, [tribeId]);
+
+  const loadTribe = async () => {
+    try {
+      const response = await api.get(`/tribes/${tribeId}`);
+      setTribe(response.data);
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        alert('You do not have permission to view this tribe');
+        navigate('/tribes');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdate = async () => {
+    try {
+      await api.put(`/tribes/${tribeId}`, {
+        name: 'Updated Name',
+      });
+      loadTribe();
+    } catch (error: any) {
+      alert(error.response?.data?.detail || 'Failed to update tribe');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm('Are you sure you want to delete this tribe?')) return;
+
+    try {
+      await api.delete(`/tribes/${tribeId}`);
+      navigate('/tribes');
+    } catch (error: any) {
+      alert(error.response?.data?.detail || 'Failed to delete tribe');
+    }
+  };
+
+  const handleAddMember = async (userId: string, role: RelationshipRole) => {
+    try {
+      await api.post(`/tribes/${tribeId}/members`, { user_id: userId, role });
+      loadTribe();
+    } catch (error: any) {
+      alert(error.response?.data?.detail || 'Failed to add member');
+    }
+  };
+
+  const handleRemoveMember = async (userId: string) => {
+    try {
+      await api.delete(`/tribes/${tribeId}/members/${userId}`);
+      loadTribe();
+    } catch (error: any) {
+      alert(error.response?.data?.detail || 'Failed to remove member');
+    }
+  };
+
+  const handleTransferOwnership = async (newChiefId: string) => {
+    if (!confirm('Are you sure you want to transfer ownership?')) return;
+
+    try {
+      await api.post(`/tribes/${tribeId}/transfer-ownership`, {
+        new_chief_id: newChiefId,
+      });
+      loadTribe();
+    } catch (error: any) {
+      alert(error.response?.data?.detail || 'Failed to transfer ownership');
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (!tribe) return <div>Tribe not found</div>;
+
+  return (
+    <div className="container mx-auto p-6">
+      {/* Header */}
+      <div className="bg-white shadow rounded-lg p-6 mb-6">
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h1 className="text-3xl font-bold">{tribe.name}</h1>
+            <p className="text-gray-600 mt-2">{tribe.description}</p>
+          </div>
+
+          {/* Role Badge */}
+          {role && (
+            <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+              isChief ? 'bg-yellow-100 text-yellow-800' :
+              role === 'elder' ? 'bg-purple-100 text-purple-800' :
+              role === 'member' ? 'bg-blue-100 text-blue-800' :
+              'bg-gray-100 text-gray-800'
+            }`}>
+              {role.toUpperCase()}
+            </span>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <CanAccessEntity entity={tribe} action="can_write">
+            <button
+              onClick={handleUpdate}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Edit Tribe
+            </button>
+          </CanAccessEntity>
+
+          <CanAccessEntity entity={tribe} action="can_delete">
+            <button
+              onClick={handleDelete}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              Delete Tribe
+            </button>
+          </CanAccessEntity>
+        </div>
+
+        {/* Permission Debug Info */}
+        <div className="mt-4 p-4 bg-gray-50 rounded text-sm">
+          <strong>Your Permissions:</strong>
+          <ul className="mt-2 space-y-1">
+            <li>Read: {canRead ? '✅' : '❌'}</li>
+            <li>Write: {canWrite ? '✅' : '❌'}</li>
+            <li>Delete: {canDelete ? '✅' : '❌'}</li>
+            <li>Manage Members: {canManageMembers ? '✅' : '❌'}</li>
+            <li>Transfer Ownership: {canTransferOwnership ? '✅' : '❌'}</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Members Section */}
+      <div className="bg-white shadow rounded-lg p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">Members</h2>
+
+          <CanAccessEntity entity={tribe} action="can_manage_members">
+            <button
+              onClick={() => {/* Open add member modal */}}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            >
+              Add Member
+            </button>
+          </CanAccessEntity>
+        </div>
+
+        <div className="space-y-3">
+          {/* Chief */}
+          <div className="flex items-center justify-between p-4 border border-yellow-300 bg-yellow-50 rounded">
+            <div>
+              <span className="font-semibold">Chief</span>
+              <p className="text-sm text-gray-600">User ID: {tribe.chief_id}</p>
+            </div>
+            <div className="flex gap-2">
+              <CanAccessEntity entity={tribe} action="can_transfer_ownership">
+                <button
+                  onClick={() => {/* Open transfer modal */}}
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  Transfer Ownership
+                </button>
+              </CanAccessEntity>
+            </div>
+          </div>
+
+          {/* Other Members */}
+          {tribe.members.map((member) => (
+            <div
+              key={member.user_id}
+              className="flex items-center justify-between p-4 border rounded"
+            >
+              <div>
+                <span className="font-semibold capitalize">{member.role}</span>
+                <p className="text-sm text-gray-600">User ID: {member.user_id}</p>
+                <p className="text-xs text-gray-500">
+                  Joined: {new Date(member.joined_at).toLocaleDateString()}
+                </p>
+              </div>
+
+              <CanAccessEntity entity={tribe} action="can_manage_members">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {/* Open edit role modal */}}
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    Change Role
+                  </button>
+                  <button
+                    onClick={() => handleRemoveMember(member.user_id)}
+                    className="text-sm text-red-600 hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </CanAccessEntity>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+### 5. Tribe List Component
+
+```typescript
+// frontend/src/pages/TribeList.tsx
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Tribe } from '../types/tribe';
+import { CanAccess } from '../components/auth/CanAccess';
+import { Permission } from '../types/permissions';
+import api from '../services/api';
+
+export const TribeList = () => {
+  const [tribes, setTribes] = useState<Tribe[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTribes();
+  }, []);
+
+  const loadTribes = async () => {
+    try {
+      const response = await api.get('/tribes');
+      setTribes(response.data);
+    } catch (error) {
+      console.error('Failed to load tribes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+
+  return (
+    <div className="container mx-auto p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Tribes</h1>
+
+        <CanAccess permission={Permission.TRIBE_CREATE}>
+          <Link
+            to="/tribes/create"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Create Tribe
+          </Link>
+        </CanAccess>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {tribes.map((tribe) => (
+          <div key={tribe.id} className="bg-white shadow rounded-lg p-6">
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-xl font-bold">{tribe.name}</h3>
+              {tribe.user_role && (
+                <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                  tribe.user_role === 'chief' ? 'bg-yellow-100 text-yellow-800' :
+                  tribe.user_role === 'elder' ? 'bg-purple-100 text-purple-800' :
+                  tribe.user_role === 'member' ? 'bg-blue-100 text-blue-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {tribe.user_role}
+                </span>
+              )}
+            </div>
+
+            <p className="text-gray-600 mb-4">{tribe.description}</p>
+
+            <div className="text-sm text-gray-500 mb-4">
+              <p>Members: {tribe.members.length + 1}</p>
+              {tribe.is_public && (
+                <p className="text-green-600">📖 Public</p>
+              )}
+            </div>
+
+            {/* Permission indicators */}
+            {tribe.user_permissions && (
+              <div className="flex gap-2 text-xs mb-4">
+                {tribe.user_permissions.can_write && (
+                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
+                    ✏️ Can Edit
+                  </span>
+                )}
+                {tribe.user_permissions.can_manage_members && (
+                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                    👥 Can Manage
+                  </span>
+                )}
+                {tribe.user_permissions.can_delete && (
+                  <span className="bg-red-100 text-red-800 px-2 py-1 rounded">
+                    🗑️ Can Delete
+                  </span>
+                )}
+              </div>
+            )}
+
+            <Link
+              to={`/tribes/${tribe.id}`}
+              className="text-blue-500 hover:underline"
+            >
+              View Details →
+            </Link>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+```
+
+## Usage Summary
+
+### Backend
+- **Chiefs** have full control (CRUD + member management + transfer ownership)
+- **Elders** can read, write, and manage members
+- **Members** can read and write
+- **Viewers** can only read
+- **Public tribes** allow read access to everyone
+- Custom permission overrides per member
+
+### Frontend
+- Permissions are fetched with the entity
+- UI elements show/hide based on user's entity permissions
+- Clean separation: global permissions + entity-specific permissions
+- Real-time permission checking
+
+This gives you a complete relationship-based permission system! 🎉
