@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { adminMainThemeId, AdminNavigation } from '@/components/layout/AdminNavigation';
@@ -15,9 +16,8 @@ import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDia
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage';
 
-const breadcrumbs = [{ label: 'Home', path: '/app' }, { label: 'Admin', path: '/admin' }, { label: 'Users' }];
-
 const UsersCrudPageContent: React.FC = () => {
+    const { t } = useTranslation();
     const { theme } = useTheme();
     const { users, loading, error, refetch } = useUsersWithRolesAndPermissions();
     const { createUser, updateUser, deleteUser, loading: mutationLoading } = useUserMutations();
@@ -28,15 +28,21 @@ const UsersCrudPageContent: React.FC = () => {
         deleteUser
     );
 
+    const breadcrumbs = useMemo(() => [
+        { label: t('common.home'), path: '/app' },
+        { label: t('common.admin'), path: '/admin' },
+        { label: t('admin.users') },
+    ], [t]);
+
     const filteredUsers = useMemo(() => {
         if (!crud.filter.trim()) return users;
         const term = crud.filter.toLowerCase();
         return users.filter(u => u.login.toLowerCase().includes(term) || u.email.toLowerCase().includes(term));
     }, [users, crud.filter]);
 
-    const columns = [
+    const columns = useMemo(() => [
         {
-            key: 'login', header: 'User',
+            key: 'login', header: t('admin.columnUser'),
             render: (u: UserWithRolesAndPermissions) => (
                 <div>
                     <div style={{ fontWeight: 500 }}>{u.login}</div>
@@ -44,25 +50,25 @@ const UsersCrudPageContent: React.FC = () => {
                 </div>
             ),
         },
-        { key: 'roles', header: 'Roles', render: (u: UserWithRolesAndPermissions) => <UserRolesBadges roles={u.roles} maxDisplay={3} /> },
-        { key: 'created_at', header: 'Created', render: (u: UserWithRolesAndPermissions) => new Date(u.created_at).toLocaleDateString() },
+        { key: 'roles', header: t('admin.columnRoles'), render: (u: UserWithRolesAndPermissions) => <UserRolesBadges roles={u.roles} maxDisplay={3} /> },
+        { key: 'created_at', header: t('common.created'), render: (u: UserWithRolesAndPermissions) => new Date(u.created_at).toLocaleDateString() },
         {
-            key: 'actions', header: 'Actions',
+            key: 'actions', header: t('common.actions'),
             render: (u: UserWithRolesAndPermissions) => (
                 <div style={{ display: 'flex', gap: '8px' }} onClick={e => e.stopPropagation()}>
-                    <ThemedButton variant="secondary" onClick={() => crud.openEdit(u)}>Edit</ThemedButton>
-                    <ThemedButton variant="danger" onClick={() => crud.openDeleteSingle(u)}>Delete</ThemedButton>
+                    <ThemedButton variant="secondary" onClick={() => crud.openEdit(u)}>{t('common.edit')}</ThemedButton>
+                    <ThemedButton variant="danger" onClick={() => crud.openDeleteSingle(u)}>{t('common.delete')}</ThemedButton>
                 </div>
             ),
         },
-    ];
+    ], [t, theme.colors.secondary, crud]);
 
     const secondaryActions = (
         <>
-            <ThemedButton variant="secondary" onClick={crud.openCreate}>Add User</ThemedButton>
+            <ThemedButton variant="secondary" onClick={crud.openCreate}>{t('admin.addUser')}</ThemedButton>
             {crud.selectedRows.size > 0 && (
                 <ThemedButton variant="danger" onClick={crud.handleDeleteSelected}>
-                    Delete Selected ({crud.selectedRows.size})
+                    {t('admin.deleteSelected', { count: crud.selectedRows.size })}
                 </ThemedButton>
             )}
         </>
@@ -78,13 +84,13 @@ const UsersCrudPageContent: React.FC = () => {
     return (
         <AppLayout breadcrumbs={breadcrumbs} headerActions={headerActions} secondaryActions={secondaryActions}>
             <ThemedCard>
-                <ThemedText variant="primary" size="large" as="h1">Users</ThemedText>
-                <ThemedText size="small">Manage user accounts and roles</ThemedText>
+                <ThemedText variant="primary" size="large" as="h1">{t('admin.users')}</ThemedText>
+                <ThemedText size="small">{t('admin.usersSubtitle')}</ThemedText>
             </ThemedCard>
             {error && <ThemedCard variant="danger"><ThemedText variant="danger">{error}</ThemedText></ThemedCard>}
             <ThemedCard>
-                <ThemedInput label="Filter" value={crud.filter} onChange={e => crud.setFilter(e.target.value)}
-                    placeholder="Search by login or email..." variant="primary" />
+                <ThemedInput label={t('common.filter')} value={crud.filter} onChange={e => crud.setFilter(e.target.value)}
+                    placeholder={t('admin.searchLoginEmail')} variant="primary" />
             </ThemedCard>
             <ThemedCard>
                 <ThemedTable data={filteredUsers} columns={columns} getRowId={u => u.id}
@@ -94,11 +100,11 @@ const UsersCrudPageContent: React.FC = () => {
                 user={crud.modalState.entity} mode={crud.modalState.mode} onSubmit={crud.handleSubmit} />
             <ThemedConfirmDialog isOpen={crud.deleteDialog.isOpen} onClose={crud.closeDeleteDialog}
                 onConfirm={crud.confirmDelete}
-                title={crud.deleteDialog.isMultiple ? 'Delete Selected Users' : 'Delete User'}
+                title={crud.deleteDialog.isMultiple ? t('admin.deleteSelectedUsers') : t('admin.deleteUser')}
                 message={crud.deleteDialog.isMultiple
-                    ? `Are you sure you want to delete ${crud.selectedRows.size} user(s)?`
-                    : `Are you sure you want to delete ${crud.deleteDialog.entity?.login}?`}
-                confirmText="Delete" variant="danger" isLoading={mutationLoading} />
+                    ? t('admin.confirmDeleteSelected', { count: crud.selectedRows.size })
+                    : t('admin.confirmDeleteUser', { login: crud.deleteDialog.entity?.login })}
+                confirmText={t('common.delete')} variant="danger" isLoading={mutationLoading} />
         </AppLayout>
     );
 };

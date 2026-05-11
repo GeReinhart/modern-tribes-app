@@ -5,7 +5,7 @@ from ...core.database import get_database
 from ...core.email import send_magic_link
 from ...core.security import create_magic_token
 from ...core.config import settings
-from ...models.auth.auth import MagicLinkRequest, MagicLinkResponse, TokenResponse, UserResponse, SessionResponse
+from ...models.auth.auth import MagicLinkRequest, MagicLinkResponse, TokenResponse, UserResponse, SessionResponse, RefreshRequest, RefreshResponse
 from ...repositories import auth_repository as auth_repo
 from ...services import auth_service
 from ...utils.permissions_helper import get_user_permissions
@@ -37,10 +37,12 @@ async def request_magic_link(request: MagicLinkRequest):
 @router.post("/auth/verify", response_model=TokenResponse)
 async def verify_magic_link(token: str, request: Request, response: Response):
     pool = get_database()
+    forwarded_for = request.headers.get("X-Forwarded-For")
+    ip_address = forwarded_for.split(",")[0].strip() if forwarded_for else (request.client.host if request.client else None)
     return await auth_service.create_session_for_magic_link(
         token,
         request.headers.get("user-agent"),
-        request.client.host,
+        ip_address,
         pool
     )
 
@@ -58,6 +60,12 @@ async def get_me(current_user: dict = Depends(get_current_user)):
         permissions=permissions,
         created_at=current_user["created_at"]
     )
+
+
+@router.post("/auth/refresh", response_model=RefreshResponse)
+async def refresh_token(body: RefreshRequest):
+    pool = get_database()
+    return await auth_service.refresh_access_token(body.refresh_token, pool)
 
 
 @router.post("/auth/logout")

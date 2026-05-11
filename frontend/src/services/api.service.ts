@@ -1,30 +1,23 @@
-import { API_BASE_URL } from '@/config/env';
+import { getAPIBaseUrl } from '@/config/env';
+import { tokenManager } from '@/utils/tokenManager';
 
 class ApiService {
-    private baseURL: string;
-
-    constructor() {
-        this.baseURL = API_BASE_URL;
-    }
 
     private getAuthHeaders(): Record<string, string> {
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
         };
-
-        const token = localStorage.getItem('access_token');
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-
+        const token = tokenManager.getAccessToken();
+        if (token) headers['Authorization'] = `Bearer ${token}`;
         return headers;
     }
 
     private async request<T>(
         endpoint: string,
-        options?: RequestInit
+        options?: RequestInit,
+        isRetry = false,
     ): Promise<T> {
-        const url = `${this.baseURL}${endpoint}`;
+        const url = `${getAPIBaseUrl()}${endpoint}`;
 
         try {
             const response = await fetch(url, {
@@ -34,6 +27,13 @@ class ApiService {
                     ...options?.headers,
                 },
             });
+
+            if (response.status === 401 && !isRetry) {
+                const newToken = await tokenManager.tryRefresh();
+                if (newToken) {
+                    return this.request<T>(endpoint, options, true);
+                }
+            }
 
             if (!response.ok) {
                 const error = await response.json().catch(() => ({ detail: 'An error occurred' }));

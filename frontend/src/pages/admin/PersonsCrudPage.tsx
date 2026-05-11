@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { adminMainThemeId, AdminNavigation } from '@/components/layout/AdminNavigation';
@@ -14,16 +15,28 @@ import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDia
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage';
 
-const GENDER_LABELS: Record<string, string> = { male: 'Male', female: 'Female', other: 'Other', prefer_not_to_say: 'Prefer not to say' };
-const getGenderLabel = (gender: string) => GENDER_LABELS[gender] || gender;
-
-const breadcrumbs = [{ label: 'Home', path: '/app' }, { label: 'Admin', path: '/admin' }, { label: 'Persons' }];
-
 const PersonsCrudPageContent: React.FC = () => {
+    const { t } = useTranslation();
     const { theme } = useTheme();
     const { persons, loading, error, refetch } = usePersons();
     const { createPerson, updatePerson, deletePerson, loading: mutationLoading } = usePersonMutations();
     const crud = useCrudPage<Person, PersonCreate, PersonUpdate>(refetch, createPerson, updatePerson, deletePerson);
+
+    const breadcrumbs = useMemo(() => [
+        { label: t('common.home'), path: '/app' },
+        { label: t('common.admin'), path: '/admin' },
+        { label: t('admin.persons') },
+    ], [t]);
+
+    const getGenderLabel = (gender: string) => {
+        const labels: Record<string, string> = {
+            male: t('admin.genderMale'),
+            female: t('admin.genderFemale'),
+            other: t('admin.genderOther'),
+            prefer_not_to_say: t('admin.genderPreferNot'),
+        };
+        return labels[gender] || gender;
+    };
 
     const filteredPersons = useMemo(() => {
         if (!crud.filter.trim()) return persons;
@@ -33,11 +46,11 @@ const PersonsCrudPageContent: React.FC = () => {
             p.gender, getGenderLabel(p.gender), p.id,
             new Date(p.created_at).toLocaleDateString(),
         ].join(' ').toLowerCase().includes(term));
-    }, [persons, crud.filter]);
+    }, [persons, crud.filter, t]);
 
-    const columns = [
+    const columns = useMemo(() => [
         {
-            key: 'name', header: 'Name',
+            key: 'name', header: t('common.name'),
             render: (p: Person) => (
                 <div>
                     <div style={{ fontWeight: 500 }}>{p.first_name} {p.last_name}</div>
@@ -46,7 +59,7 @@ const PersonsCrudPageContent: React.FC = () => {
             ),
         },
         {
-            key: 'created_at', header: 'Created',
+            key: 'created_at', header: t('common.created'),
             render: (p: Person) => (
                 <div>
                     <div>{new Date(p.created_at).toLocaleDateString()}</div>
@@ -57,22 +70,22 @@ const PersonsCrudPageContent: React.FC = () => {
             ),
         },
         {
-            key: 'actions', header: 'Actions',
+            key: 'actions', header: t('common.actions'),
             render: (p: Person) => (
                 <div style={{ display: 'flex', gap: '8px' }} onClick={e => e.stopPropagation()}>
-                    <ThemedButton variant="secondary" onClick={() => crud.openEdit(p)}>Edit</ThemedButton>
-                    <ThemedButton variant="danger" onClick={() => crud.openDeleteSingle(p)}>Delete</ThemedButton>
+                    <ThemedButton variant="secondary" onClick={() => crud.openEdit(p)}>{t('common.edit')}</ThemedButton>
+                    <ThemedButton variant="danger" onClick={() => crud.openDeleteSingle(p)}>{t('common.delete')}</ThemedButton>
                 </div>
             ),
         },
-    ];
+    ], [t, theme.colors.secondary, crud]);
 
     const secondaryActions = (
         <>
-            <ThemedButton variant="secondary" onClick={crud.openCreate}>Add Person</ThemedButton>
+            <ThemedButton variant="secondary" onClick={crud.openCreate}>{t('admin.addPerson')}</ThemedButton>
             {crud.selectedRows.size > 0 && (
                 <ThemedButton variant="danger" onClick={crud.handleDeleteSelected}>
-                    Delete Selected ({crud.selectedRows.size})
+                    {t('admin.deleteSelected', { count: crud.selectedRows.size })}
                 </ThemedButton>
             )}
         </>
@@ -88,15 +101,15 @@ const PersonsCrudPageContent: React.FC = () => {
     return (
         <AppLayout breadcrumbs={breadcrumbs} headerActions={headerActions} secondaryActions={secondaryActions}>
             <ThemedCard>
-                <ThemedText variant="primary" size="large" as="h1">Persons</ThemedText>
-                <ThemedText size="small">Manage persons</ThemedText>
+                <ThemedText variant="primary" size="large" as="h1">{t('admin.persons')}</ThemedText>
+                <ThemedText size="small">{t('admin.personsSubtitle')}</ThemedText>
             </ThemedCard>
             {error && <ThemedCard variant="danger"><ThemedText variant="danger">{error}</ThemedText></ThemedCard>}
             <ThemedCard>
-                <ThemedInput label="Filter" value={crud.filter} onChange={e => crud.setFilter(e.target.value)}
-                    placeholder="Search by name, gender, date..." variant="primary" />
+                <ThemedInput label={t('common.filter')} value={crud.filter} onChange={e => crud.setFilter(e.target.value)}
+                    placeholder={t('admin.searchNameGenderDate')} variant="primary" />
                 {crud.filter && <div style={{ marginTop: '8px', fontSize: '12px', color: theme.colors.secondary }}>
-                    Found {filteredPersons.length} result{filteredPersons.length !== 1 ? 's' : ''}
+                    {t('admin.foundResults', { count: filteredPersons.length })}
                 </div>}
             </ThemedCard>
             <ThemedCard>
@@ -107,11 +120,11 @@ const PersonsCrudPageContent: React.FC = () => {
                 person={crud.modalState.entity} mode={crud.modalState.mode} onSubmit={crud.handleSubmit} />
             <ThemedConfirmDialog isOpen={crud.deleteDialog.isOpen} onClose={crud.closeDeleteDialog}
                 onConfirm={crud.confirmDelete}
-                title={crud.deleteDialog.isMultiple ? 'Delete Selected Persons' : 'Delete Person'}
+                title={crud.deleteDialog.isMultiple ? t('admin.deleteSelectedPersons') : t('admin.deletePerson')}
                 message={crud.deleteDialog.isMultiple
-                    ? `Are you sure you want to delete ${crud.selectedRows.size} person(s)?`
-                    : `Are you sure you want to delete ${crud.deleteDialog.entity?.first_name} ${crud.deleteDialog.entity?.last_name}?`}
-                confirmText="Delete" variant="danger" isLoading={mutationLoading} />
+                    ? t('admin.confirmDeleteSelected', { count: crud.selectedRows.size })
+                    : t('admin.confirmDeletePerson', { name: `${crud.deleteDialog.entity?.first_name} ${crud.deleteDialog.entity?.last_name}` })}
+                confirmText={t('common.delete')} variant="danger" isLoading={mutationLoading} />
         </AppLayout>
     );
 };

@@ -10,6 +10,7 @@ ENV/
 .env
 *.log
 .env.local
+.env.prod
 .env.*.local
 
 # Node
@@ -44,3 +45,4 @@ build/
 /backend/data/
 /.claude/
 /frontend/.vite/
+/backend/scripts/data-prod/

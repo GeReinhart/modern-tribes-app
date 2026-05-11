@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useApi } from './useApi';
 
 interface EntityService<T, CreateDto, UpdateDto> {
@@ -16,8 +16,9 @@ export function createEntityHooks<T, CreateDto, UpdateDto>(
     function useList() {
         const [items, setItems] = useState<T[]>([]);
         const { loading, error, execute } = useApi<T[]>();
+        const hasFetched = useRef(false);
 
-        const fetch = useCallback(async () => {
+        const refetch = useCallback(async () => {
             try {
                 const data = await execute(() => service.getAll());
                 if (data) setItems(data);
@@ -26,9 +27,13 @@ export function createEntityHooks<T, CreateDto, UpdateDto>(
             }
         }, [execute]);
 
-        useEffect(() => { fetch(); }, [fetch]);
+        useEffect(() => {
+            if (hasFetched.current) return;
+            hasFetched.current = true;
+            refetch();
+        }, [refetch]);
 
-        return { items, loading, error, refetch: fetch };
+        return { items, loading, error, refetch };
     }
 
     function useById(id: string | null) {

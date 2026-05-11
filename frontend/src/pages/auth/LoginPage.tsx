@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {ApplicationLogo} from "@/components/common/icons/ApplicationLogo.tsx";
 import { ThemedText} from '@/components/common/layout/ThemedText';
 import {ThemeProvider} from "@/contexts/ThemeContext.tsx";
@@ -7,6 +8,7 @@ import {ThemedSubmitButton} from "@/components/common/form/ThemedSubmitButton.ts
 import {authService} from "@/services/auth.service.ts";
 
 export default function LoginPage() {
+    const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -29,7 +31,7 @@ export default function LoginPage() {
             setSuccess(true);
             setEmail('');
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'An error occurred. Please try again.');
+            setError(err instanceof Error ? err.message : t('validation.errorOccurred'));
         } finally {
             setIsLoading(false);
         }
@@ -42,19 +44,19 @@ export default function LoginPage() {
                     <div>
                         <ApplicationLogo />
                         <ThemedText size="large">
-                            Sign in to your account
+                            {t('auth.signIn')}
                         </ThemedText>
                         <ThemedText variant="secondary"  size="medium">
-                            We'll send you a magic link to sign in
+                            {t('auth.magicLinkHint')}
                         </ThemedText>
                     </div>
 
                     <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                         {!success && (
                             <ThemedInput
-                                label="Email"
+                                label={t('auth.email')}
                                 variant="accent"
-                                placeholder="user@example.com"
+                                placeholder={t('auth.emailPlaceholder')}
                                 value={email}
                                 onChange={handleEmailChange}
                                 type="email"
@@ -64,7 +66,7 @@ export default function LoginPage() {
 
                         {success && (
                             <ThemedText variant="success" size="large">
-                                Check your email ({sentEmail}) for the sign-in link!
+                                {t('auth.checkEmail', { email: sentEmail })}
                             </ThemedText>
                         )}
 
@@ -74,10 +76,10 @@ export default function LoginPage() {
                             <ThemedSubmitButton
                                 variant="secondary"
                                 isLoading={isLoading}
-                                loadingText="Sending..."
+                                loadingText={t('auth.sending')}
                                 type="submit"
                             >
-                                Send the magic link
+                                {t('auth.sendMagicLink')}
                             </ThemedSubmitButton>
                         )}
                     </form>

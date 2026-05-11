@@ -1,0 +1,11 @@
+login,email,role,person
+admin,admin@modern-tribes.com,Admin,John Smith
+user1,user1@modern-tribes.com,Advanced user,Jane Johnson
+user2,user2@modern-tribes.com,Advanced user,Michael Williams
+user3,user3@modern-tribes.com,Advanced user,Emma Brown
+user4,user4@modern-tribes.com,Advanced user,David Jones
+user5,user5@modern-tribes.com,Advanced user,Sarah Garcia
+user6,user6@modern-tribes.com,User,Robert Miller
+user7,user7@modern-tribes.com,User,Lisa Davis
+user8,user8@modern-tribes.com,User,James Rodriguez
+user9,user9@modern-tribes.com,User,Maria Martinez

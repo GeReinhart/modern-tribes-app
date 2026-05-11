@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
-from typing import Optional, Dict
+from typing import Optional, Dict, Tuple
 from jose import JWTError, jwt
+import hashlib
 import secrets
 from passlib.context import CryptContext
 from .config import settings
@@ -54,5 +55,13 @@ def verify_access_token(token: str) -> Optional[Dict]:
         return None
 
 def generate_session_id() -> str:
-    """Generate a unique session ID"""
     return secrets.token_urlsafe(32)
+
+def create_refresh_token() -> Tuple[str, str]:
+    """Return (raw_token, sha256_hash). Store only the hash in DB."""
+    raw = secrets.token_urlsafe(48)
+    token_hash = hashlib.sha256(raw.encode()).hexdigest()
+    return raw, token_hash
+
+def hash_refresh_token(raw_token: str) -> str:
+    return hashlib.sha256(raw_token.encode()).hexdigest()

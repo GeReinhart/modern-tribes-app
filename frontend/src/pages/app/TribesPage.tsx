@@ -1,4 +1,5 @@
 import React, {useEffect} from 'react';
+import { useTranslation } from 'react-i18next';
 import {AppLayout} from '@/components/layout/AppLayout';
 import {useUserTribes} from '@/hooks/useTribes.ts';
 import {useCurrentUserProfile} from "@/hooks/useCurrentUserProfile.ts";
@@ -15,14 +16,15 @@ import {useVerifyAuthorization} from "@/hooks/userVerifyAuthorization.ts";
 import {errorStyle} from "@/styles/theme.styles.tsx";
 
 const TribesPageContent: React.FC = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const {user, isLoading: currentUserLoading} = useCurrentUserProfile();
     const {tribes, loading: tribesLoading} = useUserTribes(user?.id || '', {enabled: !!user?.id});
     const { data: authorization, error: authorizationError, verifyAuthorization } = useVerifyAuthorization();
 
     const breadcrumbs = [
-        { label: 'Home', path: '/app' },
-        { label: 'Tribes' }
+        { label: t('common.home'), path: '/app' },
+        { label: t('tribes.title') }
     ];
 
     // Check authorization
@@ -37,7 +39,7 @@ const TribesPageContent: React.FC = () => {
 
             {authorization?.authorized && (
             <ThemedButton onClick={() => navigate('/app/tribes/create')} variant="primary">
-                Create Tribe
+                {t('tribes.createTribe')}
             </ThemedButton>
             )}
 
@@ -48,7 +50,7 @@ const TribesPageContent: React.FC = () => {
                 }}
                 theme={themesById['main_3']}
             >
-                Admin
+                {t('common.admin')}
             </ThemedButton>
         </>
     );
@@ -77,10 +79,10 @@ const TribesPageContent: React.FC = () => {
                 {/* Header */}
                 <div className="mb-6">
                     <ThemedText variant="primary" size="large" as="h1">
-                        Tribes
+                        {t('tribes.title')}
                     </ThemedText>
                     <ThemedText variant="primary" size="small">
-                        The tribes I'm involved with.
+                        {t('tribes.subtitle')}
                     </ThemedText>
                 </div>
 
@@ -100,7 +102,7 @@ const TribesPageContent: React.FC = () => {
                 {tribes.length === 0 && (
                     <ThemedCard variant="secondary">
                         <ThemedText variant="secondary" size="medium">
-                            No tribes yet. Create your first tribe!
+                            {t('tribes.empty')}
                         </ThemedText>
                     </ThemedCard>
                 )}

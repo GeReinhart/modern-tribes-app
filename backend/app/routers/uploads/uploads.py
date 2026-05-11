@@ -1,9 +1,11 @@
+import logging
+import uuid
 from fastapi import APIRouter, UploadFile, File, HTTPException, Request
 from fastapi.responses import JSONResponse
 from ...models.uploads.files import UploadFileResponse
 from ...utils.file_handler import file_handler
-import uuid
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/uploads", tags=["upload"])
 
 
@@ -31,7 +33,7 @@ async def upload_image(request: Request):
             )
 
         # Save image
-        filename, file_path = await file_handler.save_image(file)
+        filename, _ = await file_handler.save_image(file)
 
         # Generate URL
         url = file_handler.get_file_url(filename, "images")
@@ -46,11 +48,13 @@ async def upload_image(request: Request):
         )
 
     except HTTPException as e:
+        logger.warning("upload_image HTTPException: status=%d detail=%s", e.status_code, e.detail)
         return JSONResponse(
             status_code=e.status_code,
             content={"error": 1, "message": e.detail}
         )
     except Exception as e:
+        logger.exception("upload_image unhandled error: %s", e)
         return JSONResponse(
             status_code=500,
             content={"error": 1, "message": f"Upload failed: {str(e)}"}
@@ -66,13 +70,10 @@ async def upload_file(file: UploadFile = File(...)):
     """
     try:
         # Save file
-        filename, file_path, mime_type = await file_handler.save_file(file)
+        filename, file_size, mime_type = await file_handler.save_file(file)
 
         # Generate URL
         url = file_handler.get_file_url(filename, "files")
-
-        # Get file size
-        file_size = file_path.stat().st_size
 
         return UploadFileResponse(
             url=url,

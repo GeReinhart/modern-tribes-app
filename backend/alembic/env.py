@@ -17,8 +17,10 @@ from app.core.config import settings
 # access to the values within the .ini file in use.
 config = context.config
 
-# Set the database URL from environment
-db_url = settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+db_url = (
+    f"postgresql+asyncpg://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}"
+    f"@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
+)
 config.set_main_option("sqlalchemy.url", db_url)
 
 # Interpret the config file for Python logging.

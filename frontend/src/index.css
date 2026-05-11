@@ -35,6 +35,12 @@
     }
 }
 
+/* Restore heading styles inside the Jodit editor content area (Tailwind preflight resets them) */
+.jodit-wysiwyg h1 { font-size: 2em; font-weight: 700; margin: 0.67em 0; }
+.jodit-wysiwyg h2 { font-size: 1.5em; font-weight: 700; margin: 0.83em 0; }
+.jodit-wysiwyg h3 { font-size: 1.17em; font-weight: 700; margin: 1em 0; }
+.jodit-wysiwyg h4 { font-size: 1em; font-weight: 700; margin: 1.33em 0; }
+
 /* Custom animations */
 @layer utilities {
     .animate-fade-in {

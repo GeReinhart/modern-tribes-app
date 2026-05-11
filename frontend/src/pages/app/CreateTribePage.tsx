@@ -1,4 +1,5 @@
 import React, {useState, useMemo} from 'react';
+import { useTranslation } from 'react-i18next';
 import {ThemeProvider, useTheme} from '@/contexts/ThemeContext.tsx';
 import {AppLayout} from '@/components/layout/AppLayout';
 import { ThemedCard } from '@/components/common/layout/ThemedCard';
@@ -44,6 +45,7 @@ interface TribeFormData {
 }
 
 const CreateTribeFormContent: React.FC = () => {
+    const { t } = useTranslation();
     const {theme} = useTheme();
     const navigate = useNavigate();
 
@@ -65,15 +67,15 @@ const CreateTribeFormContent: React.FC = () => {
     });
 
     const breadcrumbs = [
-        { label: 'Home', path: '/app' },
-        { label: 'Tribes', path: '/app/tribes' },
-        { label: 'Create' }
+        { label: t('common.home'), path: '/app' },
+        { label: t('tribes.title'), path: '/app/tribes' },
+        { label: t('common.create') }
     ];
 
     const headerActions = (
         <>
             <ThemedButton variant="secondary" onClick={() => navigate('/app')}>
-                Cancel
+                {t('common.cancel')}
             </ThemedButton>
         </>
     );
@@ -157,21 +159,21 @@ const CreateTribeFormContent: React.FC = () => {
 
     const validateForm = (): boolean => {
         if (!formData.tribeName.trim()) {
-            setError('Tribe name is required');
+            setError(t('validation.tribeNameRequired'));
             return false;
         }
         if (!formData.documentContent.trim()) {
-            setError('Document content is required');
+            setError(t('validation.documentContentRequired'));
             return false;
         }
         if (formData.selectedPersons.length === 0) {
-            setError('Please select at least one person for the tribe');
+            setError(t('validation.selectOnePerson'));
             return false;
         }
 
         const hasChief = formData.selectedPersons.some(p => p.position === 'chief');
         if (!hasChief) {
-            setError('Please assign at least one person as Chief');
+            setError(t('validation.assignOneChief'));
             return false;
         }
 
@@ -223,7 +225,7 @@ const CreateTribeFormContent: React.FC = () => {
             }, 2000);
 
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'An error occurred while creating the tribe');
+            setError(err instanceof Error ? err.message : t('validation.failedCreateTribe'));
             console.error('Error creating tribe:', err);
         } finally {
             setIsSubmitting(false);
@@ -263,32 +265,32 @@ const CreateTribeFormContent: React.FC = () => {
         <AppLayout headerActions={headerActions} breadcrumbs={breadcrumbs}>
             {isSubmitting && (
                 <ThemedLoadingOverlay
-                    message="Creating Tribe..."
-                    subMessage="Please wait while we create the tribe and assign members"
+                    message={t('tribes.creatingTribe')}
+                    subMessage={t('tribes.createWait')}
                 />
             )}
 
             {/* Page Title */}
             <ThemedCard>
                 <ThemedText variant="primary" size="large" as="h1">
-                    Create a new tribe
+                    {t('tribes.createTitle')}
                 </ThemedText>
                 <ThemedText size="small">
-                    Fill in the form below to create a new tribe
+                    {t('tribes.createSubtitle')}
                 </ThemedText>
             </ThemedCard>
 
             {/* Error Message */}
             {displayError && (
                 <div style={errorStyle}>
-                    <strong>Error:</strong> {displayError}
+                    <strong>{t('common.error')}</strong> {displayError}
                 </div>
             )}
 
             {/* Success Message */}
             {success && (
                 <div style={successStyle}>
-                    <strong>Success!</strong> Tribe created successfully. Redirecting...
+                    <strong>{t('common.success')}</strong> {t('tribes.createSuccess')}
                 </div>
             )}
 
@@ -299,19 +301,19 @@ const CreateTribeFormContent: React.FC = () => {
                     <ThemedSection themeId="main_1">
                         <label>
                             <ThemedText size="medium" as="h3">
-                                Name *
+                                {t('tribes.name')}
                             </ThemedText>
                             <input
                                 type="text"
                                 style={inputStyle}
                                 value={formData.tribeName}
                                 onChange={(e) => handleInputChange('tribeName', e.target.value)}
-                                placeholder="Enter tribe name"
+                                placeholder={t('tribes.name').replace(' *', '')}
                                 disabled={isLoading}
                             />
                         </label>
                         <ThemedText size="medium" as="h3">
-                            Description *
+                            {t('tribes.description')}
                         </ThemedText>
                         <label>
                             <div className="border border-gray-300 rounded-lg overflow-hidden">
@@ -335,16 +337,16 @@ const CreateTribeFormContent: React.FC = () => {
                     {/* Person Selection Section */}
                     <ThemedSection themeId="main_2">
                         <ThemedText size="medium" as="h2">
-                            Members and positions
+                            {t('tribes.membersAndPositions')}
                         </ThemedText>
                         <ThemedText variant="secondary" size="small">
-                            Select persons and assign their positions. At least one Chief is required.
+                            {t('tribes.membersAndPositionsHint')}
                         </ThemedText>
 
                         {/* Filter Input */}
                         <div style={filterHeaderStyle}>
                             <ThemedText variant="accent" size="small" as="span">
-                                Filter persons
+                                {t('tribes.filterPersons')}
                             </ThemedText>
                             {(personFilter || showOnlySelected) && (
                                 <button
@@ -352,7 +354,7 @@ const CreateTribeFormContent: React.FC = () => {
                                     style={clearButtonStyle}
                                     onClick={handleClearFilter}
                                 >
-                                    Clear all filters
+                                    {t('tribes.clearAllFilters')}
                                 </button>
                             )}
                         </div>
@@ -361,7 +363,7 @@ const CreateTribeFormContent: React.FC = () => {
                             style={filterInputStyle}
                             value={personFilter}
                             onChange={(e) => setPersonFilter(e.target.value)}
-                            placeholder="Search..."
+                            placeholder={t('common.filter')}
                             disabled={isLoading}
                         />
 
@@ -389,7 +391,7 @@ const CreateTribeFormContent: React.FC = () => {
                                 }}
                             />
                             <ThemedText variant="primary" size="small" as="span">
-                                Show only selected persons ({formData.selectedPersons.length})
+                                {t('tribes.showOnlySelected', { count: formData.selectedPersons.length })}
                             </ThemedText>
                         </label>
 
@@ -397,8 +399,8 @@ const CreateTribeFormContent: React.FC = () => {
                             <div style={{marginBottom: '12px'}}>
                                 <ThemedText variant="secondary" size="small" as="div">
                                     {showOnlySelected
-                                        ? `Showing ${filteredPersons.length} selected person(s)`
-                                        : `Found ${filteredPersons.length} person(s) matching "${personFilter}"`
+                                        ? t('tribes.showingSelected', { count: filteredPersons.length })
+                                        : t('tribes.foundPersons', { count: filteredPersons.length, search: personFilter })
                                     }
                                 </ThemedText>
                             </div>
@@ -407,21 +409,21 @@ const CreateTribeFormContent: React.FC = () => {
                         <div style={personListContainerStyle}>
                             {personsLoading && (
                                 <ThemedText variant="secondary" size="small">
-                                    Loading persons...
+                                    {t('tribes.loadingPersons')}
                                 </ThemedText>
                             )}
 
                             {!personsLoading && persons.length === 0 && (
                                 <ThemedText variant="secondary" size="small">
-                                    No persons available. Please create persons first.
+                                    {t('tribes.noPersonsAvailable')}
                                 </ThemedText>
                             )}
 
                             {!personsLoading && persons.length > 0 && filteredPersons.length === 0 && (
                                 <ThemedText variant="secondary" size="small">
                                     {showOnlySelected
-                                        ? "No persons selected yet. Start selecting persons from the list above."
-                                        : "No persons match your filter. Try a different search term."
+                                        ? t('tribes.noPersonsSelected')
+                                        : t('tribes.noPersonsMatch')
                                     }
                                 </ThemedText>
                             )}
@@ -474,9 +476,9 @@ const CreateTribeFormContent: React.FC = () => {
                                                 disabled={isLoading}
                                                 onClick={(e) => e.stopPropagation()}
                                             >
-                                                <option value="member">Member</option>
-                                                <option value="chief">Chief</option>
-                                                <option value="guest">Guest</option>
+                                                <option value="member">{t('positions.member')}</option>
+                                                <option value="chief">{t('positions.chief')}</option>
+                                                <option value="guest">{t('positions.guest')}</option>
                                             </select>
                                         )}
                                     </div>
@@ -493,7 +495,7 @@ const CreateTribeFormContent: React.FC = () => {
                             onClick={handleCancel}
                             disabled={isSubmitting}
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </ThemedButton>
                         <button
                             type="submit"
@@ -501,7 +503,7 @@ const CreateTribeFormContent: React.FC = () => {
                             disabled={isSubmitting}
                         >
                             {isSubmitting && <ThemedLoadingSpinner size="sm" />}
-                            {isSubmitting ? 'Creating Tribe...' : 'Create Tribe'}
+                            {isSubmitting ? t('tribes.creatingTribe') : t('tribes.createTribe')}
                         </button>
                     </div>
                 </div>
