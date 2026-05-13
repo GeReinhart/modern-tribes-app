@@ -345,9 +345,7 @@ const UpdateTribePageContent: React.FC = () => {
             <div style={{ padding: '0 24px', maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
                 {/* Page Title */}
                 <ThemedCard>
-                    <ThemedText variant="primary" size="large" as="h1">
-                        {t('tribes.updateTitle')}
-                    </ThemedText>
+
                     <ThemedText size="small">
                         {t('tribes.updateSubtitle')}
                     </ThemedText>

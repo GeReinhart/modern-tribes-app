@@ -2,6 +2,8 @@ import React, {CSSProperties} from "react";
 import {Theme} from "@/components/themes/themes.ts";
 import {useTheme} from "@/contexts/ThemeContext.tsx";
 import {useAuth} from "@/contexts/AuthContext.tsx";
+import {useResponsiveContext} from "@/contexts/ResponsiveContext.tsx";
+import {ThemedSvgIcon, IconName} from "@/components/common/icons/ThemedSvgIcon.tsx";
 
 interface ThemedButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     children: React.ReactNode;
@@ -13,6 +15,7 @@ interface ThemedButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
     requiredPermissions?: string[];
+    mobileIcon?: IconName;
 }
 
 export const ThemedButton: React.FC<ThemedButtonProps> = ({
@@ -30,10 +33,12 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
                                                               type = 'button',
                                                               style: customStyle,
                                                               requiredPermissions,
+                                                              mobileIcon,
                                                               ...props
                                                           }) => {
     const { theme: contextTheme } = useTheme();
     const { user } = useAuth();
+    const { isMobile } = useResponsiveContext();
     const theme = themeOverride || contextTheme;
 
     // Hide button if user doesn't have at least one of the required permissions
@@ -42,13 +47,14 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
     }
 
     const isDisabled = disabled || isLoading;
+    const showIconOnly = isMobile && !!mobileIcon && !isLoading;
 
     const style: CSSProperties = {
         backgroundColor: isDisabled ? '#cccccc' : theme.colors[variant],
         color: isDisabled ? '#666666' : 'white',
         border: 'none',
-        padding: '12px 24px',
-        fontSize: '16px',
+        padding: showIconOnly ? 'var(--btn-pad-v)' : 'var(--btn-pad-v) var(--btn-pad-h)',
+        fontSize: 'var(--btn-font)',
         fontWeight: 'bold',
         borderRadius: '8px',
         cursor: isDisabled ? 'not-allowed' : 'pointer',
@@ -59,9 +65,11 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '8px',
+        gap: 'var(--space-sm)',
         ...customStyle,
     };
+
+    const labelForTitle = typeof children === 'string' ? children : undefined;
 
     return (
         <button
@@ -70,6 +78,7 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
             style={style}
             onClick={isDisabled ? undefined : onClick}
             disabled={isDisabled}
+            title={showIconOnly ? labelForTitle : undefined}
             onMouseEnter={(e) => {
                 if (!isDisabled) {
                     e.currentTarget.style.transform = 'translateY(-2px)';
@@ -90,9 +99,15 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
             )}
-            {!isLoading && leftIcon && leftIcon}
-            {isLoading ? (loadingText || children) : children}
-            {!isLoading && rightIcon && rightIcon}
+            {showIconOnly ? (
+                <ThemedSvgIcon name={mobileIcon!} color={isDisabled ? '#666666' : 'white'} size={18} />
+            ) : (
+                <>
+                    {!isLoading && leftIcon && leftIcon}
+                    {isLoading ? (loadingText || children) : children}
+                    {!isLoading && rightIcon && rightIcon}
+                </>
+            )}
         </button>
     );
 };

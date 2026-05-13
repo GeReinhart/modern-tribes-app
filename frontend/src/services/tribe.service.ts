@@ -19,8 +19,6 @@ class TribeService {
 
     async getAllByUser(userId: string): Promise<UserPersonPositionTribe[]> {
 
-        console.log("Loading tribes from "+userId);
-
         return apiService.get<UserPersonPositionTribe[]>(`${this.queryEndpoint}/by/user/${userId}`);
     }
 

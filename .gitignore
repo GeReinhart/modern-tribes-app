@@ -45,4 +45,5 @@ build/
 /backend/data/
 /.claude/
 /frontend/.vite/
-/backend/scripts/data-prod/
+/backend/.env.prod
+/.env.prod
