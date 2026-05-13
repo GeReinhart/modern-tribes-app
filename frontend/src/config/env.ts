@@ -6,7 +6,6 @@ export function getAPIBaseUrl() {
     ? rawApiBaseUrl.replace('http://', 'https://')
     : rawApiBaseUrl;
 
-    console.log(`getAPIBaseUrl: ${url}`);
 
     return url;
 }

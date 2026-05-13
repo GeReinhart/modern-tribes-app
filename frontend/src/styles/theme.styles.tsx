@@ -9,11 +9,11 @@ export const getHeaderStyle = (theme: Theme): CSSProperties => ({
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '16px 24px',
+    padding: 'var(--header-pad)',
     backgroundColor: theme.colors.surface,
     borderBottom: `2px solid ${theme.colors.border}`,
-    marginBottom: '24px',
-    gap: '24px',
+    marginBottom: 'var(--space-lg)',
+    gap: 'var(--space-lg)',
 });
 
 export const logoContainerStyle: CSSProperties = {
@@ -24,7 +24,7 @@ export const logoContainerStyle: CSSProperties = {
 export const middleSectionStyle: CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
+    gap: 'var(--space-sm)',
     flex: 1,
     minWidth: 0,
 };
@@ -37,19 +37,19 @@ export const breadcrumbContainerStyle: CSSProperties = {
 export const actionsContainerStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: 'var(--space-md)',
     flexWrap: 'wrap',
 };
 
 export const rightSectionStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: 'var(--space-md)',
     flexShrink: 0,
 };
 
 export const getFooterStyle = (theme: Theme): CSSProperties => ({
-    padding: '12px 24px',
+    padding: 'var(--space-sm) var(--space-lg)',
     backgroundColor: theme.colors.surface,
     borderTop: `1px solid ${theme.colors.border}`,
     textAlign: 'center',
@@ -59,14 +59,14 @@ export const getFooterStyle = (theme: Theme): CSSProperties => ({
 export const footerLinksStyle: CSSProperties = {
     display: 'flex',
     justifyContent: 'center',
-    gap: '24px',
-    marginTop: '4px',
+    gap: 'var(--space-lg)',
+    marginTop: 'var(--space-xs)',
 };
 
 export const getFooterLinkStyle = (theme: Theme): CSSProperties => ({
     color: theme.colors.text,
     textDecoration: 'none',
-    fontSize: '11px',
+    fontSize: 'var(--font-sm)',
     cursor: 'pointer',
     transition: 'color 0.2s ease',
 });
@@ -79,10 +79,10 @@ export const layoutStyle: CSSProperties = {
 
 export const mainStyle: CSSProperties = {
     flex: 1,
-    padding: '0 24px 24px',
+    padding: 'var(--main-pad)',
     display: 'flex',
     flexDirection: 'column',
-    gap: '24px',
+    gap: 'var(--space-lg)',
 };
 
 // ============================================
@@ -92,8 +92,8 @@ export const mainStyle: CSSProperties = {
 export const getBreadcrumbContainerStyle = (theme: Theme): CSSProperties => ({
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    fontSize: '14px',
+    gap: 'var(--space-sm)',
+    fontSize: 'var(--font-sm)',
     color: theme.colors.text,
 });
 
@@ -123,32 +123,32 @@ export const getBreadcrumbSeparatorStyle = (theme: Theme): CSSProperties => ({
 export const getCardStyle = (theme: Theme, variant: keyof Theme['colors'] = 'primary', bordered: boolean = true): CSSProperties => ({
     border: bordered ? `3px solid ${theme.colors[variant]}` : 'none',
     borderRadius: '12px',
-    padding: '24px',
+    padding: 'var(--card-pad)',
     background: `linear-gradient(135deg, ${theme.colors.primary}08, ${theme.colors.accent}08)`,
     boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-    margin: '16px 0',
+    margin: 'var(--space-md) 0',
 });
 
 export const getMemberCardStyle = (theme: Theme): CSSProperties => ({
-    padding: '12px 16px',
+    padding: 'var(--space-sm) var(--space-md)',
     backgroundColor: theme.colors.surface,
     border: `1px solid ${theme.colors.border}`,
     borderRadius: '8px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '8px',
+    marginBottom: 'var(--space-sm)',
 });
 
 export const getAttachmentCardStyle = (theme: Theme): CSSProperties => ({
-    padding: '12px 16px',
+    padding: 'var(--space-sm) var(--space-md)',
     backgroundColor: theme.colors.surface,
     border: `1px solid ${theme.colors.border}`,
     borderRadius: '8px',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '8px',
+    marginBottom: 'var(--space-sm)',
     transition: 'all 0.2s ease',
 });
 
@@ -159,12 +159,12 @@ export const getAttachmentCardStyle = (theme: Theme): CSSProperties => ({
 export const getBadgeStyle = (theme: Theme, variant: keyof Theme['colors'] = 'secondary'): CSSProperties => ({
     backgroundColor: theme.colors[variant],
     color: 'white',
-    padding: '4px 12px',
+    padding: 'var(--space-xs) var(--space-md)',
     borderRadius: '16px',
-    fontSize: '12px',
+    fontSize: 'var(--font-sm)',
     fontWeight: 'bold',
     display: 'inline-block',
-    margin: '0 4px',
+    margin: '0 var(--space-xs)',
 });
 
 export const getPositionBadgeStyle = (theme: Theme, type: 'chief' | 'member' | 'guest'): CSSProperties => {
@@ -191,16 +191,16 @@ export const getPositionBadgeStyle = (theme: Theme, type: 'chief' | 'member' | '
 
 export const getTextStyle = (theme: Theme, variant: keyof Theme['colors'] = 'text', size: 'small' | 'medium' | 'large' = 'medium'): CSSProperties => {
     const sizes = {
-        small: '14px',
-        medium: '18px',
-        large: '24px',
+        small: 'var(--font-sm)',
+        medium: 'var(--font-lg)',
+        large: 'var(--font-xl)',
     };
 
     return {
         color: theme.colors[variant],
         fontSize: sizes[size],
         fontWeight: '600',
-        margin: '8px 0',
+        margin: 'var(--space-sm) 0',
     };
 };
 
@@ -212,7 +212,7 @@ export const getDividerStyle = (theme: Theme, variant: keyof Theme['colors'] = '
     height: '2px',
     background: `linear-gradient(to right, transparent, ${theme.colors[variant]}, transparent)`,
     border: 'none',
-    margin: '20px 0',
+    margin: 'var(--space-lg) 0',
 });
 
 // ============================================
@@ -228,8 +228,8 @@ export const getButtonStyle = (
     backgroundColor: disabled ? '#cccccc' : theme.colors[variant],
     color: disabled ? '#666666' : 'white',
     border: 'none',
-    padding: '12px 24px',
-    fontSize: '16px',
+    padding: 'var(--btn-pad-v) var(--btn-pad-h)',
+    fontSize: 'var(--btn-font)',
     fontWeight: 'bold',
     borderRadius: '8px',
     cursor: disabled ? 'not-allowed' : 'pointer',
@@ -240,15 +240,15 @@ export const getButtonStyle = (
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '8px',
+    gap: 'var(--space-sm)',
 });
 
 export const getSubmitButtonStyle = (theme: Theme, isLoading: boolean): CSSProperties => ({
     backgroundColor: theme.colors.primary,
     color: 'white',
     border: 'none',
-    padding: '12px 24px',
-    fontSize: '16px',
+    padding: 'var(--btn-pad-v) var(--btn-pad-h)',
+    fontSize: 'var(--btn-font)',
     fontWeight: 'bold',
     borderRadius: '8px',
     cursor: isLoading ? 'not-allowed' : 'pointer',
@@ -257,7 +257,7 @@ export const getSubmitButtonStyle = (theme: Theme, isLoading: boolean): CSSPrope
     opacity: isLoading ? 0.7 : 1,
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
+    gap: 'var(--space-sm)',
     minWidth: '160px',
     justifyContent: 'center',
 });
@@ -287,31 +287,31 @@ export const containerStyle: CSSProperties = {
 
 export const formContainerStyle: CSSProperties = {
     backgroundColor: 'white',
-    padding: '30px',
+    padding: 'var(--space-xl)',
     borderRadius: '12px',
     boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
 };
 
 export const getInputStyle = (theme: Theme): CSSProperties => ({
     width: '100%',
-    padding: '12px',
-    fontSize: '16px',
+    padding: 'var(--space-sm)',
+    fontSize: 'var(--font-md)',
     borderRadius: '8px',
     border: `2px solid ${theme.colors.secondary}`,
-    marginTop: '8px',
-    marginBottom: '16px',
+    marginTop: 'var(--space-sm)',
+    marginBottom: 'var(--space-md)',
     fontFamily: 'Arial, sans-serif',
     transition: 'border-color 0.3s ease',
 });
 
 export const getFilterInputStyle = (theme: Theme): CSSProperties => ({
     width: '100%',
-    padding: '12px 16px',
-    fontSize: '16px',
+    padding: 'var(--space-sm) var(--space-md)',
+    fontSize: 'var(--font-md)',
     borderRadius: '8px',
     border: `2px solid ${theme.colors.secondary}`,
-    marginTop: '12px',
-    marginBottom: '16px',
+    marginTop: 'var(--space-sm)',
+    marginBottom: 'var(--space-md)',
     fontFamily: 'Arial, sans-serif',
     transition: 'all 0.3s ease',
     backgroundColor: '#fafafa',
@@ -380,8 +380,8 @@ export const successStyle: CSSProperties = {
 
 export const formActionsStyle: CSSProperties = {
     display: 'flex',
-    gap: '12px',
-    marginTop: '30px',
+    gap: 'var(--space-md)',
+    marginTop: 'var(--space-xl)',
     justifyContent: 'flex-end',
 };
 

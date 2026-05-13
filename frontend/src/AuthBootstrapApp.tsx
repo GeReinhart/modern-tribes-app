@@ -1,6 +1,7 @@
 import {BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 import {AuthProvider} from '@/contexts/AuthContext.tsx';
 import {UserProfileProvider} from '@/contexts/UserProfileContext.tsx';
+import {ResponsiveProvider} from '@/contexts/ResponsiveContext.tsx';
 import ProtectedRoute from '@/components/auth/ProtectedRoute.tsx';
 import Login from '@/pages/auth/LoginPage.tsx';
 import Verify from '@/pages/auth/VerifyPage.tsx';
@@ -25,6 +26,7 @@ function AuthBootstrapApp() {
                 console.error('App Error:', error, errorInfo);
             }}
         >
+            <ResponsiveProvider>
             <BrowserRouter>
                 <AuthProvider>
                     <UserProfileProvider>
@@ -57,6 +59,7 @@ function AuthBootstrapApp() {
                     </UserProfileProvider>
                 </AuthProvider>
             </BrowserRouter>
+            </ResponsiveProvider>
         </ErrorBoundary>
     );
 }

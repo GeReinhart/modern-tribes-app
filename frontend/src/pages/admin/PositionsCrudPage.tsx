@@ -81,7 +81,7 @@ const PositionsCrudPageContent: React.FC = () => {
     return (
         <AppLayout breadcrumbs={breadcrumbs} headerActions={headerActions} secondaryActions={secondaryActions}>
             <ThemedCard>
-                <ThemedText variant="primary" size="large" as="h1">{t('admin.positions')}</ThemedText>
+
                 <ThemedText size="small">{t('admin.positionsSubtitle')}</ThemedText>
             </ThemedCard>
             {error && <ThemedCard variant="danger"><ThemedText variant="danger">{error}</ThemedText></ThemedCard>}

@@ -147,13 +147,6 @@ const ShowTribePageContent: React.FC = () => {
                 </ThemedCard>
             )}
 
-            {/* Tribe Name */}
-            <ThemedCard>
-                <ThemedText variant="primary" size="large" as="h1">
-                    {tribe.name}
-                </ThemedText>
-            </ThemedCard>
-
             {/* Tribe Description */}
             {tribe.document_content_html && (
                 <ThemedSection themeId="main_1">

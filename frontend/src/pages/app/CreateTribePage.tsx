@@ -272,9 +272,7 @@ const CreateTribeFormContent: React.FC = () => {
 
             {/* Page Title */}
             <ThemedCard>
-                <ThemedText variant="primary" size="large" as="h1">
-                    {t('tribes.createTitle')}
-                </ThemedText>
+
                 <ThemedText size="small">
                     {t('tribes.createSubtitle')}
                 </ThemedText>

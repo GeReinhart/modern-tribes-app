@@ -2,6 +2,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Spacing & typography tokens */
+:root {
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 30px;
+    --font-sm: 14px;
+    --font-md: 16px;
+    --font-lg: 18px;
+    --font-xl: 24px;
+    --btn-pad-v: 12px;
+    --btn-pad-h: 24px;
+    --btn-font: 16px;
+    --header-pad: 16px 24px;
+    --card-pad: 24px;
+    --main-pad: 0 24px 24px;
+}
+
+@media (max-width: 768px) {
+    :root {
+        --space-xs: 2px;
+        --space-sm: 4px;
+        --space-md: 8px;
+        --space-lg: 12px;
+        --space-xl: 16px;
+        --font-sm: 11px;
+        --font-md: 13px;
+        --font-lg: 14px;
+        --font-xl: 17px;
+        --btn-pad-v: 6px;
+        --btn-pad-h: 10px;
+        --btn-font: 12px;
+        --header-pad: 8px 12px;
+        --card-pad: 12px;
+        --main-pad: 0 12px 12px;
+    }
+}
+
 /* Custom scrollbar */
 @layer utilities {
     .scrollbar-thin::-webkit-scrollbar {

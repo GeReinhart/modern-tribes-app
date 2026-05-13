@@ -84,7 +84,7 @@ const RolesCrudPageContent: React.FC = () => {
     return (
         <AppLayout breadcrumbs={breadcrumbs} headerActions={headerActions} secondaryActions={secondaryActions}>
             <ThemedCard>
-                <ThemedText variant="primary" size="large" as="h1">{t('admin.roles')}</ThemedText>
+
                 <ThemedText size="small">{t('admin.rolesSubtitle')}</ThemedText>
             </ThemedCard>
             {error && <ThemedCard variant="danger"><ThemedText variant="danger">{error}</ThemedText></ThemedCard>}

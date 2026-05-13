@@ -78,9 +78,7 @@ const TribesPageContent: React.FC = () => {
 
                 {/* Header */}
                 <div className="mb-6">
-                    <ThemedText variant="primary" size="large" as="h1">
-                        {t('tribes.title')}
-                    </ThemedText>
+
                     <ThemedText variant="primary" size="small">
                         {t('tribes.subtitle')}
                     </ThemedText>
