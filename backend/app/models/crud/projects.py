@@ -9,16 +9,18 @@ class ProjectBase(BaseModel):
 
 
 class ProjectCreate(ProjectBase):
-    pass
+    status: str = 'active'
 
 
 class ProjectUpdate(BaseModel):
     name: Optional[str] = None
     document_id: Optional[str] = None
+    status: Optional[str] = None
 
 
 class Project(ProjectBase):
     id: str
+    status: str = 'active'
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None

@@ -7,6 +7,12 @@ import json
 
 
 
+TABLES_WITH_STATUS = frozenset({
+    'permissions', 'roles', 'documents', 'persons',
+    'users', 'projects', 'tribes', 'positions', 'labels'
+})
+
+
 def uuid_to_str_recursively(data: Any) -> Any:
     """Convert UUID to string recursively"""
     if isinstance(data, UUID):
@@ -104,8 +110,12 @@ async def check_unique_field(
 
 
 async def _fetch_reference_row(pool: asyncpg.Pool, table: str, ref_id: str) -> bool:
+    if table in TABLES_WITH_STATUS:
+        query = f"SELECT id FROM {table} WHERE id = $1 AND status = 'active'"
+    else:
+        query = f"SELECT id FROM {table} WHERE id = $1"
     async with pool.acquire() as conn:
-        row = await conn.fetchrow(f"SELECT id FROM {table} WHERE id = $1", UUID(ref_id))
+        row = await conn.fetchrow(query, UUID(ref_id))
     return bool(row)
 
 
@@ -135,10 +145,16 @@ async def get_all_documents(
         params: Optional[List] = None
 ) -> List[Dict[str, Any]]:
     """Get all documents from a table"""
-    query = f"SELECT * FROM {table}"
+    status_clause = "status = 'active'" if table in TABLES_WITH_STATUS else None
 
-    if filter_query:
-        query += f" WHERE {filter_query}"
+    if filter_query and status_clause:
+        query = f"SELECT * FROM {table} WHERE ({filter_query}) AND {status_clause}"
+    elif filter_query:
+        query = f"SELECT * FROM {table} WHERE {filter_query}"
+    elif status_clause:
+        query = f"SELECT * FROM {table} WHERE {status_clause}"
+    else:
+        query = f"SELECT * FROM {table}"
 
     query += " ORDER BY created_at DESC"
 
@@ -154,8 +170,17 @@ async def get_document_by_id(
         doc_id: str,
         entity_name: str = "Document"
 ) -> Dict[str, Any]:
-    """Get a single document by ID"""
-    return await check_document_exists(pool, table, doc_id, entity_name)
+    """Get a single document by ID, filtering inactive entities"""
+    validate_uuid(doc_id, entity_name)
+    if table in TABLES_WITH_STATUS:
+        query = f"SELECT * FROM {table} WHERE id = $1 AND status = 'active'"
+    else:
+        query = f"SELECT * FROM {table} WHERE id = $1"
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(query, UUID(doc_id))
+    if not row:
+        raise HTTPException(status_code=404, detail=f"{entity_name} not found")
+    return row_to_dict(row)
 
 
 async def create_document(

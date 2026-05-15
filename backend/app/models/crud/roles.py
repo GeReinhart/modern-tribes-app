@@ -11,13 +11,14 @@ class RoleBase(BaseModel):
 
 
 class RoleCreate(RoleBase):
-    pass
+    status: str = 'active'
 
 
 class RoleUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     permission_ids: Optional[List[str]] = None
+    status: Optional[str] = None
 
 class RoleWithPermissions(BaseModel):
     id: str
@@ -25,6 +26,7 @@ class RoleWithPermissions(BaseModel):
     description: Optional[str] = None
     permission_ids: List[str] = []
     permissions: List[Any] = []
+    status: str = 'active'
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None
@@ -33,6 +35,7 @@ class RoleWithPermissions(BaseModel):
 
 class Role(RoleBase):
     id: str
+    status: str = 'active'
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None
