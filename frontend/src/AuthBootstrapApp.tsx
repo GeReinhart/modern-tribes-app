@@ -10,6 +10,7 @@ import CreateTribeForm from "@/pages/app/CreateTribePage.tsx";
 import ShowTribePage from "@/pages/app/ShowTribePage.tsx";
 import UpdateTribePage from "@/pages/app/UpdateTribePage.tsx";
 import {TribesPage} from "@/pages/app/TribesPage.tsx";
+import ProfilePage from "@/pages/app/ProfilePage.tsx";
 import {UsersCrudPage} from "@/pages/admin/UsersCrudPage.tsx";
 import {PersonsCrudPage} from "@/pages/admin/PersonsCrudPage.tsx";
 import {RolesCrudPage} from "@/pages/admin/RolesCrudPage.tsx";
@@ -51,6 +52,7 @@ function AuthBootstrapApp() {
                             <Route path="/app/tribes/create" element={<CreateTribeForm/>}/>
                             <Route path="/app/tribes/:tribeId" element={<ShowTribePage/>}/>
                             <Route path="/app/tribes/:tribeId/update" element={<UpdateTribePage/>}/>
+                            <Route path="/app/profile" element={<ProfilePage/>}/>
 
                         </Route>
                         <Route path="/" element={<Navigate to="/app/tribes" replace/>}/>
