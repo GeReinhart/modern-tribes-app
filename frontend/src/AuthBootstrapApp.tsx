@@ -38,7 +38,7 @@ function AuthBootstrapApp() {
 
                         <Route element={<ProtectedRoute/>}>
 
-                                <Route path="/admin" element={<Navigate to="/admin/users" replace/>}/>
+                                <Route path="/admin" element={<Navigate to="/admin/monitoring" replace/>}/>
                                 <Route path="/admin/users" element={<UsersCrudPage/>}/>
                                 <Route path="/admin/persons" element={<PersonsCrudPage/>}/>
                                 <Route path="/admin/roles" element={<RolesCrudPage/>}/>

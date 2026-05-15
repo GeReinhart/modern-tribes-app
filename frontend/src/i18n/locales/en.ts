@@ -107,6 +107,7 @@ const en: Record<string, string> = {
     'admin.monitoringHours': 'Show changes in the last',
     'admin.monitoringHoursUnit': 'hours',
     'monitoring.entity': 'Entity',
+    'monitoring.id': 'ID',
     'monitoring.summary': 'Summary',
     'monitoring.createdAt': 'Created At',
     'monitoring.createdBy': 'Created By',

@@ -70,6 +70,11 @@ When you encounter any of the following, refactor before continuing:
 
 - All dependencies must be declared in `requirements.txt` and pinned to specific versions.
 
+## Tracking changes on entities
+
+Any entity must have created_at (with current user_id), created_by, updated_at, updated_by (with current user_id) fields.
+Those fields must be automatically updated by the database when the entity is created or updated.
+
 
 ## Frontend
 
