@@ -9,17 +9,19 @@ class TribeBase(BaseModel):
     project_ids: Optional[List[str]] = []
 
 class TribeCreate(TribeBase):
-    pass
+    status: str = 'active'
 
 
 class TribeUpdate(BaseModel):
     name: Optional[str] = None
     document_id: Optional[str] = None
     project_ids: Optional[List[str]] = None
+    status: Optional[str] = None
 
 
 class Tribe(TribeBase):
     id: str
+    status: str = 'active'
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None

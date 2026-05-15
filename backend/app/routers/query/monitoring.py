@@ -16,6 +16,7 @@ class RecentChange(BaseModel):
     entity: str
     entity_id: str
     entity_summary: Optional[str] = None
+    entity_status: str = 'active'
     created_at: datetime
     created_by: Optional[str] = None
     updated_at: datetime
@@ -23,12 +24,13 @@ class RecentChange(BaseModel):
 
 
 _QUERY = """
-SELECT entity, entity_id, entity_summary, created_at, created_by, updated_at, updated_by
+SELECT entity, entity_id, entity_summary, entity_status, created_at, created_by, updated_at, updated_by
 FROM (
 
 SELECT 'Tribe' AS entity,
        t.id::text AS entity_id,
        name AS entity_summary,
+       t.status AS entity_status,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = t.created_by) AS created_by,
        (SELECT email FROM users WHERE id = t.updated_by) AS updated_by
@@ -40,6 +42,7 @@ UNION ALL
 SELECT 'Person',
        p.id::text,
        first_name || ' ' || last_name,
+       p.status,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = p.created_by),
        (SELECT email FROM users WHERE id = p.updated_by)
@@ -51,6 +54,7 @@ UNION ALL
 SELECT 'User',
        u.id::text,
        email,
+       u.status,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = u.created_by),
        (SELECT email FROM users WHERE id = u.updated_by)
@@ -62,6 +66,7 @@ UNION ALL
 SELECT 'Role',
        r.id::text,
        name,
+       r.status,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = r.created_by),
        (SELECT email FROM users WHERE id = r.updated_by)
@@ -73,6 +78,7 @@ UNION ALL
 SELECT 'Permission',
        pe.id::text,
        name,
+       pe.status,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = pe.created_by),
        (SELECT email FROM users WHERE id = pe.updated_by)
@@ -84,6 +90,7 @@ UNION ALL
 SELECT 'Project',
        pr.id::text,
        name,
+       pr.status,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = pr.created_by),
        (SELECT email FROM users WHERE id = pr.updated_by)
@@ -95,6 +102,7 @@ UNION ALL
 SELECT 'Label',
        l.id::text,
        name,
+       l.status,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = l.created_by),
        (SELECT email FROM users WHERE id = l.updated_by)
@@ -106,6 +114,7 @@ UNION ALL
 SELECT 'Position',
        pos.id::text,
        position,
+       pos.status,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = pos.created_by),
        (SELECT email FROM users WHERE id = pos.updated_by)
@@ -117,6 +126,7 @@ UNION ALL
 SELECT 'Document',
        d.id::text,
        LEFT(regexp_replace(content_html, '<[^>]*>', '', 'g'), 80),
+       d.status,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = d.created_by),
        (SELECT email FROM users WHERE id = d.updated_by)
@@ -145,6 +155,7 @@ async def get_recent_changes(
             entity=row["entity"],
             entity_id=row["entity_id"],
             entity_summary=row["entity_summary"],
+            entity_status=row["entity_status"],
             created_at=row["created_at"],
             created_by=row["created_by"],
             updated_at=row["updated_at"],

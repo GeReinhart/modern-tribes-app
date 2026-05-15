@@ -17,16 +17,18 @@ class PositionBase(BaseModel):
 
 
 class PositionCreate(PositionBase):
-    pass
+    status: str = 'active'
 
 class PositionUpdate(BaseModel):
     tribe_id: Optional[str] = None
     person_id: Optional[str] = None
     position: PositionEnum
+    status: Optional[str] = None
 
 
 class Position(PositionBase):
     id: str
+    status: str = 'active'
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None

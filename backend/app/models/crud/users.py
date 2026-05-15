@@ -14,7 +14,7 @@ class UserBase(BaseModel):
     sessions: List[UserSession] = []
 
 class UserCreate(UserBase):
-    pass
+    status: str = 'active'
 
 
 class UserUpdate(BaseModel):
@@ -23,10 +23,12 @@ class UserUpdate(BaseModel):
     role_ids: Optional[List[str]] = None
     person_id: Optional[str] = None
     sessions: List[UserSession] = []
+    status: Optional[str] = None
 
 
 class User(UserBase):
     id: str
+    status: str = 'active'
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None

@@ -8,7 +8,7 @@ from ..utils.db_helpers import row_to_dict
 
 async def get_tribe_by_id(pool, tribe_id: str) -> dict | None:
     async with pool.acquire() as conn:
-        row = await conn.fetchrow("SELECT * FROM tribes WHERE id = $1", UUID(tribe_id))
+        row = await conn.fetchrow("SELECT * FROM tribes WHERE id = $1 AND status = 'active'", UUID(tribe_id))
     return row_to_dict(row) if row else None
 
 
@@ -76,7 +76,7 @@ async def create_positions(pool, tribe_id: str, positions_data: list, user_id: s
 
 async def get_positions_by_tribe(pool, tribe_id: str) -> list[dict]:
     async with pool.acquire() as conn:
-        rows = await conn.fetch("SELECT * FROM positions WHERE tribe_id = $1", UUID(tribe_id))
+        rows = await conn.fetch("SELECT * FROM positions WHERE tribe_id = $1 AND status = 'active'", UUID(tribe_id))
     return [row_to_dict(row) for row in rows] if rows else []
 
 
@@ -113,7 +113,7 @@ async def get_persons_with_positions(pool, positions: list[dict]) -> List[Person
     async with pool.acquire() as conn:
         for person_id in person_ids:
             try:
-                row = await conn.fetchrow("SELECT * FROM persons WHERE id = $1", UUID(person_id))
+                row = await conn.fetchrow("SELECT * FROM persons WHERE id = $1 AND status = 'active'", UUID(person_id))
                 if row:
                     persons_map[person_id] = row_to_dict(row)
             except Exception:

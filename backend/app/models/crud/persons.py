@@ -19,7 +19,7 @@ class PersonBase(BaseModel):
 
 
 class PersonCreate(PersonBase):
-    pass
+    status: str = 'active'
 
 
 class PersonUpdate(BaseModel):
@@ -27,10 +27,12 @@ class PersonUpdate(BaseModel):
     last_name: Optional[str] = None
     gender: Optional[Gender] = None
     document_id: Optional[str] = None
+    status: Optional[str] = None
 
 
 class Person(PersonBase):
     id: str
+    status: str = 'active'
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None

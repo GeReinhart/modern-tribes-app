@@ -113,6 +113,7 @@ const fr: Record<string, string> = {
     'monitoring.createdBy': 'Créé par',
     'monitoring.updatedAt': 'Modifié le',
     'monitoring.updatedBy': 'Modifié par',
+    'monitoring.status': 'Statut',
     'monitoring.noChanges': 'Aucune modification dans cette fenêtre de temps',
     'monitoring.filterByUser': 'Filtrer par utilisateur',
     'monitoring.filterByUserPlaceholder': 'utilisateur@exemple.com',

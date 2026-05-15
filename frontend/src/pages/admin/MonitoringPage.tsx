@@ -49,6 +49,22 @@ const MonitoringPageContent: React.FC = () => {
             render: (r: RecentChange) => <span>{r.entity_summary ?? '—'}</span>,
         },
         {
+            key: 'entity_status',
+            header: t('monitoring.status'),
+            render: (r: RecentChange) => {
+                const colors: Record<string, string> = {
+                    active: theme.colors.primary,
+                    pending: theme.colors.secondary,
+                    archived: theme.colors.danger ?? '#999',
+                };
+                return (
+                    <span style={{ fontSize: 'var(--font-sm)', fontWeight: 600, color: colors[r.entity_status] ?? theme.colors.text }}>
+                        {r.entity_status}
+                    </span>
+                );
+            },
+        },
+        {
             key: 'created_at',
             header: t('monitoring.createdAt'),
             render: (r: RecentChange) => (

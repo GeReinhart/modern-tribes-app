@@ -10,15 +10,17 @@ class DocumentBase(BaseModel):
 
 
 class DocumentCreate(DocumentBase):
-    pass
+    status: str = 'active'
 
 
 class DocumentUpdate(BaseModel):
     content_html: Optional[str] = Field(None, min_length=1, description="Post content in HTML")
     attachments: Optional[List[AttachmentFile]] = Field(None, description="File attachments")
+    status: Optional[str] = None
 
 class Document(DocumentBase):
     id: str
+    status: str = 'active'
     content_summary: Optional[str] = None
     created_at: datetime
     updated_at: datetime

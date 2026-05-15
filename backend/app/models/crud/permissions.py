@@ -12,16 +12,18 @@ class PermissionBase(BaseModel):
 
 
 class PermissionCreate(PermissionBase):
-    pass
+    status: str = 'active'
 
 
 class PermissionUpdate(BaseModel):
     name: Optional[PermissionEnum] = None
     description: Optional[str] = None
+    status: Optional[str] = None
 
 
 class Permission(PermissionBase):
     id: str
+    status: str = 'active'
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None
