@@ -29,7 +29,7 @@ async def get_tribe_with_positions(tribe_id: str, pool) -> TribeWithPositionsRes
 
 async def create_tribe_with_positions(data: TribeWithPositionsCreate, pool, current_user: dict) -> TribeWithPositionsResponse:
     await _validate_tribe_create(data, pool)
-    document = await create_document_with_attachments(pool, data.document_content_html, data.document_attachments)
+    document = await create_document_with_attachments(pool, data.document_content_html, data.document_attachments, current_user['id'])
     try:
         return await _persist_tribe_create(data, document, pool, current_user['id'])
     except Exception as e:
@@ -84,6 +84,8 @@ async def _validate_tribe_update(data: TribeWithPositionsUpdate, tribe: dict, tr
 
 
 async def _apply_tribe_updates(tribe_id: str, tribe: dict, data: TribeWithPositionsUpdate, pool, user_id: str) -> None:
+    await tribe_repo.touch_tribe(pool, tribe_id, user_id)
+
     if data.name:
         await tribe_repo.update_tribe_name(pool, tribe_id, data.name, user_id)
 
@@ -94,14 +96,15 @@ async def _apply_tribe_updates(tribe_id: str, tribe: dict, data: TribeWithPositi
         document = await create_document_with_attachments(
             pool,
             data.document_content_html or "",
-            data.document_attachments or []
+            data.document_attachments or [],
+            user_id
         )
         await tribe_repo.update_tribe_document_id(pool, tribe_id, str(document["id"]), user_id)
     elif document_id:
         if data.document_content_html is not None:
-            await tribe_repo.update_tribe_document_content(pool, str(document_id), data.document_content_html)
+            await tribe_repo.update_tribe_document_content(pool, str(document_id), data.document_content_html, user_id)
         if data.document_attachments is not None:
-            await update_document_attachments(pool, str(document_id), data.document_attachments)
+            await update_document_attachments(pool, str(document_id), data.document_attachments, user_id)
 
     if data.positions is not None:
         current_positions = await tribe_repo.get_positions_by_tribe(pool, tribe_id)

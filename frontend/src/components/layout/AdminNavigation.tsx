@@ -19,6 +19,12 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ currentPage })
                 {t('admin.app')}
             </ThemedButton>
             <ThemedButton
+                variant={currentPage === 'monitoring' ? 'secondary' : 'primary'}
+                onClick={() => navigate('/admin/monitoring')}
+            >
+                    {t('admin.monitoring')}
+            </ThemedButton>
+            <ThemedButton
                 variant={currentPage === 'users' ? 'secondary' : 'primary'}
                 onClick={() => navigate('/admin/users')}
             >
@@ -66,12 +72,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ currentPage })
             >
                 {t('admin.documents')}
             </ThemedButton>
-            <ThemedButton
-                variant={currentPage === 'monitoring' ? 'secondary' : 'primary'}
-                onClick={() => navigate('/admin/monitoring')}
-            >
-                {t('admin.monitoring')}
-            </ThemedButton>
+
         </>
     );
 };

@@ -14,6 +14,7 @@ router = APIRouter(prefix="/monitoring", tags=["query_monitoring"])
 
 class RecentChange(BaseModel):
     entity: str
+    entity_id: str
     entity_summary: Optional[str] = None
     created_at: datetime
     created_by: Optional[str] = None
@@ -22,10 +23,11 @@ class RecentChange(BaseModel):
 
 
 _QUERY = """
-SELECT entity, entity_summary, created_at, created_by, updated_at, updated_by
+SELECT entity, entity_id, entity_summary, created_at, created_by, updated_at, updated_by
 FROM (
 
 SELECT 'Tribe' AS entity,
+       t.id::text AS entity_id,
        name AS entity_summary,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = t.created_by) AS created_by,
@@ -36,6 +38,7 @@ WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
 UNION ALL
 
 SELECT 'Person',
+       p.id::text,
        first_name || ' ' || last_name,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = p.created_by),
@@ -46,6 +49,7 @@ WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
 UNION ALL
 
 SELECT 'User',
+       u.id::text,
        email,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = u.created_by),
@@ -56,6 +60,7 @@ WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
 UNION ALL
 
 SELECT 'Role',
+       r.id::text,
        name,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = r.created_by),
@@ -66,6 +71,7 @@ WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
 UNION ALL
 
 SELECT 'Permission',
+       pe.id::text,
        name,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = pe.created_by),
@@ -76,6 +82,7 @@ WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
 UNION ALL
 
 SELECT 'Project',
+       pr.id::text,
        name,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = pr.created_by),
@@ -86,6 +93,7 @@ WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
 UNION ALL
 
 SELECT 'Label',
+       l.id::text,
        name,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = l.created_by),
@@ -96,6 +104,7 @@ WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
 UNION ALL
 
 SELECT 'Position',
+       pos.id::text,
        position,
        created_at, updated_at,
        (SELECT email FROM users WHERE id = pos.created_by),
@@ -106,6 +115,7 @@ WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
 UNION ALL
 
 SELECT 'Document',
+       d.id::text,
        LEFT(regexp_replace(content_html, '<[^>]*>', '', 'g'), 80),
        created_at, updated_at,
        (SELECT email FROM users WHERE id = d.created_by),
@@ -133,6 +143,7 @@ async def get_recent_changes(
     return [
         RecentChange(
             entity=row["entity"],
+            entity_id=row["entity_id"],
             entity_summary=row["entity_summary"],
             created_at=row["created_at"],
             created_by=row["created_by"],

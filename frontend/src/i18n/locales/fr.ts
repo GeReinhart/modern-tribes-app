@@ -107,6 +107,7 @@ const fr: Record<string, string> = {
     'admin.monitoringHours': 'Afficher les modifications des dernières',
     'admin.monitoringHoursUnit': 'heures',
     'monitoring.entity': 'Entité',
+    'monitoring.id': 'ID',
     'monitoring.summary': 'Résumé',
     'monitoring.createdAt': 'Créé le',
     'monitoring.createdBy': 'Créé par',

@@ -35,6 +35,15 @@ const MonitoringPageContent: React.FC = () => {
             ),
         },
         {
+            key: 'entity_id',
+            header: t('monitoring.id'),
+            render: (r: RecentChange) => (
+                <span style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary, fontFamily: 'monospace' }}>
+                    {r.entity_id}
+                </span>
+            ),
+        },
+        {
             key: 'entity_summary',
             header: t('monitoring.summary'),
             render: (r: RecentChange) => <span>{r.entity_summary ?? '—'}</span>,
@@ -131,7 +140,7 @@ const MonitoringPageContent: React.FC = () => {
                     <ThemedTable
                         data={data}
                         columns={columns}
-                        getRowId={r => `${r.entity}-${r.created_at}-${r.updated_at}`}
+                        getRowId={r => `${r.entity}-${r.entity_id}`}
                     />
                 )}
             </ThemedCard>

@@ -28,6 +28,14 @@ async def delete_tribe(pool, tribe_id: str) -> None:
         await conn.execute("DELETE FROM tribes WHERE id = $1", UUID(tribe_id))
 
 
+async def touch_tribe(pool, tribe_id: str, user_id: str) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE tribes SET updated_at = $1, updated_by = $2 WHERE id = $3",
+            datetime.now(timezone.utc), UUID(user_id), UUID(tribe_id)
+        )
+
+
 async def update_tribe_name(pool, tribe_id: str, name: str, user_id: str) -> None:
     async with pool.acquire() as conn:
         await conn.execute(
@@ -44,11 +52,11 @@ async def update_tribe_document_id(pool, tribe_id: str, document_id: str, user_i
         )
 
 
-async def update_tribe_document_content(pool, document_id: str, content_html: str) -> None:
+async def update_tribe_document_content(pool, document_id: str, content_html: str, user_id: str) -> None:
     async with pool.acquire() as conn:
         await conn.execute(
-            "UPDATE documents SET content_html = $1, updated_at = $2 WHERE id = $3",
-            content_html, datetime.now(timezone.utc), UUID(document_id)
+            "UPDATE documents SET content_html = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
+            content_html, datetime.now(timezone.utc), UUID(user_id), UUID(document_id)
         )
 
 

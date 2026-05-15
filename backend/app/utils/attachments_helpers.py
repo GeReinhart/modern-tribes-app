@@ -33,17 +33,18 @@ async def get_document_with_attachments(pool, document_id: str) -> dict:
     return document
 
 
-async def create_document_with_attachments(pool, content_html: str, attachments: List[AttachmentFile] = None) -> dict:
+async def create_document_with_attachments(pool, content_html: str, attachments: List[AttachmentFile] = None, user_id: str = None) -> dict:
     """Create document and its attachments"""
-    # Create document
+    now = datetime.now(timezone.utc)
+    uid = UUID(user_id) if user_id else None
     async with pool.acquire() as conn:
         document_row = await conn.fetchrow(
-            """INSERT INTO documents (content_html, created_at, updated_at)
-               VALUES ($1, $2, $3)
+            """INSERT INTO documents (content_html, created_at, updated_at, created_by, updated_by)
+               VALUES ($1, $2, $2, $3, $3)
                    RETURNING *""",
             content_html,
-            datetime.now(timezone.utc),
-            datetime.now(timezone.utc)
+            now,
+            uid,
         )
 
     document = row_to_dict(document_row)
@@ -72,8 +73,14 @@ async def create_document_with_attachments(pool, content_html: str, attachments:
     return document
 
 
-async def update_document_attachments(pool, document_id: str, attachments: List[AttachmentFile]) -> None:
+async def update_document_attachments(pool, document_id: str, attachments: List[AttachmentFile], user_id: str = None) -> None:
     """Update document attachments (delete old, create new)"""
+    uid = UUID(user_id) if user_id else None
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE documents SET updated_at = $1, updated_by = $2 WHERE id = $3",
+            datetime.now(timezone.utc), uid, UUID(document_id)
+        )
     async with pool.acquire() as conn:
         # Delete existing attachments
         await conn.execute(
