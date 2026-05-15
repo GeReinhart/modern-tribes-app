@@ -1,0 +1,143 @@
+from datetime import datetime
+from typing import Optional, List
+
+from fastapi import APIRouter, Depends, Query
+from pydantic import BaseModel
+
+from ..auth.authentification import get_current_user
+from ..auth.authorization import require_permission_decorator
+from ...models.auth.auth import PermissionEnum
+from ...core.database import get_database
+
+router = APIRouter(prefix="/monitoring", tags=["query_monitoring"])
+
+
+class RecentChange(BaseModel):
+    entity: str
+    entity_summary: Optional[str] = None
+    created_at: datetime
+    created_by: Optional[str] = None
+    updated_at: datetime
+    updated_by: Optional[str] = None
+
+
+_QUERY = """
+SELECT entity, entity_summary, created_at, created_by, updated_at, updated_by
+FROM (
+
+SELECT 'Tribe' AS entity,
+       name AS entity_summary,
+       created_at, updated_at,
+       (SELECT email FROM users WHERE id = t.created_by) AS created_by,
+       (SELECT email FROM users WHERE id = t.updated_by) AS updated_by
+FROM tribes t
+WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
+
+UNION ALL
+
+SELECT 'Person',
+       first_name || ' ' || last_name,
+       created_at, updated_at,
+       (SELECT email FROM users WHERE id = p.created_by),
+       (SELECT email FROM users WHERE id = p.updated_by)
+FROM persons p
+WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
+
+UNION ALL
+
+SELECT 'User',
+       email,
+       created_at, updated_at,
+       (SELECT email FROM users WHERE id = u.created_by),
+       (SELECT email FROM users WHERE id = u.updated_by)
+FROM users u
+WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
+
+UNION ALL
+
+SELECT 'Role',
+       name,
+       created_at, updated_at,
+       (SELECT email FROM users WHERE id = r.created_by),
+       (SELECT email FROM users WHERE id = r.updated_by)
+FROM roles r
+WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
+
+UNION ALL
+
+SELECT 'Permission',
+       name,
+       created_at, updated_at,
+       (SELECT email FROM users WHERE id = pe.created_by),
+       (SELECT email FROM users WHERE id = pe.updated_by)
+FROM permissions pe
+WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
+
+UNION ALL
+
+SELECT 'Project',
+       name,
+       created_at, updated_at,
+       (SELECT email FROM users WHERE id = pr.created_by),
+       (SELECT email FROM users WHERE id = pr.updated_by)
+FROM projects pr
+WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
+
+UNION ALL
+
+SELECT 'Label',
+       name,
+       created_at, updated_at,
+       (SELECT email FROM users WHERE id = l.created_by),
+       (SELECT email FROM users WHERE id = l.updated_by)
+FROM labels l
+WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
+
+UNION ALL
+
+SELECT 'Position',
+       position,
+       created_at, updated_at,
+       (SELECT email FROM users WHERE id = pos.created_by),
+       (SELECT email FROM users WHERE id = pos.updated_by)
+FROM positions pos
+WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
+
+UNION ALL
+
+SELECT 'Document',
+       LEFT(regexp_replace(content_html, '<[^>]*>', '', 'g'), 80),
+       created_at, updated_at,
+       (SELECT email FROM users WHERE id = d.created_by),
+       (SELECT email FROM users WHERE id = d.updated_by)
+FROM documents d
+WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
+
+) AS changes
+WHERE ($2::text IS NULL OR created_by = $2 OR updated_by = $2)
+ORDER BY GREATEST(created_at, updated_at) DESC
+"""
+
+
+@router.get("/recent-changes", response_model=List[RecentChange])
+@require_permission_decorator(PermissionEnum.ADMIN)
+async def get_recent_changes(
+    hours: int = Query(default=4, ge=1, le=720),
+    user_email: Optional[str] = Query(default=None),
+    current_user: dict = Depends(get_current_user)
+):
+    """Get recent changes across all entities within the last N hours"""
+    pool = get_database()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(_QUERY, hours, user_email or None)
+    return [
+        RecentChange(
+            entity=row["entity"],
+            entity_summary=row["entity_summary"],
+            created_at=row["created_at"],
+            created_by=row["created_by"],
+            updated_at=row["updated_at"],
+            updated_by=row["updated_by"],
+        )
+        for row in rows
+    ]

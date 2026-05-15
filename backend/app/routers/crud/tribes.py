@@ -77,6 +77,8 @@ async def create_tribe(tribe: TribeCreate,current_user: dict = Depends(get_curre
 
     # Create tribe
     tribe_dict = tribe.model_dump()
+    tribe_dict['created_by'] = UUID(current_user['id'])
+    tribe_dict['updated_by'] = UUID(current_user['id'])
     return await create_document(pool, TABLE, tribe_dict)
 
 
@@ -122,6 +124,7 @@ async def update_tribe(tribe_id: str, tribe: TribeUpdate,current_user: dict = De
 
     # Update tribe
     tribe_dict = tribe.model_dump(exclude_unset=True)
+    tribe_dict['updated_by'] = UUID(current_user['id'])
     return await update_document(pool, TABLE, tribe_id, tribe_dict, ENTITY_NAME)
 
 

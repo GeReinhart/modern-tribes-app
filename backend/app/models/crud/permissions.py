@@ -24,6 +24,8 @@ class Permission(PermissionBase):
     id: str
     created_at: datetime
     updated_at: datetime
+    created_by: Optional[str] = None
+    updated_by: Optional[str] = None
 
     model_config = ConfigDict(
         populate_by_name=True,

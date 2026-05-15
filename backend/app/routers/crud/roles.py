@@ -67,6 +67,8 @@ async def create_role(role: RoleCreate,current_user: dict = Depends(get_current_
 
     role_dict = role.model_dump()
     permission_ids = role_dict.pop('permission_ids', None)
+    role_dict['created_by'] = UUID(current_user['id'])
+    role_dict['updated_by'] = UUID(current_user['id'])
     created = await create_document(pool, TABLE, role_dict)
     if permission_ids:
         async with pool.acquire() as conn:
@@ -96,6 +98,7 @@ async def update_role(role_id: str, role: RoleUpdate,current_user: dict = Depend
 
     role_dict = role.model_dump(exclude_unset=True)
     permission_ids = role_dict.pop('permission_ids', None)
+    role_dict['updated_by'] = UUID(current_user['id'])
     updated = await update_document(pool, TABLE, role_id, role_dict, ENTITY_NAME)
     if permission_ids is not None:
         async with pool.acquire() as conn:

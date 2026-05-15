@@ -27,11 +27,11 @@ async def get_tribe_with_positions(tribe_id: str, pool) -> TribeWithPositionsRes
     return _build_response(tribe, document, persons)
 
 
-async def create_tribe_with_positions(data: TribeWithPositionsCreate, pool) -> TribeWithPositionsResponse:
+async def create_tribe_with_positions(data: TribeWithPositionsCreate, pool, current_user: dict) -> TribeWithPositionsResponse:
     await _validate_tribe_create(data, pool)
     document = await create_document_with_attachments(pool, data.document_content_html, data.document_attachments)
     try:
-        return await _persist_tribe_create(data, document, pool)
+        return await _persist_tribe_create(data, document, pool, current_user['id'])
     except Exception as e:
         from uuid import UUID
         from ..utils.db_helpers import delete_document as _del
@@ -39,13 +39,13 @@ async def create_tribe_with_positions(data: TribeWithPositionsCreate, pool) -> T
         raise e
 
 
-async def update_tribe_with_positions(tribe_id: str, data: TribeWithPositionsUpdate, pool) -> TribeWithPositionsResponse:
+async def update_tribe_with_positions(tribe_id: str, data: TribeWithPositionsUpdate, pool, current_user: dict) -> TribeWithPositionsResponse:
     tribe = await tribe_repo.get_tribe_by_id(pool, tribe_id)
     if not tribe:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tribe not found")
 
     await _validate_tribe_update(data, tribe, tribe_id, pool)
-    await _apply_tribe_updates(tribe_id, tribe, data, pool)
+    await _apply_tribe_updates(tribe_id, tribe, data, pool, current_user['id'])
 
     return await get_tribe_with_positions(tribe_id, pool)
 
@@ -60,10 +60,10 @@ async def _validate_tribe_create(data: TribeWithPositionsCreate, pool) -> None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="At least one Chief position is required")
 
 
-async def _persist_tribe_create(data, document, pool) -> TribeWithPositionsResponse:
-    tribe = await tribe_repo.create_tribe(pool, data.name, str(document["id"]))
+async def _persist_tribe_create(data, document, pool, user_id: str) -> TribeWithPositionsResponse:
+    tribe = await tribe_repo.create_tribe(pool, data.name, str(document["id"]), user_id)
     try:
-        positions = await tribe_repo.create_positions(pool, str(tribe["id"]), data.positions)
+        positions = await tribe_repo.create_positions(pool, str(tribe["id"]), data.positions, user_id)
         persons = await tribe_repo.get_persons_with_positions(pool, positions)
         return _build_response(tribe, document, persons)
     except Exception as e:
@@ -83,9 +83,9 @@ async def _validate_tribe_update(data: TribeWithPositionsUpdate, tribe: dict, tr
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="At least one Chief position is required")
 
 
-async def _apply_tribe_updates(tribe_id: str, tribe: dict, data: TribeWithPositionsUpdate, pool) -> None:
+async def _apply_tribe_updates(tribe_id: str, tribe: dict, data: TribeWithPositionsUpdate, pool, user_id: str) -> None:
     if data.name:
-        await tribe_repo.update_tribe_name(pool, tribe_id, data.name)
+        await tribe_repo.update_tribe_name(pool, tribe_id, data.name, user_id)
 
     document_id = tribe.get("document_id")
     has_document_changes = data.document_content_html is not None or data.document_attachments is not None
@@ -96,7 +96,7 @@ async def _apply_tribe_updates(tribe_id: str, tribe: dict, data: TribeWithPositi
             data.document_content_html or "",
             data.document_attachments or []
         )
-        await tribe_repo.update_tribe_document_id(pool, tribe_id, str(document["id"]))
+        await tribe_repo.update_tribe_document_id(pool, tribe_id, str(document["id"]), user_id)
     elif document_id:
         if data.document_content_html is not None:
             await tribe_repo.update_tribe_document_content(pool, str(document_id), data.document_content_html)
@@ -105,7 +105,7 @@ async def _apply_tribe_updates(tribe_id: str, tribe: dict, data: TribeWithPositi
 
     if data.positions is not None:
         current_positions = await tribe_repo.get_positions_by_tribe(pool, tribe_id)
-        await tribe_repo.sync_positions(pool, tribe_id, data.positions, current_positions)
+        await tribe_repo.sync_positions(pool, tribe_id, data.positions, current_positions, user_id)
 
 
 def _build_response(tribe: dict, document: dict | None, persons: list) -> TribeWithPositionsResponse:

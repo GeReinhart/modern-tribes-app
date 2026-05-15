@@ -50,6 +50,8 @@ async def create_document_endpoint(document: DocumentCreate,current_user: dict =
     # Create document
     document_dict = document.model_dump()
     document_dict['content_summary'] = extract_content_summary(document_dict['content_html'])
+    document_dict['created_by'] = UUID(current_user['id'])
+    document_dict['updated_by'] = UUID(current_user['id'])
     return await create_document(pool, TABLE, document_dict)
 
 
@@ -66,6 +68,7 @@ async def update_document_endpoint(document_id: str, document: DocumentUpdate,cu
     document_dict = document.model_dump(exclude_unset=True)
     if 'content_html' in document_dict:
         document_dict['content_summary'] = extract_content_summary(document_dict['content_html'])
+    document_dict['updated_by'] = UUID(current_user['id'])
     return await update_document(pool, TABLE, document_id, document_dict, ENTITY_NAME)
 
 

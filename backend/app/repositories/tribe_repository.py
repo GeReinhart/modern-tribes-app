@@ -12,13 +12,13 @@ async def get_tribe_by_id(pool, tribe_id: str) -> dict | None:
     return row_to_dict(row) if row else None
 
 
-async def create_tribe(pool, name: str, document_id: str) -> dict:
+async def create_tribe(pool, name: str, document_id: str, user_id: str) -> dict:
     now = datetime.now(timezone.utc)
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            """INSERT INTO tribes (name, document_id, project_ids, created_at, updated_at)
-               VALUES ($1, $2, $3, $4, $5) RETURNING *""",
-            name, UUID(document_id), [], now, now
+            """INSERT INTO tribes (name, document_id, project_ids, created_at, updated_at, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING *""",
+            name, UUID(document_id), [], now, now, UUID(user_id)
         )
     return row_to_dict(row)
 
@@ -28,19 +28,19 @@ async def delete_tribe(pool, tribe_id: str) -> None:
         await conn.execute("DELETE FROM tribes WHERE id = $1", UUID(tribe_id))
 
 
-async def update_tribe_name(pool, tribe_id: str, name: str) -> None:
+async def update_tribe_name(pool, tribe_id: str, name: str, user_id: str) -> None:
     async with pool.acquire() as conn:
         await conn.execute(
-            "UPDATE tribes SET name = $1, updated_at = $2 WHERE id = $3",
-            name, datetime.now(timezone.utc), UUID(tribe_id)
+            "UPDATE tribes SET name = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
+            name, datetime.now(timezone.utc), UUID(user_id), UUID(tribe_id)
         )
 
 
-async def update_tribe_document_id(pool, tribe_id: str, document_id: str) -> None:
+async def update_tribe_document_id(pool, tribe_id: str, document_id: str, user_id: str) -> None:
     async with pool.acquire() as conn:
         await conn.execute(
-            "UPDATE tribes SET document_id = $1, updated_at = $2 WHERE id = $3",
-            UUID(document_id), datetime.now(timezone.utc), UUID(tribe_id)
+            "UPDATE tribes SET document_id = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
+            UUID(document_id), datetime.now(timezone.utc), UUID(user_id), UUID(tribe_id)
         )
 
 
@@ -52,15 +52,15 @@ async def update_tribe_document_content(pool, document_id: str, content_html: st
         )
 
 
-async def create_positions(pool, tribe_id: str, positions_data: list) -> list[dict]:
+async def create_positions(pool, tribe_id: str, positions_data: list, user_id: str) -> list[dict]:
     now = datetime.now(timezone.utc)
     created = []
     async with pool.acquire() as conn:
         for pos in positions_data:
             row = await conn.fetchrow(
-                """INSERT INTO positions (tribe_id, person_id, position, created_at, updated_at)
-                   VALUES ($1, $2, $3, $4, $5) RETURNING *""",
-                UUID(tribe_id), UUID(pos.person_id), pos.position, now, now
+                """INSERT INTO positions (tribe_id, person_id, position, created_at, updated_at, created_by, updated_by)
+                   VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING *""",
+                UUID(tribe_id), UUID(pos.person_id), pos.position, now, now, UUID(user_id)
             )
             created.append(row_to_dict(row))
     return created
@@ -72,7 +72,7 @@ async def get_positions_by_tribe(pool, tribe_id: str) -> list[dict]:
     return [row_to_dict(row) for row in rows] if rows else []
 
 
-async def sync_positions(pool, tribe_id: str, new_positions: list, current_positions: list[dict]) -> None:
+async def sync_positions(pool, tribe_id: str, new_positions: list, current_positions: list[dict], user_id: str) -> None:
     current_map = {str(p["person_id"]): str(p["id"]) for p in current_positions}
     new_map = {pos.person_id: pos.position for pos in new_positions}
     async with pool.acquire() as conn:
@@ -85,15 +85,15 @@ async def sync_positions(pool, tribe_id: str, new_positions: list, current_posit
                 current_pos = next(p for p in current_positions if str(p["id"]) == position_id)
                 if current_pos["position"] != pos.position:
                     await conn.execute(
-                        "UPDATE positions SET position = $1, updated_at = $2 WHERE id = $3",
-                        pos.position, datetime.now(timezone.utc), UUID(position_id)
+                        "UPDATE positions SET position = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
+                        pos.position, datetime.now(timezone.utc), UUID(user_id), UUID(position_id)
                     )
             else:
                 now = datetime.now(timezone.utc)
                 await conn.execute(
-                    """INSERT INTO positions (tribe_id, person_id, position, created_at, updated_at)
-                       VALUES ($1, $2, $3, $4, $5)""",
-                    UUID(tribe_id), UUID(pos.person_id), pos.position, now, now
+                    """INSERT INTO positions (tribe_id, person_id, position, created_at, updated_at, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $5, $6, $6)""",
+                    UUID(tribe_id), UUID(pos.person_id), pos.position, now, now, UUID(user_id)
                 )
 
 

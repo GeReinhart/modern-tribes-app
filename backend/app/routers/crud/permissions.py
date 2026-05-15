@@ -59,6 +59,8 @@ async def create_permission(permission: PermissionCreate,current_user: dict = De
 
     # Create permission
     permission_dict = permission.model_dump()
+    permission_dict['created_by'] = UUID(current_user['id'])
+    permission_dict['updated_by'] = UUID(current_user['id'])
     return await create_document(pool, TABLE, permission_dict)
 
 
@@ -84,6 +86,7 @@ async def update_permission(permission_id: str, permission: PermissionUpdate,cur
 
     # Update permission
     permission_dict = permission.model_dump(exclude_unset=True)
+    permission_dict['updated_by'] = UUID(current_user['id'])
     return await update_document(pool, TABLE, permission_id, permission_dict, ENTITY_NAME)
 
 

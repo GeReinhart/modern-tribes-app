@@ -41,7 +41,10 @@ async def create_person(person: PersonCreate, current_user: dict = Depends(get_c
     validator = EntityValidator(pool)
     references = [{'table': 'documents', 'id': person.document_id, 'name': 'Document'}] if person.document_id else []
     await validator.validate_references(references)
-    return await create_document(pool, TABLE, person.model_dump())
+    person_dict = person.model_dump()
+    person_dict['created_by'] = UUID(current_user['id'])
+    person_dict['updated_by'] = UUID(current_user['id'])
+    return await create_document(pool, TABLE, person_dict)
 
 
 @router.put("/{person_id}", response_model=Person)
@@ -53,7 +56,9 @@ async def update_person(person_id: str, person: PersonUpdate, current_user: dict
     await check_document_exists(pool, TABLE, person_id, ENTITY_NAME)
     references = [{'table': 'documents', 'id': person.document_id, 'name': 'Document'}] if person.document_id else []
     await validator.validate_references(references)
-    return await update_document(pool, TABLE, person_id, person.model_dump(exclude_unset=True), ENTITY_NAME)
+    person_dict = person.model_dump(exclude_unset=True)
+    person_dict['updated_by'] = UUID(current_user['id'])
+    return await update_document(pool, TABLE, person_id, person_dict, ENTITY_NAME)
 
 
 @router.delete("/{person_id}", status_code=status.HTTP_204_NO_CONTENT)

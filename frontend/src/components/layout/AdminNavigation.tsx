@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 
 interface AdminNavigationProps {
-    currentPage: 'users' | 'persons' | 'roles' | 'permissions' | 'positions' | 'tribes' | 'projects' | 'documents';
+    currentPage: 'users' | 'persons' | 'roles' | 'permissions' | 'positions' | 'tribes' | 'projects' | 'documents' | 'monitoring';
 }
 
 export const adminMainThemeId: string = "alt_05"
@@ -65,6 +65,12 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ currentPage })
                 onClick={() => navigate('/admin/documents')}
             >
                 {t('admin.documents')}
+            </ThemedButton>
+            <ThemedButton
+                variant={currentPage === 'monitoring' ? 'secondary' : 'primary'}
+                onClick={() => navigate('/admin/monitoring')}
+            >
+                {t('admin.monitoring')}
             </ThemedButton>
         </>
     );

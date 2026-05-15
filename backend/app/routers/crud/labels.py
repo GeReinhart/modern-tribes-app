@@ -58,6 +58,8 @@ async def create_label(label: LabelCreate,current_user: dict = Depends(get_curre
 
     # Create label
     label_dict = label.model_dump()
+    label_dict['created_by'] = UUID(current_user['id'])
+    label_dict['updated_by'] = UUID(current_user['id'])
     return await create_document(pool, TABLE, label_dict)
 
 
@@ -83,6 +85,7 @@ async def update_label(label_id: str, label: LabelUpdate,current_user: dict = De
 
     # Update label
     label_dict = label.model_dump(exclude_unset=True)
+    label_dict['updated_by'] = UUID(current_user['id'])
     return await update_document(pool, TABLE, label_id, label_dict, ENTITY_NAME)
 
 
