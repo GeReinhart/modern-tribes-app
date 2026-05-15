@@ -17,7 +17,7 @@ router = APIRouter(prefix="/tribes", tags=["app_tribes"])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_CREATE_OWN_TRIBES)
 async def create_tribe_with_positions(data: TribeWithPositionsCreate, current_user: dict = Depends(get_current_user)):
     pool = get_database()
-    return await tribe_service.create_tribe_with_positions(data, pool)
+    return await tribe_service.create_tribe_with_positions(data, pool, current_user)
 
 
 @router.get("/{tribe_id}/with-positions", response_model=TribeWithPositionsResponse)
@@ -33,4 +33,4 @@ async def get_tribe_with_positions(tribe_id: str, current_user: dict = Depends(g
 async def update_tribe_with_positions(tribe_id: str, data: TribeWithPositionsUpdate, current_user: dict = Depends(get_current_user)):
     pool = get_database()
     await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position="chief")
-    return await tribe_service.update_tribe_with_positions(tribe_id, data, pool)
+    return await tribe_service.update_tribe_with_positions(tribe_id, data, pool, current_user)

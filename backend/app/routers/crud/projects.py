@@ -59,6 +59,8 @@ async def create_project(project: ProjectCreate,current_user: dict = Depends(get
 
     # Create project
     project_dict = project.model_dump()
+    project_dict['created_by'] = UUID(current_user['id'])
+    project_dict['updated_by'] = UUID(current_user['id'])
     return await create_document(pool, TABLE, project_dict)
 
 
@@ -84,6 +86,7 @@ async def update_project(project_id: str, project: ProjectUpdate,current_user: d
 
     # Update project
     project_dict = project.model_dump(exclude_unset=True)
+    project_dict['updated_by'] = UUID(current_user['id'])
     return await update_document(pool, TABLE, project_id, project_dict, ENTITY_NAME)
 
 

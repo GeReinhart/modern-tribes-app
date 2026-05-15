@@ -29,6 +29,8 @@ class User(UserBase):
     id: str
     created_at: datetime
     updated_at: datetime
+    created_by: Optional[str] = None
+    updated_by: Optional[str] = None
     sessions: List[UserSession] = []
 
     model_config = ConfigDict(

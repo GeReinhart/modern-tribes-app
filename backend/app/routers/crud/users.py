@@ -75,6 +75,8 @@ async def create_user(user: UserCreate, current_user: dict = Depends(get_current
     data = user.model_dump()
     role_ids = data.pop('role_ids', None)
     data.pop('sessions', None)
+    data['created_by'] = UUID(current_user['id'])
+    data['updated_by'] = UUID(current_user['id'])
     created = await create_document(pool, TABLE, data)
     if role_ids:
         async with pool.acquire() as conn:
@@ -98,6 +100,7 @@ async def update_user(user_id: str, user: UserUpdate, current_user: dict = Depen
     data = user.model_dump(exclude_unset=True)
     role_ids = data.pop('role_ids', None)
     data.pop('sessions', None)
+    data['updated_by'] = UUID(current_user['id'])
     updated = await update_document(pool, TABLE, user_id, data, ENTITY_NAME)
     if role_ids is not None:
         async with pool.acquire() as conn:

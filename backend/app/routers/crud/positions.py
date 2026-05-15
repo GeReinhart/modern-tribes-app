@@ -81,6 +81,8 @@ async def create_position(position: PositionCreate,current_user: dict = Depends(
 
     # Create position
     position_dict = position.model_dump()
+    position_dict['created_by'] = UUID(current_user['id'])
+    position_dict['updated_by'] = UUID(current_user['id'])
     return await create_document(pool, TABLE, position_dict)
 
 
@@ -113,6 +115,7 @@ async def update_position(position_id: str, position: PositionUpdate,current_use
 
     # Update position
     position_dict = position.model_dump(exclude_unset=True)
+    position_dict['updated_by'] = UUID(current_user['id'])
     return await update_document(pool, TABLE, position_id, position_dict, ENTITY_NAME)
 
 
