@@ -13,6 +13,7 @@ import { ThemedTable } from '@/components/common/layout/ThemedTable.tsx';
 import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
 import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog.tsx';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
+import { StatusBadge } from '@/components/common/layout/StatusBadge.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage';
 
 const ProjectsCrudPageContent: React.FC = () => {
@@ -45,6 +46,12 @@ const ProjectsCrudPageContent: React.FC = () => {
             ),
         },
         { key: 'created_at', header: t('common.created'), render: (p: Project) => new Date(p.created_at).toLocaleDateString() },
+        {
+            key: 'status', header: t('monitoring.status'),
+            render: (p: Project) => (
+                <StatusBadge status={p.status ?? 'active'} />
+            ),
+        },
         {
             key: 'actions', header: t('common.actions'),
             render: (p: Project) => (

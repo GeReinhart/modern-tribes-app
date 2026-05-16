@@ -70,7 +70,7 @@ python scripts/init_db.py
 
 Launch the backend with auto-reload:
 ```bash
-./venv/bin/uvicorn app.main:app --reload --port 8000
+set -a && source .env && set +a && ./venv/bin/uvicorn app.main:app --reload --port 8000
 ```
 
 This starts

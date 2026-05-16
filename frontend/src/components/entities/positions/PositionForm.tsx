@@ -29,14 +29,16 @@ export const PositionForm: React.FC<PositionFormProps> = ({
         tribe_id: null,
         person_id: null,
     });
+    const [status, setStatus] = useState(position?.status ?? 'active');
 
     useEffect(() => {
         if (position && mode !== 'create') {
             setFormData({
                 position: position.position,
-                tribe_id: position.tribe_id ,
-                person_id: position.person_id ,
+                tribe_id: position.tribe_id,
+                person_id: position.person_id,
             });
+            setStatus(position.status ?? 'active');
         }
     }, [position, mode]);
 
@@ -46,7 +48,7 @@ export const PositionForm: React.FC<PositionFormProps> = ({
         setError(null);
 
         try {
-            await onSubmit(formData);
+            await onSubmit(mode === 'create' ? formData : { ...formData, status });
         } catch (err: any) {
             setError(err.message || 'An error occurred');
         } finally {
@@ -55,6 +57,12 @@ export const PositionForm: React.FC<PositionFormProps> = ({
     };
 
     const isReadOnly = mode === 'view';
+
+    const statusOptions = [
+        { value: 'active', label: 'Active' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'archived', label: 'Archived' },
+    ];
 
     const positionOptions = [
         { value: 'chief', label: 'Chief' },
@@ -122,8 +130,16 @@ export const PositionForm: React.FC<PositionFormProps> = ({
                 allowEmpty={false}
             />
 
-
-
+            {mode !== 'create' && (
+                <ThemedSelect
+                    label="Status"
+                    value={status}
+                    onChange={setStatus}
+                    options={statusOptions}
+                    disabled={isReadOnly}
+                    allowEmpty={false}
+                />
+            )}
 
             {!isReadOnly && (
                 <div className="flex gap-3 pt-4">

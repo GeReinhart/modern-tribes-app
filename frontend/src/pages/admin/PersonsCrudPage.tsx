@@ -13,6 +13,7 @@ import { ThemedTable } from '@/components/common/layout/ThemedTable.tsx';
 import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
 import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog.tsx';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
+import { StatusBadge } from '@/components/common/layout/StatusBadge.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage';
 
 const PersonsCrudPageContent: React.FC = () => {
@@ -67,6 +68,12 @@ const PersonsCrudPageContent: React.FC = () => {
                         {new Date(p.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                 </div>
+            ),
+        },
+        {
+            key: 'status', header: t('monitoring.status'),
+            render: (p: Person) => (
+                <StatusBadge status={p.status ?? 'active'} />
             ),
         },
         {

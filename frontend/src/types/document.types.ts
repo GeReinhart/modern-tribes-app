@@ -14,7 +14,8 @@ export interface DocumentCreate {
 
 export interface DocumentUpdate {
     content_html?: string;
-    attachments: AttachmentFile[];
+    attachments?: AttachmentFile[];
+    status?: string;
 }
 
 

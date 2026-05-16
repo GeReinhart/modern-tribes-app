@@ -34,3 +34,11 @@ async def update_tribe_with_positions(tribe_id: str, data: TribeWithPositionsUpd
     pool = get_database()
     await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position="chief")
     return await tribe_service.update_tribe_with_positions(tribe_id, data, pool, current_user)
+
+
+@router.patch("/{tribe_id}/archive", status_code=status.HTTP_204_NO_CONTENT)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def archive_tribe(tribe_id: str, current_user: dict = Depends(get_current_user)):
+    pool = get_database()
+    await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position="chief")
+    await tribe_service.archive_tribe(tribe_id, pool, current_user)

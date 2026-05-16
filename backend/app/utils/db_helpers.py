@@ -142,10 +142,11 @@ async def get_all_documents(
         pool: asyncpg.Pool,
         table: str,
         filter_query: Optional[str] = None,
-        params: Optional[List] = None
+        params: Optional[List] = None,
+        any_status: bool = False,
 ) -> List[Dict[str, Any]]:
     """Get all documents from a table"""
-    status_clause = "status = 'active'" if table in TABLES_WITH_STATUS else None
+    status_clause = "status = 'active'" if (table in TABLES_WITH_STATUS and not any_status) else None
 
     if filter_query and status_clause:
         query = f"SELECT * FROM {table} WHERE ({filter_query}) AND {status_clause}"

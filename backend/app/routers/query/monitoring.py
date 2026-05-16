@@ -135,6 +135,7 @@ WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
 
 ) AS changes
 WHERE ($2::text IS NULL OR created_by = $2 OR updated_by = $2)
+  AND ($3::text IS NULL OR entity_status = $3)
 ORDER BY GREATEST(created_at, updated_at) DESC
 """
 
@@ -144,12 +145,13 @@ ORDER BY GREATEST(created_at, updated_at) DESC
 async def get_recent_changes(
     hours: int = Query(default=4, ge=1, le=720),
     user_email: Optional[str] = Query(default=None),
+    status: Optional[str] = Query(default=None),
     current_user: dict = Depends(get_current_user)
 ):
     """Get recent changes across all entities within the last N hours"""
     pool = get_database()
     async with pool.acquire() as conn:
-        rows = await conn.fetch(_QUERY, hours, user_email or None)
+        rows = await conn.fetch(_QUERY, hours, user_email or None, status or None)
     return [
         RecentChange(
             entity=row["entity"],

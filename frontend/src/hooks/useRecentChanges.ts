@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { RecentChange } from '@/types/monitoring.types.ts';
 import { monitoringService } from '@/services/monitoring.service.ts';
 
-export const useRecentChanges = (hours: number, userEmail?: string) => {
+export const useRecentChanges = (hours: number, userEmail?: string, status?: string) => {
     const [data, setData] = useState<RecentChange[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -10,7 +10,7 @@ export const useRecentChanges = (hours: number, userEmail?: string) => {
     const fetch = useCallback(async () => {
         setLoading(true);
         try {
-            const result = await monitoringService.getRecentChanges(hours, userEmail);
+            const result = await monitoringService.getRecentChanges(hours, userEmail, status);
             setData(result);
             setError(null);
         } catch {
@@ -18,7 +18,7 @@ export const useRecentChanges = (hours: number, userEmail?: string) => {
         } finally {
             setLoading(false);
         }
-    }, [hours, userEmail]);
+    }, [hours, userEmail, status]);
 
     useEffect(() => { fetch(); }, [fetch]);
 

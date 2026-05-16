@@ -29,6 +29,7 @@ export const PersonForm: React.FC<PersonFormProps> = ({
         gender: 'prefer_not_to_say',
         document_id: null,
     });
+    const [status, setStatus] = useState(person?.status ?? 'active');
 
     useEffect(() => {
         if (person && mode !== 'create') {
@@ -38,6 +39,7 @@ export const PersonForm: React.FC<PersonFormProps> = ({
                 gender: person.gender,
                 document_id: person.document_id || null,
             });
+            setStatus(person.status ?? 'active');
         }
     }, [person, mode]);
 
@@ -47,7 +49,7 @@ export const PersonForm: React.FC<PersonFormProps> = ({
         setError(null);
 
         try {
-            await onSubmit(formData);
+            await onSubmit(mode === 'create' ? formData : { ...formData, status });
         } catch (err: any) {
             setError(err.message || 'An error occurred');
         } finally {
@@ -56,6 +58,12 @@ export const PersonForm: React.FC<PersonFormProps> = ({
     };
 
     const isReadOnly = mode === 'view';
+
+    const statusOptions = [
+        { value: 'active', label: 'Active' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'archived', label: 'Archived' },
+    ];
 
     const genderOptions = [
         { value: 'male', label: 'Male' },
@@ -122,6 +130,17 @@ export const PersonForm: React.FC<PersonFormProps> = ({
                 options={documentOptions}
                 disabled={isReadOnly}
             />
+
+            {mode !== 'create' && (
+                <ThemedSelect
+                    label="Status"
+                    value={status}
+                    onChange={setStatus}
+                    options={statusOptions}
+                    disabled={isReadOnly}
+                    allowEmpty={false}
+                />
+            )}
 
             {!isReadOnly && (
                 <div className="flex gap-3 pt-4">

@@ -32,7 +32,7 @@ ENTITY_NAME = "Role"
 async def get_roles(current_user: dict = Depends(get_current_user)):
     """Get all roles"""
     pool = get_database()
-    return await get_all_documents(pool, TABLE)
+    return await get_all_documents(pool, TABLE, any_status=True)
 
 
 @router.get("/with/permissions", response_model=List[RoleWithPermissions])

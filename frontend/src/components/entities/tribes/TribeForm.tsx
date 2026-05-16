@@ -30,6 +30,7 @@ export const TribeForm: React.FC<TribeFormProps> = ({
         name: '',
         document_id: null,
     });
+    const [status, setStatus] = useState(tribe?.status ?? 'active');
 
     useEffect(() => {
         if (tribe && mode !== 'create') {
@@ -38,6 +39,7 @@ export const TribeForm: React.FC<TribeFormProps> = ({
                 document_id: tribe.document_id || null,
                 project_ids: tribe.project_ids || [],
             });
+            setStatus(tribe.status ?? 'active');
         }
     }, [tribe, mode]);
 
@@ -47,7 +49,7 @@ export const TribeForm: React.FC<TribeFormProps> = ({
         setError(null);
 
         try {
-            await onSubmit(formData);
+            await onSubmit(mode === 'create' ? formData : { ...formData, status });
         } catch (err: any) {
             setError(err.message || 'An error occurred');
         } finally {
@@ -56,6 +58,12 @@ export const TribeForm: React.FC<TribeFormProps> = ({
     };
 
     const isReadOnly = mode === 'view';
+
+    const statusOptions = [
+        { value: 'active', label: 'Active' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'archived', label: 'Archived' },
+    ];
 
     const documentOptions = [
         { value: '', label: 'None' },
@@ -112,6 +120,16 @@ export const TribeForm: React.FC<TribeFormProps> = ({
                 disabled={isReadOnly}
             />
 
+            {mode !== 'create' && (
+                <ThemedSelect
+                    label="Status"
+                    value={status}
+                    onChange={setStatus}
+                    options={statusOptions}
+                    disabled={isReadOnly}
+                    allowEmpty={false}
+                />
+            )}
 
             {!isReadOnly && (
                 <div className="flex gap-3 pt-4">

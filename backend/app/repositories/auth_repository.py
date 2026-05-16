@@ -96,14 +96,15 @@ async def get_session_by_refresh_token_hash(pool, token_hash: str) -> dict | Non
 
 
 async def rotate_refresh_token(
-    pool, session_pk: str, new_hash: str, new_expires_at: datetime
+    pool, session_pk: str, new_hash: str, new_expires_at: datetime, new_session_expires_at: datetime
 ) -> None:
     async with pool.acquire() as conn:
         await conn.execute(
             """UPDATE user_sessions
-               SET refresh_token_hash = $1, refresh_token_expires_at = $2, last_activity = $3
-               WHERE id = $4""",
-            new_hash, new_expires_at, datetime.now(timezone.utc), UUID(session_pk),
+               SET refresh_token_hash = $1, refresh_token_expires_at = $2,
+                   last_activity = $3, expires_at = $4
+               WHERE id = $5""",
+            new_hash, new_expires_at, datetime.now(timezone.utc), new_session_expires_at, UUID(session_pk),
         )
 
 

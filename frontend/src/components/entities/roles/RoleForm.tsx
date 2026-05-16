@@ -6,6 +6,7 @@ import {ThemedButton} from "@/components/common/form/ThemedButton.tsx";
 import {ThemedInput} from "@/components/common/form/ThemedInput.tsx";
 import {ThemedMultiSelect} from "@/components/common/form/ThemedMultiSelect.tsx";
 import {ThemedTextarea} from "@/components/common/form/ThemedTextarea.tsx";
+import {ThemedSelect} from "@/components/common/form/ThemedSelect.tsx";
 
 interface RoleFormProps {
     role?: Role;
@@ -26,8 +27,15 @@ export const RoleForm: React.FC<RoleFormProps> = ({
         description: role?.description || '',
         permission_ids: role?.permission_ids || [],
     });
+    const [status, setStatus] = useState(role?.status ?? 'active');
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const statusOptions = [
+        { value: 'active', label: 'Active' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'archived', label: 'Archived' },
+    ];
 
     const isViewMode = mode === 'view';
 
@@ -54,7 +62,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
 
         setIsSubmitting(true);
         try {
-            await onSubmit(formData);
+            await onSubmit(mode === 'create' ? formData : { ...formData, status });
         } catch (error) {
             console.error('Form submission error:', error);
         } finally {
@@ -97,6 +105,17 @@ export const RoleForm: React.FC<RoleFormProps> = ({
                 disabled={isViewMode || permissionLoading}
                 placeholder="Select permissions"
             />
+
+            {mode !== 'create' && (
+                <ThemedSelect
+                    label="Status"
+                    value={status}
+                    onChange={setStatus}
+                    options={statusOptions}
+                    disabled={isViewMode}
+                    allowEmpty={false}
+                />
+            )}
 
             {!isViewMode && (
                 <div className="flex justify-end gap-3 pt-4">

@@ -23,7 +23,7 @@ ENTITY_NAME = "Person"
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_CREATE_OWN_TRIBES, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_persons(current_user: dict = Depends(get_current_user)):
     pool = get_database()
-    return await get_all_documents(pool, TABLE)
+    return await get_all_documents(pool, TABLE, any_status=True)
 
 
 @router.get("/{person_id}", response_model=Person)

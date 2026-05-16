@@ -20,6 +20,7 @@ export interface UserUpdate {
     login?: string;
     role_ids?: string[];
     person_id?: string | null;
+    status?: string;
 }
 
 export interface UserWithRolesAndPermissions extends BaseEntity {

@@ -39,6 +39,13 @@ async def create_tribe_with_positions(data: TribeWithPositionsCreate, pool, curr
         raise e
 
 
+async def archive_tribe(tribe_id: str, pool, current_user: dict) -> None:
+    tribe = await tribe_repo.get_tribe_by_id(pool, tribe_id)
+    if not tribe:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tribe not found")
+    await tribe_repo.archive_tribe(pool, tribe_id, current_user['id'])
+
+
 async def update_tribe_with_positions(tribe_id: str, data: TribeWithPositionsUpdate, pool, current_user: dict) -> TribeWithPositionsResponse:
     tribe = await tribe_repo.get_tribe_by_id(pool, tribe_id)
     if not tribe:

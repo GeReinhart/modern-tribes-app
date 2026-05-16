@@ -17,4 +17,8 @@ export const tribeWithPositionService = {
         const response = await apiService.put<TribeWithPositionsResponse>(`/tribes/${id}/with-positions`, data);
         return response;
     },
+
+    async archiveTribe(id: string): Promise<void> {
+        await apiService.patch<void>(`/tribes/${id}/archive`);
+    },
 };

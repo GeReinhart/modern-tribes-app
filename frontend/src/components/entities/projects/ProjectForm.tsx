@@ -27,6 +27,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         name: '',
         document_id: '',
     });
+    const [status, setStatus] = useState(project?.status ?? 'active');
 
     useEffect(() => {
         if (project && mode !== 'create') {
@@ -34,6 +35,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                 name: project.name,
                 document_id: project.document_id,
             });
+            setStatus(project.status ?? 'active');
         }
     }, [project, mode]);
 
@@ -43,7 +45,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
         setError(null);
 
         try {
-            await onSubmit(formData);
+            await onSubmit(mode === 'create' ? formData : { ...formData, status });
         } catch (err: any) {
             setError(err.message || 'An error occurred');
         } finally {
@@ -52,6 +54,12 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
     };
 
     const isReadOnly = mode === 'view';
+
+    const statusOptions = [
+        { value: 'active', label: 'Active' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'archived', label: 'Archived' },
+    ];
 
     const documentOptions = documents.map((doc) => ({
         value: doc.id,
@@ -86,6 +94,17 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                 required
                 disabled={isReadOnly}
             />
+
+            {mode !== 'create' && (
+                <ThemedSelect
+                    label="Status"
+                    value={status}
+                    onChange={setStatus}
+                    options={statusOptions}
+                    disabled={isReadOnly}
+                    allowEmpty={false}
+                />
+            )}
 
             {!isReadOnly && (
                 <div className="flex gap-3 pt-4">

@@ -14,6 +14,7 @@ import { ThemedTable } from '@/components/common/layout/ThemedTable.tsx';
 import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
 import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog.tsx';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
+import { StatusBadge } from '@/components/common/layout/StatusBadge.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage';
 
 const RolesCrudPageContent: React.FC = () => {
@@ -52,6 +53,12 @@ const RolesCrudPageContent: React.FC = () => {
         },
         { key: 'permissions', header: t('admin.columnPermissions'), render: (r: RoleWithPermissions) => <RolePermissionsBadges permissions={r.permissions} maxDisplay={3} /> },
         { key: 'created_at', header: t('common.created'), render: (r: RoleWithPermissions) => new Date(r.created_at).toLocaleDateString() },
+        {
+            key: 'status', header: t('monitoring.status'),
+            render: (r: RoleWithPermissions) => (
+                <StatusBadge status={r.status ?? 'active'} />
+            ),
+        },
         {
             key: 'actions', header: t('common.actions'),
             render: (r: RoleWithPermissions) => (

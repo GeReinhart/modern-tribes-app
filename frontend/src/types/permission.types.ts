@@ -13,6 +13,7 @@ export interface PermissionCreate {
 export interface PermissionUpdate {
     name?: string;
     description?: string;
+    status?: string;
 }
 
 export interface PermissionWithUsers extends Permission {

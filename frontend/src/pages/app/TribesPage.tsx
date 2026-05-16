@@ -14,6 +14,7 @@ import {ThemedLoadingSpinner} from "@/components/common/layout/ThemedLoadingSpin
 import {ThemedDivider} from "@/components/common/layout/ThemedDivider.tsx";
 import {useVerifyAuthorization} from "@/hooks/userVerifyAuthorization.ts";
 import {errorStyle} from "@/styles/theme.styles.tsx";
+import {PWAInstallButton} from "@/components/common/pwa/PWAInstallButton.tsx";
 
 const TribesPageContent: React.FC = () => {
     const { t } = useTranslation();
@@ -42,6 +43,8 @@ const TribesPageContent: React.FC = () => {
                 {t('tribes.createTribe')}
             </ThemedButton>
             )}
+
+            <PWAInstallButton />
 
             <ThemedButton requiredPermissions={["admin"]}
                 variant={'ghost'}

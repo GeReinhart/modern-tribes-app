@@ -12,10 +12,12 @@ export interface PositionUpdate {
     tribe_id?: string;
     person_id?: string;
     position?: PositionEnum;
+    status?: string;
 }
 
 export interface Position extends PositionBase {
     id: string;
+    status: string;
     created_at: string;
     updated_at: string;
 }
