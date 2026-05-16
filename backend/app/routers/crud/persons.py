@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status, Depends
 from typing import List
+from uuid import UUID
 
 from ..auth.authentification import get_current_user
 from ..auth.authorization import require_any_permission_decorator, require_permission_decorator

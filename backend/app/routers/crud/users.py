@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status, HTTPException, Depends
 from typing import List
+from uuid import UUID
 
 from ..auth.authentification import get_current_user
 from ...models.crud.users import User, UserCreate, UserUpdate, UserWithRoles
