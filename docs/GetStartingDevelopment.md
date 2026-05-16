@@ -83,13 +83,11 @@ For schema changes, use Alembic migrations (see `MIGRATIONS.md`):
 
 ```bash
 # Apply all migrations
-alembic upgrade head
+set -a && source .env && set +a && alembic upgrade head
 
-# Create a new migration
-alembic revision -m "description"
 
 # Check migration status
-alembic current
+set -a && source .env && set +a && alembic current
 ```
 
 ## Start the frontend
