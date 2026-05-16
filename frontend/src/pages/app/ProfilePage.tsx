@@ -4,12 +4,27 @@ import { useAuth } from '@/contexts/AuthContext.tsx';
 import { useNavigate } from 'react-router-dom';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile.ts';
+import { useRepresentsByUserId } from '@/hooks/useRepresents.ts';
+import { usePerson } from '@/hooks/usePersons.ts';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedText } from '@/components/common/layout/ThemedText.tsx';
 import { ThemedDivider } from '@/components/common/layout/ThemedDivider.tsx';
 import { ThemedCard } from '@/components/common/layout/ThemedCard.tsx';
 import { ThemedBadge } from '@/components/common/layout/ThemedBadge.tsx';
 import { ThemedButton } from '@/components/common/form/ThemedButton.tsx';
+import { StatusBadge } from '@/components/common/layout/StatusBadge.tsx';
+
+function RepresentedPersonRow({ personId, status }: { personId: string; status: string }) {
+    const { person } = usePerson(personId);
+    return (
+        <div className="flex justify-between items-center">
+            <ThemedBadge variant="accent">
+                {person ? `${person.first_name} ${person.last_name}` : personId}
+            </ThemedBadge>
+            <StatusBadge status={status} />
+        </div>
+    );
+}
 
 function ProfilePageContent() {
     const { t, i18n } = useTranslation();
@@ -17,6 +32,7 @@ function ProfilePageContent() {
     const navigate = useNavigate();
     const { theme } = useTheme();
     const { user, person } = useCurrentUserProfile();
+    const { represents } = useRepresentsByUserId(user?.id ?? null);
 
     const breadcrumbs = [
         { label: t('common.home'), path: '/app' },
@@ -120,6 +136,22 @@ function ProfilePageContent() {
                         </div>
                     </ThemedCard>
                 )}
+
+                {/* Represents */}
+                <ThemedCard variant="secondary" bordered>
+                    <ThemedText variant="primary" size="medium" as="h3">
+                        {t('profile.represents')}
+                    </ThemedText>
+                    <div className="space-y-2 mt-3">
+                        {represents.length === 0 ? (
+                            <ThemedText variant="secondary" size="small">{t('profile.representsNone')}</ThemedText>
+                        ) : (
+                            represents.map(r => (
+                                <RepresentedPersonRow key={r.id} personId={r.person_id} status={r.status} />
+                            ))
+                        )}
+                    </div>
+                </ThemedCard>
 
                 {/* Account Information */}
                 <ThemedCard variant="primary" bordered>

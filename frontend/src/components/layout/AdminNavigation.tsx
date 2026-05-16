@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 
+type AdminPage = 'users' | 'persons' | 'roles' | 'permissions' | 'positions' | 'represents' | 'tribes' | 'projects' | 'documents' | 'monitoring';
+
 interface AdminNavigationProps {
-    currentPage: 'users' | 'persons' | 'roles' | 'permissions' | 'positions' | 'tribes' | 'projects' | 'documents' | 'monitoring';
+    currentPage: AdminPage;
 }
 
 export const adminMainThemeId: string = "alt_05"
@@ -13,66 +15,37 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ currentPage })
     const navigate = useNavigate();
     const { t } = useTranslation();
 
-    return (
-        <>
-            <ThemedButton variant="ghost" onClick={() => navigate('/app')}>
-                {t('admin.app')}
-            </ThemedButton>
-            <ThemedButton
-                variant={currentPage === 'monitoring' ? 'secondary' : 'primary'}
-                onClick={() => navigate('/admin/monitoring')}
-            >
-                    {t('admin.monitoring')}
-            </ThemedButton>
-            <ThemedButton
-                variant={currentPage === 'users' ? 'secondary' : 'primary'}
-                onClick={() => navigate('/admin/users')}
-            >
-                {t('admin.users')}
-            </ThemedButton>
-            <ThemedButton
-                variant={currentPage === 'persons' ? 'secondary' : 'primary'}
-                onClick={() => navigate('/admin/persons')}
-            >
-                {t('admin.persons')}
-            </ThemedButton>
-            <ThemedButton
-                variant={currentPage === 'roles' ? 'secondary' : 'primary'}
-                onClick={() => navigate('/admin/roles')}
-            >
-                {t('admin.roles')}
-            </ThemedButton>
-            <ThemedButton
-                variant={currentPage === 'permissions' ? 'secondary' : 'primary'}
-                onClick={() => navigate('/admin/permissions')}
-            >
-                {t('admin.permissions')}
-            </ThemedButton>
-            <ThemedButton
-                variant={currentPage === 'positions' ? 'secondary' : 'primary'}
-                onClick={() => navigate('/admin/positions')}
-            >
-                {t('admin.positions')}
-            </ThemedButton>
-            <ThemedButton
-                variant={currentPage === 'tribes' ? 'secondary' : 'primary'}
-                onClick={() => navigate('/admin/tribes')}
-            >
-                {t('admin.tribes')}
-            </ThemedButton>
-            <ThemedButton
-                variant={currentPage === 'projects' ? 'secondary' : 'primary'}
-                onClick={() => navigate('/admin/projects')}
-            >
-                {t('admin.projects')}
-            </ThemedButton>
-            <ThemedButton
-                variant={currentPage === 'documents' ? 'secondary' : 'primary'}
-                onClick={() => navigate('/admin/documents')}
-            >
-                {t('admin.documents')}
-            </ThemedButton>
+    const items: Array<{ page: AdminPage | 'app'; labelKey: string; path: string }> = [
+        { page: 'app',         labelKey: 'admin.app',         path: '/app' },
+        { page: 'monitoring',  labelKey: 'admin.monitoring',  path: '/admin/monitoring' },
+        { page: 'users',       labelKey: 'admin.users',       path: '/admin/users' },
+        { page: 'persons',     labelKey: 'admin.persons',     path: '/admin/persons' },
+        { page: 'roles',       labelKey: 'admin.roles',       path: '/admin/roles' },
+        { page: 'permissions', labelKey: 'admin.permissions', path: '/admin/permissions' },
+        { page: 'positions',   labelKey: 'admin.positions',   path: '/admin/positions' },
+        { page: 'represents',  labelKey: 'admin.represents',  path: '/admin/represents' },
+        { page: 'tribes',      labelKey: 'admin.tribes',      path: '/admin/tribes' },
+        { page: 'projects',    labelKey: 'admin.projects',    path: '/admin/projects' },
+        { page: 'documents',   labelKey: 'admin.documents',   path: '/admin/documents' },
+    ];
 
-        </>
+    const cols = items.length > 14 ? 3 : items.length > 7 ? 2 : 1;
+
+    return (
+        <div style={{
+            display: 'grid',
+            gridTemplateColumns: `repeat(${cols}, 1fr)`,
+            gap: 'var(--space-xs)',
+        }}>
+            {items.map(({ page, labelKey, path }) => (
+                <ThemedButton
+                    key={page}
+                    variant={page === 'app' ? 'ghost' : currentPage === page ? 'secondary' : 'primary'}
+                    onClick={() => navigate(path)}
+                >
+                    {t(labelKey)}
+                </ThemedButton>
+            ))}
+        </div>
     );
 };

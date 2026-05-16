@@ -133,6 +133,18 @@ SELECT 'Document',
 FROM documents d
 WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
 
+UNION ALL
+
+SELECT 'Represents',
+       rep.id::text,
+       (SELECT login FROM users WHERE id = rep.user_id) || ' → ' || (SELECT first_name || ' ' || last_name FROM persons WHERE id = rep.person_id),
+       rep.status,
+       rep.created_at, rep.updated_at,
+       (SELECT email FROM users WHERE id = rep.created_by),
+       (SELECT email FROM users WHERE id = rep.updated_by)
+FROM represents rep
+WHERE GREATEST(rep.created_at, rep.updated_at) >= NOW() - make_interval(hours => $1)
+
 ) AS changes
 WHERE ($2::text IS NULL OR created_by = $2 OR updated_by = $2)
   AND ($3::text IS NULL OR entity_status = $3)

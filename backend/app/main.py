@@ -17,6 +17,7 @@ from .routers.crud import (
     persons,
     tribes as crud_tribes,
     positions,
+    represents,
     labels,
     label_entities,
     projects,
@@ -96,6 +97,7 @@ app.include_router(permissions.router, prefix="/api/crud")
 app.include_router(persons.router, prefix="/api/crud")
 app.include_router(crud_tribes.router, prefix="/api/crud")
 app.include_router(positions.router, prefix="/api/crud")
+app.include_router(represents.router, prefix="/api/crud")
 app.include_router(labels.router, prefix="/api/crud")
 app.include_router(label_entities.router, prefix="/api/crud")
 app.include_router(projects.router, prefix="/api/crud")

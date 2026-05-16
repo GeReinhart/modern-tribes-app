@@ -18,6 +18,7 @@ import {PermissionsCrudPage} from "@/pages/admin/PermissionsCrudPage.tsx";
 import {ProjectsCrudPage} from "@/pages/admin/ProjectsCrudPage.tsx";
 import {TribesCrudPage} from "@/pages/admin/TribesCrudPage.tsx";
 import {PositionsCrudPage} from "@/pages/admin/PositionsCrudPage.tsx";
+import {RepresentsCrudPage} from "@/pages/admin/RepresentsCrudPage.tsx";
 import {DocumentsCrudPage} from "@/pages/admin/DocumentsCrudPage.tsx";
 import {MonitoringPage} from "@/pages/admin/MonitoringPage.tsx";
 
@@ -44,6 +45,7 @@ function AuthBootstrapApp() {
                                 <Route path="/admin/roles" element={<RolesCrudPage/>}/>
                                 <Route path="/admin/permissions" element={<PermissionsCrudPage/>}/>
                                 <Route path="/admin/positions" element={<PositionsCrudPage/>}/>
+                                <Route path="/admin/represents" element={<RepresentsCrudPage/>}/>
                                 <Route path="/admin/tribes" element={<TribesCrudPage/>}/>
                                 <Route path="/admin/projects" element={<ProjectsCrudPage/>}/>
                                 <Route path="/admin/documents" element={<DocumentsCrudPage/>}/>
