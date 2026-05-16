@@ -4,6 +4,7 @@ import { FormMode } from '@/types/common.types.ts';
 import JoditEditorComponent from "@/components/common/editor/JoditEditorComponent.tsx";
 import FileUploader from "@/components/common/editor/FileUploader.tsx";
 import {ThemedButton} from "@/components/common/form/ThemedButton.tsx";
+import {ThemedSelect} from "@/components/common/form/ThemedSelect.tsx";
 
 interface DocumentFormProps {
     document?: Document;
@@ -23,9 +24,16 @@ export const DocumentForm: React.FC<DocumentFormProps> = ({
         content_html: '',
         attachments: []
     });
+    const [status, setStatus] = useState(document?.status ?? 'active');
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const statusOptions = [
+        { value: 'active', label: 'Active' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'archived', label: 'Archived' },
+    ];
 
     useEffect(() => {
         if (document && mode !== 'create') {
@@ -33,6 +41,7 @@ export const DocumentForm: React.FC<DocumentFormProps> = ({
                 content_html: document.content_html,
                 attachments: document.attachments || [],
             });
+            setStatus(document.status ?? 'active');
         }
     }, [document, mode]);
 
@@ -50,7 +59,7 @@ export const DocumentForm: React.FC<DocumentFormProps> = ({
         setError(null);
 
         try {
-            await onSubmit(formData);
+            await onSubmit(mode === 'create' ? formData : { ...formData, status });
         } catch (err: any) {
             setError(err.message || 'An error occurred');
         } finally {
@@ -95,6 +104,18 @@ export const DocumentForm: React.FC<DocumentFormProps> = ({
                             maxFileSize={10}
                         />
                     </div>
+
+                    {mode !== 'create' && (
+                        <div className="mb-6">
+                            <ThemedSelect
+                                label="Status"
+                                value={status}
+                                onChange={setStatus}
+                                options={statusOptions}
+                                allowEmpty={false}
+                            />
+                        </div>
+                    )}
 
                     {/* Actions */}
                     <div className="flex justify-between items-center pt-6 border-t border-gray-200">

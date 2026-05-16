@@ -29,8 +29,15 @@ export const UserForm: React.FC<UserFormProps> = ({
         role_ids: user?.role_ids || [],
         person_id: user?.person_id || null
     });
+    const [status, setStatus] = useState(user?.status ?? 'active');
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const statusOptions = [
+        { value: 'active', label: 'Active' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'archived', label: 'Archived' },
+    ];
 
     const isViewMode = mode === 'view';
 
@@ -71,7 +78,7 @@ export const UserForm: React.FC<UserFormProps> = ({
             if (mode === 'create') {
                 await onSubmit(formData as UserCreate);
             } else {
-                const updateData: UserUpdate = { ...formData };
+                const updateData: UserUpdate = { ...formData, status };
                 await onSubmit(updateData);
             }
         } catch (error) {
@@ -130,6 +137,17 @@ export const UserForm: React.FC<UserFormProps> = ({
                 options={personOptions}
                 disabled={isViewMode || personsLoading}
             />
+
+            {mode !== 'create' && (
+                <ThemedSelect
+                    label="Status"
+                    value={status}
+                    onChange={setStatus}
+                    options={statusOptions}
+                    disabled={isViewMode}
+                    allowEmpty={false}
+                />
+            )}
 
             {!isViewMode && (
                 <div className="flex justify-end gap-3 pt-4">

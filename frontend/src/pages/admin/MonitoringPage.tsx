@@ -7,18 +7,23 @@ import { ThemedCard } from '@/components/common/layout/ThemedCard';
 import { ThemedText } from '@/components/common/layout/ThemedText';
 import { ThemedTable } from '@/components/common/layout/ThemedTable.tsx';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
-import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
+import { ThemedSelect } from '@/components/common/form/ThemedSelect.tsx';
 import { useRecentChanges } from '@/hooks/useRecentChanges.ts';
+import { useUsers } from '@/hooks/useUsers.ts';
 import { RecentChange } from '@/types/monitoring.types.ts';
 
 const HOURS_OPTIONS = [1, 4, 24, 48, 168];
+const STATUS_OPTIONS = ['active', 'pending', 'archived'];
 
 const MonitoringPageContent: React.FC = () => {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const [hours, setHours] = useState(4);
+
     const [userEmail, setUserEmail] = useState('');
-    const { data, loading, error } = useRecentChanges(hours, userEmail || undefined);
+    const [status, setStatus] = useState('');
+    const { users } = useUsers();
+    const { data, loading, error } = useRecentChanges(hours, userEmail || undefined, status || undefined);
 
     const breadcrumbs = useMemo(() => [
         { label: t('common.home'), path: '/app' },
@@ -119,34 +124,34 @@ const MonitoringPageContent: React.FC = () => {
                 </ThemedCard>
             )}
             <ThemedCard>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
-                        <ThemedText size="small">{t('admin.monitoringHours')}</ThemedText>
-                        <select
-                            value={hours}
-                            onChange={e => setHours(Number(e.target.value))}
-                            style={{
-                                padding: '6px 12px',
-                                borderRadius: '6px',
-                                border: `1px solid ${theme.colors.border}`,
-                                backgroundColor: theme.colors.surface,
-                                color: theme.colors.text,
-                                fontSize: 'var(--font-sm)',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            {HOURS_OPTIONS.map(h => (
-                                <option key={h} value={h}>{h} {t('admin.monitoringHoursUnit')}</option>
-                            ))}
-                        </select>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-md)' }}>
+                    <div style={{ minWidth: '160px' }}>
+                        <ThemedSelect
+                            label={t('admin.monitoringHours')}
+                            value={String(hours)}
+                            onChange={v => setHours(Number(v))}
+                            options={HOURS_OPTIONS.map(h => ({ value: String(h), label: `${h} ${t('admin.monitoringHoursUnit')}` }))}
+                            allowEmpty={false}
+                        />
                     </div>
-                    <ThemedInput
-                        label={t('monitoring.filterByUser')}
-                        value={userEmail}
-                        onChange={e => setUserEmail(e.target.value)}
-                        placeholder={t('monitoring.filterByUserPlaceholder')}
-                        variant="primary"
-                    />
+                    <div style={{ minWidth: '160px' }}>
+                        <ThemedSelect
+                            label={t('monitoring.filterByStatus')}
+                            value={status}
+                            onChange={setStatus}
+                            options={STATUS_OPTIONS.map(s => ({ value: s, label: s }))}
+                            placeholder={t('monitoring.allStatuses')}
+                        />
+                    </div>
+                    <div style={{ minWidth: '220px', flex: 1 }}>
+                        <ThemedSelect
+                            label={t('monitoring.filterByUser')}
+                            value={userEmail}
+                            onChange={setUserEmail}
+                            options={users.map(u => ({ value: u.email, label: u.email }))}
+                            placeholder={t('monitoring.allUsers')}
+                        />
+                    </div>
                 </div>
             </ThemedCard>
             <ThemedCard>

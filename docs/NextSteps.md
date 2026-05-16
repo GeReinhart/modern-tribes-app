@@ -3,15 +3,6 @@
 
 # Already done
 
-- Technical features
-  - Status of the entities
-  - Track who changed the entities
-  - I18N
-  - Authentification through magic link and JWT
-  - Authorization through granular permissions that can be grouped by roles to the users
-- Functional Features
-  - Separate the user and the person
-
 ## Common
 
 - [ ] User represents 0..N person

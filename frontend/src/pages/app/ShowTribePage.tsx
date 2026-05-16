@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext.tsx';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -6,8 +6,10 @@ import { ThemedCard } from '@/components/common/layout/ThemedCard';
 import { ThemedText} from '@/components/common/layout/ThemedText';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedSection } from "@/components/common/layout/ThemedSection.tsx";
+import { ConfirmDialog } from '@/components/common/layout/ConfirmDialog.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
+import { tribeWithPositionService } from '@/services/app/tribe_with_positions.service.ts';
 import {
     containerStyle,
     errorStyle,
@@ -23,6 +25,8 @@ const ShowTribePageContent: React.FC = () => {
     const navigate = useNavigate();
     const { tribeId } = useParams<{ tribeId: string }>();
     const { data: authorization, error: authorizationError, verifyAuthorization } = useVerifyAuthorization();
+    const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
+    const [archiving, setArchiving] = useState(false);
 
     // Single hook call to get all data
     const { tribe, loading, error } = useTribeWithPositions(tribeId || null);
@@ -36,13 +40,34 @@ const ShowTribePageContent: React.FC = () => {
         }
     }, [tribeId, verifyAuthorization]);
 
-    // Conditionally render Edit button only when authorized
+    const handleArchive = async () => {
+        if (!tribeId) return;
+        setArchiving(true);
+        try {
+            await tribeWithPositionService.archiveTribe(tribeId);
+            navigate('/app/tribes');
+        } finally {
+            setArchiving(false);
+            setShowArchiveConfirm(false);
+        }
+    };
+
+    // Conditionally render Edit / Archive buttons only when authorized
     const headerActions = (
         <>
             {authorization?.authorized && (
-                <ThemedButton variant="primary" onClick={() => navigate(`/app/tribes/${tribeId}/update`)}>
-                    Edit
-                </ThemedButton>
+                <>
+                    <ThemedButton variant="primary" onClick={() => navigate(`/app/tribes/${tribeId}/update`)}>
+                        {t('common.edit')}
+                    </ThemedButton>
+                    <ThemedButton
+                        variant="danger"
+                        isLoading={archiving}
+                        onClick={() => setShowArchiveConfirm(true)}
+                    >
+                        {t('tribes.archive')}
+                    </ThemedButton>
+                </>
             )}
         </>
     );
@@ -291,6 +316,16 @@ const ShowTribePageContent: React.FC = () => {
                 )}
             </ThemedSection>
 
+            {showArchiveConfirm && (
+                <ConfirmDialog
+                    title={t('tribes.archiveConfirmTitle')}
+                    message={t('tribes.archiveConfirmMessage', { name: tribe.name })}
+                    confirmLabel={t('tribes.archive')}
+                    confirmVariant="danger"
+                    onConfirm={handleArchive}
+                    onCancel={() => setShowArchiveConfirm(false)}
+                />
+            )}
         </AppLayout>
     );
 };

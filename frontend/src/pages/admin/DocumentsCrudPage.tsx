@@ -13,6 +13,7 @@ import { ThemedTable } from '@/components/common/layout/ThemedTable.tsx';
 import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
 import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog.tsx';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
+import { StatusBadge } from '@/components/common/layout/StatusBadge.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage';
 
 const stripHtml = (html: string) => {
@@ -56,6 +57,12 @@ const DocumentsCrudPageContent: React.FC = () => {
             render: (d: Document) => <span style={{ fontSize: '12px', color: theme.colors.secondary }}>{t('admin.files', { count: d.attachments?.length || 0 })}</span>,
         },
         { key: 'created_at', header: t('common.created'), render: (d: Document) => new Date(d.created_at).toLocaleDateString() },
+        {
+            key: 'status', header: t('monitoring.status'),
+            render: (d: Document) => (
+                <StatusBadge status={d.status ?? 'active'} />
+            ),
+        },
         {
             key: 'actions', header: t('common.actions'),
             render: (d: Document) => (

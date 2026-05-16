@@ -26,7 +26,7 @@ ENTITY_NAME = "User"
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_users(current_user: dict = Depends(get_current_user)):
     pool = get_database()
-    return await get_all_documents(pool, TABLE)
+    return await get_all_documents(pool, TABLE, any_status=True)
 
 
 

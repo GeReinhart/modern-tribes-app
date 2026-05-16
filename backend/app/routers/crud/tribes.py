@@ -35,7 +35,7 @@ async def get_tribes(current_user: dict = Depends(get_current_user)):
     """Get all tribes"""
 
     pool = get_database()
-    return await get_all_documents(pool, TABLE)
+    return await get_all_documents(pool, TABLE, any_status=True)
 
 
 @router.get("/{tribe_id}", response_model=Tribe)

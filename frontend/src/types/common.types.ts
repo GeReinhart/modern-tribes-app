@@ -12,6 +12,7 @@ export interface PaginationParams {
 
 export interface BaseEntity {
     id: string;
+    status: string;
     created_at: string;
     updated_at: string;
 }

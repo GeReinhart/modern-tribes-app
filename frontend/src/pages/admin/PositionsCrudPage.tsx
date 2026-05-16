@@ -15,6 +15,7 @@ import { ThemedTable } from '@/components/common/layout/ThemedTable.tsx';
 import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
 import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog.tsx';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
+import { StatusBadge } from '@/components/common/layout/StatusBadge.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage';
 
 const PositionsCrudPageContent: React.FC = () => {
@@ -49,6 +50,12 @@ const PositionsCrudPageContent: React.FC = () => {
         { key: 'position', header: t('admin.columnPosition'), render: (p: Position) => <div style={{ fontWeight: 500 }}>{getPositionLabel(p.position)}</div> },
         { key: 'person', header: t('admin.columnPerson'), render: (p: Position) => <PositionPersonBadge personId={p.person_id || null} /> },
         { key: 'created_at', header: t('common.created'), render: (p: Position) => new Date(p.created_at).toLocaleDateString() },
+        {
+            key: 'status', header: t('monitoring.status'),
+            render: (p: Position) => (
+                <StatusBadge status={p.status ?? 'active'} />
+            ),
+        },
         {
             key: 'actions', header: t('common.actions'),
             render: (p: Position) => (

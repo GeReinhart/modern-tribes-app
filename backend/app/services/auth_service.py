@@ -56,7 +56,8 @@ async def refresh_access_token(raw_refresh_token: str, pool) -> RefreshResponse:
 
     new_raw_refresh, new_hash = create_refresh_token()
     new_refresh_expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    await auth_repo.rotate_refresh_token(pool, str(session["id"]), new_hash, new_refresh_expires_at)
+    new_session_expires_at = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    await auth_repo.rotate_refresh_token(pool, str(session["id"]), new_hash, new_refresh_expires_at, new_session_expires_at)
 
     roles = await auth_repo.get_user_roles(pool, user_id)
     new_access_token = create_access_token(

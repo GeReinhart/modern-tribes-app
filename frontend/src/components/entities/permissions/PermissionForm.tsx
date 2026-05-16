@@ -4,6 +4,7 @@ import { FormMode } from '@/types/common.types.ts';
 import { ThemedButton } from "@/components/common/form/ThemedButton.tsx";
 import { ThemedInput } from "@/components/common/form/ThemedInput.tsx";
 import { ThemedTextarea } from "@/components/common/form/ThemedTextarea.tsx";
+import { ThemedSelect } from "@/components/common/form/ThemedSelect.tsx";
 
 interface PermissionFormProps {
     permission?: Permission;
@@ -22,8 +23,15 @@ export const PermissionForm: React.FC<PermissionFormProps> = ({
         name: permission?.name || '',
         description: permission?.description || '',
     });
+    const [status, setStatus] = useState(permission?.status ?? 'active');
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const statusOptions = [
+        { value: 'active', label: 'Active' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'archived', label: 'Archived' },
+    ];
 
     const isViewMode = mode === 'view';
 
@@ -45,7 +53,7 @@ export const PermissionForm: React.FC<PermissionFormProps> = ({
 
         setIsSubmitting(true);
         try {
-            await onSubmit(formData);
+            await onSubmit(mode === 'create' ? formData : { ...formData, status });
         } catch (error) {
             console.error('Form submission error:', error);
         } finally {
@@ -79,6 +87,17 @@ export const PermissionForm: React.FC<PermissionFormProps> = ({
                 rows={3}
                 className="block w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
             />
+
+            {mode !== 'create' && (
+                <ThemedSelect
+                    label="Status"
+                    value={status}
+                    onChange={setStatus}
+                    options={statusOptions}
+                    disabled={isViewMode}
+                    allowEmpty={false}
+                />
+            )}
 
             {!isViewMode && (
                 <div className="flex justify-end gap-3 pt-4">

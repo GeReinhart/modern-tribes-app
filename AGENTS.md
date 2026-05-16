@@ -110,3 +110,7 @@ By default, the query must check for status = 'active'.
 ## Dependencies
 
 - All dependencies must be declared in `package.json` and pinned to specific versions.
+
+## Themes
+
+The frontend layout is based on Themes UI. All the elements presented should have the current theme applied

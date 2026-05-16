@@ -65,6 +65,16 @@ export function useCrudPage<T extends { id: string }, CreateDto, UpdateDto>(
         }
     }, [modalState, create, update, refetch]);
 
+    const updateItem = useCallback(async (id: string, data: UpdateDto) => {
+        try {
+            await update(id, data);
+            refetch();
+        } catch (error) {
+            console.error('Error updating item:', error);
+            throw error;
+        }
+    }, [update, refetch]);
+
     const openCreate = useCallback(() => setModalState({ isOpen: true, mode: 'create' }), []);
     const openEdit = useCallback((entity: T) => setModalState({ isOpen: true, mode: 'edit', entity }), []);
     const openView = useCallback((entity: T) => setModalState({ isOpen: true, mode: 'view', entity }), []);
@@ -76,7 +86,7 @@ export function useCrudPage<T extends { id: string }, CreateDto, UpdateDto>(
         filter, setFilter,
         selectedRows,
         modalState, deleteDialog,
-        handleRowSelect, handleDeleteSelected, confirmDelete, handleSubmit,
+        handleRowSelect, handleDeleteSelected, confirmDelete, handleSubmit, updateItem,
         openCreate, openEdit, openView, closeModal, openDeleteSingle, closeDeleteDialog,
     };
 }

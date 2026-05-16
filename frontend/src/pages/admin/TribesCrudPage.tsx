@@ -13,6 +13,7 @@ import { ThemedTable } from '@/components/common/layout/ThemedTable.tsx';
 import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
 import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog.tsx';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
+import { StatusBadge } from '@/components/common/layout/StatusBadge.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage';
 
 const TribesCrudPageContent: React.FC = () => {
@@ -45,6 +46,12 @@ const TribesCrudPageContent: React.FC = () => {
             ),
         },
         { key: 'created_at', header: t('common.created'), render: (tr: Tribe) => new Date(tr.created_at).toLocaleDateString() },
+        {
+            key: 'status', header: t('monitoring.status'),
+            render: (tr: Tribe) => (
+                <StatusBadge status={tr.status ?? 'active'} />
+            ),
+        },
         {
             key: 'actions', header: t('common.actions'),
             render: (tr: Tribe) => (

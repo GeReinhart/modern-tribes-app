@@ -24,4 +24,5 @@ export interface RoleUpdate {
     name?: string;
     description?: string;
     permission_ids?: string[];
+    status?: string;
 }

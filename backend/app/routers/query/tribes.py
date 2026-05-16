@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List
+from uuid import UUID
 from pydantic import BaseModel
 
 from ..auth.authentification import get_current_user
@@ -8,12 +9,27 @@ from ...utils.ownership import check_own_user_or_admin
 from ...models.auth.auth import PermissionEnum
 from ...models.crud.positions import PositionEnum
 from ...core.database import get_database
-from ...utils.db_helpers import (
-    get_all_documents,
-    get_document_by_id,
-)
+from ...utils.db_helpers import validate_uuid
 
 router = APIRouter(prefix="/tribes", tags=["query_tribes"])
+
+_QUERY = """
+    SELECT
+        u.id        AS user_id,
+        u.login     AS user_login,
+        u.email     AS user_email,
+        p.id        AS person_id,
+        p.first_name AS person_first_name,
+        p.last_name  AS person_last_name,
+        pos.position AS position,
+        t.id        AS tribe_id,
+        t.name      AS tribe_name
+    FROM users u
+    JOIN persons   p   ON p.id  = u.person_id  AND p.status   = 'active'
+    JOIN positions pos ON pos.person_id = p.id  AND pos.status = 'active'
+    JOIN tribes    t   ON t.id  = pos.tribe_id  AND t.status   = 'active'
+    WHERE u.id = $1
+"""
 
 
 class UserPersonPositionTribe(BaseModel):
@@ -31,49 +47,25 @@ class UserPersonPositionTribe(BaseModel):
 @router.get("/by/user/{user_id}", response_model=List[UserPersonPositionTribe])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_tribes_by_user(user_id: str, current_user: dict = Depends(get_current_user)):
-    """Get all tribes associated with a user"""
+    """Get all active tribes associated with a user via their active positions."""
+    validate_uuid(user_id, "user_id")
     pool = get_database()
     await check_own_user_or_admin(user_id, current_user, pool)
 
-    user = await get_document_by_id(pool, "users", user_id, "User")
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(_QUERY, UUID(user_id))
 
-    person_id = user.get("person_id")
-    if not person_id:
-        return []
-
-    person = await get_document_by_id(pool, "persons", person_id, "Person")
-    if not person:
-        return []
-
-    positions = await get_all_documents(
-        pool,
-        "positions",
-        filter_query="person_id = $1",
-        params=[person_id]
-    )
-
-    result = []
-    for position in positions:
-        tribe_id = position.get("tribe_id")
-        if not tribe_id:
-            continue
-
-        tribe = await get_document_by_id(pool, "tribes", tribe_id, "Tribe")
-        if not tribe:
-            continue
-
-        result.append(UserPersonPositionTribe(
-            user_id=str(user.get("id")),
-            user_login=user.get("login", ""),
-            user_email=user.get("email", ""),
-            person_id=str(person.get("id")),
-            person_first_name=person.get("first_name", ""),
-            person_last_name=person.get("last_name", ""),
-            position=position.get("position"),
-            tribe_id=str(tribe.get("id")),
-            tribe_name=tribe.get("name", "")
-        ))
-
-    return result
+    return [
+        UserPersonPositionTribe(
+            user_id=str(r["user_id"]),
+            user_login=r["user_login"],
+            user_email=r["user_email"],
+            person_id=str(r["person_id"]),
+            person_first_name=r["person_first_name"],
+            person_last_name=r["person_last_name"],
+            position=r["position"],
+            tribe_id=str(r["tribe_id"]),
+            tribe_name=r["tribe_name"],
+        )
+        for r in rows
+    ]
