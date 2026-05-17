@@ -37,11 +37,12 @@ Features:
     - UX Themes
     - Power web app to install on mobile devices
     - Send emails
-    - Rich text editor with files / images strorage
+    - Rich text editor with files / images storage
     - Database evolutions
     - Docker packaging
 - Functional Features
-    - Separate the user and the person
+    - Separate the user and the 
+    - A user can represent several people
     - Roles management through roles that can be attached to the users
 
 

@@ -65,7 +65,7 @@ pip install -r requirements.txt
 
 Initialize database schema and seed data (development only):
 ```bash
-python scripts/init_db.py
+set -a && source .env && set +a && python scripts/init_db.py
 ```
 
 Launch the backend with auto-reload:

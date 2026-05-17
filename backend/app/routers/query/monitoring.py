@@ -135,6 +135,18 @@ WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
 
 UNION ALL
 
+SELECT 'Mail',
+       m.id::text,
+       m.subject,
+       m.status,
+       m.created_at, m.updated_at,
+       (SELECT email FROM users WHERE id = m.created_by),
+       (SELECT email FROM users WHERE id = m.updated_by)
+FROM mails m
+WHERE GREATEST(m.created_at, m.updated_at) >= NOW() - make_interval(hours => $1)
+
+UNION ALL
+
 SELECT 'Represents',
        rep.id::text,
        (SELECT login FROM users WHERE id = rep.user_id) || ' → ' || (SELECT first_name || ' ' || last_name FROM persons WHERE id = rep.person_id),

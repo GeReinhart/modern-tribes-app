@@ -1,13 +1,15 @@
+from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Depends, Request, Response, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from ...core.database import get_database
-from ...core.email import send_magic_link
+from ...core.email import magic_link_html
 from ...core.security import create_magic_token
 from ...core.config import settings
 from ...models.auth.auth import MagicLinkRequest, MagicLinkResponse, TokenResponse, UserResponse, SessionResponse, RefreshRequest, RefreshResponse
 from ...repositories import auth_repository as auth_repo
 from ...services import auth_service
+from ...utils.db_helpers import create_document
 from ...utils.permissions_helper import get_user_permissions
 
 router = APIRouter()
@@ -26,12 +28,50 @@ async def request_magic_link(request: MagicLinkRequest):
     magic_token = create_magic_token(request.email)
     magic_link = f"{settings.FRONTEND_URL}/auth/verify?token={magic_token}"
     print("Generated a magic-link " + magic_link)
-    try:
-        await send_magic_link(request.email, magic_link)
+
+    pool = get_database()
+    user = await auth_repo.get_user_by_email(pool, request.email)
+    if user is None:
         return MagicLinkResponse(message="Magic link sent to your email", email=request.email)
-    except Exception as e:
-        print(f"Error sending magic link: {str(e)}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to send email")
+
+    mail_type = "magic-link"
+    async with pool.acquire() as conn:
+        existing = await conn.fetchrow(
+            """
+            SELECT m.id FROM mails m
+            JOIN mails_to mt ON mt.mail_id = m.id
+            WHERE mt.user_id = $1
+              AND m.mail_type = $2
+              AND m.status = 'pending'
+              AND m.mail_status = 'not_sent'
+            LIMIT 1
+            """,
+            user["id"], mail_type,
+        )
+    if existing:
+        return MagicLinkResponse(message="Magic link sent to your email", email=request.email)
+
+    subject = f"Sign in to {settings.APP_NAME}"
+    html = magic_link_html(magic_link)
+    now = datetime.now(timezone.utc)
+
+    mail = await create_document(pool, "mails", {
+        "subject": subject,
+        "content_html": html,
+        "mail_type": mail_type,
+        "mail_status": "not_sent",
+        "planned_at": now,
+        "status": "pending",
+        "created_by": user["id"],
+        "updated_by": user["id"],
+    })
+
+    await create_document(pool, "mails_to", {
+        "mail_id": mail["id"],
+        "user_id": user["id"],
+    })
+
+    return MagicLinkResponse(message="Magic link sent to your email", email=request.email)
 
 
 @router.post("/auth/verify", response_model=TokenResponse)
