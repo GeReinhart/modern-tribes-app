@@ -4,14 +4,15 @@ import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { useTheme } from '@/contexts/ThemeContext';
 
+const version = import.meta.env.VITE_APP_VERSION;
+
 export const PWAInstallButton: React.FC = () => {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const { isStandalone, isIOS, canPrompt, install } = usePWAInstall();
-    const [showIOSHint, setShowIOSHint] = useState(false);
+    const [showHint, setShowHint] = useState(false);
 
     if (isStandalone) return null;
-    if (!canPrompt && !isIOS) return null;
 
     const tooltipStyle: React.CSSProperties = {
         position: 'absolute',
@@ -23,25 +24,37 @@ export const PWAInstallButton: React.FC = () => {
         borderRadius: '8px',
         boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
         padding: 'var(--space-md)',
-        minWidth: '220px',
+        minWidth: '240px',
         fontSize: 'var(--font-sm)',
         color: theme.colors.text,
         lineHeight: 1.5,
     };
+
+    const handleClick = () => {
+        if (canPrompt) {
+            void install();
+        } else {
+            setShowHint(prev => !prev);
+        }
+    };
+
+    const hintText = isIOS
+        ? t('common.installAppIOSHint')
+        : t('common.installAppGenericHint');
 
     return (
         <div style={{ position: 'relative' }}>
             <ThemedButton
                 variant="ghost"
                 mobileIcon="download"
-                onClick={canPrompt ? install : () => setShowIOSHint(prev => !prev)}
+                onClick={handleClick}
             >
-                {t('common.installApp')}
+                {t('common.installApp')} {version && `v${version}`}
             </ThemedButton>
 
-            {isIOS && showIOSHint && (
+            {!canPrompt && showHint && (
                 <div style={tooltipStyle}>
-                    {t('common.installAppIOSHint')}
+                    {hintText}
                 </div>
             )}
         </div>

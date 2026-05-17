@@ -15,6 +15,7 @@ const fr: Record<string, string> = {
     'common.admin': 'Admin',
     'common.installApp': "Installer l'app",
     'common.installAppIOSHint': 'Appuyez sur le bouton Partager dans Safari, puis "Sur l\'écran d\'accueil" pour installer cette app.',
+    'common.installAppGenericHint': 'Utilisez le menu de votre navigateur et cherchez "Ajouter à l\'écran d\'accueil" ou "Installer l\'application".',
     'common.created': 'Créé le',
     'common.actions': 'Actions',
     'common.name': 'Nom',

@@ -5,7 +5,7 @@ interface BeforeInstallPromptEvent extends Event {
     userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-interface PWAInstallState {
+export interface PWAInstallState {
     isStandalone: boolean;
     isIOS: boolean;
     canPrompt: boolean;
@@ -20,7 +20,10 @@ function detectStandalone(): boolean {
 }
 
 function detectIOS(): boolean {
-    return /iphone|ipad|ipod/i.test(navigator.userAgent);
+    return (
+        /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    );
 }
 
 export function usePWAInstall(): PWAInstallState {
