@@ -15,6 +15,7 @@ const en: Record<string, string> = {
     'common.admin': 'Admin',
     'common.installApp': 'Install app',
     'common.installAppIOSHint': 'Tap the Share button in Safari, then "Add to Home Screen" to install this app.',
+    'common.installAppGenericHint': 'Use your browser\'s menu and look for "Add to Home Screen" or "Install app".',
     'common.created': 'Created',
     'common.actions': 'Actions',
     'common.name': 'Name',
