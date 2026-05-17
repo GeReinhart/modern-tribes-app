@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     EMAILS_FROM_NAME: str = "no-reply-modern-tribes"
     MAILPACE_API_TOKEN: str = ""
 
+    # Mail scheduler
+    MAIL_CRON_INTERVAL_SECONDS: int = 60
+
 
     # CORS
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"

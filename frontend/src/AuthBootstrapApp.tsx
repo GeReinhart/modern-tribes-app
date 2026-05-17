@@ -21,6 +21,7 @@ import {PositionsCrudPage} from "@/pages/admin/PositionsCrudPage.tsx";
 import {RepresentsCrudPage} from "@/pages/admin/RepresentsCrudPage.tsx";
 import {DocumentsCrudPage} from "@/pages/admin/DocumentsCrudPage.tsx";
 import {MonitoringPage} from "@/pages/admin/MonitoringPage.tsx";
+import {MailsPage} from "@/pages/admin/MailsPage.tsx";
 
 function AuthBootstrapApp() {
     return (
@@ -50,6 +51,7 @@ function AuthBootstrapApp() {
                                 <Route path="/admin/projects" element={<ProjectsCrudPage/>}/>
                                 <Route path="/admin/documents" element={<DocumentsCrudPage/>}/>
                 <Route path="/admin/monitoring" element={<MonitoringPage/>}/>
+                                <Route path="/admin/mails" element={<MailsPage/>}/>
 
                             <Route path="/app" element={<Navigate to="/app/tribes" replace/>}/>
                             <Route path="/app/tribes" element={<TribesPage/>}/>

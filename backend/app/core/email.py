@@ -17,7 +17,7 @@ def _smtp_client() -> FastMail:
     return FastMail(conf)
 
 
-def _magic_link_html(magic_link: str) -> str:
+def magic_link_html(magic_link: str) -> str:
     return f"""
     <!DOCTYPE html>
     <html>
@@ -86,9 +86,16 @@ async def _send_via_smtp(to: str, subject: str, html: str) -> None:
     await _smtp_client().send_message(message)
 
 
+async def send_email(to: str, subject: str, html: str) -> None:
+    if settings.MAILPACE_API_TOKEN:
+        await _send_via_mailpace(to, subject, html)
+    else:
+        await _send_via_smtp(to, subject, html)
+
+
 async def send_magic_link(email: str, magic_link: str) -> None:
     subject = f"Sign in to {settings.APP_NAME}"
-    html = _magic_link_html(magic_link)
+    html = magic_link_html(magic_link)
 
     if settings.MAILPACE_API_TOKEN:
         await _send_via_mailpace(email, subject, html)

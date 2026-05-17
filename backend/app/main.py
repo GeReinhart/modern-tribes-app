@@ -3,9 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
+import asyncio
 import logging
 import os
 from .core.config import settings
+from .services.mail_scheduler import mail_scheduler
 from .core.database import connect_to_postgres, close_postgres_connection
 from .routers.uploads import (
     uploads,
@@ -18,6 +20,7 @@ from .routers.crud import (
     tribes as crud_tribes,
     positions,
     represents,
+    mails,
     labels,
     label_entities,
     projects,
@@ -32,6 +35,7 @@ from .routers.query import (
     tribes as query_tribes,
     users as query_users,
     monitoring as query_monitoring,
+    mails as query_mails,
 )
 
 # Configure logging
@@ -41,19 +45,29 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+_scheduler_task: asyncio.Task | None = None
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifecycle manager for startup and shutdown events"""
-    # Startup
+    global _scheduler_task
+
     logger.info("Starting application...")
     await connect_to_postgres()
 
+    _scheduler_task = asyncio.create_task(mail_scheduler())
     logger.info("Application started successfully")
 
     yield
 
-    # Shutdown
     logger.info("Shutting down application...")
+    if _scheduler_task:
+        _scheduler_task.cancel()
+        try:
+            await _scheduler_task
+        except asyncio.CancelledError:
+            pass
     await close_postgres_connection()
     logger.info("Application stopped")
 
@@ -98,6 +112,7 @@ app.include_router(persons.router, prefix="/api/crud")
 app.include_router(crud_tribes.router, prefix="/api/crud")
 app.include_router(positions.router, prefix="/api/crud")
 app.include_router(represents.router, prefix="/api/crud")
+app.include_router(mails.router, prefix="/api/crud")
 app.include_router(labels.router, prefix="/api/crud")
 app.include_router(label_entities.router, prefix="/api/crud")
 app.include_router(projects.router, prefix="/api/crud")
@@ -114,6 +129,7 @@ app.include_router(tribes_with_positions.router, prefix="/api")
 app.include_router(query_tribes.router, prefix="/api/query")
 app.include_router(query_users.router, prefix="/api/query")
 app.include_router(query_monitoring.router, prefix="/api/query")
+app.include_router(query_mails.router, prefix="/api/query")
 
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 
-type AdminPage = 'users' | 'persons' | 'roles' | 'permissions' | 'positions' | 'represents' | 'tribes' | 'projects' | 'documents' | 'monitoring';
+type AdminPage = 'users' | 'persons' | 'roles' | 'permissions' | 'positions' | 'represents' | 'tribes' | 'projects' | 'documents' | 'monitoring' | 'mails';
 
 interface AdminNavigationProps {
     currentPage: AdminPage;
@@ -27,6 +27,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ currentPage })
         { page: 'tribes',      labelKey: 'admin.tribes',      path: '/admin/tribes' },
         { page: 'projects',    labelKey: 'admin.projects',    path: '/admin/projects' },
         { page: 'documents',   labelKey: 'admin.documents',   path: '/admin/documents' },
+        { page: 'mails',       labelKey: 'admin.mails.nav',   path: '/admin/mails' },
     ];
 
     const cols = items.length > 14 ? 3 : items.length > 7 ? 2 : 1;
