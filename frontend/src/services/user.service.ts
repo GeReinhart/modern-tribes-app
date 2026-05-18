@@ -31,6 +31,14 @@ class UserService {
     async delete(id: string): Promise<void> {
         return apiService.delete<void>(`${this.endpoint}/${id}`);
     }
+
+    async sendMagicLink(userId: string): Promise<{ message: string; email: string }> {
+        return apiService.post<{ message: string; email: string }>(`${this.endpoint}/${userId}/magic-link/send`, {});
+    }
+
+    async generateMagicLink(userId: string): Promise<{ magic_link: string; email: string }> {
+        return apiService.get<{ magic_link: string; email: string }>(`${this.endpoint}/${userId}/magic-link/generate`);
+    }
 }
 
 export const userService = new UserService();
