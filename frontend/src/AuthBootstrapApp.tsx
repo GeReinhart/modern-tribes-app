@@ -11,17 +11,14 @@ import ShowTribePage from "@/pages/app/ShowTribePage.tsx";
 import UpdateTribePage from "@/pages/app/UpdateTribePage.tsx";
 import {TribesPage} from "@/pages/app/TribesPage.tsx";
 import ProfilePage from "@/pages/app/ProfilePage.tsx";
-import {UsersCrudPage} from "@/pages/admin/UsersCrudPage.tsx";
-import {PersonsCrudPage} from "@/pages/admin/PersonsCrudPage.tsx";
-import {RolesCrudPage} from "@/pages/admin/RolesCrudPage.tsx";
-import {PermissionsCrudPage} from "@/pages/admin/PermissionsCrudPage.tsx";
+import {AuthorizationPage} from "@/pages/admin/AuthorizationPage.tsx";
 import {ProjectsCrudPage} from "@/pages/admin/ProjectsCrudPage.tsx";
 import {TribesCrudPage} from "@/pages/admin/TribesCrudPage.tsx";
 import {PositionsCrudPage} from "@/pages/admin/PositionsCrudPage.tsx";
-import {RepresentsCrudPage} from "@/pages/admin/RepresentsCrudPage.tsx";
 import {DocumentsCrudPage} from "@/pages/admin/DocumentsCrudPage.tsx";
 import {MonitoringPage} from "@/pages/admin/MonitoringPage.tsx";
 import {MailsPage} from "@/pages/admin/MailsPage.tsx";
+import {PeopleManagementPage} from "@/pages/admin/PeopleManagementPage.tsx";
 
 function AuthBootstrapApp() {
     return (
@@ -41,12 +38,9 @@ function AuthBootstrapApp() {
                         <Route element={<ProtectedRoute/>}>
 
                                 <Route path="/admin" element={<Navigate to="/admin/monitoring" replace/>}/>
-                                <Route path="/admin/users" element={<UsersCrudPage/>}/>
-                                <Route path="/admin/persons" element={<PersonsCrudPage/>}/>
-                                <Route path="/admin/roles" element={<RolesCrudPage/>}/>
-                                <Route path="/admin/permissions" element={<PermissionsCrudPage/>}/>
+                                <Route path="/admin/people" element={<PeopleManagementPage/>}/>
+                                <Route path="/admin/authorization" element={<AuthorizationPage/>}/>
                                 <Route path="/admin/positions" element={<PositionsCrudPage/>}/>
-                                <Route path="/admin/represents" element={<RepresentsCrudPage/>}/>
                                 <Route path="/admin/tribes" element={<TribesCrudPage/>}/>
                                 <Route path="/admin/projects" element={<ProjectsCrudPage/>}/>
                                 <Route path="/admin/documents" element={<DocumentsCrudPage/>}/>

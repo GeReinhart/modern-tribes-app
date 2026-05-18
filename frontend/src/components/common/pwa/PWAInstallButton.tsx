@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useResponsiveContext } from '@/contexts/ResponsiveContext';
 
 const version = import.meta.env.VITE_APP_VERSION;
 
@@ -10,9 +11,10 @@ export const PWAInstallButton: React.FC = () => {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const { isStandalone, isIOS, canPrompt, install } = usePWAInstall();
+    const { isMobile } = useResponsiveContext();
     const [showHint, setShowHint] = useState(false);
 
-    if (isStandalone) return null;
+    if (isStandalone || !isMobile) return null;
 
     const tooltipStyle: React.CSSProperties = {
         position: 'absolute',
@@ -46,7 +48,6 @@ export const PWAInstallButton: React.FC = () => {
         <div style={{ position: 'relative' }}>
             <ThemedButton
                 variant="ghost"
-                mobileIcon="download"
                 onClick={handleClick}
             >
                 {t('common.installApp')} {version && `v${version}`}

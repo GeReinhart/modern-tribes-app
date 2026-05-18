@@ -23,14 +23,14 @@ const MailsPageContent: React.FC = () => {
     const { theme } = useTheme();
     const [filterStatus, setFilterStatus] = useState('');
     const [filterMailStatus, setFilterMailStatus] = useState('');
-    const [filterUserEmail, setFilterUserEmail] = useState('');
+    const [filterUserId, setFilterUserId] = useState('');
     const [selectedMail, setSelectedMail] = useState<MailWithRecipients | null>(null);
 
     const { users } = useUsers();
     const { mails, loading, error } = useMails({
         status: filterStatus || undefined,
         mail_status: filterMailStatus || undefined,
-        user_email: filterUserEmail || undefined,
+        user_id: filterUserId || undefined,
     });
 
     const breadcrumbs = useMemo(() => [
@@ -157,9 +157,9 @@ const MailsPageContent: React.FC = () => {
                     <div style={{ minWidth: '220px', flex: 1 }}>
                         <ThemedSelect
                             label={t('monitoring.filterByUser')}
-                            value={filterUserEmail}
-                            onChange={setFilterUserEmail}
-                            options={users.map(u => ({ value: u.email, label: u.email }))}
+                            value={filterUserId}
+                            onChange={setFilterUserId}
+                            options={users.map(u => ({ value: u.id, label: u.email }))}
                             placeholder={t('monitoring.allUsers')}
                         />
                     </div>

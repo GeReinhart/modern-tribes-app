@@ -36,10 +36,9 @@ SELECT
 FROM mails m
 WHERE ($1::text IS NULL OR m.status = $1)
   AND ($2::text IS NULL OR m.mail_status = $2)
-  AND ($3::text IS NULL OR m.id IN (
+  AND ($3::uuid IS NULL OR m.id IN (
       SELECT mt2.mail_id FROM mails_to mt2
-      JOIN users u2 ON u2.id = mt2.user_id
-      WHERE u2.email = $3
+      WHERE mt2.user_id = $3
   ))
 ORDER BY m.created_at DESC
 """
@@ -50,12 +49,12 @@ ORDER BY m.created_at DESC
 async def get_mails(
     status: Optional[str] = Query(default=None),
     mail_status: Optional[str] = Query(default=None),
-    user_email: Optional[str] = Query(default=None),
+    user_id: Optional[str] = Query(default=None),
     current_user: dict = Depends(get_current_user),
 ):
     pool = get_database()
     async with pool.acquire() as conn:
-        rows = await conn.fetch(_QUERY, status or None, mail_status or None, user_email or None)
+        rows = await conn.fetch(_QUERY, status or None, mail_status or None, user_id or None)
 
     return [
         MailWithRecipients(

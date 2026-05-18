@@ -21,7 +21,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                                                         showUserBadge = true,
                                                         breadcrumbs
                                                     }) => {
-    const { theme } = useTheme();
+    const { theme, currentThemeKey } = useTheme();
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -117,7 +117,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                     aria-haspopup={hasMenuContent ? 'menu' : undefined}
                     aria-expanded={isMenuOpen}
                 >
-                    <ApplicationLogo size="sm" />
+                    <ApplicationLogo size="sm" themeId={currentThemeKey} />
                 </div>
 
                 {isMenuOpen && hasMenuContent && (

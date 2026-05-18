@@ -22,5 +22,5 @@ export interface MailWithRecipients extends Mail {
 export interface MailsFilter {
     status?: string;
     mail_status?: string;
-    user_email?: string;
+    user_id?: string;
 }

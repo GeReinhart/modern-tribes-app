@@ -1,10 +1,14 @@
+from datetime import datetime, timezone
 from fastapi import APIRouter, status, HTTPException, Depends
 from typing import List
 from uuid import UUID
 
 from ..auth.authentification import get_current_user
 from ...models.crud.users import User, UserCreate, UserUpdate, UserWithRoles
+from ...core.config import settings
 from ...core.database import get_database
+from ...core.email import magic_link_html
+from ...core.security import create_magic_token
 from ...utils.db_helpers import (
     get_all_documents, check_document_exists, create_document,
     update_document, delete_document, check_unique_field
@@ -115,3 +119,58 @@ async def delete_user(user_id: str, current_user: dict = Depends(get_current_use
     pool = get_database()
     await delete_document(pool, TABLE, user_id, ENTITY_NAME)
     return None
+
+
+@router.post("/{user_id}/magic-link/send")
+@require_permission_decorator(PermissionEnum.ADMIN)
+async def admin_send_magic_link(user_id: str, current_user: dict = Depends(get_current_user)):
+    pool = get_database()
+    user = await check_document_exists(pool, TABLE, user_id, ENTITY_NAME)
+    async with pool.acquire() as conn:
+        existing = await conn.fetchrow(
+            """
+            SELECT m.id FROM mails m
+            JOIN mails_to mt ON mt.mail_id = m.id
+            WHERE mt.user_id = $1
+              AND m.mail_type = $2
+              AND m.status = 'pending'
+              AND m.mail_status = 'not_sent'
+            LIMIT 1
+            """,
+            user["id"], "magic-link",
+        )
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"A magic-link mail is already pending for {user['email']}",
+        )
+    magic_token = create_magic_token(user["email"])
+    magic_link = f"{settings.FRONTEND_URL}/auth/verify?token={magic_token}"
+    subject = f"Sign in to {settings.APP_NAME}"
+    html = magic_link_html(magic_link)
+    now = datetime.now(timezone.utc)
+    mail = await create_document(pool, "mails", {
+        "subject": subject,
+        "content_html": html,
+        "mail_type": "magic-link",
+        "mail_status": "not_sent",
+        "planned_at": now,
+        "status": "pending",
+        "created_by": UUID(current_user["id"]),
+        "updated_by": UUID(current_user["id"]),
+    })
+    await create_document(pool, "mails_to", {
+        "mail_id": mail["id"],
+        "user_id": user["id"],
+    })
+    return {"message": "Magic link sent", "email": user["email"]}
+
+
+@router.get("/{user_id}/magic-link/generate")
+@require_permission_decorator(PermissionEnum.ADMIN)
+async def admin_generate_magic_link(user_id: str, current_user: dict = Depends(get_current_user)):
+    pool = get_database()
+    user = await check_document_exists(pool, TABLE, user_id, ENTITY_NAME)
+    magic_token = create_magic_token(user["email"])
+    magic_link = f"{settings.FRONTEND_URL}/auth/verify?token={magic_token}"
+    return {"magic_link": magic_link, "email": user["email"]}
