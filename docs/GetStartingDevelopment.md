@@ -68,16 +68,8 @@ Initialize database schema and seed data (development only):
 set -a && source .env && set +a && python scripts/init_db.py
 ```
 
-Launch the backend with auto-reload:
-```bash
-set -a && source .env && set +a && ./venv/bin/uvicorn app.main:app --reload --port 8000
-```
 
-This starts
-- Backend of the application on `localhost:8000` => http://localhost:8000/docs
-
-
-### Database Migrations
+- Database Migrations
 
 For schema changes, use Alembic migrations (see `MIGRATIONS.md`):
 
@@ -89,6 +81,15 @@ set -a && source .env && set +a && alembic upgrade head
 # Check migration status
 set -a && source .env && set +a && alembic current
 ```
+
+Launch the backend with auto-reload:
+```bash
+set -a && source .env && set +a && ./venv/bin/uvicorn app.main:app --reload --port 8000
+```
+
+This starts
+- Backend of the application on `localhost:8000` => http://localhost:8000/docs
+
 
 ## Start the frontend
 

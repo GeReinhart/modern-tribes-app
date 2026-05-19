@@ -244,6 +244,9 @@ const ShowProjectPageContent: React.FC = () => {
             <ThemedButton variant="ghost" onClick={() => setShowAddFeature(true)}>
                 {t('features.addFeature')}
             </ThemedButton>
+            <ThemedButton variant="ghost" onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit-document`)}>
+                {t('projects.editDocument')}
+            </ThemedButton>
             <ThemedButton variant="primary" onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit`)}>
                 {t('projects.editProject')}
             </ThemedButton>
