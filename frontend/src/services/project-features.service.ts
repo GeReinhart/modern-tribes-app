@@ -11,8 +11,9 @@ class ProjectFeaturesService {
         return apiService.get<FeatureTypeInfo[]>('/project-features/feature-types');
     }
 
-    async listByProject(projectId: string): Promise<ProjectFeatureInstance[]> {
-        return apiService.get<ProjectFeatureInstance[]>(`/project-features/projects/${projectId}/features`);
+    async listByProject(projectId: string, status?: string): Promise<ProjectFeatureInstance[]> {
+        const qs = status ? `?status=${encodeURIComponent(status)}` : '';
+        return apiService.get<ProjectFeatureInstance[]>(`/project-features/projects/${projectId}/features${qs}`);
     }
 
     async create(projectId: string, data: ProjectFeatureInstanceCreate): Promise<ProjectFeatureInstance> {

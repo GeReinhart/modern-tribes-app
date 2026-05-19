@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { predefinedThemes } from '@/components/themes/themes';
 
-type AdminPage = 'authorization' | 'tribes' | 'documents' | 'monitoring' | 'mails' | 'people' | 'config';
+type AdminPage = 'authorization' | 'tribes' | 'documents' | 'monitoring' | 'mails' | 'people' | 'config' | 'features';
 
 interface AdminNavigationProps {
     currentPage: AdminPage;
@@ -25,6 +25,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ currentPage })
         { page: 'tribes', labelKey: 'admin.tribes', path: '/admin/tribes' },
         { page: 'documents',       labelKey: 'admin.documents',       path: '/admin/documents' },
         { page: 'config',          labelKey: 'admin.config',          path: '/admin/config' },
+        { page: 'features',        labelKey: 'admin.features',        path: '/admin/features' },
 
     ];
 

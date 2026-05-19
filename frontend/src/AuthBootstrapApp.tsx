@@ -26,6 +26,7 @@ import {UserEditPage} from "@/pages/admin/UserEditPage.tsx";
 import {DocumentRevisionsPage} from "@/pages/admin/DocumentRevisionsPage.tsx";
 import {SearchPage} from "@/pages/app/SearchPage.tsx";
 import {AppConfigPage} from "@/pages/admin/AppConfigPage.tsx";
+import {FeaturesPage} from "@/pages/admin/FeaturesPage.tsx";
 import {AppConfigProvider} from "@/contexts/AppConfigContext.tsx";
 
 function AuthBootstrapApp() {
@@ -59,6 +60,7 @@ function AuthBootstrapApp() {
                                 <Route path="/admin/projects" element={<Navigate to="/admin/tribes" replace/>}/>
                                 <Route path="/admin/documents" element={<DocumentsCrudPage/>}/>
                                 <Route path="/admin/config" element={<AppConfigPage/>}/>
+                                <Route path="/admin/features" element={<FeaturesPage/>}/>
                 <Route path="/admin/monitoring" element={<MonitoringPage/>}/>
                                 <Route path="/admin/monitoring/documents/:documentId" element={<DocumentRevisionsPage/>}/>
                                 <Route path="/admin/monitoring/documents/:documentId/updated_at/:date" element={<DocumentRevisionsPage/>}/>

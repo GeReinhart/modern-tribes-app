@@ -9,6 +9,7 @@ import { ThemedBadge } from '@/components/common/layout/ThemedBadge';
 import { ThemedSection } from '@/components/common/layout/ThemedSection';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
 import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
+import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
 import { useProjectWithDocument, useUserProjectsByTribe } from '@/hooks/useProjects';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
@@ -130,10 +131,11 @@ const ShowProjectPageContent: React.FC = () => {
         user?.id || '',
         { enabled: !!tribeId && !!user?.id }
     );
-    const { features, createFeature } = useProjectFeatures(projectId || null);
+    const { features, createFeature, archiveFeature } = useProjectFeatures(projectId || null);
 
     const [activeTab, setActiveTab] = useState('description');
     const [showAddFeature, setShowAddFeature] = useState(false);
+    const [archiveTarget, setArchiveTarget] = useState<{ id: string; name: string } | null>(null);
 
     const myProjectPosition = useMemo((): ProjectEntry | null => {
         if (!projectId) return null;
@@ -354,10 +356,22 @@ const ShowProjectPageContent: React.FC = () => {
                     )}
 
                     {activeFeature && FeatureComponent && (
-                        <FeatureComponent
-                            featureInstanceId={activeFeature.id}
-                            canEdit={canEdit}
-                        />
+                        <>
+                            {isManager && (
+                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+                                    <ThemedButton
+                                        variant="ghost"
+                                        onClick={() => setArchiveTarget({ id: activeFeature.id, name: activeFeature.name })}
+                                    >
+                                        {t('features.archive')}
+                                    </ThemedButton>
+                                </div>
+                            )}
+                            <FeatureComponent
+                                featureInstanceId={activeFeature.id}
+                                canEdit={canEdit}
+                            />
+                        </>
                     )}
 
                     {activeFeature && !FeatureComponent && (
@@ -367,6 +381,21 @@ const ShowProjectPageContent: React.FC = () => {
                     )}
                 </div>
             </ThemedSection>
+
+            <ThemedConfirmDialog
+                isOpen={!!archiveTarget}
+                onClose={() => setArchiveTarget(null)}
+                onConfirm={async () => {
+                    if (!archiveTarget) return;
+                    await archiveFeature(archiveTarget.id);
+                    setActiveTab('description');
+                    setArchiveTarget(null);
+                }}
+                title={t('features.archiveTitle')}
+                message={t('features.archiveMessage', { name: archiveTarget?.name ?? '' })}
+                confirmText={t('tribes.archive')}
+                variant="warning"
+            />
 
             {showAddFeature && (
                 <AddFeatureModal

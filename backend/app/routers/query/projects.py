@@ -160,6 +160,33 @@ async def get_projects_by_user(user_id: str, current_user: dict = Depends(get_cu
     return _deduplicate(rows, user_id)
 
 
+class ProjectTribeEntry(BaseModel):
+    tribe_id: str
+    tribe_name: str
+
+
+@router.get("/{project_id}/tribes", response_model=List[ProjectTribeEntry])
+@require_any_permission_decorator(PermissionEnum.ADMIN)
+async def get_tribes_for_project(
+    project_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    validate_uuid(project_id, "project_id")
+    pool = get_database()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT t.id AS tribe_id, t.name AS tribe_name
+            FROM tribes t
+            JOIN tribes_projects tp ON tp.tribe_id = t.id
+            WHERE tp.project_id = $1
+            ORDER BY t.name ASC
+            """,
+            UUID(project_id),
+        )
+    return [ProjectTribeEntry(tribe_id=str(r["tribe_id"]), tribe_name=r["tribe_name"]) for r in rows]
+
+
 @router.get("/by/tribe/{tribe_id}/for/user/{user_id}", response_model=List[UserProjectEntry])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_projects_by_tribe_for_user(

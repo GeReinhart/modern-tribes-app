@@ -2,7 +2,8 @@ export interface TodoItem {
     id: string;
     feature_instance_id: string;
     title: string;
-    status: 'todo' | 'done';
+    status: 'pending' | 'active' | 'archived';
+    todo_status: 'todo' | 'done';
     document_id: string | null;
     document_content_html: string | null;
     position: number;
@@ -21,6 +22,7 @@ export interface TodoItemCreate {
 export interface TodoItemUpdate {
     title?: string;
     status?: string;
+    todo_status?: string;
     position?: number;
     document_content_html?: string;
 }
