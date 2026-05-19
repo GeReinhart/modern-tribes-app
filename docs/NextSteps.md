@@ -11,11 +11,19 @@
 - [X] Mail queue with a batch every minute
 - [X] Store on each entity the versions of the entity in a JSON
 - [X] Full text search on documents
-- [ ] Do not duplicate configuration on FrontSide, take it from the API. Example: file extension, size.
-- [ ] Feature Todo list to show the auto update of the list
+- [X] Do not duplicate configuration on FrontSide, take it from the API. Example: file extension, size.
+- [X] Feature Todo list to show the auto update of the list
 
 ## Modern tribes
 
+- [ ] Feature Library
+    - A feature to organize documents
+    - The documents must be organized in folders
+    - The documents must be searchable by keywords
+    - The folders are organized in a tree structure
+    - A document can be moved from one folder to another
+    - A document can be editable : inline edition
+    - A document can be archived
 - [ ] Feature Kanban
 - [ ] Feature Planning
 - [ ] Feature Make groceries

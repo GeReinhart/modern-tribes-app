@@ -40,6 +40,8 @@ const en: Record<string, string> = {
     'projects.empty': 'No projects yet.',
     'projects.addProject': 'Add Project',
     'projects.editProject': 'Edit Project',
+    'projects.editDocument': 'Edit Document',
+    'projects.updatingDocument': 'Updating document...',
     'projects.name': 'Name *',
     'projects.description': 'Description *',
     'projects.creating': 'Creating project...',
