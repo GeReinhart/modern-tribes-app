@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Role } from '@/types/role.types';
 import { ThemedBadge } from '@/components/common/layout/ThemedBadge.tsx';
 
@@ -8,8 +9,10 @@ interface UserRolesBadgesProps {
 }
 
 export const UserRolesBadges: React.FC<UserRolesBadgesProps> = ({ roles, maxDisplay }) => {
+    const { t } = useTranslation();
+
     if (!roles || roles.length === 0) {
-        return <ThemedBadge variant="secondary">No roles assigned</ThemedBadge>;
+        return <ThemedBadge variant="secondary">{t('roles.noRoles')}</ThemedBadge>;
     }
 
     const displayRoles = maxDisplay ? roles.slice(0, maxDisplay) : roles;
@@ -18,10 +21,12 @@ export const UserRolesBadges: React.FC<UserRolesBadgesProps> = ({ roles, maxDisp
     return (
         <div className="flex flex-wrap gap-1">
             {displayRoles.map((role) => (
-                <ThemedBadge key={role.id} variant="primary">{role.name}</ThemedBadge>
+                <ThemedBadge key={role.id} variant="primary">
+                    {t(`roles.${role.name}`, { defaultValue: role.name })}
+                </ThemedBadge>
             ))}
             {remainingCount > 0 && (
-                <ThemedBadge variant="secondary">+{remainingCount} more</ThemedBadge>
+                <ThemedBadge variant="secondary">+{remainingCount}</ThemedBadge>
             )}
         </div>
     );

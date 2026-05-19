@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { getAPIBaseUrl } from '@/config/env';
 import { tokenManager } from '@/utils/tokenManager';
 import { authService } from '@/services/auth.service';
+import i18n from '@/i18n/index';
 
 interface User {
     id: string;
@@ -9,6 +10,7 @@ interface User {
     roles: string[];
     permissions: string[];
     is_active: boolean;
+    language: string;
 }
 
 interface AuthContextType {
@@ -36,6 +38,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (response.ok) {
                 const userData = await response.json();
                 setUser(userData);
+                if (userData.language) {
+                    i18n.changeLanguage(userData.language);
+                    localStorage.setItem('user_language', userData.language);
+                }
             } else {
                 tokenManager.clearAll();
                 setToken(null);

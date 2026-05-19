@@ -31,10 +31,11 @@ import JoditEditorComponent from "@/components/common/editor/JoditEditorComponen
 import FileUploader from "@/components/common/editor/FileUploader.tsx";
 import {AttachmentFile} from "@/types/document.types.ts";
 import {ThemedLoadingSpinner} from "@/components/common/layout/ThemedLoadingSpinner.tsx";
+import { PositionEnum } from '@/types/position.types';
 
 interface SelectedPerson {
     person_id: string;
-    position: 'chief' | 'member' | 'guest';
+    position: PositionEnum;
 }
 
 interface TribeFormData {
@@ -135,7 +136,7 @@ const CreateTribeFormContent: React.FC = () => {
         });
     };
 
-    const handlePositionChange = (personId: string, position: 'chief' | 'member' | 'guest') => {
+    const handlePositionChange = (personId: string, position: 'manager' | 'member' | 'guest') => {
         setFormData(prev => ({
             ...prev,
             selectedPersons: prev.selectedPersons.map(p =>
@@ -171,7 +172,7 @@ const CreateTribeFormContent: React.FC = () => {
             return false;
         }
 
-        const hasChief = formData.selectedPersons.some(p => p.position === 'chief');
+        const hasChief = formData.selectedPersons.some(p => p.position === 'manager');
         if (!hasChief) {
             setError(t('validation.assignOneChief'));
             return false;
@@ -467,7 +468,7 @@ const CreateTribeFormContent: React.FC = () => {
                                                     e.stopPropagation();
                                                     handlePositionChange(
                                                         person.id,
-                                                        e.target.value as 'chief' | 'member' | 'guest'
+                                                        e.target.value as 'manager' | 'member' | 'guest'
                                                     );
                                                 }}
                                                 style={positionSelectStyle}
@@ -475,7 +476,7 @@ const CreateTribeFormContent: React.FC = () => {
                                                 onClick={(e) => e.stopPropagation()}
                                             >
                                                 <option value="member">{t('positions.member')}</option>
-                                                <option value="chief">{t('positions.chief')}</option>
+                                                <option value="manager">{t('positions.manager')}</option>
                                                 <option value="guest">{t('positions.guest')}</option>
                                             </select>
                                         )}

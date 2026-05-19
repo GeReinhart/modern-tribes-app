@@ -17,7 +17,9 @@ export const authService = {
 
         if (!response.ok) {
             const data = await response.json();
-            throw new Error(data.detail || 'Failed to send magic link');
+            const error: Error & { status?: number } = new Error(data.detail || 'Failed to send magic link');
+            error.status = response.status;
+            throw error;
         }
     },
 
@@ -51,6 +53,10 @@ export const authService = {
         }
 
         return response.json();
+    },
+
+    updateLanguage: async (language: string): Promise<void> => {
+        await apiService.patch('/auth/me/language', { language });
     },
 
     verifyAuthorization: async (

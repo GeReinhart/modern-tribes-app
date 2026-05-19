@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -36,6 +36,7 @@ import { userService } from '@/services/user.service';
 const UsersTab: React.FC = () => {
     const { t } = useTranslation();
     const { theme } = useTheme();
+    const navigate = useNavigate();
 
     const { users, loading, error, refetch } = useUsersWithRolesAndPermissions();
     const { createUser, updateUser, deleteUser, loading: mutationLoading } = useUserMutations();
@@ -186,7 +187,7 @@ const UsersTab: React.FC = () => {
                 const isActing = magicLinkAction?.userId === u.id;
                 return (
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }} onClick={e => e.stopPropagation()}>
-                        <ThemedButton variant="secondary" onClick={() => crud.openEdit(u)}>{t('common.edit')}</ThemedButton>
+                        <ThemedButton variant="secondary" onClick={() => navigate(`/admin/users/${u.id}/edit`)}>{t('common.edit')}</ThemedButton>
                         <ThemedButton variant="danger" onClick={() => crud.openDeleteSingle(u)}>{t('common.delete')}</ThemedButton>
                         <ThemedButton
                             variant="accent"

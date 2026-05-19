@@ -17,7 +17,26 @@ def _smtp_client() -> FastMail:
     return FastMail(conf)
 
 
-def magic_link_html(magic_link: str) -> str:
+_MAGIC_LINK_STRINGS = {
+    "en": {
+        "title": "Sign in to {app_name}",
+        "intro": "Click the button below to sign in to your account:",
+        "button": "Sign In",
+        "fallback": "Or copy and paste this link into your browser:",
+        "footer": "This link will expire in {minutes} minutes.<br>If you didn't request this email, you can safely ignore it.",
+    },
+    "fr": {
+        "title": "Connexion à {app_name}",
+        "intro": "Cliquez sur le bouton ci-dessous pour vous connecter à votre compte :",
+        "button": "Se connecter",
+        "fallback": "Ou copiez et collez ce lien dans votre navigateur :",
+        "footer": "Ce lien expirera dans {minutes} minutes.<br>Si vous n'avez pas demandé cet e-mail, vous pouvez l'ignorer.",
+    },
+}
+
+
+def magic_link_html(magic_link: str, language: str = "en") -> str:
+    s = _MAGIC_LINK_STRINGS.get(language, _MAGIC_LINK_STRINGS["en"])
     return f"""
     <!DOCTYPE html>
     <html>
@@ -39,14 +58,13 @@ def magic_link_html(magic_link: str) -> str:
     </head>
     <body>
         <div class="container">
-            <h2>Sign in to {settings.APP_NAME}</h2>
-            <p>Click the button below to sign in to your account:</p>
-            <a href="{magic_link}" class="button">Sign In</a>
-            <p>Or copy and paste this link into your browser:</p>
+            <h2>{s["title"].format(app_name=settings.APP_NAME)}</h2>
+            <p>{s["intro"]}</p>
+            <a href="{magic_link}" class="button">{s["button"]}</a>
+            <p>{s["fallback"]}</p>
             <p style="color: #666; word-break: break-all;">{magic_link}</p>
             <p class="footer">
-                This link will expire in {settings.MAGIC_LINK_EXPIRE_MINUTES} minutes.<br>
-                If you didn't request this email, you can safely ignore it.
+                {s["footer"].format(minutes=settings.MAGIC_LINK_EXPIRE_MINUTES)}
             </p>
         </div>
     </body>

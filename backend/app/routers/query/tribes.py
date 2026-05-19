@@ -23,11 +23,32 @@ _QUERY = """
         p.last_name  AS person_last_name,
         pos.position AS position,
         t.id        AS tribe_id,
-        t.name      AS tribe_name
+        t.name      AS tribe_name,
+        FALSE       AS via_represents
     FROM users u
     JOIN persons   p   ON p.id  = u.person_id  AND p.status   = 'active'
     JOIN positions pos ON pos.person_id = p.id  AND pos.status = 'active'
     JOIN tribes    t   ON t.id  = pos.tribe_id  AND t.status   = 'active'
+    WHERE u.id = $1
+
+    UNION
+
+    SELECT
+        u.id        AS user_id,
+        u.login     AS user_login,
+        u.email     AS user_email,
+        p.id        AS person_id,
+        p.first_name AS person_first_name,
+        p.last_name  AS person_last_name,
+        pos.position AS position,
+        t.id        AS tribe_id,
+        t.name      AS tribe_name,
+        TRUE        AS via_represents
+    FROM users u
+    JOIN represents r  ON r.user_id = u.id        AND r.status   = 'active'
+    JOIN persons   p   ON p.id  = r.person_id     AND p.status   = 'active'
+    JOIN positions pos ON pos.person_id = p.id    AND pos.status = 'active'
+    JOIN tribes    t   ON t.id  = pos.tribe_id    AND t.status   = 'active'
     WHERE u.id = $1
 """
 
@@ -42,6 +63,7 @@ class UserPersonPositionTribe(BaseModel):
     position: PositionEnum
     tribe_id: str
     tribe_name: str
+    via_represents: bool
 
 
 @router.get("/by/user/{user_id}", response_model=List[UserPersonPositionTribe])
@@ -66,6 +88,7 @@ async def get_tribes_by_user(user_id: str, current_user: dict = Depends(get_curr
             position=r["position"],
             tribe_id=str(r["tribe_id"]),
             tribe_name=r["tribe_name"],
+            via_represents=r["via_represents"],
         )
         for r in rows
     ]

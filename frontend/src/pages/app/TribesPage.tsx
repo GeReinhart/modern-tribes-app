@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {AppLayout} from '@/components/layout/AppLayout';
 import {useUserTribes} from '@/hooks/useTribes.ts';
@@ -14,7 +14,8 @@ import {ThemedLoadingSpinner} from "@/components/common/layout/ThemedLoadingSpin
 import {ThemedDivider} from "@/components/common/layout/ThemedDivider.tsx";
 import {useVerifyAuthorization} from "@/hooks/userVerifyAuthorization.ts";
 import {errorStyle} from "@/styles/theme.styles.tsx";
-import {PWAInstallButton} from "@/components/common/pwa/PWAInstallButton.tsx";
+import { TribeEntry } from '@/types/queries/tribes.query.types.ts';
+
 
 const TribesPageContent: React.FC = () => {
     const { t } = useTranslation();
@@ -22,6 +23,30 @@ const TribesPageContent: React.FC = () => {
     const {user, isLoading: currentUserLoading} = useCurrentUserProfile();
     const {tribes, loading: tribesLoading} = useUserTribes(user?.id || '', {enabled: !!user?.id});
     const { data: authorization, error: authorizationError, verifyAuthorization } = useVerifyAuthorization();
+
+    const dedupedTribes = useMemo((): TribeEntry[] => {
+        const map = new Map<string, TribeEntry>();
+        for (const row of tribes) {
+            const existing = map.get(row.tribe_id);
+            if (!existing) {
+                map.set(row.tribe_id, {
+                    tribe_id: row.tribe_id,
+                    tribe_name: row.tribe_name,
+                    direct_position: row.via_represents ? null : row.position,
+                    represented_persons: row.via_represents
+                        ? [{ first_name: row.person_first_name, last_name: row.person_last_name, position: row.position }]
+                        : [],
+                });
+            } else {
+                if (!row.via_represents) {
+                    existing.direct_position = row.position;
+                } else {
+                    existing.represented_persons.push({ first_name: row.person_first_name, last_name: row.person_last_name, position: row.position });
+                }
+            }
+        }
+        return Array.from(map.values());
+    }, [tribes]);
 
     const breadcrumbs = [
         { label: t('common.home'), path: '/app' },
@@ -37,20 +62,19 @@ const TribesPageContent: React.FC = () => {
 
     const headerActions = (
         <>
-
             {authorization?.authorized && (
-            <ThemedButton onClick={() => navigate('/app/tribes/create')} variant="primary">
-                {t('tribes.createTribe')}
-            </ThemedButton>
+                <ThemedButton onClick={() => navigate('/app/tribes/create')} variant="primary">
+                    {t('tribes.createTribe')}
+                </ThemedButton>
             )}
 
-            <PWAInstallButton />
+            <ThemedButton variant="ghost" onClick={() => navigate('/app/projects')}>
+                {t('projects.title')}
+            </ThemedButton>
 
             <ThemedButton requiredPermissions={["admin"]}
                 variant={'ghost'}
-                onClick={() => {
-                    navigate('/admin');
-                }}
+                onClick={() => navigate('/admin')}
                 theme={themesById['main_3']}
             >
                 {t('common.admin')}
@@ -91,7 +115,7 @@ const TribesPageContent: React.FC = () => {
 
                 {/* Tribes Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {tribes.map((tribe) => (
+                    {dedupedTribes.map((tribe) => (
                         <TribeCard
                             key={tribe.tribe_id}
                             tribe={tribe}
@@ -100,7 +124,7 @@ const TribesPageContent: React.FC = () => {
                     ))}
                 </div>
 
-                {tribes.length === 0 && (
+                {dedupedTribes.length === 0 && (
                     <ThemedCard variant="secondary">
                         <ThemedText variant="secondary" size="medium">
                             {t('tribes.empty')}

@@ -21,8 +21,14 @@ async def check_own_person_or_admin(person_id: str, current_user: dict, pool) ->
     if PermissionEnum.ADMIN in permissions:
         return
     async with pool.acquire() as conn:
-        row = await conn.fetchrow("SELECT * FROM users WHERE person_id = $1", UUID(person_id))
-    if not row or str(row.get("id")) != str(current_user.get("id")):
+        row = await conn.fetchrow("SELECT id FROM users WHERE person_id = $1", UUID(person_id))
+        if row and str(row.get("id")) == str(current_user.get("id")):
+            return
+        represents_row = await conn.fetchrow(
+            "SELECT id FROM represents WHERE user_id = $1 AND person_id = $2",
+            UUID(str(current_user.get("id"))), UUID(person_id)
+        )
+    if not represents_row:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have permission to access this person's data."
@@ -41,18 +47,31 @@ async def check_own_tribe_position_or_admin(
     if not user_doc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
 
+    user_id = UUID(str(current_user.get("id")))
     person_id = user_doc.get("person_id")
+
     async with pool.acquire() as conn:
-        row = await conn.fetchrow(
-            "SELECT * FROM positions WHERE tribe_id = $1 AND person_id = $2",
+        # Direct membership via the user's own person
+        direct_rows = await conn.fetch(
+            "SELECT position FROM positions WHERE tribe_id = $1 AND person_id = $2",
             UUID(tribe_id), UUID(person_id)
         )
+        # Membership via the represents relation
+        represents_rows = await conn.fetch(
+            """
+            SELECT pos.position FROM positions pos
+            JOIN represents r ON r.person_id = pos.person_id AND r.status = 'active'
+            WHERE pos.tribe_id = $1 AND r.user_id = $2
+            """,
+            UUID(tribe_id), user_id
+        )
 
-    if not row:
+    all_positions = [r["position"] for r in direct_rows] + [r["position"] for r in represents_rows]
+
+    if not all_positions:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not a member of this tribe.")
 
-    position = row_to_dict(row)
-    if required_position and position.get("position") != required_position:
+    if required_position and required_position not in all_positions:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"You must be a {required_position} to perform this action."

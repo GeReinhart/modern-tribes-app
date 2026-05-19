@@ -100,7 +100,7 @@ const MailsPageContent: React.FC = () => {
                     color: 'white',
                     backgroundColor: m.mail_status === 'sent' ? theme.colors.primary : theme.colors.secondary,
                 }}>
-                    {m.mail_status}
+                    {t(`mail_status.${m.mail_status}`, { defaultValue: m.mail_status })}
                 </span>
             ),
         },
@@ -150,7 +150,7 @@ const MailsPageContent: React.FC = () => {
                             label={t('admin.mails.mailStatus')}
                             value={filterMailStatus}
                             onChange={setFilterMailStatus}
-                            options={MAIL_STATUS_OPTIONS.map(s => ({ value: s, label: s }))}
+                            options={MAIL_STATUS_OPTIONS.map(s => ({ value: s, label: t(`mail_status.${s}`, { defaultValue: s }) }))}
                             placeholder={t('admin.mails.allMailStatuses')}
                         />
                     </div>

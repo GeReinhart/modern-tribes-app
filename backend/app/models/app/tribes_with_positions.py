@@ -3,9 +3,19 @@ from typing import Optional, List
 from datetime import datetime
 from ..uploads.files import AttachmentFile
 
+
+class TribeProjectResponse(BaseModel):
+    id: str
+    tribe_id: str
+    project_id: str
+    relation: str
+    created_at: datetime
+    project_name: str = ""
+
+
 class PositionData(BaseModel):
     person_id: str
-    position: str  # "chief", "member", or "invite"
+    position: str  # "manager", "member", or "guest"
 
 
 class TribeWithPositionsCreate(BaseModel):
@@ -42,7 +52,7 @@ class TribeWithPositionsResponse(BaseModel):
     document_id: str
     document_content_html: str
     document_attachments: List[AttachmentFile] = []
-    project_ids: List[str] = []
+    projects: List[TribeProjectResponse] = []
     persons: List[PersonWithPosition]
     created_at: datetime
     updated_at: datetime

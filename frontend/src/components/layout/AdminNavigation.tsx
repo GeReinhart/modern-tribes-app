@@ -2,8 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
+import { predefinedThemes } from '@/components/themes/themes';
 
-type AdminPage = 'authorization' | 'positions' | 'tribes' | 'projects' | 'documents' | 'monitoring' | 'mails' | 'people';
+type AdminPage = 'authorization' | 'tribes' | 'documents' | 'monitoring' | 'mails' | 'people';
 
 interface AdminNavigationProps {
     currentPage: AdminPage;
@@ -21,13 +22,12 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ currentPage })
         { page: 'mails',       labelKey: 'admin.mails.nav',   path: '/admin/mails' },
         { page: 'people',      labelKey: 'admin.people',      path: '/admin/people' },
         { page: 'authorization', labelKey: 'admin.authorization', path: '/admin/authorization' },
-        { page: 'positions',     labelKey: 'admin.positions',     path: '/admin/positions' },
-        { page: 'tribes',      labelKey: 'admin.tribes',      path: '/admin/tribes' },
-        { page: 'projects',    labelKey: 'admin.projects',    path: '/admin/projects' },
-        { page: 'documents',   labelKey: 'admin.documents',   path: '/admin/documents' },
+        { page: 'tribes', labelKey: 'admin.tribes', path: '/admin/tribes' },
+        { page: 'documents',       labelKey: 'admin.documents',       path: '/admin/documents' },
 
     ];
 
+    const adminTheme = predefinedThemes[adminMainThemeId];
     const cols = items.length > 14 ? 3 : items.length > 7 ? 2 : 1;
 
     return (
@@ -39,6 +39,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ currentPage })
             {items.map(({ page, labelKey, path }) => (
                 <ThemedButton
                     key={page}
+                    theme={adminTheme}
                     variant={page === 'app' ? 'ghost' : currentPage === page ? 'secondary' : 'primary'}
                     onClick={() => navigate(path)}
                 >

@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from uuid import UUID
 from fastapi import APIRouter, HTTPException, Depends, Request, Response, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
@@ -6,6 +7,7 @@ from ...core.database import get_database
 from ...core.email import magic_link_html
 from ...core.security import create_magic_token
 from ...core.config import settings
+from pydantic import BaseModel
 from ...models.auth.auth import MagicLinkRequest, MagicLinkResponse, TokenResponse, UserResponse, SessionResponse, RefreshRequest, RefreshResponse
 from ...repositories import auth_repository as auth_repo
 from ...services import auth_service
@@ -27,48 +29,45 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 async def request_magic_link(request: MagicLinkRequest):
     magic_token = create_magic_token(request.email)
     magic_link = f"{settings.FRONTEND_URL}/auth/verify?token={magic_token}"
-    print("Generated a magic-link " + magic_link)
-
     pool = get_database()
     user = await auth_repo.get_user_by_email(pool, request.email)
     if user is None:
-        return MagicLinkResponse(message="Magic link sent to your email", email=request.email)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No account found for this email address")
 
-    mail_type = "magic-link"
+    user_id = UUID(user["id"])
+
     async with pool.acquire() as conn:
-        existing = await conn.fetchrow(
-            """
-            SELECT m.id FROM mails m
-            JOIN mails_to mt ON mt.mail_id = m.id
-            WHERE mt.user_id = $1
-              AND m.mail_type = $2
-              AND m.status = 'pending'
-              AND m.mail_status = 'not_sent'
-            LIMIT 1
-            """,
-            user["id"], mail_type,
-        )
-    if existing:
-        return MagicLinkResponse(message="Magic link sent to your email", email=request.email)
+        await conn.execute("""
+            DELETE FROM mails
+            WHERE id IN (
+                SELECT m.id FROM mails m
+                JOIN mails_to mt ON mt.mail_id = m.id
+                WHERE mt.user_id = $1
+                  AND m.mail_type = 'magic-link'
+                  AND m.status = 'pending'
+                  AND m.mail_status = 'not_sent'
+            )
+        """, user_id)
 
-    subject = f"Sign in to {settings.APP_NAME}"
-    html = magic_link_html(magic_link)
+    language = user.get("language", "en")
+    subject = f"Sign in to {settings.APP_NAME}" if language != "fr" else f"Connexion à {settings.APP_NAME}"
+    html = magic_link_html(magic_link, language=language)
     now = datetime.now(timezone.utc)
 
     mail = await create_document(pool, "mails", {
         "subject": subject,
         "content_html": html,
-        "mail_type": mail_type,
+        "mail_type": "magic-link",
         "mail_status": "not_sent",
         "planned_at": now,
         "status": "pending",
-        "created_by": user["id"],
-        "updated_by": user["id"],
+        "created_by": user_id,
+        "updated_by": user_id,
     })
 
     await create_document(pool, "mails_to", {
-        "mail_id": mail["id"],
-        "user_id": user["id"],
+        "mail_id": UUID(mail["id"]),
+        "user_id": user_id,
     })
 
     return MagicLinkResponse(message="Magic link sent to your email", email=request.email)
@@ -98,8 +97,32 @@ async def get_me(current_user: dict = Depends(get_current_user)):
         email=current_user["email"],
         roles=roles,
         permissions=permissions,
-        created_at=current_user["created_at"]
+        created_at=current_user["created_at"],
+        language=current_user.get("language", "en"),
     )
+
+
+_SUPPORTED_LANGUAGES = {"en", "fr"}
+
+
+class UpdateLanguageRequest(BaseModel):
+    language: str
+
+
+@router.patch("/auth/me/language")
+async def update_my_language(body: UpdateLanguageRequest, current_user: dict = Depends(get_current_user)):
+    if body.language not in _SUPPORTED_LANGUAGES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported language. Supported: {', '.join(sorted(_SUPPORTED_LANGUAGES))}",
+        )
+    pool = get_database()
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE users SET language = $1 WHERE id = $2",
+            body.language, UUID(str(current_user["id"])),
+        )
+    return {"language": body.language}
 
 
 @router.post("/auth/refresh", response_model=RefreshResponse)

@@ -30,12 +30,13 @@ from .routers.crud import (
 )
 from .routers.auth import authentification
 from .routers.auth import authorization
-from .routers.app import tribes_with_positions
+from .routers.app import tribes_with_positions, project_with_document
 from .routers.query import (
     tribes as query_tribes,
     users as query_users,
     monitoring as query_monitoring,
     mails as query_mails,
+    projects as query_projects,
 )
 
 # Configure logging
@@ -124,12 +125,14 @@ app.include_router(authentification.router, prefix="/api", tags=["auth"])
 app.include_router(authorization.router, prefix="/api", tags=["auth"])
 
 app.include_router(tribes_with_positions.router, prefix="/api")
+app.include_router(project_with_document.router, prefix="/api")
 
 
 app.include_router(query_tribes.router, prefix="/api/query")
 app.include_router(query_users.router, prefix="/api/query")
 app.include_router(query_monitoring.router, prefix="/api/query")
 app.include_router(query_mails.router, prefix="/api/query")
+app.include_router(query_projects.router, prefix="/api/query")
 
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")

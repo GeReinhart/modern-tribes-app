@@ -1,14 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext.tsx';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedCard } from '@/components/common/layout/ThemedCard';
 import { ThemedText} from '@/components/common/layout/ThemedText';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
+import { ThemedBadge } from '@/components/common/layout/ThemedBadge';
 import { ThemedSection } from "@/components/common/layout/ThemedSection.tsx";
+import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
 import { ConfirmDialog } from '@/components/common/layout/ConfirmDialog.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
+import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
+import { useUserTribes } from '@/hooks/useTribes';
+import { useUserProjectsByTribe } from '@/hooks/useProjects';
 import { tribeWithPositionService } from '@/services/app/tribe_with_positions.service.ts';
 import {
     containerStyle,
@@ -18,6 +23,7 @@ import { Paperclip, Download, FileText, Image, Film, Music, File } from 'lucide-
 import { AttachmentFile } from '@/types/document.types.ts';
 import {ThemedLoadingSpinner} from "@/components/common/layout/ThemedLoadingSpinner.tsx";
 import {useVerifyAuthorization} from "@/hooks/userVerifyAuthorization.ts";
+import { ProjectEntry } from '@/types/queries/projects.query.types';
 
 const ShowTribePageContent: React.FC = () => {
     const { t } = useTranslation();
@@ -27,14 +33,80 @@ const ShowTribePageContent: React.FC = () => {
     const { data: authorization, error: authorizationError, verifyAuthorization } = useVerifyAuthorization();
     const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
     const [archiving, setArchiving] = useState(false);
+    const [activeTab, setActiveTab] = useState<'description' | 'projects' | 'members'>('description');
 
     // Single hook call to get all data
     const { tribe, loading, error } = useTribeWithPositions(tribeId || null);
 
+    const { user } = useCurrentUserProfile();
+    const { tribes: userTribes } = useUserTribes(user?.id || '', { enabled: !!user?.id });
+    const { projects: tribeProjects } = useUserProjectsByTribe(
+        tribeId || '',
+        user?.id || '',
+        { enabled: !!tribeId && !!user?.id }
+    );
+
+    const myPosition = useMemo(() => {
+        if (!tribeId) return null;
+        const entries = userTribes.filter(r => r.tribe_id === tribeId);
+        const direct = entries.find(e => !e.via_represents);
+        const represents = entries.filter(e => e.via_represents);
+        return {
+            direct_position: direct?.position ?? null,
+            represented_persons: represents.map(r => ({
+                first_name: r.person_first_name,
+                last_name: r.person_last_name,
+                position: r.position,
+            })),
+        };
+    }, [tribeId, userTribes]);
+
+    const isManager = useMemo(() => {
+        if (!myPosition) return false;
+        return (
+            myPosition.direct_position === 'manager' ||
+            myPosition.represented_persons.some(p => p.position === 'manager')
+        );
+    }, [myPosition]);
+
+    const dedupedProjects = useMemo((): ProjectEntry[] => {
+        const map = new Map<string, ProjectEntry>();
+        for (const row of tribeProjects) {
+            const existing = map.get(row.project_id);
+            if (!existing) {
+                map.set(row.project_id, {
+                    project_id: row.project_id,
+                    project_name: row.project_name,
+                    direct_position: row.via_represents ? null : row.effective_position,
+                    represented_persons: row.via_represents && row.person_first_name && row.person_last_name
+                        ? [{ first_name: row.person_first_name, last_name: row.person_last_name, position: row.effective_position }]
+                        : [],
+                });
+            } else {
+                if (!row.via_represents) {
+                    existing.direct_position = row.effective_position;
+                } else if (row.person_first_name && row.person_last_name) {
+                    existing.represented_persons.push({
+                        first_name: row.person_first_name,
+                        last_name: row.person_last_name,
+                        position: row.effective_position,
+                    });
+                }
+            }
+        }
+        return Array.from(map.values());
+    }, [tribeProjects]);
+
+    const tabs = useMemo(() => [
+        { key: 'description', label: t('tribes.tabDescription') },
+        { key: 'projects',    label: t('tribes.tabProjects', { count: dedupedProjects.length }) },
+        { key: 'members',     label: t('tribes.tabMembers', { count: tribe?.persons.length ?? 0 }) },
+    ], [t, dedupedProjects.length, tribe?.persons.length]);
+
     // Check authorization when component mounts or tribeId changes
     useEffect(() => {
         if (tribeId) {
-            verifyAuthorization([ 'admin','can_access_attached_tribes'], tribeId, 'chief').catch((err) => {
+            verifyAuthorization([ 'admin','can_access_attached_tribes'], tribeId, 'manager').catch((err) => {
                 console.error('Authorization check failed:', err);
             });
         }
@@ -55,6 +127,11 @@ const ShowTribePageContent: React.FC = () => {
     // Conditionally render Edit / Archive buttons only when authorized
     const headerActions = (
         <>
+            {isManager && (
+                <ThemedButton variant="secondary" onClick={() => navigate(`/app/tribes/${tribeId}/projects/new`)}>
+                    {t('projects.addProject')}
+                </ThemedButton>
+            )}
             {authorization?.authorized && (
                 <>
                     <ThemedButton variant="primary" onClick={() => navigate(`/app/tribes/${tribeId}/update`)}>
@@ -89,9 +166,9 @@ const ShowTribePageContent: React.FC = () => {
         marginBottom: '8px',
     };
 
-    const badgeStyle = (type: 'chief' | 'member' | 'guest'): React.CSSProperties => {
+    const badgeStyle = (type: 'manager' | 'member' | 'guest'): React.CSSProperties => {
         const colors = {
-            chief: theme.colors.accent,
+            manager: theme.colors.accent,
             member: theme.colors.primary,
             guest: theme.colors.ghost,
         };
@@ -156,7 +233,7 @@ const ShowTribePageContent: React.FC = () => {
     }
 
     // Group persons by position
-    const chiefs = tribe.persons.filter(p => p.position === 'chief');
+    const managers = tribe.persons.filter(p => p.position === 'manager');
     const members = tribe.persons.filter(p => p.position === 'member');
     const guests = tribe.persons.filter(p => p.position === 'guest');
 
@@ -172,149 +249,198 @@ const ShowTribePageContent: React.FC = () => {
                 </ThemedCard>
             )}
 
-            {/* Tribe Description */}
-            {tribe.document_content_html && (
-                <ThemedSection themeId="main_1">
-                    <ThemedText size="medium" as="h2">
-                        {t('tribes.descriptionSection')}
-                    </ThemedText>
-                    <div
-                        className="prose max-w-none"
-                        style={{
-                            padding: '16px',
-                            backgroundColor: theme.colors.surface,
-                            borderRadius: '8px',
-                            border: `1px solid ${theme.colors.border}`,
-                        }}
-                        dangerouslySetInnerHTML={{ __html: tribe.document_content_html }}
-                    />
-                </ThemedSection>
+            {/* User position in this tribe */}
+            {myPosition && (myPosition.direct_position || myPosition.represented_persons.length > 0) && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
+                    {myPosition.direct_position && (
+                        <ThemedBadge variant={myPosition.direct_position === 'manager' ? 'accent' : myPosition.direct_position === 'member' ? 'primary' : 'ghost'}>
+                            {t(`positions.${myPosition.direct_position}`)}
+                        </ThemedBadge>
+                    )}
+                    {myPosition.represented_persons.map((p, i) => (
+                        <ThemedBadge key={i} variant={p.position === 'manager' ? 'accent' : p.position === 'member' ? 'primary' : 'ghost'}>
+                            {t(`positions.${p.position}`)} {t('tribes.as')} {p.first_name} {p.last_name}
+                        </ThemedBadge>
+                    ))}
+                </div>
             )}
 
-            {/* Attachments Section */}
-            {tribe.document_attachments && tribe.document_attachments.length > 0 && (
-                <ThemedSection themeId="main_1">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-                        <Paperclip size={20} color={theme.colors.secondary} />
-                        <ThemedText size="small" as="h4">
-                            {t('tribes.attachmentsCount', { count: tribe.document_attachments.length })}
-                        </ThemedText>
-                    </div>
+            {/* Tabs */}
+            <ThemedTabs
+                tabs={tabs}
+                activeTab={activeTab}
+                onTabChange={key => setActiveTab(key as typeof activeTab)}
+            />
 
-                    {tribe.document_attachments.map((attachment: AttachmentFile) => (
-                        <div
-                            key={attachment.id}
-                            style={attachmentCardStyle}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
-                                e.currentTarget.style.borderColor = theme.colors.primary;
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = theme.colors.surface;
-                                e.currentTarget.style.borderColor = theme.colors.border;
-                            }}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <span style={{ color: theme.colors.primary }}>
-                                    {getFileIcon(attachment.type)}
-                                </span>
-                                <div>
-                                    <ThemedText variant="primary" size="small">
-                                        {attachment.name}
-                                    </ThemedText>
-                                    <ThemedText variant="secondary" size="small">
-                                        {formatFileSize(attachment.size)}
+            <div style={{ marginTop: '16px' }}>
+
+                {/* Description tab */}
+                {activeTab === 'description' && (
+                    <>
+                        {tribe.document_content_html ? (
+                            <ThemedSection themeId="main_1">
+                                <div
+                                    className="prose max-w-none"
+                                    style={{
+                                        padding: '16px',
+                                        backgroundColor: theme.colors.surface,
+                                        borderRadius: '8px',
+                                        border: `1px solid ${theme.colors.border}`,
+                                    }}
+                                    dangerouslySetInnerHTML={{ __html: tribe.document_content_html }}
+                                />
+                            </ThemedSection>
+                        ) : (
+                            <ThemedText variant="secondary" size="small">
+                                {t('tribes.descriptionSection')}
+                            </ThemedText>
+                        )}
+
+                        {tribe.document_attachments && tribe.document_attachments.length > 0 && (
+                            <ThemedSection themeId="main_1">
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                                    <Paperclip size={20} color={theme.colors.secondary} />
+                                    <ThemedText size="small" as="h4">
+                                        {t('tribes.attachmentsCount', { count: tribe.document_attachments.length })}
                                     </ThemedText>
                                 </div>
-                            </div>
-                            <a
-                                href={attachment.url}
-                                download={attachment.name}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    padding: '8px 12px',
-                                    backgroundColor: theme.colors.primary,
-                                    color: 'white',
-                                    borderRadius: '6px',
-                                    textDecoration: 'none',
-                                    fontSize: '14px',
-                                    fontWeight: 500,
-                                    transition: 'opacity 0.2s ease',
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.opacity = '0.9';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.opacity = '1';
-                                }}
-                            >
-                                <Download size={16} />
-                                {t('tribes.download')}
-                            </a>
-                        </div>
-                    ))}
-                </ThemedSection>
-            )}
-
-            {/* Members Section */}
-            <ThemedSection themeId="main_2">
-                <ThemedText size="medium" as="h2">
-                    {t('tribes.membersCount', { count: tribe.persons.length })}
-                </ThemedText>
-
-                {/* Chiefs */}
-                {chiefs.length > 0 && (
-                    <div style={{ marginBottom: '24px' }}>
-                        {chiefs.map((person) => (
-                            <div key={person.id} style={memberCardStyle}>
-                                <ThemedText variant="primary" size="small">
-                                    {person.first_name} {person.last_name}
-                                </ThemedText>
-                                <span style={badgeStyle('chief')}>{t('positions.chief')}</span>
-                            </div>
-                        ))}
-                    </div>
+                                {tribe.document_attachments.map((attachment: AttachmentFile) => (
+                                    <div
+                                        key={attachment.id}
+                                        style={attachmentCardStyle}
+                                        onMouseEnter={e => {
+                                            e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
+                                            e.currentTarget.style.borderColor = theme.colors.primary;
+                                        }}
+                                        onMouseLeave={e => {
+                                            e.currentTarget.style.backgroundColor = theme.colors.surface;
+                                            e.currentTarget.style.borderColor = theme.colors.border;
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <span style={{ color: theme.colors.primary }}>{getFileIcon(attachment.type)}</span>
+                                            <div>
+                                                <ThemedText variant="primary" size="small">{attachment.name}</ThemedText>
+                                                <ThemedText variant="secondary" size="small">{formatFileSize(attachment.size)}</ThemedText>
+                                            </div>
+                                        </div>
+                                        <a
+                                            href={attachment.url}
+                                            download={attachment.name}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{
+                                                display: 'flex', alignItems: 'center', gap: '6px',
+                                                padding: '8px 12px', backgroundColor: theme.colors.primary,
+                                                color: 'white', borderRadius: '6px', textDecoration: 'none',
+                                                fontSize: '14px', fontWeight: 500, transition: 'opacity 0.2s ease',
+                                            }}
+                                            onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; }}
+                                            onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
+                                        >
+                                            <Download size={16} />
+                                            {t('tribes.download')}
+                                        </a>
+                                    </div>
+                                ))}
+                            </ThemedSection>
+                        )}
+                    </>
                 )}
 
-                {/* Members */}
-                {members.length > 0 && (
-                    <div style={{ marginBottom: '24px' }}>
-                        {members.map((person) => (
-                            <div key={person.id} style={memberCardStyle}>
-                                <ThemedText variant="primary" size="small">
-                                    {person.first_name} {person.last_name}
-                                </ThemedText>
-                                <span style={badgeStyle('member')}>{t('positions.member')}</span>
+                {/* Projects tab */}
+                {activeTab === 'projects' && (
+                    <ThemedSection themeId="main_1">
+                        {dedupedProjects.length === 0 ? (
+                            <ThemedText variant="secondary" size="small">
+                                {t('projects.noProjects')}
+                            </ThemedText>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                {dedupedProjects.map(project => (
+                                    <div
+                                        key={project.project_id}
+                                        style={{
+                                            padding: '12px 16px',
+                                            backgroundColor: theme.colors.surface,
+                                            border: `1px solid ${theme.colors.border}`,
+                                            borderRadius: '8px',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                        }}
+                                        onClick={() => navigate(`/app/tribes/${tribeId}/projects/${project.project_id}`)}
+                                        onMouseEnter={e => {
+                                            e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
+                                            e.currentTarget.style.borderColor = theme.colors.primary;
+                                        }}
+                                        onMouseLeave={e => {
+                                            e.currentTarget.style.backgroundColor = theme.colors.surface;
+                                            e.currentTarget.style.borderColor = theme.colors.border;
+                                        }}
+                                    >
+                                        <ThemedText variant="primary" size="small">{project.project_name}</ThemedText>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                            {project.direct_position && (
+                                                <ThemedBadge variant={project.direct_position === 'manager' ? 'accent' : project.direct_position === 'member' ? 'primary' : 'ghost'}>
+                                                    {t(`positions.${project.direct_position}`)}
+                                                </ThemedBadge>
+                                            )}
+                                            {project.represented_persons.map((p, i) => (
+                                                <ThemedBadge key={i} variant={p.position === 'manager' ? 'accent' : p.position === 'member' ? 'primary' : 'ghost'}>
+                                                    {t(`positions.${p.position}`)} {t('tribes.as')} {p.first_name} {p.last_name}
+                                                </ThemedBadge>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        )}
+                    </ThemedSection>
                 )}
 
-                {/* Guests */}
-                {guests.length > 0 && (
-                    <div style={{ marginBottom: '24px' }}>
-                        {guests.map((person) => (
-                            <div key={person.id} style={memberCardStyle}>
-                                <ThemedText variant="primary" size="small">
-                                    {person.first_name} {person.last_name}
-                                </ThemedText>
-                                <span style={badgeStyle('guest')}>{t('positions.guest')}</span>
+                {/* Members tab */}
+                {activeTab === 'members' && (
+                    <ThemedSection themeId="main_2">
+                        {managers.length > 0 && (
+                            <div style={{ marginBottom: '24px' }}>
+                                {managers.map(person => (
+                                    <div key={person.id} style={memberCardStyle}>
+                                        <ThemedText variant="primary" size="small">{person.first_name} {person.last_name}</ThemedText>
+                                        <span style={badgeStyle('manager')}>{t('positions.manager')}</span>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        )}
+                        {members.length > 0 && (
+                            <div style={{ marginBottom: '24px' }}>
+                                {members.map(person => (
+                                    <div key={person.id} style={memberCardStyle}>
+                                        <ThemedText variant="primary" size="small">{person.first_name} {person.last_name}</ThemedText>
+                                        <span style={badgeStyle('member')}>{t('positions.member')}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {guests.length > 0 && (
+                            <div style={{ marginBottom: '24px' }}>
+                                {guests.map(person => (
+                                    <div key={person.id} style={memberCardStyle}>
+                                        <ThemedText variant="primary" size="small">{person.first_name} {person.last_name}</ThemedText>
+                                        <span style={badgeStyle('guest')}>{t('positions.guest')}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {tribe.persons.length === 0 && (
+                            <ThemedText variant="secondary" size="small">{t('tribes.noMembers')}</ThemedText>
+                        )}
+                    </ThemedSection>
                 )}
 
-                {/* No Members */}
-                {tribe.persons.length === 0 && (
-                    <ThemedText variant="secondary" size="small">
-                        {t('tribes.noMembers')}
-                    </ThemedText>
-                )}
-            </ThemedSection>
+            </div>
 
             {showArchiveConfirm && (
                 <ConfirmDialog

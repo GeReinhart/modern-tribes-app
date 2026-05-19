@@ -57,14 +57,26 @@ When you encounter any of the following, refactor before continuing:
 - **Shared utilities go in a dedicated `utils/` or `helpers/` module**, never inline in a route or service.
 - **Pydantic schemas are not business objects.** Keep them in `schemas/`; keep domain logic in services.
 
+
+- **MUST**: all SQL queries must be under `backend/app/repositories`
+
 ### Files and directories
 
 - backend: all the backend
 - backend/app: all the backend code
 - backend/scripts/init_schema.sql: database schema. this is the reference for the entities
+- backend/scripts/data-dev: init the dev database. should show the different possibilities offered by the application
 
 - backend/data: do not look here
 - backend/venv: do not look here
+
+- **MUST**: when adding a new entity:
+  - add the corresponding migration step in `backend/alembic/versions`
+  - update `backend/scripts/init_schema.sql` and `backend/scripts/init_db.sh` 
+  - add examples of data under `backend/scripts/data-dev`
+
+
+
 
 ## Dependencies
 
@@ -114,3 +126,8 @@ By default, the query must check for status = 'active'.
 ## Themes
 
 The frontend layout is based on Themes UI. All the elements presented should have the current theme applied
+
+
+## Enum
+
+- **MUST** - When an Enum is defined on the backend, it must be defined on the frontend as well under `frontend/src/types` and we must use only the Enum.

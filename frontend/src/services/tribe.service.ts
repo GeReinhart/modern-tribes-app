@@ -3,9 +3,10 @@ import {
     Tribe,
     TribeCreate,
     TribeUpdate,
+    TribeProject,
+    TribeProjectInput,
     TribeWithPersonsWithPosition,
     TribeWithPositions,
-    TribeWithProjects
 } from '../types/tribe.types';
 import {UserPersonPositionTribe} from "@/types/queries/tribes.query.types.ts";
 
@@ -35,8 +36,12 @@ class TribeService {
         return apiService.get<TribeWithPersonsWithPosition>(`${this.endpoint}/${id}/persons`);
     }
 
-    async getTribeProjects(id: string): Promise<TribeWithProjects> {
-        return apiService.get<TribeWithProjects>(`${this.endpoint}/${id}/projects`);
+    async getTribeProjects(id: string): Promise<TribeProject[]> {
+        return apiService.get<TribeProject[]>(`${this.endpoint}/${id}/projects`);
+    }
+
+    async syncTribeProjects(id: string, projects: TribeProjectInput[]): Promise<TribeProject[]> {
+        return apiService.put<TribeProject[]>(`${this.endpoint}/${id}/projects`, projects);
     }
 
     async create(data: TribeCreate): Promise<Tribe> {

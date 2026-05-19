@@ -32,10 +32,11 @@ import FileUploader from "@/components/common/editor/FileUploader.tsx";
 import { AttachmentFile } from "@/types/document.types.ts";
 import {TribeWithPositionsUpdate} from "@/types/app/tribe_with_positions.types.ts";
 import {ThemedLoadingSpinner} from "@/components/common/layout/ThemedLoadingSpinner.tsx";
+import { PositionEnum } from '@/types/position.types';
 
 interface SelectedPerson {
     person_id: string;
-    position: 'chief' | 'member' | 'guest';
+    position: PositionEnum;
 }
 
 const UpdateTribePageContent: React.FC = () => {
@@ -179,7 +180,7 @@ const UpdateTribePageContent: React.FC = () => {
             return false;
         }
 
-        const hasChief = selectedPersons.some(p => p.position === 'chief');
+        const hasChief = selectedPersons.some(p => p.position === 'manager');
         if (!hasChief) {
             setError(t('validation.assignOneChief'));
             return false;
@@ -268,7 +269,7 @@ const UpdateTribePageContent: React.FC = () => {
         });
     };
 
-    const handlePositionChange = (personId: string, position: 'chief' | 'member' | 'guest') => {
+    const handlePositionChange = (personId: string, position: 'manager' | 'member' | 'guest') => {
         setSelectedPersons(prev =>
             prev.map(p => p.person_id === personId ? { ...p, position } : p)
         );
@@ -535,7 +536,7 @@ const UpdateTribePageContent: React.FC = () => {
                                                         e.stopPropagation();
                                                         handlePositionChange(
                                                             person.id,
-                                                            e.target.value as 'chief' | 'member' | 'guest'
+                                                            e.target.value as 'manager' | 'member' | 'guest'
                                                         );
                                                     }}
                                                     style={positionSelectStyle}
@@ -543,7 +544,7 @@ const UpdateTribePageContent: React.FC = () => {
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
                                                     <option value="member">{t('positions.member')}</option>
-                                                    <option value="chief">{t('positions.chief')}</option>
+                                                    <option value="manager">{t('positions.manager')}</option>
                                                     <option value="guest">{t('positions.guest')}</option>
                                                 </select>
                                             )}

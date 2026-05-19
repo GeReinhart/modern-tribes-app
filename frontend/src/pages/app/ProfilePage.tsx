@@ -12,17 +12,21 @@ import { ThemedDivider } from '@/components/common/layout/ThemedDivider.tsx';
 import { ThemedCard } from '@/components/common/layout/ThemedCard.tsx';
 import { ThemedBadge } from '@/components/common/layout/ThemedBadge.tsx';
 import { ThemedButton } from '@/components/common/form/ThemedButton.tsx';
-import { StatusBadge } from '@/components/common/layout/StatusBadge.tsx';
+import { authService } from '@/services/auth.service.ts';
 
-function RepresentedPersonRow({ personId, status }: { personId: string; status: string }) {
+const GENDER_I18N_KEY: Record<string, string> = {
+    male: 'admin.genderMale',
+    female: 'admin.genderFemale',
+    other: 'admin.genderOther',
+    prefer_not_to_say: 'admin.genderPreferNot',
+};
+
+function RepresentedPersonRow({ personId }: { personId: string }) {
     const { person } = usePerson(personId);
     return (
-        <div className="flex justify-between items-center">
-            <ThemedBadge variant="accent">
-                {person ? `${person.first_name} ${person.last_name}` : personId}
-            </ThemedBadge>
-            <StatusBadge status={status} />
-        </div>
+        <ThemedBadge variant="accent">
+            {person ? `${person.first_name} ${person.last_name}` : personId}
+        </ThemedBadge>
     );
 }
 
@@ -44,9 +48,14 @@ function ProfilePageContent() {
         navigate('/auth/login');
     };
 
-    const handleLanguageChange = (lang: string) => {
+    const handleLanguageChange = async (lang: string) => {
         i18n.changeLanguage(lang);
         localStorage.setItem('user_language', lang);
+        try {
+            await authService.updateLanguage(lang);
+        } catch {
+            // language is already applied in the UI; DB sync failure is non-blocking
+        }
     };
 
     const initials = person
@@ -125,7 +134,7 @@ function ProfilePageContent() {
                             </div>
                             <div className="flex justify-between items-center">
                                 <ThemedText variant="secondary" size="small">{t('profile.gender')}</ThemedText>
-                                <ThemedBadge variant="accent">{person.gender}</ThemedBadge>
+                                <ThemedBadge variant="accent">{t(GENDER_I18N_KEY[person.gender] ?? 'admin.genderOther')}</ThemedBadge>
                             </div>
                             {person.document_id && (
                                 <div className="flex justify-between items-center">
@@ -147,7 +156,7 @@ function ProfilePageContent() {
                             <ThemedText variant="secondary" size="small">{t('profile.representsNone')}</ThemedText>
                         ) : (
                             represents.map(r => (
-                                <RepresentedPersonRow key={r.id} personId={r.person_id} status={r.status} />
+                                <RepresentedPersonRow key={r.id} personId={r.person_id} />
                             ))
                         )}
                     </div>
@@ -171,7 +180,9 @@ function ProfilePageContent() {
                             <ThemedText variant="secondary" size="small">{t('profile.roles')}</ThemedText>
                             <div className="flex gap-1">
                                 {user?.roles.map((role, idx) => (
-                                    <ThemedBadge key={idx} variant="success">{role.name}</ThemedBadge>
+                                    <ThemedBadge key={idx} variant="success">
+                                        {t(`roles.${role.name}`, { defaultValue: role.name })}
+                                    </ThemedBadge>
                                 ))}
                             </div>
                         </div>

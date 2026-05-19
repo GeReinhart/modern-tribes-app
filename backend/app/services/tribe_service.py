@@ -1,7 +1,8 @@
 from fastapi import HTTPException, status
 
 from ..models.app.tribes_with_positions import (
-    TribeWithPositionsCreate, TribeWithPositionsUpdate, TribeWithPositionsResponse, AttachmentFile
+    TribeWithPositionsCreate, TribeWithPositionsUpdate, TribeWithPositionsResponse,
+    TribeProjectResponse, AttachmentFile
 )
 from ..repositories import tribe_repository as tribe_repo
 from ..utils.attachments_helpers import get_document_with_attachments, create_document_with_attachments, update_document_attachments
@@ -23,8 +24,9 @@ async def get_tribe_with_positions(tribe_id: str, pool) -> TribeWithPositionsRes
 
     positions = await tribe_repo.get_positions_by_tribe(pool, tribe_id)
     persons = await tribe_repo.get_persons_with_positions(pool, positions)
+    tribe_projects = await tribe_repo.get_tribe_projects(pool, tribe_id)
 
-    return _build_response(tribe, document, persons)
+    return _build_response(tribe, document, persons, tribe_projects)
 
 
 async def create_tribe_with_positions(data: TribeWithPositionsCreate, pool, current_user: dict) -> TribeWithPositionsResponse:
@@ -63,8 +65,8 @@ async def _validate_tribe_create(data: TribeWithPositionsCreate, pool) -> None:
     person_ids = [pos.person_id for pos in data.positions]
     if person_ids:
         await validator.validate_reference_lists([{'table': 'persons', 'ids': person_ids, 'name': 'Person'}])
-    if not any(pos.position == "chief" for pos in data.positions):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="At least one Chief position is required")
+    if not any(pos.position == "manager" for pos in data.positions):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="At least one Manager position is required")
 
 
 async def _persist_tribe_create(data, document, pool, user_id: str) -> TribeWithPositionsResponse:
@@ -72,7 +74,7 @@ async def _persist_tribe_create(data, document, pool, user_id: str) -> TribeWith
     try:
         positions = await tribe_repo.create_positions(pool, str(tribe["id"]), data.positions, user_id)
         persons = await tribe_repo.get_persons_with_positions(pool, positions)
-        return _build_response(tribe, document, persons)
+        return _build_response(tribe, document, persons, [])
     except Exception as e:
         await tribe_repo.delete_tribe(pool, str(tribe["id"]))
         raise e
@@ -86,8 +88,8 @@ async def _validate_tribe_update(data: TribeWithPositionsUpdate, tribe: dict, tr
         person_ids = [pos.person_id for pos in data.positions]
         if person_ids:
             await validator.validate_reference_lists([{'table': 'persons', 'ids': person_ids, 'name': 'Person'}])
-        if not any(pos.position == "chief" for pos in data.positions):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="At least one Chief position is required")
+        if not any(pos.position == "manager" for pos in data.positions):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="At least one Manager position is required")
 
 
 async def _apply_tribe_updates(tribe_id: str, tribe: dict, data: TribeWithPositionsUpdate, pool, user_id: str) -> None:
@@ -118,18 +120,19 @@ async def _apply_tribe_updates(tribe_id: str, tribe: dict, data: TribeWithPositi
         await tribe_repo.sync_positions(pool, tribe_id, data.positions, current_positions, user_id)
 
 
-def _build_response(tribe: dict, document: dict | None, persons: list) -> TribeWithPositionsResponse:
+def _build_response(tribe: dict, document: dict | None, persons: list, tribe_projects: list) -> TribeWithPositionsResponse:
     attachments = [
         AttachmentFile(**att) if isinstance(att, dict) else att
         for att in (document.get("attachments", []) if document else [])
     ]
+    projects = [TribeProjectResponse(**p) for p in tribe_projects]
     return TribeWithPositionsResponse(
         id=str(tribe["id"]),
         name=tribe["name"],
         document_id=str(document["id"]) if document else "",
         document_content_html=document.get("content_html", "") if document else "",
         document_attachments=attachments,
-        project_ids=tribe.get("project_ids", []),
+        projects=projects,
         persons=persons,
         created_at=tribe["created_at"],
         updated_at=tribe["updated_at"]

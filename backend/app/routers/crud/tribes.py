@@ -10,6 +10,8 @@ from ...routers.auth.authorization import (
 )
 
 from ...models.crud.tribes import Tribe, TribeCreate, TribeUpdate
+from ...models.crud.tribe_projects import TribeProjectInput, TribeProject
+from ...repositories import tribe_repository as tribe_repo
 from ...routers.auth.authentification import get_current_user
 from ...utils.db_helpers import (
     get_all_documents,
@@ -103,14 +105,6 @@ async def update_tribe(tribe_id: str, tribe: TribeUpdate,current_user: dict = De
             error_message="Tribe name already exists"
         )
 
-    # Validate multiple project references
-    if tribe.project_ids is not None:
-        await validator.validate_reference_lists([{
-            'table': 'projects',
-            'ids': tribe.project_ids,
-            'name': 'Project'
-        }])
-
     # Validate document reference
     references = []
     if tribe.document_id:
@@ -162,41 +156,29 @@ async def get_tribe_positions(tribe_id: str,current_user: dict = Depends(get_cur
     }
 
 
-@router.get("/{tribe_id}/projects")
+@router.get("/{tribe_id}/projects", response_model=List[TribeProject])
 @require_permission_decorator(PermissionEnum.ADMIN)
-async def get_tribe_projects(tribe_id: str,current_user: dict = Depends(get_current_user)):
-    """Get all projects associated with a tribe"""
+async def get_tribe_projects(tribe_id: str, current_user: dict = Depends(get_current_user)):
+    """Get all project relations for a tribe"""
     pool = get_database()
+    await check_document_exists(pool, TABLE, tribe_id, ENTITY_NAME)
+    return await tribe_repo.get_tribe_projects(pool, tribe_id)
 
-    tribe = await check_document_exists(pool, TABLE, tribe_id, ENTITY_NAME)
 
-    # Get project_ids from tribe (stored as strings)
-    project_ids = tribe.get("project_ids", [])
-
-    if not project_ids:
-        return {
-            "tribe_id": str(tribe["id"]),
-            "tribe_name": tribe["name"],
-            "project_count": 0,
-            "projects": []
-        }
-
-    # Query projects using SQL
-    projects = []
-    for project_id in project_ids:
-        try:
-            project = await get_document_by_id(pool, "projects", project_id, "Project")
-            projects.append(project)
-        except:
-            # Skip invalid project IDs
-            continue
-
-    return {
-        "tribe_id": str(tribe["id"]),
-        "tribe_name": tribe["name"],
-        "project_count": len(projects),
-        "projects": projects
-    }
+@router.put("/{tribe_id}/projects", response_model=List[TribeProject])
+@require_permission_decorator(PermissionEnum.ADMIN)
+async def sync_tribe_projects(tribe_id: str, projects: List[TribeProjectInput], current_user: dict = Depends(get_current_user)):
+    """Replace all project relations for a tribe"""
+    pool = get_database()
+    await check_document_exists(pool, TABLE, tribe_id, ENTITY_NAME)
+    validator = EntityValidator(pool)
+    if projects:
+        await validator.validate_reference_lists([{
+            'table': 'projects',
+            'ids': [p.project_id for p in projects],
+            'name': 'Project'
+        }])
+    return await tribe_repo.sync_tribe_projects(pool, tribe_id, [p.model_dump() for p in projects])
 
 
 @router.get("/{tribe_id}/persons")

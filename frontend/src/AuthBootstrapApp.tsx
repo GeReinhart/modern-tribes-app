@@ -10,15 +10,19 @@ import CreateTribeForm from "@/pages/app/CreateTribePage.tsx";
 import ShowTribePage from "@/pages/app/ShowTribePage.tsx";
 import UpdateTribePage from "@/pages/app/UpdateTribePage.tsx";
 import {TribesPage} from "@/pages/app/TribesPage.tsx";
+import {ProjectsPage} from "@/pages/app/ProjectsPage.tsx";
+import {CreateProjectPage} from "@/pages/app/CreateProjectPage.tsx";
+import {EditProjectPage} from "@/pages/app/EditProjectPage.tsx";
+import ShowProjectPage from "@/pages/app/ShowProjectPage.tsx";
 import ProfilePage from "@/pages/app/ProfilePage.tsx";
 import {AuthorizationPage} from "@/pages/admin/AuthorizationPage.tsx";
-import {ProjectsCrudPage} from "@/pages/admin/ProjectsCrudPage.tsx";
-import {TribesCrudPage} from "@/pages/admin/TribesCrudPage.tsx";
-import {PositionsCrudPage} from "@/pages/admin/PositionsCrudPage.tsx";
+import {TribesProjectsPage} from "@/pages/admin/TribesProjectsPage.tsx";
+import {TribeEditPage} from "@/pages/admin/TribeEditPage.tsx";
 import {DocumentsCrudPage} from "@/pages/admin/DocumentsCrudPage.tsx";
 import {MonitoringPage} from "@/pages/admin/MonitoringPage.tsx";
 import {MailsPage} from "@/pages/admin/MailsPage.tsx";
 import {PeopleManagementPage} from "@/pages/admin/PeopleManagementPage.tsx";
+import {UserEditPage} from "@/pages/admin/UserEditPage.tsx";
 
 function AuthBootstrapApp() {
     return (
@@ -39,10 +43,15 @@ function AuthBootstrapApp() {
 
                                 <Route path="/admin" element={<Navigate to="/admin/monitoring" replace/>}/>
                                 <Route path="/admin/people" element={<PeopleManagementPage/>}/>
+                                <Route path="/admin/users" element={<Navigate to="/admin/people" replace/>}/>
+                                <Route path="/admin/users/:userId/edit" element={<UserEditPage/>}/>
                                 <Route path="/admin/authorization" element={<AuthorizationPage/>}/>
-                                <Route path="/admin/positions" element={<PositionsCrudPage/>}/>
-                                <Route path="/admin/tribes" element={<TribesCrudPage/>}/>
-                                <Route path="/admin/projects" element={<ProjectsCrudPage/>}/>
+                                <Route path="/admin/tribes" element={<TribesProjectsPage/>}/>
+                                <Route path="/admin/tribes/new" element={<TribeEditPage/>}/>
+                                <Route path="/admin/tribes/:tribeId/edit" element={<TribeEditPage/>}/>
+                                <Route path="/admin/tribes-projects" element={<Navigate to="/admin/tribes" replace/>}/>
+                                <Route path="/admin/positions" element={<Navigate to="/admin/tribes" replace/>}/>
+                                <Route path="/admin/projects" element={<Navigate to="/admin/tribes" replace/>}/>
                                 <Route path="/admin/documents" element={<DocumentsCrudPage/>}/>
                 <Route path="/admin/monitoring" element={<MonitoringPage/>}/>
                                 <Route path="/admin/mails" element={<MailsPage/>}/>
@@ -52,6 +61,10 @@ function AuthBootstrapApp() {
                             <Route path="/app/tribes/create" element={<CreateTribeForm/>}/>
                             <Route path="/app/tribes/:tribeId" element={<ShowTribePage/>}/>
                             <Route path="/app/tribes/:tribeId/update" element={<UpdateTribePage/>}/>
+                            <Route path="/app/tribes/:tribeId/projects/new" element={<CreateProjectPage/>}/>
+                            <Route path="/app/tribes/:tribeId/projects/:projectId" element={<ShowProjectPage/>}/>
+                            <Route path="/app/tribes/:tribeId/projects/:projectId/edit" element={<EditProjectPage/>}/>
+                            <Route path="/app/projects" element={<ProjectsPage/>}/>
                             <Route path="/app/profile" element={<ProfilePage/>}/>
 
                         </Route>

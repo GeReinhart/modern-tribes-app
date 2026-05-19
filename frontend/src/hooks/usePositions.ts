@@ -18,21 +18,23 @@ export function usePosition(id: string | null) {
 
 export function usePositionsByTribe(tribe_id: string | null) {
     const [positions, setPositions] = useState<Position[]>([]);
+    const [hasFetched, setHasFetched] = useState(!tribe_id);
     const { loading, error, execute } = useApi<Position[]>();
 
     const fetch = useCallback(async () => {
-        if (!tribe_id) return;
+        if (!tribe_id) { setHasFetched(true); return; }
         try {
             const data = await execute(() => positionService.getAllByTribeId(tribe_id));
             if (data) setPositions(data);
         } catch {
             console.error('Error fetching positions by tribe');
         }
+        setHasFetched(true);
     }, [tribe_id, execute]);
 
     useEffect(() => { fetch(); }, [fetch]);
 
-    return { positions, loading, error, refetch: fetch };
+    return { positions, loading, hasFetched, error, refetch: fetch };
 }
 
 export function usePositionMutations() {

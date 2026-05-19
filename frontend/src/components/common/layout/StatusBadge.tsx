@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const STATUS_COLORS: Record<string, string> = {
     active: '#22c55e',
@@ -11,6 +12,7 @@ interface StatusBadgeProps {
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
+    const { t } = useTranslation();
     const color = STATUS_COLORS[status] ?? '#6b7280';
     return (
         <span style={{
@@ -23,7 +25,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
             border: `1px solid ${color}50`,
             whiteSpace: 'nowrap',
         }}>
-            {status}
+            {t(`status.${status}`, { defaultValue: status })}
         </span>
     );
 };
