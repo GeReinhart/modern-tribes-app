@@ -295,6 +295,17 @@ const fr: Record<string, string> = {
     'search.placeholder': 'Rechercher dans les documents...',
     'search.empty': 'Aucun résultat trouvé pour votre recherche.',
 
+    'features.addFeature': 'Ajouter une fonctionnalité',
+    'features.featureType': 'Type de fonctionnalité',
+    'features.selectType': 'Sélectionner un type...',
+    'features.featureName': 'Nom',
+    'features.featureNamePlaceholder': 'ex. Backlog du sprint',
+    'features.unknownType': 'Type de fonctionnalité inconnu : {{type}}',
+    'features.todo.empty': "Aucune tâche pour l'instant. Ajoutez-en une ci-dessous.",
+    'features.todo.add': 'Ajouter',
+    'features.todo.addPlaceholder': 'Nouvelle tâche...',
+    'features.todo.noNote': "Aucune note pour l'instant.",
+
     'footer.allRightsReserved': '© {{year}} Modern Tribes. Tous droits réservés.',
     'footer.privacy': 'Confidentialité',
     'footer.terms': "Conditions d'utilisation",

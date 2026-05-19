@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 import asyncio
 import logging
 import os
+import features  # noqa: F401 — triggers feature self-registration
 from .core.config import settings
 from .services.mail_scheduler import mail_scheduler
 from .core.database import connect_to_postgres, close_postgres_connection
@@ -31,7 +32,7 @@ from .routers.crud import (
 )
 from .routers.auth import authentification
 from .routers.auth import authorization
-from .routers.app import tribes_with_positions, project_with_document
+from .routers.app import tribes_with_positions, project_with_document, project_features
 from .routers.query import (
     tribes as query_tribes,
     users as query_users,
@@ -130,6 +131,7 @@ app.include_router(authorization.router, prefix="/api", tags=["auth"])
 
 app.include_router(tribes_with_positions.router, prefix="/api")
 app.include_router(project_with_document.router, prefix="/api")
+app.include_router(project_features.router, prefix="/api")
 
 
 app.include_router(query_tribes.router, prefix="/api/query")
@@ -139,6 +141,11 @@ app.include_router(query_mails.router, prefix="/api/query")
 app.include_router(query_projects.router, prefix="/api/query")
 app.include_router(query_search.router, prefix="/api/query")
 app.include_router(query_app_config.router, prefix="/api/query")
+
+# Feature routers (registered via features package self-registration)
+from features.registry import get_all_routers as _get_feature_routers
+for _feature_router in _get_feature_routers():
+    app.include_router(_feature_router, prefix="/api/features")
 
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")

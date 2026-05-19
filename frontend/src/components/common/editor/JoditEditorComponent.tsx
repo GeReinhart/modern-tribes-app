@@ -8,16 +8,17 @@ import { useAppConfig } from '@/contexts/AppConfigContext';
 interface JoditEditorComponentProps {
     content: string;
     onChange: (content: string) => void;
+    minHeight?: number;
 }
 
-const JoditEditorComponent = ({ content, onChange }: JoditEditorComponentProps) => {
+const JoditEditorComponent = ({ content, onChange, minHeight = 600 }: JoditEditorComponentProps) => {
     const editor = useRef(null);
     const { config: appConfig } = useAppConfig();
 
     const config = useMemo(
         () => ({
             readonly: false,
-            minHeight: 600,
+            minHeight,
             uploader: {
                 insertImageAsBase64URI: false,
                 imagesExtensions: appConfig.editorImageExtensions,
@@ -176,7 +177,7 @@ const JoditEditorComponent = ({ content, onChange }: JoditEditorComponentProps) 
                 'redo'
             ]
         }),
-        [appConfig.editorImageExtensions]
+        [appConfig.editorImageExtensions, minHeight]
     );
 
     return (

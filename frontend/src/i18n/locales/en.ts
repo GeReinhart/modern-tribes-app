@@ -295,6 +295,17 @@ const en: Record<string, string> = {
     'search.placeholder': 'Search documents...',
     'search.empty': 'No results found for your query.',
 
+    'features.addFeature': 'Add Feature',
+    'features.featureType': 'Feature Type',
+    'features.selectType': 'Select a type...',
+    'features.featureName': 'Name',
+    'features.featureNamePlaceholder': 'e.g. Sprint backlog',
+    'features.unknownType': 'Unknown feature type: {{type}}',
+    'features.todo.empty': 'No tasks yet. Add one below.',
+    'features.todo.add': 'Add',
+    'features.todo.addPlaceholder': 'New task...',
+    'features.todo.noNote': 'No notes yet.',
+
     'footer.allRightsReserved': '© {{year}} Modern Tribes. All rights reserved.',
     'footer.privacy': 'Privacy',
     'footer.terms': 'Terms',

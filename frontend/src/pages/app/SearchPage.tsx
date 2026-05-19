@@ -64,7 +64,7 @@ const SearchResultCard: React.FC<{ result: SearchResult }> = ({ result }) => {
                 <div
                     style={{
                         fontSize: 'var(--font-sm)',
-                        color: theme.colors.textSecondary,
+                        color: theme.colors.secondary,
                         lineHeight: 1.6,
                     }}
                     dangerouslySetInnerHTML={{ __html: result.headline }}

@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+import '@/features';  // triggers feature self-registration
 import i18n from '@/i18n/index';
 import { I18nextProvider } from 'react-i18next';
 import AuthBootstrapApp from "@/AuthBootstrapApp.tsx";

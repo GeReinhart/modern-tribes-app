@@ -37,6 +37,14 @@ When you encounter any of the following, refactor before continuing:
 - A file imports from many unrelated modules (sign of mixed concerns)
 
 
+### Features
+
+- each feature should be on a specific package under the package `features` on backend and front end
+- try to use the hexagonal architecture to have the dependency from the application to this features (the features can use common element provided by the app on the front and on the back)
+- the project is associated with several features, 
+   - a same feature can have several instances in the project
+   - the manager of the project can add the features to the project, a name is given for each instance
+   - each instance of the feature is accessible by a tab in the project page
 
 ---
 
