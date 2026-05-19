@@ -121,7 +121,7 @@ const ConfigRow: React.FC<{
                         placeholder={t('admin.config.descriptionPlaceholder')}
                     />
                 ) : (
-                    <span style={{ fontSize: 'var(--font-sm)', color: theme.colors.textSecondary }}>
+                    <span style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary }}>
                         {entry.description ?? '—'}
                     </span>
                 )}
@@ -185,7 +185,7 @@ const AddConfigForm: React.FC<{ onAdded: (entry: AppConfigEntry) => void; onCanc
         <form onSubmit={handleSubmit}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 2fr auto', gap: 'var(--space-sm)', alignItems: 'end' }}>
                 <div>
-                    <label style={{ display: 'block', fontSize: 'var(--font-xs)', marginBottom: 4, color: theme.colors.textSecondary }}>
+                    <label style={{ display: 'block', fontSize: 'var(--font-xs)', marginBottom: 4, color: theme.colors.secondary }}>
                         {t('admin.config.key')} *
                     </label>
                     <input
@@ -198,7 +198,7 @@ const AddConfigForm: React.FC<{ onAdded: (entry: AppConfigEntry) => void; onCanc
                     />
                 </div>
                 <div>
-                    <label style={{ display: 'block', fontSize: 'var(--font-xs)', marginBottom: 4, color: theme.colors.textSecondary }}>
+                    <label style={{ display: 'block', fontSize: 'var(--font-xs)', marginBottom: 4, color: theme.colors.secondary }}>
                         {t('admin.config.value')} *
                     </label>
                     <input
@@ -209,7 +209,7 @@ const AddConfigForm: React.FC<{ onAdded: (entry: AppConfigEntry) => void; onCanc
                     />
                 </div>
                 <div>
-                    <label style={{ display: 'block', fontSize: 'var(--font-xs)', marginBottom: 4, color: theme.colors.textSecondary }}>
+                    <label style={{ display: 'block', fontSize: 'var(--font-xs)', marginBottom: 4, color: theme.colors.secondary }}>
                         {t('admin.config.description')}
                     </label>
                     <input
@@ -236,7 +236,7 @@ const AppConfigPageContent: React.FC = () => {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const { reload: reloadAppConfig } = useAppConfig();
-    const { entries, setEntries, loading, error, refetch } = useAdminConfig();
+    const { entries, setEntries, loading, error } = useAdminConfig();
     const [showAddForm, setShowAddForm] = useState(false);
 
     const breadcrumbs = useMemo(() => [
@@ -268,7 +268,7 @@ const AppConfigPageContent: React.FC = () => {
         textAlign: 'left',
         fontSize: 'var(--font-sm)',
         fontWeight: 600,
-        color: theme.colors.textSecondary,
+        color: theme.colors.secondary,
         borderBottom: `2px solid ${theme.colors.border}`,
     };
 
@@ -333,7 +333,7 @@ const AppConfigPageContent: React.FC = () => {
                             ))}
                             {entries.length === 0 && (
                                 <tr>
-                                    <td colSpan={4} style={{ padding: '24px', textAlign: 'center', color: theme.colors.textSecondary }}>
+                                    <td colSpan={4} style={{ padding: '24px', textAlign: 'center', color: theme.colors.secondary }}>
                                         {t('common.noData')}
                                     </td>
                                 </tr>

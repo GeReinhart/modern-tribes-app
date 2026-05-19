@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
@@ -8,9 +8,12 @@ import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedBadge } from '@/components/common/layout/ThemedBadge';
 import { ThemedSection } from '@/components/common/layout/ThemedSection';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
+import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
 import { useProjectWithDocument, useUserProjectsByTribe } from '@/hooks/useProjects';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
+import { useProjectFeatures, useFeatureTypes } from '@/hooks/useProjectFeatures';
+import { getFeatureComponent } from '@/features/registry';
 import { errorStyle, containerStyle } from '@/styles/theme.styles';
 import { Paperclip, Download, FileText, Image, Film, Music, File } from 'lucide-react';
 import { AttachmentFile } from '@/types/document.types';
@@ -20,6 +23,97 @@ const getPositionVariant = (position: string): 'primary' | 'accent' | 'ghost' =>
     if (position === 'manager') return 'accent';
     if (position === 'member') return 'primary';
     return 'ghost';
+};
+
+const AddFeatureModal: React.FC<{
+    onClose: () => void;
+    onAdd: (featureType: string, name: string) => Promise<void>;
+}> = ({ onClose, onAdd }) => {
+    const { t } = useTranslation();
+    const { theme } = useTheme();
+    const { featureTypes } = useFeatureTypes();
+    const [featureType, setFeatureType] = useState('');
+    const [name, setName] = useState('');
+    const [saving, setSaving] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!featureType || !name.trim()) return;
+        setSaving(true);
+        await onAdd(featureType, name.trim());
+        setSaving(false);
+        onClose();
+    };
+
+    const inputStyle: React.CSSProperties = {
+        width: '100%',
+        padding: '8px 12px',
+        border: `1px solid ${theme.colors.border}`,
+        borderRadius: '8px',
+        backgroundColor: theme.colors.surface,
+        color: theme.colors.text,
+        fontSize: 'var(--font-sm)',
+        boxSizing: 'border-box',
+    };
+
+    return (
+        <div style={{
+            position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+        }}>
+            <div style={{
+                backgroundColor: theme.colors.surface,
+                borderRadius: '12px',
+                padding: '24px',
+                width: '400px',
+                maxWidth: '90vw',
+                border: `1px solid ${theme.colors.border}`,
+            }}>
+                <ThemedText size="medium" as="h3" style={{ marginBottom: '16px' }}>
+                    {t('features.addFeature')}
+                </ThemedText>
+                <form onSubmit={handleSubmit}>
+                    <div style={{ marginBottom: '12px' }}>
+                        <label style={{ display: 'block', fontSize: 'var(--font-sm)', marginBottom: '4px', color: theme.colors.secondary }}>
+                            {t('features.featureType')}
+                        </label>
+                        <select
+                            value={featureType}
+                            onChange={e => setFeatureType(e.target.value)}
+                            style={inputStyle}
+                            required
+                        >
+                            <option value="">{t('features.selectType')}</option>
+                            {featureTypes.map(ft => (
+                                <option key={ft.feature_type} value={ft.feature_type}>{ft.label}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'block', fontSize: 'var(--font-sm)', marginBottom: '4px', color: theme.colors.secondary }}>
+                            {t('features.featureName')}
+                        </label>
+                        <input
+                            type="text"
+                            style={inputStyle}
+                            value={name}
+                            onChange={e => setName(e.target.value)}
+                            placeholder={t('features.featureNamePlaceholder')}
+                            required
+                        />
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                        <ThemedButton variant="ghost" type="button" onClick={onClose} disabled={saving}>
+                            {t('common.cancel')}
+                        </ThemedButton>
+                        <ThemedButton variant="primary" type="submit" disabled={saving || !featureType || !name.trim()}>
+                            {t('common.create')}
+                        </ThemedButton>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
 };
 
 const ShowProjectPageContent: React.FC = () => {
@@ -36,6 +130,10 @@ const ShowProjectPageContent: React.FC = () => {
         user?.id || '',
         { enabled: !!tribeId && !!user?.id }
     );
+    const { features, createFeature } = useProjectFeatures(projectId || null);
+
+    const [activeTab, setActiveTab] = useState('description');
+    const [showAddFeature, setShowAddFeature] = useState(false);
 
     const myProjectPosition = useMemo((): ProjectEntry | null => {
         if (!projectId) return null;
@@ -69,12 +167,27 @@ const ShowProjectPageContent: React.FC = () => {
         );
     }, [myProjectPosition]);
 
+    const canEdit = useMemo(() => {
+        if (!myProjectPosition) return false;
+        const allPositions = [
+            myProjectPosition.direct_position,
+            ...myProjectPosition.represented_persons.map(p => p.position),
+        ].filter(Boolean);
+        return allPositions.some(p => p === 'manager' || p === 'member');
+    }, [myProjectPosition]);
+
     const breadcrumbs = useMemo(() => [
         { label: t('common.home'), path: '/app' },
         { label: t('tribes.title'), path: '/app/tribes' },
         { label: tribe?.name || t('common.loading'), path: `/app/tribes/${tribeId}` },
         { label: project?.name || t('common.loading') },
     ], [tribe?.name, project?.name, tribeId, t]);
+
+    const tabs = useMemo(() => {
+        const base = [{ key: 'description', label: t('tribes.tabDescription') }];
+        const featureTabs = features.map(f => ({ key: f.id, label: f.name }));
+        return [...base, ...featureTabs];
+    }, [features, t]);
 
     const attachmentCardStyle: React.CSSProperties = {
         padding: '12px 16px',
@@ -125,10 +238,18 @@ const ShowProjectPageContent: React.FC = () => {
     }
 
     const headerActions = isManager ? (
-        <ThemedButton variant="primary" onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit`)}>
-            {t('projects.editProject')}
-        </ThemedButton>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <ThemedButton variant="ghost" onClick={() => setShowAddFeature(true)}>
+                {t('features.addFeature')}
+            </ThemedButton>
+            <ThemedButton variant="primary" onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit`)}>
+                {t('projects.editProject')}
+            </ThemedButton>
+        </div>
     ) : undefined;
+
+    const activeFeature = features.find(f => f.id === activeTab);
+    const FeatureComponent = activeFeature ? getFeatureComponent(activeFeature.feature_type) : null;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs} headerActions={headerActions}>
@@ -149,83 +270,112 @@ const ShowProjectPageContent: React.FC = () => {
                 </div>
             )}
 
-            {/* Description */}
-            {project.document_content_html && (
-                <ThemedSection themeId="main_1">
-                    <ThemedText size="medium" as="h2">
-                        {t('tribes.descriptionSection')}
-                    </ThemedText>
-                    <div
-                        className="prose max-w-none"
-                        style={{
-                            padding: '16px',
-                            backgroundColor: theme.colors.surface,
-                            borderRadius: '8px',
-                            border: `1px solid ${theme.colors.border}`,
-                        }}
-                        dangerouslySetInnerHTML={{ __html: project.document_content_html }}
-                    />
-                </ThemedSection>
-            )}
+            {/* Tabs */}
+            <ThemedSection themeId="main_1">
+                <ThemedTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
-            {/* Attachments */}
-            {project.document_attachments && project.document_attachments.length > 0 && (
-                <ThemedSection themeId="main_1">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-                        <Paperclip size={20} color={theme.colors.secondary} />
-                        <ThemedText size="small" as="h4">
-                            {t('tribes.attachmentsCount', { count: project.document_attachments.length })}
+                <div style={{ paddingTop: '16px' }}>
+                    {activeTab === 'description' && (
+                        <>
+                            {/* Description */}
+                            {project.document_content_html && (
+                                <div
+                                    className="prose max-w-none"
+                                    style={{
+                                        padding: '16px',
+                                        backgroundColor: theme.colors.surface,
+                                        borderRadius: '8px',
+                                        border: `1px solid ${theme.colors.border}`,
+                                        marginBottom: '16px',
+                                    }}
+                                    dangerouslySetInnerHTML={{ __html: project.document_content_html }}
+                                />
+                            )}
+
+                            {/* Attachments */}
+                            {project.document_attachments && project.document_attachments.length > 0 && (
+                                <>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                                        <Paperclip size={20} color={theme.colors.secondary} />
+                                        <ThemedText size="small" as="h4">
+                                            {t('tribes.attachmentsCount', { count: project.document_attachments.length })}
+                                        </ThemedText>
+                                    </div>
+                                    {project.document_attachments.map((attachment: AttachmentFile) => (
+                                        <div
+                                            key={attachment.id}
+                                            style={attachmentCardStyle}
+                                            onMouseEnter={e => {
+                                                e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
+                                                e.currentTarget.style.borderColor = theme.colors.primary;
+                                            }}
+                                            onMouseLeave={e => {
+                                                e.currentTarget.style.backgroundColor = theme.colors.surface;
+                                                e.currentTarget.style.borderColor = theme.colors.border;
+                                            }}
+                                        >
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                <span style={{ color: theme.colors.primary }}>
+                                                    {getFileIcon(attachment.type)}
+                                                </span>
+                                                <div>
+                                                    <ThemedText variant="primary" size="small">{attachment.name}</ThemedText>
+                                                    <ThemedText variant="secondary" size="small">{formatFileSize(attachment.size)}</ThemedText>
+                                                </div>
+                                            </div>
+                                            <a
+                                                href={attachment.url}
+                                                download={attachment.name}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '6px',
+                                                    padding: '8px 12px',
+                                                    backgroundColor: theme.colors.primary,
+                                                    color: 'white',
+                                                    borderRadius: '6px',
+                                                    textDecoration: 'none',
+                                                    fontSize: '14px',
+                                                    fontWeight: 500,
+                                                }}
+                                                onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; }}
+                                                onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
+                                            >
+                                                <Download size={16} />
+                                                {t('tribes.download')}
+                                            </a>
+                                        </div>
+                                    ))}
+                                </>
+                            )}
+                        </>
+                    )}
+
+                    {activeFeature && FeatureComponent && (
+                        <FeatureComponent
+                            featureInstanceId={activeFeature.id}
+                            canEdit={canEdit}
+                        />
+                    )}
+
+                    {activeFeature && !FeatureComponent && (
+                        <ThemedText variant="secondary" size="small">
+                            {t('features.unknownType', { type: activeFeature.feature_type })}
                         </ThemedText>
-                    </div>
+                    )}
+                </div>
+            </ThemedSection>
 
-                    {project.document_attachments.map((attachment: AttachmentFile) => (
-                        <div
-                            key={attachment.id}
-                            style={attachmentCardStyle}
-                            onMouseEnter={e => {
-                                e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
-                                e.currentTarget.style.borderColor = theme.colors.primary;
-                            }}
-                            onMouseLeave={e => {
-                                e.currentTarget.style.backgroundColor = theme.colors.surface;
-                                e.currentTarget.style.borderColor = theme.colors.border;
-                            }}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <span style={{ color: theme.colors.primary }}>
-                                    {getFileIcon(attachment.type)}
-                                </span>
-                                <div>
-                                    <ThemedText variant="primary" size="small">{attachment.name}</ThemedText>
-                                    <ThemedText variant="secondary" size="small">{formatFileSize(attachment.size)}</ThemedText>
-                                </div>
-                            </div>
-                            <a
-                                href={attachment.url}
-                                download={attachment.name}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    padding: '8px 12px',
-                                    backgroundColor: theme.colors.primary,
-                                    color: 'white',
-                                    borderRadius: '6px',
-                                    textDecoration: 'none',
-                                    fontSize: '14px',
-                                    fontWeight: 500,
-                                }}
-                                onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; }}
-                                onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
-                            >
-                                <Download size={16} />
-                                {t('tribes.download')}
-                            </a>
-                        </div>
-                    ))}
-                </ThemedSection>
+            {showAddFeature && (
+                <AddFeatureModal
+                    onClose={() => setShowAddFeature(false)}
+                    onAdd={async (featureType, name) => {
+                        const created = await createFeature({ feature_type: featureType, name, position: features.length });
+                        if (created) setActiveTab(created.id);
+                    }}
+                />
             )}
         </AppLayout>
     );
