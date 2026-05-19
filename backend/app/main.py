@@ -37,6 +37,7 @@ from .routers.query import (
     monitoring as query_monitoring,
     mails as query_mails,
     projects as query_projects,
+    search as query_search,
 )
 
 # Configure logging
@@ -133,6 +134,7 @@ app.include_router(query_users.router, prefix="/api/query")
 app.include_router(query_monitoring.router, prefix="/api/query")
 app.include_router(query_mails.router, prefix="/api/query")
 app.include_router(query_projects.router, prefix="/api/query")
+app.include_router(query_search.router, prefix="/api/query")
 
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")

@@ -150,11 +150,6 @@ const ShowProjectPageContent: React.FC = () => {
                 </div>
             )}
 
-            {/* Project Title */}
-            <ThemedCard>
-                <ThemedText size="large" as="h1">{project.name}</ThemedText>
-            </ThemedCard>
-
             {/* Description */}
             {project.document_content_html && (
                 <ThemedSection themeId="main_1">

@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ApplicationLogo } from '@/components/common/icons/ApplicationLogo';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { BreadcrumbItem } from './Breadcrumb';
 import UserBadge from "@/components/entities/users/CurrentUserBadge.tsx";
 
@@ -23,6 +23,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                                                     }) => {
     const { theme, currentThemeKey } = useTheme();
     const navigate = useNavigate();
+    const location = useLocation();
+    const isSearchActive = location.pathname === '/app/search';
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -195,9 +197,31 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 </div>
             )}
 
-            {/* Right - User Badge */}
+            {/* Right - Search + User Badge */}
             {showUserBadge && (
                 <div style={rightSectionStyle}>
+                    <button
+                        onClick={() => navigate('/app/search')}
+                        title="Search"
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            border: `2px solid ${isSearchActive ? theme.colors.primary : theme.colors.border}`,
+                            backgroundColor: isSearchActive ? `${theme.colors.primary}15` : 'transparent',
+                            cursor: 'pointer',
+                            color: isSearchActive ? theme.colors.primary : theme.colors.text,
+                            flexShrink: 0,
+                        }}
+                    >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                    </button>
                     <UserBadge />
                 </div>
             )}

@@ -4,6 +4,21 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 
+class _TextStripper(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self._parts: list[str] = []
+
+    def handle_data(self, data):
+        self._parts.append(data)
+
+
+def strip_html(html: str) -> str:
+    parser = _TextStripper()
+    parser.feed(html)
+    return ' '.join(' '.join(parser._parts).split())
+
+
 class _ContentSummaryParser(HTMLParser):
     _HEADER_TAGS = {'h1', 'h2', 'h3', 'h4', 'h5', 'h6'}
 
@@ -49,9 +64,10 @@ async def update_document_content_with_revision(pool, document_id: str, content_
         })
 
         await conn.execute(
-            "UPDATE documents SET content_html = $1, content_summary = $2, updated_at = $3, updated_by = $4, revisions = $5::jsonb WHERE id = $6",
+            "UPDATE documents SET content_html = $1, content_summary = $2, content_text = $3, updated_at = $4, updated_by = $5, revisions = $6::jsonb WHERE id = $7",
             content_html,
             extract_content_summary(content_html),
+            strip_html(content_html),
             datetime.now(timezone.utc),
             UUID(user_id),
             json.dumps(current_revisions),
