@@ -15,7 +15,7 @@ router = APIRouter(prefix="/todo-items", tags=["feature_todo_list"])
 
 async def _get_feature_instance_project(conn, feature_instance_id: str) -> str:
     row = await conn.fetchrow(
-        "SELECT project_id FROM project_feature_instances WHERE id = $1",
+        "SELECT project_id FROM projects_features WHERE id = $1",
         UUID(feature_instance_id)
     )
     if not row:
@@ -29,6 +29,7 @@ def _row_to_todo(row) -> TodoItemResponse:
         feature_instance_id=str(row["feature_instance_id"]),
         title=row["title"],
         status=row["status"],
+        todo_status=row["todo_status"],
         document_id=str(row["document_id"]) if row["document_id"] else None,
         document_content_html=row["content_html"] if "content_html" in row.keys() else None,
         position=row["position"],
@@ -99,6 +100,8 @@ async def update_todo_item(item_id: str, data: TodoItemUpdate, current_user: dic
             updates["title"] = data.title
         if data.status is not None:
             updates["status"] = data.status
+        if data.todo_status is not None:
+            updates["todo_status"] = data.todo_status
         if data.position is not None:
             updates["position"] = data.position
 

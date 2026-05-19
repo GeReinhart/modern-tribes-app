@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
@@ -16,14 +16,33 @@ const TodoRow: React.FC<{
     item: TodoItem;
     canEdit: boolean;
     onToggle: (id: string, done: boolean) => void;
-    onDelete: (id: string) => void;
+    onSetStatus: (id: string, status: 'pending' | 'active' | 'archived') => void;
     onSaveNote: (id: string, html: string) => void;
-}> = ({ item, canEdit, onToggle, onDelete, onSaveNote }) => {
+    onRename: (id: string, title: string) => void;
+}> = ({ item, canEdit, onToggle, onSetStatus, onSaveNote, onRename }) => {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const [expanded, setExpanded] = useState(false);
+    const [editing, setEditing] = useState(false);
+    const [editTitle, setEditTitle] = useState(item.title);
     const [noteContent, setNoteContent] = useState(item.document_content_html ?? '');
     const [noteDirty, setNoteDirty] = useState(false);
+
+    const handleStartEdit = () => {
+        setEditTitle(item.title);
+        setEditing(true);
+    };
+
+    const handleCommitEdit = () => {
+        const trimmed = editTitle.trim();
+        if (trimmed && trimmed !== item.title) onRename(item.id, trimmed);
+        setEditing(false);
+    };
+
+    const handleEditKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') { e.preventDefault(); handleCommitEdit(); }
+        if (e.key === 'Escape') { setEditing(false); setEditTitle(item.title); }
+    };
 
     const handleNoteChange = (html: string) => {
         setNoteContent(html);
@@ -35,7 +54,8 @@ const TodoRow: React.FC<{
         setNoteDirty(false);
     };
 
-    const isDone = item.status === 'done';
+    const isDone = item.todo_status === 'done';
+    const isArchived = item.status === 'archived';
 
     return (
         <div style={{
@@ -51,7 +71,7 @@ const TodoRow: React.FC<{
                 gap: '10px',
                 padding: '10px 14px',
             }}>
-                {canEdit && (
+                {canEdit && !isArchived && (
                     <input
                         type="checkbox"
                         checked={isDone}
@@ -59,7 +79,7 @@ const TodoRow: React.FC<{
                         style={{ width: 18, height: 18, cursor: 'pointer', flexShrink: 0 }}
                     />
                 )}
-                {!canEdit && (
+                {(!canEdit || isArchived) && (
                     <span style={{
                         width: 18, height: 18, flexShrink: 0,
                         border: `2px solid ${theme.colors.border}`,
@@ -68,18 +88,39 @@ const TodoRow: React.FC<{
                         display: 'inline-block',
                     }} />
                 )}
-                <span
-                    style={{
-                        flex: 1,
-                        textDecoration: isDone ? 'line-through' : 'none',
-                        color: isDone ? theme.colors.secondary : theme.colors.text,
-                        fontSize: 'var(--font-sm)',
-                        cursor: 'pointer',
-                    }}
-                    onClick={() => setExpanded(e => !e)}
-                >
-                    {item.title}
-                </span>
+                {canEdit && editing && !isArchived ? (
+                    <input
+                        autoFocus
+                        value={editTitle}
+                        onChange={e => setEditTitle(e.target.value)}
+                        onBlur={handleCommitEdit}
+                        onKeyDown={handleEditKeyDown}
+                        style={{
+                            flex: 1,
+                            fontSize: 'var(--font-md)',
+                            padding: '2px 6px',
+                            border: `1px solid ${theme.colors.primary}`,
+                            borderRadius: '4px',
+                            backgroundColor: theme.colors.surface,
+                            color: theme.colors.text,
+                            outline: 'none',
+                        }}
+                    />
+                ) : (
+                    <span
+                        style={{
+                            flex: 1,
+                            textDecoration: isDone || isArchived ? 'line-through' : 'none',
+                            color: isArchived ? theme.colors.secondary : isDone ? theme.colors.secondary : theme.colors.text,
+                            fontSize: 'var(--font-md)',
+                            cursor: canEdit && !isArchived ? 'text' : 'default',
+                            opacity: isArchived ? 0.55 : 1,
+                        }}
+                        onClick={() => canEdit && !isArchived ? handleStartEdit() : setExpanded(e => !e)}
+                    >
+                        {item.title}
+                    </span>
+                )}
                 <button
                     onClick={() => setExpanded(e => !e)}
                     style={{
@@ -93,21 +134,38 @@ const TodoRow: React.FC<{
                 >
                     {expanded ? '▲' : '▼'}
                 </button>
-                {canEdit && (
+                {canEdit && !isArchived && (
                     <button
-                        onClick={() => onDelete(item.id)}
+                        onClick={() => onSetStatus(item.id, 'archived')}
                         style={{
                             background: 'none',
                             border: 'none',
                             cursor: 'pointer',
-                            color: theme.colors.danger,
-                            fontSize: '16px',
-                            padding: '2px 4px',
+                            color: theme.colors.secondary,
+                            fontSize: '13px',
+                            padding: '2px 6px',
                             lineHeight: 1,
                         }}
-                        title={t('common.delete')}
+                        title={t('common.archive')}
                     >
-                        ×
+                        {t('common.archive')}
+                    </button>
+                )}
+                {canEdit && isArchived && (
+                    <button
+                        onClick={() => onSetStatus(item.id, 'active')}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: theme.colors.primary,
+                            fontSize: '13px',
+                            padding: '2px 6px',
+                            lineHeight: 1,
+                        }}
+                        title={t('common.restore')}
+                    >
+                        {t('common.restore')}
                     </button>
                 )}
             </div>
@@ -151,9 +209,11 @@ const TodoRow: React.FC<{
 const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit }) => {
     const { t } = useTranslation();
     const { theme } = useTheme();
-    const { items, error, createItem, updateItem, deleteItem } = useTodoItems(featureInstanceId);
+    const { items, error, createItem, updateItem } = useTodoItems(featureInstanceId);
     const [newTitle, setNewTitle] = useState('');
     const [adding, setAdding] = useState(false);
+    const [showArchived, setShowArchived] = useState(false);
+    const addInputRef = useRef<HTMLInputElement>(null);
 
     const handleAdd = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -166,19 +226,27 @@ const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit }) => {
         });
         setNewTitle('');
         setAdding(false);
+        setTimeout(() => addInputRef.current?.focus(), 0);
     };
 
     const handleToggle = async (id: string, done: boolean) => {
-        await updateItem(id, { status: done ? 'done' : 'todo' });
-    };
-
-    const handleDelete = async (id: string) => {
-        await deleteItem(id);
+        await updateItem(id, { todo_status: done ? 'done' : 'todo' });
     };
 
     const handleSaveNote = async (id: string, html: string) => {
         await updateItem(id, { document_content_html: html });
     };
+
+    const handleRename = async (id: string, title: string) => {
+        await updateItem(id, { title });
+    };
+
+    const handleSetStatus = async (id: string, status: 'pending' | 'active' | 'archived') => {
+        await updateItem(id, { status });
+    };
+
+    const archivedCount = items.filter(i => i.status === 'archived').length;
+    const visibleItems = showArchived ? items : items.filter(i => i.status !== 'archived');
 
     return (
         <div>
@@ -189,26 +257,47 @@ const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit }) => {
             )}
 
             <div style={{ marginBottom: '16px' }}>
-                {items.length === 0 && (
+                {visibleItems.length === 0 && items.length === 0 && (
                     <ThemedText variant="secondary" size="small" style={{ marginBottom: '12px' }}>
                         {t('features.todo.empty')}
                     </ThemedText>
                 )}
-                {items.map(item => (
+                {visibleItems.map(item => (
                     <TodoRow
                         key={item.id}
                         item={item}
                         canEdit={canEdit}
                         onToggle={handleToggle}
-                        onDelete={handleDelete}
+                        onSetStatus={handleSetStatus}
                         onSaveNote={handleSaveNote}
+                        onRename={handleRename}
                     />
                 ))}
+                {archivedCount > 0 && (
+                    <button
+                        onClick={() => setShowArchived(s => !s)}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: theme.colors.secondary,
+                            fontSize: 'var(--font-sm)',
+                            padding: '6px 0',
+                            display: 'block',
+                            marginTop: '4px',
+                        }}
+                    >
+                        {showArchived
+                            ? t('features.todo.hideArchived')
+                            : t('features.todo.showArchived', { count: archivedCount })}
+                    </button>
+                )}
             </div>
 
             {canEdit && (
                 <form onSubmit={handleAdd} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <input
+                        ref={addInputRef}
                         type="text"
                         value={newTitle}
                         onChange={e => setNewTitle(e.target.value)}

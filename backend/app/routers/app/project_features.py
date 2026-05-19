@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from typing import Optional
 from uuid import UUID
 
 from ..auth.authentification import get_current_user
@@ -25,14 +26,21 @@ async def get_feature_types(current_user: dict = Depends(get_current_user)):
 
 @router.get("/projects/{project_id}/features", response_model=list[ProjectFeatureInstanceResponse])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
-async def list_project_features(project_id: str, current_user: dict = Depends(get_current_user)):
+async def list_project_features(
+    project_id: str,
+    status_filter: Optional[str] = Query(None, alias="status"),
+    current_user: dict = Depends(get_current_user),
+):
     pool = get_database()
     await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
+    if status_filter:
+        query = "SELECT * FROM projects_features WHERE project_id = $1 AND status = $2 ORDER BY position ASC, created_at ASC"
+        params = [UUID(project_id), status_filter]
+    else:
+        query = "SELECT * FROM projects_features WHERE project_id = $1 ORDER BY position ASC, created_at ASC"
+        params = [UUID(project_id)]
     async with pool.acquire() as conn:
-        rows = await conn.fetch(
-            "SELECT * FROM project_feature_instances WHERE project_id = $1 AND status = 'active' ORDER BY position ASC, created_at ASC",
-            UUID(project_id)
-        )
+        rows = await conn.fetch(query, *params)
     return [
         ProjectFeatureInstanceResponse(
             id=str(r["id"]),
@@ -61,7 +69,7 @@ async def create_project_feature(
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """
-            INSERT INTO project_feature_instances (project_id, feature_type, name, position, created_by, updated_by)
+            INSERT INTO projects_features (project_id, feature_type, name, position, created_by, updated_by)
             VALUES ($1, $2, $3, $4, $5, $5)
             RETURNING *
             """,
@@ -102,7 +110,7 @@ async def update_project_feature(
 
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            f"UPDATE project_feature_instances SET {set_clauses} WHERE id = $1 AND project_id = ${len(values)+2} RETURNING *",
+            f"UPDATE projects_features SET {set_clauses} WHERE id = $1 AND project_id = ${len(values)+2} RETURNING *",
             UUID(feature_id), *values, UUID(project_id)
         )
     if not row:

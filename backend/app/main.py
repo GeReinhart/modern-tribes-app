@@ -41,6 +41,7 @@ from .routers.query import (
     projects as query_projects,
     search as query_search,
     app_config as query_app_config,
+    features as query_features,
 )
 
 # Configure logging
@@ -141,6 +142,7 @@ app.include_router(query_mails.router, prefix="/api/query")
 app.include_router(query_projects.router, prefix="/api/query")
 app.include_router(query_search.router, prefix="/api/query")
 app.include_router(query_app_config.router, prefix="/api/query")
+app.include_router(query_features.router, prefix="/api/query")
 
 # Feature routers (registered via features package self-registration)
 from features.registry import get_all_routers as _get_feature_routers

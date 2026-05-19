@@ -12,6 +12,7 @@ class TodoItemCreate(BaseModel):
 class TodoItemUpdate(BaseModel):
     title: Optional[str] = None
     status: Optional[str] = None
+    todo_status: Optional[str] = None
     position: Optional[int] = None
     document_content_html: Optional[str] = None
 
@@ -21,6 +22,7 @@ class TodoItemResponse(BaseModel):
     feature_instance_id: str
     title: str
     status: str
+    todo_status: str
     document_id: Optional[str] = None
     document_content_html: Optional[str] = None
     position: int

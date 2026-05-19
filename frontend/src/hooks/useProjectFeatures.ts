@@ -15,7 +15,7 @@ export function useProjectFeatures(projectId: string | null) {
         if (!projectId) return;
         setLoading(true);
         setError(null);
-        projectFeaturesService.listByProject(projectId)
+        projectFeaturesService.listByProject(projectId, 'active')
             .then(data => setFeatures(data))
             .catch(e => setError(e.message))
             .finally(() => setLoading(false));
