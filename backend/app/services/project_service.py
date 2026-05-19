@@ -13,6 +13,7 @@ from ..utils.attachments_helpers import (
     update_document_attachments,
 )
 from ..utils.db_helpers import row_to_dict
+from ..utils.document_helpers import update_document_content_with_revision
 
 
 async def get_project_with_document(project_id: str, pool) -> ProjectWithDocumentResponse:
@@ -90,11 +91,7 @@ async def update_project_with_document(
             )
     elif document_id:
         if data.document_content_html is not None:
-            async with pool.acquire() as conn:
-                await conn.execute(
-                    "UPDATE documents SET content_html = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
-                    data.document_content_html, now, uid, UUID(str(document_id)),
-                )
+            await update_document_content_with_revision(pool, str(document_id), data.document_content_html, current_user["id"])
         if data.document_attachments is not None:
             await update_document_attachments(pool, str(document_id), data.document_attachments, current_user["id"])
 

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
@@ -18,6 +19,7 @@ const STATUS_OPTIONS = ['active', 'pending', 'archived'];
 const MonitoringPageContent: React.FC = () => {
     const { t } = useTranslation();
     const { theme } = useTheme();
+    const navigate = useNavigate();
     const [hours, setHours] = useState(4);
 
     const [userEmail, setUserEmail] = useState('');
@@ -36,7 +38,26 @@ const MonitoringPageContent: React.FC = () => {
             key: 'entity',
             header: t('monitoring.entity'),
             render: (r: RecentChange) => (
-                <span style={{ fontWeight: 600, color: theme.colors.primary }}>{r.entity}</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>
+                    <span style={{ fontWeight: 600, color: theme.colors.primary }}>{r.entity}</span>
+                    {r.entity === 'Document' && (
+                        <button
+                            onClick={() => navigate(`/admin/monitoring/documents/${r.entity_id}`)}
+                            style={{
+                                fontSize: 'var(--font-xs, 11px)',
+                                padding: '1px 6px',
+                                borderRadius: 'var(--radius-sm)',
+                                border: `1px solid ${theme.colors.primary}`,
+                                background: 'transparent',
+                                color: theme.colors.primary,
+                                cursor: 'pointer',
+                                lineHeight: 1.4,
+                            }}
+                        >
+                            {t('monitoring.revisions.link')}
+                        </button>
+                    )}
+                </span>
             ),
         },
         {
@@ -101,7 +122,7 @@ const MonitoringPageContent: React.FC = () => {
                 <span style={{ fontSize: 'var(--font-sm)' }}>{r.updated_by ?? '—'}</span>
             ),
         },
-    ], [t, theme.colors.primary, theme.colors.secondary]);
+    ], [t, navigate, theme.colors.primary, theme.colors.secondary]);
 
     const headerActions = <AdminNavigation currentPage="monitoring" />;
 

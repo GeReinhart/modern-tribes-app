@@ -1,6 +1,7 @@
 from fastapi import APIRouter, status, Depends
 from typing import List
 from uuid import UUID
+import json
 
 from ..auth.authentification import get_current_user
 from ...models.crud.documents import Document, DocumentCreate, DocumentUpdate
@@ -61,14 +62,23 @@ async def update_document_endpoint(document_id: str, document: DocumentUpdate,cu
     """Update an existing document"""
     pool = get_database()
 
-    # Check if document exists
-    await check_document_exists(pool, TABLE, document_id, ENTITY_NAME)
+    current_doc = await check_document_exists(pool, TABLE, document_id, ENTITY_NAME)
 
-    # Update document
     document_dict = document.model_dump(exclude_unset=True)
     if 'content_html' in document_dict:
         document_dict['content_summary'] = extract_content_summary(document_dict['content_html'])
     document_dict['updated_by'] = UUID(current_user['id'])
+
+    revisions_raw = current_doc.get('revisions') or '[]'
+    current_revisions = json.loads(revisions_raw) if isinstance(revisions_raw, str) else revisions_raw
+    updated_at = current_doc.get('updated_at')
+    current_revisions.append({
+        'content_html': current_doc['content_html'],
+        'updated_at': updated_at.isoformat() if hasattr(updated_at, 'isoformat') else str(updated_at),
+        'updated_by': current_doc.get('updated_by'),
+    })
+    document_dict['revisions'] = current_revisions
+
     return await update_document(pool, TABLE, document_id, document_dict, ENTITY_NAME)
 
 
