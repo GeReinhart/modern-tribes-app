@@ -68,10 +68,6 @@ const TribesPageContent: React.FC = () => {
                 </ThemedButton>
             )}
 
-            <ThemedButton variant="ghost" onClick={() => navigate('/app/projects')}>
-                {t('projects.title')}
-            </ThemedButton>
-
             <ThemedButton requiredPermissions={["admin"]}
                 variant={'ghost'}
                 onClick={() => navigate('/admin')}

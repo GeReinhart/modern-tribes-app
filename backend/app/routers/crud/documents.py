@@ -18,7 +18,7 @@ from ...models.auth.auth import PermissionEnum
 from ...routers.auth.authorization import (
     require_permission_decorator
 )
-from ...utils.document_helpers import extract_content_summary
+from ...utils.document_helpers import extract_content_summary, strip_html
 
 router = APIRouter(prefix="/documents", tags=["crud_documents"])
 
@@ -51,6 +51,7 @@ async def create_document_endpoint(document: DocumentCreate,current_user: dict =
     # Create document
     document_dict = document.model_dump()
     document_dict['content_summary'] = extract_content_summary(document_dict['content_html'])
+    document_dict['content_text'] = strip_html(document_dict['content_html'])
     document_dict['created_by'] = UUID(current_user['id'])
     document_dict['updated_by'] = UUID(current_user['id'])
     return await create_document(pool, TABLE, document_dict)
@@ -67,6 +68,7 @@ async def update_document_endpoint(document_id: str, document: DocumentUpdate,cu
     document_dict = document.model_dump(exclude_unset=True)
     if 'content_html' in document_dict:
         document_dict['content_summary'] = extract_content_summary(document_dict['content_html'])
+        document_dict['content_text'] = strip_html(document_dict['content_html'])
     document_dict['updated_by'] = UUID(current_user['id'])
 
     revisions_raw = current_doc.get('revisions') or '[]'

@@ -282,6 +282,11 @@ const en: Record<string, string> = {
     'validation.failedCreateTribe': 'An error occurred while creating the tribe',
     'validation.failedUpdateTribe': 'Failed to update tribe',
 
+    'search.title': 'Search',
+    'search.subtitle': 'Search through documents you have access to.',
+    'search.placeholder': 'Search documents...',
+    'search.empty': 'No results found for your query.',
+
     'footer.allRightsReserved': '© {{year}} Modern Tribes. All rights reserved.',
     'footer.privacy': 'Privacy',
     'footer.terms': 'Terms',

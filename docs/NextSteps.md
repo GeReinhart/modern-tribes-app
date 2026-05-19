@@ -11,8 +11,8 @@
 - [ ] Todo list to show the auto update of the list
 - [ ] Do not duplicate configuration on FrontSide, take it from the API. Example: file extension, size.
 - [X] Mail queue with a batch every minute
-- [ ] Store on each entity the versions of the entity in a JSON
-- [ ] Full text search on all entities
+- [X] Store on each entity the versions of the entity in a JSON
+- [X] Full text search on documents
 
 ## Modern tribes
 

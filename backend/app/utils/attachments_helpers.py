@@ -4,6 +4,7 @@ from uuid import UUID
 
 from ..models.uploads.files import AttachmentFile
 from ..utils.db_helpers import row_to_dict
+from ..utils.document_helpers import extract_content_summary, strip_html
 
 
 async def get_document_with_attachments(pool, document_id: str) -> dict:
@@ -39,10 +40,12 @@ async def create_document_with_attachments(pool, content_html: str, attachments:
     uid = UUID(user_id) if user_id else None
     async with pool.acquire() as conn:
         document_row = await conn.fetchrow(
-            """INSERT INTO documents (content_html, created_at, updated_at, created_by, updated_by)
-               VALUES ($1, $2, $2, $3, $3)
+            """INSERT INTO documents (content_html, content_summary, content_text, created_at, updated_at, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $4, $5, $5)
                    RETURNING *""",
             content_html,
+            extract_content_summary(content_html),
+            strip_html(content_html),
             now,
             uid,
         )

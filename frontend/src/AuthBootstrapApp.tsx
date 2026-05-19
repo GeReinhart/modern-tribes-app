@@ -24,6 +24,7 @@ import {MailsPage} from "@/pages/admin/MailsPage.tsx";
 import {PeopleManagementPage} from "@/pages/admin/PeopleManagementPage.tsx";
 import {UserEditPage} from "@/pages/admin/UserEditPage.tsx";
 import {DocumentRevisionsPage} from "@/pages/admin/DocumentRevisionsPage.tsx";
+import {SearchPage} from "@/pages/app/SearchPage.tsx";
 
 function AuthBootstrapApp() {
     return (
@@ -68,6 +69,7 @@ function AuthBootstrapApp() {
                             <Route path="/app/tribes/:tribeId/projects/:projectId" element={<ShowProjectPage/>}/>
                             <Route path="/app/tribes/:tribeId/projects/:projectId/edit" element={<EditProjectPage/>}/>
                             <Route path="/app/projects" element={<ProjectsPage/>}/>
+                            <Route path="/app/search" element={<SearchPage/>}/>
                             <Route path="/app/profile" element={<ProfilePage/>}/>
 
                         </Route>
