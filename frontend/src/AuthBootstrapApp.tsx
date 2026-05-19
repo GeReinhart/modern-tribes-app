@@ -25,6 +25,8 @@ import {PeopleManagementPage} from "@/pages/admin/PeopleManagementPage.tsx";
 import {UserEditPage} from "@/pages/admin/UserEditPage.tsx";
 import {DocumentRevisionsPage} from "@/pages/admin/DocumentRevisionsPage.tsx";
 import {SearchPage} from "@/pages/app/SearchPage.tsx";
+import {AppConfigPage} from "@/pages/admin/AppConfigPage.tsx";
+import {AppConfigProvider} from "@/contexts/AppConfigContext.tsx";
 
 function AuthBootstrapApp() {
     return (
@@ -36,6 +38,7 @@ function AuthBootstrapApp() {
             <ResponsiveProvider>
             <BrowserRouter>
                 <AuthProvider>
+                    <AppConfigProvider>
                     <UserProfileProvider>
                     <Routes>
                         <Route path="/auth/login" element={<Login/>}/>
@@ -55,6 +58,7 @@ function AuthBootstrapApp() {
                                 <Route path="/admin/positions" element={<Navigate to="/admin/tribes" replace/>}/>
                                 <Route path="/admin/projects" element={<Navigate to="/admin/tribes" replace/>}/>
                                 <Route path="/admin/documents" element={<DocumentsCrudPage/>}/>
+                                <Route path="/admin/config" element={<AppConfigPage/>}/>
                 <Route path="/admin/monitoring" element={<MonitoringPage/>}/>
                                 <Route path="/admin/monitoring/documents/:documentId" element={<DocumentRevisionsPage/>}/>
                                 <Route path="/admin/monitoring/documents/:documentId/updated_at/:date" element={<DocumentRevisionsPage/>}/>
@@ -77,6 +81,7 @@ function AuthBootstrapApp() {
                         <Route path="*" element={<Navigate to="/app/tribes" replace/>}/>
                     </Routes>
                     </UserProfileProvider>
+                    </AppConfigProvider>
                 </AuthProvider>
             </BrowserRouter>
             </ResponsiveProvider>

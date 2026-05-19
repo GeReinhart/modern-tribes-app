@@ -282,6 +282,14 @@ const en: Record<string, string> = {
     'validation.failedCreateTribe': 'An error occurred while creating the tribe',
     'validation.failedUpdateTribe': 'Failed to update tribe',
 
+    'admin.config': 'Configuration',
+    'admin.configSubtitle': 'Manage runtime configuration values',
+    'admin.config.key': 'Key',
+    'admin.config.value': 'Value',
+    'admin.config.description': 'Description',
+    'admin.config.descriptionPlaceholder': 'What this setting controls...',
+    'admin.config.addEntry': 'Add Entry',
+
     'search.title': 'Search',
     'search.subtitle': 'Search through documents you have access to.',
     'search.placeholder': 'Search documents...',

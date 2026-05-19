@@ -100,8 +100,6 @@ export const DocumentForm: React.FC<DocumentFormProps> = ({
                         <FileUploader
                             attachments={formData.attachments}
                             onAttachmentsChange={handleAttachmentsChange}
-                            maxFiles={5}
-                            maxFileSize={10}
                         />
                     </div>
 

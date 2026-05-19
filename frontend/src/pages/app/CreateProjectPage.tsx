@@ -101,8 +101,6 @@ const CreateProjectPageContent: React.FC = () => {
                             <FileUploader
                                 attachments={attachments}
                                 onAttachmentsChange={setAttachments}
-                                maxFiles={5}
-                                maxFileSize={10}
                             />
                         </div>
                     </ThemedSection>

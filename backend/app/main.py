@@ -25,7 +25,8 @@ from .routers.crud import (
     label_entities,
     projects,
     documents,
-    document_entities
+    document_entities,
+    app_config,
 
 )
 from .routers.auth import authentification
@@ -38,6 +39,7 @@ from .routers.query import (
     mails as query_mails,
     projects as query_projects,
     search as query_search,
+    app_config as query_app_config,
 )
 
 # Configure logging
@@ -120,6 +122,7 @@ app.include_router(label_entities.router, prefix="/api/crud")
 app.include_router(projects.router, prefix="/api/crud")
 app.include_router(documents.router, prefix="/api/crud")
 app.include_router(document_entities.router, prefix="/api/crud")
+app.include_router(app_config.router, prefix="/api/crud")
 app.include_router(uploads.router)
 
 app.include_router(authentification.router, prefix="/api", tags=["auth"])
@@ -135,6 +138,7 @@ app.include_router(query_monitoring.router, prefix="/api/query")
 app.include_router(query_mails.router, prefix="/api/query")
 app.include_router(query_projects.router, prefix="/api/query")
 app.include_router(query_search.router, prefix="/api/query")
+app.include_router(query_app_config.router, prefix="/api/query")
 
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")

@@ -8,17 +8,17 @@
 - [X] User represents 0..N person
 - [X] Proper page to manage users / persons / represents. Be also able to relaunch the magic-link mail or generate it for copy paste purpose.
 - [X] Projects
-- [ ] Todo list to show the auto update of the list
-- [ ] Do not duplicate configuration on FrontSide, take it from the API. Example: file extension, size.
 - [X] Mail queue with a batch every minute
 - [X] Store on each entity the versions of the entity in a JSON
 - [X] Full text search on documents
+- [ ] Do not duplicate configuration on FrontSide, take it from the API. Example: file extension, size.
+- [ ] Feature Todo list to show the auto update of the list
 
 ## Modern tribes
 
-- Feature Kanban
-- Feature Planning
-- Feature Make groceries
-- Feature Carpooling
-- Feature Show guitar chords
+- [ ] Feature Kanban
+- [ ] Feature Planning
+- [ ] Feature Make groceries
+- [ ] Feature Carpooling
+- [ ] Feature Show guitar chords
 

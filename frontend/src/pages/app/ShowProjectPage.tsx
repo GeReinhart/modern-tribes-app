@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
 import { ThemedText } from '@/components/common/layout/ThemedText';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedBadge } from '@/components/common/layout/ThemedBadge';

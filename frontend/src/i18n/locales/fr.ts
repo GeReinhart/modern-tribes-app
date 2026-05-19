@@ -282,6 +282,14 @@ const fr: Record<string, string> = {
     'validation.failedCreateTribe': "Une erreur s'est produite lors de la création de la tribu",
     'validation.failedUpdateTribe': 'Échec de la mise à jour de la tribu',
 
+    'admin.config': 'Configuration',
+    'admin.configSubtitle': 'Gérer les valeurs de configuration',
+    'admin.config.key': 'Clé',
+    'admin.config.value': 'Valeur',
+    'admin.config.description': 'Description',
+    'admin.config.descriptionPlaceholder': 'Ce que ce paramètre contrôle...',
+    'admin.config.addEntry': 'Ajouter',
+
     'search.title': 'Recherche',
     'search.subtitle': 'Recherchez dans les documents auxquels vous avez accès.',
     'search.placeholder': 'Rechercher dans les documents...',
