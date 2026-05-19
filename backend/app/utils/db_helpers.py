@@ -207,9 +207,17 @@ async def create_document(
 
 
 def _build_update_query(table: str, doc_id: str, data: Dict[str, Any]) -> tuple[str, list]:
-    set_parts = [f"{key} = ${i+2}" for i, key in enumerate(data.keys())]
+    set_parts = []
+    values = [UUID(doc_id)]
+    for i, (key, value) in enumerate(data.items()):
+        if isinstance(value, (list, dict)):
+            set_parts.append(f"{key} = ${i+2}::jsonb")
+            values.append(json.dumps(value))
+        else:
+            set_parts.append(f"{key} = ${i+2}")
+            values.append(value)
     query = f"UPDATE {table} SET {', '.join(set_parts)} WHERE id = $1 RETURNING *"
-    return query, [UUID(doc_id)] + list(data.values())
+    return query, values
 
 
 async def update_document(

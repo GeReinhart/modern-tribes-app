@@ -1,4 +1,7 @@
 from html.parser import HTMLParser
+import json
+from datetime import datetime, timezone
+from uuid import UUID
 
 
 class _ContentSummaryParser(HTMLParser):
@@ -24,6 +27,36 @@ class _ContentSummaryParser(HTMLParser):
         if self._in_header:
             self._header_parts.append(data)
         self._plain_parts.append(data)
+
+
+async def update_document_content_with_revision(pool, document_id: str, content_html: str, user_id: str) -> None:
+    """Fetch current document, snapshot it into revisions, then update content_html."""
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT content_html, updated_at, updated_by, revisions FROM documents WHERE id = $1",
+            UUID(document_id)
+        )
+        if not row:
+            return
+
+        revisions_raw = row["revisions"]
+        current_revisions = json.loads(revisions_raw) if isinstance(revisions_raw, str) else (revisions_raw or [])
+        updated_at = row["updated_at"]
+        current_revisions.append({
+            "content_html": row["content_html"],
+            "updated_at": updated_at.isoformat() if hasattr(updated_at, "isoformat") else str(updated_at),
+            "updated_by": str(row["updated_by"]) if row["updated_by"] else None,
+        })
+
+        await conn.execute(
+            "UPDATE documents SET content_html = $1, content_summary = $2, updated_at = $3, updated_by = $4, revisions = $5::jsonb WHERE id = $6",
+            content_html,
+            extract_content_summary(content_html),
+            datetime.now(timezone.utc),
+            UUID(user_id),
+            json.dumps(current_revisions),
+            UUID(document_id),
+        )
 
 
 def extract_content_summary(html: str) -> str:

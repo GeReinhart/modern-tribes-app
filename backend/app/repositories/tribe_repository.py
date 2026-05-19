@@ -4,6 +4,7 @@ from uuid import UUID
 
 from ..models.app.tribes_with_positions import PersonWithPosition
 from ..utils.db_helpers import row_to_dict
+from ..utils.document_helpers import update_document_content_with_revision
 
 
 async def get_tribe_by_id(pool, tribe_id: str) -> dict | None:
@@ -86,11 +87,7 @@ async def update_tribe_document_id(pool, tribe_id: str, document_id: str, user_i
 
 
 async def update_tribe_document_content(pool, document_id: str, content_html: str, user_id: str) -> None:
-    async with pool.acquire() as conn:
-        await conn.execute(
-            "UPDATE documents SET content_html = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
-            content_html, datetime.now(timezone.utc), UUID(user_id), UUID(document_id)
-        )
+    await update_document_content_with_revision(pool, document_id, content_html, user_id)
 
 
 async def create_positions(pool, tribe_id: str, positions_data: list, user_id: str) -> list[dict]:

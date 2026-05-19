@@ -23,6 +23,7 @@ import {MonitoringPage} from "@/pages/admin/MonitoringPage.tsx";
 import {MailsPage} from "@/pages/admin/MailsPage.tsx";
 import {PeopleManagementPage} from "@/pages/admin/PeopleManagementPage.tsx";
 import {UserEditPage} from "@/pages/admin/UserEditPage.tsx";
+import {DocumentRevisionsPage} from "@/pages/admin/DocumentRevisionsPage.tsx";
 
 function AuthBootstrapApp() {
     return (
@@ -54,6 +55,8 @@ function AuthBootstrapApp() {
                                 <Route path="/admin/projects" element={<Navigate to="/admin/tribes" replace/>}/>
                                 <Route path="/admin/documents" element={<DocumentsCrudPage/>}/>
                 <Route path="/admin/monitoring" element={<MonitoringPage/>}/>
+                                <Route path="/admin/monitoring/documents/:documentId" element={<DocumentRevisionsPage/>}/>
+                                <Route path="/admin/monitoring/documents/:documentId/updated_at/:date" element={<DocumentRevisionsPage/>}/>
                                 <Route path="/admin/mails" element={<MailsPage/>}/>
 
                             <Route path="/app" element={<Navigate to="/app/tribes" replace/>}/>

@@ -80,7 +80,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         padding: '12px 24px',
         cursor: clickable ? 'pointer' : 'default',
         color: isLast ? theme.colors.primary : theme.colors.text,
-        fontSize: '27px',
+        fontSize: 'calc(var(--btn-font) * 0.9)',
         fontWeight: isLast ? 600 : 400,
         borderLeft: isLast ? `3px solid ${theme.colors.primary}` : '3px solid transparent',
         transition: 'background-color 0.15s ease',
