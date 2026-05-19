@@ -167,9 +167,9 @@ export const getBadgeStyle = (theme: Theme, variant: keyof Theme['colors'] = 'se
     margin: '0 var(--space-xs)',
 });
 
-export const getPositionBadgeStyle = (theme: Theme, type: 'chief' | 'member' | 'guest'): CSSProperties => {
+export const getPositionBadgeStyle = (theme: Theme, type: 'manager' | 'member' | 'guest'): CSSProperties => {
     const colors = {
-        chief: theme.colors.accent,
+        manager: theme.colors.accent,
         member: theme.colors.primary,
         guest: theme.colors.ghost,
     };

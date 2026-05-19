@@ -46,6 +46,7 @@ class UserResponse(BaseModel):
     email: EmailStr
     permissions: Optional[List[str]] = []
     created_at: datetime
+    language: str = 'en'
 
 class SessionResponse(BaseModel):
     session_id: str

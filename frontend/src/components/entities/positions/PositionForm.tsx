@@ -65,7 +65,7 @@ export const PositionForm: React.FC<PositionFormProps> = ({
     ];
 
     const positionOptions = [
-        { value: 'chief', label: 'Chief' },
+        { value: 'manager', label: 'Manager' },
         { value: 'member', label: 'Member' },
         { value: 'guest', label: 'guest' },
     ];

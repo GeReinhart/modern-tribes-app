@@ -30,8 +30,12 @@ export default function LoginPage() {
             setSentEmail(email);
             setSuccess(true);
             setEmail('');
-        } catch (err) {
-            setError(err instanceof Error ? err.message : t('validation.errorOccurred'));
+        } catch (err: any) {
+            if (err?.status === 404) {
+                setError(t('auth.emailNotFound'));
+            } else {
+                setError(t('validation.errorOccurred'));
+            }
         } finally {
             setIsLoading(false);
         }

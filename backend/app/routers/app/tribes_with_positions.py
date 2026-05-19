@@ -32,7 +32,7 @@ async def get_tribe_with_positions(tribe_id: str, current_user: dict = Depends(g
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def update_tribe_with_positions(tribe_id: str, data: TribeWithPositionsUpdate, current_user: dict = Depends(get_current_user)):
     pool = get_database()
-    await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position="chief")
+    await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position="manager")
     return await tribe_service.update_tribe_with_positions(tribe_id, data, pool, current_user)
 
 
@@ -40,5 +40,5 @@ async def update_tribe_with_positions(tribe_id: str, data: TribeWithPositionsUpd
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def archive_tribe(tribe_id: str, current_user: dict = Depends(get_current_user)):
     pool = get_database()
-    await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position="chief")
+    await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position="manager")
     await tribe_service.archive_tribe(tribe_id, pool, current_user)

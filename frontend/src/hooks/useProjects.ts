@@ -1,6 +1,14 @@
+import { useState, useEffect, useCallback } from 'react';
 import { projectService } from '../services/project.service';
 import { Project, ProjectCreate, ProjectUpdate } from '../types/project.types';
+import { UserProjectEntry } from '../types/queries/projects.query.types';
+import {
+    ProjectWithDocumentCreate,
+    ProjectWithDocumentUpdate,
+    ProjectWithDocumentResponse,
+} from '../types/app/project_with_document.types';
 import { createEntityHooks } from './useEntityCrud';
+import { useApi } from './useApi';
 
 const { useList, useById, useMutations } = createEntityHooks<Project, ProjectCreate, ProjectUpdate>(projectService, 'projects');
 
@@ -17,4 +25,89 @@ export function useProject(id: string | null) {
 export function useProjectMutations() {
     const { create: createProject, update: updateProject, remove: deleteProject, ...rest } = useMutations();
     return { createProject, updateProject, deleteProject, ...rest };
+}
+
+export function useUserProjects(userId: string, options: { enabled?: boolean } = {}) {
+    const [projects, setProjects] = useState<UserProjectEntry[]>([]);
+    const { loading, error, execute } = useApi<UserProjectEntry[]>();
+
+    const fetch = useCallback(() => {
+        if (!userId) return;
+        execute(() => projectService.getByUser(userId)).then(data => {
+            if (data) setProjects(data);
+        });
+    }, [userId, execute]);
+
+    useEffect(() => {
+        if (options.enabled !== false) fetch();
+    }, [fetch, options.enabled]);
+
+    return { projects, loading, error, refetch: fetch };
+}
+
+export function useUserProjectsByTribe(tribeId: string, userId: string, options: { enabled?: boolean } = {}) {
+    const [projects, setProjects] = useState<UserProjectEntry[]>([]);
+    const { loading, error, execute } = useApi<UserProjectEntry[]>();
+
+    const fetch = useCallback(() => {
+        if (!tribeId || !userId) return;
+        execute(() => projectService.getByTribeForUser(tribeId, userId)).then(data => {
+            if (data) setProjects(data);
+        });
+    }, [tribeId, userId, execute]);
+
+    useEffect(() => {
+        if (options.enabled !== false) fetch();
+    }, [fetch, options.enabled]);
+
+    return { projects, loading, error, refetch: fetch };
+}
+
+export function useProjectWithDocument(projectId: string | null) {
+    const [project, setProject] = useState<ProjectWithDocumentResponse | null>(null);
+    const { loading, error, execute } = useApi<ProjectWithDocumentResponse>();
+
+    const fetch = useCallback(() => {
+        if (!projectId) return;
+        execute(() => projectService.getWithDocument(projectId)).then(data => {
+            if (data) setProject(data);
+        });
+    }, [projectId, execute]);
+
+    useEffect(() => { fetch(); }, [fetch]);
+
+    return { project, loading, error, refetch: fetch };
+}
+
+export function useProjectWithDocumentMutations() {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const createProjectWithDocument = useCallback(async (data: ProjectWithDocumentCreate): Promise<ProjectWithDocumentResponse | null> => {
+        setLoading(true);
+        setError(null);
+        try {
+            return await projectService.createWithDocument(data);
+        } catch (e: any) {
+            setError(e.message || 'Error');
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const updateProjectWithDocument = useCallback(async (projectId: string, data: ProjectWithDocumentUpdate): Promise<ProjectWithDocumentResponse | null> => {
+        setLoading(true);
+        setError(null);
+        try {
+            return await projectService.updateWithDocument(projectId, data);
+        } catch (e: any) {
+            setError(e.message || 'Error');
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    return { createProjectWithDocument, updateProjectWithDocument, loading, error };
 }

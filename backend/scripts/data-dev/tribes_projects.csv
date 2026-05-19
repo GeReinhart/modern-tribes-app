@@ -1,0 +1,25 @@
+tribe,project,relation
+The Smith Family,Summer BBQ,manager
+The Smith Family,Holiday Gift Exchange,member
+The Smith Family,Annual Camping Trip,guest
+Downtown Friends,Summer BBQ,member
+Downtown Friends,Community Garden,manager
+Downtown Friends,Local Sports Tournament,member
+The Johnson Clan,Book of the Month,manager
+The Johnson Clan,Holiday Gift Exchange,member
+Game Night Crew,Movie Night Series,manager
+Game Night Crew,Local Sports Tournament,member
+The Williams Dynasty,Charity Marathon,manager
+The Williams Dynasty,Home Renovation Help,member
+Hiking Buddies,Annual Camping Trip,manager
+Hiking Buddies,Charity Marathon,member
+Hiking Buddies,Community Garden,guest
+The Brown Household,Cooking Workshop,manager
+The Brown Household,Home Renovation Help,member
+Book Club Circle,Book of the Month,manager
+Book Club Circle,Movie Night Series,member
+The Martinez Family,Cooking Workshop,member
+The Martinez Family,Summer BBQ,guest
+Sports Enthusiasts,Local Sports Tournament,manager
+Sports Enthusiasts,Charity Marathon,member
+Sports Enthusiasts,Annual Camping Trip,member

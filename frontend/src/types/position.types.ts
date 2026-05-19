@@ -1,4 +1,4 @@
-export type PositionEnum = 'chief' | 'member' | 'guest' ;
+export type PositionEnum = 'manager' | 'member' | 'guest';
 
 export interface PositionBase {
     tribe_id: string | null;

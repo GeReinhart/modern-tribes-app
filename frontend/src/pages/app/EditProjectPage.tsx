@@ -1,0 +1,160 @@
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { ThemedCard } from '@/components/common/layout/ThemedCard';
+import { ThemedText } from '@/components/common/layout/ThemedText';
+import { ThemedButton } from '@/components/common/form/ThemedButton';
+import { ThemedSection } from '@/components/common/layout/ThemedSection';
+import { ThemedLoadingOverlay } from '@/components/common/layout/ThemedLoadingOverlay';
+import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
+import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
+import FileUploader from '@/components/common/editor/FileUploader';
+import { AttachmentFile } from '@/types/document.types';
+import { useProjectWithDocument, useProjectWithDocumentMutations } from '@/hooks/useProjects';
+import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
+import { errorStyle, formActionsStyle, formContainerStyle, getInputStyle } from '@/styles/theme.styles';
+
+const EditProjectPageContent: React.FC = () => {
+    const { t } = useTranslation();
+    const { theme } = useTheme();
+    const navigate = useNavigate();
+    const { tribeId, projectId } = useParams<{ tribeId: string; projectId: string }>();
+
+    const { tribe } = useTribeWithPositions(tribeId || null);
+    const { project, loading: loadingProject } = useProjectWithDocument(projectId || null);
+    const { updateProjectWithDocument, loading } = useProjectWithDocumentMutations();
+
+    const [name, setName] = useState('');
+    const [documentContent, setDocumentContent] = useState('');
+    const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
+    const [error, setError] = useState<string | null>(null);
+    const [submitting, setSubmitting] = useState(false);
+    const [initialized, setInitialized] = useState(false);
+
+    const inputStyle = getInputStyle(theme);
+
+    useEffect(() => {
+        if (project && !initialized) {
+            setName(project.name);
+            setDocumentContent(project.document_content_html);
+            setAttachments(project.document_attachments);
+            setInitialized(true);
+        }
+    }, [project, initialized]);
+
+    const breadcrumbs = [
+        { label: t('common.home'), path: '/app' },
+        { label: t('tribes.title'), path: '/app/tribes' },
+        { label: tribe?.name || t('common.loading'), path: `/app/tribes/${tribeId}` },
+        { label: project?.name || t('common.loading'), path: `/app/tribes/${tribeId}/projects/${projectId}` },
+        { label: t('projects.editProject') },
+    ];
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!name.trim()) { setError(t('projects.name').replace(' *', '') + ' is required'); return; }
+        if (!projectId) return;
+        setSubmitting(true);
+        setError(null);
+        try {
+            const result = await updateProjectWithDocument(projectId, {
+                name: name.trim(),
+                document_content_html: documentContent,
+                document_attachments: attachments,
+            });
+            if (!result) throw new Error('Failed to update project');
+            navigate(`/app/tribes/${tribeId}/projects/${projectId}`);
+        } catch (err: any) {
+            setError(err.message || t('validation.errorOccurred'));
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    if (loadingProject) {
+        return (
+            <AppLayout breadcrumbs={breadcrumbs}>
+                <ThemedLoadingSpinner />
+            </AppLayout>
+        );
+    }
+
+    if (!project) {
+        return (
+            <AppLayout breadcrumbs={breadcrumbs}>
+                <ThemedCard>
+                    <div style={errorStyle}><strong>{t('common.error')}</strong> {t('projects.notFound')}</div>
+                </ThemedCard>
+            </AppLayout>
+        );
+    }
+
+    return (
+        <AppLayout
+            breadcrumbs={breadcrumbs}
+            headerActions={
+                <ThemedButton variant="secondary" onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}`)}>
+                    {t('common.cancel')}
+                </ThemedButton>
+            }
+        >
+            {submitting && (
+                <ThemedLoadingOverlay message={t('projects.updating')} />
+            )}
+
+            {error && <div style={errorStyle}><strong>{t('common.error')}</strong> {error}</div>}
+
+            <form onSubmit={handleSubmit}>
+                <div style={formContainerStyle}>
+                    <ThemedSection themeId="main_1">
+                        <label>
+                            <ThemedText size="medium" as="h3">{t('projects.name')}</ThemedText>
+                            <input
+                                type="text"
+                                style={inputStyle}
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                                placeholder={t('projects.name').replace(' *', '')}
+                                disabled={submitting || loading}
+                            />
+                        </label>
+
+                        <ThemedText size="medium" as="h3" style={{ marginTop: '16px' }}>
+                            {t('projects.description')}
+                        </ThemedText>
+                        <div className="border border-gray-300 rounded-lg overflow-hidden">
+                            <JoditEditorComponent content={documentContent} onChange={setDocumentContent} />
+                        </div>
+                        <div className="mb-6">
+                            <FileUploader
+                                attachments={attachments}
+                                onAttachmentsChange={setAttachments}
+                                maxFiles={5}
+                                maxFileSize={10}
+                            />
+                        </div>
+                    </ThemedSection>
+
+                    <div style={formActionsStyle}>
+                        <ThemedButton
+                            variant="secondary"
+                            onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}`)}
+                            disabled={submitting}
+                        >
+                            {t('common.cancel')}
+                        </ThemedButton>
+                        <ThemedButton type="submit" variant="primary" isLoading={submitting || loading} disabled={submitting || loading}>
+                            {t('common.update')}
+                        </ThemedButton>
+                    </div>
+                </div>
+            </form>
+        </AppLayout>
+    );
+};
+
+export const EditProjectPage: React.FC = () => (
+    <ThemeProvider defaultTheme="default"><EditProjectPageContent /></ThemeProvider>
+);

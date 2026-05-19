@@ -1,5 +1,11 @@
 import { apiService } from './api.service';
 import { Project, ProjectCreate, ProjectUpdate } from '../types/project.types';
+import { UserProjectEntry } from '../types/queries/projects.query.types';
+import {
+    ProjectWithDocumentCreate,
+    ProjectWithDocumentUpdate,
+    ProjectWithDocumentResponse,
+} from '../types/app/project_with_document.types';
 
 class ProjectService {
     private endpoint = '/crud/projects';
@@ -23,6 +29,26 @@ class ProjectService {
 
     async delete(id: string): Promise<void> {
         return apiService.delete<void>(`${this.endpoint}/${id}`);
+    }
+
+    async getByUser(userId: string): Promise<UserProjectEntry[]> {
+        return apiService.get<UserProjectEntry[]>(`/query/projects/by/user/${userId}`);
+    }
+
+    async getByTribeForUser(tribeId: string, userId: string): Promise<UserProjectEntry[]> {
+        return apiService.get<UserProjectEntry[]>(`/query/projects/by/tribe/${tribeId}/for/user/${userId}`);
+    }
+
+    async createWithDocument(data: ProjectWithDocumentCreate): Promise<ProjectWithDocumentResponse> {
+        return apiService.post<ProjectWithDocumentResponse>('/projects/with-document', data);
+    }
+
+    async getWithDocument(projectId: string): Promise<ProjectWithDocumentResponse> {
+        return apiService.get<ProjectWithDocumentResponse>(`/projects/${projectId}/with-document`);
+    }
+
+    async updateWithDocument(projectId: string, data: ProjectWithDocumentUpdate): Promise<ProjectWithDocumentResponse> {
+        return apiService.put<ProjectWithDocumentResponse>(`/projects/${projectId}/with-document`, data);
     }
 }
 

@@ -4,9 +4,9 @@ import {
     Tribe,
     TribeCreate,
     TribeUpdate,
+    TribeProject,
     TribeWithPersonsWithPosition,
     TribeWithPositions,
-    TribeWithProjects
 } from '../types/tribe.types';
 import { useApi } from './useApi';
 import {UserPersonPositionTribe} from "@/types/queries/tribes.query.types.ts";
@@ -118,15 +118,24 @@ export function useTribePersonsPosition(id: string ) {
 
 
 export function useTribeProjects(id: string | null) {
-    const { data: tribeProjects, loading, error, execute } = useApi<TribeWithProjects>();
+    const [tribeProjects, setTribeProjects] = useState<TribeProject[]>([]);
+    const [hasFetched, setHasFetched] = useState(!id);
+    const { loading, error, execute } = useApi<TribeProject[]>();
 
-    useEffect(() => {
-        if (id) {
-            execute(() => tribeService.getTribeProjects(id));
+    const fetch = useCallback(async () => {
+        if (!id) { setHasFetched(true); return; }
+        try {
+            const data = await execute(() => tribeService.getTribeProjects(id));
+            if (data) setTribeProjects(data);
+        } catch (err) {
+            console.error('Error fetching tribe projects:', err);
         }
+        setHasFetched(true);
     }, [id, execute]);
 
-    return { tribeProjects, loading, error };
+    useEffect(() => { fetch(); }, [fetch]);
+
+    return { tribeProjects, loading, hasFetched, error };
 }
 
 export function useTribeMutations() {

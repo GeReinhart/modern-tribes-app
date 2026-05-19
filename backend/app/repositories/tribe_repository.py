@@ -16,11 +16,36 @@ async def create_tribe(pool, name: str, document_id: str, user_id: str) -> dict:
     now = datetime.now(timezone.utc)
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            """INSERT INTO tribes (name, document_id, project_ids, created_at, updated_at, created_by, updated_by)
-               VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING *""",
-            name, UUID(document_id), [], now, now, UUID(user_id)
+            """INSERT INTO tribes (name, document_id, created_at, updated_at, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $5, $5) RETURNING *""",
+            name, UUID(document_id), now, now, UUID(user_id)
         )
     return row_to_dict(row)
+
+
+async def get_tribe_projects(pool, tribe_id: str) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch("""
+            SELECT tp.id, tp.tribe_id, tp.project_id, tp.relation, tp.created_at,
+                   p.name AS project_name
+            FROM tribes_projects tp
+            JOIN projects p ON p.id = tp.project_id
+            WHERE tp.tribe_id = $1
+        """, UUID(tribe_id))
+    return [row_to_dict(row) for row in rows] if rows else []
+
+
+async def sync_tribe_projects(pool, tribe_id: str, projects: list) -> list[dict]:
+    now = datetime.now(timezone.utc)
+    async with pool.acquire() as conn:
+        await conn.execute("DELETE FROM tribes_projects WHERE tribe_id = $1", UUID(tribe_id))
+        for proj in projects:
+            await conn.execute(
+                """INSERT INTO tribes_projects (tribe_id, project_id, relation, created_at)
+                   VALUES ($1, $2, $3, $4)""",
+                UUID(tribe_id), UUID(proj["project_id"]), proj["relation"], now
+            )
+    return await get_tribe_projects(pool, tribe_id)
 
 
 async def delete_tribe(pool, tribe_id: str) -> None:

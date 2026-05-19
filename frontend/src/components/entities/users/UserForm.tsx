@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { User, UserCreate, UserUpdate } from '@/types/user.types.ts';
 import { useRoles } from '@/hooks/useRoles.ts';
 import { usePersons } from '@/hooks/usePersons.ts';
@@ -18,6 +19,7 @@ interface UserFormProps {
 }
 
 export const UserForm: React.FC<UserFormProps> = ({ user, mode, onSubmit, onCancel, initialRepresentPersonIds }) => {
+    const { t } = useTranslation();
     const { theme } = useTheme();
     const { roles, loading: rolesLoading } = useRoles();
     const { persons, loading: personsLoading } = usePersons();
@@ -32,14 +34,16 @@ export const UserForm: React.FC<UserFormProps> = ({ user, mode, onSubmit, onCanc
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const [representPersonIds, setRepresentPersonIds] = useState<string[]>([]);
+    // Initialize synchronously when already available (edit page), fall back to effect for modal (async load)
+    const [representPersonIds, setRepresentPersonIds] = useState<string[]>(initialRepresentPersonIds ?? []);
     const [representFilter, setRepresentFilter] = useState('');
-    const [showOnlySelected, setShowOnlySelected] = useState(true);
-    const representsInitialized = useRef(false);
+    const [showOnlySelected, setShowOnlySelected] = useState((initialRepresentPersonIds?.length ?? 0) > 0);
+    const representsInitialized = useRef(initialRepresentPersonIds !== undefined);
 
     useEffect(() => {
         if (!representsInitialized.current && initialRepresentPersonIds !== undefined) {
             setRepresentPersonIds(initialRepresentPersonIds);
+            setShowOnlySelected(initialRepresentPersonIds.length > 0);
             representsInitialized.current = true;
         }
     }, [initialRepresentPersonIds]);
@@ -47,7 +51,7 @@ export const UserForm: React.FC<UserFormProps> = ({ user, mode, onSubmit, onCanc
     const isViewMode = mode === 'view';
     const showRepresents = mode !== 'create';
 
-    const roleOptions = roles.map(role => ({ value: role.id, label: role.name }));
+    const roleOptions = roles.map(role => ({ value: role.id, label: t(`roles.${role.name}`, { defaultValue: role.name }) }));
     const personOptions = persons.map(person => ({ value: person.id, label: `${person.first_name} ${person.last_name}` }));
 
     const filteredPersonsForRepresents = useMemo(() => {

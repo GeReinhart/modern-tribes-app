@@ -14,6 +14,7 @@ interface MailDetailModalProps {
 }
 
 function MailStatusBadge({ mailStatus }: { mailStatus: string }) {
+    const { t } = useTranslation();
     const { theme } = useTheme();
     const color = mailStatus === 'sent' ? theme.colors.primary : theme.colors.secondary;
     return (
@@ -26,7 +27,7 @@ function MailStatusBadge({ mailStatus }: { mailStatus: string }) {
             color: 'white',
             backgroundColor: color,
         }}>
-            {mailStatus}
+            {t(`mail_status.${mailStatus}`, { defaultValue: mailStatus })}
         </span>
     );
 }

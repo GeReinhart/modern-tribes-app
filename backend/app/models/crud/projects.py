@@ -5,7 +5,7 @@ from datetime import datetime
 
 class ProjectBase(BaseModel):
     name: str
-    document_id: str
+    document_id: Optional[str] = None
 
 
 class ProjectCreate(ProjectBase):

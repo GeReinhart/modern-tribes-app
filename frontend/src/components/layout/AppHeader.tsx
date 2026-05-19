@@ -69,18 +69,18 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         zIndex: 1000,
         backgroundColor: theme.colors.surface,
         border: `2px solid ${theme.colors.border}`,
-        borderRadius: '8px',
+        borderRadius: '12px',
         boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-        minWidth: '220px',
-        marginTop: 'var(--space-sm)',
+        minWidth: '330px',
+        marginTop: '12px',
         overflow: 'hidden',
     };
 
     const menuNavItemStyle = (clickable: boolean, isLast: boolean): React.CSSProperties => ({
-        padding: 'var(--space-sm) var(--space-md)',
+        padding: '12px 24px',
         cursor: clickable ? 'pointer' : 'default',
         color: isLast ? theme.colors.primary : theme.colors.text,
-        fontSize: 'var(--font-md)',
+        fontSize: '27px',
         fontWeight: isLast ? 600 : 400,
         borderLeft: isLast ? `3px solid ${theme.colors.primary}` : '3px solid transparent',
         transition: 'background-color 0.15s ease',
@@ -89,14 +89,21 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     const menuSeparatorStyle: React.CSSProperties = {
         height: '1px',
         backgroundColor: theme.colors.border,
-        margin: 'var(--space-xs) 0',
+        margin: '6px 0',
     };
 
     const menuActionsStyle: React.CSSProperties = {
         display: 'flex',
         flexDirection: 'column',
-        gap: 'var(--space-xs)',
-        padding: 'var(--space-sm) var(--space-md)',
+        gap: '6px',
+        padding: '12px 24px',
+    };
+
+    const menuSecondaryActionsStyle: React.CSSProperties = {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: '6px',
+        padding: '12px 24px',
     };
 
     const handleNavItem = (path?: string) => {
@@ -144,22 +151,27 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                             );
                         })}
 
-                        {/* Separator between nav items and actions */}
-                        {breadcrumbs && breadcrumbs.length > 0 && (actions || secondaryActions) && (
+                        {/* Separator between breadcrumbs and current page actions */}
+                        {breadcrumbs && breadcrumbs.length > 0 && (secondaryActions || actions) && (
                             <div style={menuSeparatorStyle} />
                         )}
 
-                        {/* Primary actions */}
-                        {actions && (
-                            <div style={menuActionsStyle}>
-                                {actions}
+                        {/* Current page actions */}
+                        {secondaryActions && (
+                            <div style={menuSecondaryActionsStyle} onClick={() => setIsMenuOpen(false)}>
+                                {secondaryActions}
                             </div>
                         )}
 
-                        {/* Secondary actions */}
-                        {secondaryActions && (
-                            <div style={menuActionsStyle}>
-                                {secondaryActions}
+                        {/* Separator between current page actions and admin nav */}
+                        {secondaryActions && actions && (
+                            <div style={menuSeparatorStyle} />
+                        )}
+
+                        {/* Admin navigation */}
+                        {actions && (
+                            <div style={menuActionsStyle} onClick={() => setIsMenuOpen(false)}>
+                                {actions}
                             </div>
                         )}
                     </div>

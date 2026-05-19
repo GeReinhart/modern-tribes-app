@@ -5,7 +5,7 @@ from enum import Enum
 
 
 class PositionEnum(str, Enum):
-    CHIEF = "chief"
+    MANAGER = "manager"
     MEMBER = "member"
     GUEST = "guest"
 
@@ -41,7 +41,7 @@ class Position(PositionBase):
                 "id": "507f1f77bcf86cd799439014",
                 "tribe_ids": "507f1f77bcf86cd799439015",
                 "person_id": "507f1f77bcf86cd799439016",
-                "position": "chief",
+                "position": "manager",
                 "created_at": "2024-01-01T00:00:00",
                 "updated_at": "2024-01-01T00:00:00"
             }

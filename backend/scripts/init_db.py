@@ -61,12 +61,12 @@ class DatabaseInitializer:
                 """)
                 await conn.execute("""
                     INSERT INTO alembic_version (version_num)
-                    VALUES ('001')
+                    VALUES ('012')
                     ON CONFLICT DO NOTHING
                 """)
 
             print("✓ Database schema initialized")
-            print("✓ Alembic stamped at revision 001")
+            print("✓ Alembic stamped at revision 012")
         except FileNotFoundError:
             print(f"✗ Schema file not found: {schema_file}")
             sys.exit(1)
@@ -78,8 +78,12 @@ class DatabaseInitializer:
         tables = [
             "document_entities",
             "label_entities",
+            "mails_to",
+            "mails",
+            "tribes_projects",
             "tribe_projects",
             "positions",
+            "represents",
             "user_sessions",
             "user_roles",
             "role_permissions",
@@ -94,10 +98,13 @@ class DatabaseInitializer:
         ]
         async with self.pool.acquire() as conn:
             for table in tables:
-                result = await conn.execute(f"DELETE FROM {table}")
-                count = int(result.split()[-1])
-                if count > 0:
-                    print(f"✓ Cleared {table} table ({count} rows)")
+                try:
+                    result = await conn.execute(f"DELETE FROM {table}")
+                    count = int(result.split()[-1])
+                    if count > 0:
+                        print(f"✓ Cleared {table} table ({count} rows)")
+                except Exception:
+                    pass  # table may not exist in current schema version
 
     async def create_permissions(self) -> Dict[str, str]:
         rows = self.load_csv("permissions.csv")
@@ -200,6 +207,45 @@ class DatabaseInitializer:
         print(f"✓ Created {len(user_ids)} users")
         return user_ids
 
+    async def create_projects(self) -> Dict[str, str]:
+        rows = self.load_csv("projects.csv")
+        project_ids: Dict[str, str] = {}
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                r = await conn.fetchrow(
+                    "INSERT INTO projects (name, description) VALUES ($1, $2) RETURNING id",
+                    row["name"],
+                    row.get("description") or None,
+                )
+                project_ids[row["name"]] = str(r["id"])
+        print(f"✓ Created {len(project_ids)} projects")
+        return project_ids
+
+    async def create_tribes_projects(
+        self, tribe_ids: Dict[str, str], project_ids: Dict[str, str]
+    ) -> int:
+        rows = self.load_csv("tribes_projects.csv")
+        count = 0
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                tribe_name = row["tribe"]
+                project_name = row["project"]
+                if tribe_name not in tribe_ids:
+                    print(f"✗ Unknown tribe '{tribe_name}' in tribes_projects.csv")
+                    sys.exit(1)
+                if project_name not in project_ids:
+                    print(f"✗ Unknown project '{project_name}' in tribes_projects.csv")
+                    sys.exit(1)
+                await conn.execute(
+                    "INSERT INTO tribes_projects (tribe_id, project_id, relation) VALUES ($1, $2, $3)",
+                    tribe_ids[tribe_name],
+                    project_ids[project_name],
+                    row["relation"],
+                )
+                count += 1
+        print(f"✓ Created {count} tribe-project relations")
+        return count
+
     async def create_positions(
         self, tribe_ids: Dict[str, str], person_ids: Dict[str, str]
     ) -> List[str]:
@@ -240,8 +286,10 @@ class DatabaseInitializer:
             role_ids = await self.create_roles(permission_ids)
             person_ids = await self.create_persons()
             tribe_ids = await self.create_tribes()
+            project_ids = await self.create_projects()
             user_ids = await self.create_users(role_ids, person_ids)
             position_ids = await self.create_positions(tribe_ids, person_ids)
+            tribes_projects_count = await self.create_tribes_projects(tribe_ids, project_ids)
 
             print("\n✅ Database initialization completed successfully!\n")
             print("📊 Summary:")
@@ -249,8 +297,10 @@ class DatabaseInitializer:
             print(f"   • Roles: {len(role_ids)}")
             print(f"   • Persons: {len(person_ids)}")
             print(f"   • Tribes: {len(tribe_ids)}")
+            print(f"   • Projects: {len(project_ids)}")
             print(f"   • Users: {len(user_ids)}")
             print(f"   • Positions: {len(position_ids)}")
+            print(f"   • Tribe-project relations: {tribes_projects_count}")
 
         except Exception as e:
             print(f"\n✗ Error during initialization: {e}")
