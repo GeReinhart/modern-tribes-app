@@ -2,6 +2,7 @@ import { useState, useRef, ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AttachmentFile } from '@/types/document.types.ts';
 import { uploadFile, formatFileSize } from '@/utils/uploadHelpers';
+import { useAppConfig } from '@/contexts/AppConfigContext';
 import {
     XMarkIcon,
     PaperClipIcon,
@@ -18,10 +19,13 @@ interface FileUploaderProps {
 const FileUploader = ({
                           attachments,
                           onAttachmentsChange,
-                          maxFiles = 10,
-                          maxFileSize = 10
+                          maxFiles: maxFilesProp,
+                          maxFileSize: maxFileSizeProp,
                       }: FileUploaderProps) => {
     const { t } = useTranslation();
+    const { config } = useAppConfig();
+    const maxFiles = maxFilesProp ?? config.uploadMaxFiles;
+    const maxFileSize = maxFileSizeProp ?? config.uploadMaxFileSizeMb;
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 

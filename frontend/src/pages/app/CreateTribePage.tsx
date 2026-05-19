@@ -326,8 +326,6 @@ const CreateTribeFormContent: React.FC = () => {
                                 <FileUploader
                                     attachments={formData.attachments}
                                     onAttachmentsChange={handleAttachmentsChange}
-                                    maxFiles={5}
-                                    maxFileSize={10}
                                 />
                             </div>
                         </label>

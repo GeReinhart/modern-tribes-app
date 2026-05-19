@@ -3,6 +3,7 @@ import JoditEditor from 'jodit-react';
 import { uploadImage } from '@/utils/uploadHelpers';
 import type { Jodit } from 'jodit';
 import { getAPIBaseUrl } from '@/config/env';
+import { useAppConfig } from '@/contexts/AppConfigContext';
 
 interface JoditEditorComponentProps {
     content: string;
@@ -11,6 +12,7 @@ interface JoditEditorComponentProps {
 
 const JoditEditorComponent = ({ content, onChange }: JoditEditorComponentProps) => {
     const editor = useRef(null);
+    const { config: appConfig } = useAppConfig();
 
     const config = useMemo(
         () => ({
@@ -18,7 +20,7 @@ const JoditEditorComponent = ({ content, onChange }: JoditEditorComponentProps) 
             minHeight: 600,
             uploader: {
                 insertImageAsBase64URI: false,
-                imagesExtensions: ['jpg', 'png', 'jpeg', 'gif', 'webp'],
+                imagesExtensions: appConfig.editorImageExtensions,
                 url: `${getAPIBaseUrl()}/uploads/image`,
                 format: 'json',
                 prepareData: function (formData: FormData) {
@@ -174,7 +176,7 @@ const JoditEditorComponent = ({ content, onChange }: JoditEditorComponentProps) 
                 'redo'
             ]
         }),
-        []
+        [appConfig.editorImageExtensions]
     );
 
     return (

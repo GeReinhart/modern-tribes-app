@@ -38,19 +38,22 @@ Features:
     - Power web app to install on mobile devices
     - Send emails
     - Rich text editor with files / images storage
+    - Storage of the different revisions of the documents
+    - Search full text on documents content
     - Database evolutions
     - Docker packaging
 - Functional Features
-    - Separate the user and the 
+    - Separate the user and the person
     - A user can represent several people
     - Roles management through roles that can be attached to the users
+
 
 
 
 ## Stack
 
 - **Backend**: Python / FastAPI
-- **Database**: PostgreSQL
+- **Database**: PostgreSQL (use JSONB and FullText Search)
 - **Frontend**: React / TypeScript / Vite / PWA
 - **Auth**: Magic link (passwordless) with JWT + refresh tokens
 
