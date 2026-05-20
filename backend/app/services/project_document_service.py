@@ -76,6 +76,13 @@ async def _build_response(pd_row: dict, pool) -> ProjectDocumentResponse:
     ]
     labels = await _get_document_labels(pool, str(pd_row["document_id"]))
 
+    async with pool.acquire() as conn:
+        pub_row = await conn.fetchrow(
+            "SELECT id FROM publications WHERE document_id = $1",
+            UUID(str(pd_row["document_id"]))
+        )
+    publication_id = str(pub_row["id"]) if pub_row else None
+
     return ProjectDocumentResponse(
         id=str(pd_row["id"]),
         project_id=str(pd_row["project_id"]),
@@ -86,6 +93,7 @@ async def _build_response(pd_row: dict, pool) -> ProjectDocumentResponse:
         attachments=attachments,
         labels=labels,
         status=pd_row["status"],
+        publication_id=publication_id,
         created_at=pd_row["created_at"],
         updated_at=pd_row["updated_at"],
         created_by=str(pd_row["created_by"]) if pd_row.get("created_by") else None,
@@ -164,9 +172,10 @@ async def list_project_documents(
     where_clause = " AND ".join(conditions)
     query = f"""
         SELECT pd.id, pd.document_id, pd.title, pd.status, pd.created_at, pd.updated_at,
-               d.content_summary
+               d.content_summary, pub.id AS publication_id
         FROM projects_documents pd
         JOIN documents d ON d.id = pd.document_id
+        LEFT JOIN publications pub ON pub.document_id = pd.document_id
         WHERE {where_clause}
         ORDER BY pd.updated_at DESC
     """
@@ -185,6 +194,7 @@ async def list_project_documents(
             content_summary=row["content_summary"],
             labels=labels,
             status=row["status"],
+            publication_id=str(row["publication_id"]) if row["publication_id"] else None,
             created_at=row["created_at"],
             updated_at=row["updated_at"],
         ))

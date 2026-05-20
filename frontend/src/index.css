@@ -9,6 +9,7 @@
     --space-md: 16px;
     --space-lg: 24px;
     --space-xl: 30px;
+    --font-xs: 12px;
     --font-sm: 14px;
     --font-md: 16px;
     --font-lg: 18px;
@@ -28,6 +29,7 @@
         --space-md: 8px;
         --space-lg: 12px;
         --space-xl: 16px;
+        --font-xs: 10px;
         --font-sm: 11px;
         --font-md: 13px;
         --font-lg: 14px;
@@ -38,6 +40,19 @@
         --header-pad: 8px 12px;
         --card-pad: 12px;
         --main-pad: 0 12px 12px;
+    }
+}
+
+/* Header logo responsive sizing */
+.header-logo svg {
+    width: 90px;
+    height: 90px;
+}
+
+@media (max-width: 768px) {
+    .header-logo svg {
+        width: 48px;
+        height: 48px;
     }
 }
 

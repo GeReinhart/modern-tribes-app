@@ -31,6 +31,7 @@ class ProjectDocumentSummary(BaseModel):
     content_summary: Optional[str] = None
     labels: List[LabelInfo] = []
     status: str
+    publication_id: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -45,6 +46,7 @@ class ProjectDocumentResponse(BaseModel):
     attachments: List[AttachmentFile] = []
     labels: List[LabelInfo] = []
     status: str
+    publication_id: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None

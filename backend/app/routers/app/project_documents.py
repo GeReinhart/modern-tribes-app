@@ -9,7 +9,7 @@ from ...models.app.project_document import (
     ProjectDocumentResponse, ProjectDocumentSummary, ProjectDocumentLabel,
 )
 from ...core.database import get_database
-from ...services import project_document_service
+from ...services import project_document_service, publication_service
 from ...utils.project_access import check_project_access_or_admin
 
 router = APIRouter(prefix="/project-documents", tags=["app_project_documents"])
@@ -88,6 +88,37 @@ async def archive_project_document(
     await project_document_service.archive_project_document(
         project_id, project_document_id, pool, current_user
     )
+    return None
+
+
+@router.patch(
+    "/projects/{project_id}/documents/{project_document_id}/publish",
+    status_code=status.HTTP_200_OK,
+)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def publish_project_document(
+    project_id: str,
+    project_document_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    pool = get_database()
+    await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
+    return await publication_service.publish_document(project_id, project_document_id, pool, current_user)
+
+
+@router.patch(
+    "/projects/{project_id}/documents/{project_document_id}/unpublish",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def unpublish_project_document(
+    project_id: str,
+    project_document_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    pool = get_database()
+    await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
+    await publication_service.unpublish_document(project_id, project_document_id, pool, current_user)
     return None
 
 

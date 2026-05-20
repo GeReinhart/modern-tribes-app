@@ -18,6 +18,7 @@ export interface ProjectDocumentSummary {
     content_summary: string | null;
     labels: LabelInfo[];
     status: string;
+    publication_id: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -32,6 +33,7 @@ export interface ProjectDocument {
     attachments: AttachmentFile[];
     labels: LabelInfo[];
     status: string;
+    publication_id: string | null;
     created_at: string;
     updated_at: string;
     created_by: string | null;

@@ -1,0 +1,8 @@
+subject,content_html,mail_type,mail_status,planned_at,sent_at
+Welcome to Modern Tribes,"<p>Welcome to <strong>Modern Tribes</strong>! We are excited to have you join our community platform.</p>",welcome,sent,2025-01-15 09:00:00,2025-01-15 09:01:00
+Summer BBQ: Registration Open,"<p>The <strong>Summer BBQ</strong> registration is now open. Please confirm your attendance before the end of the month.</p>",event_announcement,sent,2025-05-01 10:00:00,2025-05-01 10:00:00
+Monthly Activity Reminder,"<p>This is your friendly monthly reminder to check on your tribe projects and keep your profile up to date.</p>",reminder,sent,2025-04-01 08:00:00,2025-04-01 08:00:00
+Book Club: New Title Selected,"<p>The book club has chosen a new title for this month. Check the reading schedule document for details and session dates.</p>",announcement,sent,2025-03-15 11:00:00,2025-03-15 11:00:00
+Camping Trip: Final Reminder,"<p>The annual camping trip is just around the corner! Please review the packing list and safety procedures before departure.</p>",event_reminder,not_sent,2026-06-01 09:00:00,
+Marathon Training Kick-off,"<p>The charity marathon 12-week training plan starts next Monday. Join us in training for a great cause!</p>",announcement,not_sent,2026-06-15 10:00:00,
+Community Garden: Spring Season,"<p>The community garden spring season is starting. Come by to pick up your plot assignment and review the planting calendar.</p>",event_announcement,not_sent,2026-05-25 08:00:00,
