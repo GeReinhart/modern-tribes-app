@@ -32,7 +32,7 @@ from .routers.crud import (
 )
 from .routers.auth import authentification
 from .routers.auth import authorization
-from .routers.app import tribes_with_positions, project_with_document, project_features
+from .routers.app import tribes_with_positions, project_with_document, project_features, project_documents
 from .routers.query import (
     tribes as query_tribes,
     users as query_users,
@@ -133,6 +133,7 @@ app.include_router(authorization.router, prefix="/api", tags=["auth"])
 app.include_router(tribes_with_positions.router, prefix="/api")
 app.include_router(project_with_document.router, prefix="/api")
 app.include_router(project_features.router, prefix="/api")
+app.include_router(project_documents.router, prefix="/api")
 
 
 app.include_router(query_tribes.router, prefix="/api/query")
