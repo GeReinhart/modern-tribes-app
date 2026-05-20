@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedText } from '@/components/common/layout/ThemedText';
@@ -19,6 +19,7 @@ import { errorStyle, containerStyle } from '@/styles/theme.styles';
 import { Paperclip, Download, FileText, Image, Film, Music, File } from 'lucide-react';
 import { AttachmentFile } from '@/types/document.types';
 import { ProjectEntry } from '@/types/queries/projects.query.types';
+import { ProjectDocumentsTab } from '@/components/entities/projects/ProjectDocumentsTab';
 
 const getPositionVariant = (position: string): 'primary' | 'accent' | 'ghost' => {
     if (position === 'manager') return 'accent';
@@ -122,6 +123,7 @@ const ShowProjectPageContent: React.FC = () => {
     const { theme } = useTheme();
     const navigate = useNavigate();
     const { tribeId, projectId } = useParams<{ tribeId: string; projectId: string }>();
+    const [searchParams] = useSearchParams();
 
     const { user } = useCurrentUserProfile();
     const { tribe } = useTribeWithPositions(tribeId || null);
@@ -133,7 +135,8 @@ const ShowProjectPageContent: React.FC = () => {
     );
     const { features, createFeature, archiveFeature } = useProjectFeatures(projectId || null);
 
-    const [activeTab, setActiveTab] = useState('description');
+    const [activeTab, setActiveTab] = useState(() => searchParams.get('tab') || 'description');
+    const initialLabelId = searchParams.get('labelId') || null;
     const [showAddFeature, setShowAddFeature] = useState(false);
     const [archiveTarget, setArchiveTarget] = useState<{ id: string; name: string } | null>(null);
 
@@ -186,7 +189,10 @@ const ShowProjectPageContent: React.FC = () => {
     ], [tribe?.name, project?.name, tribeId, t]);
 
     const tabs = useMemo(() => {
-        const base = [{ key: 'description', label: t('tribes.tabDescription') }];
+        const base = [
+            { key: 'description', label: t('tribes.tabDescription') },
+            { key: 'documents', label: t('projectDocuments.tab') },
+        ];
         const featureTabs = features.map(f => ({ key: f.id, label: f.name }));
         return [...base, ...featureTabs];
     }, [features, t]);
@@ -280,6 +286,15 @@ const ShowProjectPageContent: React.FC = () => {
                 <ThemedTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
                 <div style={{ paddingTop: '16px' }}>
+                    {activeTab === 'documents' && projectId && tribeId && (
+                        <ProjectDocumentsTab
+                            projectId={projectId}
+                            tribeId={tribeId}
+                            canEdit={canEdit}
+                            initialLabelId={initialLabelId}
+                        />
+                    )}
+
                     {activeTab === 'description' && (
                         <>
                             {/* Description */}
