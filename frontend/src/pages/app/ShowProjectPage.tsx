@@ -374,22 +374,19 @@ const ShowProjectPageContent: React.FC = () => {
                     )}
 
                     {activeFeature && FeatureComponent && (
-                        <>
-                            {isManager && (
-                                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
-                                    <ThemedButton
-                                        variant="ghost"
-                                        onClick={() => setArchiveTarget({ id: activeFeature.id, name: activeFeature.name })}
-                                    >
-                                        {t('features.archive')}
-                                    </ThemedButton>
-                                </div>
-                            )}
-                            <FeatureComponent
-                                featureInstanceId={activeFeature.id}
-                                canEdit={canEdit}
-                            />
-                        </>
+                        <FeatureComponent
+                            featureInstanceId={activeFeature.id}
+                            canEdit={canEdit}
+                            actions={isManager ? (
+                                <button
+                                    onClick={() => setArchiveTarget({ id: activeFeature.id, name: activeFeature.name })}
+                                    title={t('features.archive')}
+                                    style={{ background: 'none', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', color: theme.colors.secondary, fontSize: '16px', padding: '4px 10px', lineHeight: 1 }}
+                                >
+                                    🗄
+                                </button>
+                            ) : undefined}
+                        />
                     )}
 
                     {activeFeature && !FeatureComponent && (
