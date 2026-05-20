@@ -1,0 +1,44 @@
+from pydantic import BaseModel
+from typing import Optional, List
+from datetime import datetime
+
+from .project_document import LabelInfo
+from ..uploads.files import AttachmentFile
+
+
+class PublicationSummary(BaseModel):
+    id: str
+    document_id: str
+    project_document_id: str
+    title: str
+    content_summary: Optional[str] = None
+    labels: List[LabelInfo] = []
+    published_at: datetime
+
+
+class PublicationDetail(BaseModel):
+    id: str
+    document_id: str
+    title: str
+    content_html: str
+    content_summary: Optional[str] = None
+    labels: List[LabelInfo] = []
+    attachments: List[AttachmentFile] = []
+    published_at: datetime
+    published_by_login: Optional[str] = None
+    author_name: Optional[str] = None
+
+
+class PublicationAdminItem(BaseModel):
+    id: str
+    document_id: str
+    project_document_id: str
+    title: str
+    content_summary: Optional[str] = None
+    labels: List[LabelInfo] = []
+    tribe_id: str
+    tribe_name: str
+    project_id: str
+    project_name: str
+    published_at: datetime
+    published_by_login: Optional[str] = None

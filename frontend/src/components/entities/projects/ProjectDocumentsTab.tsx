@@ -7,7 +7,7 @@ import { ThemedText } from '@/components/common/layout/ThemedText';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
 import { useProjectDocuments, useProjectDocumentLabels } from '@/hooks/useProjectDocuments';
 import { ProjectDocumentSummary } from '@/types/project-document.types';
-import { Search, Tag } from 'lucide-react';
+import { Search, Tag, Globe } from 'lucide-react';
 
 interface ProjectDocumentsTabProps {
     projectId: string;
@@ -170,9 +170,37 @@ export const ProjectDocumentsTab: React.FC<ProjectDocumentsTabProps> = ({
                         }
                     }}
                 >
-                    <ThemedText variant="primary" size="small" style={{ fontWeight: 600, marginBottom: '4px' }}>
-                        {doc.title}
-                    </ThemedText>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', marginBottom: '4px' }}>
+                        <ThemedText variant="primary" size="small" style={{ fontWeight: 600, flex: 1 }}>
+                            {doc.title}
+                        </ThemedText>
+                        {doc.publication_id && (
+                            <button
+                                type="button"
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    navigate(`/public/publications/${doc.publication_id}`);
+                                }}
+                                style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    padding: '2px 8px',
+                                    borderRadius: '10px',
+                                    fontSize: 'var(--font-xs)',
+                                    fontWeight: 600,
+                                    backgroundColor: `${theme.colors.primary}15`,
+                                    color: theme.colors.primary,
+                                    border: `1px solid ${theme.colors.primary}40`,
+                                    cursor: 'pointer',
+                                    flexShrink: 0,
+                                }}
+                            >
+                                <Globe size={11} />
+                                {t('publications.published')}
+                            </button>
+                        )}
+                    </div>
 
                     {doc.content_summary && (
                         <ThemedText variant="secondary" size="small" style={{ marginBottom: '8px' }}>

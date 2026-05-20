@@ -31,6 +31,9 @@ import {SearchPage} from "@/pages/app/SearchPage.tsx";
 import {AppConfigPage} from "@/pages/admin/AppConfigPage.tsx";
 import {FeaturesPage} from "@/pages/admin/FeaturesPage.tsx";
 import {AppConfigProvider} from "@/contexts/AppConfigContext.tsx";
+import {PublicationsAdminPage} from "@/pages/admin/PublicationsAdminPage.tsx";
+import {PublicationsPage} from "@/pages/public/PublicationsPage.tsx";
+import {PublicationDetailPage} from "@/pages/public/PublicationDetailPage.tsx";
 
 function AuthBootstrapApp() {
     return (
@@ -47,6 +50,8 @@ function AuthBootstrapApp() {
                     <Routes>
                         <Route path="/auth/login" element={<Login/>}/>
                         <Route path="/auth/verify" element={<Verify/>}/>
+                        <Route path="/public/publications" element={<PublicationsPage/>}/>
+                        <Route path="/public/publications/:publicationId" element={<PublicationDetailPage/>}/>
 
                         <Route element={<ProtectedRoute/>}>
 
@@ -68,6 +73,7 @@ function AuthBootstrapApp() {
                                 <Route path="/admin/monitoring/documents/:documentId" element={<DocumentRevisionsPage/>}/>
                                 <Route path="/admin/monitoring/documents/:documentId/updated_at/:date" element={<DocumentRevisionsPage/>}/>
                                 <Route path="/admin/mails" element={<MailsPage/>}/>
+                                <Route path="/admin/publications" element={<PublicationsAdminPage/>}/>
 
                             <Route path="/app" element={<Navigate to="/app/tribes" replace/>}/>
                             <Route path="/app/tribes" element={<TribesPage/>}/>

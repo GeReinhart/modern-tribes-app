@@ -82,8 +82,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         padding: '12px 24px',
         cursor: clickable ? 'pointer' : 'default',
         color: isLast ? theme.colors.primary : theme.colors.text,
-        fontSize: 'calc(var(--btn-font) * 0.9)',
-        fontWeight: isLast ? 600 : 400,
+        fontSize: 'calc(var(--btn-font) * 1.2)',
+        fontWeight: isLast ? 700 : 600,
         borderLeft: isLast ? `3px solid ${theme.colors.primary}` : '3px solid transparent',
         transition: 'background-color 0.15s ease',
     });
@@ -95,8 +95,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     };
 
     const menuActionsStyle: React.CSSProperties = {
-        display: 'flex',
-        flexDirection: 'column',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
         gap: '6px',
         padding: '12px 24px',
     };
@@ -121,6 +121,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             {/* Left - Logo (menu trigger) */}
             <div ref={menuRef} style={{ position: 'relative', flexShrink: 0 }}>
                 <div
+                    className="header-logo"
                     style={{ cursor: hasMenuContent ? 'pointer' : 'default' }}
                     onClick={() => hasMenuContent && setIsMenuOpen(prev => !prev)}
                     aria-haspopup={hasMenuContent ? 'menu' : undefined}
@@ -187,10 +188,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                         color: theme.colors.text,
                         fontSize: 'var(--font-xl)',
                         fontWeight: 800,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
                         display: 'block',
+                        wordBreak: 'break-word',
                     }}>
                         {pageTitle}
                     </span>

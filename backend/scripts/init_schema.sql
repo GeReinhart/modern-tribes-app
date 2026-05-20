@@ -1,8 +1,17 @@
 -- PostgreSQL Schema for Modern Tribes Application
--- Reflects migration 011 (current head)
+-- Reflects full schema (alembic revision 001)
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- updated_at trigger function
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
 
 -- Permissions table
 CREATE TABLE IF NOT EXISTS permissions (
@@ -40,6 +49,8 @@ CREATE TABLE IF NOT EXISTS documents (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     content_html TEXT,
     content_summary TEXT,
+    content_text TEXT,
+    revisions JSONB NOT NULL DEFAULT '[]',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_by UUID,
@@ -242,8 +253,78 @@ CREATE TABLE IF NOT EXISTS document_entities (
     UNIQUE (document_id, entity_type, entity_id)
 );
 
+-- App config table
+CREATE TABLE IF NOT EXISTS app_config (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    key VARCHAR(255) UNIQUE NOT NULL,
+    value TEXT NOT NULL DEFAULT '',
+    description TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Projects features table (named projects_features after migration 019)
+CREATE TABLE IF NOT EXISTS projects_features (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
+    feature_type VARCHAR(100) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'archived')),
+    position INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Todo items table (final structure from migrations 018+020+021)
+CREATE TABLE IF NOT EXISTS todo_items (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    feature_instance_id UUID REFERENCES projects_features(id) ON DELETE CASCADE NOT NULL,
+    title VARCHAR(500) NOT NULL,
+    status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    todo_status VARCHAR(50) NOT NULL DEFAULT 'todo' CHECK (todo_status IN ('todo', 'done')),
+    document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
+    position INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Projects documents table
+CREATE TABLE IF NOT EXISTS projects_documents (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'active'
+        CONSTRAINT projects_documents_status_check CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id),
+    updated_by UUID REFERENCES users(id)
+);
+
+-- Publications table
+CREATE TABLE IF NOT EXISTS publications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    document_id UUID NOT NULL UNIQUE REFERENCES documents(id) ON DELETE CASCADE,
+    project_document_id UUID NOT NULL REFERENCES projects_documents(id) ON DELETE CASCADE,
+    status VARCHAR(50) NOT NULL DEFAULT 'active'
+        CONSTRAINT publications_status_check CHECK (status IN ('pending', 'active', 'archived')),
+    published_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    published_by UUID REFERENCES users(id),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id),
+    updated_by UUID REFERENCES users(id)
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents(created_at);
+CREATE INDEX IF NOT EXISTS idx_documents_content_fts ON documents USING GIN(to_tsvector('french', COALESCE(content_text, '')));
 CREATE INDEX IF NOT EXISTS idx_document_attachments_document_id ON document_attachments(document_id);
 CREATE INDEX IF NOT EXISTS idx_document_attachments_file_id ON document_attachments(file_id);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
@@ -267,15 +348,14 @@ CREATE INDEX IF NOT EXISTS idx_label_entities_label_id ON label_entities(label_i
 CREATE INDEX IF NOT EXISTS idx_label_entities_entity ON label_entities(entity_type, entity_id);
 CREATE INDEX IF NOT EXISTS idx_document_entities_document_id ON document_entities(document_id);
 CREATE INDEX IF NOT EXISTS idx_document_entities_entity ON document_entities(entity_type, entity_id);
-
--- updated_at trigger function
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.updated_at = CURRENT_TIMESTAMP;
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
+CREATE INDEX IF NOT EXISTS idx_projects_features_project_id ON projects_features(project_id);
+CREATE INDEX IF NOT EXISTS idx_todo_items_feature_instance_id ON todo_items(feature_instance_id);
+CREATE INDEX IF NOT EXISTS idx_projects_documents_project_id ON projects_documents(project_id);
+CREATE INDEX IF NOT EXISTS idx_projects_documents_document_id ON projects_documents(document_id);
+CREATE INDEX IF NOT EXISTS idx_projects_documents_status ON projects_documents(status);
+CREATE INDEX IF NOT EXISTS idx_publications_document_id ON publications(document_id);
+CREATE INDEX IF NOT EXISTS idx_publications_project_document_id ON publications(project_document_id);
+CREATE INDEX IF NOT EXISTS idx_publications_published_at ON publications(published_at DESC);
 
 -- updated_at triggers
 CREATE TRIGGER update_permissions_updated_at BEFORE UPDATE ON permissions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -289,3 +369,8 @@ CREATE TRIGGER update_positions_updated_at BEFORE UPDATE ON positions FOR EACH R
 CREATE TRIGGER update_represents_updated_at BEFORE UPDATE ON represents FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_mails_updated_at BEFORE UPDATE ON mails FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_labels_updated_at BEFORE UPDATE ON labels FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_app_config_updated_at BEFORE UPDATE ON app_config FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_projects_features_updated_at BEFORE UPDATE ON projects_features FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_todo_items_updated_at BEFORE UPDATE ON todo_items FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_projects_documents_updated_at BEFORE UPDATE ON projects_documents FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_publications_updated_at BEFORE UPDATE ON publications FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

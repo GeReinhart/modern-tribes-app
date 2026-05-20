@@ -46,7 +46,7 @@ Features:
     - Separate the user and the person
     - A user can represent several people
     - Roles management through roles that can be attached to the users
-
+    - Documents publication
 
 
 

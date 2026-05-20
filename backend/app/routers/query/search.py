@@ -42,6 +42,17 @@ accessible_docs AS (
     JOIN tribes_projects tp ON tp.project_id = proj.id
     JOIN tribes t ON t.id = tp.tribe_id AND t.status = 'active'
     WHERE d.status = 'active'
+
+    UNION ALL
+
+    SELECT d.id AS document_id, t.id::text AS tribe_id, t.name AS tribe_name,
+           proj.id::text AS project_id, proj.name AS project_name
+    FROM documents d
+    JOIN projects_documents pd ON pd.document_id = d.id AND pd.status = 'active'
+    JOIN projects proj ON proj.id = pd.project_id AND proj.status = 'active'
+    JOIN tribes_projects tp ON tp.project_id = proj.id
+    JOIN tribes t ON t.id = tp.tribe_id AND t.status = 'active'
+    WHERE d.status = 'active'
 ),
 deduped AS (
     SELECT DISTINCT ON (document_id) document_id, tribe_id, tribe_name, project_id, project_name
@@ -96,6 +107,18 @@ accessible_docs AS (
            proj.id::text AS project_id, proj.name AS project_name
     FROM documents d
     JOIN projects proj ON proj.document_id = d.id AND proj.status = 'active'
+    JOIN tribes_projects tp ON tp.project_id = proj.id
+    JOIN tribes t ON t.id = tp.tribe_id AND t.status = 'active'
+    WHERE d.status = 'active'
+      AND t.id IN (SELECT tribe_id FROM user_tribe_ids)
+
+    UNION ALL
+
+    SELECT d.id AS document_id, t.id::text AS tribe_id, t.name AS tribe_name,
+           proj.id::text AS project_id, proj.name AS project_name
+    FROM documents d
+    JOIN projects_documents pd ON pd.document_id = d.id AND pd.status = 'active'
+    JOIN projects proj ON proj.id = pd.project_id AND proj.status = 'active'
     JOIN tribes_projects tp ON tp.project_id = proj.id
     JOIN tribes t ON t.id = tp.tribe_id AND t.status = 'active'
     WHERE d.status = 'active'

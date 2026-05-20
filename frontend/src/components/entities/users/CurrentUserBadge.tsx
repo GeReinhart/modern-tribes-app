@@ -21,7 +21,7 @@ function UserBadge() {
 
     return (
         <div
-            className="w-20 h-20 rounded-full flex items-center justify-center text-white text-lg font-bold cursor-pointer hover:scale-105 transition-transform"
+            className="w-10 h-10 sm:w-20 sm:h-20 rounded-full flex items-center justify-center text-white text-sm sm:text-lg font-bold cursor-pointer hover:scale-105 transition-transform"
             style={{ background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})` }}
             onClick={() => navigate('/app/profile')}
         >
