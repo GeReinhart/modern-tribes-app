@@ -46,7 +46,17 @@ Features:
     - Separate the user and the person
     - A user can represent several people
     - Roles management through roles that can be attached to the users
+    - Organize tribes
+    - Add projects to tribes
+    - Add documents to projects
     - Documents publication
+
+## Additional features
+
+Tag: 1.x.y
+
+- Feature Todo list
+- Feature Kanban
 
 
 

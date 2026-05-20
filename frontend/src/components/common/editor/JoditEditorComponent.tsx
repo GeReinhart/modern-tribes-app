@@ -5,13 +5,16 @@ import type { Jodit } from 'jodit';
 import { getAPIBaseUrl } from '@/config/env';
 import { useAppConfig } from '@/contexts/AppConfigContext';
 
+const COMPACT_BUTTONS = ['bold', 'italic', 'underline', '|', 'ul', 'ol', '|', 'image', 'link', '|', 'undo', 'redo'];
+
 interface JoditEditorComponentProps {
     content: string;
     onChange: (content: string) => void;
     minHeight?: number;
+    compact?: boolean;
 }
 
-const JoditEditorComponent = ({ content, onChange, minHeight = 600 }: JoditEditorComponentProps) => {
+const JoditEditorComponent = ({ content, onChange, minHeight = 600, compact = false }: JoditEditorComponentProps) => {
     const editor = useRef(null);
     const { config: appConfig } = useAppConfig();
 
@@ -129,55 +132,19 @@ const JoditEditorComponent = ({ content, onChange, minHeight = 600 }: JoditEdito
                     });
                 }
             },
-            buttons: [
-                'source',
-                '|',
-                'bold',
-                'italic',
-                'underline',
-                'strikethrough',
-                '|',
-                'ul',
-                'ol',
-                '|',
-                'font',
-                'fontsize',
-                'brush',
-                'paragraph',
-                '|',
-                'image',
-                'video',
-                'table',
-                'link',
-                '|',
-                'align',
-                'undo',
-                'redo',
-                '|',
-                'hr',
-                'eraser',
-                'copyformat',
-                '|',
-                'symbol',
-                'fullsize',
-                'print'
+            buttons: compact ? COMPACT_BUTTONS : [
+                'source', '|',
+                'bold', 'italic', 'underline', 'strikethrough', '|',
+                'ul', 'ol', '|',
+                'font', 'fontsize', 'brush', 'paragraph', '|',
+                'image', 'video', 'table', 'link', '|',
+                'align', 'undo', 'redo', '|',
+                'hr', 'eraser', 'copyformat', '|',
+                'symbol', 'fullsize', 'print'
             ],
-            buttonsXS: [
-                'bold',
-                'italic',
-                '|',
-                'ul',
-                'ol',
-                '|',
-                'image',
-                'link',
-                '|',
-                'align',
-                'undo',
-                'redo'
-            ]
+            buttonsXS: COMPACT_BUTTONS,
         }),
-        [appConfig.editorImageExtensions, minHeight]
+        [appConfig.editorImageExtensions, minHeight, compact]
     );
 
     return (

@@ -16,17 +16,9 @@
 
 ## Modern tribes
 
-- [ ] Documents on Projects
-  - Be able to add documents to a project
-  - Provide a specific page to create / edit / view documents in the context of a project
-  - Provide the possibility to define labels of the document: use `labels` and `label_entities` to link a label to a document. 
-  - On the documents tabs in the project page;
-    - The documents must be searchable by keywords
-    - Provide labels used in the project to filter the documents (show the label in order of popularity, easy to select)
-    - The result of the search show the Title of the document, the summary and its labels
-    - When the user click on the document, he is redirected to the document page
-  - The document can be archived
-- [ ] Feature Kanban
+- [X] Documents on Projects
+- [X] Publish documents
+- [X] Feature Kanban
 - [ ] Feature Planning
 - [ ] Feature Make groceries
 - [ ] Feature Carpooling

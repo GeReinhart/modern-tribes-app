@@ -357,6 +357,43 @@ CREATE INDEX IF NOT EXISTS idx_publications_document_id ON publications(document
 CREATE INDEX IF NOT EXISTS idx_publications_project_document_id ON publications(project_document_id);
 CREATE INDEX IF NOT EXISTS idx_publications_published_at ON publications(published_at DESC);
 
+-- Kanban columns table (migration 024)
+CREATE TABLE IF NOT EXISTS kanban_columns (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    feature_instance_id UUID NOT NULL REFERENCES projects_features(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    position INTEGER NOT NULL DEFAULT 0,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_kanban_columns_feature_instance ON kanban_columns(feature_instance_id);
+CREATE INDEX IF NOT EXISTS idx_kanban_columns_position ON kanban_columns(feature_instance_id, position);
+
+-- Kanban cards table (migration 024)
+CREATE TABLE IF NOT EXISTS kanban_cards (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    feature_instance_id UUID NOT NULL REFERENCES projects_features(id) ON DELETE CASCADE,
+    column_id UUID NOT NULL REFERENCES kanban_columns(id) ON DELETE CASCADE,
+    parent_card_id UUID REFERENCES kanban_cards(id) ON DELETE CASCADE,
+    title VARCHAR(500) NOT NULL,
+    assigned_person_id UUID REFERENCES persons(id) ON DELETE SET NULL,
+    document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
+    position INTEGER NOT NULL DEFAULT 0,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_kanban_cards_feature_instance ON kanban_cards(feature_instance_id);
+CREATE INDEX IF NOT EXISTS idx_kanban_cards_column ON kanban_cards(column_id);
+CREATE INDEX IF NOT EXISTS idx_kanban_cards_parent ON kanban_cards(parent_card_id);
+
 -- updated_at triggers
 CREATE TRIGGER update_permissions_updated_at BEFORE UPDATE ON permissions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_roles_updated_at BEFORE UPDATE ON roles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -374,3 +411,5 @@ CREATE TRIGGER update_projects_features_updated_at BEFORE UPDATE ON projects_fea
 CREATE TRIGGER update_todo_items_updated_at BEFORE UPDATE ON todo_items FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_projects_documents_updated_at BEFORE UPDATE ON projects_documents FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_publications_updated_at BEFORE UPDATE ON publications FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_kanban_columns_updated_at BEFORE UPDATE ON kanban_columns FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_kanban_cards_updated_at BEFORE UPDATE ON kanban_cards FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
