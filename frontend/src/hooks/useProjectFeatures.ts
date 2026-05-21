@@ -35,6 +35,16 @@ export function useProjectFeatures(projectId: string | null) {
         }
     }, [projectId]);
 
+    const renameFeature = useCallback(async (featureId: string, name: string): Promise<void> => {
+        if (!projectId) return;
+        try {
+            const updated = await projectFeaturesService.update(projectId, featureId, { name });
+            setFeatures(prev => prev.map(f => f.id === featureId ? { ...f, name: updated.name } : f));
+        } catch (e: any) {
+            setError(e.message);
+        }
+    }, [projectId]);
+
     const archiveFeature = useCallback(async (featureId: string): Promise<void> => {
         if (!projectId) return;
         try {
@@ -45,7 +55,7 @@ export function useProjectFeatures(projectId: string | null) {
         }
     }, [projectId]);
 
-    return { features, loading, error, refetch: fetch, createFeature, archiveFeature };
+    return { features, loading, error, refetch: fetch, createFeature, renameFeature, archiveFeature };
 }
 
 export function useFeatureTypes() {

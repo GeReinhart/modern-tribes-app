@@ -1,5 +1,5 @@
 import { apiService } from '@/services/api.service';
-import { KanbanBoard, KanbanCard, KanbanColumn, PersonOption, CardCreate, CardUpdate, ColumnCreate, MoveDirection } from './types';
+import { KanbanBoard, KanbanCard, KanbanColumn, KanbanLabel, PersonOption, CardCreate, CardUpdate, ColumnCreate, LabelCreate, LabelUpdate, MoveDirection, ReorderDirection } from './types';
 
 class KanbanService {
     async getBoard(featureInstanceId: string): Promise<KanbanBoard> {
@@ -38,8 +38,36 @@ class KanbanService {
         return apiService.delete<void>(`/features/kanban/cards/${cardId}`);
     }
 
-    async moveCard(cardId: string, direction: 'prev' | 'next'): Promise<KanbanCard[]> {
+    async restoreCard(cardId: string): Promise<KanbanCard> {
+        return apiService.post<KanbanCard>(`/features/kanban/cards/${cardId}/restore`, {});
+    }
+
+    async moveCard(cardId: string, direction: MoveDirection): Promise<KanbanCard[]> {
         return apiService.post<KanbanCard[]>(`/features/kanban/cards/${cardId}/move`, { direction });
+    }
+
+    async reorderCard(cardId: string, direction: ReorderDirection): Promise<KanbanCard[]> {
+        return apiService.post<KanbanCard[]>(`/features/kanban/cards/${cardId}/reorder`, { direction });
+    }
+
+    async createLabel(data: LabelCreate): Promise<KanbanLabel> {
+        return apiService.post<KanbanLabel>('/features/kanban/labels', data);
+    }
+
+    async updateLabel(labelId: string, data: LabelUpdate): Promise<KanbanLabel> {
+        return apiService.patch<KanbanLabel>(`/features/kanban/labels/${labelId}`, data);
+    }
+
+    async deleteLabel(labelId: string): Promise<void> {
+        return apiService.delete<void>(`/features/kanban/labels/${labelId}`);
+    }
+
+    async addCardLabel(cardId: string, labelId: string): Promise<KanbanCard> {
+        return apiService.post<KanbanCard>(`/features/kanban/cards/${cardId}/labels/${labelId}`, {});
+    }
+
+    async removeCardLabel(cardId: string, labelId: string): Promise<KanbanCard> {
+        return apiService.delete<KanbanCard>(`/features/kanban/cards/${cardId}/labels/${labelId}`);
     }
 }
 

@@ -134,12 +134,14 @@ const ShowProjectPageContent: React.FC = () => {
         user?.id || '',
         { enabled: !!tribeId && !!user?.id }
     );
-    const { features, createFeature, archiveFeature } = useProjectFeatures(projectId || null);
+    const { features, createFeature, renameFeature, archiveFeature } = useProjectFeatures(projectId || null);
 
     const [activeTab, setActiveTab] = useState(() => searchParams.get('tab') || 'description');
     const initialLabelId = searchParams.get('labelId') || null;
     const [showAddFeature, setShowAddFeature] = useState(false);
     const [archiveTarget, setArchiveTarget] = useState<{ id: string; name: string } | null>(null);
+    const [renameTarget, setRenameTarget] = useState<{ id: string; name: string } | null>(null);
+    const [renameValue, setRenameValue] = useState('');
 
     const myProjectPosition = useMemo((): ProjectEntry | null => {
         if (!projectId) return null;
@@ -380,13 +382,22 @@ const ShowProjectPageContent: React.FC = () => {
                             canEdit={canEdit}
                             isManager={isManager}
                             actions={isManager ? (
-                                <button
-                                    onClick={() => setArchiveTarget({ id: activeFeature.id, name: activeFeature.name })}
-                                    title={t('features.archive')}
-                                    style={{ background: 'none', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}
-                                >
-                                    <ThemedSvgIcon name="archive" color={theme.colors.secondary} size={16} />
-                                </button>
+                                <div style={{ display: 'flex', gap: '6px' }}>
+                                    <button
+                                        onClick={() => { setRenameValue(activeFeature.name); setRenameTarget({ id: activeFeature.id, name: activeFeature.name }); }}
+                                        title={t('features.rename')}
+                                        style={{ background: 'none', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}
+                                    >
+                                        <ThemedSvgIcon name="pencil" color={theme.colors.secondary} size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => setArchiveTarget({ id: activeFeature.id, name: activeFeature.name })}
+                                        title={t('features.archive')}
+                                        style={{ background: 'none', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}
+                                    >
+                                        <ThemedSvgIcon name="archive" color={theme.colors.secondary} size={16} />
+                                    </button>
+                                </div>
                             ) : undefined}
                         />
                     )}
@@ -422,6 +433,32 @@ const ShowProjectPageContent: React.FC = () => {
                         if (created) setActiveTab(created.id);
                     }}
                 />
+            )}
+
+            {renameTarget && (
+                <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                    <div style={{ backgroundColor: theme.colors.surface, borderRadius: '12px', padding: '24px', width: '360px', maxWidth: '90vw', border: `1px solid ${theme.colors.border}` }}>
+                        <ThemedText size="medium" as="h3" style={{ marginBottom: '16px' }}>{t('features.rename')}</ThemedText>
+                        <form onSubmit={async e => {
+                            e.preventDefault();
+                            const trimmed = renameValue.trim();
+                            if (trimmed && trimmed !== renameTarget.name) await renameFeature(renameTarget.id, trimmed);
+                            setRenameTarget(null);
+                        }}>
+                            <input
+                                autoFocus
+                                value={renameValue}
+                                onChange={e => setRenameValue(e.target.value)}
+                                onKeyDown={e => { if (e.key === 'Escape') setRenameTarget(null); }}
+                                style={{ width: '100%', padding: '8px 12px', border: `1px solid ${theme.colors.border}`, borderRadius: '8px', backgroundColor: theme.colors.surface, color: theme.colors.text, fontSize: 'var(--font-sm)', boxSizing: 'border-box', marginBottom: '16px' }}
+                            />
+                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                                <ThemedButton variant="ghost" type="button" onClick={() => setRenameTarget(null)}>{t('common.cancel')}</ThemedButton>
+                                <ThemedButton variant="primary" type="submit" disabled={!renameValue.trim()}>{t('common.save')}</ThemedButton>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             )}
         </AppLayout>
     );

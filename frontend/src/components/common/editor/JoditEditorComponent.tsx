@@ -5,7 +5,7 @@ import type { Jodit } from 'jodit';
 import { getAPIBaseUrl } from '@/config/env';
 import { useAppConfig } from '@/contexts/AppConfigContext';
 
-const COMPACT_BUTTONS = ['bold', 'italic', 'underline', '|', 'ul', 'ol', '|', 'image', 'link', '|', 'undo', 'redo'];
+const COMPACT_BUTTONS = ['bold', 'italic', '|', 'ul', 'ol', '|', 'link', '|', 'undo', 'redo'];
 
 interface JoditEditorComponentProps {
     content: string;

@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { kanbanService } from './service';
-import { KanbanBoard, KanbanCard, KanbanColumn, PersonOption, CardCreate, CardUpdate, ColumnCreate, MoveDirection } from './types';
+import { KanbanBoard, KanbanCard, KanbanColumn, KanbanLabel, PersonOption, CardCreate, CardUpdate, ColumnCreate, LabelCreate, LabelUpdate, MoveDirection, ReorderDirection } from './types';
 
 const POLL_INTERVAL_MS = 10_000;
-const EMPTY_BOARD: KanbanBoard = { columns: [], cards: [] };
+const EMPTY_BOARD: KanbanBoard = { columns: [], cards: [], labels: [] };
 
 export function useKanban(featureInstanceId: string | null) {
     const [board, setBoard] = useState<KanbanBoard>(EMPTY_BOARD);
@@ -38,10 +38,7 @@ export function useKanban(featureInstanceId: string | null) {
     const createColumn = useCallback(async (data: ColumnCreate): Promise<KanbanColumn | null> => {
         try {
             const col = await kanbanService.createColumn(data);
-            setBoard(prev => ({
-                ...prev,
-                columns: [...prev.columns, col].sort((a, b) => a.position - b.position),
-            }));
+            setBoard(prev => ({ ...prev, columns: [...prev.columns, col].sort((a, b) => a.position - b.position) }));
             return col;
         } catch (e: any) { setError(e.message); return null; }
     }, []);
@@ -87,20 +84,96 @@ export function useKanban(featureInstanceId: string | null) {
     const archiveCard = useCallback(async (cardId: string) => {
         try {
             await kanbanService.archiveCard(cardId);
-            setBoard(prev => ({ ...prev, cards: prev.cards.filter(c => c.id !== cardId) }));
+            setBoard(prev => ({ ...prev, cards: prev.cards.map(c => c.id === cardId ? { ...c, status: 'archived' as const } : c) }));
         } catch (e: any) { setError(e.message); }
     }, []);
 
-    const moveCard = useCallback(async (cardId: string, direction: 'prev' | 'next') => {
+    const restoreCard = useCallback(async (cardId: string) => {
+        try {
+            const updated = await kanbanService.restoreCard(cardId);
+            setBoard(prev => ({ ...prev, cards: prev.cards.map(c => c.id === cardId ? updated : c) }));
+        } catch (e: any) { setError(e.message); }
+    }, []);
+
+    const moveCard = useCallback(async (cardId: string, direction: MoveDirection) => {
         try {
             patchCards(await kanbanService.moveCard(cardId, direction));
         } catch (e: any) { setError(e.message); }
     }, [patchCards]);
 
+    const reorderCard = useCallback(async (cardId: string, direction: ReorderDirection) => {
+        // Optimistic update: swap positions locally before the API responds
+        let previousCards: KanbanCard[] = [];
+        setBoard(prev => {
+            previousCards = prev.cards;
+            const card = prev.cards.find(c => c.id === cardId);
+            if (!card) return prev;
+            const colActive = prev.cards
+                .filter(c => c.column_id === card.column_id && c.status === 'active')
+                .sort((a, b) => a.position - b.position);
+            const idx = colActive.findIndex(c => c.id === cardId);
+            const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+            if (targetIdx < 0 || targetIdx >= colActive.length) return prev;
+            const posA = colActive[idx].position;
+            const posB = colActive[targetIdx].position;
+            return {
+                ...prev,
+                cards: prev.cards.map(c => {
+                    if (c.id === colActive[idx].id) return { ...c, position: posB };
+                    if (c.id === colActive[targetIdx].id) return { ...c, position: posA };
+                    return c;
+                }),
+            };
+        });
+        try {
+            patchCards(await kanbanService.reorderCard(cardId, direction));
+        } catch (e: any) {
+            setBoard(prev => ({ ...prev, cards: previousCards }));
+            setError(e.message);
+        }
+    }, [patchCards]);
+
+    const createLabel = useCallback(async (data: LabelCreate): Promise<KanbanLabel | null> => {
+        try {
+            const label = await kanbanService.createLabel(data);
+            setBoard(prev => ({ ...prev, labels: [...prev.labels, label] }));
+            return label;
+        } catch (e: any) { setError(e.message); return null; }
+    }, []);
+
+    const updateLabel = useCallback(async (labelId: string, data: LabelUpdate) => {
+        try {
+            const updated = await kanbanService.updateLabel(labelId, data);
+            setBoard(prev => ({ ...prev, labels: prev.labels.map(l => l.id === labelId ? updated : l) }));
+        } catch (e: any) { setError(e.message); }
+    }, []);
+
+    const deleteLabel = useCallback(async (labelId: string) => {
+        try {
+            await kanbanService.deleteLabel(labelId);
+            setBoard(prev => ({
+                ...prev,
+                labels: prev.labels.filter(l => l.id !== labelId),
+                cards: prev.cards.map(c => ({ ...c, label_ids: c.label_ids.filter(id => id !== labelId) })),
+            }));
+        } catch (e: any) { setError(e.message); }
+    }, []);
+
+    const toggleCardLabel = useCallback(async (cardId: string, labelId: string, currentLabelIds: string[]) => {
+        try {
+            const has = currentLabelIds.includes(labelId);
+            const updated = has
+                ? await kanbanService.removeCardLabel(cardId, labelId)
+                : await kanbanService.addCardLabel(cardId, labelId);
+            setBoard(prev => ({ ...prev, cards: prev.cards.map(c => c.id === cardId ? updated : c) }));
+        } catch (e: any) { setError(e.message); }
+    }, []);
+
     return {
         board, persons, error, loaded,
         createColumn, renameColumn, deleteColumn, moveColumn,
-        createCard, updateCard, archiveCard, moveCard,
+        createCard, updateCard, archiveCard, restoreCard, moveCard, reorderCard,
+        createLabel, updateLabel, deleteLabel, toggleCardLabel,
         refetch: fetchBoard,
     };
 }

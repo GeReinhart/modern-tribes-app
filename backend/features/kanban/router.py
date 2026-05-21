@@ -10,8 +10,9 @@ from app.utils.project_access import check_project_access_or_admin
 from app.utils.document_helpers import strip_html, extract_content_summary
 from app.repositories import kanban_repository as repo
 from .models import (
-    KanbanBoard, KanbanColumnResponse, KanbanCardResponse, PersonOption,
-    ColumnCreate, ColumnUpdate, CardCreate, CardUpdate, MoveCard,
+    KanbanBoard, KanbanColumnResponse, KanbanCardResponse, KanbanLabel, PersonOption,
+    ColumnCreate, ColumnUpdate, CardCreate, CardUpdate, MoveCard, ReorderCard,
+    LabelCreate, LabelUpdate,
 )
 
 router = APIRouter(prefix="/kanban", tags=["feature_kanban"])
@@ -21,7 +22,12 @@ def _column(row: dict) -> KanbanColumnResponse:
     return KanbanColumnResponse(id=str(row["id"]), name=row["name"], position=row["position"])
 
 
+def _label(row: dict) -> KanbanLabel:
+    return KanbanLabel(id=str(row["id"]), name=row["name"], color=row["color"], position=row["position"])
+
+
 def _card(row: dict) -> KanbanCardResponse:
+    label_ids = [str(lid) for lid in (row.get("label_ids") or [])]
     return KanbanCardResponse(
         id=str(row["id"]),
         feature_instance_id=str(row["feature_instance_id"]),
@@ -33,6 +39,8 @@ def _card(row: dict) -> KanbanCardResponse:
         document_content_html=row.get("document_content_html"),
         position=row["position"],
         status=row["status"],
+        size=row.get("size"),
+        label_ids=label_ids,
     )
 
 
@@ -59,6 +67,7 @@ async def get_board(feature_instance_id: str, current_user: dict = Depends(get_c
     return KanbanBoard(
         columns=[_column(c) for c in data["columns"]],
         cards=[_card(c) for c in data["cards"]],
+        labels=[_label(lb) for lb in data["labels"]],
     )
 
 
@@ -157,7 +166,7 @@ async def update_card(card_id: str, data: CardUpdate, current_user: dict = Depen
         raise HTTPException(status_code=404, detail="Card not found.")
     await _require_feature_access(str(card["feature_instance_id"]), current_user, pool, "member")
     uid = str(current_user["id"])
-    await repo.update_card_fields(pool, card_id, data.title, data.assigned_person_id, data.clear_assignee, uid)
+    await repo.update_card_fields(pool, card_id, data.title, data.assigned_person_id, data.clear_assignee, data.size, data.clear_size, uid)
     if data.document_content_html is not None:
         await _upsert_card_document(pool, card, data.document_content_html, uid)
     return _card(await repo.fetch_card(pool, card_id))
@@ -192,6 +201,18 @@ async def archive_card(card_id: str, current_user: dict = Depends(get_current_us
     await repo.archive_card(pool, card_id, str(current_user["id"]))
 
 
+@router.post("/cards/{card_id}/restore", response_model=KanbanCardResponse)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def restore_card(card_id: str, current_user: dict = Depends(get_current_user)):
+    pool = get_database()
+    card = await repo.fetch_card(pool, card_id)
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found.")
+    await _require_feature_access(str(card["feature_instance_id"]), current_user, pool, "member")
+    await repo.restore_card(pool, card_id, str(current_user["id"]))
+    return _card(await repo.fetch_card(pool, card_id))
+
+
 @router.post("/cards/{card_id}/move", response_model=list[KanbanCardResponse])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def move_card(card_id: str, data: MoveCard, current_user: dict = Depends(get_current_user)):
@@ -213,3 +234,82 @@ async def move_card(card_id: str, data: MoveCard, current_user: dict = Depends(g
     uid = str(current_user["id"])
     await repo.move_card_to_column(pool, card_id, target_col_id, uid)
     return [_card(await repo.fetch_card(pool, card_id))]
+
+
+@router.post("/cards/{card_id}/reorder", response_model=list[KanbanCardResponse])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def reorder_card(card_id: str, data: ReorderCard, current_user: dict = Depends(get_current_user)):
+    pool = get_database()
+    card = await repo.fetch_card(pool, card_id)
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found.")
+    await _require_feature_access(str(card["feature_instance_id"]), current_user, pool, "member")
+    updated = await repo.reorder_card_in_column(pool, card_id, data.direction, str(current_user["id"]))
+    return [_card(c) for c in updated]
+
+
+# --- Labels ---
+
+@router.get("/labels/{feature_instance_id}", response_model=list[KanbanLabel])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def list_labels(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
+    pool = get_database()
+    await _require_feature_access(feature_instance_id, current_user, pool, "guest")
+    rows = await repo.fetch_labels_for_feature(pool, feature_instance_id)
+    return [_label(r) for r in rows]
+
+
+@router.post("/labels", response_model=KanbanLabel, status_code=status.HTTP_201_CREATED)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def create_label(data: LabelCreate, current_user: dict = Depends(get_current_user)):
+    pool = get_database()
+    await _require_feature_access(data.feature_instance_id, current_user, pool, "manager")
+    row = await repo.insert_label(pool, data.feature_instance_id, data.name, data.color, str(current_user["id"]))
+    return _label(row)
+
+
+@router.patch("/labels/{label_id}", response_model=KanbanLabel)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def update_label(label_id: str, data: LabelUpdate, current_user: dict = Depends(get_current_user)):
+    pool = get_database()
+    lb = await repo.fetch_label(pool, label_id)
+    if not lb:
+        raise HTTPException(status_code=404, detail="Label not found.")
+    await _require_feature_access(str(lb["feature_instance_id"]), current_user, pool, "manager")
+    updated = await repo.update_label(pool, label_id, data.name, data.color, str(current_user["id"]))
+    return _label(updated)
+
+
+@router.delete("/labels/{label_id}", status_code=status.HTTP_204_NO_CONTENT)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def delete_label(label_id: str, current_user: dict = Depends(get_current_user)):
+    pool = get_database()
+    lb = await repo.fetch_label(pool, label_id)
+    if not lb:
+        raise HTTPException(status_code=404, detail="Label not found.")
+    await _require_feature_access(str(lb["feature_instance_id"]), current_user, pool, "manager")
+    await repo.delete_label(pool, label_id)
+
+
+@router.post("/cards/{card_id}/labels/{label_id}", response_model=KanbanCardResponse)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def add_card_label(card_id: str, label_id: str, current_user: dict = Depends(get_current_user)):
+    pool = get_database()
+    card = await repo.fetch_card(pool, card_id)
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found.")
+    await _require_feature_access(str(card["feature_instance_id"]), current_user, pool, "member")
+    await repo.add_card_label(pool, card_id, label_id)
+    return _card(await repo.fetch_card(pool, card_id))
+
+
+@router.delete("/cards/{card_id}/labels/{label_id}", response_model=KanbanCardResponse)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def remove_card_label(card_id: str, label_id: str, current_user: dict = Depends(get_current_user)):
+    pool = get_database()
+    card = await repo.fetch_card(pool, card_id)
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found.")
+    await _require_feature_access(str(card["feature_instance_id"]), current_user, pool, "member")
+    await repo.remove_card_label(pool, card_id, label_id)
+    return _card(await repo.fetch_card(pool, card_id))
