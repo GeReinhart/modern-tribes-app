@@ -28,6 +28,7 @@ import {PeopleManagementPage} from "@/pages/admin/PeopleManagementPage.tsx";
 import {UserEditPage} from "@/pages/admin/UserEditPage.tsx";
 import {DocumentRevisionsPage} from "@/pages/admin/DocumentRevisionsPage.tsx";
 import {SearchPage} from "@/pages/app/SearchPage.tsx";
+import AboutPage from "@/pages/app/AboutPage.tsx";
 import {AppConfigPage} from "@/pages/admin/AppConfigPage.tsx";
 import {FeaturesPage} from "@/pages/admin/FeaturesPage.tsx";
 import {AppConfigProvider} from "@/contexts/AppConfigContext.tsx";
@@ -89,6 +90,7 @@ function AuthBootstrapApp() {
                             <Route path="/app/tribes/:tribeId/projects/:projectId/documents/:projectDocumentId/edit" element={<ProjectDocumentFormPage/>}/>
                             <Route path="/app/projects" element={<ProjectsPage/>}/>
                             <Route path="/app/search" element={<SearchPage/>}/>
+                            <Route path="/app/about" element={<AboutPage/>}/>
                             <Route path="/app/profile" element={<ProfilePage/>}/>
 
                         </Route>

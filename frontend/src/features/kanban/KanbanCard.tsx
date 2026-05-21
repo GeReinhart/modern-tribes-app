@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog';
+import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { KanbanCard as Card, CardUpdate } from './types';
 import KanbanCardBody from './KanbanCardBody';
 
@@ -48,8 +49,8 @@ const KanbanCard: React.FC<Props> = ({ card, canEdit, isFirstCol, isLastCol, acc
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 10px 9px 10px' }}>
                 {canEdit && (
                     <>
-                        <button disabled={isFirstCol} onClick={() => onMove(card.id, 'prev')} style={{ background: 'none', border: 'none', cursor: isFirstCol ? 'default' : 'pointer', opacity: isFirstCol ? 0.2 : 1, fontSize: '15px', padding: '0 2px', color: theme.colors.primary, flexShrink: 0 }}>←</button>
-                        <button disabled={isLastCol} onClick={() => onMove(card.id, 'next')} style={{ background: 'none', border: 'none', cursor: isLastCol ? 'default' : 'pointer', opacity: isLastCol ? 0.2 : 1, fontSize: '15px', padding: '0 2px', color: theme.colors.primary, flexShrink: 0 }}>→</button>
+                        <button disabled={isFirstCol} onClick={() => onMove(card.id, 'prev')} style={{ background: 'none', border: 'none', cursor: isFirstCol ? 'default' : 'pointer', opacity: isFirstCol ? 0.2 : 1, padding: '0 2px', color: theme.colors.primary, flexShrink: 0, display: 'flex', alignItems: 'center' }}><ThemedSvgIcon name="arrow-left" color={theme.colors.primary} size={16} /></button>
+                        <button disabled={isLastCol} onClick={() => onMove(card.id, 'next')} style={{ background: 'none', border: 'none', cursor: isLastCol ? 'default' : 'pointer', opacity: isLastCol ? 0.2 : 1, padding: '0 2px', color: theme.colors.primary, flexShrink: 0, display: 'flex', alignItems: 'center' }}><ThemedSvgIcon name="arrow-right" color={theme.colors.primary} size={16} /></button>
                     </>
                 )}
 
@@ -76,13 +77,13 @@ const KanbanCard: React.FC<Props> = ({ card, canEdit, isFirstCol, isLastCol, acc
                         </span>
                     )}
                     {card.document_id && (
-                        <span style={{ fontSize: '12px', color: theme.colors.secondary }} title="Has notes">📝</span>
+                        <span style={{ color: theme.colors.secondary, display: 'flex', alignItems: 'center' }} title="Has notes"><ThemedSvgIcon name="file-text" color={theme.colors.secondary} size={14} /></span>
                     )}
-                    <button onClick={() => setExpanded(v => !v)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.secondary, fontSize: '11px', padding: '2px 4px' }}>
-                        {expanded ? '▲' : '▼'}
+                    <button onClick={() => setExpanded(v => !v)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.secondary, padding: '2px 4px', display: 'flex', alignItems: 'center' }}>
+                        <ThemedSvgIcon name={expanded ? 'chevron-up' : 'chevron-down'} color={theme.colors.secondary} size={14} />
                     </button>
                     {canEdit && (
-                        <button onClick={() => setConfirmArchive(true)} title={t('common.archive')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.danger, fontSize: '12px', padding: '2px 4px' }}>✕</button>
+                        <button onClick={() => setConfirmArchive(true)} title={t('common.archive')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.danger, padding: '2px 4px', display: 'flex', alignItems: 'center' }}><ThemedSvgIcon name="x" color={theme.colors.danger} size={14} /></button>
                     )}
                 </div>
             </div>

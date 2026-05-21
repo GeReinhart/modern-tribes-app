@@ -9,12 +9,14 @@ export function useKanban(featureInstanceId: string | null) {
     const [board, setBoard] = useState<KanbanBoard>(EMPTY_BOARD);
     const [persons, setPersons] = useState<PersonOption[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [loaded, setLoaded] = useState(false);
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
     const fetchBoard = useCallback(async () => {
         if (!featureInstanceId) return;
         try {
             setBoard(await kanbanService.getBoard(featureInstanceId));
+            setLoaded(true);
         } catch (e: any) {
             setError(e.message);
         }
@@ -96,7 +98,7 @@ export function useKanban(featureInstanceId: string | null) {
     }, [patchCards]);
 
     return {
-        board, persons, error,
+        board, persons, error, loaded,
         createColumn, renameColumn, deleteColumn, moveColumn,
         createCard, updateCard, archiveCard, moveCard,
         refetch: fetchBoard,

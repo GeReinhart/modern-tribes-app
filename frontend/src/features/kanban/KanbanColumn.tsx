@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog';
+import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { KanbanColumn as Column, KanbanCard, KanbanBoard, CardCreate, CardUpdate, MoveDirection } from './types';
 import KanbanCardComponent from './KanbanCard';
 
@@ -77,12 +78,12 @@ const KanbanColumn: React.FC<Props> = ({ column, board, featureInstanceId, canEd
                 <span style={{ fontSize: '11px', fontWeight: 600, color: theme.colors.secondary, background: theme.colors.border, borderRadius: '10px', padding: '1px 7px' }}>{topLevelCards.length}</span>
                 {canEdit && configuring && (
                     <>
-                        <button disabled={isFirst} onClick={() => onMove(column.id, 'prev')} style={{ background: 'none', border: 'none', cursor: isFirst ? 'default' : 'pointer', opacity: isFirst ? 0.25 : 1, fontSize: '14px', padding: '2px 3px', color: theme.colors.primary }}>←</button>
-                        <button disabled={isLast} onClick={() => onMove(column.id, 'next')} style={{ background: 'none', border: 'none', cursor: isLast ? 'default' : 'pointer', opacity: isLast ? 0.25 : 1, fontSize: '14px', padding: '2px 3px', color: theme.colors.primary }}>→</button>
+                        <button disabled={isFirst} onClick={() => onMove(column.id, 'prev')} style={{ background: 'none', border: 'none', cursor: isFirst ? 'default' : 'pointer', opacity: isFirst ? 0.25 : 1, padding: '2px 3px', color: theme.colors.primary, display: 'flex', alignItems: 'center' }}><ThemedSvgIcon name="arrow-left" color={theme.colors.primary} size={16} /></button>
+                        <button disabled={isLast} onClick={() => onMove(column.id, 'next')} style={{ background: 'none', border: 'none', cursor: isLast ? 'default' : 'pointer', opacity: isLast ? 0.25 : 1, padding: '2px 3px', color: theme.colors.primary, display: 'flex', alignItems: 'center' }}><ThemedSvgIcon name="arrow-right" color={theme.colors.primary} size={16} /></button>
                     </>
                 )}
                 {canEdit && configuring && canDelete && (
-                    <button onClick={() => setConfirmDelete(true)} title={t('features.kanban.deleteColumn')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.danger, fontSize: '13px', padding: '2px 4px' }}>✕</button>
+                    <button onClick={() => setConfirmDelete(true)} title={t('features.kanban.deleteColumn')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.danger, padding: '2px 4px', display: 'flex', alignItems: 'center' }}><ThemedSvgIcon name="x" color={theme.colors.danger} size={15} /></button>
                 )}
             </div>
 
@@ -110,9 +111,9 @@ const KanbanColumn: React.FC<Props> = ({ column, board, featureInstanceId, canEd
                     <button
                         type="submit" disabled={!newCardTitle.trim()}
                         title={t('features.kanban.addCard')}
-                        style={{ padding: '6px 14px', border: 'none', borderRadius: '6px', background: newCardTitle.trim() ? theme.colors.primary : theme.colors.border, cursor: newCardTitle.trim() ? 'pointer' : 'default', color: newCardTitle.trim() ? '#fff' : theme.colors.secondary, fontSize: '18px', lineHeight: 1, transition: 'background 0.15s' }}
+                        style={{ padding: '6px 10px', border: 'none', borderRadius: '6px', background: newCardTitle.trim() ? theme.colors.primary : theme.colors.border, cursor: newCardTitle.trim() ? 'pointer' : 'default', display: 'flex', alignItems: 'center', transition: 'background 0.15s' }}
                     >
-                        +
+                        <ThemedSvgIcon name="plus" color={newCardTitle.trim() ? '#fff' : theme.colors.secondary} size={18} />
                     </button>
                 </form>
             )}

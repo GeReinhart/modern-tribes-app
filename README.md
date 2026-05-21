@@ -1,72 +1,115 @@
 # Modern Tribes App
 
-## Abstract
+## Vision
 
-The subject is the fact that in our modern way of life we need tools to help us to be more efficient in the way we organize our life, activities.
-The term tribe is a nice way of seeing a group of people with a common project.
+Modern life calls for lightweight, flexible tools to organise the groups we belong to — families, sports clubs, project teams, event crews. **Modern Tribes** calls these groups *tribes*.
 
-First, we need to easily define the tribes. One person can be part of several tribes. The tribes can be long-term like a family or short-term to organize a specific event.
+Key ideas:
 
-We need to differentiate the user and the person. In the case of a child, this person can be represented by an adult.
-
-To be organized, in our various projects we need some tools such as Kanban boards, Planning, Events, Checklists...
-From time to time we need specific tools like: car-pooling, groceries list, money management...
-
-## Personal goals
-
-This project is a way to explore several modern technologies to show a certain know how.
-
-This project is also a concert project to experiment and evaluate Gen AI. 
-
-## Common stage
-
-Tag: 0.1.x
-
-The idea is to propose a stack with common feature we would expect in most applications.
-From those common features, we will add '~ plugins'. 
-The purpose is to be able to fork the repo from this stage to create a new application with already existing common features. 
-
-Features:
-
-- Technical features
-    - Authentification through magic link and JWT
-    - Authorization through granular permissions 
-    - Status of the entities
-    - Track who changed the entities
-    - I18N
-    - UX Themes
-    - Power web app to install on mobile devices
-    - Send emails
-    - Rich text editor with files / images storage
-    - Storage of the different revisions of the documents
-    - Search full text on documents content
-    - Database evolutions
-    - Docker packaging
-- Functional Features
-    - Separate the user and the person
-    - A user can represent several people
-    - Roles management through roles that can be attached to the users
-    - Organize tribes
-    - Add projects to tribes
-    - Add documents to projects
-    - Documents publication
-
-## Additional features
-
-Tag: 1.x.y
-
-- Feature Todo list
-- Feature Kanban
-
-
+- A person can belong to many tribes simultaneously, whether long-lived (a family) or short-lived (a weekend event).
+- **User ≠ Person.** An adult can represent a child or anyone without their own account.
+- Tribes own projects, and projects host pluggable feature modules — Kanban boards, todo lists, documents, and more.
 
 ## Stack
 
-- **Backend**: Python / FastAPI
-- **Database**: PostgreSQL (use JSONB and FullText Search)
-- **Frontend**: React / TypeScript / Vite / PWA
-- **Auth**: Magic link (passwordless) with JWT + refresh tokens
+| Layer | Technology |
+| --- | --- |
+| Backend | Python 3.12 · FastAPI · asyncpg |
+| Database | PostgreSQL 16 (JSONB, full-text search, Alembic migrations) |
+| Frontend | React 18 · TypeScript · Vite · Tailwind CSS · PWA |
+| Auth | Magic-link (passwordless) · JWT + refresh tokens |
+| Email | SMTP via MailHog (dev) |
+| Packaging | Docker / Podman |
+
+## Features
+
+### Platform (tag `0.1.x`)
+
+A reusable base that can be forked to bootstrap any new application.
+
+**Technical**
+- Passwordless authentication via magic link + JWT
+- Granular permission system with roles
+- Entity lifecycle (active / archived) with full audit trail
+- Internationalisation (i18n) — EN / FR
+- Themeable UI with multiple colour themes
+- Installable PWA (mobile home screen)
+- Outbound email with scheduling
+- Rich-text editor with image upload and storage
+- Document revision history
+- Full-text search on document content
+- Database schema migrations (Alembic)
+- Docker / Podman packaging
+
+**Functional**
+- User / Person separation (one user can represent multiple people)
+- Tribe management with per-tribe membership and roles
+- Projects attached to tribes
+- Project documents with labels and publication workflow
+
+### Application features (tag `1.x.y`)
+
+Pluggable modules added to projects:
+
+- **Todo list** — tasks with status tracking, notes, and archive
+- **Kanban** — columnar board (up to 4 columns), card notes, theme-coloured columns
+
+## Development setup
+
+### Prerequisites
+
+- Node.js 18+
+- Python 3.12+ and `python3-devel` (`sudo dnf install python3-devel` on Fedora)
+- Docker Compose or Podman Compose
+
+### 1 — Infrastructure (PostgreSQL, pgAdmin, MailHog)
+
+```bash
+cp .env.example .env
+podman-compose up -d        # or: docker compose up -d
+```
+
+| Service | URL |
+| --- | --- |
+| pgAdmin | http://localhost:8081 |
+| MailHog | http://localhost:8025 |
+| PostgreSQL | localhost:5432 |
+
+### 2 — Backend
+
+```bash
+cd backend
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+
+# Seed schema + development data
+set -a && source .env && set +a && python scripts/init_db.py
+
+# Start with auto-reload
+set -a && source .env && set +a && uvicorn app.main:app --reload --port 8000
+```
+
+API docs: http://localhost:8000/docs
+
+### 3 — Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev        # http://localhost:3000
+```
+
+## Project goals
+
+This project serves two purposes:
+
+1. **Practical tool** — a real application for organizing everyday tribe life.
+2. **Technical showcase** — exploration of a modern full-stack Python/React architecture and a concrete experiment in collaborative development with Generative AI.
+
+## Known prod instances
+
+- https://www.reinhart.online/public/publications (hosted on https://www.clever.cloud/)
 
 ## License
 
-Apache License — see [LICENSE](./LICENSE)
+Apache 2.0 — see [LICENSE](./LICENSE).

@@ -3,6 +3,7 @@ import React from 'react';
 export interface FeatureTabProps {
     featureInstanceId: string;
     canEdit: boolean;
+    isManager: boolean;
     actions?: React.ReactNode;
 }
 

@@ -6,7 +6,10 @@ import { useAppConfig } from '@/contexts/AppConfigContext';
 import {
     XMarkIcon,
     PaperClipIcon,
-    ArrowDownTrayIcon
+    ArrowDownTrayIcon,
+    DocumentTextIcon,
+    PhotoIcon,
+    ArchiveBoxIcon,
 } from '@heroicons/react/24/outline';
 
 interface FileUploaderProps {
@@ -76,11 +79,11 @@ const FileUploader = ({
     };
 
     const getFileIcon = (type: string) => {
-        if (type.includes('pdf')) return '📄';
-        if (type.includes('word') || type.includes('document')) return '📝';
-        if (type.includes('sheet') || type.includes('excel')) return '📊';
-        if (type.includes('zip') || type.includes('rar')) return '🗜️';
-        return '📎';
+        const cls = 'h-5 w-5';
+        if (type.startsWith('image/')) return <PhotoIcon className={cls} />;
+        if (type.includes('pdf') || type.includes('word') || type.includes('document')) return <DocumentTextIcon className={cls} />;
+        if (type.includes('zip') || type.includes('rar') || type.includes('compressed')) return <ArchiveBoxIcon className={cls} />;
+        return <PaperClipIcon className={cls} />;
     };
 
     return (
@@ -122,7 +125,7 @@ const FileUploader = ({
                             className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
                         >
                             <div className="flex items-center space-x-3 flex-1 min-w-0">
-                <span className="text-2xl flex-shrink-0">
+                <span className="flex-shrink-0">
                   {getFileIcon(file.type)}
                 </span>
                                 <div className="flex-1 min-w-0">

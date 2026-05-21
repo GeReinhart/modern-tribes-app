@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedText } from '@/components/common/layout/ThemedText';
+import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
 import { useTodoItems } from './hooks';
 import { TodoItem } from './types';
@@ -10,6 +11,8 @@ import { TodoItem } from './types';
 interface Props {
     featureInstanceId: string;
     canEdit: boolean;
+    isManager: boolean;
+    actions?: React.ReactNode;
 }
 
 const TodoRow: React.FC<{
@@ -128,11 +131,12 @@ const TodoRow: React.FC<{
                         border: 'none',
                         cursor: 'pointer',
                         color: theme.colors.secondary,
-                        fontSize: '12px',
                         padding: '2px 6px',
+                        display: 'flex',
+                        alignItems: 'center',
                     }}
                 >
-                    {expanded ? '▲' : '▼'}
+                    <ThemedSvgIcon name={expanded ? 'chevron-up' : 'chevron-down'} color={theme.colors.secondary} size={14} />
                 </button>
                 {canEdit && !isArchived && (
                     <button

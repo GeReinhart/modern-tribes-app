@@ -1,4 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
+import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 
 interface Props {
     children: ReactNode;
@@ -43,7 +44,10 @@ export class ErrorBoundary extends Component<Props, State> {
                     maxWidth: '600px',
                     margin: '2rem auto'
                 }}>
-                    <h2>⚠️ Something went wrong</h2>
+                    <h2 style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        <ThemedSvgIcon name="warning" color="#e53e3e" size={24} />
+                        Something went wrong
+                    </h2>
                     <details style={{ marginTop: '1rem', textAlign: 'left' }}>
                         <summary style={{ cursor: 'pointer', marginBottom: '0.5rem' }}>
                             Error details

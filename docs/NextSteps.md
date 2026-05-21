@@ -19,6 +19,7 @@
 - [X] Documents on Projects
 - [X] Publish documents
 - [X] Feature Kanban
+- [ ] About page
 - [ ] Feature Planning
 - [ ] Feature Make groceries
 - [ ] Feature Carpooling

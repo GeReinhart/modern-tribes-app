@@ -1,27 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
+import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { useKanban } from './hooks';
 import KanbanColumnComponent from './KanbanColumn';
 
 interface Props {
     featureInstanceId: string;
     canEdit: boolean;
+    isManager: boolean;
     actions?: React.ReactNode;
 }
 
-const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, actions }) => {
+const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, actions }) => {
     const { t } = useTranslation();
     const { theme } = useTheme();
-    const { board, error, createColumn, renameColumn, deleteColumn, moveColumn, createCard, updateCard, archiveCard, moveCard } = useKanban(featureInstanceId);
-    const [configuring, setConfiguring] = useState(true);
+    const { board, error, loaded, createColumn, renameColumn, deleteColumn, moveColumn, createCard, updateCard, archiveCard, moveCard } = useKanban(featureInstanceId);
+    const [configuring, setConfiguring] = useState(false);
+    const initDone = useRef(false);
     const [newColName, setNewColName] = useState('');
     const [showAddForm, setShowAddForm] = useState(false);
     const [submittingCol, setSubmittingCol] = useState(false);
 
     const sortedCols = [...board.columns].sort((a, b) => a.position - b.position);
     const maxColumns = 4;
+
+    useEffect(() => {
+        if (!loaded || initDone.current || !isManager) return;
+        initDone.current = true;
+        if (board.columns.length === 0) setConfiguring(true);
+    }, [loaded, board.columns.length, isManager]);
 
 
     const handleAddColumn = async (e: React.FormEvent) => {
@@ -48,16 +57,16 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, actions }) => 
                 </div>
             )}
 
-            {(canEdit || actions) && (
+            {(isManager || actions) && (
                 <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                     {actions}
-                    {canEdit && (
+                    {isManager && (
                         <button
                             onClick={() => configuring ? handleDoneConfiguring() : setConfiguring(true)}
                             title={configuring ? t('features.kanban.saveColumns') : t('features.kanban.configureColumns')}
-                            style={{ background: configuring ? theme.colors.primary : 'none', border: `1px solid ${configuring ? theme.colors.primary : theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', color: configuring ? '#fff' : theme.colors.secondary, fontSize: '16px', padding: '4px 10px', lineHeight: 1 }}
+                            style={{ background: configuring ? theme.colors.primary : 'none', border: `1px solid ${configuring ? theme.colors.primary : theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}
                         >
-                            ⚙
+                            <ThemedSvgIcon name="settings" color={configuring ? '#fff' : theme.colors.secondary} size={16} />
                         </button>
                     )}
                 </div>
@@ -71,7 +80,7 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, actions }) => 
                         board={board}
                         featureInstanceId={featureInstanceId}
                         canEdit={canEdit}
-                        configuring={configuring}
+                        configuring={isManager && configuring}
                         isFirst={idx === 0}
                         isLast={idx === sortedCols.length - 1}
                         canDelete={sortedCols.length > 2 && idx !== 0 && idx !== sortedCols.length - 1}
@@ -90,9 +99,10 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, actions }) => 
                         {!showAddForm ? (
                             <button
                                 onClick={() => setShowAddForm(true)}
-                                style={{ padding: '10px 14px', border: `2px dashed ${theme.colors.border}`, borderRadius: '10px', background: 'none', cursor: 'pointer', color: theme.colors.secondary, fontSize: 'var(--font-sm)', textAlign: 'center', whiteSpace: 'nowrap' }}
+                                style={{ padding: '10px 14px', border: `2px dashed ${theme.colors.border}`, borderRadius: '10px', background: 'none', cursor: 'pointer', color: theme.colors.secondary, fontSize: 'var(--font-sm)', textAlign: 'center', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '6px' }}
                             >
-                                + {t('features.kanban.addColumn')}
+                                <ThemedSvgIcon name="plus" color={theme.colors.secondary} size={14} />
+                                {t('features.kanban.addColumn')}
                             </button>
                         ) : (
                             <form onSubmit={handleAddColumn} style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px', border: `1px solid ${theme.colors.border}`, borderRadius: '10px', backgroundColor: theme.colors.surface }}>
