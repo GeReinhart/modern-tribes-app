@@ -102,7 +102,6 @@ export function useKanban(featureInstanceId: string | null) {
     }, [patchCards]);
 
     const reorderCard = useCallback(async (cardId: string, direction: ReorderDirection) => {
-        // Optimistic update: swap positions locally before the API responds
         let previousCards: KanbanCard[] = [];
         setBoard(prev => {
             previousCards = prev.cards;
@@ -112,6 +111,16 @@ export function useKanban(featureInstanceId: string | null) {
                 .filter(c => c.column_id === card.column_id && c.status === 'active')
                 .sort((a, b) => a.position - b.position);
             const idx = colActive.findIndex(c => c.id === cardId);
+            if (direction === 'top') {
+                if (idx === 0) return prev;
+                const newPos = colActive[0].position - 1;
+                return { ...prev, cards: prev.cards.map(c => c.id === cardId ? { ...c, position: newPos } : c) };
+            }
+            if (direction === 'bottom') {
+                if (idx === colActive.length - 1) return prev;
+                const newPos = colActive[colActive.length - 1].position + 1;
+                return { ...prev, cards: prev.cards.map(c => c.id === cardId ? { ...c, position: newPos } : c) };
+            }
             const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
             if (targetIdx < 0 || targetIdx >= colActive.length) return prev;
             const posA = colActive[idx].position;

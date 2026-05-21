@@ -343,6 +343,8 @@ const fr: Record<string, string> = {
     'features.kanban.hideArchived': 'Masquer les archivées',
     'features.kanban.restore': 'Restaurer',
     'features.kanban.archived': 'Archivée',
+    'features.kanban.moveToTop': 'Déplacer en haut',
+    'features.kanban.moveToBottom': 'Déplacer en bas',
     'features.kanban.size': 'Points d\'effort',
     'features.kanban.setSize': 'Définir les points d\'effort',
     'features.kanban.filterBy': 'Filtrer :',

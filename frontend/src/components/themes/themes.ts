@@ -192,6 +192,34 @@ export const predefinedThemes: Record<string, Theme> = {
 
 export const themeKeys = Object.keys(predefinedThemes);
 
+export const LABEL_COLORS: string[] = [
+    predefinedThemes.default.colors.danger,     // red
+    predefinedThemes.main_3.colors.primary,     // coral
+    predefinedThemes.alt_05.colors.primary,     // dark orange
+    predefinedThemes.main_3.colors.accent,      // orange
+    predefinedThemes.alt_05.colors.secondary,   // gold
+    predefinedThemes.alt_02.colors.primary,     // sea green
+    predefinedThemes.alt_06.colors.primary,     // aquamarine
+    predefinedThemes.alt_06.colors.secondary,   // turquoise
+    predefinedThemes.main_2.colors.primary,     // steel blue
+    predefinedThemes.alt_01.colors.primary,     // dodger blue
+    predefinedThemes.alt_04.colors.secondary,   // magenta
+    predefinedThemes.alt_03.colors.primary,     // orchid purple
+    predefinedThemes.alt_03.colors.accent,      // violet
+    predefinedThemes.alt_07.colors.primary,     // hot pink
+    predefinedThemes.default.colors.primary,    // slate grey
+];
+
+export const FIB_COLORS: string[] = [
+    predefinedThemes.alt_02.colors.primary,     // sea green   — size 1
+    predefinedThemes.alt_06.colors.primary,     // aquamarine  — size 2
+    predefinedThemes.alt_06.colors.secondary,   // turquoise   — size 3
+    predefinedThemes.main_2.colors.primary,     // steel blue  — size 5
+    predefinedThemes.alt_03.colors.secondary,   // medium purple — size 8
+    predefinedThemes.alt_05.colors.primary,     // dark orange — size 13
+    predefinedThemes.default.colors.danger,     // red         — size 21
+];
+
 export const themesById = Object.values(predefinedThemes).reduce(
     (acc, theme) => {
         acc[theme.id] = theme;

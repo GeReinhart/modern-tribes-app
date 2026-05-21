@@ -17,6 +17,7 @@ interface Props {
     canDelete: boolean;
     showArchived: boolean;
     filterLabelId: string | null;
+    filterPersonId: string | null;
     persons: PersonOption[];
     onRename: (columnId: string, name: string) => Promise<void>;
     onMove: (columnId: string, direction: MoveDirection) => Promise<void>;
@@ -33,7 +34,7 @@ interface Props {
 
 const KanbanColumn: React.FC<Props> = ({
     column, board, featureInstanceId, canEdit, configuring, isFirst, isLast, canDelete,
-    showArchived, filterLabelId, persons,
+    showArchived, filterLabelId, filterPersonId, persons,
     onRename, onMove, onDelete, onCreateCard, onUpdateCard, onArchiveCard, onRestoreCard,
     onMoveCard, onReorderCard, onToggleLabel, onCreateLabel,
 }) => {
@@ -51,10 +52,10 @@ const KanbanColumn: React.FC<Props> = ({
     const activeCards = allColCards.filter(c => c.status === 'active');
     const archivedCards = allColCards.filter(c => c.status === 'archived');
 
-    const visibleActive = (filterLabelId
-        ? activeCards.filter(c => c.label_ids.includes(filterLabelId))
-        : activeCards
-    ).sort((a, b) => a.position - b.position);
+    const visibleActive = activeCards
+        .filter(c => !filterLabelId || c.label_ids.includes(filterLabelId))
+        .filter(c => !filterPersonId || c.assigned_person_id === filterPersonId)
+        .sort((a, b) => a.position - b.position);
 
     const handleNameCommit = () => {
         const trimmed = nameVal.trim();
@@ -145,7 +146,7 @@ const KanbanColumn: React.FC<Props> = ({
                 )}
             </div>
 
-            {canEdit && isFirst && (
+            {canEdit && (
                 <form onSubmit={handleAddCard} style={{ display: 'flex', gap: '6px', marginTop: '10px' }}>
                     <input
                         value={newCardTitle} onChange={e => setNewCardTitle(e.target.value)}
@@ -157,7 +158,7 @@ const KanbanColumn: React.FC<Props> = ({
                         title={t('features.kanban.addCard')}
                         style={{ padding: '6px 10px', border: 'none', borderRadius: '6px', background: newCardTitle.trim() ? theme.colors.primary : theme.colors.border, cursor: newCardTitle.trim() ? 'pointer' : 'default', display: 'flex', alignItems: 'center', transition: 'background 0.15s' }}
                     >
-                        <ThemedSvgIcon name="plus" color={newCardTitle.trim() ? '#fff' : theme.colors.secondary} size={18} />
+                        <ThemedSvgIcon name="plus" color={newCardTitle.trim() ? theme.colors.surface : theme.colors.secondary} size={18} />
                     </button>
                 </form>
             )}

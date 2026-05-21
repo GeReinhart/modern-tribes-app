@@ -71,14 +71,14 @@ export interface LabelUpdate {
 }
 
 export type MoveDirection = 'prev' | 'next';
-export type ReorderDirection = 'up' | 'down';
+export type ReorderDirection = 'up' | 'down' | 'top' | 'bottom';
+
+import { FIB_COLORS } from '@/components/themes/themes';
 
 export const FIBONACCI = [1, 2, 3, 5, 8, 13, 21] as const;
 
 export function fibColor(size: number | null): string {
     if (size === null) return '';
     const idx = FIBONACCI.indexOf(size as typeof FIBONACCI[number]);
-    if (idx === -1) return '';
-    const hue = 120 - (idx / (FIBONACCI.length - 1)) * 120;
-    return `hsl(${Math.round(hue)}, 65%, 45%)`;
+    return idx === -1 ? '' : (FIB_COLORS[idx] ?? '');
 }

@@ -3,12 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
-import { Tag } from 'lucide-react';
+import { Tag, User } from 'lucide-react';
+import { LABEL_COLORS } from '@/components/themes/themes';
 import { useKanban } from './hooks';
 import { LabelCreate } from './types';
 import KanbanColumnComponent from './KanbanColumn';
-
-const LABEL_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280'];
 
 interface Props {
     featureInstanceId: string;
@@ -30,6 +29,7 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
     const [configuring, setConfiguring] = useState(false);
     const [showArchived, setShowArchived] = useState(false);
     const [filterLabelId, setFilterLabelId] = useState<string | null>(null);
+    const [filterPersonId, setFilterPersonId] = useState<string | null>(null);
     const [newColName, setNewColName] = useState('');
     const [showAddForm, setShowAddForm] = useState(false);
     const [submittingCol, setSubmittingCol] = useState(false);
@@ -41,6 +41,10 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
     const initDone = useRef(false);
     const sortedCols = [...board.columns].sort((a, b) => a.position - b.position);
     const maxColumns = 4;
+
+    const assignedPersons = persons.filter(p =>
+        board.cards.some(c => c.status === 'active' && c.assigned_person_id === p.id)
+    );
 
     const hasArchived = board.cards.some(c => c.status === 'archived');
 
@@ -83,60 +87,91 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
                 </div>
             )}
 
-            {/* Label filter row */}
-            {board.labels.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '14px', alignItems: 'center' }}>
-                    <Tag size={14} color={theme.colors.secondary} />
-                    {board.labels.map(label => {
-                        const active = filterLabelId === label.id;
+            {/* Top bar: label filters + actions */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                {/* Label filters */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center', flex: 1 }}>
+                    {board.labels.length > 0 && (
+                        <>
+                            <Tag size={14} color={theme.colors.secondary} />
+                            {board.labels.map(label => {
+                                const active = filterLabelId === label.id;
+                                return (
+                                    <button
+                                        key={label.id}
+                                        type="button"
+                                        onClick={() => setFilterLabelId(prev => prev === label.id ? null : label.id)}
+                                        style={{
+                                            padding: '4px 12px', borderRadius: '16px',
+                                            fontSize: 'var(--font-xs)', fontWeight: 500,
+                                            cursor: 'pointer',
+                                            border: `1px solid ${active ? label.color : theme.colors.border}`,
+                                            backgroundColor: active ? `${label.color}20` : theme.colors.surface,
+                                            color: active ? label.color : theme.colors.secondary,
+                                            transition: 'all 0.15s', whiteSpace: 'nowrap',
+                                        }}
+                                    >
+                                        {label.name}
+                                    </button>
+                                );
+                            })}
+                        </>
+                    )}
+                </div>
+
+                {/* Right actions */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                    {actions}
+
+                    {canEdit && hasArchived && (
+                        <button
+                            onClick={() => setShowArchived(v => !v)}
+                            title={showArchived ? t('features.kanban.hideArchived') : t('features.kanban.showArchived')}
+                            style={{ background: showArchived ? theme.colors.secondary : 'none', border: `1px solid ${showArchived ? theme.colors.secondary : theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}
+                        >
+                            <ThemedSvgIcon name={showArchived ? 'eye-off' : 'eye'} color={showArchived ? theme.colors.surface : theme.colors.secondary} size={16} />
+                        </button>
+                    )}
+
+                    {isManager && (
+                        <button
+                            onClick={() => configuring ? handleDoneConfiguring() : setConfiguring(true)}
+                            title={configuring ? t('features.kanban.saveColumns') : t('features.kanban.configureColumns')}
+                            style={{ background: configuring ? theme.colors.primary : 'none', border: `1px solid ${configuring ? theme.colors.primary : theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}
+                        >
+                            <ThemedSvgIcon name="settings" color={configuring ? theme.colors.surface : theme.colors.secondary} size={16} />
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {/* Person filter row */}
+            {assignedPersons.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '10px', alignItems: 'center' }}>
+                    <User size={14} color={theme.colors.secondary} />
+                    {assignedPersons.map(person => {
+                        const active = filterPersonId === person.id;
                         return (
                             <button
-                                key={label.id}
+                                key={person.id}
                                 type="button"
-                                onClick={() => setFilterLabelId(prev => prev === label.id ? null : label.id)}
+                                onClick={() => setFilterPersonId(prev => prev === person.id ? null : person.id)}
                                 style={{
                                     padding: '4px 12px', borderRadius: '16px',
                                     fontSize: 'var(--font-xs)', fontWeight: 500,
                                     cursor: 'pointer',
-                                    border: `1px solid ${active ? label.color : theme.colors.border}`,
-                                    backgroundColor: active ? `${label.color}20` : theme.colors.surface,
-                                    color: active ? label.color : theme.colors.secondary,
+                                    border: `1px solid ${active ? theme.colors.accent : theme.colors.border}`,
+                                    backgroundColor: active ? `${theme.colors.accent}20` : theme.colors.surface,
+                                    color: active ? theme.colors.accent : theme.colors.secondary,
                                     transition: 'all 0.15s', whiteSpace: 'nowrap',
                                 }}
                             >
-                                {label.name}
+                                {person.name}
                             </button>
                         );
                     })}
                 </div>
             )}
-
-            {/* Action toolbar */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                {actions}
-
-                {/* Show archived toggle — eye icon */}
-                {canEdit && hasArchived && (
-                    <button
-                        onClick={() => setShowArchived(v => !v)}
-                        title={showArchived ? t('features.kanban.hideArchived') : t('features.kanban.showArchived')}
-                        style={{ background: showArchived ? theme.colors.secondary : 'none', border: `1px solid ${showArchived ? theme.colors.secondary : theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}
-                    >
-                        <ThemedSvgIcon name={showArchived ? 'eye-off' : 'eye'} color={showArchived ? '#fff' : theme.colors.secondary} size={16} />
-                    </button>
-                )}
-
-                {/* Configure columns — settings icon */}
-                {isManager && (
-                    <button
-                        onClick={() => configuring ? handleDoneConfiguring() : setConfiguring(true)}
-                        title={configuring ? t('features.kanban.saveColumns') : t('features.kanban.configureColumns')}
-                        style={{ background: configuring ? theme.colors.primary : 'none', border: `1px solid ${configuring ? theme.colors.primary : theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}
-                    >
-                        <ThemedSvgIcon name="settings" color={configuring ? '#fff' : theme.colors.secondary} size={16} />
-                    </button>
-                )}
-            </div>
 
             {/* Columns */}
             <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start', overflowX: 'auto' }}>
@@ -153,6 +188,7 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
                         canDelete={sortedCols.length > 2 && idx !== 0 && idx !== sortedCols.length - 1}
                         showArchived={showArchived}
                         filterLabelId={filterLabelId}
+                        filterPersonId={filterPersonId}
                         persons={persons}
                         onRename={renameColumn}
                         onMove={moveColumn}
