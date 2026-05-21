@@ -4,9 +4,8 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
+import { LABEL_COLORS } from '@/components/themes/themes';
 import { KanbanCard, KanbanLabel, PersonOption, CardUpdate, LabelCreate, FIBONACCI, fibColor } from './types';
-
-const LABEL_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#6b7280'];
 
 interface Props {
     card: KanbanCard;
@@ -17,11 +16,10 @@ interface Props {
     onUpdate: (cardId: string, data: CardUpdate) => Promise<void>;
     onToggleLabel: (cardId: string, labelId: string, currentLabelIds: string[]) => Promise<void>;
     onCreateLabel: (data: LabelCreate) => Promise<KanbanLabel | null>;
-    onArchive: (cardId: string) => Promise<void>;
 }
 
 const KanbanCardModal: React.FC<Props> = ({
-    card, boardLabels, persons, canEdit, onClose, onUpdate, onToggleLabel, onCreateLabel, onArchive,
+    card, boardLabels, persons, canEdit, onClose, onUpdate, onToggleLabel, onCreateLabel,
 }) => {
     const { t } = useTranslation();
     const { theme } = useTheme();
@@ -31,7 +29,6 @@ const KanbanCardModal: React.FC<Props> = ({
     const [size, setSize] = useState<number | null>(card.size);
     const [notes, setNotes] = useState(card.document_content_html ?? '');
     const [saving, setSaving] = useState(false);
-    const [confirmArchive, setConfirmArchive] = useState(false);
 
     // Local label state for immediate visual feedback
     const [localLabelIds, setLocalLabelIds] = useState<string[]>(card.label_ids);
@@ -146,7 +143,7 @@ const KanbanCardModal: React.FC<Props> = ({
                                             padding: '4px 12px', borderRadius: '12px',
                                             border: `1.5px solid ${label.color}`,
                                             background: active ? label.color : 'transparent',
-                                            color: active ? '#fff' : label.color,
+                                            color: active ? theme.colors.surface : label.color,
                                             fontSize: '12px', fontWeight: 600,
                                             cursor: canEdit ? 'pointer' : 'default',
                                             transition: 'all 0.15s',
@@ -209,7 +206,7 @@ const KanbanCardModal: React.FC<Props> = ({
                                             border: size === n ? `2px solid ${fibColor(n)}` : `1px solid ${theme.colors.border}`,
                                             borderRadius: '6px',
                                             background: size === n ? fibColor(n) : 'transparent',
-                                            color: size === n ? '#fff' : fibColor(n),
+                                            color: size === n ? theme.colors.surface : fibColor(n),
                                             fontWeight: 700, fontSize: '13px', cursor: canEdit ? 'pointer' : 'default',
                                             transition: 'all 0.15s',
                                         }}
@@ -250,33 +247,13 @@ const KanbanCardModal: React.FC<Props> = ({
                 </div>
 
                 {/* Footer */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 20px', borderTop: `1px solid ${theme.colors.border}` }}>
-                    <div>
-                        {canEdit && !confirmArchive && (
-                            <button
-                                onClick={() => setConfirmArchive(true)}
-                                style={{ background: 'none', border: `1px solid ${theme.colors.danger}`, borderRadius: '6px', cursor: 'pointer', color: theme.colors.danger, padding: '6px 12px', fontSize: 'var(--font-sm)', display: 'flex', alignItems: 'center', gap: '5px' }}
-                            >
-                                <ThemedSvgIcon name="archive" color={theme.colors.danger} size={14} />
-                                {t('common.archive')}
-                            </button>
-                        )}
-                        {confirmArchive && (
-                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                <span style={{ fontSize: 'var(--font-sm)', color: theme.colors.danger }}>{t('features.kanban.archiveCardTitle')}</span>
-                                <ThemedButton variant="ghost" onClick={() => setConfirmArchive(false)}>{t('common.cancel')}</ThemedButton>
-                                <ThemedButton variant="primary" onClick={() => { onArchive(card.id); onClose(); }}>{t('common.archive')}</ThemedButton>
-                            </div>
-                        )}
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                        <ThemedButton variant="ghost" onClick={onClose} disabled={saving}>{t('common.cancel')}</ThemedButton>
-                        {canEdit && (
-                            <ThemedButton variant="primary" onClick={handleSave} disabled={saving || !title.trim()}>
-                                {saving ? t('common.saving') : t('common.save')}
-                            </ThemedButton>
-                        )}
-                    </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: '14px 20px', borderTop: `1px solid ${theme.colors.border}`, gap: '8px' }}>
+                    <ThemedButton variant="ghost" onClick={onClose} disabled={saving}>{t('common.cancel')}</ThemedButton>
+                    {canEdit && (
+                        <ThemedButton variant="primary" onClick={handleSave} disabled={saving || !title.trim()}>
+                            {saving ? t('common.saving') : t('common.save')}
+                        </ThemedButton>
+                    )}
                 </div>
             </div>
         </div>

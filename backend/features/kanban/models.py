@@ -72,7 +72,7 @@ class MoveCard(BaseModel):
 
 
 class ReorderCard(BaseModel):
-    direction: str  # "up" | "down"
+    direction: str  # "up" | "down" | "top" | "bottom"
 
 
 class LabelCreate(BaseModel):

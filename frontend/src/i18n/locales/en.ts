@@ -343,6 +343,8 @@ const en: Record<string, string> = {
     'features.kanban.hideArchived': 'Hide archived',
     'features.kanban.restore': 'Restore',
     'features.kanban.archived': 'Archived',
+    'features.kanban.moveToTop': 'Move to top',
+    'features.kanban.moveToBottom': 'Move to bottom',
     'features.kanban.size': 'Story points',
     'features.kanban.setSize': 'Set story points',
     'features.kanban.filterBy': 'Filter:',

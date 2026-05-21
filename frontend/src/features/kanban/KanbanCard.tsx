@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
+import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
-import { KanbanCard as Card, KanbanLabel, PersonOption, CardUpdate, LabelCreate, fibColor } from './types';
+import { KanbanCard as Card, KanbanLabel, PersonOption, CardUpdate, LabelCreate, ReorderDirection, fibColor } from './types';
 import KanbanCardModal from './KanbanCardModal';
 
 interface Props {
@@ -19,7 +20,7 @@ interface Props {
     onArchive: (cardId: string) => Promise<void>;
     onRestore: (cardId: string) => Promise<void>;
     onMove: (cardId: string, direction: 'prev' | 'next') => Promise<void>;
-    onReorder: (cardId: string, direction: 'up' | 'down') => Promise<void>;
+    onReorder: (cardId: string, direction: ReorderDirection) => Promise<void>;
     onToggleLabel: (cardId: string, labelId: string, currentLabelIds: string[]) => Promise<void>;
     onCreateLabel: (data: LabelCreate) => Promise<KanbanLabel | null>;
 }
@@ -32,6 +33,7 @@ const KanbanCard: React.FC<Props> = ({
     const { t } = useTranslation();
     const { theme } = useTheme();
     const [modalOpen, setModalOpen] = useState(false);
+    const [confirmArchive, setConfirmArchive] = useState(false);
 
     const isArchived = card.status === 'archived';
     const borderColor = card.size ? fibColor(card.size) : accentColor;
@@ -77,14 +79,20 @@ const KanbanCard: React.FC<Props> = ({
                             </>
                         )}
 
-                        {/* Within-column reorder: up / down */}
+                        {/* Within-column reorder: top / up / down / bottom */}
                         {canEdit && !isArchived && (
                             <>
+                                <button disabled={isFirstInCol} onClick={() => onReorder(card.id, 'top')} title={t('features.kanban.moveToTop')} style={{ background: 'none', border: 'none', cursor: isFirstInCol ? 'default' : 'pointer', opacity: isFirstInCol ? 0.2 : 1, padding: '0 1px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                                    <ThemedSvgIcon name="chevrons-up" color={theme.colors.secondary} size={14} />
+                                </button>
                                 <button disabled={isFirstInCol} onClick={() => onReorder(card.id, 'up')} style={{ background: 'none', border: 'none', cursor: isFirstInCol ? 'default' : 'pointer', opacity: isFirstInCol ? 0.2 : 1, padding: '0 1px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
                                     <ThemedSvgIcon name="arrow-up" color={theme.colors.secondary} size={14} />
                                 </button>
                                 <button disabled={isLastInCol} onClick={() => onReorder(card.id, 'down')} style={{ background: 'none', border: 'none', cursor: isLastInCol ? 'default' : 'pointer', opacity: isLastInCol ? 0.2 : 1, padding: '0 1px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
                                     <ThemedSvgIcon name="arrow-down" color={theme.colors.secondary} size={14} />
+                                </button>
+                                <button disabled={isLastInCol} onClick={() => onReorder(card.id, 'bottom')} title={t('features.kanban.moveToBottom')} style={{ background: 'none', border: 'none', cursor: isLastInCol ? 'default' : 'pointer', opacity: isLastInCol ? 0.2 : 1, padding: '0 1px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                                    <ThemedSvgIcon name="chevrons-down" color={theme.colors.secondary} size={14} />
                                 </button>
                             </>
                         )}
@@ -98,7 +106,7 @@ const KanbanCard: React.FC<Props> = ({
                         ))}
 
                         {card.size && (
-                            <span style={{ fontSize: '10px', fontWeight: 700, padding: '1px 5px', borderRadius: '8px', background: fibColor(card.size), color: '#fff', flexShrink: 0 }} title={t('features.kanban.size')}>
+                            <span style={{ fontSize: '10px', fontWeight: 700, padding: '1px 5px', borderRadius: '8px', background: fibColor(card.size), color: theme.colors.surface, flexShrink: 0 }} title={t('features.kanban.size')}>
                                 {card.size}
                             </span>
                         )}
@@ -115,11 +123,18 @@ const KanbanCard: React.FC<Props> = ({
                             </span>
                         )}
 
-                        {/* Edit button */}
+                        {/* Edit + Archive buttons */}
                         {!isArchived && (
-                            <button onClick={() => setModalOpen(true)} title={t('common.edit')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.secondary, padding: '1px 3px', display: 'flex', alignItems: 'center', opacity: 0.6 }}>
-                                <ThemedSvgIcon name="pencil" color={theme.colors.secondary} size={13} />
-                            </button>
+                            <>
+                                <button onClick={() => setModalOpen(true)} title={t('common.edit')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.secondary, padding: '1px 3px', display: 'flex', alignItems: 'center', opacity: 0.6 }}>
+                                    <ThemedSvgIcon name="pencil" color={theme.colors.secondary} size={13} />
+                                </button>
+                                {canEdit && (
+                                    <button onClick={() => setConfirmArchive(true)} title={t('common.archive')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 3px', display: 'flex', alignItems: 'center', opacity: 0.6 }}>
+                                        <ThemedSvgIcon name="archive" color={theme.colors.danger} size={13} />
+                                    </button>
+                                )}
+                            </>
                         )}
 
                         {/* Archive indicator + restore button (archived) */}
@@ -147,8 +162,28 @@ const KanbanCard: React.FC<Props> = ({
                     onUpdate={onUpdate}
                     onToggleLabel={onToggleLabel}
                     onCreateLabel={onCreateLabel}
-                    onArchive={onArchive}
                 />
+            )}
+
+            {confirmArchive && (
+                <div
+                    style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: '16px' }}
+                    onClick={e => { if (e.target === e.currentTarget) setConfirmArchive(false); }}
+                >
+                    <div style={{ backgroundColor: theme.colors.surface, borderRadius: '12px', border: `1px solid ${theme.colors.border}`, padding: '24px', maxWidth: '360px', width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.25)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <ThemedSvgIcon name="archive" color={theme.colors.danger} size={20} />
+                            <span style={{ fontWeight: 700, fontSize: 'var(--font-md)', color: theme.colors.text }}>{t('features.kanban.archiveCardTitle')}</span>
+                        </div>
+                        <p style={{ margin: 0, fontSize: 'var(--font-sm)', color: theme.colors.secondary }}>
+                            {t('features.kanban.archiveCardMessage', { title: card.title })}
+                        </p>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+                            <ThemedButton variant="ghost" onClick={() => setConfirmArchive(false)}>{t('common.cancel')}</ThemedButton>
+                            <ThemedButton variant="danger" onClick={() => { onArchive(card.id); setConfirmArchive(false); }}>{t('common.archive')}</ThemedButton>
+                        </div>
+                    </div>
+                </div>
             )}
         </>
     );

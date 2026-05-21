@@ -198,6 +198,28 @@ async def move_card_to_column(pool, card_id: str, column_id: str, user_id: str) 
         )
 
 
+async def _apply_reorder(conn, cards: list[dict], idx: int, direction: str, user_id: str) -> list:
+    if direction == "top":
+        if idx == 0:
+            return []
+        new_pos = cards[0]["position"] - 1
+        await conn.execute("UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3", new_pos, UUID(user_id), cards[idx]["id"])
+        return [cards[idx]["id"]]
+    if direction == "bottom":
+        if idx == len(cards) - 1:
+            return []
+        new_pos = cards[-1]["position"] + 1
+        await conn.execute("UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3", new_pos, UUID(user_id), cards[idx]["id"])
+        return [cards[idx]["id"]]
+    target_idx = idx - 1 if direction == "up" else idx + 1
+    if target_idx < 0 or target_idx >= len(cards):
+        return []
+    pos_a, pos_b = cards[idx]["position"], cards[target_idx]["position"]
+    await conn.execute("UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3", pos_b, UUID(user_id), cards[idx]["id"])
+    await conn.execute("UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3", pos_a, UUID(user_id), cards[target_idx]["id"])
+    return [cards[idx]["id"], cards[target_idx]["id"]]
+
+
 async def reorder_card_in_column(pool, card_id: str, direction: str, user_id: str) -> list[dict]:
     async with pool.acquire() as conn:
         card_row = await conn.fetchrow(
@@ -206,37 +228,16 @@ async def reorder_card_in_column(pool, card_id: str, direction: str, user_id: st
         )
         if not card_row:
             return []
-        column_id = card_row["column_id"]
         rows = await conn.fetch(
             "SELECT id, position FROM kanban_cards WHERE column_id = $1 AND status = 'active' ORDER BY position ASC",
-            column_id,
+            card_row["column_id"],
         )
         cards = [dict(r) for r in rows]
         idx = next((i for i, c in enumerate(cards) if str(c["id"]) == card_id), None)
         if idx is None:
             return []
-        target_idx = idx - 1 if direction == "up" else idx + 1
-        if target_idx < 0 or target_idx >= len(cards):
-            return []
-        pos_a = cards[idx]["position"]
-        pos_b = cards[target_idx]["position"]
-        await conn.execute("UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3", pos_b, UUID(user_id), cards[idx]["id"])
-        await conn.execute("UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3", pos_a, UUID(user_id), cards[target_idx]["id"])
-        affected_ids = [cards[idx]["id"], cards[target_idx]["id"]]
-        result_rows = await conn.fetch(
-            """SELECT kc.*, kc.size,
-                      d.content_html AS document_content_html,
-                      p.first_name || ' ' || p.last_name AS assigned_person_name,
-                      ARRAY(
-                          SELECT kcl.label_id::text FROM kanban_card_labels kcl WHERE kcl.card_id = kc.id
-                      ) AS label_ids
-               FROM kanban_cards kc
-               LEFT JOIN documents d ON d.id = kc.document_id
-               LEFT JOIN persons p ON p.id = kc.assigned_person_id
-               WHERE kc.id = ANY($1)""",
-            affected_ids,
-        )
-    return [dict(r) for r in result_rows]
+        affected_ids = await _apply_reorder(conn, cards, idx, direction, user_id)
+    return [c for c in [await fetch_card(pool, str(aid)) for aid in affected_ids] if c]
 
 
 # --- Label management ---
