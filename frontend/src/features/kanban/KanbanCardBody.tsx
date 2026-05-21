@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
+import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
 import { KanbanCard, CardUpdate } from './types';
 
@@ -48,9 +49,9 @@ const KanbanCardBody: React.FC<Props> = ({ card, canEdit, onUpdate }) => {
                             <button
                                 onClick={() => setEditing(true)}
                                 title={t('common.edit')}
-                                style={{ background: 'none', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', color: theme.colors.secondary, fontSize: '15px', padding: '3px 9px', lineHeight: 1 }}
+                                style={{ background: 'none', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', color: theme.colors.secondary, padding: '5px 8px', display: 'flex', alignItems: 'center' }}
                             >
-                                ✏️
+                                <ThemedSvgIcon name="pencil" color={theme.colors.secondary} size={15} />
                             </button>
                         </div>
                     )}

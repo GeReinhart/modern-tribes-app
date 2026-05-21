@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedCard } from '@/components/common/layout/ThemedCard';
 import { ThemedText } from '@/components/common/layout/ThemedText';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
+import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { useSearch } from '@/hooks/useSearch';
 import { SearchResult } from '@/types/search.types';
@@ -84,9 +85,13 @@ const SearchResultCard: React.FC<{ result: SearchResult }> = ({ result }) => {
                             cursor: 'pointer',
                             fontSize: 'var(--font-sm)',
                             fontWeight: 500,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
                         }}
                     >
-                        {contextType === 'project' ? contextLabel : result.tribe_name} →
+                        {contextType === 'project' ? contextLabel : result.tribe_name}
+                        <ThemedSvgIcon name="arrow-right" color={theme.colors.primary} size={14} />
                     </button>
                 )}
             </div>

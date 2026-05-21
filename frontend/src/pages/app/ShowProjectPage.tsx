@@ -17,6 +17,7 @@ import { useProjectFeatures, useFeatureTypes } from '@/hooks/useProjectFeatures'
 import { getFeatureComponent } from '@/features/registry';
 import { errorStyle, containerStyle } from '@/styles/theme.styles';
 import { Paperclip, Download, FileText, Image, Film, Music, File } from 'lucide-react';
+import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { AttachmentFile } from '@/types/document.types';
 import { ProjectEntry } from '@/types/queries/projects.query.types';
 import { ProjectDocumentsTab } from '@/components/entities/projects/ProjectDocumentsTab';
@@ -377,13 +378,14 @@ const ShowProjectPageContent: React.FC = () => {
                         <FeatureComponent
                             featureInstanceId={activeFeature.id}
                             canEdit={canEdit}
+                            isManager={isManager}
                             actions={isManager ? (
                                 <button
                                     onClick={() => setArchiveTarget({ id: activeFeature.id, name: activeFeature.name })}
                                     title={t('features.archive')}
-                                    style={{ background: 'none', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', color: theme.colors.secondary, fontSize: '16px', padding: '4px 10px', lineHeight: 1 }}
+                                    style={{ background: 'none', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}
                                 >
-                                    🗄
+                                    <ThemedSvgIcon name="archive" color={theme.colors.secondary} size={16} />
                                 </button>
                             ) : undefined}
                         />

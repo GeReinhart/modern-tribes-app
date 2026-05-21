@@ -7,6 +7,7 @@ import { adminMainThemeId, AdminNavigation } from '@/components/layout/AdminNavi
 import { ThemedCard } from '@/components/common/layout/ThemedCard';
 import { ThemedText } from '@/components/common/layout/ThemedText';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
+import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
 import { monitoringService } from '@/services/monitoring.service.ts';
 import { DocumentRevision } from '@/types/monitoring.types.ts';
@@ -194,14 +195,20 @@ const DocumentRevisionsPageContent: React.FC = () => {
                                                 disabled={selectedIndex >= revisions.length - 1}
                                                 onClick={() => navigateTo(revisions[selectedIndex + 1])}
                                             >
-                                                {t('monitoring.revisions.older')}
+                                                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    <ThemedSvgIcon name="arrow-left" color="currentColor" size={14} />
+                                                    {t('monitoring.revisions.older')}
+                                                </span>
                                             </ThemedButton>
                                             <ThemedButton
                                                 variant="secondary"
                                                 disabled={selectedIndex <= 0}
                                                 onClick={() => navigateTo(revisions[selectedIndex - 1])}
                                             >
-                                                {t('monitoring.revisions.newer')}
+                                                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    {t('monitoring.revisions.newer')}
+                                                    <ThemedSvgIcon name="arrow-right" color="currentColor" size={14} />
+                                                </span>
                                             </ThemedButton>
                                         </div>
                                     </div>

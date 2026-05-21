@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ApplicationLogo } from '@/components/common/icons/ApplicationLogo';
+import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { BreadcrumbItem } from './Breadcrumb';
 import UserBadge from "@/components/entities/users/CurrentUserBadge.tsx";
@@ -25,6 +26,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     const navigate = useNavigate();
     const location = useLocation();
     const isSearchActive = location.pathname === '/app/search';
+    const isAboutActive = location.pathname === '/app/about';
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -196,7 +198,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 </div>
             )}
 
-            {/* Right - Search + User Badge */}
+            {/* Right - Search + About + User Badge */}
             {showUserBadge && (
                 <div style={rightSectionStyle}>
                     <button
@@ -216,10 +218,25 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                             flexShrink: 0,
                         }}
                     >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="11" cy="11" r="8" />
-                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                        </svg>
+                        <ThemedSvgIcon name="search" color={isSearchActive ? theme.colors.primary : theme.colors.text} size={18} />
+                    </button>
+                    <button
+                        onClick={() => navigate('/app/about')}
+                        title="About"
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            border: `2px solid ${isAboutActive ? theme.colors.primary : theme.colors.border}`,
+                            backgroundColor: isAboutActive ? `${theme.colors.primary}15` : 'transparent',
+                            cursor: 'pointer',
+                            flexShrink: 0,
+                        }}
+                    >
+                        <ThemedSvgIcon name="info" color={isAboutActive ? theme.colors.primary : theme.colors.text} size={18} />
                     </button>
                     <UserBadge />
                 </div>

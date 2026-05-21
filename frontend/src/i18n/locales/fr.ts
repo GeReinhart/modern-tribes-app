@@ -213,8 +213,8 @@ const fr: Record<string, string> = {
     'monitoring.revisions.none': 'Aucune révision enregistrée pour ce document.',
     'monitoring.revisions.selectOne': 'Sélectionnez une révision dans la liste.',
     'monitoring.revisions.loadError': 'Impossible de charger les révisions.',
-    'monitoring.revisions.older': '← Plus ancienne',
-    'monitoring.revisions.newer': 'Plus récente →',
+    'monitoring.revisions.older': 'Plus ancienne',
+    'monitoring.revisions.newer': 'Plus récente',
     'monitoring.revisions.current': 'Actuelle',
     'admin.app': 'Application',
     'admin.addUser': 'Ajouter un utilisateur',
@@ -388,6 +388,14 @@ const fr: Record<string, string> = {
     'files.maxFilesError': '{{maxFiles}} fichiers maximum autorisés',
     'files.fileSizeError': 'Le fichier {{filename}} dépasse la limite de {{maxFileSize}} Mo',
     'files.uploadFailed': 'Échec du téléversement',
+
+    'about.title': 'À propos',
+    'about.subtitle': 'Modern Tribes — un outil léger pour organiser les groupes auxquels vous appartenez.',
+    'about.sourceCode': 'Code source',
+    'about.stack': 'Stack technique',
+    'about.features': 'Fonctionnalités',
+    'about.platform': 'Plateforme',
+    'about.application': 'Modules applicatifs',
 };
 
 export default fr;
