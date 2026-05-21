@@ -169,7 +169,7 @@ const KanbanCardModal: React.FC<Props> = ({
 
                         {/* Inline new label form */}
                         {canEdit && showNewLabel && (
-                            <form onSubmit={handleCreateLabel} style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginTop: '10px', padding: '10px 12px', border: `1px solid ${theme.colors.border}`, borderRadius: '8px', backgroundColor: theme.colors.background ?? theme.colors.surface }}>
+                            <form onSubmit={handleCreateLabel} style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginTop: '10px', padding: '10px 12px', border: `1px solid ${theme.colors.border}`, borderRadius: '8px', backgroundColor: theme.colors.surface }}>
                                 <input
                                     autoFocus
                                     value={newLabelName}

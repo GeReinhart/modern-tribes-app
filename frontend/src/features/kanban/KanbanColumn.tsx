@@ -138,7 +138,7 @@ const KanbanColumn: React.FC<Props> = ({
                                 boardLabels={board.labels}
                                 persons={persons}
                                 onUpdate={onUpdateCard} onArchive={onArchiveCard} onRestore={onRestoreCard}
-                                onMove={onMoveCard} onReorder={onReorderCard} onToggleLabel={onToggleLabel}
+                                onMove={onMoveCard} onReorder={onReorderCard} onToggleLabel={onToggleLabel} onCreateLabel={onCreateLabel}
                             />
                         ))}
                     </div>
