@@ -210,7 +210,7 @@ const TodoRow: React.FC<{
     );
 };
 
-const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit }) => {
+const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit, actions }) => {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const { items, error, createItem, updateItem } = useTodoItems(featureInstanceId);
@@ -257,6 +257,12 @@ const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit }) => {
             {error && (
                 <div style={{ padding: '8px 12px', marginBottom: '12px', color: theme.colors.danger, fontSize: 'var(--font-sm)' }}>
                     {error}
+                </div>
+            )}
+
+            {actions && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                    {actions}
                 </div>
             )}
 

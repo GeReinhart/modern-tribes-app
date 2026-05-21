@@ -13,8 +13,14 @@ async def fetch_board(pool, feature_instance_id: str) -> dict:
         cards = await conn.fetch(
             """SELECT kc.id, kc.feature_instance_id, kc.column_id,
                       kc.title, kc.assigned_person_id, kc.position, kc.status,
-                      kc.document_id, d.content_html AS document_content_html,
-                      p.first_name || ' ' || p.last_name AS assigned_person_name
+                      kc.document_id, kc.size,
+                      d.content_html AS document_content_html,
+                      p.first_name || ' ' || p.last_name AS assigned_person_name,
+                      ARRAY(
+                          SELECT kcl.label_id::text
+                          FROM kanban_card_labels kcl
+                          WHERE kcl.card_id = kc.id
+                      ) AS label_ids
                FROM kanban_cards kc
                LEFT JOIN documents d ON d.id = kc.document_id
                LEFT JOIN persons p ON p.id = kc.assigned_person_id
@@ -22,7 +28,17 @@ async def fetch_board(pool, feature_instance_id: str) -> dict:
                ORDER BY kc.position ASC""",
             UUID(feature_instance_id),
         )
-    return {"columns": [dict(r) for r in cols], "cards": [dict(r) for r in cards]}
+        labels = await conn.fetch(
+            """SELECT id, name, color, position FROM kanban_labels
+               WHERE feature_instance_id = $1
+               ORDER BY position ASC""",
+            UUID(feature_instance_id),
+        )
+    return {
+        "columns": [dict(r) for r in cols],
+        "cards": [dict(r) for r in cards],
+        "labels": [dict(r) for r in labels],
+    }
 
 
 async def fetch_columns_sorted(pool, feature_instance_id: str) -> list[dict]:
@@ -85,7 +101,9 @@ async def fetch_persons_for_feature(pool, feature_instance_id: str) -> list[dict
             """SELECT DISTINCT p.id, p.first_name || ' ' || p.last_name AS name
                FROM projects_features pf
                JOIN tribes_projects tp ON tp.project_id = pf.project_id
-               JOIN positions pos ON pos.tribe_id = tp.tribe_id AND pos.status = 'active'
+               JOIN positions pos ON pos.tribe_id = tp.tribe_id
+                   AND pos.status = 'active'
+                   AND pos.position IN ('manager', 'member')
                JOIN persons p ON p.id = pos.person_id AND p.status = 'active'
                WHERE pf.id = $1
                ORDER BY name ASC""",
@@ -97,8 +115,14 @@ async def fetch_persons_for_feature(pool, feature_instance_id: str) -> list[dict
 async def fetch_card(pool, card_id: str) -> Optional[dict]:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            """SELECT kc.*, d.content_html AS document_content_html,
-                      p.first_name || ' ' || p.last_name AS assigned_person_name
+            """SELECT kc.*, kc.size,
+                      d.content_html AS document_content_html,
+                      p.first_name || ' ' || p.last_name AS assigned_person_name,
+                      ARRAY(
+                          SELECT kcl.label_id::text
+                          FROM kanban_card_labels kcl
+                          WHERE kcl.card_id = kc.id
+                      ) AS label_ids
                FROM kanban_cards kc
                LEFT JOIN documents d ON d.id = kc.document_id
                LEFT JOIN persons p ON p.id = kc.assigned_person_id
@@ -127,7 +151,7 @@ async def insert_card(
 
 async def update_card_fields(
     pool, card_id: str, title: Optional[str], assigned_person_id: Optional[str],
-    clear_assignee: bool, user_id: str,
+    clear_assignee: bool, size: Optional[int], clear_size: bool, user_id: str,
 ) -> None:
     async with pool.acquire() as conn:
         if title is not None:
@@ -136,6 +160,10 @@ async def update_card_fields(
             await conn.execute("UPDATE kanban_cards SET assigned_person_id = NULL, updated_by = $1 WHERE id = $2", UUID(user_id), UUID(card_id))
         elif assigned_person_id is not None:
             await conn.execute("UPDATE kanban_cards SET assigned_person_id = $1, updated_by = $2 WHERE id = $3", UUID(assigned_person_id), UUID(user_id), UUID(card_id))
+        if clear_size:
+            await conn.execute("UPDATE kanban_cards SET size = NULL, updated_by = $1 WHERE id = $2", UUID(user_id), UUID(card_id))
+        elif size is not None:
+            await conn.execute("UPDATE kanban_cards SET size = $1, updated_by = $2 WHERE id = $3", size, UUID(user_id), UUID(card_id))
 
 
 async def set_card_document(pool, card_id: str, document_id: str, user_id: str) -> None:
@@ -154,6 +182,14 @@ async def archive_card(pool, card_id: str, user_id: str) -> None:
         )
 
 
+async def restore_card(pool, card_id: str, user_id: str) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE kanban_cards SET status = 'active', updated_by = $1 WHERE id = $2",
+            UUID(user_id), UUID(card_id),
+        )
+
+
 async def move_card_to_column(pool, card_id: str, column_id: str, user_id: str) -> None:
     async with pool.acquire() as conn:
         await conn.execute(
@@ -162,3 +198,104 @@ async def move_card_to_column(pool, card_id: str, column_id: str, user_id: str) 
         )
 
 
+async def reorder_card_in_column(pool, card_id: str, direction: str, user_id: str) -> list[dict]:
+    async with pool.acquire() as conn:
+        card_row = await conn.fetchrow(
+            "SELECT id, column_id, position FROM kanban_cards WHERE id = $1 AND status = 'active'",
+            UUID(card_id),
+        )
+        if not card_row:
+            return []
+        column_id = card_row["column_id"]
+        rows = await conn.fetch(
+            "SELECT id, position FROM kanban_cards WHERE column_id = $1 AND status = 'active' ORDER BY position ASC",
+            column_id,
+        )
+        cards = [dict(r) for r in rows]
+        idx = next((i for i, c in enumerate(cards) if str(c["id"]) == card_id), None)
+        if idx is None:
+            return []
+        target_idx = idx - 1 if direction == "up" else idx + 1
+        if target_idx < 0 or target_idx >= len(cards):
+            return []
+        pos_a = cards[idx]["position"]
+        pos_b = cards[target_idx]["position"]
+        await conn.execute("UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3", pos_b, UUID(user_id), cards[idx]["id"])
+        await conn.execute("UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3", pos_a, UUID(user_id), cards[target_idx]["id"])
+        affected_ids = [cards[idx]["id"], cards[target_idx]["id"]]
+        result_rows = await conn.fetch(
+            """SELECT kc.*, kc.size,
+                      d.content_html AS document_content_html,
+                      p.first_name || ' ' || p.last_name AS assigned_person_name,
+                      ARRAY(
+                          SELECT kcl.label_id::text FROM kanban_card_labels kcl WHERE kcl.card_id = kc.id
+                      ) AS label_ids
+               FROM kanban_cards kc
+               LEFT JOIN documents d ON d.id = kc.document_id
+               LEFT JOIN persons p ON p.id = kc.assigned_person_id
+               WHERE kc.id = ANY($1)""",
+            affected_ids,
+        )
+    return [dict(r) for r in result_rows]
+
+
+# --- Label management ---
+
+async def fetch_labels_for_feature(pool, feature_instance_id: str) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT id, name, color, position FROM kanban_labels WHERE feature_instance_id = $1 ORDER BY position ASC",
+            UUID(feature_instance_id),
+        )
+    return [dict(r) for r in rows]
+
+
+async def fetch_label(pool, label_id: str) -> Optional[dict]:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("SELECT * FROM kanban_labels WHERE id = $1", UUID(label_id))
+    return dict(row) if row else None
+
+
+async def insert_label(pool, feature_instance_id: str, name: str, color: str, user_id: str) -> dict:
+    async with pool.acquire() as conn:
+        labels = await conn.fetch(
+            "SELECT position FROM kanban_labels WHERE feature_instance_id = $1 ORDER BY position DESC LIMIT 1",
+            UUID(feature_instance_id),
+        )
+        next_pos = (labels[0]["position"] + 1) if labels else 0
+        row = await conn.fetchrow(
+            "INSERT INTO kanban_labels (feature_instance_id, name, color, position, created_by, updated_by) VALUES ($1, $2, $3, $4, $5, $5) RETURNING id, name, color, position",
+            UUID(feature_instance_id), name, color, next_pos, UUID(user_id),
+        )
+    return dict(row)
+
+
+async def update_label(pool, label_id: str, name: Optional[str], color: Optional[str], user_id: str) -> Optional[dict]:
+    async with pool.acquire() as conn:
+        if name is not None:
+            await conn.execute("UPDATE kanban_labels SET name = $1, updated_by = $2 WHERE id = $3", name, UUID(user_id), UUID(label_id))
+        if color is not None:
+            await conn.execute("UPDATE kanban_labels SET color = $1, updated_by = $2 WHERE id = $3", color, UUID(user_id), UUID(label_id))
+        row = await conn.fetchrow("SELECT id, name, color, position FROM kanban_labels WHERE id = $1", UUID(label_id))
+    return dict(row) if row else None
+
+
+async def delete_label(pool, label_id: str) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute("DELETE FROM kanban_labels WHERE id = $1", UUID(label_id))
+
+
+async def add_card_label(pool, card_id: str, label_id: str) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "INSERT INTO kanban_card_labels (card_id, label_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+            UUID(card_id), UUID(label_id),
+        )
+
+
+async def remove_card_label(pool, card_id: str, label_id: str) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "DELETE FROM kanban_card_labels WHERE card_id = $1 AND label_id = $2",
+            UUID(card_id), UUID(label_id),
+        )

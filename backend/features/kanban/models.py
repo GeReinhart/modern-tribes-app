@@ -2,6 +2,13 @@ from pydantic import BaseModel
 from typing import Optional
 
 
+class KanbanLabel(BaseModel):
+    id: str
+    name: str
+    color: str
+    position: int
+
+
 class KanbanColumnResponse(BaseModel):
     id: str
     name: str
@@ -19,11 +26,14 @@ class KanbanCardResponse(BaseModel):
     document_content_html: Optional[str] = None
     position: int
     status: str
+    size: Optional[int] = None
+    label_ids: list[str] = []
 
 
 class KanbanBoard(BaseModel):
     columns: list[KanbanColumnResponse]
     cards: list[KanbanCardResponse]
+    labels: list[KanbanLabel]
 
 
 class PersonOption(BaseModel):
@@ -53,7 +63,24 @@ class CardUpdate(BaseModel):
     assigned_person_id: Optional[str] = None
     clear_assignee: bool = False
     document_content_html: Optional[str] = None
+    size: Optional[int] = None
+    clear_size: bool = False
 
 
 class MoveCard(BaseModel):
     direction: str  # "prev" | "next"
+
+
+class ReorderCard(BaseModel):
+    direction: str  # "up" | "down"
+
+
+class LabelCreate(BaseModel):
+    feature_instance_id: str
+    name: str
+    color: str = '#6b7280'
+
+
+class LabelUpdate(BaseModel):
+    name: Optional[str] = None
+    color: Optional[str] = None

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
-import { KanbanColumn as Column, KanbanCard, KanbanBoard, CardCreate, CardUpdate, MoveDirection } from './types';
+import { KanbanColumn as Column, KanbanCard, KanbanBoard, KanbanLabel, PersonOption, CardCreate, CardUpdate, LabelCreate, MoveDirection, ReorderDirection } from './types';
 import KanbanCardComponent from './KanbanCard';
 
 interface Props {
@@ -15,16 +15,28 @@ interface Props {
     isFirst: boolean;
     isLast: boolean;
     canDelete: boolean;
+    showArchived: boolean;
+    filterLabelId: string | null;
+    persons: PersonOption[];
     onRename: (columnId: string, name: string) => Promise<void>;
     onMove: (columnId: string, direction: MoveDirection) => Promise<void>;
     onDelete: (columnId: string) => Promise<void>;
     onCreateCard: (data: CardCreate) => Promise<KanbanCard | null>;
     onUpdateCard: (cardId: string, data: CardUpdate) => Promise<void>;
     onArchiveCard: (cardId: string) => Promise<void>;
+    onRestoreCard: (cardId: string) => Promise<void>;
     onMoveCard: (cardId: string, direction: 'prev' | 'next') => Promise<void>;
+    onReorderCard: (cardId: string, direction: ReorderDirection) => Promise<void>;
+    onToggleLabel: (cardId: string, labelId: string, currentLabelIds: string[]) => Promise<void>;
+    onCreateLabel: (data: LabelCreate) => Promise<KanbanLabel | null>;
 }
 
-const KanbanColumn: React.FC<Props> = ({ column, board, featureInstanceId, canEdit, configuring, isFirst, isLast, canDelete, onRename, onMove, onDelete, onCreateCard, onUpdateCard, onArchiveCard, onMoveCard }) => {
+const KanbanColumn: React.FC<Props> = ({
+    column, board, featureInstanceId, canEdit, configuring, isFirst, isLast, canDelete,
+    showArchived, filterLabelId, persons,
+    onRename, onMove, onDelete, onCreateCard, onUpdateCard, onArchiveCard, onRestoreCard,
+    onMoveCard, onReorderCard, onToggleLabel, onCreateLabel,
+}) => {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const [editingName, setEditingName] = useState(false);
@@ -33,8 +45,16 @@ const KanbanColumn: React.FC<Props> = ({ column, board, featureInstanceId, canEd
     const [confirmDelete, setConfirmDelete] = useState(false);
 
     const accentColor = isFirst ? theme.colors.primary : isLast ? theme.colors.success : theme.colors.accent;
-    const topLevelCards = board.cards.filter(c => c.column_id === column.id && c.status === 'active');
-    const canRename = canEdit && configuring && !isFirst && !isLast;
+    const canRename = canEdit && configuring;
+
+    const allColCards = board.cards.filter(c => c.column_id === column.id);
+    const activeCards = allColCards.filter(c => c.status === 'active');
+    const archivedCards = allColCards.filter(c => c.status === 'archived');
+
+    const visibleActive = (filterLabelId
+        ? activeCards.filter(c => c.label_ids.includes(filterLabelId))
+        : activeCards
+    ).sort((a, b) => a.position - b.position);
 
     const handleNameCommit = () => {
         const trimmed = nameVal.trim();
@@ -46,7 +66,8 @@ const KanbanColumn: React.FC<Props> = ({ column, board, featureInstanceId, canEd
         e.preventDefault();
         const title = newCardTitle.trim();
         if (!title) return;
-        await onCreateCard({ feature_instance_id: featureInstanceId, column_id: column.id, title, position: topLevelCards.length });
+        const autoAssignee = persons.length === 1 ? persons[0].id : undefined;
+        await onCreateCard({ feature_instance_id: featureInstanceId, column_id: column.id, title, position: activeCards.length, assigned_person_id: autoAssignee });
         setNewCardTitle('');
     };
 
@@ -71,15 +92,16 @@ const KanbanColumn: React.FC<Props> = ({ column, board, featureInstanceId, canEd
                     <span
                         onClick={() => canRename ? setEditingName(true) : undefined}
                         style={{ flex: 1, fontWeight: 700, fontSize: 'var(--font-md)', color: accentColor, cursor: canRename ? 'pointer' : 'default', letterSpacing: '0.01em' }}
+                        title={canRename ? t('features.kanban.clickToRename') : undefined}
                     >
                         {column.name}
                     </span>
                 )}
-                <span style={{ fontSize: '11px', fontWeight: 600, color: theme.colors.secondary, background: theme.colors.border, borderRadius: '10px', padding: '1px 7px' }}>{topLevelCards.length}</span>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: theme.colors.secondary, background: theme.colors.border, borderRadius: '10px', padding: '1px 7px' }}>{visibleActive.length}</span>
                 {canEdit && configuring && (
                     <>
-                        <button disabled={isFirst} onClick={() => onMove(column.id, 'prev')} style={{ background: 'none', border: 'none', cursor: isFirst ? 'default' : 'pointer', opacity: isFirst ? 0.25 : 1, padding: '2px 3px', color: theme.colors.primary, display: 'flex', alignItems: 'center' }}><ThemedSvgIcon name="arrow-left" color={theme.colors.primary} size={16} /></button>
-                        <button disabled={isLast} onClick={() => onMove(column.id, 'next')} style={{ background: 'none', border: 'none', cursor: isLast ? 'default' : 'pointer', opacity: isLast ? 0.25 : 1, padding: '2px 3px', color: theme.colors.primary, display: 'flex', alignItems: 'center' }}><ThemedSvgIcon name="arrow-right" color={theme.colors.primary} size={16} /></button>
+                        <button disabled={isFirst} onClick={() => onMove(column.id, 'prev')} style={{ background: 'none', border: 'none', cursor: isFirst ? 'default' : 'pointer', opacity: isFirst ? 0.25 : 1, padding: '2px 3px', display: 'flex', alignItems: 'center' }}><ThemedSvgIcon name="arrow-left" color={theme.colors.primary} size={16} /></button>
+                        <button disabled={isLast} onClick={() => onMove(column.id, 'next')} style={{ background: 'none', border: 'none', cursor: isLast ? 'default' : 'pointer', opacity: isLast ? 0.25 : 1, padding: '2px 3px', display: 'flex', alignItems: 'center' }}><ThemedSvgIcon name="arrow-right" color={theme.colors.primary} size={16} /></button>
                     </>
                 )}
                 {canEdit && configuring && canDelete && (
@@ -88,16 +110,38 @@ const KanbanColumn: React.FC<Props> = ({ column, board, featureInstanceId, canEd
             </div>
 
             <div style={{ flex: 1, minHeight: '40px' }}>
-                {topLevelCards.map(card => (
+                {visibleActive.map((card, idx) => (
                     <KanbanCardComponent
                         key={card.id} card={card} canEdit={canEdit}
                         isFirstCol={isFirst} isLastCol={isLast}
+                        isFirstInCol={idx === 0} isLastInCol={idx === visibleActive.length - 1}
                         accentColor={accentColor}
-                        onUpdate={onUpdateCard} onArchive={onArchiveCard} onMove={onMoveCard}
+                        boardLabels={board.labels}
+                        persons={persons}
+                        onUpdate={onUpdateCard} onArchive={onArchiveCard} onRestore={onRestoreCard}
+                        onMove={onMoveCard} onReorder={onReorderCard} onToggleLabel={onToggleLabel} onCreateLabel={onCreateLabel}
                     />
                 ))}
-                {topLevelCards.length === 0 && (
+                {visibleActive.length === 0 && (
                     <div style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary, textAlign: 'center', padding: '20px 0', fontStyle: 'italic' }}>{t('features.kanban.empty')}</div>
+                )}
+
+                {/* Archived cards */}
+                {showArchived && archivedCards.length > 0 && (
+                    <div style={{ marginTop: '8px', borderTop: `1px dashed ${theme.colors.border}`, paddingTop: '8px' }}>
+                        {archivedCards.map(card => (
+                            <KanbanCardComponent
+                                key={card.id} card={card} canEdit={canEdit}
+                                isFirstCol={isFirst} isLastCol={isLast}
+                                isFirstInCol={false} isLastInCol={false}
+                                accentColor={accentColor}
+                                boardLabels={board.labels}
+                                persons={persons}
+                                onUpdate={onUpdateCard} onArchive={onArchiveCard} onRestore={onRestoreCard}
+                                onMove={onMoveCard} onReorder={onReorderCard} onToggleLabel={onToggleLabel}
+                            />
+                        ))}
+                    </div>
                 )}
             </div>
 
