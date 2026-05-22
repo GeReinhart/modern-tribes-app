@@ -409,6 +409,13 @@ const fr: Record<string, string> = {
     'files.fileSizeError': 'Le fichier {{filename}} dépasse la limite de {{maxFileSize}} Mo',
     'files.uploadFailed': 'Échec du téléversement',
 
+    'common.saving': 'Enregistrement...',
+
+    'dashboard.title': 'Tableau de bord',
+    'dashboard.tabs.tasks': 'Tâches',
+    'dashboard.tasks.empty': 'Aucune tâche à venir qui vous est assignée.',
+    'dashboard.tasks.openSource': 'Ouvrir dans le projet',
+
     'about.title': 'À propos',
     'about.subtitle': 'Modern Tribes — un outil léger pour organiser les groupes auxquels vous appartenez.',
     'about.sourceCode': 'Code source',

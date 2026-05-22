@@ -35,6 +35,7 @@ import {AppConfigProvider} from "@/contexts/AppConfigContext.tsx";
 import {PublicationsAdminPage} from "@/pages/admin/PublicationsAdminPage.tsx";
 import {PublicationsPage} from "@/pages/public/PublicationsPage.tsx";
 import {PublicationDetailPage} from "@/pages/public/PublicationDetailPage.tsx";
+import DashboardPage from "@/pages/app/DashboardPage.tsx";
 
 function AuthBootstrapApp() {
     return (
@@ -76,7 +77,9 @@ function AuthBootstrapApp() {
                                 <Route path="/admin/mails" element={<MailsPage/>}/>
                                 <Route path="/admin/publications" element={<PublicationsAdminPage/>}/>
 
-                            <Route path="/app" element={<Navigate to="/app/tribes" replace/>}/>
+                            <Route path="/app" element={<Navigate to="/app/dashboard" replace/>}/>
+                            <Route path="/app/dashboard" element={<Navigate to="/app/dashboard/tasks" replace/>}/>
+                            <Route path="/app/dashboard/:tab" element={<DashboardPage/>}/>
                             <Route path="/app/tribes" element={<TribesPage/>}/>
                             <Route path="/app/tribes/create" element={<CreateTribeForm/>}/>
                             <Route path="/app/tribes/:tribeId" element={<ShowTribePage/>}/>
@@ -95,8 +98,8 @@ function AuthBootstrapApp() {
                             <Route path="/app/profile" element={<ProfilePage/>}/>
 
                         </Route>
-                        <Route path="/" element={<Navigate to="/app/tribes" replace/>}/>
-                        <Route path="*" element={<Navigate to="/app/tribes" replace/>}/>
+                        <Route path="/" element={<Navigate to="/app/dashboard" replace/>}/>
+                        <Route path="*" element={<Navigate to="/app/dashboard" replace/>}/>
                     </Routes>
                     </UserProfileProvider>
                     </AppConfigProvider>

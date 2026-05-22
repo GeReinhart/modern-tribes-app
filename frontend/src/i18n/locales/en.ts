@@ -409,6 +409,13 @@ const en: Record<string, string> = {
     'files.fileSizeError': 'File {{filename}} exceeds {{maxFileSize}}MB limit',
     'files.uploadFailed': 'Upload failed',
 
+    'common.saving': 'Saving...',
+
+    'dashboard.title': 'Dashboard',
+    'dashboard.tabs.tasks': 'Tasks',
+    'dashboard.tasks.empty': 'No upcoming tasks assigned to you.',
+    'dashboard.tasks.openSource': 'Open in project',
+
     'about.title': 'About',
     'about.subtitle': 'Modern Tribes — a lightweight tool for organising the groups you belong to.',
     'about.sourceCode': 'Source code',
