@@ -103,11 +103,11 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
                                         onClick={() => setFilterLabelId(prev => prev === label.id ? null : label.id)}
                                         style={{
                                             padding: '4px 12px', borderRadius: '16px',
-                                            fontSize: 'var(--font-xs)', fontWeight: 500,
+                                            fontSize: 'var(--font-xs)', fontWeight: active ? 700 : 500,
                                             cursor: 'pointer',
-                                            border: `1px solid ${active ? label.color : theme.colors.border}`,
-                                            backgroundColor: active ? `${label.color}20` : theme.colors.surface,
-                                            color: active ? label.color : theme.colors.secondary,
+                                            border: `1px solid ${label.color}`,
+                                            backgroundColor: active ? `${label.color}20` : 'transparent',
+                                            color: label.color,
                                             transition: 'all 0.15s', whiteSpace: 'nowrap',
                                         }}
                                     >

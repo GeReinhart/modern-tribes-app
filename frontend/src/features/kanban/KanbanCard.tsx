@@ -38,6 +38,8 @@ const KanbanCard: React.FC<Props> = ({
     const isArchived = card.status === 'archived';
     const borderColor = card.size ? fibColor(card.size) : accentColor;
     const cardLabels = boardLabels.filter(l => card.label_ids.includes(l.id));
+    const getInitials = (name: string) =>
+        name.split(' ').slice(0, 2).map(w => w[0]?.toUpperCase() ?? '').join('');
 
     return (
         <>
@@ -111,9 +113,9 @@ const KanbanCard: React.FC<Props> = ({
                             </span>
                         )}
 
-                        {card.assigned_person_name && (
+                        {card.assigned_person_name && persons.length > 1 && (
                             <span style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '10px', background: accentColor + '22', color: accentColor, fontWeight: 600, border: `1px solid ${accentColor}44`, whiteSpace: 'nowrap' }}>
-                                {card.assigned_person_name}
+                                {getInitials(card.assigned_person_name)}
                             </span>
                         )}
 
@@ -126,11 +128,11 @@ const KanbanCard: React.FC<Props> = ({
                         {/* Edit + Archive buttons */}
                         {!isArchived && (
                             <>
-                                <button onClick={() => setModalOpen(true)} title={t('common.edit')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.secondary, padding: '1px 3px', display: 'flex', alignItems: 'center', opacity: 0.6 }}>
+                                <button onClick={() => setModalOpen(true)} title={t('common.edit')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.secondary, padding: '1px 3px', display: 'flex', alignItems: 'center', opacity: 0.8 }}>
                                     <ThemedSvgIcon name="pencil" color={theme.colors.secondary} size={13} />
                                 </button>
                                 {canEdit && (
-                                    <button onClick={() => setConfirmArchive(true)} title={t('common.archive')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 3px', display: 'flex', alignItems: 'center', opacity: 0.6 }}>
+                                    <button onClick={() => setConfirmArchive(true)} title={t('common.archive')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 3px', display: 'flex', alignItems: 'center', opacity: 0.8 }}>
                                         <ThemedSvgIcon name="archive" color={theme.colors.danger} size={13} />
                                     </button>
                                 )}
