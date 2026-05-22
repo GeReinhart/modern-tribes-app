@@ -1,6 +1,6 @@
 from typing import Optional
 from uuid import UUID
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 
 from app.repositories.persons_repository import fetch_persons_for_feature  # noqa: F401
 
@@ -68,7 +68,8 @@ async def update_todo_item_basic(pool, item_id: str, updates: dict, user_id: str
 
 
 async def update_todo_fields(pool, item_id: str, size: Optional[int], clear_size: bool,
-                             assigned_person_id: Optional[str], clear_assignee: bool, user_id: str) -> None:
+                             assigned_person_id: Optional[str], clear_assignee: bool,
+                             due_date: Optional[date], clear_due_date: bool, user_id: str) -> None:
     uid = UUID(user_id)
     iid = UUID(item_id)
     async with pool.acquire() as conn:
@@ -81,6 +82,10 @@ async def update_todo_fields(pool, item_id: str, size: Optional[int], clear_size
         elif assigned_person_id is not None:
             await conn.execute("UPDATE todo_items SET assigned_person_id = $1, updated_by = $2 WHERE id = $3",
                                UUID(assigned_person_id), uid, iid)
+        if clear_due_date:
+            await conn.execute("UPDATE todo_items SET due_date = NULL, updated_by = $1 WHERE id = $2", uid, iid)
+        elif due_date is not None:
+            await conn.execute("UPDATE todo_items SET due_date = $1, updated_by = $2 WHERE id = $3", due_date, uid, iid)
 
 
 async def upsert_document(pool, item_id: str, content_html: str, content_text: str,

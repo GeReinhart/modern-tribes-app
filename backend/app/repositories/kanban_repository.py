@@ -1,5 +1,6 @@
 from typing import Optional
 from uuid import UUID
+from datetime import date
 from app.repositories.persons_repository import fetch_persons_for_feature  # noqa: F401 – re-exported for callers
 
 
@@ -14,7 +15,7 @@ async def fetch_board(pool, feature_instance_id: str) -> dict:
         cards = await conn.fetch(
             """SELECT kc.id, kc.feature_instance_id, kc.column_id,
                       kc.title, kc.assigned_person_id, kc.position, kc.status,
-                      kc.document_id, kc.size,
+                      kc.document_id, kc.size, kc.due_date,
                       d.content_html AS document_content_html,
                       p.first_name || ' ' || p.last_name AS assigned_person_name,
                       ARRAY(
@@ -137,7 +138,8 @@ async def insert_card(
 
 async def update_card_fields(
     pool, card_id: str, title: Optional[str], assigned_person_id: Optional[str],
-    clear_assignee: bool, size: Optional[int], clear_size: bool, user_id: str,
+    clear_assignee: bool, size: Optional[int], clear_size: bool,
+    due_date: Optional[date], clear_due_date: bool, user_id: str,
 ) -> None:
     async with pool.acquire() as conn:
         if title is not None:
@@ -150,6 +152,10 @@ async def update_card_fields(
             await conn.execute("UPDATE kanban_cards SET size = NULL, updated_by = $1 WHERE id = $2", UUID(user_id), UUID(card_id))
         elif size is not None:
             await conn.execute("UPDATE kanban_cards SET size = $1, updated_by = $2 WHERE id = $3", size, UUID(user_id), UUID(card_id))
+        if clear_due_date:
+            await conn.execute("UPDATE kanban_cards SET due_date = NULL, updated_by = $1 WHERE id = $2", UUID(user_id), UUID(card_id))
+        elif due_date is not None:
+            await conn.execute("UPDATE kanban_cards SET due_date = $1, updated_by = $2 WHERE id = $3", due_date, UUID(user_id), UUID(card_id))
 
 
 async def set_card_document(pool, card_id: str, document_id: str, user_id: str) -> None:

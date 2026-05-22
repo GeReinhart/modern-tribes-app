@@ -4,6 +4,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
+import ThemedDateSelection from '@/components/common/form/ThemedDateSelection';
 import { LABEL_COLORS } from '@/components/themes/themes';
 import { FIBONACCI, fibColor, PersonOption } from '@/types/features';
 import { TodoItem, TodoLabel, TodoItemUpdate, TodoLabelCreate } from './types';
@@ -31,6 +32,7 @@ const TodoItemModal: React.FC<Props> = ({
     const [title, setTitle] = useState(item.title);
     const [size, setSize] = useState<number | null>(item.size);
     const [assigneeId, setAssigneeId] = useState(item.assigned_person_id ?? '');
+    const [dueDate, setDueDate] = useState(item.due_date ?? '');
     const [notes, setNotes] = useState(item.document_content_html ?? '');
     const [saving, setSaving] = useState(false);
     const [localLabelIds, setLocalLabelIds] = useState<string[]>(item.label_ids);
@@ -57,6 +59,10 @@ const TodoItemModal: React.FC<Props> = ({
         if (assigneeId !== (item.assigned_person_id ?? '')) {
             if (!assigneeId) patch.clear_assignee = true;
             else patch.assigned_person_id = assigneeId;
+        }
+        if (dueDate !== (item.due_date ?? '')) {
+            if (!dueDate) patch.clear_due_date = true;
+            else patch.due_date = dueDate;
         }
         if (Object.keys(patch).length > 0) await onUpdate(item.id, patch);
         setSaving(false);
@@ -115,50 +121,64 @@ const TodoItemModal: React.FC<Props> = ({
 
                 {/* Body */}
                 <div style={{ flex: 1, overflowY: 'auto', padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
-                    {/* Labels */}
-                    <div>
-                        <div style={sectionLabel}>{t('features.kanban.manageLabels')}</div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
-                            {labels.map(label => {
-                                const active = localLabelIds.includes(label.id);
-                                return (
-                                    <button key={label.id} onClick={() => handleToggleLabel(label.id)} disabled={!canEdit}
-                                        style={{ padding: '4px 12px', borderRadius: '12px', border: `1.5px solid ${label.color}`, background: active ? label.color : 'transparent', color: active ? theme.colors.surface : label.color, fontSize: '12px', fontWeight: 600, cursor: canEdit ? 'pointer' : 'default', transition: 'all 0.15s' }}>
-                                        {label.name}
+                    {/* Labels + Assignee row */}
+                    <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                        {/* Labels */}
+                        <div style={{ flex: 1 }}>
+                            <div style={sectionLabel}>{t('features.kanban.manageLabels')}</div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+                                {labels.map(label => {
+                                    const active = localLabelIds.includes(label.id);
+                                    return (
+                                        <button key={label.id} onClick={() => handleToggleLabel(label.id)} disabled={!canEdit}
+                                            style={{ padding: '4px 12px', borderRadius: '12px', border: `1.5px solid ${label.color}`, background: active ? label.color : 'transparent', color: active ? theme.colors.surface : label.color, fontSize: '12px', fontWeight: 600, cursor: canEdit ? 'pointer' : 'default', transition: 'all 0.15s' }}>
+                                            {label.name}
+                                        </button>
+                                    );
+                                })}
+                                {isManager && !showNewLabel && (
+                                    <button onClick={() => setShowNewLabel(true)}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '3px 10px', borderRadius: '12px', border: `1.5px dashed ${theme.colors.border}`, background: 'none', color: theme.colors.secondary, fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
+                                        <ThemedSvgIcon name="plus" color={theme.colors.secondary} size={12} />
+                                        {t('features.kanban.addLabel')}
                                     </button>
-                                );
-                            })}
-                            {isManager && !showNewLabel && (
-                                <button onClick={() => setShowNewLabel(true)}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '3px 10px', borderRadius: '12px', border: `1.5px dashed ${theme.colors.border}`, background: 'none', color: theme.colors.secondary, fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
-                                    <ThemedSvgIcon name="plus" color={theme.colors.secondary} size={12} />
-                                    {t('features.kanban.addLabel')}
-                                </button>
+                                )}
+                            </div>
+                            {isManager && showNewLabel && (
+                                <form onSubmit={handleCreateLabel} style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px', padding: '10px 12px', border: `1px solid ${theme.colors.border}`, borderRadius: '8px' }}>
+                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                        <input autoFocus value={newLabelName} onChange={e => setNewLabelName(e.target.value)}
+                                            onKeyDown={e => { if (e.key === 'Escape') { setShowNewLabel(false); setNewLabelName(''); } }}
+                                            placeholder={t('features.kanban.newLabelPlaceholder')}
+                                            style={{ padding: '5px 9px', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', backgroundColor: theme.colors.surface, color: theme.colors.text, fontSize: 'var(--font-sm)', width: '140px' }} />
+                                        <div style={{ display: 'flex', gap: '4px' }}>
+                                            {LABEL_COLORS.map(c => (
+                                                <button key={c} type="button" onClick={() => setNewLabelColor(c)}
+                                                    style={{ width: '20px', height: '20px', borderRadius: '50%', background: c, border: newLabelColor === c ? `2px solid ${theme.colors.text}` : '2px solid transparent', cursor: 'pointer', padding: 0, flexShrink: 0 }} />
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                                        <ThemedButton variant="ghost" type="button" onClick={() => { setShowNewLabel(false); setNewLabelName(''); }} style={{ fontSize: 'var(--font-xs)', padding: '3px 10px' }}>{t('common.cancel')}</ThemedButton>
+                                        <ThemedButton variant="primary" type="submit" disabled={!newLabelName.trim() || addingLabel} style={{ fontSize: 'var(--font-xs)', padding: '3px 10px' }}>{t('features.kanban.addLabel')}</ThemedButton>
+                                    </div>
+                                </form>
                             )}
                         </div>
-                        {isManager && showNewLabel && (
-                            <form onSubmit={handleCreateLabel} style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px', padding: '10px 12px', border: `1px solid ${theme.colors.border}`, borderRadius: '8px' }}>
-                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                                    <input autoFocus value={newLabelName} onChange={e => setNewLabelName(e.target.value)}
-                                        onKeyDown={e => { if (e.key === 'Escape') { setShowNewLabel(false); setNewLabelName(''); } }}
-                                        placeholder={t('features.kanban.newLabelPlaceholder')}
-                                        style={{ padding: '5px 9px', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', backgroundColor: theme.colors.surface, color: theme.colors.text, fontSize: 'var(--font-sm)', width: '140px' }} />
-                                    <div style={{ display: 'flex', gap: '4px' }}>
-                                        {LABEL_COLORS.map(c => (
-                                            <button key={c} type="button" onClick={() => setNewLabelColor(c)}
-                                                style={{ width: '20px', height: '20px', borderRadius: '50%', background: c, border: newLabelColor === c ? `2px solid ${theme.colors.text}` : '2px solid transparent', cursor: 'pointer', padding: 0, flexShrink: 0 }} />
-                                        ))}
-                                    </div>
-                                </div>
-                                <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
-                                    <ThemedButton variant="ghost" type="button" onClick={() => { setShowNewLabel(false); setNewLabelName(''); }} style={{ fontSize: 'var(--font-xs)', padding: '3px 10px' }}>{t('common.cancel')}</ThemedButton>
-                                    <ThemedButton variant="primary" type="submit" disabled={!newLabelName.trim() || addingLabel} style={{ fontSize: 'var(--font-xs)', padding: '3px 10px' }}>{t('features.kanban.addLabel')}</ThemedButton>
-                                </div>
-                            </form>
+
+                        {/* Assignee */}
+                        {persons.length > 1 && (
+                            <div style={{ flexShrink: 0 }}>
+                                <div style={sectionLabel}>{t('features.kanban.assignee')}</div>
+                                <select value={assigneeId} onChange={e => setAssigneeId(e.target.value)} disabled={!canEdit} style={{ ...inputStyle, width: 'auto', minWidth: '160px' }}>
+                                    <option value="">{t('features.kanban.noAssignee')}</option>
+                                    {persons.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                </select>
+                            </div>
                         )}
                     </div>
 
-                    {/* Size + Assignee */}
+                    {/* Size + Due date */}
                     <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
                         <div style={{ flex: '1 1 200px' }}>
                             <div style={sectionLabel}>{t('features.kanban.size')}</div>
@@ -171,15 +191,14 @@ const TodoItemModal: React.FC<Props> = ({
                                 ))}
                             </div>
                         </div>
-                        {persons.length > 1 && (
-                            <div style={{ flex: '1 1 200px' }}>
-                                <div style={sectionLabel}>{t('features.kanban.assignee')}</div>
-                                <select value={assigneeId} onChange={e => setAssigneeId(e.target.value)} disabled={!canEdit} style={{ ...inputStyle, width: 'auto', minWidth: '160px' }}>
-                                    <option value="">{t('features.kanban.noAssignee')}</option>
-                                    {persons.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                                </select>
-                            </div>
-                        )}
+
+                        {/* Due date */}
+                        <ThemedDateSelection
+                            label={t('features.todo.dueDate')}
+                            value={dueDate}
+                            onChange={setDueDate}
+                            disabled={!canEdit}
+                        />
                     </div>
 
                     {/* Notes */}

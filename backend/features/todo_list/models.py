@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, date
 
 
 class TodoItemCreate(BaseModel):
@@ -19,6 +19,8 @@ class TodoItemUpdate(BaseModel):
     clear_size: bool = False
     assigned_person_id: Optional[str] = None
     clear_assignee: bool = False
+    due_date: Optional[date] = None
+    clear_due_date: bool = False
 
 
 class TodoItemResponse(BaseModel):
@@ -31,6 +33,7 @@ class TodoItemResponse(BaseModel):
     document_content_html: Optional[str] = None
     position: int
     size: Optional[int] = None
+    due_date: Optional[date] = None
     assigned_person_id: Optional[str] = None
     assigned_person_name: Optional[str] = None
     label_ids: list[str] = []

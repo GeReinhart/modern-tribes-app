@@ -28,6 +28,7 @@ export interface TodoItem {
     document_content_html: string | null;
     position: number;
     size: number | null;
+    due_date: string | null;
     assigned_person_id: string | null;
     assigned_person_name: string | null;
     label_ids: string[];
@@ -53,4 +54,6 @@ export interface TodoItemUpdate {
     clear_size?: boolean;
     assigned_person_id?: string | null;
     clear_assignee?: boolean;
+    due_date?: string | null;
+    clear_due_date?: boolean;
 }

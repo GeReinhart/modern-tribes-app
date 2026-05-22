@@ -210,6 +210,14 @@ export const LABEL_COLORS: string[] = [
     predefinedThemes.default.colors.primary,    // slate grey
 ];
 
+export const URGENCY_COLORS: string[] = [
+    predefinedThemes.alt_06.colors.primary,      // #66CDAA aquamarine — very comfortable
+    predefinedThemes.alt_02.colors.primary,      // #3CB371 sea green  — comfortable
+    predefinedThemes.alt_05.colors.secondary,    // #DAA520 goldenrod  — moderate
+    predefinedThemes.main_3.colors.primary,      // #FF7F50 coral      — urgent
+    predefinedThemes.default.colors.danger,      // #de1234 red        — overdue / critical
+];
+
 export const FIB_COLORS: string[] = [
     predefinedThemes.alt_02.colors.primary,     // sea green   — size 1
     predefinedThemes.alt_06.colors.primary,     // aquamarine  — size 2

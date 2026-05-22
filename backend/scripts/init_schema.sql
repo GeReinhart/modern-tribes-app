@@ -289,6 +289,7 @@ CREATE TABLE IF NOT EXISTS todo_items (
     position INTEGER DEFAULT 0,
     size INTEGER,
     assigned_person_id UUID REFERENCES persons(id) ON DELETE SET NULL,
+    due_date DATE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
@@ -407,6 +408,8 @@ CREATE TABLE IF NOT EXISTS kanban_cards (
     position INTEGER NOT NULL DEFAULT 0,
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CHECK (status IN ('pending', 'active', 'archived')),
+    size INTEGER,
+    due_date DATE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,

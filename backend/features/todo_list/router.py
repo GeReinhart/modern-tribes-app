@@ -37,6 +37,7 @@ def _row_to_todo(row: dict) -> TodoItemResponse:
         document_content_html=row.get("document_content_html"),
         position=row["position"],
         size=row.get("size"),
+        due_date=row.get("due_date"),
         assigned_person_id=str(row["assigned_person_id"]) if row.get("assigned_person_id") else None,
         assigned_person_name=row.get("assigned_person_name"),
         label_ids=list(row.get("label_ids") or []),
@@ -104,9 +105,9 @@ async def update_todo_item(item_id: str, data: TodoItemUpdate, current_user: dic
         basic["position"] = data.position
     await todo_repository.update_todo_item_basic(pool, item_id, basic, user_id)
 
-    if data.size is not None or data.clear_size or data.assigned_person_id is not None or data.clear_assignee:
+    if data.size is not None or data.clear_size or data.assigned_person_id is not None or data.clear_assignee or data.due_date is not None or data.clear_due_date:
         await todo_repository.update_todo_fields(
-            pool, item_id, data.size, data.clear_size, data.assigned_person_id, data.clear_assignee, user_id,
+            pool, item_id, data.size, data.clear_size, data.assigned_person_id, data.clear_assignee, data.due_date, data.clear_due_date, user_id,
         )
 
     if data.document_content_html is not None:

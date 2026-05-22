@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
-import { PersonOption, fibColor } from '@/types/features';
+import { PersonOption, fibColor, urgencyColor } from '@/types/features';
 import { TodoItem, TodoLabel, TodoItemUpdate, TodoLabelCreate } from './types';
 import TodoItemModal from './TodoItemModal';
 
@@ -37,8 +37,8 @@ const TodoRow: React.FC<Props> = ({
 
     return (
         <div style={{ borderRadius: '8px', border: `1px solid ${theme.colors.border}`, marginBottom: '8px', overflow: 'hidden', backgroundColor: theme.colors.surface, opacity: isArchived ? 0.65 : 1 }}>
-            {/* Line 1: checkbox + title + chevron */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px 4px' }}>
+            {/* Line 1: checkbox + title + edit/archive + chevron */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 14px 4px' }}>
                 {canEdit && !isArchived ? (
                     <input type="checkbox" checked={isDone} onChange={e => onToggle(item.id, e.target.checked)}
                         style={{ width: 18, height: 18, cursor: 'pointer', flexShrink: 0 }} />
@@ -51,18 +51,42 @@ const TodoRow: React.FC<Props> = ({
                 >
                     {item.title}
                 </span>
+                {!isArchived && (
+                    <button onClick={() => setModalOpen(true)} title={t('common.edit')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 2px', display: 'flex', alignItems: 'center', opacity: 0.7, flexShrink: 0 }}>
+                        <ThemedSvgIcon name="pencil" color={theme.colors.text} size={13} />
+                    </button>
+                )}
+                {canEdit && !isArchived && (
+                    <button onClick={() => onSetStatus(item.id, 'archived')} title={t('common.archive')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 2px', display: 'flex', alignItems: 'center', opacity: 0.7, flexShrink: 0 }}>
+                        <ThemedSvgIcon name="archive" color={theme.colors.danger} size={13} />
+                    </button>
+                )}
+                {canEdit && isArchived && (
+                    <button onClick={() => onSetStatus(item.id, 'active')} title={t('common.restore')} style={{ background: 'none', border: `1px solid ${theme.colors.success}`, borderRadius: '4px', cursor: 'pointer', padding: '1px 3px', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                        <ThemedSvgIcon name="refresh" color={theme.colors.success} size={13} />
+                    </button>
+                )}
                 <button onClick={() => setExpanded(e => !e)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px', display: 'flex', alignItems: 'center', opacity: 0.75, flexShrink: 0 }}>
                     <ThemedSvgIcon name={expanded ? 'chevron-up' : 'chevron-down'} color={theme.colors.text} size={14} />
                 </button>
             </div>
 
-            {/* Line 2: size + label dots + assignee + edit + archive */}
+            {/* Line 2: badges */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 14px 8px', justifyContent: 'flex-end' }}>
                 {item.size && (
                     <span style={{ fontSize: '10px', fontWeight: 700, padding: '1px 5px', borderRadius: '8px', background: fibColor(item.size), color: theme.colors.surface, flexShrink: 0 }}>
                         {item.size}
                     </span>
                 )}
+                {item.due_date && (() => {
+                    const uc = urgencyColor(item.due_date, item.size);
+                    const overdue = new Date(item.due_date + 'T00:00:00') < new Date(new Date().toDateString());
+                    return (
+                        <span style={{ fontSize: '10px', fontWeight: 600, padding: '1px 5px', borderRadius: '8px', background: overdue ? uc : uc + '28', color: overdue ? '#fff' : uc, flexShrink: 0 }} title={t('features.todo.dueDate')}>
+                            {item.due_date}
+                        </span>
+                    );
+                })()}
                 {cardLabels.map(l => (
                     <span key={l.id} title={l.name} style={{ width: '10px', height: '10px', borderRadius: '50%', background: l.color, display: 'inline-block', flexShrink: 0 }} />
                 ))}
@@ -70,21 +94,6 @@ const TodoRow: React.FC<Props> = ({
                     <span style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '10px', background: theme.colors.accent + '22', color: theme.colors.accent, fontWeight: 600, border: `1px solid ${theme.colors.accent}44`, whiteSpace: 'nowrap' }}>
                         {getInitials(item.assigned_person_name)}
                     </span>
-                )}
-                {!isArchived && (
-                    <button onClick={() => setModalOpen(true)} title={t('common.edit')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 3px', display: 'flex', alignItems: 'center', opacity: 0.8 }}>
-                        <ThemedSvgIcon name="pencil" color={theme.colors.text} size={13} />
-                    </button>
-                )}
-                {canEdit && !isArchived && (
-                    <button onClick={() => onSetStatus(item.id, 'archived')} title={t('common.archive')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 3px', display: 'flex', alignItems: 'center', opacity: 0.8 }}>
-                        <ThemedSvgIcon name="archive" color={theme.colors.danger} size={13} />
-                    </button>
-                )}
-                {canEdit && isArchived && (
-                    <button onClick={() => onSetStatus(item.id, 'active')} title={t('common.restore')} style={{ background: 'none', border: `1px solid ${theme.colors.success}`, borderRadius: '4px', cursor: 'pointer', padding: '2px 4px', display: 'flex', alignItems: 'center' }}>
-                        <ThemedSvgIcon name="refresh" color={theme.colors.success} size={13} />
-                    </button>
                 )}
             </div>
 

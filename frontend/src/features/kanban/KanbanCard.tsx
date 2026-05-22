@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
-import { KanbanCard as Card, KanbanLabel, PersonOption, CardUpdate, LabelCreate, ReorderDirection, fibColor } from './types';
+import { KanbanCard as Card, KanbanLabel, PersonOption, CardUpdate, LabelCreate, ReorderDirection, fibColor, urgencyColor } from './types';
 import KanbanCardModal from './KanbanCardModal';
 import KanbanCardBody from './KanbanCardBody';
 
@@ -55,7 +55,7 @@ const KanbanCard: React.FC<Props> = ({
                 opacity: isArchived ? 0.65 : 1,
             }}>
                 <div style={{ padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    {/* Line 1: title + expand toggle */}
+                    {/* Line 1: title + edit/archive + expand */}
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '4px' }}>
                         <span
                             onClick={() => setModalOpen(true)}
@@ -70,6 +70,28 @@ const KanbanCard: React.FC<Props> = ({
                         >
                             {card.title}
                         </span>
+                        {!isArchived && (
+                            <>
+                                <button onClick={() => setModalOpen(true)} title={t('common.edit')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 2px', display: 'flex', alignItems: 'center', opacity: 0.7, flexShrink: 0 }}>
+                                    <ThemedSvgIcon name="pencil" color={theme.colors.text} size={12} />
+                                </button>
+                                {canEdit && (
+                                    <button onClick={() => setConfirmArchive(true)} title={t('common.archive')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 2px', display: 'flex', alignItems: 'center', opacity: 0.7, flexShrink: 0 }}>
+                                        <ThemedSvgIcon name="archive" color={theme.colors.danger} size={12} />
+                                    </button>
+                                )}
+                            </>
+                        )}
+                        {isArchived && (
+                            <span style={{ display: 'flex', alignItems: 'center', opacity: 0.6, flexShrink: 0 }} title={t('features.kanban.archived')}>
+                                <ThemedSvgIcon name="archive" color={theme.colors.secondary} size={12} />
+                            </span>
+                        )}
+                        {isArchived && canEdit && (
+                            <button onClick={() => onRestore(card.id)} title={t('features.kanban.restore')} style={{ background: 'none', border: `1px solid ${theme.colors.success}`, borderRadius: '4px', cursor: 'pointer', padding: '1px 3px', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                                <ThemedSvgIcon name="refresh" color={theme.colors.success} size={12} />
+                            </button>
+                        )}
                         <button
                             onClick={() => setExpanded(v => !v)}
                             title={expanded ? t('features.kanban.hideContent') : t('features.kanban.showContent')}
@@ -79,9 +101,8 @@ const KanbanCard: React.FC<Props> = ({
                         </button>
                     </div>
 
-                    {/* Line 2: arrows (left) + badges (right) */}
+                    {/* Line 2: arrows + badges */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                        {/* Column move: left / right */}
                         {canEdit && !isArchived && (
                             <>
                                 <button disabled={isFirstCol} onClick={() => onMove(card.id, 'prev')} style={{ background: 'none', border: 'none', cursor: isFirstCol ? 'default' : 'pointer', opacity: isFirstCol ? 0.2 : 1, padding: '0 1px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
@@ -92,8 +113,6 @@ const KanbanCard: React.FC<Props> = ({
                                 </button>
                             </>
                         )}
-
-                        {/* Within-column reorder: top / up / down / bottom */}
                         {canEdit && !isArchived && (
                             <>
                                 <button disabled={isFirstInCol} onClick={() => onReorder(card.id, 'top')} title={t('features.kanban.moveToTop')} style={{ background: 'none', border: 'none', cursor: isFirstInCol ? 'default' : 'pointer', opacity: isFirstInCol ? 0.2 : 1, padding: '0 1px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
@@ -110,51 +129,28 @@ const KanbanCard: React.FC<Props> = ({
                                 </button>
                             </>
                         )}
-
-                        {/* Spacer */}
                         <div style={{ flex: 1 }} />
-
-                        {/* Badges */}
                         {cardLabels.map(l => (
                             <span key={l.id} title={l.name} style={{ width: '10px', height: '10px', borderRadius: '50%', background: l.color, display: 'inline-block', flexShrink: 0 }} />
                         ))}
-
                         {card.size && (
                             <span style={{ fontSize: '10px', fontWeight: 700, padding: '1px 5px', borderRadius: '8px', background: fibColor(card.size), color: theme.colors.surface, flexShrink: 0 }} title={t('features.kanban.size')}>
                                 {card.size}
                             </span>
                         )}
-
+                        {card.due_date && (() => {
+                            const uc = urgencyColor(card.due_date, card.size);
+                            const overdue = new Date(card.due_date + 'T00:00:00') < new Date(new Date().toDateString());
+                            return (
+                                <span style={{ fontSize: '10px', fontWeight: 600, padding: '1px 5px', borderRadius: '8px', background: overdue ? uc : uc + '28', color: overdue ? '#fff' : uc, flexShrink: 0 }} title={t('features.kanban.dueDate')}>
+                                    {card.due_date}
+                                </span>
+                            );
+                        })()}
                         {card.assigned_person_name && persons.length > 1 && (
                             <span style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '10px', background: accentColor + '22', color: accentColor, fontWeight: 600, border: `1px solid ${accentColor}44`, whiteSpace: 'nowrap' }}>
                                 {expanded ? card.assigned_person_name : getInitials(card.assigned_person_name)}
                             </span>
-                        )}
-
-                        {/* Edit + Archive buttons */}
-                        {!isArchived && (
-                            <>
-                                <button onClick={() => setModalOpen(true)} title={t('common.edit')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 3px', display: 'flex', alignItems: 'center', opacity: 0.8 }}>
-                                    <ThemedSvgIcon name="pencil" color={theme.colors.text} size={13} />
-                                </button>
-                                {canEdit && (
-                                    <button onClick={() => setConfirmArchive(true)} title={t('common.archive')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 3px', display: 'flex', alignItems: 'center', opacity: 0.8 }}>
-                                        <ThemedSvgIcon name="archive" color={theme.colors.danger} size={13} />
-                                    </button>
-                                )}
-                            </>
-                        )}
-
-                        {/* Archive indicator + restore button (archived) */}
-                        {isArchived && (
-                            <span style={{ color: theme.colors.secondary, display: 'flex', alignItems: 'center', opacity: 0.7 }} title={t('features.kanban.archived')}>
-                                <ThemedSvgIcon name="archive" color={theme.colors.secondary} size={13} />
-                            </span>
-                        )}
-                        {isArchived && canEdit && (
-                            <button onClick={() => onRestore(card.id)} title={t('features.kanban.restore')} style={{ background: 'none', border: `1px solid ${theme.colors.success}`, borderRadius: '4px', cursor: 'pointer', padding: '2px 4px', display: 'flex', alignItems: 'center' }}>
-                                <ThemedSvgIcon name="refresh" color={theme.colors.success} size={13} />
-                            </button>
                         )}
                     </div>
                 </div>

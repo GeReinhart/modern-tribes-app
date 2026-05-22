@@ -324,6 +324,7 @@ const fr: Record<string, string> = {
     'features.todo.noNote': "Aucune note pour l'instant.",
     'features.todo.showArchived': '{{count}} élément(s) archivé(s)',
     'features.todo.hideArchived': 'Masquer les éléments archivés',
+    'features.todo.dueDate': "Date d'échéance",
     'features.kanban.empty': 'Aucune carte pour l\'instant.',
     'features.kanban.addCard': 'Ajouter',
     'features.kanban.addCardPlaceholder': 'Titre de la carte...',
@@ -355,6 +356,7 @@ const fr: Record<string, string> = {
     'features.kanban.newLabelPlaceholder': 'Nom de l\'étiquette...',
     'features.kanban.assignee': 'Responsable',
     'features.kanban.noAssignee': 'Aucun responsable',
+    'features.kanban.dueDate': "Date d'échéance",
 
     'projectDocuments.tab': 'Documents',
     'projectDocuments.addDocument': 'Ajouter un document',

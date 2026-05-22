@@ -23,6 +23,7 @@ export interface KanbanCard {
     position: number;
     status: 'pending' | 'active' | 'archived';
     size: number | null;
+    due_date: string | null;
     label_ids: string[];
 }
 
@@ -49,6 +50,8 @@ export interface CardUpdate {
     document_content_html?: string;
     size?: number | null;
     clear_size?: boolean;
+    due_date?: string | null;
+    clear_due_date?: boolean;
 }
 
 export interface ColumnCreate {
@@ -70,4 +73,4 @@ export interface LabelUpdate {
 export type MoveDirection = 'prev' | 'next';
 export type ReorderDirection = 'up' | 'down' | 'top' | 'bottom';
 
-export { FIBONACCI, fibColor } from '@/types/features';
+export { FIBONACCI, fibColor, urgencyColor } from '@/types/features';

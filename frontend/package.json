@@ -12,10 +12,12 @@
   "dependencies": {
     "@heroicons/react": "2.2.0",
     "axios": "1.15.2",
+    "date-fns": "4.2.1",
     "i18next": "^26.1.0",
     "jodit-react": "5.3.21",
     "lucide-react": "0.577.0",
     "react": "18.3.1",
+    "react-datepicker": "9.1.0",
     "react-dom": "18.3.1",
     "react-i18next": "^17.0.7",
     "react-router-dom": "7.14.2"
