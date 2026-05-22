@@ -24,6 +24,10 @@ class LabelService {
     async delete(id: string): Promise<void> {
         return apiService.delete<void>(`${this.endpoint}/${id}`);
     }
+
+    async searchFeatureLabels(name: string): Promise<Array<{ id: string; name: string; color: string; feature_instance_id: string }>> {
+        return apiService.get(`/query/labels/search?name=${encodeURIComponent(name)}`);
+    }
 }
 
 export const labelService = new LabelService()

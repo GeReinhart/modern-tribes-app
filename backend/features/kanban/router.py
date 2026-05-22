@@ -9,6 +9,7 @@ from app.core.database import get_database
 from app.utils.project_access import check_project_access_or_admin
 from app.utils.document_helpers import strip_html, extract_content_summary
 from app.repositories import kanban_repository as repo
+from app.repositories import feature_labels_repository as labels_repo
 from .models import (
     KanbanBoard, KanbanColumnResponse, KanbanCardResponse, KanbanLabel, PersonOption,
     ColumnCreate, ColumnUpdate, CardCreate, CardUpdate, MoveCard, ReorderCard,
@@ -256,7 +257,7 @@ async def reorder_card(card_id: str, data: ReorderCard, current_user: dict = Dep
 async def list_labels(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
     pool = get_database()
     await _require_feature_access(feature_instance_id, current_user, pool, "guest")
-    rows = await repo.fetch_labels_for_feature(pool, feature_instance_id)
+    rows = await labels_repo.fetch_labels_for_feature(pool, feature_instance_id)
     return [_label(r) for r in rows]
 
 
@@ -265,7 +266,7 @@ async def list_labels(feature_instance_id: str, current_user: dict = Depends(get
 async def create_label(data: LabelCreate, current_user: dict = Depends(get_current_user)):
     pool = get_database()
     await _require_feature_access(data.feature_instance_id, current_user, pool, "manager")
-    row = await repo.insert_label(pool, data.feature_instance_id, data.name, data.color, str(current_user["id"]))
+    row = await labels_repo.insert_feature_label(pool, data.feature_instance_id, data.name, data.color, str(current_user["id"]))
     return _label(row)
 
 
@@ -273,11 +274,11 @@ async def create_label(data: LabelCreate, current_user: dict = Depends(get_curre
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def update_label(label_id: str, data: LabelUpdate, current_user: dict = Depends(get_current_user)):
     pool = get_database()
-    lb = await repo.fetch_label(pool, label_id)
+    lb = await labels_repo.fetch_label_by_id(pool, label_id)
     if not lb:
         raise HTTPException(status_code=404, detail="Label not found.")
     await _require_feature_access(str(lb["feature_instance_id"]), current_user, pool, "manager")
-    updated = await repo.update_label(pool, label_id, data.name, data.color, str(current_user["id"]))
+    updated = await labels_repo.update_feature_label(pool, label_id, data.name, data.color, str(current_user["id"]))
     return _label(updated)
 
 
@@ -285,11 +286,11 @@ async def update_label(label_id: str, data: LabelUpdate, current_user: dict = De
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def delete_label(label_id: str, current_user: dict = Depends(get_current_user)):
     pool = get_database()
-    lb = await repo.fetch_label(pool, label_id)
+    lb = await labels_repo.fetch_label_by_id(pool, label_id)
     if not lb:
         raise HTTPException(status_code=404, detail="Label not found.")
     await _require_feature_access(str(lb["feature_instance_id"]), current_user, pool, "manager")
-    await repo.delete_label(pool, label_id)
+    await labels_repo.delete_feature_label(pool, label_id)
 
 
 @router.post("/cards/{card_id}/labels/{label_id}", response_model=KanbanCardResponse)
@@ -300,7 +301,7 @@ async def add_card_label(card_id: str, label_id: str, current_user: dict = Depen
     if not card:
         raise HTTPException(status_code=404, detail="Card not found.")
     await _require_feature_access(str(card["feature_instance_id"]), current_user, pool, "member")
-    await repo.add_card_label(pool, card_id, label_id)
+    await labels_repo.add_entity_label(pool, card_id, 'kanban_card', label_id)
     return _card(await repo.fetch_card(pool, card_id))
 
 
@@ -312,5 +313,5 @@ async def remove_card_label(card_id: str, label_id: str, current_user: dict = De
     if not card:
         raise HTTPException(status_code=404, detail="Card not found.")
     await _require_feature_access(str(card["feature_instance_id"]), current_user, pool, "member")
-    await repo.remove_card_label(pool, card_id, label_id)
+    await labels_repo.remove_entity_label(pool, card_id, 'kanban_card', label_id)
     return _card(await repo.fetch_card(pool, card_id))

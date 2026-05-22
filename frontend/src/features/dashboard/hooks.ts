@@ -1,12 +1,12 @@
 import { useEffect, useCallback } from 'react';
-import { useApi } from '@/hooks/useApi';
-import { kanbanService } from '@/features/kanban/service';
-import { todoListService } from '@/features/todo_list/service';
-import type { MyTasksResponse, MyTasksFilters, DashboardTask } from './types';
-import type { CardUpdate } from '@/features/kanban/types';
-import type { TodoItemUpdate } from '@/features/todo_list/types';
-import type { TaskPatch } from '@/components/tasks/types';
-import { getMyTasks } from './service';
+import { useApi } from '@/hooks/useApi.ts';
+import { kanbanService } from '@/features/kanban/service.ts';
+import { todoListService } from '@/features/todo_list/service.ts';
+import type { MyTasksResponse, MyTasksFilters, DashboardTask } from './types.ts';
+import type { CardUpdate } from '@/features/kanban/types.ts';
+import type { TodoItemUpdate } from '@/features/todo_list/types.ts';
+import type { TaskPatch } from '@/components/tasks/types.ts';
+import { getMyTasks } from './service.ts';
 
 export function useMyTasks(filters: MyTasksFilters) {
     const { data, loading, error, execute } = useApi<MyTasksResponse>();

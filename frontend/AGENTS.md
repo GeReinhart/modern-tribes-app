@@ -36,6 +36,9 @@
 
 The frontend layout is based on Themes UI. All the elements presented should have the current theme applied
 
+## Layout
+
+- When there are some tabs in a page, we can access to the tab through the url and bread crump. Link in the project page.
 
 ## Enum
 

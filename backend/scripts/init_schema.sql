@@ -219,17 +219,23 @@ CREATE TABLE IF NOT EXISTS mails_to (
     UNIQUE (mail_id, user_id)
 );
 
--- Labels table
+-- Labels table (unified: global admin labels + feature-instance-scoped labels for kanban/todo)
 CREATE TABLE IF NOT EXISTS labels (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255) NOT NULL,
     description TEXT,
+    feature_instance_id UUID REFERENCES projects_features(id) ON DELETE CASCADE,
+    color VARCHAR(20) NOT NULL DEFAULT '#6b7280',
+    position INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
     updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived'))
 );
+CREATE UNIQUE INDEX IF NOT EXISTS labels_name_global_unique ON labels (name) WHERE feature_instance_id IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS labels_name_feature_unique ON labels (name, feature_instance_id) WHERE feature_instance_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_labels_feature_instance ON labels (feature_instance_id);
 
 -- Label entities table (polymorphic)
 CREATE TABLE IF NOT EXISTS label_entities (
@@ -296,25 +302,6 @@ CREATE TABLE IF NOT EXISTS todo_items (
     updated_by UUID REFERENCES users(id) ON DELETE SET NULL
 );
 
-CREATE TABLE IF NOT EXISTS todo_labels (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    feature_instance_id UUID NOT NULL REFERENCES projects_features(id) ON DELETE CASCADE,
-    name VARCHAR(100) NOT NULL,
-    color VARCHAR(20) NOT NULL DEFAULT '#6b7280',
-    position INTEGER NOT NULL DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
-);
-CREATE INDEX IF NOT EXISTS idx_todo_labels_feature_instance ON todo_labels(feature_instance_id);
-
-CREATE TABLE IF NOT EXISTS todo_item_labels (
-    item_id UUID NOT NULL REFERENCES todo_items(id) ON DELETE CASCADE,
-    label_id UUID NOT NULL REFERENCES todo_labels(id) ON DELETE CASCADE,
-    PRIMARY KEY (item_id, label_id)
-);
-CREATE INDEX IF NOT EXISTS idx_todo_item_labels_item ON todo_item_labels(item_id);
 
 -- Projects documents table
 CREATE TABLE IF NOT EXISTS projects_documents (

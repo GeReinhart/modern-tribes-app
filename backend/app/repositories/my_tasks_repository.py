@@ -17,7 +17,7 @@ _KANBAN_BASE = """
         t.id AS tribe_id,
         t.name AS tribe_name,
         col.name AS column_name,
-        ARRAY(SELECT kcl.label_id::text FROM kanban_card_labels kcl WHERE kcl.card_id = c.id) AS label_ids
+        ARRAY(SELECT le.label_id::text FROM label_entities le WHERE le.entity_type = 'kanban_card' AND le.entity_id = c.id) AS label_ids
     FROM kanban_cards c
     JOIN projects_features pf ON pf.id = c.feature_instance_id AND pf.status = 'active'
     JOIN projects p ON p.id = pf.project_id AND p.status = 'active'
@@ -55,7 +55,7 @@ _TODO_BASE = """
         p.name AS project_name,
         t.id AS tribe_id,
         t.name AS tribe_name,
-        ARRAY(SELECT til.label_id::text FROM todo_item_labels til WHERE til.item_id = i.id) AS label_ids
+        ARRAY(SELECT le.label_id::text FROM label_entities le WHERE le.entity_type = 'todo_item' AND le.entity_id = i.id) AS label_ids
     FROM todo_items i
     JOIN projects_features pf ON pf.id = i.feature_instance_id AND pf.status = 'active'
     JOIN projects p ON p.id = pf.project_id AND p.status = 'active'
@@ -73,8 +73,14 @@ _TODO_BASE = """
     )
 """
 
-_KANBAN_LABEL_EXISTS = "SELECT 1 FROM kanban_card_labels kcl3 WHERE kcl3.card_id = c.id AND kcl3.label_id = {}"
-_TODO_LABEL_EXISTS = "SELECT 1 FROM todo_item_labels til3 WHERE til3.item_id = i.id AND til3.label_id = {}"
+_KANBAN_LABEL_EXISTS = (
+    "SELECT 1 FROM label_entities le3 WHERE le3.entity_type = 'kanban_card' AND le3.entity_id = c.id"
+    " AND le3.label_id IN (SELECT id FROM labels WHERE name = (SELECT name FROM labels WHERE id = {}))"
+)
+_TODO_LABEL_EXISTS = (
+    "SELECT 1 FROM label_entities le3 WHERE le3.entity_type = 'todo_item' AND le3.entity_id = i.id"
+    " AND le3.label_id IN (SELECT id FROM labels WHERE name = (SELECT name FROM labels WHERE id = {}))"
+)
 
 
 def _build_filter_clauses(filters: dict, id_col: str, label_exists: str) -> tuple[str, list]:
@@ -92,21 +98,11 @@ def _build_filter_clauses(filters: dict, id_col: str, label_exists: str) -> tupl
     return (" AND " + " AND ".join(clauses)) if clauses else "", params
 
 
-async def _fetch_kanban_label_details(conn, label_ids: list[str]) -> dict[str, dict]:
+async def _fetch_label_details(conn, label_ids: list[str]) -> dict[str, dict]:
     if not label_ids:
         return {}
     rows = await conn.fetch(
-        "SELECT id, name, color FROM kanban_labels WHERE id = ANY($1::uuid[])",
-        [UUID(lid) for lid in label_ids],
-    )
-    return {str(r['id']): {'id': str(r['id']), 'name': r['name'], 'color': r['color']} for r in rows}
-
-
-async def _fetch_todo_label_details(conn, label_ids: list[str]) -> dict[str, dict]:
-    if not label_ids:
-        return {}
-    rows = await conn.fetch(
-        "SELECT id, name, color FROM todo_labels WHERE id = ANY($1::uuid[])",
+        "SELECT id, name, color FROM labels WHERE id = ANY($1::uuid[])",
         [UUID(lid) for lid in label_ids],
     )
     return {str(r['id']): {'id': str(r['id']), 'name': r['name'], 'color': r['color']} for r in rows}
@@ -163,7 +159,7 @@ async def fetch_my_tasks_kanban(pool, user_id: str, filters: dict) -> list[dict]
     async with pool.acquire() as conn:
         rows = await conn.fetch(query, UUID(user_id), *extra_params)
         all_label_ids = list({lid for r in rows for lid in (r['label_ids'] or [])})
-        label_map = await _fetch_kanban_label_details(conn, all_label_ids)
+        label_map = await _fetch_label_details(conn, all_label_ids)
     return [_kanban_row_to_dict(r, label_map) for r in rows]
 
 
@@ -173,5 +169,5 @@ async def fetch_my_tasks_todo(pool, user_id: str, filters: dict) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(query, UUID(user_id), *extra_params)
         all_label_ids = list({lid for r in rows for lid in (r['label_ids'] or [])})
-        label_map = await _fetch_todo_label_details(conn, all_label_ids)
+        label_map = await _fetch_label_details(conn, all_label_ids)
     return [_todo_row_to_dict(r, label_map) for r in rows]

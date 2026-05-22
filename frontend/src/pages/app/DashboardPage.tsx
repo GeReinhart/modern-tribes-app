@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, {useEffect, useMemo} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -6,8 +6,11 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { themesById } from '@/components/themes/themes';
-import DashboardTasksTab from '@/dashboard/tabs/DashboardTasksTab';
-import DashboardTribesTab from '@/dashboard/tabs/DashboardTribesTab';
+import {useVerifyAuthorization} from "@/hooks/userVerifyAuthorization.ts";
+import DashboardTasksTab from '@/features/dashboard/tabs/DashboardTasksTab';
+import DashboardTribesTab from '@/features/dashboard/tabs/DashboardTribesTab';
+import {ThemedCard} from "@/components/common/layout/ThemedCard.tsx";
+import {errorStyle} from "@/styles/theme.styles.tsx";
 
 const TABS = (t: (k: string) => string) => [
     { key: 'tasks', label: t('dashboard.tabs.tasks'), Component: DashboardTasksTab },
@@ -18,6 +21,7 @@ const DashboardPageContent: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { tab } = useParams<{ tab?: string }>();
+    const { data: authorization, error: authorizationError, verifyAuthorization } = useVerifyAuthorization();
 
     const tabs = useMemo(() => TABS(t), [t]);
     const activeTab = tab && tabs.find(tb => tb.key === tab) ? tab : tabs[0].key;
@@ -35,9 +39,24 @@ const DashboardPageContent: React.FC = () => {
         isActive: tb.key === activeTab,
     })), [tabs, activeTab]);
 
+    // Check authorization
+    useEffect(() => {
+        verifyAuthorization(['admin','can_create_own_tribes']).catch((err) => {
+            console.error('Authorization check failed:', err);
+        });
+    }, [verifyAuthorization]);
+
     const handleTabChange = (key: string) => navigate(`/app/dashboard/${key}`);
 
     const headerActions = (
+        <>
+        {authorization?.authorized && (
+            <ThemedButton onClick={() => navigate('/app/tribes/create')} variant="primary">
+                {t('tribes.createTribe')}
+            </ThemedButton>
+        )}
+
+
         <ThemedButton
             requiredPermissions={['admin']}
             variant="ghost"
@@ -46,10 +65,22 @@ const DashboardPageContent: React.FC = () => {
         >
             {t('common.admin')}
         </ThemedButton>
+
+        </>
     );
 
     return (
         <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} headerActions={headerActions}>
+
+            {/* Authorization Error Message */}
+            {authorizationError && (
+                <ThemedCard>
+                    <div style={errorStyle}>
+                        <strong>Authorization Error:</strong> {authorizationError.message}
+                    </div>
+                </ThemedCard>
+            )}
+
             <ThemedTabs
                 tabs={tabs.map(({ key, label }) => ({ key, label }))}
                 activeTab={activeTab}

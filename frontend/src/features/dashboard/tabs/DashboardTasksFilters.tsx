@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext.tsx';
 import { Tag, User, Layers, FolderOpen } from 'lucide-react';
-import type { DashboardTask, MyTasksFilters } from '../types';
-import type { PersonOption } from '@/types/features';
+import type { DashboardTask, MyTasksFilters } from '../types.ts';
+import type { PersonOption } from '@/types/features.ts';
 
 interface Props {
     tasks: DashboardTask[];
@@ -18,7 +18,7 @@ function uniqueBy<T>(items: T[], key: (i: T) => string): T[] {
 }
 
 function pillStyle(active: boolean, color: string): React.CSSProperties {
-    return { padding: '4px 12px', borderRadius: '16px', fontSize: 'var(--font-xs)', fontWeight: active ? 700 : 500, cursor: 'pointer', border: `1px solid ${color}`, backgroundColor: active ? `${color}20` : 'transparent', color, transition: 'all 0.15s', whiteSpace: 'nowrap' };
+    return { padding: '4px 12px', borderRadius: '16px', fontSize: 'var(--font-sm)', fontWeight: active ? 700 : 500, cursor: 'pointer', border: `1px solid ${color}`, backgroundColor: active ? `${color}20` : 'transparent', color, transition: 'all 0.15s', whiteSpace: 'nowrap' };
 }
 
 const DashboardTasksFilters: React.FC<Props> = ({ tasks, filters, effectivePersons, onChange }) => {
@@ -38,7 +38,7 @@ const DashboardTasksFilters: React.FC<Props> = ({ tasks, filters, effectivePerso
 
     const labels = uniqueBy(
         tasks.flatMap(tk => tk.labels),
-        l => l.id,
+        l => l.name.toLowerCase(),
     );
 
     const toggle = (key: keyof MyTasksFilters, value: string) =>

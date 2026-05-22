@@ -61,7 +61,7 @@ const KanbanCard: React.FC<Props> = ({
                             onClick={() => setModalOpen(true)}
                             style={{
                                 flex: 1,
-                                fontSize: 'var(--font-sm)',
+                                fontSize: 'var(--font-lg)',
                                 color: isArchived ? theme.colors.secondary : theme.colors.text,
                                 cursor: 'pointer',
                                 textDecoration: isArchived ? 'line-through' : 'none',

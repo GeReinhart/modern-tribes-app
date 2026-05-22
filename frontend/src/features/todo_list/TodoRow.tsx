@@ -46,7 +46,7 @@ const TodoRow: React.FC<Props> = ({
                     <span style={{ width: 18, height: 18, flexShrink: 0, border: `2px solid ${theme.colors.border}`, borderRadius: '3px', backgroundColor: isDone ? theme.colors.primary : 'transparent', display: 'inline-block' }} />
                 )}
                 <span
-                    style={{ flex: 1, textDecoration: isDone || isArchived ? 'line-through' : 'none', color: isArchived || isDone ? theme.colors.secondary : theme.colors.text, fontSize: 'var(--font-md)', cursor: 'pointer' }}
+                    style={{ flex: 1, textDecoration: isDone || isArchived ? 'line-through' : 'none', color: isArchived || isDone ? theme.colors.secondary : theme.colors.text, fontSize: 'var(--font-lg)', cursor: 'pointer' }}
                     onClick={() => setModalOpen(true)}
                 >
                     {item.title}

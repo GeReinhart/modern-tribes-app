@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '@/contexts/ThemeContext';
-import DashboardTaskCard from './DashboardTaskCard';
-import type { DashboardTask, MyTasksResponse } from '../types';
-import type { PersonOption } from '@/types/features';
-import type { TaskLabelInfo, TaskPatch } from '@/components/tasks/types';
+import { useTheme } from '@/contexts/ThemeContext.tsx';
+import DashboardTaskCard from './DashboardTaskCard.tsx';
+import type { DashboardTask, MyTasksResponse } from '../types.ts';
+import type { PersonOption } from '@/types/features.ts';
+import type { TaskLabelInfo, TaskPatch } from '@/components/tasks/types.ts';
 
 interface Props {
     data: MyTasksResponse;
