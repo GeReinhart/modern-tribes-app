@@ -78,7 +78,7 @@ async def get_board(feature_instance_id: str, current_user: dict = Depends(get_c
 async def list_persons(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
     pool = get_database()
     await _require_feature_access(feature_instance_id, current_user, pool, "guest")
-    rows = await repo.fetch_persons_for_feature(pool, feature_instance_id)
+    rows = await repo.fetch_persons_for_feature(pool, feature_instance_id, str(current_user["id"]))
     return [PersonOption(id=str(r["id"]), name=r["name"]) for r in rows]
 
 
