@@ -8,6 +8,13 @@ export interface BreadcrumbItem {
     path?: string;
 }
 
+export interface BreadcrumbTab {
+    key: string;
+    label: string;
+    path: string;
+    isActive: boolean;
+}
+
 interface BreadcrumbProps {
     items: BreadcrumbItem[];
 }

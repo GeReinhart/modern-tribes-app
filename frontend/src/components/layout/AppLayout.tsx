@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { AppHeader } from './AppHeader';
-import { BreadcrumbItem } from './Breadcrumb';
+import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb';
 
 interface AppLayoutProps {
     children: React.ReactNode;
@@ -9,6 +9,7 @@ interface AppLayoutProps {
     secondaryActions?: React.ReactNode;
     showUserBadge?: boolean;
     breadcrumbs?: BreadcrumbItem[];
+    breadcrumbTabs?: BreadcrumbTab[];
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({
@@ -17,6 +18,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                                                          secondaryActions,
                                                          showUserBadge = true,
                                                          breadcrumbs,
+                                                         breadcrumbTabs,
                                                      }) => {
     const { theme } = useTheme();
 
@@ -42,6 +44,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 secondaryActions={secondaryActions}
                 showUserBadge={showUserBadge}
                 breadcrumbs={breadcrumbs}
+                breadcrumbTabs={breadcrumbTabs}
             />
             <main style={mainStyle}>{children}</main>
         </div>

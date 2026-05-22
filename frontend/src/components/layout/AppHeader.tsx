@@ -4,7 +4,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { ApplicationLogo } from '@/components/common/icons/ApplicationLogo';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { BreadcrumbItem } from './Breadcrumb';
+import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb';
 import UserBadge from "@/components/entities/users/CurrentUserBadge.tsx";
 
 
@@ -14,13 +14,15 @@ interface AppHeaderProps {
     secondaryActions?: React.ReactNode;
     showUserBadge?: boolean;
     breadcrumbs?: BreadcrumbItem[];
+    breadcrumbTabs?: BreadcrumbTab[];
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
                                                         actions,
                                                         secondaryActions,
                                                         showUserBadge = true,
-                                                        breadcrumbs
+                                                        breadcrumbs,
+                                                        breadcrumbTabs,
                                                     }) => {
     const { theme, currentThemeKey } = useTheme();
     const navigate = useNavigate();
@@ -75,7 +77,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         border: `2px solid ${theme.colors.border}`,
         borderRadius: '12px',
         boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-        minWidth: '330px',
+        minWidth: breadcrumbTabs ? '480px' : '330px',
         marginTop: '12px',
         overflow: 'hidden',
     };
@@ -134,32 +136,54 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
                 {isMenuOpen && hasMenuContent && (
                     <div style={menuStyle} role="menu">
-                        {/* Breadcrumb navigation items */}
-                        {breadcrumbs && breadcrumbs.map((item, index) => {
-                            const isLast = index === breadcrumbs.length - 1;
-                            const clickable = !isLast && !!item.path;
-                            return (
-                                <div
-                                    key={index}
-                                    role="menuitem"
-                                    style={menuNavItemStyle(clickable, isLast)}
-                                    onClick={() => handleNavItem(item.path)}
-                                    onMouseEnter={(e) => {
-                                        if (clickable) e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        if (clickable) e.currentTarget.style.backgroundColor = 'transparent';
-                                    }}
-                                >
-                                    {item.label}
+                        {/* Breadcrumb navigation — single or two-column layout */}
+                        {breadcrumbs && breadcrumbs.length > 0 && (
+                            <div style={{ display: 'grid', gridTemplateColumns: breadcrumbTabs ? '1fr 1fr' : '1fr', borderBottom: (secondaryActions || actions) ? `1px solid ${theme.colors.border}` : undefined }}>
+                                <div>
+                                    {breadcrumbs.map((item, index) => {
+                                        const isLast = index === breadcrumbs.length - 1;
+                                        const clickable = !isLast && !!item.path;
+                                        return (
+                                            <div
+                                                key={index}
+                                                role="menuitem"
+                                                style={menuNavItemStyle(clickable, isLast)}
+                                                onClick={() => handleNavItem(item.path)}
+                                                onMouseEnter={(e) => {
+                                                    if (clickable) e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    if (clickable) e.currentTarget.style.backgroundColor = 'transparent';
+                                                }}
+                                            >
+                                                {item.label}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
-                            );
-                        })}
-
-                        {/* Separator between breadcrumbs and current page actions */}
-                        {breadcrumbs && breadcrumbs.length > 0 && (secondaryActions || actions) && (
-                            <div style={menuSeparatorStyle} />
+                                {breadcrumbTabs && (
+                                    <div style={{ borderLeft: `1px solid ${theme.colors.border}` }}>
+                                        {breadcrumbTabs.map((tab) => (
+                                            <div
+                                                key={tab.key}
+                                                role="menuitem"
+                                                style={menuNavItemStyle(true, tab.isActive)}
+                                                onClick={() => handleNavItem(tab.path)}
+                                                onMouseEnter={(e) => {
+                                                    if (!tab.isActive) e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    if (!tab.isActive) e.currentTarget.style.backgroundColor = 'transparent';
+                                                }}
+                                            >
+                                                {tab.label}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         )}
+
 
                         {/* Current page actions */}
                         {secondaryActions && (
