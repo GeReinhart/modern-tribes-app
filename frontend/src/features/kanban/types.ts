@@ -32,10 +32,7 @@ export interface KanbanBoard {
     labels: KanbanLabel[];
 }
 
-export interface PersonOption {
-    id: string;
-    name: string;
-}
+export type { PersonOption } from '@/types/features';
 
 export interface CardCreate {
     feature_instance_id: string;
@@ -73,12 +70,4 @@ export interface LabelUpdate {
 export type MoveDirection = 'prev' | 'next';
 export type ReorderDirection = 'up' | 'down' | 'top' | 'bottom';
 
-import { FIB_COLORS } from '@/components/themes/themes';
-
-export const FIBONACCI = [1, 2, 3, 5, 8, 13, 21] as const;
-
-export function fibColor(size: number | null): string {
-    if (size === null) return '';
-    const idx = FIBONACCI.indexOf(size as typeof FIBONACCI[number]);
-    return idx === -1 ? '' : (FIB_COLORS[idx] ?? '');
-}
+export { FIBONACCI, fibColor } from '@/types/features';

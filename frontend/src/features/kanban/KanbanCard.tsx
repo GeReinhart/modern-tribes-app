@@ -162,10 +162,7 @@ const KanbanCard: React.FC<Props> = ({
                 {expanded && (
                     <KanbanCardBody
                         card={card}
-                        canEdit={canEdit && !isArchived}
                         boardLabels={boardLabels}
-                        onUpdate={onUpdate}
-                        onToggleLabel={onToggleLabel}
                     />
                 )}
             </div>

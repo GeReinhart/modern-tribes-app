@@ -204,7 +204,7 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
             {/* Person filter row */}
             {assignedPersons.length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '10px', alignItems: 'center' }}>
-                    <User size={14} color={theme.colors.secondary} />
+                    <User size={14} color={theme.colors.primary} />
                     {assignedPersons.map(person => {
                         const active = filterPersonId === person.id;
                         return (
@@ -214,11 +214,11 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
                                 onClick={() => setFilterPersonId(prev => prev === person.id ? null : person.id)}
                                 style={{
                                     padding: '4px 12px', borderRadius: '16px',
-                                    fontSize: 'var(--font-xs)', fontWeight: 500,
+                                    fontSize: 'var(--font-xs)', fontWeight: active ? 700 : 500,
                                     cursor: 'pointer',
-                                    border: `1px solid ${active ? theme.colors.accent : theme.colors.border}`,
-                                    backgroundColor: active ? `${theme.colors.accent}20` : theme.colors.surface,
-                                    color: active ? theme.colors.accent : theme.colors.text,
+                                    border: `1px solid ${theme.colors.primary}`,
+                                    backgroundColor: active ? theme.colors.primary : 'transparent',
+                                    color: active ? theme.colors.surface : theme.colors.primary,
                                     transition: 'all 0.15s', whiteSpace: 'nowrap',
                                 }}
                             >

@@ -166,26 +166,30 @@ const KanbanCardModal: React.FC<Props> = ({
 
                         {/* Inline new label form */}
                         {canEdit && showNewLabel && (
-                            <form onSubmit={handleCreateLabel} style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', marginTop: '10px', padding: '10px 12px', border: `1px solid ${theme.colors.border}`, borderRadius: '8px', backgroundColor: theme.colors.surface }}>
-                                <input
-                                    autoFocus
-                                    value={newLabelName}
-                                    onChange={e => setNewLabelName(e.target.value)}
-                                    onKeyDown={e => { if (e.key === 'Escape') { setShowNewLabel(false); setNewLabelName(''); } }}
-                                    placeholder={t('features.kanban.newLabelPlaceholder')}
-                                    style={{ padding: '5px 9px', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', backgroundColor: theme.colors.surface, color: theme.colors.text, fontSize: 'var(--font-sm)', width: '140px' }}
-                                />
-                                <div style={{ display: 'flex', gap: '4px' }}>
-                                    {LABEL_COLORS.map(c => (
-                                        <button
-                                            key={c} type="button"
-                                            onClick={() => setNewLabelColor(c)}
-                                            style={{ width: '20px', height: '20px', borderRadius: '50%', background: c, border: newLabelColor === c ? `2px solid ${theme.colors.text}` : '2px solid transparent', cursor: 'pointer', padding: 0, flexShrink: 0 }}
-                                        />
-                                    ))}
+                            <form onSubmit={handleCreateLabel} style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '10px', padding: '10px 12px', border: `1px solid ${theme.colors.border}`, borderRadius: '8px', backgroundColor: theme.colors.surface }}>
+                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                                    <input
+                                        autoFocus
+                                        value={newLabelName}
+                                        onChange={e => setNewLabelName(e.target.value)}
+                                        onKeyDown={e => { if (e.key === 'Escape') { setShowNewLabel(false); setNewLabelName(''); } }}
+                                        placeholder={t('features.kanban.newLabelPlaceholder')}
+                                        style={{ padding: '5px 9px', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', backgroundColor: theme.colors.surface, color: theme.colors.text, fontSize: 'var(--font-sm)', width: '140px' }}
+                                    />
+                                    <div style={{ display: 'flex', gap: '4px' }}>
+                                        {LABEL_COLORS.map(c => (
+                                            <button
+                                                key={c} type="button"
+                                                onClick={() => setNewLabelColor(c)}
+                                                style={{ width: '20px', height: '20px', borderRadius: '50%', background: c, border: newLabelColor === c ? `2px solid ${theme.colors.text}` : '2px solid transparent', cursor: 'pointer', padding: 0, flexShrink: 0 }}
+                                            />
+                                        ))}
+                                    </div>
                                 </div>
-                                <ThemedButton variant="primary" type="submit" disabled={!newLabelName.trim() || addingLabel}>{t('features.kanban.addLabel')}</ThemedButton>
-                                <ThemedButton variant="ghost" type="button" onClick={() => { setShowNewLabel(false); setNewLabelName(''); }}>{t('common.cancel')}</ThemedButton>
+                                <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                                    <ThemedButton variant="ghost" type="button" onClick={() => { setShowNewLabel(false); setNewLabelName(''); }} style={{ fontSize: 'var(--font-xs)', padding: '3px 10px' }}>{t('common.cancel')}</ThemedButton>
+                                    <ThemedButton variant="primary" type="submit" disabled={!newLabelName.trim() || addingLabel} style={{ fontSize: 'var(--font-xs)', padding: '3px 10px' }}>{t('features.kanban.addLabel')}</ThemedButton>
+                                </div>
                             </form>
                         )}
                     </div>

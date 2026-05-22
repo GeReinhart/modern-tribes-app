@@ -5,7 +5,7 @@ import type { Jodit } from 'jodit';
 import { getAPIBaseUrl } from '@/config/env';
 import { useAppConfig } from '@/contexts/AppConfigContext';
 
-const COMPACT_BUTTONS = ['bold', 'italic', '|', 'ul', 'ol', '|', 'link', '|', 'undo', 'redo'];
+const COMPACT_BUTTONS = ['bold', 'italic', '|', 'ul', 'ol', '|', 'link', 'image', '|', 'undo', 'redo'];
 
 interface JoditEditorComponentProps {
     content: string;
@@ -22,6 +22,7 @@ const JoditEditorComponent = ({ content, onChange, minHeight = 600, compact = fa
         () => ({
             readonly: false,
             minHeight,
+            zIndex: 10000,
             uploader: {
                 insertImageAsBase64URI: false,
                 imagesExtensions: appConfig.editorImageExtensions,

@@ -1,5 +1,6 @@
 from typing import Optional
 from uuid import UUID
+from app.repositories.persons_repository import fetch_persons_for_feature  # noqa: F401 – re-exported for callers
 
 
 async def fetch_board(pool, feature_instance_id: str) -> dict:
@@ -95,21 +96,6 @@ async def swap_column_positions(pool, col_id_a: str, col_id_b: str, user_id: str
         await conn.execute("UPDATE kanban_columns SET position=$1, updated_by=$2 WHERE id=$3", pos_a, UUID(user_id), UUID(col_id_b))
 
 
-async def fetch_persons_for_feature(pool, feature_instance_id: str) -> list[dict]:
-    async with pool.acquire() as conn:
-        rows = await conn.fetch(
-            """SELECT DISTINCT p.id, p.first_name || ' ' || p.last_name AS name
-               FROM projects_features pf
-               JOIN tribes_projects tp ON tp.project_id = pf.project_id
-               JOIN positions pos ON pos.tribe_id = tp.tribe_id
-                   AND pos.status = 'active'
-                   AND pos.position IN ('manager', 'member')
-               JOIN persons p ON p.id = pos.person_id AND p.status = 'active'
-               WHERE pf.id = $1
-               ORDER BY name ASC""",
-            UUID(feature_instance_id),
-        )
-    return [dict(r) for r in rows]
 
 
 async def fetch_card(pool, card_id: str) -> Optional[dict]:
