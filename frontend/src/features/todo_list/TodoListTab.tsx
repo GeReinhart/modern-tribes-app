@@ -129,18 +129,15 @@ const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, a
 
                 {/* Right: actions aligned with each filter row */}
                 <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
-                    {/* Row 1 (with labels): archive toggle */}
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                        {archivedCount > 0 && (
-                            <button onClick={() => setShowArchived(s => !s)} title={showArchived ? t('features.todo.hideArchived') : t('features.todo.showArchived', { count: archivedCount })}
-                                style={{ background: showArchived ? theme.colors.secondary : 'none', border: `1px solid ${showArchived ? theme.colors.secondary : theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}>
-                                <ThemedSvgIcon name={showArchived ? 'eye-off' : 'eye'} color={showArchived ? theme.colors.surface : theme.colors.secondary} size={16} />
-                            </button>
-                        )}
-                    </div>
-                    {/* Row 2 (with persons): external actions */}
-                    {(assignedPersons.length > 0 || actions) && (
+                    {/* Archive toggle + external actions */}
+                    {(assignedPersons.length > 0 || actions || archivedCount > 0) && (
                         <div style={{ display: 'flex', gap: '8px' }}>
+                            {archivedCount > 0 && (
+                                <button onClick={() => setShowArchived(s => !s)} title={showArchived ? t('features.todo.hideArchived') : t('features.todo.showArchived', { count: archivedCount })}
+                                    style={{ background: showArchived ? theme.colors.secondary : 'none', border: `1px solid ${showArchived ? theme.colors.secondary : theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}>
+                                    <ThemedSvgIcon name={showArchived ? 'eye-off' : 'eye'} color={showArchived ? theme.colors.surface : theme.colors.secondary} size={16} />
+                                </button>
+                            )}
                             {actions}
                         </div>
                     )}

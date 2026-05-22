@@ -162,24 +162,24 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
 
                 {/* Right: actions aligned with each filter row */}
                 <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
-                    {/* Row 1 (with labels): archive toggle + configure */}
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                        {canEdit && hasArchived && (
-                            <button onClick={() => setShowArchived(v => !v)} title={showArchived ? t('features.kanban.hideArchived') : t('features.kanban.showArchived')}
-                                style={{ background: showArchived ? theme.colors.secondary : 'none', border: `1px solid ${showArchived ? theme.colors.secondary : theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}>
-                                <ThemedSvgIcon name={showArchived ? 'eye-off' : 'eye'} color={showArchived ? theme.colors.surface : theme.colors.secondary} size={16} />
-                            </button>
-                        )}
-                        {isManager && (
+                    {/* Row 1 (with labels): configure */}
+                    {isManager && (
+                        <div style={{ display: 'flex', gap: '8px' }}>
                             <button onClick={() => configuring ? handleDoneConfiguring() : setConfiguring(true)} title={configuring ? t('features.kanban.saveColumns') : t('features.kanban.configureColumns')}
                                 style={{ background: configuring ? theme.colors.primary : 'none', border: `1px solid ${configuring ? theme.colors.primary : theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}>
                                 <ThemedSvgIcon name="settings" color={configuring ? theme.colors.surface : theme.colors.secondary} size={16} />
                             </button>
-                        )}
-                    </div>
-                    {/* Row 2 (with persons): external actions */}
-                    {(assignedPersons.length > 0 || actions) && (
+                        </div>
+                    )}
+                    {/* Row 2 (with persons): archive toggle + external actions */}
+                    {(assignedPersons.length > 0 || actions || (canEdit && hasArchived)) && (
                         <div style={{ display: 'flex', gap: '8px' }}>
+                            {canEdit && hasArchived && (
+                                <button onClick={() => setShowArchived(v => !v)} title={showArchived ? t('features.kanban.hideArchived') : t('features.kanban.showArchived')}
+                                    style={{ background: showArchived ? theme.colors.secondary : 'none', border: `1px solid ${showArchived ? theme.colors.secondary : theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}>
+                                    <ThemedSvgIcon name={showArchived ? 'eye-off' : 'eye'} color={showArchived ? theme.colors.surface : theme.colors.secondary} size={16} />
+                                </button>
+                            )}
                             {actions}
                         </div>
                     )}
