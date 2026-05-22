@@ -91,7 +91,7 @@ const TaskItemModal: React.FC<TaskItemModalProps> = ({
                                 canCreateLabel={canCreateLabel} featureInstanceId={value.feature_instance_id}
                                 onToggle={handleToggle} onCreateLabel={onCreateLabel} onLabelCreated={handleLabelCreated} />
                         </div>
-                        {persons.length > 1 && (
+                        {persons.length > 0 && (
                             <div style={{ flexShrink: 0 }}>
                                 <div style={{ ...sectionLabel, color: theme.colors.secondary }}>{t('features.kanban.assignee')}</div>
                                 <select value={assigneeId} onChange={e => setAssigneeId(e.target.value)} disabled={!canEdit}

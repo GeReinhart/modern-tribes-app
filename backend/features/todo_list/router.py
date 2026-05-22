@@ -66,7 +66,7 @@ async def list_persons(feature_instance_id: str, current_user: dict = Depends(ge
     async with pool.acquire() as conn:
         project_id = await _get_project_id(conn, feature_instance_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
-    rows = await persons_repository.fetch_persons_for_feature(pool, feature_instance_id)
+    rows = await persons_repository.fetch_persons_for_feature(pool, feature_instance_id, str(current_user["id"]))
     return [PersonOption(**r) for r in rows]
 
 

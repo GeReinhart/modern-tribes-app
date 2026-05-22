@@ -1,7 +1,7 @@
 from uuid import UUID
 
 
-async def fetch_persons_for_feature(pool, feature_instance_id: str) -> list[dict]:
+async def fetch_persons_for_feature(pool, feature_instance_id: str, user_id: str) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             """SELECT DISTINCT p.id, p.first_name || ' ' || p.last_name AS name
@@ -12,7 +12,13 @@ async def fetch_persons_for_feature(pool, feature_instance_id: str) -> list[dict
                    AND pos.position IN ('manager', 'member')
                JOIN persons p ON p.id = pos.person_id AND p.status = 'active'
                WHERE pf.id = $1
+               UNION
+               SELECT p.id, p.first_name || ' ' || p.last_name AS name
+               FROM users u
+               JOIN persons p ON p.id = u.person_id AND p.status = 'active'
+               WHERE u.id = $2
                ORDER BY name ASC""",
             UUID(feature_instance_id),
+            UUID(user_id),
         )
     return [{"id": str(r["id"]), "name": r["name"]} for r in rows]
