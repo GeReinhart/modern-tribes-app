@@ -11,9 +11,9 @@ async def fetch_todo_items(pool, feature_instance_id: str) -> list[dict]:
             """SELECT t.*, d.content_html AS document_content_html,
                       p.first_name || ' ' || p.last_name AS assigned_person_name,
                       ARRAY(
-                          SELECT til.label_id::text
-                          FROM todo_item_labels til
-                          WHERE til.item_id = t.id
+                          SELECT le.label_id::text
+                          FROM label_entities le
+                          WHERE le.entity_type = 'todo_item' AND le.entity_id = t.id
                       ) AS label_ids
                FROM todo_items t
                LEFT JOIN documents d ON d.id = t.document_id
@@ -31,9 +31,9 @@ async def fetch_todo_item(pool, item_id: str) -> Optional[dict]:
             """SELECT t.*, d.content_html AS document_content_html,
                       p.first_name || ' ' || p.last_name AS assigned_person_name,
                       ARRAY(
-                          SELECT til.label_id::text
-                          FROM todo_item_labels til
-                          WHERE til.item_id = t.id
+                          SELECT le.label_id::text
+                          FROM label_entities le
+                          WHERE le.entity_type = 'todo_item' AND le.entity_id = t.id
                       ) AS label_ids
                FROM todo_items t
                LEFT JOIN documents d ON d.id = t.document_id
@@ -110,54 +110,3 @@ async def upsert_document(pool, item_id: str, content_html: str, content_text: s
             )
 
 
-async def fetch_labels(pool, feature_instance_id: str) -> list[dict]:
-    async with pool.acquire() as conn:
-        rows = await conn.fetch(
-            "SELECT id, name, color, position FROM todo_labels WHERE feature_instance_id = $1 ORDER BY position ASC",
-            UUID(feature_instance_id),
-        )
-    return [{"id": str(r["id"]), "name": r["name"], "color": r["color"], "position": r["position"]} for r in rows]
-
-
-async def insert_label(pool, feature_instance_id: str, name: str, color: str, user_id: str) -> dict:
-    async with pool.acquire() as conn:
-        position = await conn.fetchval(
-            "SELECT COALESCE(MAX(position), -1) + 1 FROM todo_labels WHERE feature_instance_id = $1",
-            UUID(feature_instance_id),
-        )
-        row = await conn.fetchrow(
-            """INSERT INTO todo_labels (feature_instance_id, name, color, position, created_by, updated_by)
-               VALUES ($1, $2, $3, $4, $5, $5) RETURNING id, name, color, position""",
-            UUID(feature_instance_id), name, color, position, UUID(user_id),
-        )
-    return {"id": str(row["id"]), "name": row["name"], "color": row["color"], "position": row["position"]}
-
-
-async def update_label(pool, label_id: str, name: Optional[str], user_id: str) -> None:
-    if name is not None:
-        async with pool.acquire() as conn:
-            await conn.execute(
-                "UPDATE todo_labels SET name = $1, updated_by = $2 WHERE id = $3",
-                name, UUID(user_id), UUID(label_id),
-            )
-
-
-async def delete_label(pool, label_id: str) -> None:
-    async with pool.acquire() as conn:
-        await conn.execute("DELETE FROM todo_labels WHERE id = $1", UUID(label_id))
-
-
-async def toggle_item_label(pool, item_id: str, label_id: str) -> list[str]:
-    iid, lid = UUID(item_id), UUID(label_id)
-    async with pool.acquire() as conn:
-        existing = await conn.fetchval(
-            "SELECT 1 FROM todo_item_labels WHERE item_id = $1 AND label_id = $2", iid, lid,
-        )
-        if existing:
-            await conn.execute("DELETE FROM todo_item_labels WHERE item_id = $1 AND label_id = $2", iid, lid)
-        else:
-            await conn.execute(
-                "INSERT INTO todo_item_labels (item_id, label_id) VALUES ($1, $2) ON CONFLICT DO NOTHING", iid, lid,
-            )
-        rows = await conn.fetch("SELECT label_id::text FROM todo_item_labels WHERE item_id = $1", iid)
-    return [r["label_id"] for r in rows]

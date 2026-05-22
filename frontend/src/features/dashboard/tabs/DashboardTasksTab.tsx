@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { useTheme } from '@/contexts/ThemeContext';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
-import { useMyTasks, useMyTaskMutations } from '../hooks';
-import DashboardTasksFilters from './DashboardTasksFilters';
-import DashboardTasksList from './DashboardTasksList';
-import type { MyTasksFilters, DashboardTask, MyTasksResponse } from '../types';
-import type { PersonOption } from '@/types/features';
-import type { TaskLabelInfo, TaskPatch } from '@/components/tasks/types';
+import { useTheme } from '@/contexts/ThemeContext.tsx';
+import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
+import { useMyTasks, useMyTaskMutations } from '../hooks.ts';
+import DashboardTasksFilters from './DashboardTasksFilters.tsx';
+import DashboardTasksList from './DashboardTasksList.tsx';
+import type { MyTasksFilters, DashboardTask, MyTasksResponse } from '../types.ts';
+import type { PersonOption } from '@/types/features.ts';
+import type { TaskLabelInfo, TaskPatch } from '@/components/tasks/types.ts';
 
 function uniquePersons(data: MyTasksResponse): PersonOption[] {
     const seen = new Set<string>();

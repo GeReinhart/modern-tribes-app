@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '@/contexts/ThemeContext';
-import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
-import TaskItemModal from '@/components/tasks/TaskItemModal';
-import type { TaskLabelInfo, TaskPatch } from '@/components/tasks/types';
-import type { PersonOption } from '@/types/features';
-import { fibColor, urgencyColor } from '@/types/features';
-import type { DashboardTask } from '../types';
+import { useTheme } from '@/contexts/ThemeContext.tsx';
+import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon.tsx';
+import TaskItemModal from '@/components/tasks/TaskItemModal.tsx';
+import type { TaskLabelInfo, TaskPatch } from '@/components/tasks/types.ts';
+import type { PersonOption } from '@/types/features.ts';
+import { fibColor, urgencyColor } from '@/types/features.ts';
+import type { DashboardTask } from '../types.ts';
 
 interface Props {
     task: DashboardTask;
@@ -46,7 +46,7 @@ const DashboardTaskCard: React.FC<Props> = ({
             <div style={{ borderRadius: '8px', border: `1px solid ${theme.colors.border}`, borderLeft: `3px solid ${borderColor}`, marginBottom: '8px', backgroundColor: theme.colors.surface, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                 <div style={{ padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '4px' }}>
-                        <span onClick={() => setModalOpen(true)} style={{ flex: 1, fontSize: 'var(--font-sm)', color: theme.colors.text, cursor: 'pointer', lineHeight: 1.4 }}>
+                        <span onClick={() => setModalOpen(true)} style={{ flex: 1, fontSize: 'var(--font-lg)', color: theme.colors.text, cursor: 'pointer', lineHeight: 1.4 }}>
                             {task.title}
                         </span>
                         {canEdit && (
@@ -65,9 +65,7 @@ const DashboardTaskCard: React.FC<Props> = ({
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
                         <div style={{ flex: 1 }} />
-                        {task.labels.map(l => (
-                            <span key={l.id} title={l.name} style={{ width: '10px', height: '10px', borderRadius: '50%', background: l.color, display: 'inline-block', flexShrink: 0 }} />
-                        ))}
+
                         {task.size && (
                             <span style={{ fontSize: '10px', fontWeight: 700, padding: '1px 5px', borderRadius: '8px', background: fibColor(task.size), color: theme.colors.surface, flexShrink: 0 }}>
                                 {task.size}

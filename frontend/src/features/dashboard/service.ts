@@ -1,5 +1,5 @@
-import { apiService } from '@/services/api.service';
-import type { MyTasksFilters, MyTasksResponse } from './types';
+import { apiService } from '@/services/api.service.ts';
+import type { MyTasksFilters, MyTasksResponse } from './types.ts';
 
 function buildQuery(filters: MyTasksFilters): string {
     const params = new URLSearchParams();

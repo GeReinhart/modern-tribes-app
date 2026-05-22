@@ -1,15 +1,15 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '@/contexts/ThemeContext';
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedText } from '@/components/common/layout/ThemedText';
-import { ThemedDivider } from '@/components/common/layout/ThemedDivider';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
-import { TribeCard } from '@/components/entities/tribes/TribeCard';
-import { useUserTribes } from '@/hooks/useTribes';
-import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
-import type { TribeEntry } from '@/types/queries/tribes.query.types';
+import { useTheme } from '@/contexts/ThemeContext.tsx';
+import { ThemedCard } from '@/components/common/layout/ThemedCard.tsx';
+import { ThemedText } from '@/components/common/layout/ThemedText.tsx';
+import { ThemedDivider } from '@/components/common/layout/ThemedDivider.tsx';
+import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
+import { TribeCard } from '@/components/entities/tribes/TribeCard.tsx';
+import { useUserTribes } from '@/hooks/useTribes.ts';
+import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile.ts';
+import type { TribeEntry } from '@/types/queries/tribes.query.types.ts';
 
 function buildDedupedTribes(tribes: ReturnType<typeof useUserTribes>['tribes']): TribeEntry[] {
     const map = new Map<string, TribeEntry>();

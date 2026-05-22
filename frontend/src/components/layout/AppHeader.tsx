@@ -77,9 +77,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         border: `2px solid ${theme.colors.border}`,
         borderRadius: '12px',
         boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-        minWidth: breadcrumbTabs ? '480px' : '330px',
+        minWidth: breadcrumbTabs ? '360px' : '330px',
+        maxWidth: 'calc(100vw - 16px)',
         marginTop: '12px',
         overflow: 'hidden',
+        boxSizing: 'border-box',
     };
 
     const menuNavItemStyle = (clickable: boolean, isLast: boolean): React.CSSProperties => ({
