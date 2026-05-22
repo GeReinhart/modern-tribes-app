@@ -413,6 +413,7 @@ const fr: Record<string, string> = {
 
     'dashboard.title': 'Tableau de bord',
     'dashboard.tabs.tasks': 'Tâches',
+    'dashboard.tabs.tribes': 'Tribus',
     'dashboard.tasks.empty': 'Aucune tâche à venir qui vous est assignée.',
     'dashboard.tasks.openSource': 'Ouvrir dans le projet',
 

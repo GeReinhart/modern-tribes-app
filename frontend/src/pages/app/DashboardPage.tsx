@@ -4,10 +4,14 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
+import { ThemedButton } from '@/components/common/form/ThemedButton';
+import { themesById } from '@/components/themes/themes';
 import DashboardTasksTab from '@/dashboard/tabs/DashboardTasksTab';
+import DashboardTribesTab from '@/dashboard/tabs/DashboardTribesTab';
 
 const TABS = (t: (k: string) => string) => [
     { key: 'tasks', label: t('dashboard.tabs.tasks'), Component: DashboardTasksTab },
+    { key: 'tribes', label: t('dashboard.tabs.tribes'), Component: DashboardTribesTab },
 ];
 
 const DashboardPageContent: React.FC = () => {
@@ -20,6 +24,7 @@ const DashboardPageContent: React.FC = () => {
     const ActiveComponent = tabs.find(tb => tb.key === activeTab)?.Component ?? DashboardTasksTab;
 
     const breadcrumbs = useMemo(() => [
+        { label: t('common.home'), path: '/app' },
         { label: t('dashboard.title') },
     ], [t]);
 
@@ -32,8 +37,19 @@ const DashboardPageContent: React.FC = () => {
 
     const handleTabChange = (key: string) => navigate(`/app/dashboard/${key}`);
 
+    const headerActions = (
+        <ThemedButton
+            requiredPermissions={['admin']}
+            variant="ghost"
+            onClick={() => navigate('/admin')}
+            theme={themesById['main_3']}
+        >
+            {t('common.admin')}
+        </ThemedButton>
+    );
+
     return (
-        <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs}>
+        <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} headerActions={headerActions}>
             <ThemedTabs
                 tabs={tabs.map(({ key, label }) => ({ key, label }))}
                 activeTab={activeTab}

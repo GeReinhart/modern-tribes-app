@@ -413,6 +413,7 @@ const en: Record<string, string> = {
 
     'dashboard.title': 'Dashboard',
     'dashboard.tabs.tasks': 'Tasks',
+    'dashboard.tabs.tribes': 'Tribes',
     'dashboard.tasks.empty': 'No upcoming tasks assigned to you.',
     'dashboard.tasks.openSource': 'Open in project',
 
