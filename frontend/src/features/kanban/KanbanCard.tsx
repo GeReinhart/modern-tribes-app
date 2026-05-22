@@ -55,19 +55,29 @@ const KanbanCard: React.FC<Props> = ({
                 opacity: isArchived ? 0.65 : 1,
             }}>
                 <div style={{ padding: '8px 10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    {/* Line 1: title */}
-                    <span
-                        onClick={() => setModalOpen(true)}
-                        style={{
-                            fontSize: 'var(--font-sm)',
-                            color: isArchived ? theme.colors.secondary : theme.colors.text,
-                            cursor: 'pointer',
-                            textDecoration: isArchived ? 'line-through' : 'none',
-                            lineHeight: 1.4,
-                        }}
-                    >
-                        {card.title}
-                    </span>
+                    {/* Line 1: title + expand toggle */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '4px' }}>
+                        <span
+                            onClick={() => setModalOpen(true)}
+                            style={{
+                                flex: 1,
+                                fontSize: 'var(--font-sm)',
+                                color: isArchived ? theme.colors.secondary : theme.colors.text,
+                                cursor: 'pointer',
+                                textDecoration: isArchived ? 'line-through' : 'none',
+                                lineHeight: 1.4,
+                            }}
+                        >
+                            {card.title}
+                        </span>
+                        <button
+                            onClick={() => setExpanded(v => !v)}
+                            title={expanded ? t('features.kanban.hideContent') : t('features.kanban.showContent')}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 2px', display: 'flex', alignItems: 'center', opacity: 0.75, flexShrink: 0 }}
+                        >
+                            <ThemedSvgIcon name={expanded ? 'chevron-up' : 'chevron-down'} color={theme.colors.text} size={13} />
+                        </button>
+                    </div>
 
                     {/* Line 2: arrows (left) + badges (right) */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
@@ -120,14 +130,6 @@ const KanbanCard: React.FC<Props> = ({
                                 {expanded ? card.assigned_person_name : getInitials(card.assigned_person_name)}
                             </span>
                         )}
-
-                        <button
-                            onClick={() => setExpanded(v => !v)}
-                            title={expanded ? t('features.kanban.hideContent') : t('features.kanban.showContent')}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 2px', display: 'flex', alignItems: 'center', opacity: 0.75 }}
-                        >
-                            <ThemedSvgIcon name={expanded ? 'chevron-up' : 'chevron-down'} color={theme.colors.text} size={13} />
-                        </button>
 
                         {/* Edit + Archive buttons */}
                         {!isArchived && (

@@ -33,31 +33,24 @@ const KanbanCardBody: React.FC<Props> = ({ card, canEdit, boardLabels, onUpdate,
     return (
         <div style={{ padding: '10px 14px 12px', borderTop: `1px solid ${theme.colors.border}` }}>
             {/* Labels */}
-            {boardLabels.length > 0 && (
+            {card.label_ids.length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '10px' }}>
-                    {boardLabels.map(label => {
-                        const active = card.label_ids.includes(label.id);
-                        return (
-                            <button
-                                key={label.id}
-                                onClick={() => canEdit ? onToggleLabel(card.id, label.id, card.label_ids) : undefined}
-                                title={label.name}
-                                style={{
-                                    padding: '2px 8px',
-                                    borderRadius: '10px',
-                                    border: `1px solid ${label.color}`,
-                                    background: active ? label.color : 'transparent',
-                                    color: active ? theme.colors.surface : label.color,
-                                    fontSize: '11px',
-                                    fontWeight: 600,
-                                    cursor: canEdit ? 'pointer' : 'default',
-                                    transition: 'all 0.15s',
-                                }}
-                            >
-                                {label.name}
-                            </button>
-                        );
-                    })}
+                    {boardLabels.filter(l => card.label_ids.includes(l.id)).map(label => (
+                        <span
+                            key={label.id}
+                            style={{
+                                padding: '2px 8px',
+                                borderRadius: '10px',
+                                border: `1px solid ${label.color}`,
+                                background: label.color,
+                                color: theme.colors.surface,
+                                fontSize: '11px',
+                                fontWeight: 600,
+                            }}
+                        >
+                            {label.name}
+                        </span>
+                    ))}
                 </div>
             )}
 
