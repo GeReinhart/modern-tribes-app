@@ -68,7 +68,7 @@ def _to_todo(row: dict) -> MyTodoTask:
 
 
 @router.get("", response_model=MyTasksResponse)
-@require_any_permission_decorator(PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_my_tasks(
     tribe_id: Optional[str] = None,
     project_id: Optional[str] = None,

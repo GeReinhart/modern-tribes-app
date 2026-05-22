@@ -71,7 +71,7 @@ function AuthBootstrapApp() {
                                 <Route path="/admin/documents" element={<DocumentsCrudPage/>}/>
                                 <Route path="/admin/config" element={<AppConfigPage/>}/>
                                 <Route path="/admin/features" element={<FeaturesPage/>}/>
-                <Route path="/admin/monitoring" element={<MonitoringPage/>}/>
+                                <Route path="/admin/monitoring" element={<MonitoringPage/>}/>
                                 <Route path="/admin/monitoring/documents/:documentId" element={<DocumentRevisionsPage/>}/>
                                 <Route path="/admin/monitoring/documents/:documentId/updated_at/:date" element={<DocumentRevisionsPage/>}/>
                                 <Route path="/admin/mails" element={<MailsPage/>}/>

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
 import DashboardTasksTab from '@/dashboard/tabs/DashboardTasksTab';
@@ -9,7 +10,7 @@ const TABS = (t: (k: string) => string) => [
     { key: 'tasks', label: t('dashboard.tabs.tasks'), Component: DashboardTasksTab },
 ];
 
-const DashboardPage: React.FC = () => {
+const DashboardPageContent: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { tab } = useParams<{ tab?: string }>();
@@ -42,5 +43,9 @@ const DashboardPage: React.FC = () => {
         </AppLayout>
     );
 };
+
+const DashboardPage: React.FC = () => (
+    <ThemeProvider defaultTheme="default"><DashboardPageContent /></ThemeProvider>
+);
 
 export default DashboardPage;

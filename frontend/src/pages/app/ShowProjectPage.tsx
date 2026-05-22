@@ -176,13 +176,14 @@ const ShowProjectPageContent: React.FC = () => {
     }, [myProjectPosition]);
 
     const canEdit = useMemo(() => {
+        if (user?.permissions?.includes('admin')) return true;
         if (!myProjectPosition) return false;
         const allPositions = [
             myProjectPosition.direct_position,
             ...myProjectPosition.represented_persons.map(p => p.position),
         ].filter(Boolean);
         return allPositions.some(p => p === 'manager' || p === 'member');
-    }, [myProjectPosition]);
+    }, [myProjectPosition, user]);
 
     const tabs = useMemo(() => {
         const base = [
