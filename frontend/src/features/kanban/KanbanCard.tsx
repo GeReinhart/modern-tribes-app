@@ -5,6 +5,7 @@ import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { KanbanCard as Card, KanbanLabel, PersonOption, CardUpdate, LabelCreate, ReorderDirection, fibColor } from './types';
 import KanbanCardModal from './KanbanCardModal';
+import KanbanCardBody from './KanbanCardBody';
 
 interface Props {
     card: Card;
@@ -34,6 +35,7 @@ const KanbanCard: React.FC<Props> = ({
     const { theme } = useTheme();
     const [modalOpen, setModalOpen] = useState(false);
     const [confirmArchive, setConfirmArchive] = useState(false);
+    const [expanded, setExpanded] = useState(false);
 
     const isArchived = card.status === 'archived';
     const borderColor = card.size ? fibColor(card.size) : accentColor;
@@ -85,16 +87,16 @@ const KanbanCard: React.FC<Props> = ({
                         {canEdit && !isArchived && (
                             <>
                                 <button disabled={isFirstInCol} onClick={() => onReorder(card.id, 'top')} title={t('features.kanban.moveToTop')} style={{ background: 'none', border: 'none', cursor: isFirstInCol ? 'default' : 'pointer', opacity: isFirstInCol ? 0.2 : 1, padding: '0 1px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-                                    <ThemedSvgIcon name="chevrons-up" color={theme.colors.secondary} size={14} />
+                                    <ThemedSvgIcon name="chevrons-up" color={theme.colors.text} size={14} />
                                 </button>
                                 <button disabled={isFirstInCol} onClick={() => onReorder(card.id, 'up')} style={{ background: 'none', border: 'none', cursor: isFirstInCol ? 'default' : 'pointer', opacity: isFirstInCol ? 0.2 : 1, padding: '0 1px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-                                    <ThemedSvgIcon name="arrow-up" color={theme.colors.secondary} size={14} />
+                                    <ThemedSvgIcon name="arrow-up" color={theme.colors.text} size={14} />
                                 </button>
                                 <button disabled={isLastInCol} onClick={() => onReorder(card.id, 'down')} style={{ background: 'none', border: 'none', cursor: isLastInCol ? 'default' : 'pointer', opacity: isLastInCol ? 0.2 : 1, padding: '0 1px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-                                    <ThemedSvgIcon name="arrow-down" color={theme.colors.secondary} size={14} />
+                                    <ThemedSvgIcon name="arrow-down" color={theme.colors.text} size={14} />
                                 </button>
                                 <button disabled={isLastInCol} onClick={() => onReorder(card.id, 'bottom')} title={t('features.kanban.moveToBottom')} style={{ background: 'none', border: 'none', cursor: isLastInCol ? 'default' : 'pointer', opacity: isLastInCol ? 0.2 : 1, padding: '0 1px', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
-                                    <ThemedSvgIcon name="chevrons-down" color={theme.colors.secondary} size={14} />
+                                    <ThemedSvgIcon name="chevrons-down" color={theme.colors.text} size={14} />
                                 </button>
                             </>
                         )}
@@ -115,21 +117,23 @@ const KanbanCard: React.FC<Props> = ({
 
                         {card.assigned_person_name && persons.length > 1 && (
                             <span style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '10px', background: accentColor + '22', color: accentColor, fontWeight: 600, border: `1px solid ${accentColor}44`, whiteSpace: 'nowrap' }}>
-                                {getInitials(card.assigned_person_name)}
+                                {expanded ? card.assigned_person_name : getInitials(card.assigned_person_name)}
                             </span>
                         )}
 
-                        {card.document_id && (
-                            <span style={{ color: theme.colors.secondary, display: 'flex', alignItems: 'center' }} title={t('features.kanban.notes')}>
-                                <ThemedSvgIcon name="file-text" color={theme.colors.secondary} size={13} />
-                            </span>
-                        )}
+                        <button
+                            onClick={() => setExpanded(v => !v)}
+                            title={expanded ? t('features.kanban.hideContent') : t('features.kanban.showContent')}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 2px', display: 'flex', alignItems: 'center', opacity: 0.75 }}
+                        >
+                            <ThemedSvgIcon name={expanded ? 'chevron-up' : 'chevron-down'} color={theme.colors.text} size={13} />
+                        </button>
 
                         {/* Edit + Archive buttons */}
                         {!isArchived && (
                             <>
-                                <button onClick={() => setModalOpen(true)} title={t('common.edit')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.secondary, padding: '1px 3px', display: 'flex', alignItems: 'center', opacity: 0.8 }}>
-                                    <ThemedSvgIcon name="pencil" color={theme.colors.secondary} size={13} />
+                                <button onClick={() => setModalOpen(true)} title={t('common.edit')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 3px', display: 'flex', alignItems: 'center', opacity: 0.8 }}>
+                                    <ThemedSvgIcon name="pencil" color={theme.colors.text} size={13} />
                                 </button>
                                 {canEdit && (
                                     <button onClick={() => setConfirmArchive(true)} title={t('common.archive')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 3px', display: 'flex', alignItems: 'center', opacity: 0.8 }}>
@@ -152,6 +156,16 @@ const KanbanCard: React.FC<Props> = ({
                         )}
                     </div>
                 </div>
+
+                {expanded && (
+                    <KanbanCardBody
+                        card={card}
+                        canEdit={canEdit && !isArchived}
+                        boardLabels={boardLabels}
+                        onUpdate={onUpdate}
+                        onToggleLabel={onToggleLabel}
+                    />
+                )}
             </div>
 
             {modalOpen && (

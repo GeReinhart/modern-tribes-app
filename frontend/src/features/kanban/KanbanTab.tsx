@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
-import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { Tag, User } from 'lucide-react';
-import { LABEL_COLORS } from '@/components/themes/themes';
 import { useKanban } from './hooks';
-import { LabelCreate } from './types';
 import KanbanColumnComponent from './KanbanColumn';
+
+const compactBtn: React.CSSProperties = {
+    padding: '4px 12px', fontSize: 'var(--font-xs)', fontWeight: 600,
+    borderRadius: '6px', cursor: 'pointer', border: 'none', transition: 'all 0.15s',
+};
 
 interface Props {
     featureInstanceId: string;
@@ -23,7 +25,7 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
         board, persons, error, loaded,
         createColumn, renameColumn, deleteColumn, moveColumn,
         createCard, updateCard, archiveCard, restoreCard, moveCard, reorderCard,
-        createLabel, deleteLabel, toggleCardLabel,
+        createLabel, updateLabel, deleteLabel, toggleCardLabel,
     } = useKanban(featureInstanceId);
 
     const [configuring, setConfiguring] = useState(false);
@@ -34,13 +36,18 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
     const [showAddForm, setShowAddForm] = useState(false);
     const [submittingCol, setSubmittingCol] = useState(false);
 
-    // New label form state
-    const [newLabelName, setNewLabelName] = useState('');
-    const [newLabelColor, setNewLabelColor] = useState(LABEL_COLORS[0]);
+    const [hoveredLabelId, setHoveredLabelId] = useState<string | null>(null);
+    const [renamingLabelId, setRenamingLabelId] = useState<string | null>(null);
+    const [renameLabelValue, setRenameLabelValue] = useState('');
 
     const initDone = useRef(false);
     const sortedCols = [...board.columns].sort((a, b) => a.position - b.position);
     const maxColumns = 4;
+
+    const activeCardLabelIds = new Set(
+        board.cards.filter(c => c.status === 'active').flatMap(c => c.label_ids)
+    );
+    const visibleLabels = board.labels.filter(l => activeCardLabelIds.has(l.id));
 
     const assignedPersons = persons.filter(p =>
         board.cards.some(c => c.status === 'active' && c.assigned_person_id === p.id)
@@ -53,6 +60,12 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
         initDone.current = true;
         if (board.columns.length === 0) setConfiguring(true);
     }, [loaded, board.columns.length, isManager]);
+
+    useEffect(() => {
+        if (!filterLabelId) return;
+        const activeIds = new Set(board.cards.filter(c => c.status === 'active').flatMap(c => c.label_ids));
+        if (!activeIds.has(filterLabelId)) setFilterLabelId(null);
+    }, [board.cards, filterLabelId]);
 
     const handleAddColumn = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -70,13 +83,12 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
         setNewColName('');
     };
 
-    const handleAddLabel = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const name = newLabelName.trim();
-        if (!name) return;
-        await createLabel({ feature_instance_id: featureInstanceId, name, color: newLabelColor } as LabelCreate);
-        setNewLabelName('');
-        setNewLabelColor(LABEL_COLORS[0]);
+    const handleRenameLabel = async (labelId: string) => {
+        const name = renameLabelValue.trim();
+        const original = board.labels.find(l => l.id === labelId)?.name;
+        if (name && name !== original) await updateLabel(labelId, { name });
+        setRenamingLabelId(null);
+        setRenameLabelValue('');
     };
 
     return (
@@ -91,28 +103,72 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
                 {/* Label filters */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center', flex: 1 }}>
-                    {board.labels.length > 0 && (
+                    {visibleLabels.length > 0 && (
                         <>
                             <Tag size={14} color={theme.colors.secondary} />
-                            {board.labels.map(label => {
+                            {visibleLabels.map(label => {
                                 const active = filterLabelId === label.id;
+                                const isRenaming = renamingLabelId === label.id;
+
+                                if (isRenaming) {
+                                    return (
+                                        <input
+                                            key={label.id}
+                                            autoFocus
+                                            value={renameLabelValue}
+                                            onChange={e => setRenameLabelValue(e.target.value)}
+                                            onKeyDown={e => {
+                                                if (e.key === 'Enter') handleRenameLabel(label.id);
+                                                if (e.key === 'Escape') { setRenamingLabelId(null); setRenameLabelValue(''); }
+                                            }}
+                                            onBlur={() => handleRenameLabel(label.id)}
+                                            style={{ padding: '3px 8px', borderRadius: '12px', fontSize: 'var(--font-xs)', border: `1px solid ${label.color}`, backgroundColor: theme.colors.surface, color: theme.colors.text, width: '100px', outline: 'none' }}
+                                        />
+                                    );
+                                }
+
                                 return (
-                                    <button
+                                    <div
                                         key={label.id}
-                                        type="button"
-                                        onClick={() => setFilterLabelId(prev => prev === label.id ? null : label.id)}
-                                        style={{
-                                            padding: '4px 12px', borderRadius: '16px',
-                                            fontSize: 'var(--font-xs)', fontWeight: active ? 700 : 500,
-                                            cursor: 'pointer',
-                                            border: `1px solid ${label.color}`,
-                                            backgroundColor: active ? `${label.color}20` : 'transparent',
-                                            color: label.color,
-                                            transition: 'all 0.15s', whiteSpace: 'nowrap',
-                                        }}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '2px' }}
+                                        onMouseEnter={() => setHoveredLabelId(label.id)}
+                                        onMouseLeave={() => setHoveredLabelId(null)}
                                     >
-                                        {label.name}
-                                    </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setFilterLabelId(prev => prev === label.id ? null : label.id)}
+                                            style={{
+                                                padding: '4px 12px', borderRadius: '16px',
+                                                fontSize: 'var(--font-xs)', fontWeight: active ? 700 : 500,
+                                                cursor: 'pointer',
+                                                border: `1px solid ${label.color}`,
+                                                backgroundColor: active ? `${label.color}20` : 'transparent',
+                                                color: label.color,
+                                                transition: 'all 0.15s', whiteSpace: 'nowrap',
+                                            }}
+                                        >
+                                            {label.name}
+                                        </button>
+                                        {isManager && hoveredLabelId === label.id && (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    title={t('features.kanban.renameLabel')}
+                                                    onClick={() => { setRenamingLabelId(label.id); setRenameLabelValue(label.name); }}
+                                                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center', opacity: 0.6 }}
+                                                >
+                                                    <ThemedSvgIcon name="pencil" color={theme.colors.secondary} size={12} />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => deleteLabel(label.id)}
+                                                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center', opacity: 0.6 }}
+                                                >
+                                                    <ThemedSvgIcon name="x" color={theme.colors.danger} size={12} />
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
                                 );
                             })}
                         </>
@@ -162,7 +218,7 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
                                     cursor: 'pointer',
                                     border: `1px solid ${active ? theme.colors.accent : theme.colors.border}`,
                                     backgroundColor: active ? `${theme.colors.accent}20` : theme.colors.surface,
-                                    color: active ? theme.colors.accent : theme.colors.secondary,
+                                    color: active ? theme.colors.accent : theme.colors.text,
                                     transition: 'all 0.15s', whiteSpace: 'nowrap',
                                 }}
                             >
@@ -224,8 +280,20 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
                                     style={{ padding: '7px 10px', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', backgroundColor: theme.colors.surface, color: theme.colors.text, fontSize: 'var(--font-sm)' }}
                                 />
                                 <div style={{ display: 'flex', gap: '6px' }}>
-                                    <ThemedButton variant="primary" type="submit" disabled={!newColName.trim() || submittingCol}>{t('features.kanban.addColumn')}</ThemedButton>
-                                    <ThemedButton variant="secondary" type="button" onClick={() => { setShowAddForm(false); setNewColName(''); }}>{t('common.cancel')}</ThemedButton>
+                                    <button
+                                        type="submit"
+                                        disabled={!newColName.trim() || submittingCol}
+                                        style={{ ...compactBtn, background: !newColName.trim() || submittingCol ? theme.colors.border : theme.colors.primary, color: !newColName.trim() || submittingCol ? theme.colors.secondary : theme.colors.surface }}
+                                    >
+                                        {t('features.kanban.addColumn')}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setShowAddForm(false); setNewColName(''); }}
+                                        style={{ ...compactBtn, background: theme.colors.surface, color: theme.colors.secondary, border: `1px solid ${theme.colors.border}` }}
+                                    >
+                                        {t('common.cancel')}
+                                    </button>
                                 </div>
                             </form>
                         )}
@@ -233,47 +301,6 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
                 )}
             </div>
 
-            {/* Label management (configure mode, manager only) */}
-            {isManager && configuring && (
-                <div style={{ marginTop: '20px', padding: '16px', border: `1px solid ${theme.colors.border}`, borderRadius: '10px', backgroundColor: theme.colors.surface }}>
-                    <div style={{ fontWeight: 600, fontSize: 'var(--font-sm)', color: theme.colors.text, marginBottom: '10px' }}>{t('features.kanban.manageLabels')}</div>
-
-                    {/* Existing labels */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px' }}>
-                        {board.labels.map(label => (
-                            <div key={label.id} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '3px 8px', borderRadius: '10px', border: `1px solid ${label.color}`, background: label.color + '22' }}>
-                                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: label.color, flexShrink: 0 }} />
-                                <span style={{ fontSize: '12px', fontWeight: 600, color: label.color }}>{label.name}</span>
-                                <button onClick={() => deleteLabel(label.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.danger, padding: '0 2px', display: 'flex', alignItems: 'center', marginLeft: '2px' }}>
-                                    <ThemedSvgIcon name="x" color={theme.colors.danger} size={12} />
-                                </button>
-                            </div>
-                        ))}
-                        {board.labels.length === 0 && (
-                            <span style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary, fontStyle: 'italic' }}>{t('features.kanban.noLabels')}</span>
-                        )}
-                    </div>
-
-                    {/* New label form */}
-                    <form onSubmit={handleAddLabel} style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-                        <input
-                            value={newLabelName} onChange={e => setNewLabelName(e.target.value)}
-                            placeholder={t('features.kanban.newLabelPlaceholder')}
-                            style={{ padding: '5px 9px', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', backgroundColor: theme.colors.surface, color: theme.colors.text, fontSize: 'var(--font-sm)', width: '140px' }}
-                        />
-                        <div style={{ display: 'flex', gap: '4px' }}>
-                            {LABEL_COLORS.map(c => (
-                                <button
-                                    key={c} type="button"
-                                    onClick={() => setNewLabelColor(c)}
-                                    style={{ width: '20px', height: '20px', borderRadius: '50%', background: c, border: newLabelColor === c ? `2px solid ${theme.colors.text}` : '2px solid transparent', cursor: 'pointer', padding: 0 }}
-                                />
-                            ))}
-                        </div>
-                        <ThemedButton variant="primary" type="submit" disabled={!newLabelName.trim()}>{t('features.kanban.addLabel')}</ThemedButton>
-                    </form>
-                </div>
-            )}
         </div>
     );
 };
