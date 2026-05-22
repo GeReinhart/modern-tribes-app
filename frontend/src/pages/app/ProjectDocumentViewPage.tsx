@@ -121,7 +121,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
                         <Tag size={14} color={theme.colors.secondary} />
                         {doc.labels.map(l => (
                             <button key={l.id} type="button"
-                                onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}?tab=documents&labelId=${l.id}`)}
+                                onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}/documents?labelId=${l.id}`)}
                                 style={{ padding: '2px 10px', borderRadius: '12px', fontSize: 'var(--font-xs)', fontWeight: 500, backgroundColor: `${theme.colors.accent}20`, color: theme.colors.accent, border: `1px solid ${theme.colors.accent}40`, cursor: 'pointer' }}
                                 onMouseEnter={e => { e.currentTarget.style.opacity = '0.75'; }}
                                 onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}>

@@ -324,6 +324,7 @@ const en: Record<string, string> = {
     'features.todo.noNote': 'No notes yet.',
     'features.todo.showArchived': 'Show {{count}} archived item(s)',
     'features.todo.hideArchived': 'Hide archived items',
+    'features.todo.dueDate': 'Due date',
     'features.kanban.empty': 'No cards yet.',
     'features.kanban.addCard': 'Add',
     'features.kanban.addCardPlaceholder': 'Card title...',
@@ -355,6 +356,7 @@ const en: Record<string, string> = {
     'features.kanban.newLabelPlaceholder': 'Label name...',
     'features.kanban.assignee': 'Assignee',
     'features.kanban.noAssignee': 'No assignee',
+    'features.kanban.dueDate': 'Due date',
 
     'projectDocuments.tab': 'Documents',
     'projectDocuments.addDocument': 'Add Document',
@@ -406,6 +408,14 @@ const en: Record<string, string> = {
     'files.maxFilesError': 'Maximum {{maxFiles}} files allowed',
     'files.fileSizeError': 'File {{filename}} exceeds {{maxFileSize}}MB limit',
     'files.uploadFailed': 'Upload failed',
+
+    'common.saving': 'Saving...',
+
+    'dashboard.title': 'Dashboard',
+    'dashboard.tabs.tasks': 'Tasks',
+    'dashboard.tabs.tribes': 'Tribes',
+    'dashboard.tasks.empty': 'No upcoming tasks assigned to you.',
+    'dashboard.tasks.openSource': 'Open in project',
 
     'about.title': 'About',
     'about.subtitle': 'Modern Tribes — a lightweight tool for organising the groups you belong to.',

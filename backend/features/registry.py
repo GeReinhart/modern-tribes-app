@@ -6,6 +6,7 @@ class FeatureDefinition:
     feature_type: str
     label: str
     router: APIRouter
+    extra_routers: list[APIRouter] = field(default_factory=list)
 
 
 _registry: dict[str, FeatureDefinition] = {}
@@ -16,7 +17,11 @@ def register_feature(definition: FeatureDefinition) -> None:
 
 
 def get_all_routers() -> list[APIRouter]:
-    return [d.router for d in _registry.values()]
+    routers = []
+    for d in _registry.values():
+        routers.append(d.router)
+        routers.extend(d.extra_routers)
+    return routers
 
 
 def get_available_feature_types() -> list[dict]:

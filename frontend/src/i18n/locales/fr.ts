@@ -324,6 +324,7 @@ const fr: Record<string, string> = {
     'features.todo.noNote': "Aucune note pour l'instant.",
     'features.todo.showArchived': '{{count}} élément(s) archivé(s)',
     'features.todo.hideArchived': 'Masquer les éléments archivés',
+    'features.todo.dueDate': "Date d'échéance",
     'features.kanban.empty': 'Aucune carte pour l\'instant.',
     'features.kanban.addCard': 'Ajouter',
     'features.kanban.addCardPlaceholder': 'Titre de la carte...',
@@ -355,6 +356,7 @@ const fr: Record<string, string> = {
     'features.kanban.newLabelPlaceholder': 'Nom de l\'étiquette...',
     'features.kanban.assignee': 'Responsable',
     'features.kanban.noAssignee': 'Aucun responsable',
+    'features.kanban.dueDate': "Date d'échéance",
 
     'projectDocuments.tab': 'Documents',
     'projectDocuments.addDocument': 'Ajouter un document',
@@ -406,6 +408,14 @@ const fr: Record<string, string> = {
     'files.maxFilesError': '{{maxFiles}} fichiers maximum autorisés',
     'files.fileSizeError': 'Le fichier {{filename}} dépasse la limite de {{maxFileSize}} Mo',
     'files.uploadFailed': 'Échec du téléversement',
+
+    'common.saving': 'Enregistrement...',
+
+    'dashboard.title': 'Tableau de bord',
+    'dashboard.tabs.tasks': 'Tâches',
+    'dashboard.tabs.tribes': 'Tribus',
+    'dashboard.tasks.empty': 'Aucune tâche à venir qui vous est assignée.',
+    'dashboard.tasks.openSource': 'Ouvrir dans le projet',
 
     'about.title': 'À propos',
     'about.subtitle': 'Modern Tribes — un outil léger pour organiser les groupes auxquels vous appartenez.',

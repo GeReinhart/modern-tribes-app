@@ -123,7 +123,7 @@ const ShowProjectPageContent: React.FC = () => {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const navigate = useNavigate();
-    const { tribeId, projectId } = useParams<{ tribeId: string; projectId: string }>();
+    const { tribeId, projectId, tab } = useParams<{ tribeId: string; projectId: string; tab?: string }>();
     const [searchParams] = useSearchParams();
 
     const { user } = useCurrentUserProfile();
@@ -136,7 +136,7 @@ const ShowProjectPageContent: React.FC = () => {
     );
     const { features, createFeature, renameFeature, archiveFeature } = useProjectFeatures(projectId || null);
 
-    const [activeTab, setActiveTab] = useState(() => searchParams.get('tab') || 'description');
+    const activeTab = tab || 'description';
     const initialLabelId = searchParams.get('labelId') || null;
     const [showAddFeature, setShowAddFeature] = useState(false);
     const [archiveTarget, setArchiveTarget] = useState<{ id: string; name: string } | null>(null);
@@ -176,20 +176,14 @@ const ShowProjectPageContent: React.FC = () => {
     }, [myProjectPosition]);
 
     const canEdit = useMemo(() => {
+        if (user?.permissions?.includes('admin')) return true;
         if (!myProjectPosition) return false;
         const allPositions = [
             myProjectPosition.direct_position,
             ...myProjectPosition.represented_persons.map(p => p.position),
         ].filter(Boolean);
         return allPositions.some(p => p === 'manager' || p === 'member');
-    }, [myProjectPosition]);
-
-    const breadcrumbs = useMemo(() => [
-        { label: t('common.home'), path: '/app' },
-        { label: t('tribes.title'), path: '/app/tribes' },
-        { label: tribe?.name || t('common.loading'), path: `/app/tribes/${tribeId}` },
-        { label: project?.name || t('common.loading') },
-    ], [tribe?.name, project?.name, tribeId, t]);
+    }, [myProjectPosition, user]);
 
     const tabs = useMemo(() => {
         const base = [
@@ -199,6 +193,27 @@ const ShowProjectPageContent: React.FC = () => {
         const featureTabs = features.map(f => ({ key: f.id, label: f.name }));
         return [...base, ...featureTabs];
     }, [features, t]);
+
+    const handleTabChange = (key: string) => {
+        navigate(`/app/tribes/${tribeId}/projects/${projectId}/${key}`);
+    };
+
+    const activeTabLabel = tabs.find(t => t.key === activeTab)?.label || '';
+
+    const breadcrumbs = useMemo(() => [
+        { label: t('common.home'), path: '/app' },
+        { label: t('tribes.title'), path: '/app/tribes' },
+        { label: tribe?.name || t('common.loading'), path: `/app/tribes/${tribeId}` },
+        { label: project?.name || t('common.loading'), path: `/app/tribes/${tribeId}/projects/${projectId}` },
+        { label: activeTabLabel || t('common.loading') },
+    ], [tribe?.name, project?.name, tribeId, projectId, activeTabLabel, t]);
+
+    const breadcrumbTabs = useMemo(() => tabs.map(t => ({
+        key: t.key,
+        label: t.label,
+        path: `/app/tribes/${tribeId}/projects/${projectId}/${t.key}`,
+        isActive: t.key === activeTab,
+    })), [tabs, tribeId, projectId, activeTab]);
 
     const attachmentCardStyle: React.CSSProperties = {
         padding: '12px 16px',
@@ -266,7 +281,7 @@ const ShowProjectPageContent: React.FC = () => {
     const FeatureComponent = activeFeature ? getFeatureComponent(activeFeature.feature_type) : null;
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs} headerActions={headerActions}>
+        <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} headerActions={headerActions}>
 
             {/* User position on this project */}
             {myProjectPosition && (myProjectPosition.direct_position || myProjectPosition.represented_persons.length > 0) && (
@@ -286,7 +301,7 @@ const ShowProjectPageContent: React.FC = () => {
 
             {/* Tabs */}
             <ThemedSection themeId="main_1">
-                <ThemedTabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+                <ThemedTabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} />
 
                 <div style={{ paddingTop: '16px' }}>
                     {activeTab === 'documents' && projectId && tribeId && (
@@ -416,7 +431,7 @@ const ShowProjectPageContent: React.FC = () => {
                 onConfirm={async () => {
                     if (!archiveTarget) return;
                     await archiveFeature(archiveTarget.id);
-                    setActiveTab('description');
+                    navigate(`/app/tribes/${tribeId}/projects/${projectId}/description`);
                     setArchiveTarget(null);
                 }}
                 title={t('features.archiveTitle')}
@@ -430,7 +445,7 @@ const ShowProjectPageContent: React.FC = () => {
                     onClose={() => setShowAddFeature(false)}
                     onAdd={async (featureType, name) => {
                         const created = await createFeature({ feature_type: featureType, name, position: features.length });
-                        if (created) setActiveTab(created.id);
+                        if (created) navigate(`/app/tribes/${tribeId}/projects/${projectId}/${created.id}`);
                     }}
                 />
             )}

@@ -31,7 +31,7 @@ export const DocumentViewHeaderActions: React.FC<Props> = ({
     return (
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             <ThemedButton variant="ghost"
-                onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}?tab=documents`)}>
+                onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}/documents`)}>
                 {t('projectDocuments.backToDocuments')}
             </ThemedButton>
             {canEdit && isActive && (

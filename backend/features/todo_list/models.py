@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, date
 
 
 class TodoItemCreate(BaseModel):
@@ -15,6 +15,12 @@ class TodoItemUpdate(BaseModel):
     todo_status: Optional[str] = None
     position: Optional[int] = None
     document_content_html: Optional[str] = None
+    size: Optional[int] = None
+    clear_size: bool = False
+    assigned_person_id: Optional[str] = None
+    clear_assignee: bool = False
+    due_date: Optional[date] = None
+    clear_due_date: bool = False
 
 
 class TodoItemResponse(BaseModel):
@@ -26,7 +32,34 @@ class TodoItemResponse(BaseModel):
     document_id: Optional[str] = None
     document_content_html: Optional[str] = None
     position: int
+    size: Optional[int] = None
+    due_date: Optional[date] = None
+    assigned_person_id: Optional[str] = None
+    assigned_person_name: Optional[str] = None
+    label_ids: list[str] = []
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None
     updated_by: Optional[str] = None
+
+
+class TodoLabel(BaseModel):
+    id: str
+    name: str
+    color: str
+    position: int
+
+
+class TodoLabelCreate(BaseModel):
+    feature_instance_id: str
+    name: str
+    color: str = '#6b7280'
+
+
+class TodoLabelUpdate(BaseModel):
+    name: Optional[str] = None
+
+
+class PersonOption(BaseModel):
+    id: str
+    name: str

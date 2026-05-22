@@ -40,6 +40,7 @@ def _card(row: dict) -> KanbanCardResponse:
         position=row["position"],
         status=row["status"],
         size=row.get("size"),
+        due_date=row.get("due_date"),
         label_ids=label_ids,
     )
 
@@ -166,7 +167,7 @@ async def update_card(card_id: str, data: CardUpdate, current_user: dict = Depen
         raise HTTPException(status_code=404, detail="Card not found.")
     await _require_feature_access(str(card["feature_instance_id"]), current_user, pool, "member")
     uid = str(current_user["id"])
-    await repo.update_card_fields(pool, card_id, data.title, data.assigned_person_id, data.clear_assignee, data.size, data.clear_size, uid)
+    await repo.update_card_fields(pool, card_id, data.title, data.assigned_person_id, data.clear_assignee, data.size, data.clear_size, data.due_date, data.clear_due_date, uid)
     if data.document_content_html is not None:
         await _upsert_card_document(pool, card, data.document_content_html, uid)
     return _card(await repo.fetch_card(pool, card_id))
