@@ -77,7 +77,7 @@ function ProfilePageContent() {
     });
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs} bookmarkTitle={t('profile.title')}>
             <div style={{ maxWidth: '600px', width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
 
                 {/* Avatar */}

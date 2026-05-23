@@ -10,6 +10,7 @@ interface AppLayoutProps {
     showUserBadge?: boolean;
     breadcrumbs?: BreadcrumbItem[];
     breadcrumbTabs?: BreadcrumbTab[];
+    bookmarkTitle?: string | null;
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({
@@ -19,6 +20,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                                                          showUserBadge = true,
                                                          breadcrumbs,
                                                          breadcrumbTabs,
+                                                         bookmarkTitle,
                                                      }) => {
     const { theme } = useTheme();
 
@@ -45,6 +47,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 showUserBadge={showUserBadge}
                 breadcrumbs={breadcrumbs}
                 breadcrumbTabs={breadcrumbTabs}
+                bookmarkTitle={bookmarkTitle}
             />
             <main style={mainStyle}>{children}</main>
         </div>

@@ -279,7 +279,7 @@ const ShowProjectPageContent: React.FC = () => {
     const FeatureComponent = activeFeature ? getFeatureComponent(activeFeature.feature_type) : null;
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} headerActions={headerActions}>
+        <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} headerActions={headerActions} bookmarkTitle={project?.name ?? null}>
 
             {showTabConfig && (
                 <TabConfigPopup

@@ -414,6 +414,14 @@ const en: Record<string, string> = {
     'dashboard.title': 'Dashboard',
     'dashboard.tabs.tasks': 'Tasks',
     'dashboard.tabs.tribes': 'Tribes',
+    'dashboard.tabs.bookmarks': 'Bookmarks',
+
+    'bookmarks.empty': 'No bookmarks yet. Browse pages and click the bookmark icon to save them here.',
+    'bookmarks.add': 'Add to bookmarks',
+    'bookmarks.remove': 'Remove from bookmarks',
+    'bookmarks.moveUp': 'Move up',
+    'bookmarks.moveDown': 'Move down',
+    'bookmarks.open': 'Open page',
     'dashboard.tasks.empty': 'No upcoming tasks assigned to you.',
     'dashboard.tasks.openSource': 'Open in project',
 

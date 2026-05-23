@@ -414,6 +414,14 @@ const fr: Record<string, string> = {
     'dashboard.title': 'Tableau de bord',
     'dashboard.tabs.tasks': 'Tâches',
     'dashboard.tabs.tribes': 'Tribus',
+    'dashboard.tabs.bookmarks': 'Favoris',
+
+    'bookmarks.empty': 'Aucun favori pour le moment. Parcourez les pages et cliquez sur l\'icône de favori pour les enregistrer ici.',
+    'bookmarks.add': 'Ajouter aux favoris',
+    'bookmarks.remove': 'Retirer des favoris',
+    'bookmarks.moveUp': 'Monter',
+    'bookmarks.moveDown': 'Descendre',
+    'bookmarks.open': 'Ouvrir la page',
     'dashboard.tasks.empty': 'Aucune tâche à venir qui vous est assignée.',
     'dashboard.tasks.openSource': 'Ouvrir dans le projet',
 

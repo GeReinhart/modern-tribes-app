@@ -9,6 +9,7 @@ import { themesById } from '@/components/themes/themes';
 import { useVerifyAuthorization } from "@/hooks/userVerifyAuthorization.ts";
 import DashboardTasksTab from '@/features/dashboard/tabs/DashboardTasksTab';
 import DashboardTribesTab from '@/features/dashboard/tabs/DashboardTribesTab';
+import DashboardBookmarksTab from '@/features/bookmarks/DashboardBookmarksTab';
 import { ThemedCard } from "@/components/common/layout/ThemedCard.tsx";
 import { errorStyle } from "@/styles/theme.styles.tsx";
 import { useUrlTab } from '@/hooks/useUrlTab';
@@ -19,6 +20,7 @@ import { TabConfigPopup } from '@/features/tab-config/TabConfigPopup';
 const TABS = (t: (k: string) => string) => [
     { key: 'tasks', label: t('dashboard.tabs.tasks'), Component: DashboardTasksTab },
     { key: 'tribes', label: t('dashboard.tabs.tribes'), Component: DashboardTribesTab },
+    { key: 'bookmarks', label: t('dashboard.tabs.bookmarks'), Component: DashboardBookmarksTab },
 ];
 
 const DashboardPageContent: React.FC = () => {
@@ -67,7 +69,7 @@ const DashboardPageContent: React.FC = () => {
     );
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} headerActions={headerActions}>
+        <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} headerActions={headerActions} bookmarkTitle={t('dashboard.title')}>
 
             {showTabConfig && (
                 <TabConfigPopup

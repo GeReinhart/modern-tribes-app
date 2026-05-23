@@ -246,7 +246,7 @@ const ShowTribePageContent: React.FC = () => {
     const guests = tribe.persons.filter(p => p.position === 'guest');
 
     return (
-        <AppLayout headerActions={headerActions} breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs}>
+        <AppLayout headerActions={headerActions} breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} bookmarkTitle={tribe?.name ?? null}>
 
             {showTabConfig && (
                 <TabConfigPopup

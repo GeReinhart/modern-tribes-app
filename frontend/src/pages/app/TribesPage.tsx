@@ -87,7 +87,7 @@ const TribesPageContent: React.FC = () => {
     }
 
     return (
-        <AppLayout headerActions={headerActions}  breadcrumbs={breadcrumbs} >
+        <AppLayout headerActions={headerActions} breadcrumbs={breadcrumbs} bookmarkTitle={t('tribes.title')}>
             <div className="container mx-auto px-4 py-8">
 
                 {/* Authorization Error Message */}
