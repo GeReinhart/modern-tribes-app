@@ -79,6 +79,7 @@ const ShowTribePageContent: React.FC = () => {
             if (!existing) {
                 map.set(row.project_id, {
                     project_id: row.project_id,
+                    project_url_param_id: row.project_url_param_id,
                     project_name: row.project_name,
                     direct_position: row.via_represents ? null : row.effective_position,
                     represented_persons: row.via_represents && row.person_first_name && row.person_last_name
@@ -380,7 +381,7 @@ const ShowTribePageContent: React.FC = () => {
                                             cursor: 'pointer',
                                             transition: 'all 0.2s ease',
                                         }}
-                                        onClick={() => navigate(`/app/tribes/${tribeId}/projects/${project.project_id}`)}
+                                        onClick={() => navigate(`/app/tribes/${tribeId}/projects/${project.project_url_param_id}`)}
                                         onMouseEnter={e => {
                                             e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
                                             e.currentTarget.style.borderColor = theme.colors.primary;

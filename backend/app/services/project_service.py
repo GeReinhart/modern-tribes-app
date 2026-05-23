@@ -114,6 +114,7 @@ async def _build_response(project: dict, pool) -> ProjectWithDocumentResponse:
 
     return ProjectWithDocumentResponse(
         id=str(project["id"]),
+        url_param_id=project["url_param_id"],
         name=project["name"],
         document_id=str(document_id) if document_id else None,
         document_content_html=document.get("content_html", "") if document else "",

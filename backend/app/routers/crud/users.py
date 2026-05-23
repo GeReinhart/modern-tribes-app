@@ -11,7 +11,7 @@ from ...core.email import magic_link_html
 from ...core.security import create_magic_token
 from ...utils.db_helpers import (
     get_all_documents, check_document_exists, create_document,
-    update_document, delete_document, check_unique_field
+    update_document, delete_document, check_unique_field, resolve_url_param_id,
 )
 from ...utils.ownership import check_own_user_or_admin
 from ...utils.validators import EntityValidator
@@ -49,6 +49,7 @@ async def get_userswith_roles_permissions(current_user: dict = Depends(get_curre
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_OWN_PROFILE)
 async def get_user(user_id: str, current_user: dict = Depends(get_current_user)):
     pool = get_database()
+    user_id = await resolve_url_param_id(pool, TABLE, user_id)
     await check_own_user_or_admin(user_id, current_user, pool)
     user = await user_repo.get_user_with_roles_and_permissions(pool, user_id)
     if not user:
@@ -60,6 +61,7 @@ async def get_user(user_id: str, current_user: dict = Depends(get_current_user))
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_OWN_PROFILE)
 async def get_user_with_roles_and_permissions(user_id: str, current_user: dict = Depends(get_current_user)):
     pool = get_database()
+    user_id = await resolve_url_param_id(pool, TABLE, user_id)
     await check_own_user_or_admin(user_id, current_user, pool)
     user = await user_repo.get_user_with_roles_and_permissions(pool, user_id)
     if not user:
@@ -93,6 +95,7 @@ async def create_user(user: UserCreate, current_user: dict = Depends(get_current
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def update_user(user_id: str, user: UserUpdate, current_user: dict = Depends(get_current_user)):
     pool = get_database()
+    user_id = await resolve_url_param_id(pool, TABLE, user_id)
     await check_own_user_or_admin(user_id, current_user, pool)
     validator = EntityValidator(pool)
     existing_user = await check_document_exists(pool, TABLE, user_id, ENTITY_NAME)
@@ -117,6 +120,7 @@ async def update_user(user_id: str, user: UserUpdate, current_user: dict = Depen
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def delete_user(user_id: str, current_user: dict = Depends(get_current_user)):
     pool = get_database()
+    user_id = await resolve_url_param_id(pool, TABLE, user_id)
     await delete_document(pool, TABLE, user_id, ENTITY_NAME)
     return None
 
@@ -125,6 +129,7 @@ async def delete_user(user_id: str, current_user: dict = Depends(get_current_use
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def admin_send_magic_link(user_id: str, current_user: dict = Depends(get_current_user)):
     pool = get_database()
+    user_id = await resolve_url_param_id(pool, TABLE, user_id)
     user = await check_document_exists(pool, TABLE, user_id, ENTITY_NAME)
     async with pool.acquire() as conn:
         existing = await conn.fetchrow(
@@ -170,6 +175,7 @@ async def admin_send_magic_link(user_id: str, current_user: dict = Depends(get_c
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def admin_generate_magic_link(user_id: str, current_user: dict = Depends(get_current_user)):
     pool = get_database()
+    user_id = await resolve_url_param_id(pool, TABLE, user_id)
     user = await check_document_exists(pool, TABLE, user_id, ENTITY_NAME)
     magic_token = create_magic_token(user["email"])
     magic_link = f"{settings.FRONTEND_URL}/auth/verify?token={magic_token}"

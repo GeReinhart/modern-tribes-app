@@ -13,18 +13,20 @@ export interface ProjectDocumentLabel {
 
 export interface ProjectDocumentSummary {
     id: string;
+    url_param_id: string;
     document_id: string;
     title: string;
     content_summary: string | null;
     labels: LabelInfo[];
     status: string;
-    publication_id: string | null;
+    publication_url_param_id: string | null;
     created_at: string;
     updated_at: string;
 }
 
 export interface ProjectDocument {
     id: string;
+    url_param_id: string;
     project_id: string;
     document_id: string;
     title: string;
@@ -33,7 +35,7 @@ export interface ProjectDocument {
     attachments: AttachmentFile[];
     labels: LabelInfo[];
     status: string;
-    publication_id: string | null;
+    publication_url_param_id: string | null;
     created_at: string;
     updated_at: string;
     created_by: string | null;

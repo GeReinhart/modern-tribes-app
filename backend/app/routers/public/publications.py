@@ -5,6 +5,7 @@ from ...models.app.publication import PublicationSummary, PublicationDetail
 from ...models.app.project_document import LabelInfo
 from ...core.database import get_database
 from ...services import publication_service
+from ...utils.db_helpers import resolve_url_param_id
 
 router = APIRouter(prefix="/public/publications", tags=["public_publications"])
 
@@ -27,4 +28,5 @@ async def list_publications(
 @router.get("/{publication_id}", response_model=PublicationDetail)
 async def get_publication(publication_id: str):
     pool = get_database()
+    publication_id = await resolve_url_param_id(pool, "publications", publication_id)
     return await publication_service.get_publication(publication_id, pool)

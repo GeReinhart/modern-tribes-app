@@ -152,6 +152,7 @@ const ShowProjectPageContent: React.FC = () => {
         if (rows.length === 0) return null;
         const entry: ProjectEntry = {
             project_id: projectId,
+            project_url_param_id: rows[0].project_url_param_id,
             project_name: rows[0].project_name,
             direct_position: null,
             represented_persons: [],

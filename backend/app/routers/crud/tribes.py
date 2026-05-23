@@ -21,7 +21,8 @@ from ...utils.db_helpers import (
     delete_document,
     check_unique_field,
     check_document_exists,
-    row_to_dict
+    row_to_dict,
+    resolve_url_param_id,
 )
 from ...utils.validators import EntityValidator
 
@@ -46,6 +47,7 @@ async def get_tribes(current_user: dict = Depends(get_current_user)):
 async def get_tribe(tribe_id: str,current_user: dict = Depends(get_current_user)):
     """Get a specific tribe by ID"""
     pool = get_database()
+    tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
     return await get_document_by_id(pool, TABLE, tribe_id, ENTITY_NAME)
 
 
@@ -89,6 +91,7 @@ async def create_tribe(tribe: TribeCreate,current_user: dict = Depends(get_curre
 async def update_tribe(tribe_id: str, tribe: TribeUpdate,current_user: dict = Depends(get_current_user)):
     """Update an existing tribe"""
     pool = get_database()
+    tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
     validator = EntityValidator(pool)
 
     # Check if tribe exists
@@ -127,6 +130,7 @@ async def update_tribe(tribe_id: str, tribe: TribeUpdate,current_user: dict = De
 async def delete_tribe(tribe_id: str,current_user: dict = Depends(get_current_user)):
     """Delete a tribe"""
     pool = get_database()
+    tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
     await delete_document(pool, TABLE, tribe_id, ENTITY_NAME)
     return None
 
@@ -136,6 +140,7 @@ async def delete_tribe(tribe_id: str,current_user: dict = Depends(get_current_us
 async def get_tribe_positions(tribe_id: str,current_user: dict = Depends(get_current_user)):
     """Get all positions in a tribe"""
     pool = get_database()
+    tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
 
     # Check if tribe exists and get it
     tribe = await check_document_exists(pool, TABLE, tribe_id, ENTITY_NAME)
@@ -161,6 +166,7 @@ async def get_tribe_positions(tribe_id: str,current_user: dict = Depends(get_cur
 async def get_tribe_projects(tribe_id: str, current_user: dict = Depends(get_current_user)):
     """Get all project relations for a tribe"""
     pool = get_database()
+    tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
     await check_document_exists(pool, TABLE, tribe_id, ENTITY_NAME)
     return await tribe_repo.get_tribe_projects(pool, tribe_id)
 
@@ -170,6 +176,7 @@ async def get_tribe_projects(tribe_id: str, current_user: dict = Depends(get_cur
 async def sync_tribe_projects(tribe_id: str, projects: List[TribeProjectInput], current_user: dict = Depends(get_current_user)):
     """Replace all project relations for a tribe"""
     pool = get_database()
+    tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
     await check_document_exists(pool, TABLE, tribe_id, ENTITY_NAME)
     validator = EntityValidator(pool)
     if projects:
@@ -186,6 +193,7 @@ async def sync_tribe_projects(tribe_id: str, projects: List[TribeProjectInput], 
 async def get_tribe_persons(tribe_id: str,current_user: dict = Depends(get_current_user)):
     """Get all persons and their positions in a tribe"""
     pool = get_database()
+    tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
 
     tribe = await check_document_exists(pool, TABLE, tribe_id, ENTITY_NAME)
 

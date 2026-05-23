@@ -104,7 +104,7 @@ const ProjectDocumentFormPageContent: React.FC = () => {
                     attachments,
                     label_names: labelNames,
                 });
-                navigate(`/app/tribes/${tribeId}/projects/${projectId}/documents/${created.id}`);
+                navigate(`/app/tribes/${tribeId}/projects/${projectId}/documents/${created.url_param_id}`);
             }
         } catch (err: any) {
             setError(err.message || t('validation.errorOccurred'));

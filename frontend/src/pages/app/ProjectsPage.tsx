@@ -31,6 +31,7 @@ const ProjectsPageContent: React.FC = () => {
             if (!existing) {
                 map.set(row.project_id, {
                     project_id: row.project_id,
+                    project_url_param_id: row.project_url_param_id,
                     project_name: row.project_name,
                     direct_position: row.via_represents ? null : row.effective_position,
                     represented_persons: row.via_represents && row.person_first_name && row.person_last_name

@@ -20,6 +20,7 @@ class ProjectWithDocumentUpdate(BaseModel):
 
 class ProjectWithDocumentResponse(BaseModel):
     id: str
+    url_param_id: str
     name: str
     document_id: Optional[str] = None
     document_content_html: str

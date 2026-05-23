@@ -73,7 +73,7 @@ function PublicationAdminRow({ pub, onUnpublish }: { pub: PublicationAdminItem; 
                     )}
                 </div>
                 <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
-                    <ThemedButton variant="ghost" onClick={() => navigate(`/public/publications/${pub.id}`)}
+                    <ThemedButton variant="ghost" onClick={() => navigate(`/public/publications/${pub.url_param_id}`)}
                         style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <ExternalLink size={14} />{t('publications.view')}
                     </ThemedButton>

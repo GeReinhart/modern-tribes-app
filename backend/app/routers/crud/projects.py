@@ -11,7 +11,8 @@ from ...utils.db_helpers import (
     create_document,
     update_document,
     delete_document,
-    check_document_exists
+    check_document_exists,
+    resolve_url_param_id,
 )
 from ...utils.validators import EntityValidator
 from ...models.auth.auth import PermissionEnum
@@ -38,6 +39,7 @@ async def get_projects(current_user: dict = Depends(get_current_user)):
 async def get_project(project_id: str,current_user: dict = Depends(get_current_user)):
     """Get a specific project by ID"""
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, TABLE, project_id)
     return await get_document_by_id(pool, TABLE, project_id, ENTITY_NAME)
 
 
@@ -69,6 +71,7 @@ async def create_project(project: ProjectCreate,current_user: dict = Depends(get
 async def update_project(project_id: str, project: ProjectUpdate,current_user: dict = Depends(get_current_user)):
     """Update an existing project"""
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, TABLE, project_id)
     validator = EntityValidator(pool)
 
     # Check if project exists
@@ -95,5 +98,6 @@ async def update_project(project_id: str, project: ProjectUpdate,current_user: d
 async def delete_project(project_id: str,current_user: dict = Depends(get_current_user)):
     """Delete a project"""
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, TABLE, project_id)
     await delete_document(pool, TABLE, project_id, ENTITY_NAME)
     return None

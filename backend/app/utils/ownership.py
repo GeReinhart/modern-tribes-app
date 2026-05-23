@@ -3,12 +3,13 @@ from uuid import UUID
 
 from fastapi import HTTPException, status
 
-from .db_helpers import get_document_by_id, row_to_dict
+from .db_helpers import get_document_by_id, row_to_dict, resolve_url_param_id
 from .permissions_helper import get_user_permissions
 from ..models.auth.auth import PermissionEnum
 
 
 async def check_own_user_or_admin(user_id: str, current_user: dict, pool) -> None:
+    user_id = await resolve_url_param_id(pool, "users", user_id)
     if str(current_user.get("id")) == user_id:
         return
     permissions = await get_user_permissions(pool, str(current_user.get("id")))
@@ -39,6 +40,7 @@ async def check_own_tribe_position_or_admin(
     tribe_id: str, current_user: dict, pool,
     required_position: Optional[str] = None
 ) -> None:
+    tribe_id = await resolve_url_param_id(pool, "tribes", tribe_id)
     permissions = await get_user_permissions(pool, str(current_user.get("id")))
     if PermissionEnum.ADMIN in permissions:
         return

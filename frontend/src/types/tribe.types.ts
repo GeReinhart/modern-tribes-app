@@ -30,6 +30,7 @@ export interface TribeUpdate {
 
 export interface Tribe extends TribeBase {
     id: string;
+    url_param_id: string;
     status: string;
     created_at: string;
     updated_at: string;

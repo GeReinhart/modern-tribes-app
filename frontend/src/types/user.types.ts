@@ -2,6 +2,7 @@ import { BaseEntity } from './common.types';
 import {Role} from "@/types/role.types.ts";
 
 export interface User extends BaseEntity {
+    url_param_id: string;
     email: string;
     login: string;
     role_ids: string[];
@@ -24,6 +25,7 @@ export interface UserUpdate {
 }
 
 export interface UserWithRolesAndPermissions extends BaseEntity {
+    url_param_id: string;
     email: string;
     login: string;
     role_ids: string[];

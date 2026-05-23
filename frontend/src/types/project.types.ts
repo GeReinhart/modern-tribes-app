@@ -13,6 +13,7 @@ export interface ProjectUpdate {
 
 export interface Project extends ProjectBase {
     id: string;
+    url_param_id: string;
     status: string;
     created_at: string;
     updated_at: string;

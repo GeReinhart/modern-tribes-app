@@ -4,6 +4,7 @@ from typing import Optional
 from fastapi import HTTPException, status
 
 from .permissions_helper import get_user_permissions
+from .db_helpers import resolve_url_param_id
 from ..models.auth.auth import PermissionEnum
 
 _POSITION_ORDER = {'guest': 0, 'member': 1, 'manager': 2}
@@ -48,6 +49,7 @@ async def check_project_access_or_admin(
     Returns the effective position string.
     Raises 403 if access is denied.
     """
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
     user_id = UUID(str(current_user["id"]))
     user_permissions = await get_user_permissions(pool, str(user_id))
 

@@ -137,7 +137,7 @@ const TribesTab: React.FC = () => {
             key: 'actions', header: t('common.actions'),
             render: (tr: Tribe) => (
                 <div style={{ display: 'flex', gap: '8px' }} onClick={e => e.stopPropagation()}>
-                    <ThemedButton variant="secondary" onClick={() => navigate(`/admin/tribes/${tr.id}/edit`)}>{t('common.edit')}</ThemedButton>
+                    <ThemedButton variant="secondary" onClick={() => navigate(`/admin/tribes/${tr.url_param_id}/edit`)}>{t('common.edit')}</ThemedButton>
                     <ThemedButton variant="danger" onClick={() => crud.openDeleteSingle(tr)}>{t('common.delete')}</ThemedButton>
                 </div>
             ),
@@ -186,7 +186,7 @@ const TribesTab: React.FC = () => {
                     data={filteredTribes}
                     columns={columns}
                     getRowId={tr => tr.id}
-                    onRowClick={tr => navigate(`/admin/tribes/${tr.id}/edit`)}
+                    onRowClick={tr => navigate(`/admin/tribes/${tr.url_param_id}/edit`)}
                     selectedRows={crud.selectedRows}
                     onRowSelect={crud.handleRowSelect}
                 />

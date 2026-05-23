@@ -10,6 +10,7 @@ from ...models.app.project_with_document import (
 from ...core.database import get_database
 from ...services import project_service
 from ...utils.ownership import check_own_tribe_position_or_admin
+from ...utils.db_helpers import resolve_url_param_id
 
 router = APIRouter(prefix="/projects", tags=["app_projects"])
 
@@ -28,6 +29,7 @@ async def create_project_with_document(
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_project_with_document(project_id: str, current_user: dict = Depends(get_current_user)):
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
     return await project_service.get_project_with_document(project_id, pool)
 
 
@@ -37,6 +39,7 @@ async def update_project_with_document(
     project_id: str, data: ProjectWithDocumentUpdate, current_user: dict = Depends(get_current_user)
 ):
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
     # Verify the user is a manager of at least one tribe linked to this project
     async with pool.acquire() as conn:
         tribe_row = await conn.fetchrow(
