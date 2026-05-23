@@ -6,6 +6,7 @@ import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb';
 import UserBadge from "@/components/entities/users/CurrentUserBadge.tsx";
+import { BookmarkToggle } from '@/features/bookmarks/BookmarkToggle';
 
 
 
@@ -15,6 +16,7 @@ interface AppHeaderProps {
     showUserBadge?: boolean;
     breadcrumbs?: BreadcrumbItem[];
     breadcrumbTabs?: BreadcrumbTab[];
+    bookmarkTitle?: string | null;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
@@ -23,6 +25,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                                                         showUserBadge = true,
                                                         breadcrumbs,
                                                         breadcrumbTabs,
+                                                        bookmarkTitle,
                                                     }) => {
     const { theme, currentThemeKey } = useTheme();
     const navigate = useNavigate();
@@ -51,6 +54,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     }, [isMenuOpen]);
 
     const headerStyle: React.CSSProperties = {
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -224,9 +230,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 </div>
             )}
 
-            {/* Right - Search + About + User Badge */}
+            {/* Right - Bookmark + Search + About + User Badge */}
             {showUserBadge && (
                 <div style={rightSectionStyle}>
+                    {bookmarkTitle && (
+                        <BookmarkToggle pagePath={location.pathname} pageTitle={bookmarkTitle} />
+                    )}
                     <button
                         onClick={() => navigate('/app/search')}
                         title="Search"

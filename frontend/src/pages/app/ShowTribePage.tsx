@@ -10,6 +10,7 @@ import { ThemedSection } from "@/components/common/layout/ThemedSection.tsx";
 import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
 import { ConfirmDialog } from '@/components/common/layout/ConfirmDialog.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useUrlTab } from '@/hooks/useUrlTab';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
 import { useUserTribes } from '@/hooks/useTribes';
@@ -19,11 +20,13 @@ import {
     containerStyle,
     errorStyle,
 } from '@/styles/theme.styles';
-import { Paperclip, Download, FileText, Image, Film, Music, File } from 'lucide-react';
+import { Paperclip, Download, FileText, Image, Film, Music, File, Settings } from 'lucide-react';
 import { AttachmentFile } from '@/types/document.types.ts';
 import {ThemedLoadingSpinner} from "@/components/common/layout/ThemedLoadingSpinner.tsx";
 import {useVerifyAuthorization} from "@/hooks/userVerifyAuthorization.ts";
 import { ProjectEntry } from '@/types/queries/projects.query.types';
+import { useTabConfig } from '@/features/tab-config/useTabConfig';
+import { TabConfigPopup } from '@/features/tab-config/TabConfigPopup';
 
 const ShowTribePageContent: React.FC = () => {
     const { t } = useTranslation();
@@ -33,7 +36,7 @@ const ShowTribePageContent: React.FC = () => {
     const { data: authorization, error: authorizationError, verifyAuthorization } = useVerifyAuthorization();
     const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
     const [archiving, setArchiving] = useState(false);
-    const [activeTab, setActiveTab] = useState<'description' | 'projects' | 'members'>('description');
+    const [showTabConfig, setShowTabConfig] = useState(false);
 
     // Single hook call to get all data
     const { tribe, loading, error } = useTribeWithPositions(tribeId || null);
@@ -97,11 +100,16 @@ const ShowTribePageContent: React.FC = () => {
         return Array.from(map.values());
     }, [tribeProjects]);
 
-    const tabs = useMemo(() => [
+    const allTabs = useMemo(() => [
         { key: 'description', label: t('tribes.tabDescription') },
-        { key: 'projects',    label: t('tribes.tabProjects', { count: dedupedProjects.length }) },
-        { key: 'members',     label: t('tribes.tabMembers', { count: tribe?.persons.length ?? 0 }) },
+        { key: 'projects',    label: t('tribes.tabProjects') },
+        { key: 'members',     label: t('tribes.tabMembers') },
     ], [t, dedupedProjects.length, tribe?.persons.length]);
+
+    const contextKey = tribeId ? `tribe:${tribeId}` : '';
+    const { visibleTabs, defaultTabKey, tabsWithConfig, saveConfig } = useTabConfig(contextKey, allTabs);
+
+    const { activeTab, breadcrumbTabs, handleTabChange } = useUrlTab(visibleTabs, `/app/tribes/${tribeId ?? ''}`, defaultTabKey);
 
     // Check authorization when component mounts or tribeId changes
     useEffect(() => {
@@ -180,7 +188,7 @@ const ShowTribePageContent: React.FC = () => {
             borderRadius: '12px',
             fontSize: '12px',
             fontWeight: 600,
-            textTransform: 'uppercase',
+
         };
     };
 
@@ -238,7 +246,15 @@ const ShowTribePageContent: React.FC = () => {
     const guests = tribe.persons.filter(p => p.position === 'guest');
 
     return (
-        <AppLayout headerActions={headerActions} breadcrumbs={breadcrumbs}>
+        <AppLayout headerActions={headerActions} breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} bookmarkTitle={tribe?.name ?? null}>
+
+            {showTabConfig && (
+                <TabConfigPopup
+                    tabsWithConfig={tabsWithConfig}
+                    onSave={saveConfig}
+                    onClose={() => setShowTabConfig(false)}
+                />
+            )}
 
             {/* Authorization Error Message */}
             {authorizationError && (
@@ -249,27 +265,20 @@ const ShowTribePageContent: React.FC = () => {
                 </ThemedCard>
             )}
 
-            {/* User position in this tribe */}
-            {myPosition && (myPosition.direct_position || myPosition.represented_persons.length > 0) && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
-                    {myPosition.direct_position && (
-                        <ThemedBadge variant={myPosition.direct_position === 'manager' ? 'accent' : myPosition.direct_position === 'member' ? 'primary' : 'ghost'}>
-                            {t(`positions.${myPosition.direct_position}`)}
-                        </ThemedBadge>
-                    )}
-                    {myPosition.represented_persons.map((p, i) => (
-                        <ThemedBadge key={i} variant={p.position === 'manager' ? 'accent' : p.position === 'member' ? 'primary' : 'ghost'}>
-                            {t(`positions.${p.position}`)} {t('tribes.as')} {p.first_name} {p.last_name}
-                        </ThemedBadge>
-                    ))}
-                </div>
-            )}
-
             {/* Tabs */}
             <ThemedTabs
-                tabs={tabs}
+                tabs={visibleTabs}
                 activeTab={activeTab}
-                onTabChange={key => setActiveTab(key as typeof activeTab)}
+                onTabChange={handleTabChange}
+                configButton={isManager ? (
+                    <button
+                        onClick={() => setShowTabConfig(true)}
+                        title={t('tabConfig.configure')}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.secondary, display: 'flex', alignItems: 'center', padding: '4px' }}
+                    >
+                        <Settings size={16} />
+                    </button>
+                ) : undefined}
             />
 
             <div style={{ marginTop: '16px' }}>
@@ -403,7 +412,30 @@ const ShowTribePageContent: React.FC = () => {
 
                 {/* Members tab */}
                 {activeTab === 'members' && (
+
+                    <>
+                    <ThemedSection themeId="default">
+                        {/* User position in this tribe */}
+                        {myPosition && (myPosition.direct_position || myPosition.represented_persons.length > 0) && (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
+                                {myPosition.direct_position && (
+                                    <ThemedBadge variant={myPosition.direct_position === 'manager' ? 'accent' : myPosition.direct_position === 'member' ? 'primary' : 'ghost'}>
+                                        {t(`positions.${myPosition.direct_position}`)}
+                                    </ThemedBadge>
+                                )}
+                                {myPosition.represented_persons.map((p, i) => (
+                                    <ThemedBadge key={i} variant={p.position === 'manager' ? 'accent' : p.position === 'member' ? 'primary' : 'ghost'}>
+                                        {t(`positions.${p.position}`)} {t('tribes.as')} {p.first_name} {p.last_name}
+                                    </ThemedBadge>
+                                ))}
+                            </div>
+                        )}
+                    </ThemedSection>
                     <ThemedSection themeId="main_2">
+
+
+
+
                         {managers.length > 0 && (
                             <div style={{ marginBottom: '24px' }}>
                                 {managers.map(person => (
@@ -438,6 +470,9 @@ const ShowTribePageContent: React.FC = () => {
                             <ThemedText variant="secondary" size="small">{t('tribes.noMembers')}</ThemedText>
                         )}
                     </ThemedSection>
+
+
+                    </>
                 )}
 
             </div>

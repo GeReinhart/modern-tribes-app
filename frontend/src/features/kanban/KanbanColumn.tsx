@@ -74,7 +74,7 @@ const KanbanColumn: React.FC<Props> = ({
 
     return (
         <div style={{
-            flex: '1 1 0', minWidth: '240px', display: 'flex', flexDirection: 'column',
+            flex: '1 1 0', minWidth: '340px', display: 'flex', flexDirection: 'column',
             backgroundColor: theme.colors.surface, borderRadius: '10px',
             border: `1px solid ${theme.colors.border}`,
             borderTop: `3px solid ${accentColor}`,
@@ -146,7 +146,7 @@ const KanbanColumn: React.FC<Props> = ({
                 )}
             </div>
 
-            {canEdit && (
+            {canEdit && isFirst && (
                 <form onSubmit={handleAddCard} style={{ display: 'flex', gap: '6px', marginTop: '10px' }}>
                     <input
                         value={newCardTitle} onChange={e => setNewCardTitle(e.target.value)}

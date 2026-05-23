@@ -36,6 +36,7 @@ import {PublicationsAdminPage} from "@/pages/admin/PublicationsAdminPage.tsx";
 import {PublicationsPage} from "@/pages/public/PublicationsPage.tsx";
 import {PublicationDetailPage} from "@/pages/public/PublicationDetailPage.tsx";
 import DashboardPage from "@/pages/app/DashboardPage.tsx";
+import { BookmarksProvider } from '@/features/bookmarks/BookmarksContext';
 
 function AuthBootstrapApp() {
     return (
@@ -49,6 +50,7 @@ function AuthBootstrapApp() {
                 <AuthProvider>
                     <AppConfigProvider>
                     <UserProfileProvider>
+                    <BookmarksProvider>
                     <Routes>
                         <Route path="/auth/login" element={<Login/>}/>
                         <Route path="/auth/verify" element={<Verify/>}/>
@@ -83,6 +85,7 @@ function AuthBootstrapApp() {
                             <Route path="/app/tribes" element={<TribesPage/>}/>
                             <Route path="/app/tribes/create" element={<CreateTribeForm/>}/>
                             <Route path="/app/tribes/:tribeId" element={<ShowTribePage/>}/>
+                            <Route path="/app/tribes/:tribeId/:tab" element={<ShowTribePage/>}/>
                             <Route path="/app/tribes/:tribeId/update" element={<UpdateTribePage/>}/>
                             <Route path="/app/tribes/:tribeId/projects/new" element={<CreateProjectPage/>}/>
                             <Route path="/app/tribes/:tribeId/projects/:projectId" element={<ShowProjectPage/>}/>
@@ -101,6 +104,7 @@ function AuthBootstrapApp() {
                         <Route path="/" element={<Navigate to="/app/dashboard" replace/>}/>
                         <Route path="*" element={<Navigate to="/app/dashboard" replace/>}/>
                     </Routes>
+                    </BookmarksProvider>
                     </UserProfileProvider>
                     </AppConfigProvider>
                 </AuthProvider>

@@ -1,43 +1,44 @@
-import React, {useEffect, useMemo} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { useNavigate } from 'react-router-dom';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { themesById } from '@/components/themes/themes';
-import {useVerifyAuthorization} from "@/hooks/userVerifyAuthorization.ts";
+import { useVerifyAuthorization } from "@/hooks/userVerifyAuthorization.ts";
 import DashboardTasksTab from '@/features/dashboard/tabs/DashboardTasksTab';
 import DashboardTribesTab from '@/features/dashboard/tabs/DashboardTribesTab';
-import {ThemedCard} from "@/components/common/layout/ThemedCard.tsx";
-import {errorStyle} from "@/styles/theme.styles.tsx";
+import DashboardBookmarksTab from '@/features/bookmarks/DashboardBookmarksTab';
+import { ThemedCard } from "@/components/common/layout/ThemedCard.tsx";
+import { errorStyle } from "@/styles/theme.styles.tsx";
+import { useUrlTab } from '@/hooks/useUrlTab';
+import { Settings } from 'lucide-react';
+import { useTabConfig } from '@/features/tab-config/useTabConfig';
+import { TabConfigPopup } from '@/features/tab-config/TabConfigPopup';
 
 const TABS = (t: (k: string) => string) => [
     { key: 'tasks', label: t('dashboard.tabs.tasks'), Component: DashboardTasksTab },
     { key: 'tribes', label: t('dashboard.tabs.tribes'), Component: DashboardTribesTab },
+    { key: 'bookmarks', label: t('dashboard.tabs.bookmarks'), Component: DashboardBookmarksTab },
 ];
 
 const DashboardPageContent: React.FC = () => {
     const { t } = useTranslation();
+    const { theme } = useTheme();
     const navigate = useNavigate();
-    const { tab } = useParams<{ tab?: string }>();
     const { data: authorization, error: authorizationError, verifyAuthorization } = useVerifyAuthorization();
+    const [showTabConfig, setShowTabConfig] = useState(false);
 
-    const tabs = useMemo(() => TABS(t), [t]);
-    const activeTab = tab && tabs.find(tb => tb.key === tab) ? tab : tabs[0].key;
-    const ActiveComponent = tabs.find(tb => tb.key === activeTab)?.Component ?? DashboardTasksTab;
+    const allTabs = useMemo(() => TABS(t).map(({ key, label }) => ({ key, label })), [t]);
+    const { visibleTabs, defaultTabKey, tabsWithConfig, saveConfig } = useTabConfig('dashboard', allTabs);
+    const { activeTab, breadcrumbTabs, handleTabChange } = useUrlTab(visibleTabs, '/app/dashboard', defaultTabKey);
+    const ActiveComponent = TABS(t).find(tb => tb.key === activeTab)?.Component ?? DashboardTasksTab;
 
     const breadcrumbs = useMemo(() => [
         { label: t('common.home'), path: '/app' },
         { label: t('dashboard.title') },
     ], [t]);
-
-    const breadcrumbTabs = useMemo(() => tabs.map(tb => ({
-        key: tb.key,
-        label: tb.label,
-        path: `/app/dashboard/${tb.key}`,
-        isActive: tb.key === activeTab,
-    })), [tabs, activeTab]);
 
     // Check authorization
     useEffect(() => {
@@ -45,8 +46,6 @@ const DashboardPageContent: React.FC = () => {
             console.error('Authorization check failed:', err);
         });
     }, [verifyAuthorization]);
-
-    const handleTabChange = (key: string) => navigate(`/app/dashboard/${key}`);
 
     const headerActions = (
         <>
@@ -70,7 +69,15 @@ const DashboardPageContent: React.FC = () => {
     );
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} headerActions={headerActions}>
+        <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} headerActions={headerActions} bookmarkTitle={t('dashboard.title')}>
+
+            {showTabConfig && (
+                <TabConfigPopup
+                    tabsWithConfig={tabsWithConfig}
+                    onSave={saveConfig}
+                    onClose={() => setShowTabConfig(false)}
+                />
+            )}
 
             {/* Authorization Error Message */}
             {authorizationError && (
@@ -82,9 +89,18 @@ const DashboardPageContent: React.FC = () => {
             )}
 
             <ThemedTabs
-                tabs={tabs.map(({ key, label }) => ({ key, label }))}
+                tabs={visibleTabs}
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
+                configButton={
+                    <button
+                        onClick={() => setShowTabConfig(true)}
+                        title={t('tabConfig.configure')}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.secondary, display: 'flex', alignItems: 'center', padding: '4px' }}
+                    >
+                        <Settings size={16} />
+                    </button>
+                }
             />
             <ActiveComponent />
         </AppLayout>

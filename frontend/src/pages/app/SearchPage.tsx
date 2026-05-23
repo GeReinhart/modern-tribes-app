@@ -113,7 +113,7 @@ const SearchPageContent: React.FC = () => {
     const showResults = query.trim().length >= 2;
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs} bookmarkTitle={t('search.title')}>
             <div className="container mx-auto px-4 py-8">
                 <div style={{ marginBottom: 'var(--space-lg)' }}>
                     <ThemedText variant="secondary" size="small">

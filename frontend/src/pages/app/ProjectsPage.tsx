@@ -67,7 +67,7 @@ const ProjectsPageContent: React.FC = () => {
     }
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs} headerActions={headerActions}>
+        <AppLayout breadcrumbs={breadcrumbs} headerActions={headerActions} bookmarkTitle={t('projects.title')}>
             <div className="container mx-auto px-4 py-8">
                 <div className="mb-6">
                     <ThemedText variant="primary" size="small">
