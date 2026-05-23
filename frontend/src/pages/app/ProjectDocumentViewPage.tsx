@@ -42,7 +42,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
 
     const myProjectPosition = useMemo((): ProjectEntry | null => {
         if (!projectId) return null;
-        const rows = tribeProjects.filter(r => r.project_id === projectId);
+        const rows = tribeProjects.filter(r => r.project_url_param_id === projectId);
         if (rows.length === 0) return null;
         const entry: ProjectEntry = {
             project_id: projectId,
