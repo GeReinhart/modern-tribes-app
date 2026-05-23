@@ -36,7 +36,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
     const mainStyle: React.CSSProperties = {
         flex: 1,
+        display: 'flex',
+        justifyContent: 'center',
         padding: '0 24px 24px',
+    };
+
+    const contentStyle: React.CSSProperties = {
+        width: '100%',
+        maxWidth: '1000px',
         display: 'flex',
         flexDirection: 'column',
         gap: '24px',
@@ -53,7 +60,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
                 breadcrumbTabs={breadcrumbTabs}
                 bookmarkTitle={bookmarkTitle}
             />
-            <main style={mainStyle}>{children}</main>
+            <main style={mainStyle}>
+                <div style={contentStyle}>{children}</div>
+            </main>
         </div>
     );
 };

@@ -15,7 +15,7 @@ import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
 import { useProjectDocument } from '@/hooks/useProjectDocuments';
 import { projectDocumentService } from '@/services/project-document.service';
 import { publicationService } from '@/services/publication.service';
-import { errorStyle, containerStyle } from '@/styles/theme.styles';
+import { errorStyle } from '@/styles/theme.styles';
 import { Tag, Globe } from 'lucide-react';
 import { ProjectEntry } from '@/types/queries/projects.query.types';
 
@@ -109,8 +109,8 @@ const ProjectDocumentViewPageContent: React.FC = () => {
         onPublish: () => setShowPublishConfirm(true), onUnpublish: () => setShowUnpublishConfirm(true), onArchive: () => setShowArchiveConfirm(true),
     });
 
-    if (loading) return <div style={containerStyle}><div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}><ThemedLoadingSpinner size="sm" /></div></div>;
-    if (error || !doc) return <div style={containerStyle}><div style={errorStyle}><strong>{t('common.error')}</strong> {error || t('projectDocuments.notFound')}</div></div>;
+    if (loading) return <AppLayout breadcrumbs={breadcrumbs}><div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}><ThemedLoadingSpinner size="sm" /></div></AppLayout>;
+    if (error || !doc) return <AppLayout breadcrumbs={breadcrumbs}><div style={errorStyle}><strong>{t('common.error')}</strong> {error || t('projectDocuments.notFound')}</div></AppLayout>;
 
     return (
         <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions}>

@@ -1,5 +1,16 @@
 # Agent Coding Guidelines
 
+## Main process
+
+- 1 - **Check** the project is a good status first. Green light. Otherwise, you do not start anything.
+   - ./scripts/check-area.sh
+   - ./scripts/check-backend.sh
+   - ./scripts/check-frontend.sh
+- 2 - **Apply changes** to the project.
+- 3 - **Check** the produced code is still a good status.
+  - ./scripts/check-backend.sh
+  - ./scripts/check-frontend.sh
+
 ## Testing the changes
 
 - You **MUST NOT** try to launch neither the backend nor the frontend. To test anything.

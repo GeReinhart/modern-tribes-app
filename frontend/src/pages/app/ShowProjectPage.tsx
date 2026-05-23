@@ -17,7 +17,7 @@ import { useProjectWithDocument, useUserProjectsByTribe } from '@/hooks/useProje
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
 import { useProjectFeatures, useFeatureTypes } from '@/hooks/useProjectFeatures';
 import { getFeatureComponent } from '@/features/registry';
-import { errorStyle, containerStyle } from '@/styles/theme.styles';
+import { errorStyle } from '@/styles/theme.styles';
 import { Paperclip, Download, FileText, Image, Film, Music, File } from 'lucide-react';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { AttachmentFile } from '@/types/document.types';
@@ -213,6 +213,12 @@ const ShowProjectPageContent: React.FC = () => {
         { label: project?.name || t('common.loading') },
     ], [tribe?.name, project?.name, tribeId, projectId, t]);
 
+    const menuActions = useMemo((): MenuAction[] => isManager ? [
+        { icon: 'plus', label: t('features.addFeature'), onClick: () => setShowAddFeature(true) },
+        { icon: 'file-text', label: t('projects.editDocument'), onClick: () => navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit-document`) },
+        { icon: 'pencil', label: t('projects.editProject'), onClick: () => navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit`) },
+    ] : [], [isManager, tribeId, projectId, t, navigate]);
+
     const attachmentCardStyle: React.CSSProperties = {
         padding: '12px 16px',
         backgroundColor: theme.colors.surface,
@@ -243,29 +249,23 @@ const ShowProjectPageContent: React.FC = () => {
 
     if (loading) {
         return (
-            <div style={containerStyle}>
+            <AppLayout breadcrumbs={breadcrumbs}>
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
                     <ThemedLoadingSpinner size="sm" />
                 </div>
-            </div>
+            </AppLayout>
         );
     }
 
     if (error || !project) {
         return (
-            <div style={containerStyle}>
+            <AppLayout breadcrumbs={breadcrumbs}>
                 <div style={errorStyle}>
                     <strong>{t('common.error')}</strong> {error || t('projects.notFound')}
                 </div>
-            </div>
+            </AppLayout>
         );
     }
-
-    const menuActions = useMemo((): MenuAction[] => isManager ? [
-        { icon: 'plus', label: t('features.addFeature'), onClick: () => setShowAddFeature(true) },
-        { icon: 'file-text', label: t('projects.editDocument'), onClick: () => navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit-document`) },
-        { icon: 'pencil', label: t('projects.editProject'), onClick: () => navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit`) },
-    ] : [], [isManager, tribeId, projectId, t, navigate]);
 
     const activeFeature = features.find(f => f.id === activeTab);
     const FeatureComponent = activeFeature ? getFeatureComponent(activeFeature.feature_type) : null;

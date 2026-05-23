@@ -16,10 +16,7 @@ import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
 import { useUserTribes } from '@/hooks/useTribes';
 import { useUserProjectsByTribe } from '@/hooks/useProjects';
 import { tribeWithPositionService } from '@/services/app/tribe_with_positions.service.ts';
-import {
-    containerStyle,
-    errorStyle,
-} from '@/styles/theme.styles';
+import { errorStyle } from '@/styles/theme.styles';
 import { Paperclip, Download, FileText, Image, Film, Music, File } from 'lucide-react';
 import { AttachmentFile } from '@/types/document.types.ts';
 import {ThemedLoadingSpinner} from "@/components/common/layout/ThemedLoadingSpinner.tsx";
@@ -207,21 +204,21 @@ const ShowTribePageContent: React.FC = () => {
 
     if (loading) {
         return (
-            <div style={containerStyle}>
+            <AppLayout breadcrumbs={breadcrumbs}>
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-                    <ThemedLoadingSpinner size="sm"  />
+                    <ThemedLoadingSpinner size="sm" />
                 </div>
-            </div>
+            </AppLayout>
         );
     }
 
     if (error || !tribe) {
         return (
-            <div style={containerStyle}>
+            <AppLayout breadcrumbs={breadcrumbs}>
                 <div style={errorStyle}>
                     <strong>Error:</strong> {error || 'Tribe not found'}
                 </div>
-            </div>
+            </AppLayout>
         );
     }
 

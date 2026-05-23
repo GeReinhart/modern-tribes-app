@@ -62,13 +62,19 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 'var(--header-pad)',
         backgroundColor: theme.colors.surface,
         borderBottom: `2px solid ${theme.colors.border}`,
         marginBottom: 'var(--space-lg)',
+    };
+
+    const headerInnerStyle: React.CSSProperties = {
+        maxWidth: '1000px',
+        width: '100%',
+        margin: '0 auto',
+        padding: 'var(--header-pad)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         gap: 'var(--space-lg)',
     };
 
@@ -134,6 +140,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
     return (
         <header style={headerStyle}>
+        <div style={headerInnerStyle}>
             {/* Left - Logo (menu trigger) */}
             <div ref={menuRef} style={{ position: 'relative', flexShrink: 0 }}>
                 <div
@@ -286,6 +293,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                     <UserBadge />
                 </div>
             )}
+        </div>
         </header>
     );
 };

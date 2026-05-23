@@ -2,7 +2,6 @@ import React, {useState, useMemo} from 'react';
 import { useTranslation } from 'react-i18next';
 import {ThemeProvider, useTheme} from '@/contexts/ThemeContext.tsx';
 import {AppLayout} from '@/components/layout/AppLayout';
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
 import { ThemedText} from '@/components/common/layout/ThemedText';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import {ThemedSection} from "@/components/common/layout/ThemedSection.tsx";

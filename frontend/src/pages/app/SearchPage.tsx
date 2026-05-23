@@ -114,15 +114,14 @@ const SearchPageContent: React.FC = () => {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs} bookmarkTitle={t('search.title')}>
-            <div className="container mx-auto px-4 py-8">
-                <div style={{ marginBottom: 'var(--space-lg)' }}>
-                    <ThemedText variant="secondary" size="small">
-                        {t('search.subtitle')}
-                    </ThemedText>
-                </div>
+            <div style={{ marginBottom: 'var(--space-lg)' }}>
+                <ThemedText variant="secondary" size="small">
+                    {t('search.subtitle')}
+                </ThemedText>
+            </div>
 
-                <div style={{ marginBottom: 'var(--space-xl)' }}>
-                    <input
+            <div style={{ marginBottom: 'var(--space-xl)' }}>
+                <input
                         type="search"
                         value={query}
                         onChange={e => setQuery(e.target.value)}
@@ -144,32 +143,31 @@ const SearchPageContent: React.FC = () => {
                     />
                 </div>
 
-                {loading && <ThemedLoadingSpinner />}
+            {loading && <ThemedLoadingSpinner />}
 
-                {error && (
-                    <ThemedCard variant="secondary">
-                        <ThemedText variant="secondary" size="medium">
-                            {t('common.error')} {error}
-                        </ThemedText>
-                    </ThemedCard>
-                )}
+            {error && (
+                <ThemedCard variant="secondary">
+                    <ThemedText variant="secondary" size="medium">
+                        {t('common.error')} {error}
+                    </ThemedText>
+                </ThemedCard>
+            )}
 
-                {!loading && !error && showResults && results.length === 0 && (
-                    <ThemedCard variant="secondary">
-                        <ThemedText variant="secondary" size="medium">
-                            {t('search.empty')}
-                        </ThemedText>
-                    </ThemedCard>
-                )}
+            {!loading && !error && showResults && results.length === 0 && (
+                <ThemedCard variant="secondary">
+                    <ThemedText variant="secondary" size="medium">
+                        {t('search.empty')}
+                    </ThemedText>
+                </ThemedCard>
+            )}
 
-                {!loading && results.length > 0 && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-                        {results.map(result => (
-                            <SearchResultCard key={result.document_id} result={result} />
-                        ))}
-                    </div>
-                )}
-            </div>
+            {!loading && results.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+                    {results.map(result => (
+                        <SearchResultCard key={result.document_id} result={result} />
+                    ))}
+                </div>
+            )}
 
             <style>{`
                 mark {

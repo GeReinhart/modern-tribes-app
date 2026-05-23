@@ -75,37 +75,31 @@ const TribesPageContent: React.FC = () => {
 
     return (
         <AppLayout menuActions={menuActions} breadcrumbs={breadcrumbs} bookmarkTitle={t('tribes.title')}>
-            <div className="container mx-auto px-4 py-8">
+            {authorizationError && (
+                <ThemedCard>
+                    <div style={errorStyle}>
+                        <strong>Authorization Error:</strong> {authorizationError.message}
+                    </div>
+                </ThemedCard>
+            )}
 
-                {/* Authorization Error Message */}
-                {authorizationError && (
-                    <ThemedCard>
-                        <div style={errorStyle}>
-                            <strong>Authorization Error:</strong> {authorizationError.message}
-                        </div>
-                    </ThemedCard>
-                )}
-
-
-                {/* Tribes Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {dedupedTribes.map((tribe) => (
-                        <TribeCard
-                            key={tribe.tribe_id}
-                            tribe={tribe}
-                            onClick={(t) => navigate(`/app/tribes/${t.tribe_url_param_id}`)}
-                        />
-                    ))}
-                </div>
-
-                {dedupedTribes.length === 0 && (
-                    <ThemedCard variant="secondary">
-                        <ThemedText variant="secondary" size="medium">
-                            {t('tribes.empty')}
-                        </ThemedText>
-                    </ThemedCard>
-                )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {dedupedTribes.map((tribe) => (
+                    <TribeCard
+                        key={tribe.tribe_id}
+                        tribe={tribe}
+                        onClick={(t) => navigate(`/app/tribes/${t.tribe_url_param_id}`)}
+                    />
+                ))}
             </div>
+
+            {dedupedTribes.length === 0 && (
+                <ThemedCard variant="secondary">
+                    <ThemedText variant="secondary" size="medium">
+                        {t('tribes.empty')}
+                    </ThemedText>
+                </ThemedCard>
+            )}
         </AppLayout>
     );
 };

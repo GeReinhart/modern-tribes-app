@@ -67,29 +67,25 @@ const ProjectsPageContent: React.FC = () => {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions} bookmarkTitle={t('projects.title')}>
-            <div className="container mx-auto px-4 py-8">
-                <div className="mb-6">
-                    <ThemedText variant="primary" size="small">
-                        {t('projects.subtitle')}
-                    </ThemedText>
-                </div>
+            <ThemedText variant="primary" size="small">
+                {t('projects.subtitle')}
+            </ThemedText>
 
-                <ThemedDivider variant="primary" />
+            <ThemedDivider variant="primary" />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {dedupedProjects.map(project => (
-                        <ProjectCard key={project.project_id} project={project} />
-                    ))}
-                </div>
-
-                {dedupedProjects.length === 0 && (
-                    <ThemedCard variant="secondary">
-                        <ThemedText variant="secondary" size="medium">
-                            {t('projects.empty')}
-                        </ThemedText>
-                    </ThemedCard>
-                )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {dedupedProjects.map(project => (
+                    <ProjectCard key={project.project_id} project={project} />
+                ))}
             </div>
+
+            {dedupedProjects.length === 0 && (
+                <ThemedCard variant="secondary">
+                    <ThemedText variant="secondary" size="medium">
+                        {t('projects.empty')}
+                    </ThemedText>
+                </ThemedCard>
+            )}
         </AppLayout>
     );
 };
