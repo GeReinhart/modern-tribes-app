@@ -186,7 +186,7 @@ async def update_label(label_id: str, data: TodoLabelUpdate, current_user: dict 
     async with pool.acquire() as conn:
         project_id = await _get_project_id(conn, str(lb["feature_instance_id"]))
     await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
-    await labels_repo.update_feature_label(pool, label_id, data.name, None, user_id)
+    await labels_repo.update_feature_label(pool, label_id, data.name, data.color, user_id)
 
 
 @label_router.delete("/{label_id}", status_code=status.HTTP_204_NO_CONTENT)

@@ -2,14 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
-import { Tag, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import { useKanban } from './hooks';
 import KanbanColumnComponent from './KanbanColumn';
-
-const compactBtn: React.CSSProperties = {
-    padding: '4px 12px', fontSize: 'var(--font-xs)', fontWeight: 600,
-    borderRadius: '6px', cursor: 'pointer', border: 'none', transition: 'all 0.15s',
-};
+import { LabelBar } from '@/components/common/form/LabelBar';
+import AddColumnForm from './AddColumnForm';
 
 interface Props {
     featureInstanceId: string;
@@ -32,13 +29,7 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
     const [showArchived, setShowArchived] = useState(false);
     const [filterLabelId, setFilterLabelId] = useState<string | null>(null);
     const [filterPersonId, setFilterPersonId] = useState<string | null>(null);
-    const [newColName, setNewColName] = useState('');
-    const [showAddForm, setShowAddForm] = useState(false);
-    const [submittingCol, setSubmittingCol] = useState(false);
 
-    const [hoveredLabelId, setHoveredLabelId] = useState<string | null>(null);
-    const [renamingLabelId, setRenamingLabelId] = useState<string | null>(null);
-    const [renameLabelValue, setRenameLabelValue] = useState('');
 
     const initDone = useRef(false);
     const sortedCols = [...board.columns].sort((a, b) => a.position - b.position);
@@ -47,8 +38,6 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
     const activeCardLabelIds = new Set(
         board.cards.filter(c => c.status === 'active').flatMap(c => c.label_ids)
     );
-    const visibleLabels = board.labels.filter(l => activeCardLabelIds.has(l.id));
-
     const assignedPersons = persons.filter(p =>
         board.cards.some(c => c.status === 'active' && c.assigned_person_id === p.id)
     );
@@ -67,29 +56,7 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
         if (!activeIds.has(filterLabelId)) setFilterLabelId(null);
     }, [board.cards, filterLabelId]);
 
-    const handleAddColumn = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const name = newColName.trim();
-        if (!name) return;
-        setSubmittingCol(true);
-        await createColumn({ feature_instance_id: featureInstanceId, name });
-        setNewColName('');
-        setSubmittingCol(false);
-    };
-
-    const handleDoneConfiguring = () => {
-        setConfiguring(false);
-        setShowAddForm(false);
-        setNewColName('');
-    };
-
-    const handleRenameLabel = async (labelId: string) => {
-        const name = renameLabelValue.trim();
-        const original = board.labels.find(l => l.id === labelId)?.name;
-        if (name && name !== original) await updateLabel(labelId, { name });
-        setRenamingLabelId(null);
-        setRenameLabelValue('');
-    };
+    const handleDoneConfiguring = () => setConfiguring(false);
 
     return (
         <div>
@@ -103,47 +70,15 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
             <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
                 {/* Left: label row + person row */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
-                        {visibleLabels.length > 0 && (
-                            <>
-                                <Tag size={14} color={theme.colors.secondary} />
-                                {visibleLabels.map(label => {
-                                    const active = filterLabelId === label.id;
-                                    const isRenaming = renamingLabelId === label.id;
-                                    if (isRenaming) {
-                                        return (
-                                            <input key={label.id} autoFocus value={renameLabelValue}
-                                                onChange={e => setRenameLabelValue(e.target.value)}
-                                                onKeyDown={e => { if (e.key === 'Enter') handleRenameLabel(label.id); if (e.key === 'Escape') { setRenamingLabelId(null); setRenameLabelValue(''); } }}
-                                                onBlur={() => handleRenameLabel(label.id)}
-                                                style={{ padding: '3px 8px', borderRadius: '12px', fontSize: 'var(--font-xs)', border: `1px solid ${label.color}`, backgroundColor: theme.colors.surface, color: theme.colors.text, width: '100px', outline: 'none' }} />
-                                        );
-                                    }
-                                    return (
-                                        <div key={label.id} style={{ display: 'flex', alignItems: 'center', gap: '2px' }}
-                                            onMouseEnter={() => setHoveredLabelId(label.id)} onMouseLeave={() => setHoveredLabelId(null)}>
-                                            <button type="button" onClick={() => setFilterLabelId(prev => prev === label.id ? null : label.id)}
-                                                style={{ padding: '4px 12px', borderRadius: '16px', fontSize: 'var(--font-xs)', fontWeight: active ? 700 : 500, cursor: 'pointer', border: `1px solid ${label.color}`, backgroundColor: active ? `${label.color}20` : 'transparent', color: label.color, transition: 'all 0.15s', whiteSpace: 'nowrap' }}>
-                                                {label.name}
-                                            </button>
-                                            {isManager && hoveredLabelId === label.id && (
-                                                <>
-                                                    <button type="button" title={t('features.kanban.renameLabel')} onClick={() => { setRenamingLabelId(label.id); setRenameLabelValue(label.name); }}
-                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center', opacity: 0.6 }}>
-                                                        <ThemedSvgIcon name="pencil" color={theme.colors.secondary} size={12} />
-                                                    </button>
-                                                    <button type="button" onClick={() => deleteLabel(label.id)}
-                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center', opacity: 0.6 }}>
-                                                        <ThemedSvgIcon name="x" color={theme.colors.danger} size={12} />
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </>
-                        )}
-                    </div>
+                    <LabelBar
+                        labels={board.labels}
+                        activeLabelIds={activeCardLabelIds}
+                        filterLabelId={filterLabelId}
+                        onFilter={setFilterLabelId}
+                        isManager={isManager}
+                        onUpdate={updateLabel}
+                        onDelete={deleteLabel}
+                    />
                     {assignedPersons.length > 0 && (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
                             <User size={14} color={theme.colors.primary} />
@@ -219,41 +154,8 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
 
                 {/* Add column */}
                 {isManager && configuring && sortedCols.length < maxColumns && (
-                    <div style={{ minWidth: '200px', flex: '0 0 auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {!showAddForm ? (
-                            <button
-                                onClick={() => setShowAddForm(true)}
-                                style={{ padding: '10px 14px', border: `2px dashed ${theme.colors.border}`, borderRadius: '10px', background: 'none', cursor: 'pointer', color: theme.colors.secondary, fontSize: 'var(--font-sm)', textAlign: 'center', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '6px' }}
-                            >
-                                <ThemedSvgIcon name="plus" color={theme.colors.secondary} size={14} />
-                                {t('features.kanban.addColumn')}
-                            </button>
-                        ) : (
-                            <form onSubmit={handleAddColumn} style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '12px', border: `1px solid ${theme.colors.border}`, borderRadius: '10px', backgroundColor: theme.colors.surface }}>
-                                <input
-                                    autoFocus value={newColName} onChange={e => setNewColName(e.target.value)}
-                                    placeholder={t('features.kanban.addColumnPlaceholder')}
-                                    onKeyDown={e => { if (e.key === 'Escape') { setShowAddForm(false); setNewColName(''); } }}
-                                    style={{ padding: '7px 10px', border: `1px solid ${theme.colors.border}`, borderRadius: '6px', backgroundColor: theme.colors.surface, color: theme.colors.text, fontSize: 'var(--font-sm)' }}
-                                />
-                                <div style={{ display: 'flex', gap: '6px' }}>
-                                    <button
-                                        type="submit"
-                                        disabled={!newColName.trim() || submittingCol}
-                                        style={{ ...compactBtn, background: !newColName.trim() || submittingCol ? theme.colors.border : theme.colors.primary, color: !newColName.trim() || submittingCol ? theme.colors.secondary : theme.colors.surface }}
-                                    >
-                                        {t('features.kanban.addColumn')}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => { setShowAddForm(false); setNewColName(''); }}
-                                        style={{ ...compactBtn, background: theme.colors.surface, color: theme.colors.secondary, border: `1px solid ${theme.colors.border}` }}
-                                    >
-                                        {t('common.cancel')}
-                                    </button>
-                                </div>
-                            </form>
-                        )}
+                    <div style={{ minWidth: '200px', flex: '0 0 auto' }}>
+                        <AddColumnForm onAdd={name => createColumn({ feature_instance_id: featureInstanceId, name })} />
                     </div>
                 )}
             </div>
