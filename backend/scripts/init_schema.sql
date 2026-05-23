@@ -448,6 +448,9 @@ CREATE TABLE IF NOT EXISTS user_bookmarks (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     page_path VARCHAR(500) NOT NULL,
     page_title VARCHAR(200) NOT NULL,
+    description TEXT,
+    color_text VARCHAR(50),
+    color_background VARCHAR(50),
     display_order INT NOT NULL DEFAULT 0,
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CHECK (status IN ('pending', 'active', 'archived')),

@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/contexts/ThemeContext.tsx';
 import { ThemedCard } from '@/components/common/layout/ThemedCard.tsx';
 import { ThemedText } from '@/components/common/layout/ThemedText.tsx';
-import { ThemedDivider } from '@/components/common/layout/ThemedDivider.tsx';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
 import { TribeCard } from '@/components/entities/tribes/TribeCard.tsx';
 import { useUserTribes } from '@/hooks/useTribes.ts';

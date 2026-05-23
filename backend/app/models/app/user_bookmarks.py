@@ -1,10 +1,20 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 
 class UserBookmarkCreate(BaseModel):
     page_path: str
     page_title: str
+    description: Optional[str] = None
+    color_text: Optional[str] = None
+    color_background: Optional[str] = None
+
+
+class UserBookmarkUpdate(BaseModel):
+    page_title: str
+    description: Optional[str] = None
+    color_text: Optional[str] = None
+    color_background: Optional[str] = None
 
 
 class UserBookmarkItem(BaseModel):
@@ -12,6 +22,9 @@ class UserBookmarkItem(BaseModel):
     page_path: str
     page_title: str
     display_order: int
+    description: Optional[str] = None
+    color_text: Optional[str] = None
+    color_background: Optional[str] = None
 
 
 class UserBookmarksResponse(BaseModel):

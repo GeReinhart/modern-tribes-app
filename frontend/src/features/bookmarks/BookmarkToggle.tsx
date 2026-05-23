@@ -3,20 +3,28 @@ import { Bookmark } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useBookmarks } from './BookmarksContext';
+import { DEFAULT_BOOKMARK_COLOR } from './types';
 
 interface BookmarkToggleProps {
     pagePath: string;
     pageTitle: string;
+    pageDescription?: string | null;
 }
 
-export const BookmarkToggle: React.FC<BookmarkToggleProps> = ({ pagePath, pageTitle }) => {
+export const BookmarkToggle: React.FC<BookmarkToggleProps> = ({ pagePath, pageTitle, pageDescription }) => {
     const { theme } = useTheme();
     const { t } = useTranslation();
     const { isBookmarked, toggleBookmark } = useBookmarks();
     const bookmarked = isBookmarked(pagePath);
 
     const handleClick = () => {
-        toggleBookmark(pagePath, pageTitle).catch(console.error);
+        toggleBookmark(
+            pagePath,
+            pageTitle,
+            pageDescription ?? null,
+            DEFAULT_BOOKMARK_COLOR.text,
+            DEFAULT_BOOKMARK_COLOR.background,
+        ).catch(console.error);
     };
 
     return (

@@ -2,8 +2,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ApplicationLogo } from '@/components/common/icons/ApplicationLogo';
-import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
+import { ThemedSvgIcon, IconName } from '@/components/common/icons/ThemedSvgIcon';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb';
 import UserBadge from "@/components/entities/users/CurrentUserBadge.tsx";
 import { BookmarkToggle } from '@/features/bookmarks/BookmarkToggle';
@@ -30,6 +31,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     const { theme, currentThemeKey } = useTheme();
     const navigate = useNavigate();
     const location = useLocation();
+    const { t } = useTranslation();
     const isSearchActive = location.pathname === '/app/search';
     const isAboutActive = location.pathname === '/app/about';
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -125,8 +127,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         setIsMenuOpen(false);
     };
 
-    const hasMenuContent = (breadcrumbs && breadcrumbs.length > 0) || actions || secondaryActions;
+    const hasMenuContent = true;
+    const hasPrecedingMenuContent = (breadcrumbs && breadcrumbs.length > 0) || actions || secondaryActions;
     const pageTitle = breadcrumbs && breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].label : undefined;
+    const bookmarkDescription = breadcrumbs && breadcrumbs.length > 0
+        ? breadcrumbs.map(b => b.label).join(' / ')
+        : null;
 
     return (
         <header style={headerStyle}>
@@ -211,6 +217,31 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                                 {actions}
                             </div>
                         )}
+
+                        {/* Separator before app nav */}
+                        {hasPrecedingMenuContent && <div style={menuSeparatorStyle} />}
+
+                        {/* App navigation — Search & About */}
+                        {([
+                            { path: '/app/search', icon: 'search' as IconName, label: t('search.title'), active: isSearchActive },
+                            { path: '/app/about',  icon: 'info'   as IconName, label: t('about.title'),  active: isAboutActive  },
+                        ]).map(item => (
+                            <div
+                                key={item.path}
+                                role="menuitem"
+                                style={{ ...menuNavItemStyle(true, item.active), display: 'flex', alignItems: 'center', gap: '10px' }}
+                                onClick={() => handleNavItem(item.path)}
+                                onMouseEnter={(e) => {
+                                    if (!item.active) e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
+                                }}
+                                onMouseLeave={(e) => {
+                                    if (!item.active) e.currentTarget.style.backgroundColor = 'transparent';
+                                }}
+                            >
+                                <ThemedSvgIcon name={item.icon} color={item.active ? theme.colors.primary : theme.colors.text} size={16} />
+                                {item.label}
+                            </div>
+                        ))}
                     </div>
                 )}
             </div>
@@ -230,49 +261,12 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 </div>
             )}
 
-            {/* Right - Bookmark + Search + About + User Badge */}
+            {/* Right - Bookmark + User Badge */}
             {showUserBadge && (
                 <div style={rightSectionStyle}>
                     {bookmarkTitle && (
-                        <BookmarkToggle pagePath={location.pathname} pageTitle={bookmarkTitle} />
+                        <BookmarkToggle pagePath={location.pathname} pageTitle={bookmarkTitle} pageDescription={bookmarkDescription} />
                     )}
-                    <button
-                        onClick={() => navigate('/app/search')}
-                        title="Search"
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '50%',
-                            border: `2px solid ${isSearchActive ? theme.colors.primary : theme.colors.border}`,
-                            backgroundColor: isSearchActive ? `${theme.colors.primary}15` : 'transparent',
-                            cursor: 'pointer',
-                            color: isSearchActive ? theme.colors.primary : theme.colors.text,
-                            flexShrink: 0,
-                        }}
-                    >
-                        <ThemedSvgIcon name="search" color={isSearchActive ? theme.colors.primary : theme.colors.text} size={18} />
-                    </button>
-                    <button
-                        onClick={() => navigate('/app/about')}
-                        title="About"
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '50%',
-                            border: `2px solid ${isAboutActive ? theme.colors.primary : theme.colors.border}`,
-                            backgroundColor: isAboutActive ? `${theme.colors.primary}15` : 'transparent',
-                            cursor: 'pointer',
-                            flexShrink: 0,
-                        }}
-                    >
-                        <ThemedSvgIcon name="info" color={isAboutActive ? theme.colors.primary : theme.colors.text} size={18} />
-                    </button>
                     <UserBadge />
                 </div>
             )}

@@ -422,6 +422,11 @@ const fr: Record<string, string> = {
     'bookmarks.moveUp': 'Monter',
     'bookmarks.moveDown': 'Descendre',
     'bookmarks.open': 'Ouvrir la page',
+    'bookmarks.edit.open': 'Modifier le favori',
+    'bookmarks.edit.title': 'Modifier le favori',
+    'bookmarks.edit.name': 'Nom',
+    'bookmarks.edit.description': 'Description',
+    'bookmarks.edit.color': 'Couleur',
     'dashboard.tasks.empty': 'Aucune tâche à venir qui vous est assignée.',
     'dashboard.tasks.openSource': 'Ouvrir dans le projet',
 
