@@ -4,7 +4,8 @@ from ..auth.authentification import get_current_user
 from ..auth.authorization import require_any_permission_decorator
 from ...models.auth.auth import PermissionEnum
 from ...models.app.user_bookmarks import (
-    UserBookmarkCreate, UserBookmarkItem, UserBookmarksResponse, UserBookmarksReorderRequest
+    UserBookmarkCreate, UserBookmarkUpdate, UserBookmarkItem,
+    UserBookmarksResponse, UserBookmarksReorderRequest,
 )
 from ...core.database import get_database
 from ...services import user_bookmarks_service
@@ -37,6 +38,17 @@ async def reorder_bookmarks(
 ):
     pool = get_database()
     return await user_bookmarks_service.reorder_bookmarks(current_user['id'], data, pool, current_user)
+
+
+@router.put("/{bookmark_id}", response_model=UserBookmarkItem)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def update_bookmark(
+    bookmark_id: str,
+    data: UserBookmarkUpdate,
+    current_user: dict = Depends(get_current_user),
+):
+    pool = get_database()
+    return await user_bookmarks_service.update_bookmark(current_user['id'], bookmark_id, data, pool, current_user)
 
 
 @router.delete("/{bookmark_id}", status_code=204)

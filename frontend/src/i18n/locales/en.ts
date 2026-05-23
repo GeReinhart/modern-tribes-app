@@ -422,6 +422,11 @@ const en: Record<string, string> = {
     'bookmarks.moveUp': 'Move up',
     'bookmarks.moveDown': 'Move down',
     'bookmarks.open': 'Open page',
+    'bookmarks.edit.open': 'Edit bookmark',
+    'bookmarks.edit.title': 'Edit Bookmark',
+    'bookmarks.edit.name': 'Name',
+    'bookmarks.edit.description': 'Description',
+    'bookmarks.edit.color': 'Color',
     'dashboard.tasks.empty': 'No upcoming tasks assigned to you.',
     'dashboard.tasks.openSource': 'Open in project',
 

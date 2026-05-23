@@ -1,12 +1,19 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { UserBookmark } from './types';
+import { UserBookmark, UserBookmarkUpdate } from './types';
 import { userBookmarksService } from './service';
 
 interface BookmarksContextType {
     bookmarks: UserBookmark[];
     isBookmarked: (pagePath: string) => boolean;
-    toggleBookmark: (pagePath: string, pageTitle: string) => Promise<void>;
+    toggleBookmark: (
+        pagePath: string,
+        pageTitle: string,
+        description?: string | null,
+        colorText?: string | null,
+        colorBackground?: string | null,
+    ) => Promise<void>;
+    updateBookmark: (bookmarkId: string, data: UserBookmarkUpdate) => Promise<void>;
     reorderBookmarks: (orderedIds: string[]) => Promise<void>;
     isLoading: boolean;
 }
@@ -34,16 +41,27 @@ export const BookmarksProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         [bookmarks],
     );
 
-    const toggleBookmark = useCallback(async (pagePath: string, pageTitle: string) => {
+    const toggleBookmark = useCallback(async (
+        pagePath: string,
+        pageTitle: string,
+        description: string | null = null,
+        colorText: string | null = null,
+        colorBackground: string | null = null,
+    ) => {
         const existing = bookmarks.find(b => b.page_path === pagePath);
         if (existing) {
             await userBookmarksService.removeBookmark(existing.id);
             setBookmarks(prev => prev.filter(b => b.id !== existing.id));
         } else {
-            const added = await userBookmarksService.addBookmark(pagePath, pageTitle);
+            const added = await userBookmarksService.addBookmark(pagePath, pageTitle, description, colorText, colorBackground);
             setBookmarks(prev => [...prev, added]);
         }
     }, [bookmarks]);
+
+    const updateBookmark = useCallback(async (bookmarkId: string, data: UserBookmarkUpdate) => {
+        const updated = await userBookmarksService.updateBookmark(bookmarkId, data);
+        setBookmarks(prev => prev.map(b => b.id === bookmarkId ? updated : b));
+    }, []);
 
     const reorderBookmarks = useCallback(async (orderedIds: string[]) => {
         const res = await userBookmarksService.reorderBookmarks(orderedIds);
@@ -51,7 +69,7 @@ export const BookmarksProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }, []);
 
     return (
-        <BookmarksContext.Provider value={{ bookmarks, isBookmarked, toggleBookmark, reorderBookmarks, isLoading }}>
+        <BookmarksContext.Provider value={{ bookmarks, isBookmarked, toggleBookmark, updateBookmark, reorderBookmarks, isLoading }}>
             {children}
         </BookmarksContext.Provider>
     );
