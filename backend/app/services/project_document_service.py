@@ -9,7 +9,7 @@ from ..models.app.project_document import (
     ProjectDocumentSummary, ProjectDocumentLabel, LabelInfo,
 )
 from ..models.uploads.files import AttachmentFile
-from ..utils.db_helpers import row_to_dict
+from ..utils.db_helpers import row_to_dict, generate_url_param_id
 from ..utils.attachments_helpers import (
     get_document_with_attachments,
     create_document_with_attachments,
@@ -78,13 +78,14 @@ async def _build_response(pd_row: dict, pool) -> ProjectDocumentResponse:
 
     async with pool.acquire() as conn:
         pub_row = await conn.fetchrow(
-            "SELECT id FROM publications WHERE document_id = $1",
+            "SELECT url_param_id FROM publications WHERE document_id = $1",
             UUID(str(pd_row["document_id"]))
         )
-    publication_id = str(pub_row["id"]) if pub_row else None
+    publication_url_param_id = pub_row["url_param_id"] if pub_row else None
 
     return ProjectDocumentResponse(
         id=str(pd_row["id"]),
+        url_param_id=pd_row["url_param_id"],
         project_id=str(pd_row["project_id"]),
         document_id=str(pd_row["document_id"]),
         title=pd_row["title"],
@@ -93,7 +94,7 @@ async def _build_response(pd_row: dict, pool) -> ProjectDocumentResponse:
         attachments=attachments,
         labels=labels,
         status=pd_row["status"],
-        publication_id=publication_id,
+        publication_url_param_id=publication_url_param_id,
         created_at=pd_row["created_at"],
         updated_at=pd_row["updated_at"],
         created_by=str(pd_row["created_by"]) if pd_row.get("created_by") else None,
@@ -122,13 +123,14 @@ async def create_project_document(
     if data.label_names:
         await _sync_document_labels(pool, document_id, data.label_names)
 
+    url_param_id = generate_url_param_id()
     async with pool.acquire() as conn:
         pd_row = await conn.fetchrow(
             """INSERT INTO projects_documents
-                   (project_id, document_id, title, status, created_at, updated_at, created_by, updated_by)
-               VALUES ($1, $2, $3, 'active', $4, $4, $5, $5)
+                   (project_id, document_id, title, status, url_param_id, created_at, updated_at, created_by, updated_by)
+               VALUES ($1, $2, $3, 'active', $4, $5, $5, $6, $6)
                RETURNING *""",
-            UUID(project_id), UUID(document_id), data.title, now, uid
+            UUID(project_id), UUID(document_id), data.title, url_param_id, now, uid
         )
 
     return await _build_response(row_to_dict(pd_row), pool)
@@ -171,8 +173,8 @@ async def list_project_documents(
 
     where_clause = " AND ".join(conditions)
     query = f"""
-        SELECT pd.id, pd.document_id, pd.title, pd.status, pd.created_at, pd.updated_at,
-               d.content_summary, pub.id AS publication_id
+        SELECT pd.id, pd.url_param_id, pd.document_id, pd.title, pd.status, pd.created_at, pd.updated_at,
+               d.content_summary, pub.url_param_id AS publication_url_param_id
         FROM projects_documents pd
         JOIN documents d ON d.id = pd.document_id
         LEFT JOIN publications pub ON pub.document_id = pd.document_id
@@ -189,12 +191,13 @@ async def list_project_documents(
         labels = await _get_document_labels(pool, document_id)
         results.append(ProjectDocumentSummary(
             id=str(row["id"]),
+            url_param_id=row["url_param_id"],
             document_id=document_id,
             title=row["title"],
             content_summary=row["content_summary"],
             labels=labels,
             status=row["status"],
-            publication_id=str(row["publication_id"]) if row["publication_id"] else None,
+            publication_url_param_id=row["publication_url_param_id"],
             created_at=row["created_at"],
             updated_at=row["updated_at"],
         ))

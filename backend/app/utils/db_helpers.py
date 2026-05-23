@@ -2,15 +2,44 @@ from fastapi import HTTPException
 from typing import Optional, Dict, Any, List
 from datetime import datetime
 import asyncpg
+import random
+import string
 from uuid import UUID
 import json
-
 
 
 TABLES_WITH_STATUS = frozenset({
     'permissions', 'roles', 'documents', 'persons',
     'users', 'projects', 'tribes', 'positions', 'labels'
 })
+
+URL_PARAM_ID_TABLES = frozenset({
+    'users', 'tribes', 'projects', 'projects_documents', 'publications'
+})
+
+
+def generate_url_param_id() -> str:
+    chars = string.ascii_letters + string.digits
+    return ''.join(random.choices(chars, k=6))
+
+
+async def resolve_url_param_id(pool: asyncpg.Pool, table: str, id_param: str) -> str:
+    """Convert a url_param_id (6-char short ID) to the entity's UUID.
+    If id_param is already a valid UUID, returns it unchanged.
+    Raises 404 if url_param_id is not found."""
+    try:
+        UUID(id_param)
+        return id_param
+    except (ValueError, AttributeError):
+        if table not in URL_PARAM_ID_TABLES:
+            raise HTTPException(status_code=400, detail="Invalid ID format")
+        async with pool.acquire() as conn:
+            row = await conn.fetchrow(
+                f"SELECT id FROM {table} WHERE url_param_id = $1", id_param
+            )
+        if not row:
+            raise HTTPException(status_code=404, detail="Not found")
+        return str(row['id'])
 
 
 def uuid_to_str_recursively(data: Any) -> Any:
@@ -190,6 +219,9 @@ async def create_document(
         data: Dict[str, Any]
 ) -> Dict[str, Any]:
     """Create a new document"""
+    if table in URL_PARAM_ID_TABLES and 'url_param_id' not in data:
+        data = dict(data)
+        data['url_param_id'] = generate_url_param_id()
     columns = list(data.keys())
     placeholders = [f"${i+1}" for i in range(len(columns))]
     values = [data[col] for col in columns]

@@ -48,6 +48,7 @@ class PersonWithPosition(BaseModel):
 
 class TribeWithPositionsResponse(BaseModel):
     id: str
+    url_param_id: str
     name: str
     document_id: str
     document_content_html: str

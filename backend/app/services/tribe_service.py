@@ -128,6 +128,7 @@ def _build_response(tribe: dict, document: dict | None, persons: list, tribe_pro
     projects = [TribeProjectResponse(**p) for p in tribe_projects]
     return TribeWithPositionsResponse(
         id=str(tribe["id"]),
+        url_param_id=tribe["url_param_id"],
         name=tribe["name"],
         document_id=str(document["id"]) if document else "",
         document_content_html=document.get("content_html", "") if document else "",

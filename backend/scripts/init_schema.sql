@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS persons (
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    url_param_id VARCHAR(6) UNIQUE NOT NULL,
     login VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     person_id UUID REFERENCES persons(id) ON DELETE SET NULL,
@@ -148,6 +149,7 @@ CREATE TABLE IF NOT EXISTS represents (
 -- Projects table
 CREATE TABLE IF NOT EXISTS projects (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    url_param_id VARCHAR(6) UNIQUE NOT NULL,
     name VARCHAR(255) UNIQUE NOT NULL,
     description TEXT,
     document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
@@ -161,6 +163,7 @@ CREATE TABLE IF NOT EXISTS projects (
 -- Tribes table
 CREATE TABLE IF NOT EXISTS tribes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    url_param_id VARCHAR(6) UNIQUE NOT NULL,
     name VARCHAR(255) UNIQUE NOT NULL,
     document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -306,6 +309,7 @@ CREATE TABLE IF NOT EXISTS todo_items (
 -- Projects documents table
 CREATE TABLE IF NOT EXISTS projects_documents (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    url_param_id VARCHAR(6) UNIQUE NOT NULL,
     project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
@@ -320,6 +324,7 @@ CREATE TABLE IF NOT EXISTS projects_documents (
 -- Publications table
 CREATE TABLE IF NOT EXISTS publications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    url_param_id VARCHAR(6) UNIQUE NOT NULL,
     document_id UUID NOT NULL UNIQUE REFERENCES documents(id) ON DELETE CASCADE,
     project_document_id UUID NOT NULL REFERENCES projects_documents(id) ON DELETE CASCADE,
     status VARCHAR(50) NOT NULL DEFAULT 'active'
@@ -337,6 +342,11 @@ CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents(created_at);
 CREATE INDEX IF NOT EXISTS idx_documents_content_fts ON documents USING GIN(to_tsvector('french', COALESCE(content_text, '')));
 CREATE INDEX IF NOT EXISTS idx_document_attachments_document_id ON document_attachments(document_id);
 CREATE INDEX IF NOT EXISTS idx_document_attachments_file_id ON document_attachments(file_id);
+CREATE INDEX IF NOT EXISTS idx_users_url_param_id ON users(url_param_id);
+CREATE INDEX IF NOT EXISTS idx_tribes_url_param_id ON tribes(url_param_id);
+CREATE INDEX IF NOT EXISTS idx_projects_url_param_id ON projects(url_param_id);
+CREATE INDEX IF NOT EXISTS idx_projects_documents_url_param_id ON projects_documents(url_param_id);
+CREATE INDEX IF NOT EXISTS idx_publications_url_param_id ON publications(url_param_id);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_person_id ON users(person_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_user_sessions_refresh_token ON user_sessions(refresh_token_hash) WHERE refresh_token_hash IS NOT NULL;

@@ -9,7 +9,7 @@ from ...utils.ownership import check_own_user_or_admin
 from ...models.auth.auth import PermissionEnum
 from ...models.crud.positions import PositionEnum
 from ...core.database import get_database
-from ...utils.db_helpers import validate_uuid
+from ...utils.db_helpers import validate_uuid, resolve_url_param_id
 
 router = APIRouter(prefix="/projects", tags=["query_projects"])
 
@@ -19,6 +19,7 @@ _QUERY = """
     SELECT
         u.id        AS user_id,
         proj.id     AS project_id,
+        proj.url_param_id AS project_url_param_id,
         proj.name   AS project_name,
         CASE LEAST(
             CASE pos.position WHEN 'guest' THEN 0 WHEN 'member' THEN 1 ELSE 2 END,
@@ -44,6 +45,7 @@ _QUERY = """
     SELECT
         u.id        AS user_id,
         proj.id     AS project_id,
+        proj.url_param_id AS project_url_param_id,
         proj.name   AS project_name,
         CASE LEAST(
             CASE pos.position WHEN 'guest' THEN 0 WHEN 'member' THEN 1 ELSE 2 END,
@@ -70,6 +72,7 @@ _QUERY = """
 class UserProjectEntry(BaseModel):
     user_id: str
     project_id: str
+    project_url_param_id: str
     project_name: str
     effective_position: PositionEnum
     via_represents: bool
@@ -81,6 +84,7 @@ _QUERY_BY_TRIBE = """
     SELECT
         u.id        AS user_id,
         proj.id     AS project_id,
+        proj.url_param_id AS project_url_param_id,
         proj.name   AS project_name,
         CASE LEAST(
             CASE pos.position WHEN 'guest' THEN 0 WHEN 'member' THEN 1 ELSE 2 END,
@@ -106,6 +110,7 @@ _QUERY_BY_TRIBE = """
     SELECT
         u.id        AS user_id,
         proj.id     AS project_id,
+        proj.url_param_id AS project_url_param_id,
         proj.name   AS project_name,
         CASE LEAST(
             CASE pos.position WHEN 'guest' THEN 0 WHEN 'member' THEN 1 ELSE 2 END,
@@ -137,6 +142,7 @@ def _deduplicate(rows, user_id: str) -> List[UserProjectEntry]:
         if key not in best or _POSITION_RANK[ep] > _POSITION_RANK[best[key]["effective_position"]]:
             best[key] = {
                 "project_id": str(r["project_id"]),
+                "project_url_param_id": r["project_url_param_id"],
                 "project_name": r["project_name"],
                 "effective_position": ep,
                 "via_represents": r["via_represents"],
@@ -150,8 +156,8 @@ def _deduplicate(rows, user_id: str) -> List[UserProjectEntry]:
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_projects_by_user(user_id: str, current_user: dict = Depends(get_current_user)):
     """Get all active projects accessible to a user, with effective position per path."""
-    validate_uuid(user_id, "user_id")
     pool = get_database()
+    user_id = await resolve_url_param_id(pool, "users", user_id)
     await check_own_user_or_admin(user_id, current_user, pool)
 
     async with pool.acquire() as conn:
@@ -171,8 +177,8 @@ async def get_tribes_for_project(
     project_id: str,
     current_user: dict = Depends(get_current_user),
 ):
-    validate_uuid(project_id, "project_id")
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             """
@@ -195,9 +201,9 @@ async def get_projects_by_tribe_for_user(
     current_user: dict = Depends(get_current_user),
 ):
     """Get all active projects in a tribe accessible to a user, with effective position per path."""
-    validate_uuid(tribe_id, "tribe_id")
-    validate_uuid(user_id, "user_id")
     pool = get_database()
+    user_id = await resolve_url_param_id(pool, "users", user_id)
+    tribe_id = await resolve_url_param_id(pool, "tribes", tribe_id)
     await check_own_user_or_admin(user_id, current_user, pool)
 
     async with pool.acquire() as conn:

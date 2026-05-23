@@ -43,7 +43,7 @@ async def publish_document(
     result = await publication_repository.insert_publication(
         pool, str(pd["document_id"]), project_document_id, str(current_user["id"])
     )
-    return {"publication_id": result["id"]}
+    return {"publication_url_param_id": result["url_param_id"]}
 
 
 async def unpublish_document(
@@ -68,6 +68,7 @@ async def _build_publication_detail(row: dict, pool) -> PublicationDetail:
     labels = await _get_labels(pool, str(row["document_id"]))
     return PublicationDetail(
         id=str(row["id"]),
+        url_param_id=row["url_param_id"],
         document_id=str(row["document_id"]),
         title=row["title"],
         content_html=(document or {}).get("content_html") or "",
@@ -103,6 +104,7 @@ async def list_publications(
 def _row_to_publication_summary(row: dict, labels: List[LabelInfo]) -> PublicationSummary:
     return PublicationSummary(
         id=str(row["id"]),
+        url_param_id=row["url_param_id"],
         document_id=str(row["document_id"]),
         project_document_id=str(row["project_document_id"]),
         title=row["title"],
@@ -135,6 +137,7 @@ async def list_publications_admin(
 def _row_to_admin_item(row: dict, labels: List[LabelInfo]) -> PublicationAdminItem:
     return PublicationAdminItem(
         id=str(row["id"]),
+        url_param_id=row["url_param_id"],
         document_id=str(row["document_id"]),
         project_document_id=str(row["project_document_id"]),
         title=row["title"],

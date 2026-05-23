@@ -26,18 +26,20 @@ class ProjectDocumentUpdate(BaseModel):
 
 class ProjectDocumentSummary(BaseModel):
     id: str
+    url_param_id: str
     document_id: str
     title: str
     content_summary: Optional[str] = None
     labels: List[LabelInfo] = []
     status: str
-    publication_id: Optional[str] = None
+    publication_url_param_id: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
 
 class ProjectDocumentResponse(BaseModel):
     id: str
+    url_param_id: str
     project_id: str
     document_id: str
     title: str
@@ -46,7 +48,7 @@ class ProjectDocumentResponse(BaseModel):
     attachments: List[AttachmentFile] = []
     labels: List[LabelInfo] = []
     status: str
-    publication_id: Optional[str] = None
+    publication_url_param_id: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None

@@ -20,6 +20,7 @@ class TribeUpdate(BaseModel):
 
 class Tribe(TribeBase):
     id: str
+    url_param_id: str
     status: str = 'active'
     created_at: datetime
     updated_at: datetime

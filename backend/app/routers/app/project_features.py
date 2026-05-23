@@ -13,6 +13,7 @@ from ...models.app.project_features import (
 )
 from ...core.database import get_database
 from ...utils.project_access import check_project_access_or_admin
+from ...utils.db_helpers import resolve_url_param_id
 
 router = APIRouter(prefix="/project-features", tags=["app_project_features"])
 
@@ -32,6 +33,7 @@ async def list_project_features(
     current_user: dict = Depends(get_current_user),
 ):
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
     if status_filter:
         query = "SELECT * FROM projects_features WHERE project_id = $1 AND status = $2 ORDER BY position ASC, created_at ASC"
@@ -64,6 +66,7 @@ async def create_project_feature(
     project_id: str, data: ProjectFeatureInstanceCreate, current_user: dict = Depends(get_current_user)
 ):
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
     user_id = UUID(str(current_user["id"]))
     async with pool.acquire() as conn:
@@ -95,6 +98,7 @@ async def update_project_feature(
     project_id: str, feature_id: str, data: ProjectFeatureInstanceUpdate, current_user: dict = Depends(get_current_user)
 ):
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
     user_id = UUID(str(current_user["id"]))
     updates: dict = {"updated_by": user_id}

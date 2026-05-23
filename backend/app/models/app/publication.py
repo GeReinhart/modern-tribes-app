@@ -8,6 +8,7 @@ from ..uploads.files import AttachmentFile
 
 class PublicationSummary(BaseModel):
     id: str
+    url_param_id: str
     document_id: str
     project_document_id: str
     title: str
@@ -18,6 +19,7 @@ class PublicationSummary(BaseModel):
 
 class PublicationDetail(BaseModel):
     id: str
+    url_param_id: str
     document_id: str
     title: str
     content_html: str
@@ -31,6 +33,7 @@ class PublicationDetail(BaseModel):
 
 class PublicationAdminItem(BaseModel):
     id: str
+    url_param_id: str
     document_id: str
     project_document_id: str
     title: str

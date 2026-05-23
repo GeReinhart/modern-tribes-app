@@ -11,6 +11,7 @@ from ...models.app.project_document import (
 from ...core.database import get_database
 from ...services import project_document_service, publication_service
 from ...utils.project_access import check_project_access_or_admin
+from ...utils.db_helpers import resolve_url_param_id
 
 router = APIRouter(prefix="/project-documents", tags=["app_project_documents"])
 
@@ -24,6 +25,7 @@ async def list_project_documents(
     current_user: dict = Depends(get_current_user),
 ):
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
     return await project_document_service.list_project_documents(
         project_id, pool, search_query=q, label_id=label_id
@@ -42,6 +44,7 @@ async def create_project_document(
     current_user: dict = Depends(get_current_user),
 ):
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position='member')
     return await project_document_service.create_project_document(project_id, data, pool, current_user)
 
@@ -54,6 +57,8 @@ async def get_project_document(
     current_user: dict = Depends(get_current_user),
 ):
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
     return await project_document_service.get_project_document(project_id, project_document_id, pool)
 
@@ -67,6 +72,8 @@ async def update_project_document(
     current_user: dict = Depends(get_current_user),
 ):
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position='member')
     return await project_document_service.update_project_document(
         project_id, project_document_id, data, pool, current_user
@@ -84,6 +91,8 @@ async def archive_project_document(
     current_user: dict = Depends(get_current_user),
 ):
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
     await project_document_service.archive_project_document(
         project_id, project_document_id, pool, current_user
@@ -102,6 +111,8 @@ async def publish_project_document(
     current_user: dict = Depends(get_current_user),
 ):
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
     return await publication_service.publish_document(project_id, project_document_id, pool, current_user)
 
@@ -117,6 +128,8 @@ async def unpublish_project_document(
     current_user: dict = Depends(get_current_user),
 ):
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
     await publication_service.unpublish_document(project_id, project_document_id, pool, current_user)
     return None
@@ -129,5 +142,6 @@ async def get_project_document_labels(
     current_user: dict = Depends(get_current_user),
 ):
     pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
     return await project_document_service.get_project_document_labels(project_id, pool)

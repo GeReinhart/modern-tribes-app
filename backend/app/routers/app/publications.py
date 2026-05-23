@@ -7,6 +7,7 @@ from ...models.auth.auth import PermissionEnum
 from ...models.app.publication import PublicationAdminItem
 from ...core.database import get_database
 from ...services import publication_service
+from ...utils.db_helpers import resolve_url_param_id
 
 router = APIRouter(prefix="/publications", tags=["app_publications"])
 
@@ -30,5 +31,6 @@ async def delete_publication(
     current_user: dict = Depends(get_current_user),
 ):
     pool = get_database()
+    publication_id = await resolve_url_param_id(pool, "publications", publication_id)
     await publication_service.admin_unpublish(publication_id, pool)
     return None

@@ -9,7 +9,7 @@ from ...utils.ownership import check_own_user_or_admin
 from ...models.auth.auth import PermissionEnum
 from ...models.crud.positions import PositionEnum
 from ...core.database import get_database
-from ...utils.db_helpers import validate_uuid
+from ...utils.db_helpers import validate_uuid, resolve_url_param_id
 
 router = APIRouter(prefix="/tribes", tags=["query_tribes"])
 
@@ -23,6 +23,7 @@ _QUERY = """
         p.last_name  AS person_last_name,
         pos.position AS position,
         t.id        AS tribe_id,
+        t.url_param_id AS tribe_url_param_id,
         t.name      AS tribe_name,
         FALSE       AS via_represents
     FROM users u
@@ -42,6 +43,7 @@ _QUERY = """
         p.last_name  AS person_last_name,
         pos.position AS position,
         t.id        AS tribe_id,
+        t.url_param_id AS tribe_url_param_id,
         t.name      AS tribe_name,
         TRUE        AS via_represents
     FROM users u
@@ -62,6 +64,7 @@ class UserPersonPositionTribe(BaseModel):
     person_last_name: str
     position: PositionEnum
     tribe_id: str
+    tribe_url_param_id: str
     tribe_name: str
     via_represents: bool
 
@@ -70,8 +73,8 @@ class UserPersonPositionTribe(BaseModel):
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_tribes_by_user(user_id: str, current_user: dict = Depends(get_current_user)):
     """Get all active tribes associated with a user via their active positions."""
-    validate_uuid(user_id, "user_id")
     pool = get_database()
+    user_id = await resolve_url_param_id(pool, "users", user_id)
     await check_own_user_or_admin(user_id, current_user, pool)
 
     async with pool.acquire() as conn:
@@ -87,6 +90,7 @@ async def get_tribes_by_user(user_id: str, current_user: dict = Depends(get_curr
             person_last_name=r["person_last_name"],
             position=r["position"],
             tribe_id=str(r["tribe_id"]),
+            tribe_url_param_id=r["tribe_url_param_id"],
             tribe_name=r["tribe_name"],
             via_represents=r["via_represents"],
         )

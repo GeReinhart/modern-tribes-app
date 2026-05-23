@@ -2,21 +2,24 @@ from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
+from ..utils.db_helpers import generate_url_param_id
+
 
 async def insert_publication(
     pool, document_id: str, project_document_id: str, published_by: str
 ) -> dict:
     now = datetime.now(timezone.utc)
+    url_param_id = generate_url_param_id()
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """INSERT INTO publications
                    (document_id, project_document_id, published_at, published_by,
-                    status, created_at, updated_at)
-               VALUES ($1, $2, $3, $4, 'active', $3, $3)
-               RETURNING id""",
-            UUID(document_id), UUID(project_document_id), now, UUID(published_by)
+                    status, url_param_id, created_at, updated_at)
+               VALUES ($1, $2, $3, $4, 'active', $5, $3, $3)
+               RETURNING id, url_param_id""",
+            UUID(document_id), UUID(project_document_id), now, UUID(published_by), url_param_id
         )
-    return {"id": str(row["id"])}
+    return {"id": str(row["id"]), "url_param_id": row["url_param_id"]}
 
 
 async def delete_publication_by_document(pool, document_id: str) -> str:
@@ -38,7 +41,7 @@ async def delete_publication_by_id(pool, publication_id: str) -> str:
 async def fetch_publication_by_id(pool, publication_id: str) -> Optional[dict]:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            """SELECT pub.id, pub.document_id, pub.published_at,
+            """SELECT pub.id, pub.url_param_id, pub.document_id, pub.published_at,
                       pd.title, d.content_html, d.content_summary,
                       u.login AS published_by_login,
                       COALESCE(ap.first_name || ' ' || ap.last_name, au.login) AS author_name
@@ -97,7 +100,7 @@ async def fetch_publications(pool, q: Optional[str], label_id: Optional[str]) ->
         params.append(q.strip())
     where = _build_where(conditions, params)
     query = f"""
-        SELECT pub.id, pub.document_id, pub.project_document_id,
+        SELECT pub.id, pub.url_param_id, pub.document_id, pub.project_document_id,
                pd.title, d.content_summary, pub.published_at
         FROM publications pub
         JOIN documents d ON d.id = pub.document_id
@@ -130,7 +133,7 @@ async def fetch_publications_admin(
     extra_clause = ("AND " + " AND ".join(extra)) if extra else ""
     query = f"""
         SELECT DISTINCT ON (pub.id)
-               pub.id, pub.document_id, pub.project_document_id, pub.published_at,
+               pub.id, pub.url_param_id, pub.document_id, pub.project_document_id, pub.published_at,
                pd.title, d.content_summary,
                t.id AS tribe_id, t.name AS tribe_name,
                proj.id AS project_id, proj.name AS project_name,
