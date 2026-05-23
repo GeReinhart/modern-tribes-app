@@ -20,11 +20,13 @@ import {
     containerStyle,
     errorStyle,
 } from '@/styles/theme.styles';
-import { Paperclip, Download, FileText, Image, Film, Music, File } from 'lucide-react';
+import { Paperclip, Download, FileText, Image, Film, Music, File, Settings } from 'lucide-react';
 import { AttachmentFile } from '@/types/document.types.ts';
 import {ThemedLoadingSpinner} from "@/components/common/layout/ThemedLoadingSpinner.tsx";
 import {useVerifyAuthorization} from "@/hooks/userVerifyAuthorization.ts";
 import { ProjectEntry } from '@/types/queries/projects.query.types';
+import { useTabConfig } from '@/features/tab-config/useTabConfig';
+import { TabConfigPopup } from '@/features/tab-config/TabConfigPopup';
 
 const ShowTribePageContent: React.FC = () => {
     const { t } = useTranslation();
@@ -34,6 +36,7 @@ const ShowTribePageContent: React.FC = () => {
     const { data: authorization, error: authorizationError, verifyAuthorization } = useVerifyAuthorization();
     const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
     const [archiving, setArchiving] = useState(false);
+    const [showTabConfig, setShowTabConfig] = useState(false);
 
     // Single hook call to get all data
     const { tribe, loading, error } = useTribeWithPositions(tribeId || null);
@@ -97,13 +100,16 @@ const ShowTribePageContent: React.FC = () => {
         return Array.from(map.values());
     }, [tribeProjects]);
 
-    const tabs = useMemo(() => [
+    const allTabs = useMemo(() => [
         { key: 'description', label: t('tribes.tabDescription') },
         { key: 'projects',    label: t('tribes.tabProjects') },
         { key: 'members',     label: t('tribes.tabMembers') },
     ], [t, dedupedProjects.length, tribe?.persons.length]);
 
-    const { activeTab, breadcrumbTabs, handleTabChange } = useUrlTab(tabs, `/app/tribes/${tribeId ?? ''}`);
+    const contextKey = tribeId ? `tribe:${tribeId}` : '';
+    const { visibleTabs, defaultTabKey, tabsWithConfig, saveConfig } = useTabConfig(contextKey, allTabs);
+
+    const { activeTab, breadcrumbTabs, handleTabChange } = useUrlTab(visibleTabs, `/app/tribes/${tribeId ?? ''}`, defaultTabKey);
 
     // Check authorization when component mounts or tribeId changes
     useEffect(() => {
@@ -242,6 +248,14 @@ const ShowTribePageContent: React.FC = () => {
     return (
         <AppLayout headerActions={headerActions} breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs}>
 
+            {showTabConfig && (
+                <TabConfigPopup
+                    tabsWithConfig={tabsWithConfig}
+                    onSave={saveConfig}
+                    onClose={() => setShowTabConfig(false)}
+                />
+            )}
+
             {/* Authorization Error Message */}
             {authorizationError && (
                 <ThemedCard>
@@ -253,9 +267,18 @@ const ShowTribePageContent: React.FC = () => {
 
             {/* Tabs */}
             <ThemedTabs
-                tabs={tabs}
+                tabs={visibleTabs}
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
+                configButton={isManager ? (
+                    <button
+                        onClick={() => setShowTabConfig(true)}
+                        title={t('tabConfig.configure')}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.secondary, display: 'flex', alignItems: 'center', padding: '4px' }}
+                    >
+                        <Settings size={16} />
+                    </button>
+                ) : undefined}
             />
 
             <div style={{ marginTop: '16px' }}>

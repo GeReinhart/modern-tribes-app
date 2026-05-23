@@ -4,7 +4,7 @@
 
 - You **MUST NOT** try to launch neither the backend nor the frontend. To test anything.
 - You **MUST** ask me to do the test for you, and I will give you the feedback from the application.
-
+- You can check that the code is compiling, but you **MUST NOT** check that it works live.
 
 ## Code Quality — Hard Constraints
 

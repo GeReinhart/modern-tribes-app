@@ -13,11 +13,11 @@ interface UseUrlTabResult {
     breadcrumbTabs: BreadcrumbTab[];
 }
 
-export function useUrlTab(tabs: TabDefinition[], basePath: string): UseUrlTabResult {
+export function useUrlTab(tabs: TabDefinition[], basePath: string, defaultTabKey?: string): UseUrlTabResult {
     const { tab } = useParams<{ tab?: string }>();
     const navigate = useNavigate();
 
-    const activeTab = tab || tabs[0]?.key || '';
+    const activeTab = tab || defaultTabKey || tabs[0]?.key || '';
 
     const breadcrumbTabs = useMemo(
         () => tabs.map(t => ({

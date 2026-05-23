@@ -99,15 +99,6 @@ const TribesPageContent: React.FC = () => {
                     </ThemedCard>
                 )}
 
-                {/* Header */}
-                <div className="mb-6">
-
-                    <ThemedText variant="primary" size="small">
-                        {t('tribes.subtitle')}
-                    </ThemedText>
-                </div>
-
-                <ThemedDivider variant="primary"/>
 
                 {/* Tribes Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -17,11 +17,13 @@ import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
 import { useProjectFeatures, useFeatureTypes } from '@/hooks/useProjectFeatures';
 import { getFeatureComponent } from '@/features/registry';
 import { errorStyle, containerStyle } from '@/styles/theme.styles';
-import { Paperclip, Download, FileText, Image, Film, Music, File } from 'lucide-react';
+import { Paperclip, Download, FileText, Image, Film, Music, File, Settings } from 'lucide-react';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { AttachmentFile } from '@/types/document.types';
 import { ProjectEntry } from '@/types/queries/projects.query.types';
 import { ProjectDocumentsTab } from '@/components/entities/projects/ProjectDocumentsTab';
+import { useTabConfig } from '@/features/tab-config/useTabConfig';
+import { TabConfigPopup } from '@/features/tab-config/TabConfigPopup';
 
 const getPositionVariant = (position: string): 'primary' | 'accent' | 'ghost' => {
     if (position === 'manager') return 'accent';
@@ -139,6 +141,7 @@ const ShowProjectPageContent: React.FC = () => {
 
     const initialLabelId = searchParams.get('labelId') || null;
     const [showAddFeature, setShowAddFeature] = useState(false);
+    const [showTabConfig, setShowTabConfig] = useState(false);
     const [archiveTarget, setArchiveTarget] = useState<{ id: string; name: string } | null>(null);
     const [renameTarget, setRenameTarget] = useState<{ id: string; name: string } | null>(null);
     const [renameValue, setRenameValue] = useState('');
@@ -185,7 +188,7 @@ const ShowProjectPageContent: React.FC = () => {
         return allPositions.some(p => p === 'manager' || p === 'member');
     }, [myProjectPosition, user]);
 
-    const tabs = useMemo(() => {
+    const allTabs = useMemo(() => {
         const base = [
             { key: 'description', label: t('tribes.tabDescription') },
             { key: 'documents', label: t('projectDocuments.tab') },
@@ -194,10 +197,13 @@ const ShowProjectPageContent: React.FC = () => {
         return [...base, ...featureTabs];
     }, [features, t]);
 
-    const basePath = `/app/tribes/${tribeId ?? ''}/projects/${projectId ?? ''}`;
-    const { activeTab, breadcrumbTabs, handleTabChange } = useUrlTab(tabs, basePath);
+    const contextKey = projectId ? `project:${projectId}` : '';
+    const { visibleTabs, defaultTabKey, tabsWithConfig, saveConfig } = useTabConfig(contextKey, allTabs);
 
-    const activeTabLabel = tabs.find(t => t.key === activeTab)?.label || '';
+    const basePath = `/app/tribes/${tribeId ?? ''}/projects/${projectId ?? ''}`;
+    const { activeTab, breadcrumbTabs, handleTabChange } = useUrlTab(visibleTabs, basePath, defaultTabKey);
+
+    const activeTabLabel = visibleTabs.find(t => t.key === activeTab)?.label || '';
 
     const breadcrumbs = useMemo(() => [
         { label: t('common.home'), path: '/app' },
@@ -275,25 +281,30 @@ const ShowProjectPageContent: React.FC = () => {
     return (
         <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} headerActions={headerActions}>
 
-            {/* User position on this project */}
-            {myProjectPosition && (myProjectPosition.direct_position || myProjectPosition.represented_persons.length > 0) && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
-                    {myProjectPosition.direct_position && (
-                        <ThemedBadge variant={getPositionVariant(myProjectPosition.direct_position)}>
-                            {t(`positions.${myProjectPosition.direct_position}`)}
-                        </ThemedBadge>
-                    )}
-                    {myProjectPosition.represented_persons.map((p, i) => (
-                        <ThemedBadge key={i} variant={getPositionVariant(p.position)}>
-                            {t(`positions.${p.position}`)} {t('tribes.as')} {p.first_name} {p.last_name}
-                        </ThemedBadge>
-                    ))}
-                </div>
+            {showTabConfig && (
+                <TabConfigPopup
+                    tabsWithConfig={tabsWithConfig}
+                    onSave={saveConfig}
+                    onClose={() => setShowTabConfig(false)}
+                />
             )}
 
             {/* Tabs */}
             <ThemedSection themeId="main_1">
-                <ThemedTabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} />
+                <ThemedTabs
+                    tabs={visibleTabs}
+                    activeTab={activeTab}
+                    onTabChange={handleTabChange}
+                    configButton={isManager ? (
+                        <button
+                            onClick={() => setShowTabConfig(true)}
+                            title={t('tabConfig.configure')}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.secondary, display: 'flex', alignItems: 'center', padding: '4px' }}
+                        >
+                            <Settings size={16} />
+                        </button>
+                    ) : undefined}
+                />
 
                 <div style={{ paddingTop: '16px' }}>
                     {activeTab === 'documents' && projectId && tribeId && (
@@ -307,6 +318,24 @@ const ShowProjectPageContent: React.FC = () => {
 
                     {activeTab === 'description' && (
                         <>
+                        <ThemedSection themeId="default">
+                            {/* User position on this project */}
+                            {myProjectPosition && (myProjectPosition.direct_position || myProjectPosition.represented_persons.length > 0) && (
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+                                    {myProjectPosition.direct_position && (
+                                        <ThemedBadge variant={getPositionVariant(myProjectPosition.direct_position)}>
+                                            {t(`positions.${myProjectPosition.direct_position}`)}
+                                        </ThemedBadge>
+                                    )}
+                                    {myProjectPosition.represented_persons.map((p, i) => (
+                                        <ThemedBadge key={i} variant={getPositionVariant(p.position)}>
+                                            {t(`positions.${p.position}`)} {t('tribes.as')} {p.first_name} {p.last_name}
+                                        </ThemedBadge>
+                                    ))}
+                                </div>
+                            )}
+                         </ThemedSection>
+
                             {/* Description */}
                             {project.document_content_html && (
                                 <div

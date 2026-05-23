@@ -58,10 +58,6 @@ const DashboardTribesTab: React.FC = () => {
 
     return (
         <div>
-            <ThemedText variant="primary" size="small" style={{ marginBottom: '12px' }}>
-                {t('tribes.subtitle')}
-            </ThemedText>
-            <ThemedDivider variant="primary" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {dedupedTribes.map(tribe => (
                     <TribeCard

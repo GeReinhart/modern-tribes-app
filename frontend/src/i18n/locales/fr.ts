@@ -417,6 +417,16 @@ const fr: Record<string, string> = {
     'dashboard.tasks.empty': 'Aucune tâche à venir qui vous est assignée.',
     'dashboard.tasks.openSource': 'Ouvrir dans le projet',
 
+    'tabConfig.configure': 'Configurer les onglets',
+    'tabConfig.title': 'Configuration des onglets',
+    'tabConfig.tab': 'Onglet',
+    'tabConfig.visible': 'Visible',
+    'tabConfig.default': 'Par défaut',
+    'tabConfig.moveUp': 'Monter',
+    'tabConfig.moveDown': 'Descendre',
+    'tabConfig.toggleVisibility': 'Basculer la visibilité',
+    'tabConfig.setDefault': 'Définir comme onglet par défaut',
+
     'about.title': 'À propos',
     'about.subtitle': 'Modern Tribes — un outil léger pour organiser les groupes auxquels vous appartenez.',
     'about.sourceCode': 'Code source',

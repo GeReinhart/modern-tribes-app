@@ -10,13 +10,14 @@ interface ThemedTabsProps {
     tabs: Tab[];
     activeTab: string;
     onTabChange: (key: string) => void;
+    configButton?: React.ReactNode;
 }
 
-export const ThemedTabs: React.FC<ThemedTabsProps> = ({ tabs, activeTab, onTabChange }) => {
+export const ThemedTabs: React.FC<ThemedTabsProps> = ({ tabs, activeTab, onTabChange, configButton }) => {
     const { theme } = useTheme();
 
     return (
-        <div style={{ display: 'flex', gap: '2px', borderBottom: `2px solid ${theme.colors.primary}30`, marginBottom: '0' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', borderBottom: `2px solid ${theme.colors.primary}30`, marginBottom: '0' }}>
             {tabs.map(tab => {
                 const isActive = activeTab === tab.key;
                 return (
@@ -41,6 +42,11 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({ tabs, activeTab, onTabCh
                     </button>
                 );
             })}
+            {configButton && (
+                <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
+                    {configButton}
+                </div>
+            )}
         </div>
     );
 };

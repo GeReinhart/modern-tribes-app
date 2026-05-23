@@ -417,6 +417,16 @@ const en: Record<string, string> = {
     'dashboard.tasks.empty': 'No upcoming tasks assigned to you.',
     'dashboard.tasks.openSource': 'Open in project',
 
+    'tabConfig.configure': 'Configure tabs',
+    'tabConfig.title': 'Tab configuration',
+    'tabConfig.tab': 'Tab',
+    'tabConfig.visible': 'Visible',
+    'tabConfig.default': 'Default',
+    'tabConfig.moveUp': 'Move up',
+    'tabConfig.moveDown': 'Move down',
+    'tabConfig.toggleVisibility': 'Toggle visibility',
+    'tabConfig.setDefault': 'Set as default tab',
+
     'about.title': 'About',
     'about.subtitle': 'Modern Tribes — a lightweight tool for organising the groups you belong to.',
     'about.sourceCode': 'Source code',

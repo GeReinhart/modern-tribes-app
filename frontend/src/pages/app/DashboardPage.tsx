@@ -1,17 +1,20 @@
-import React, {useEffect, useMemo} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { themesById } from '@/components/themes/themes';
-import {useVerifyAuthorization} from "@/hooks/userVerifyAuthorization.ts";
+import { useVerifyAuthorization } from "@/hooks/userVerifyAuthorization.ts";
 import DashboardTasksTab from '@/features/dashboard/tabs/DashboardTasksTab';
 import DashboardTribesTab from '@/features/dashboard/tabs/DashboardTribesTab';
-import {ThemedCard} from "@/components/common/layout/ThemedCard.tsx";
-import {errorStyle} from "@/styles/theme.styles.tsx";
+import { ThemedCard } from "@/components/common/layout/ThemedCard.tsx";
+import { errorStyle } from "@/styles/theme.styles.tsx";
 import { useUrlTab } from '@/hooks/useUrlTab';
+import { Settings } from 'lucide-react';
+import { useTabConfig } from '@/features/tab-config/useTabConfig';
+import { TabConfigPopup } from '@/features/tab-config/TabConfigPopup';
 
 const TABS = (t: (k: string) => string) => [
     { key: 'tasks', label: t('dashboard.tabs.tasks'), Component: DashboardTasksTab },
@@ -20,12 +23,15 @@ const TABS = (t: (k: string) => string) => [
 
 const DashboardPageContent: React.FC = () => {
     const { t } = useTranslation();
+    const { theme } = useTheme();
     const navigate = useNavigate();
     const { data: authorization, error: authorizationError, verifyAuthorization } = useVerifyAuthorization();
+    const [showTabConfig, setShowTabConfig] = useState(false);
 
-    const tabs = useMemo(() => TABS(t), [t]);
-    const { activeTab, breadcrumbTabs, handleTabChange } = useUrlTab(tabs, '/app/dashboard');
-    const ActiveComponent = tabs.find(tb => tb.key === activeTab)?.Component ?? DashboardTasksTab;
+    const allTabs = useMemo(() => TABS(t).map(({ key, label }) => ({ key, label })), [t]);
+    const { visibleTabs, defaultTabKey, tabsWithConfig, saveConfig } = useTabConfig('dashboard', allTabs);
+    const { activeTab, breadcrumbTabs, handleTabChange } = useUrlTab(visibleTabs, '/app/dashboard', defaultTabKey);
+    const ActiveComponent = TABS(t).find(tb => tb.key === activeTab)?.Component ?? DashboardTasksTab;
 
     const breadcrumbs = useMemo(() => [
         { label: t('common.home'), path: '/app' },
@@ -63,6 +69,14 @@ const DashboardPageContent: React.FC = () => {
     return (
         <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} headerActions={headerActions}>
 
+            {showTabConfig && (
+                <TabConfigPopup
+                    tabsWithConfig={tabsWithConfig}
+                    onSave={saveConfig}
+                    onClose={() => setShowTabConfig(false)}
+                />
+            )}
+
             {/* Authorization Error Message */}
             {authorizationError && (
                 <ThemedCard>
@@ -73,9 +87,18 @@ const DashboardPageContent: React.FC = () => {
             )}
 
             <ThemedTabs
-                tabs={tabs.map(({ key, label }) => ({ key, label }))}
+                tabs={visibleTabs}
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
+                configButton={
+                    <button
+                        onClick={() => setShowTabConfig(true)}
+                        title={t('tabConfig.configure')}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.secondary, display: 'flex', alignItems: 'center', padding: '4px' }}
+                    >
+                        <Settings size={16} />
+                    </button>
+                }
             />
             <ActiveComponent />
         </AppLayout>
