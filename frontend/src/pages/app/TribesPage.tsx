@@ -11,7 +11,6 @@ import {useNavigate} from 'react-router-dom';
 import {themesById} from "@/components/themes/themes.ts";
 import {ThemeProvider} from "@/contexts/ThemeContext.tsx";
 import {ThemedLoadingSpinner} from "@/components/common/layout/ThemedLoadingSpinner.tsx";
-import {ThemedDivider} from "@/components/common/layout/ThemedDivider.tsx";
 import {useVerifyAuthorization} from "@/hooks/userVerifyAuthorization.ts";
 import {errorStyle} from "@/styles/theme.styles.tsx";
 import { TribeEntry } from '@/types/queries/tribes.query.types.ts';
