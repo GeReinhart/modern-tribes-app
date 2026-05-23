@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedCard } from '@/components/common/layout/ThemedCard';
 import { ThemedText } from '@/components/common/layout/ThemedText';
-import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedDivider } from '@/components/common/layout/ThemedDivider';
+import { MenuAction } from '@/types/menu.types';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
 import { ProjectCard } from '@/components/entities/projects/ProjectCard';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -53,22 +53,20 @@ const ProjectsPageContent: React.FC = () => {
         return Array.from(map.values());
     }, [projects]);
 
-    const headerActions = (
-        <ThemedButton variant="ghost" onClick={() => navigate('/app/tribes')}>
-            {t('tribes.title')}
-        </ThemedButton>
-    );
+    const menuActions = useMemo((): MenuAction[] => [
+        { icon: 'arrow-left', label: t('tribes.title'), onClick: () => navigate('/app/tribes') },
+    ], [t, navigate]);
 
     if (currentUserLoading || projectsLoading) {
         return (
-            <AppLayout breadcrumbs={breadcrumbs} headerActions={headerActions}>
+            <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions}>
                 <ThemedLoadingSpinner />
             </AppLayout>
         );
     }
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs} headerActions={headerActions} bookmarkTitle={t('projects.title')}>
+        <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions} bookmarkTitle={t('projects.title')}>
             <div className="container mx-auto px-4 py-8">
                 <div className="mb-6">
                     <ThemedText variant="primary" size="small">

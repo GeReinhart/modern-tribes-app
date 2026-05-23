@@ -3,7 +3,7 @@ from typing import List
 from uuid import UUID
 
 from ..models.app.tribes_with_positions import PersonWithPosition
-from ..utils.db_helpers import row_to_dict
+from ..utils.db_helpers import row_to_dict, generate_url_param_id
 from ..utils.document_helpers import update_document_content_with_revision
 
 
@@ -15,11 +15,12 @@ async def get_tribe_by_id(pool, tribe_id: str) -> dict | None:
 
 async def create_tribe(pool, name: str, document_id: str, user_id: str) -> dict:
     now = datetime.now(timezone.utc)
+    url_param_id = generate_url_param_id()
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            """INSERT INTO tribes (name, document_id, created_at, updated_at, created_by, updated_by)
-               VALUES ($1, $2, $3, $4, $5, $5) RETURNING *""",
-            name, UUID(document_id), now, now, UUID(user_id)
+            """INSERT INTO tribes (name, document_id, created_at, updated_at, created_by, updated_by, url_param_id)
+               VALUES ($1, $2, $3, $4, $5, $5, $6) RETURNING *""",
+            name, UUID(document_id), now, now, UUID(user_id), url_param_id
         )
     return row_to_dict(row)
 

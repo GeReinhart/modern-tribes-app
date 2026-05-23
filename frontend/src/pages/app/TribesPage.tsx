@@ -5,11 +5,10 @@ import {useUserTribes} from '@/hooks/useTribes.ts';
 import {useCurrentUserProfile} from "@/hooks/useCurrentUserProfile.ts";
 import { ThemedCard } from '@/components/common/layout/ThemedCard';
 import { ThemedText} from '@/components/common/layout/ThemedText';
-import { ThemedButton } from '@/components/common/form/ThemedButton';
 import {TribeCard} from '@/components/entities/tribes/TribeCard.tsx';
 import {useNavigate} from 'react-router-dom';
-import {themesById} from "@/components/themes/themes.ts";
 import {ThemeProvider} from "@/contexts/ThemeContext.tsx";
+import { MenuAction } from '@/types/menu.types';
 import {ThemedLoadingSpinner} from "@/components/common/layout/ThemedLoadingSpinner.tsx";
 import {useVerifyAuthorization} from "@/hooks/userVerifyAuthorization.ts";
 import {errorStyle} from "@/styles/theme.styles.tsx";
@@ -60,34 +59,22 @@ const TribesPageContent: React.FC = () => {
             });
     }, [verifyAuthorization]);
 
-    const headerActions = (
-        <>
-            {authorization?.authorized && (
-                <ThemedButton onClick={() => navigate('/app/tribes/create')} variant="primary">
-                    {t('tribes.createTribe')}
-                </ThemedButton>
-            )}
-
-            <ThemedButton requiredPermissions={["admin"]}
-                variant={'ghost'}
-                onClick={() => navigate('/admin')}
-                theme={themesById['main_3']}
-            >
-                {t('common.admin')}
-            </ThemedButton>
-        </>
-    );
+    const isAdmin = user?.permissions?.includes('admin') ?? false;
+    const menuActions = useMemo((): MenuAction[] => [
+        ...(authorization?.authorized ? [{ icon: 'plus' as const, label: t('tribes.createTribe'), onClick: () => navigate('/app/tribes/create') }] : []),
+        ...(isAdmin ? [{ icon: 'settings' as const, label: t('common.admin'), onClick: () => navigate('/admin') }] : []),
+    ], [authorization?.authorized, isAdmin, t, navigate]);
 
     if (currentUserLoading || tribesLoading) {
         return (
-            <AppLayout headerActions={headerActions}>
+            <AppLayout menuActions={menuActions}>
                 <ThemedLoadingSpinner/>
             </AppLayout>
         );
     }
 
     return (
-        <AppLayout headerActions={headerActions} breadcrumbs={breadcrumbs} bookmarkTitle={t('tribes.title')}>
+        <AppLayout menuActions={menuActions} breadcrumbs={breadcrumbs} bookmarkTitle={t('tribes.title')}>
             <div className="container mx-auto px-4 py-8">
 
                 {/* Authorization Error Message */}

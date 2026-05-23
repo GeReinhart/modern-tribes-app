@@ -7,6 +7,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedText } from '@/components/common/layout/ThemedText';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedBadge } from '@/components/common/layout/ThemedBadge';
+import { MenuAction } from '@/types/menu.types';
 import { ThemedSection } from '@/components/common/layout/ThemedSection';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
 import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
@@ -260,25 +261,17 @@ const ShowProjectPageContent: React.FC = () => {
         );
     }
 
-    const headerActions = isManager ? (
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <ThemedButton variant="ghost" onClick={() => setShowAddFeature(true)}>
-                {t('features.addFeature')}
-            </ThemedButton>
-            <ThemedButton variant="ghost" onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit-document`)}>
-                {t('projects.editDocument')}
-            </ThemedButton>
-            <ThemedButton variant="primary" onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit`)}>
-                {t('projects.editProject')}
-            </ThemedButton>
-        </div>
-    ) : undefined;
+    const menuActions = useMemo((): MenuAction[] => isManager ? [
+        { icon: 'plus', label: t('features.addFeature'), onClick: () => setShowAddFeature(true) },
+        { icon: 'file-text', label: t('projects.editDocument'), onClick: () => navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit-document`) },
+        { icon: 'pencil', label: t('projects.editProject'), onClick: () => navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit`) },
+    ] : [], [isManager, tribeId, projectId, t, navigate]);
 
     const activeFeature = features.find(f => f.id === activeTab);
     const FeatureComponent = activeFeature ? getFeatureComponent(activeFeature.feature_type) : null;
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} headerActions={headerActions} bookmarkTitle={project?.name ?? null}>
+        <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} menuActions={menuActions} bookmarkTitle={project?.name ?? null}>
 
             {showTabConfig && (
                 <TabConfigPopup

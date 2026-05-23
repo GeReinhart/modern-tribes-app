@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
@@ -19,6 +19,7 @@ import { projectDocumentService } from '@/services/project-document.service';
 import { labelService } from '@/services/label.service';
 import { AttachmentFile } from '@/types/document.types';
 import { errorStyle, formActionsStyle, formContainerStyle } from '@/styles/theme.styles';
+import { MenuAction } from '@/types/menu.types';
 
 const ProjectDocumentFormPageContent: React.FC = () => {
     const { t } = useTranslation();
@@ -151,15 +152,12 @@ const ProjectDocumentFormPageContent: React.FC = () => {
         outline: 'none',
     };
 
+    const menuActions = useMemo((): MenuAction[] => [
+        { icon: 'x', label: t('common.cancel'), onClick: () => navigate(cancelPath) },
+    ], [t, navigate, cancelPath]);
+
     return (
-        <AppLayout
-            breadcrumbs={breadcrumbs}
-            headerActions={
-                <ThemedButton variant="secondary" onClick={() => navigate(cancelPath)}>
-                    {t('common.cancel')}
-                </ThemedButton>
-            }
-        >
+        <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions}>
             {submitting && (
                 <ThemedLoadingOverlay
                     message={isEdit ? t('projectDocuments.updating') : t('projectDocuments.creating')}

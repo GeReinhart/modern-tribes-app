@@ -8,12 +8,14 @@ import { useTranslation } from 'react-i18next';
 import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb';
 import UserBadge from "@/components/entities/users/CurrentUserBadge.tsx";
 import { BookmarkToggle } from '@/features/bookmarks/BookmarkToggle';
+import { MenuAction } from '@/types/menu.types';
 
 
 
 interface AppHeaderProps {
     actions?: React.ReactNode;
     secondaryActions?: React.ReactNode;
+    menuActions?: MenuAction[];
     showUserBadge?: boolean;
     breadcrumbs?: BreadcrumbItem[];
     breadcrumbTabs?: BreadcrumbTab[];
@@ -23,6 +25,7 @@ interface AppHeaderProps {
 export const AppHeader: React.FC<AppHeaderProps> = ({
                                                         actions,
                                                         secondaryActions,
+                                                        menuActions,
                                                         showUserBadge = true,
                                                         breadcrumbs,
                                                         breadcrumbTabs,
@@ -108,12 +111,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         margin: '6px 0',
     };
 
-    const menuActionsStyle: React.CSSProperties = {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '6px',
-        padding: '12px 24px',
-    };
+    const menuActionsStyle: React.CSSProperties = {};
 
     const menuSecondaryActionsStyle: React.CSSProperties = {
         display: 'grid',
@@ -128,7 +126,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     };
 
     const hasMenuContent = true;
-    const hasPrecedingMenuContent = (breadcrumbs && breadcrumbs.length > 0) || actions || secondaryActions;
+    const hasPrecedingMenuContent = (breadcrumbs && breadcrumbs.length > 0) || actions || secondaryActions || (menuActions && menuActions.length > 0);
     const pageTitle = breadcrumbs && breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].label : undefined;
     const bookmarkDescription = breadcrumbs && breadcrumbs.length > 0
         ? breadcrumbs.map(b => b.label).join(' / ')
@@ -217,6 +215,24 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                                 {actions}
                             </div>
                         )}
+
+                        {/* Page-specific menu actions (icon + text) */}
+                        {menuActions && menuActions.length > 0 && menuActions.map((action, index) => {
+                            const color = action.variant === 'danger' ? theme.colors.danger : theme.colors.text;
+                            return (
+                                <div
+                                    key={index}
+                                    role="menuitem"
+                                    style={{ ...menuNavItemStyle(true, false), display: 'flex', alignItems: 'center', gap: '10px', color, opacity: action.disabled ? 0.5 : 1, cursor: action.disabled ? 'not-allowed' : 'pointer' }}
+                                    onClick={() => { if (!action.disabled) { action.onClick(); setIsMenuOpen(false); } }}
+                                    onMouseEnter={(e) => { if (!action.disabled) e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`; }}
+                                    onMouseLeave={(e) => { if (!action.disabled) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                                >
+                                    <ThemedSvgIcon name={action.icon} color={color} size={16} />
+                                    {action.label}
+                                </div>
+                            );
+                        })}
 
                         {/* Separator before app nav */}
                         {hasPrecedingMenuContent && <div style={menuSeparatorStyle} />}

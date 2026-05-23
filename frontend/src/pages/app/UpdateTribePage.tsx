@@ -33,6 +33,7 @@ import { AttachmentFile } from "@/types/document.types.ts";
 import {TribeWithPositionsUpdate} from "@/types/app/tribe_with_positions.types.ts";
 import {ThemedLoadingSpinner} from "@/components/common/layout/ThemedLoadingSpinner.tsx";
 import { PositionEnum } from '@/types/position.types';
+import { MenuAction } from '@/types/menu.types';
 
 interface SelectedPerson {
     person_id: string;
@@ -102,16 +103,9 @@ const UpdateTribePageContent: React.FC = () => {
         { label: t('common.edit') }
     ], [tribe?.name, tribeId, t]);
 
-    // ✅ MOVE HEADER ACTIONS HERE - AFTER BREADCRUMBS
-    const headerActions = (
-        <ThemedButton
-            variant="secondary"
-            onClick={() => navigate(`/app/tribes/${tribeId}`)}
-            disabled={isSubmitting}
-        >
-            {t('common.cancel')}
-        </ThemedButton>
-    );
+    const menuActions = useMemo((): MenuAction[] => [
+        { icon: 'x', label: t('common.cancel'), onClick: () => navigate(`/app/tribes/${tribeId}`), disabled: isSubmitting },
+    ], [t, navigate, tribeId, isSubmitting]);
 
     // Get theme-dependent styles
     const inputStyle = getInputStyle(theme);
@@ -312,7 +306,7 @@ const UpdateTribePageContent: React.FC = () => {
     // ✅ EARLY RETURNS NOW COME AFTER BREADCRUMBS AND HEADER ACTIONS ARE DEFINED
     if (tribeLoading) {
         return (
-            <AppLayout headerActions={headerActions} breadcrumbs={breadcrumbs}>
+            <AppLayout menuActions={menuActions} breadcrumbs={breadcrumbs}>
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
                     <ThemedLoadingSpinner size="sm"  />
                 </div>
@@ -322,7 +316,7 @@ const UpdateTribePageContent: React.FC = () => {
 
     if (!tribe) {
         return (
-            <AppLayout headerActions={headerActions} breadcrumbs={breadcrumbs}>
+            <AppLayout menuActions={menuActions} breadcrumbs={breadcrumbs}>
                 <div style={{ padding: '0 24px' }}>
                     <ThemedCard>
                         <ThemedText variant="danger" size="medium">
@@ -335,7 +329,7 @@ const UpdateTribePageContent: React.FC = () => {
     }
 
     return (
-        <AppLayout headerActions={headerActions} breadcrumbs={breadcrumbs}>
+        <AppLayout menuActions={menuActions} breadcrumbs={breadcrumbs}>
             {isSubmitting && (
                 <ThemedLoadingOverlay
                     message={t('tribes.updatingTribe')}

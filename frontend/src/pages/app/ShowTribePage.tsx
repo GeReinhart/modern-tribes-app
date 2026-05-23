@@ -4,8 +4,8 @@ import { ThemeProvider, useTheme } from '@/contexts/ThemeContext.tsx';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedCard } from '@/components/common/layout/ThemedCard';
 import { ThemedText} from '@/components/common/layout/ThemedText';
-import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedBadge } from '@/components/common/layout/ThemedBadge';
+import { MenuAction } from '@/types/menu.types';
 import { ThemedSection } from "@/components/common/layout/ThemedSection.tsx";
 import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
 import { ConfirmDialog } from '@/components/common/layout/ConfirmDialog.tsx';
@@ -52,7 +52,7 @@ const ShowTribePageContent: React.FC = () => {
 
     const myPosition = useMemo(() => {
         if (!tribeId) return null;
-        const entries = userTribes.filter(r => r.tribe_id === tribeId);
+        const entries = userTribes.filter(r => r.tribe_url_param_id === tribeId);
         const direct = entries.find(e => !e.via_represents);
         const represents = entries.filter(e => e.via_represents);
         return {
@@ -134,30 +134,13 @@ const ShowTribePageContent: React.FC = () => {
         }
     };
 
-    // Conditionally render Edit / Archive buttons only when authorized
-    const headerActions = (
-        <>
-            {isManager && (
-                <ThemedButton variant="secondary" onClick={() => navigate(`/app/tribes/${tribeId}/projects/new`)}>
-                    {t('projects.addProject')}
-                </ThemedButton>
-            )}
-            {authorization?.authorized && (
-                <>
-                    <ThemedButton variant="primary" onClick={() => navigate(`/app/tribes/${tribeId}/update`)}>
-                        {t('common.edit')}
-                    </ThemedButton>
-                    <ThemedButton
-                        variant="danger"
-                        isLoading={archiving}
-                        onClick={() => setShowArchiveConfirm(true)}
-                    >
-                        {t('tribes.archive')}
-                    </ThemedButton>
-                </>
-            )}
-        </>
-    );
+    const menuActions = useMemo((): MenuAction[] => [
+        ...(isManager ? [{ icon: 'plus' as const, label: t('projects.addProject'), onClick: () => navigate(`/app/tribes/${tribeId}/projects/new`) }] : []),
+        ...(authorization?.authorized ? [
+            { icon: 'pencil' as const, label: t('common.edit'), onClick: () => navigate(`/app/tribes/${tribeId}/update`) },
+            { icon: 'archive' as const, label: t('tribes.archive'), onClick: () => setShowArchiveConfirm(true), variant: 'danger' as const, disabled: archiving },
+        ] : []),
+    ], [isManager, authorization?.authorized, archiving, tribeId, t, navigate]);
 
     const breadcrumbs = React.useMemo(() => [
         { label: t('common.home'), path: '/app' },
@@ -248,7 +231,7 @@ const ShowTribePageContent: React.FC = () => {
     const guests = tribe.persons.filter(p => p.position === 'guest');
 
     return (
-        <AppLayout headerActions={headerActions} breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} bookmarkTitle={tribe?.name ?? null}>
+        <AppLayout menuActions={menuActions} breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} bookmarkTitle={tribe?.name ?? null}>
 
             {showTabConfig && (
                 <TabConfigPopup

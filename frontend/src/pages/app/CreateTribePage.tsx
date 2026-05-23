@@ -32,6 +32,7 @@ import FileUploader from "@/components/common/editor/FileUploader.tsx";
 import {AttachmentFile} from "@/types/document.types.ts";
 import {ThemedLoadingSpinner} from "@/components/common/layout/ThemedLoadingSpinner.tsx";
 import { PositionEnum } from '@/types/position.types';
+import { MenuAction } from '@/types/menu.types';
 
 interface SelectedPerson {
     person_id: string;
@@ -73,13 +74,9 @@ const CreateTribeFormContent: React.FC = () => {
         { label: t('common.create') }
     ];
 
-    const headerActions = (
-        <>
-            <ThemedButton variant="secondary" onClick={() => navigate('/app')}>
-                {t('common.cancel')}
-            </ThemedButton>
-        </>
-    );
+    const menuActions = useMemo((): MenuAction[] => [
+        { icon: 'x', label: t('common.cancel'), onClick: () => navigate('/app') },
+    ], [t, navigate]);
 
     // Get theme-dependent styles
     const inputStyle = getInputStyle(theme);
@@ -263,21 +260,13 @@ const CreateTribeFormContent: React.FC = () => {
     };
 
     return (
-        <AppLayout headerActions={headerActions} breadcrumbs={breadcrumbs}>
+        <AppLayout menuActions={menuActions} breadcrumbs={breadcrumbs}>
             {isSubmitting && (
                 <ThemedLoadingOverlay
                     message={t('tribes.creatingTribe')}
                     subMessage={t('tribes.createWait')}
                 />
             )}
-
-            {/* Page Title */}
-            <ThemedCard>
-
-                <ThemedText size="small">
-                    {t('tribes.createSubtitle')}
-                </ThemedText>
-            </ThemedCard>
 
             {/* Error Message */}
             {displayError && (

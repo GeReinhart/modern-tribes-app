@@ -8,7 +8,7 @@ import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSp
 import { ThemedBadge } from '@/components/common/layout/ThemedBadge';
 import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog';
 import { DocumentAttachments } from '@/components/common/document/DocumentAttachments';
-import { DocumentViewHeaderActions } from '@/components/common/document/DocumentViewHeaderActions';
+import { useDocumentViewMenuActions } from '@/components/common/document/useDocumentViewMenuActions';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
 import { useProjectWithDocument, useUserProjectsByTribe } from '@/hooks/useProjects';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
@@ -102,18 +102,18 @@ const ProjectDocumentViewPageContent: React.FC = () => {
         finally { setArchiving(false); setShowArchiveConfirm(false); }
     };
 
+    const menuActions = useDocumentViewMenuActions({
+        tribeId: tribeId!, projectId: projectId!, projectDocumentId: projectDocumentId!,
+        docStatus: doc?.status ?? '', canEdit, isManager,
+        effectivePublicationUrlParamId, publishing, archiving,
+        onPublish: () => setShowPublishConfirm(true), onUnpublish: () => setShowUnpublishConfirm(true), onArchive: () => setShowArchiveConfirm(true),
+    });
+
     if (loading) return <div style={containerStyle}><div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}><ThemedLoadingSpinner size="sm" /></div></div>;
     if (error || !doc) return <div style={containerStyle}><div style={errorStyle}><strong>{t('common.error')}</strong> {error || t('projectDocuments.notFound')}</div></div>;
 
-    const headerActions = <DocumentViewHeaderActions
-        tribeId={tribeId!} projectId={projectId!} projectDocumentId={projectDocumentId!}
-        docStatus={doc.status} canEdit={canEdit} isManager={isManager}
-        effectivePublicationUrlParamId={effectivePublicationUrlParamId} publishing={publishing} archiving={archiving}
-        onPublish={() => setShowPublishConfirm(true)} onUnpublish={() => setShowUnpublishConfirm(true)} onArchive={() => setShowArchiveConfirm(true)}
-    />;
-
     return (
-        <AppLayout breadcrumbs={breadcrumbs} headerActions={headerActions}>
+        <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions}>
             <ThemedSection themeId="main_1">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
                     {doc.status === 'archived' && <ThemedBadge variant="ghost">{t('status.archived')}</ThemedBadge>}

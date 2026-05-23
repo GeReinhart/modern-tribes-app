@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -12,6 +12,7 @@ import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSp
 import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
 import FileUploader from '@/components/common/editor/FileUploader';
 import { AttachmentFile } from '@/types/document.types';
+import { MenuAction } from '@/types/menu.types';
 import { useProjectWithDocument, useProjectWithDocumentMutations } from '@/hooks/useProjects';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
 import { errorStyle, formActionsStyle, formContainerStyle } from '@/styles/theme.styles';
@@ -84,15 +85,12 @@ const EditProjectDocumentPageContent: React.FC = () => {
         );
     }
 
+    const menuActions = useMemo((): MenuAction[] => [
+        { icon: 'x', label: t('common.cancel'), onClick: () => navigate(`/app/tribes/${tribeId}/projects/${projectId}`) },
+    ], [t, navigate, tribeId, projectId]);
+
     return (
-        <AppLayout
-            breadcrumbs={breadcrumbs}
-            headerActions={
-                <ThemedButton variant="secondary" onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}`)}>
-                    {t('common.cancel')}
-                </ThemedButton>
-            }
-        >
+        <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions}>
             {submitting && (
                 <ThemedLoadingOverlay message={t('projects.updatingDocument')} />
             )}

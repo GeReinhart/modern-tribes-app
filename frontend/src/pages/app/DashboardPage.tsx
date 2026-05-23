@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
-import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { themesById } from '@/components/themes/themes';
 import { useVerifyAuthorization } from "@/hooks/userVerifyAuthorization.ts";
+import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
+import { MenuAction } from '@/types/menu.types';
 import DashboardTasksTab from '@/features/dashboard/tabs/DashboardTasksTab';
 import DashboardTribesTab from '@/features/dashboard/tabs/DashboardTribesTab';
 import DashboardBookmarksTab from '@/features/bookmarks/DashboardBookmarksTab';
@@ -27,6 +27,7 @@ const DashboardPageContent: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { data: authorization, error: authorizationError, verifyAuthorization } = useVerifyAuthorization();
+    const { user } = useCurrentUserProfile();
     const [showTabConfig, setShowTabConfig] = useState(false);
 
     const allTabs = useMemo(() => TABS(t).map(({ key, label }) => ({ key, label })), [t]);
@@ -46,29 +47,14 @@ const DashboardPageContent: React.FC = () => {
         });
     }, [verifyAuthorization]);
 
-    const headerActions = (
-        <>
-        {authorization?.authorized && (
-            <ThemedButton onClick={() => navigate('/app/tribes/create')} variant="primary">
-                {t('tribes.createTribe')}
-            </ThemedButton>
-        )}
-
-
-        <ThemedButton
-            requiredPermissions={['admin']}
-            variant="ghost"
-            onClick={() => navigate('/admin')}
-            theme={themesById['main_3']}
-        >
-            {t('common.admin')}
-        </ThemedButton>
-
-        </>
-    );
+    const isAdmin = user?.permissions?.includes('admin') ?? false;
+    const menuActions = useMemo((): MenuAction[] => [
+        ...(authorization?.authorized ? [{ icon: 'plus' as const, label: t('tribes.createTribe'), onClick: () => navigate('/app/tribes/create') }] : []),
+        ...(isAdmin ? [{ icon: 'settings' as const, label: t('common.admin'), onClick: () => navigate('/admin') }] : []),
+    ], [authorization?.authorized, isAdmin, t, navigate]);
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} headerActions={headerActions} bookmarkTitle={t('dashboard.title')}>
+        <AppLayout breadcrumbs={breadcrumbs} breadcrumbTabs={breadcrumbTabs} menuActions={menuActions} bookmarkTitle={t('dashboard.title')}>
 
             {showTabConfig && (
                 <TabConfigPopup
