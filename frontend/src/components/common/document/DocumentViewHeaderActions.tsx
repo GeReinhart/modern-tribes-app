@@ -11,7 +11,7 @@ interface Props {
     docStatus: string;
     canEdit: boolean;
     isManager: boolean;
-    effectivePublicationId: string | null;
+    effectivePublicationUrlParamId: string | null;
     publishing: boolean;
     archiving: boolean;
     onPublish: () => void;
@@ -21,7 +21,7 @@ interface Props {
 
 export const DocumentViewHeaderActions: React.FC<Props> = ({
     tribeId, projectId, projectDocumentId, docStatus,
-    canEdit, isManager, effectivePublicationId,
+    canEdit, isManager, effectivePublicationUrlParamId,
     publishing, archiving, onPublish, onUnpublish, onArchive,
 }) => {
     const { t } = useTranslation();
@@ -40,19 +40,19 @@ export const DocumentViewHeaderActions: React.FC<Props> = ({
                     {t('common.edit')}
                 </ThemedButton>
             )}
-            {isManager && isActive && effectivePublicationId && (
+            {isManager && isActive && effectivePublicationUrlParamId && (
                 <ThemedButton variant="ghost"
-                    onClick={() => navigate(`/public/publications/${effectivePublicationId}`)}
+                    onClick={() => navigate(`/public/publications/${effectivePublicationUrlParamId}`)}
                     style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                     <Globe size={14} />{t('publications.view')}
                 </ThemedButton>
             )}
-            {isManager && isActive && !effectivePublicationId && (
+            {isManager && isActive && !effectivePublicationUrlParamId && (
                 <ThemedButton variant="primary" onClick={onPublish} disabled={publishing}>
                     {t('publications.publish')}
                 </ThemedButton>
             )}
-            {isManager && isActive && effectivePublicationId && (
+            {isManager && isActive && effectivePublicationUrlParamId && (
                 <ThemedButton variant="ghost" onClick={onUnpublish} disabled={publishing}>
                     {t('publications.unpublish')}
                 </ThemedButton>

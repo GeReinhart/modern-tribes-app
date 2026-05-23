@@ -52,7 +52,7 @@ const CreateProjectPageContent: React.FC = () => {
                 document_attachments: attachments,
             });
             if (!result) throw new Error('Failed to create project');
-            navigate(`/app/tribes/${tribeId}/projects/${result.id}`);
+            navigate(`/app/tribes/${tribeId}/projects/${result.url_param_id}`);
         } catch (err: any) {
             setError(err.message || t('validation.errorOccurred'));
         } finally {

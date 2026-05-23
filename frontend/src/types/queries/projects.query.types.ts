@@ -3,6 +3,7 @@ import { PositionEnum } from '@/types/position.types';
 export interface UserProjectEntry {
     user_id: string;
     project_id: string;
+    project_url_param_id: string;
     project_name: string;
     effective_position: PositionEnum;
     via_represents: boolean;
@@ -12,6 +13,7 @@ export interface UserProjectEntry {
 
 export interface ProjectEntry {
     project_id: string;
+    project_url_param_id: string;
     project_name: string;
     /** null when accessed only via represents (no direct path) */
     direct_position: PositionEnum | null;

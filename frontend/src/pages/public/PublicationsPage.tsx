@@ -120,7 +120,7 @@ const PublicationsPageContent: React.FC = () => {
                 )}
                 {publications.map(pub => (
                     <PublicationCard key={pub.id} pub={pub}
-                        onClick={() => navigate(`/public/publications/${pub.id}`)} />
+                        onClick={() => navigate(`/public/publications/${pub.url_param_id}`)} />
                 ))}
             </div>
         </PublicLayout>

@@ -49,3 +49,4 @@ The frontend layout is based on Themes UI. All the elements presented should hav
 ## New page
 
 - When creating a new page, make sure it can be added in the bookmarks
+- Use the front/db mapping of the ids

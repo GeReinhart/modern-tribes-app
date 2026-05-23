@@ -30,6 +30,7 @@ const TribesPageContent: React.FC = () => {
             if (!existing) {
                 map.set(row.tribe_id, {
                     tribe_id: row.tribe_id,
+                    tribe_url_param_id: row.tribe_url_param_id,
                     tribe_name: row.tribe_name,
                     direct_position: row.via_represents ? null : row.position,
                     represented_persons: row.via_represents
@@ -105,7 +106,7 @@ const TribesPageContent: React.FC = () => {
                         <TribeCard
                             key={tribe.tribe_id}
                             tribe={tribe}
-                            onClick={(t) => navigate(`/app/tribes/${t.tribe_id}`)}
+                            onClick={(t) => navigate(`/app/tribes/${t.tribe_url_param_id}`)}
                         />
                     ))}
                 </div>

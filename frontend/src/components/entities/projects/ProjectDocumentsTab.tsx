@@ -153,7 +153,7 @@ export const ProjectDocumentsTab: React.FC<ProjectDocumentsTabProps> = ({
                 <div
                     key={doc.id}
                     style={{ ...cardStyle, marginBottom: '8px' }}
-                    onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}/documents/${doc.id}`)}
+                    onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}/documents/${doc.url_param_id}`)}
                     onMouseEnter={e => {
                         e.currentTarget.style.borderColor = theme.colors.primary;
                         e.currentTarget.style.backgroundColor = `${theme.colors.primary}08`;
@@ -166,7 +166,7 @@ export const ProjectDocumentsTab: React.FC<ProjectDocumentsTabProps> = ({
                     tabIndex={0}
                     onKeyDown={e => {
                         if (e.key === 'Enter') {
-                            navigate(`/app/tribes/${tribeId}/projects/${projectId}/documents/${doc.id}`);
+                            navigate(`/app/tribes/${tribeId}/projects/${projectId}/documents/${doc.url_param_id}`);
                         }
                     }}
                 >
@@ -174,12 +174,12 @@ export const ProjectDocumentsTab: React.FC<ProjectDocumentsTabProps> = ({
                         <ThemedText variant="primary" size="small" style={{ fontWeight: 600, flex: 1 }}>
                             {doc.title}
                         </ThemedText>
-                        {doc.publication_id && (
+                        {doc.publication_url_param_id && (
                             <button
                                 type="button"
                                 onClick={e => {
                                     e.stopPropagation();
-                                    navigate(`/public/publications/${doc.publication_id}`);
+                                    navigate(`/public/publications/${doc.publication_url_param_id}`);
                                 }}
                                 style={{
                                     display: 'inline-flex',

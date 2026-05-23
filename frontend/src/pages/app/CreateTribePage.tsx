@@ -222,7 +222,7 @@ const CreateTribeFormContent: React.FC = () => {
 
             // Navigate after a short delay
             setTimeout(() => {
-                navigate(`/app/tribes/${result.id}`);
+                navigate(`/app/tribes/${result.url_param_id}`);
             }, 2000);
 
         } catch (err) {

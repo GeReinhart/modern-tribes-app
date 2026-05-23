@@ -35,6 +35,7 @@ export interface TribeWithPositionsUpdate {
 
 export interface TribeWithPositionsResponse {
     id: string;
+    url_param_id: string;
     name: string;
     document_id: string;
     document_content_html: string;

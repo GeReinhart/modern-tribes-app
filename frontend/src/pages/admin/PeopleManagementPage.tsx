@@ -187,7 +187,7 @@ const UsersTab: React.FC = () => {
                 const isActing = magicLinkAction?.userId === u.id;
                 return (
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }} onClick={e => e.stopPropagation()}>
-                        <ThemedButton variant="secondary" onClick={() => navigate(`/admin/users/${u.id}/edit`)}>{t('common.edit')}</ThemedButton>
+                        <ThemedButton variant="secondary" onClick={() => navigate(`/admin/users/${u.url_param_id}/edit`)}>{t('common.edit')}</ThemedButton>
                         <ThemedButton variant="danger" onClick={() => crud.openDeleteSingle(u)}>{t('common.delete')}</ThemedButton>
                         <ThemedButton
                             variant="accent"

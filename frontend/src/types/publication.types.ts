@@ -3,6 +3,7 @@ import { AttachmentFile } from './document.types';
 
 export interface PublicationSummary {
     id: string;
+    url_param_id: string;
     document_id: string;
     project_document_id: string;
     title: string;
@@ -13,6 +14,7 @@ export interface PublicationSummary {
 
 export interface PublicationDetail {
     id: string;
+    url_param_id: string;
     document_id: string;
     title: string;
     content_html: string;
@@ -26,6 +28,7 @@ export interface PublicationDetail {
 
 export interface PublicationAdminItem {
     id: string;
+    url_param_id: string;
     document_id: string;
     project_document_id: string;
     title: string;

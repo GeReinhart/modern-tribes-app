@@ -23,8 +23,8 @@ class PublicationService {
 
     // Authenticated endpoints (manager actions on project documents)
 
-    publish(projectId: string, projectDocumentId: string): Promise<{ publication_id: string }> {
-        return apiService.patch<{ publication_id: string }>(
+    publish(projectId: string, projectDocumentId: string): Promise<{ publication_url_param_id: string }> {
+        return apiService.patch<{ publication_url_param_id: string }>(
             `/project-documents/projects/${projectId}/documents/${projectDocumentId}/publish`
         );
     }

@@ -9,12 +9,14 @@ export interface UserPersonPositionTribe {
     person_last_name: string;
     position: PositionEnum;
     tribe_id: string;
+    tribe_url_param_id: string;
     tribe_name: string;
     via_represents: boolean;
 }
 
 export interface TribeEntry {
     tribe_id: string;
+    tribe_url_param_id: string;
     tribe_name: string;
     /** null when accessed only via represents (no direct person membership) */
     direct_position: PositionEnum | null;

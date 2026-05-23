@@ -15,6 +15,7 @@ export interface ProjectWithDocumentUpdate {
 
 export interface ProjectWithDocumentResponse {
     id: string;
+    url_param_id: string;
     name: string;
     document_id: string | null;
     document_content_html: string;

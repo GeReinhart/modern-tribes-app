@@ -38,13 +38,19 @@ const ProjectDocumentViewPageContent: React.FC = () => {
     const [showPublishConfirm, setShowPublishConfirm] = useState(false);
     const [showUnpublishConfirm, setShowUnpublishConfirm] = useState(false);
     const [publishing, setPublishing] = useState(false);
-    const [publicationId, setPublicationId] = useState<string | null | undefined>(undefined);
+    const [publicationUrlParamId, setPublicationUrlParamId] = useState<string | null | undefined>(undefined);
 
     const myProjectPosition = useMemo((): ProjectEntry | null => {
         if (!projectId) return null;
         const rows = tribeProjects.filter(r => r.project_id === projectId);
         if (rows.length === 0) return null;
-        const entry: ProjectEntry = { project_id: projectId, project_name: rows[0].project_name, direct_position: null, represented_persons: [] };
+        const entry: ProjectEntry = {
+            project_id: projectId,
+            project_url_param_id: rows[0].project_url_param_id,
+            project_name: rows[0].project_name,
+            direct_position: null,
+            represented_persons: [],
+        };
         for (const r of rows) {
             if (!r.via_represents) entry.direct_position = r.effective_position;
             else if (r.person_first_name && r.person_last_name) entry.represented_persons.push({ first_name: r.person_first_name, last_name: r.person_last_name, position: r.effective_position });
@@ -68,12 +74,12 @@ const ProjectDocumentViewPageContent: React.FC = () => {
         { label: doc?.title || t('common.loading') },
     ], [tribe?.name, project?.name, doc?.title, tribeId, projectId, t]);
 
-    const effectivePublicationId = publicationId !== undefined ? publicationId : (doc?.publication_id ?? null);
+    const effectivePublicationUrlParamId = publicationUrlParamId !== undefined ? publicationUrlParamId : (doc?.publication_url_param_id ?? null);
 
     const handlePublish = async () => {
         if (!projectId || !projectDocumentId) return;
         setPublishing(true);
-        try { const r = await publicationService.publish(projectId, projectDocumentId); setPublicationId(r.publication_id); }
+        try { const r = await publicationService.publish(projectId, projectDocumentId); setPublicationUrlParamId(r.publication_url_param_id); }
         catch (e) { console.error(e); }
         finally { setPublishing(false); setShowPublishConfirm(false); }
     };
@@ -81,7 +87,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
     const handleUnpublish = async () => {
         if (!projectId || !projectDocumentId) return;
         setPublishing(true);
-        try { await publicationService.unpublish(projectId, projectDocumentId); setPublicationId(null); }
+        try { await publicationService.unpublish(projectId, projectDocumentId); setPublicationUrlParamId(null); }
         catch (e) { console.error(e); }
         finally { setPublishing(false); setShowUnpublishConfirm(false); }
     };
@@ -100,7 +106,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
     const headerActions = <DocumentViewHeaderActions
         tribeId={tribeId!} projectId={projectId!} projectDocumentId={projectDocumentId!}
         docStatus={doc.status} canEdit={canEdit} isManager={isManager}
-        effectivePublicationId={effectivePublicationId} publishing={publishing} archiving={archiving}
+        effectivePublicationUrlParamId={effectivePublicationUrlParamId} publishing={publishing} archiving={archiving}
         onPublish={() => setShowPublishConfirm(true)} onUnpublish={() => setShowUnpublishConfirm(true)} onArchive={() => setShowArchiveConfirm(true)}
     />;
 
@@ -109,8 +115,8 @@ const ProjectDocumentViewPageContent: React.FC = () => {
             <ThemedSection themeId="main_1">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
                     {doc.status === 'archived' && <ThemedBadge variant="ghost">{t('status.archived')}</ThemedBadge>}
-                    {effectivePublicationId && (
-                        <button type="button" onClick={() => navigate(`/public/publications/${effectivePublicationId}`)}
+                    {effectivePublicationUrlParamId && (
+                        <button type="button" onClick={() => navigate(`/public/publications/${effectivePublicationUrlParamId}`)}
                             style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '3px 10px', borderRadius: '12px', fontSize: 'var(--font-xs)', fontWeight: 600, backgroundColor: `${theme.colors.primary}15`, color: theme.colors.primary, border: `1px solid ${theme.colors.primary}40`, cursor: 'pointer' }}>
                             <Globe size={12} />{t('publications.published')}
                         </button>
