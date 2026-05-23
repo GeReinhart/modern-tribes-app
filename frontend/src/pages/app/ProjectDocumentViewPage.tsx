@@ -42,7 +42,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
 
     const myProjectPosition = useMemo((): ProjectEntry | null => {
         if (!projectId) return null;
-        const rows = tribeProjects.filter(r => r.project_id === projectId);
+        const rows = tribeProjects.filter(r => r.project_url_param_id === projectId);
         if (rows.length === 0) return null;
         const entry: ProjectEntry = {
             project_id: projectId,
@@ -62,10 +62,12 @@ const ProjectDocumentViewPageContent: React.FC = () => {
         myProjectPosition.direct_position === 'manager' || myProjectPosition.represented_persons.some(p => p.position === 'manager'),
     [myProjectPosition]);
 
-    const canEdit = useMemo(() => !myProjectPosition ? false :
-        [myProjectPosition.direct_position, ...myProjectPosition.represented_persons.map(p => p.position)]
-            .filter(Boolean).some(p => p === 'manager' || p === 'member'),
-    [myProjectPosition]);
+    const canEdit = useMemo(() => {
+        if (user?.permissions?.includes('admin')) return true;
+        if (!myProjectPosition) return false;
+        return [myProjectPosition.direct_position, ...myProjectPosition.represented_persons.map(p => p.position)]
+            .filter(Boolean).some(p => p === 'manager' || p === 'member');
+    }, [myProjectPosition, user]);
 
     const breadcrumbs = useMemo(() => [
         { label: t('common.home'), path: '/app' }, { label: t('tribes.title'), path: '/app/tribes' },
