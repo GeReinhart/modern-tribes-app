@@ -17,13 +17,14 @@ import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
 import { useProjectFeatures, useFeatureTypes } from '@/hooks/useProjectFeatures';
 import { getFeatureComponent } from '@/features/registry';
 import { errorStyle, containerStyle } from '@/styles/theme.styles';
-import { Paperclip, Download, FileText, Image, Film, Music, File, Settings } from 'lucide-react';
+import { Paperclip, Download, FileText, Image, Film, Music, File } from 'lucide-react';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { AttachmentFile } from '@/types/document.types';
 import { ProjectEntry } from '@/types/queries/projects.query.types';
 import { ProjectDocumentsTab } from '@/components/entities/projects/ProjectDocumentsTab';
 import { useTabConfig } from '@/features/tab-config/useTabConfig';
 import { TabConfigPopup } from '@/features/tab-config/TabConfigPopup';
+import { TabConfigButton } from '@/features/tab-config/TabConfigButton';
 
 const getPositionVariant = (position: string): 'primary' | 'accent' | 'ghost' => {
     if (position === 'manager') return 'accent';
@@ -296,15 +297,7 @@ const ShowProjectPageContent: React.FC = () => {
                     tabs={visibleTabs}
                     activeTab={activeTab}
                     onTabChange={handleTabChange}
-                    configButton={isManager ? (
-                        <button
-                            onClick={() => setShowTabConfig(true)}
-                            title={t('tabConfig.configure')}
-                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.secondary, display: 'flex', alignItems: 'center', padding: '4px' }}
-                        >
-                            <Settings size={16} />
-                        </button>
-                    ) : undefined}
+                    configButton={<TabConfigButton onClick={() => setShowTabConfig(true)} />}
                 />
 
                 <div style={{ paddingTop: '16px' }}>
