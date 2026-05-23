@@ -58,6 +58,7 @@ class TodoLabelCreate(BaseModel):
 
 class TodoLabelUpdate(BaseModel):
     name: Optional[str] = None
+    color: Optional[str] = None
 
 
 class PersonOption(BaseModel):

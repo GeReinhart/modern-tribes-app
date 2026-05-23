@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
@@ -13,9 +13,9 @@ import DashboardBookmarksTab from '@/features/bookmarks/DashboardBookmarksTab';
 import { ThemedCard } from "@/components/common/layout/ThemedCard.tsx";
 import { errorStyle } from "@/styles/theme.styles.tsx";
 import { useUrlTab } from '@/hooks/useUrlTab';
-import { Settings } from 'lucide-react';
 import { useTabConfig } from '@/features/tab-config/useTabConfig';
 import { TabConfigPopup } from '@/features/tab-config/TabConfigPopup';
+import { TabConfigButton } from '@/features/tab-config/TabConfigButton';
 
 const TABS = (t: (k: string) => string) => [
     { key: 'tasks', label: t('dashboard.tabs.tasks'), Component: DashboardTasksTab },
@@ -25,7 +25,6 @@ const TABS = (t: (k: string) => string) => [
 
 const DashboardPageContent: React.FC = () => {
     const { t } = useTranslation();
-    const { theme } = useTheme();
     const navigate = useNavigate();
     const { data: authorization, error: authorizationError, verifyAuthorization } = useVerifyAuthorization();
     const [showTabConfig, setShowTabConfig] = useState(false);
@@ -92,15 +91,7 @@ const DashboardPageContent: React.FC = () => {
                 tabs={visibleTabs}
                 activeTab={activeTab}
                 onTabChange={handleTabChange}
-                configButton={
-                    <button
-                        onClick={() => setShowTabConfig(true)}
-                        title={t('tabConfig.configure')}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.colors.secondary, display: 'flex', alignItems: 'center', padding: '4px' }}
-                    >
-                        <Settings size={16} />
-                    </button>
-                }
+                configButton={<TabConfigButton onClick={() => setShowTabConfig(true)} />}
             />
             <ActiveComponent />
         </AppLayout>

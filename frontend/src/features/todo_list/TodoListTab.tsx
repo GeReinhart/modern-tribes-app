@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
-import { Tag, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import { useTodoList } from './hooks';
 import TodoRow from './TodoRow';
+import { LabelBar } from '@/components/common/form/LabelBar';
 
 interface Props {
     featureInstanceId: string;
@@ -24,16 +25,12 @@ const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, a
     const [showArchived, setShowArchived] = useState(false);
     const [filterLabelId, setFilterLabelId] = useState<string | null>(null);
     const [filterPersonId, setFilterPersonId] = useState<string | null>(null);
-    const [hoveredLabelId, setHoveredLabelId] = useState<string | null>(null);
-    const [renamingLabelId, setRenamingLabelId] = useState<string | null>(null);
-    const [renameLabelValue, setRenameLabelValue] = useState('');
     const addInputRef = useRef<HTMLInputElement>(null);
 
     const activeItems = items.filter(i => i.status !== 'archived');
     const archivedCount = items.filter(i => i.status === 'archived').length;
 
     const activeItemLabelIds = new Set(activeItems.flatMap(i => i.label_ids));
-    const visibleLabels = labels.filter(l => activeItemLabelIds.has(l.id));
     const assignedPersons = persons.filter(p => activeItems.some(i => i.assigned_person_id === p.id));
 
     useEffect(() => {
@@ -55,14 +52,6 @@ const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, a
         setTimeout(() => addInputRef.current?.focus(), 0);
     };
 
-    const handleRenameLabel = async (labelId: string) => {
-        const name = renameLabelValue.trim();
-        const original = labels.find(l => l.id === labelId)?.name;
-        if (name && name !== original) await updateLabel(labelId, { name });
-        setRenamingLabelId(null);
-        setRenameLabelValue('');
-    };
-
     return (
         <div>
             {error && <div style={{ padding: '8px 12px', marginBottom: '12px', color: theme.colors.danger, fontSize: 'var(--font-sm)' }}>{error}</div>}
@@ -71,46 +60,15 @@ const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, a
             <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
                 {/* Left: label row + person row */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
-                        {visibleLabels.length > 0 && (
-                            <>
-                                <Tag size={14} color={theme.colors.secondary} />
-                                {visibleLabels.map(label => {
-                                    const active = filterLabelId === label.id;
-                                    if (renamingLabelId === label.id) {
-                                        return (
-                                            <input key={label.id} autoFocus value={renameLabelValue}
-                                                onChange={e => setRenameLabelValue(e.target.value)}
-                                                onKeyDown={e => { if (e.key === 'Enter') handleRenameLabel(label.id); if (e.key === 'Escape') { setRenamingLabelId(null); setRenameLabelValue(''); } }}
-                                                onBlur={() => handleRenameLabel(label.id)}
-                                                style={{ padding: '3px 8px', borderRadius: '12px', fontSize: 'var(--font-xs)', border: `1px solid ${label.color}`, backgroundColor: theme.colors.surface, color: theme.colors.text, width: '100px', outline: 'none' }} />
-                                        );
-                                    }
-                                    return (
-                                        <div key={label.id} style={{ display: 'flex', alignItems: 'center', gap: '2px' }}
-                                            onMouseEnter={() => setHoveredLabelId(label.id)} onMouseLeave={() => setHoveredLabelId(null)}>
-                                            <button type="button" onClick={() => setFilterLabelId(prev => prev === label.id ? null : label.id)}
-                                                style={{ padding: '4px 12px', borderRadius: '16px', fontSize: 'var(--font-xs)', fontWeight: active ? 700 : 500, cursor: 'pointer', border: `1px solid ${label.color}`, backgroundColor: active ? `${label.color}20` : 'transparent', color: label.color, transition: 'all 0.15s', whiteSpace: 'nowrap' }}>
-                                                {label.name}
-                                            </button>
-                                            {isManager && hoveredLabelId === label.id && (
-                                                <>
-                                                    <button type="button" title={t('features.kanban.renameLabel')} onClick={() => { setRenamingLabelId(label.id); setRenameLabelValue(label.name); }}
-                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center', opacity: 0.6 }}>
-                                                        <ThemedSvgIcon name="pencil" color={theme.colors.secondary} size={12} />
-                                                    </button>
-                                                    <button type="button" onClick={() => deleteLabel(label.id)}
-                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center', opacity: 0.6 }}>
-                                                        <ThemedSvgIcon name="x" color={theme.colors.danger} size={12} />
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </>
-                        )}
-                    </div>
+                    <LabelBar
+                        labels={labels}
+                        activeLabelIds={activeItemLabelIds}
+                        filterLabelId={filterLabelId}
+                        onFilter={setFilterLabelId}
+                        isManager={isManager}
+                        onUpdate={updateLabel}
+                        onDelete={deleteLabel}
+                    />
                     {assignedPersons.length > 0 && (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
                             <User size={14} color={theme.colors.primary} />

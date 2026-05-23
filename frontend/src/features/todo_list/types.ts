@@ -16,6 +16,7 @@ export interface TodoLabelCreate {
 
 export interface TodoLabelUpdate {
     name?: string;
+    color?: string;
 }
 
 export interface TodoItem {

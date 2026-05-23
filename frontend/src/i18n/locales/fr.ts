@@ -447,6 +447,9 @@ const fr: Record<string, string> = {
     'about.features': 'Fonctionnalités',
     'about.platform': 'Plateforme',
     'about.application': 'Modules applicatifs',
+
+    'labels.edit': 'Modifier le label',
+    'labels.delete': 'Supprimer le label',
 };
 
 export default fr;

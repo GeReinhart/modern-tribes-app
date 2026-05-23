@@ -447,6 +447,9 @@ const en: Record<string, string> = {
     'about.features': 'Features',
     'about.platform': 'Platform',
     'about.application': 'Application modules',
+
+    'labels.edit': 'Edit label',
+    'labels.delete': 'Delete label',
 };
 
 export default en;
