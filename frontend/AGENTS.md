@@ -38,7 +38,9 @@ The frontend layout is based on Themes UI. All the elements presented should hav
 
 ## Layout
 
-- When there are some tabs in a page, we can access to the tab through the url and bread crump. Link in the project page.
+- When there are some tabs in a page, we can access to the tab through the url and bread crump as if it's some subpages. 
+   - use `@/hooks/useUrlTab` 
+   - like in DashBoradPage.tsx, ShowTribePage.tsx
 
 ## Enum
 

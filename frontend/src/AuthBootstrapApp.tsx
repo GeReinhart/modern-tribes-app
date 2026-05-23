@@ -83,6 +83,7 @@ function AuthBootstrapApp() {
                             <Route path="/app/tribes" element={<TribesPage/>}/>
                             <Route path="/app/tribes/create" element={<CreateTribeForm/>}/>
                             <Route path="/app/tribes/:tribeId" element={<ShowTribePage/>}/>
+                            <Route path="/app/tribes/:tribeId/:tab" element={<ShowTribePage/>}/>
                             <Route path="/app/tribes/:tribeId/update" element={<UpdateTribePage/>}/>
                             <Route path="/app/tribes/:tribeId/projects/new" element={<CreateProjectPage/>}/>
                             <Route path="/app/tribes/:tribeId/projects/:projectId" element={<ShowProjectPage/>}/>

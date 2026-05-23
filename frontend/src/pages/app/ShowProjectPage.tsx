@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useUrlTab } from '@/hooks/useUrlTab';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedText } from '@/components/common/layout/ThemedText';
@@ -123,7 +124,7 @@ const ShowProjectPageContent: React.FC = () => {
     const { t } = useTranslation();
     const { theme } = useTheme();
     const navigate = useNavigate();
-    const { tribeId, projectId, tab } = useParams<{ tribeId: string; projectId: string; tab?: string }>();
+    const { tribeId, projectId } = useParams<{ tribeId: string; projectId: string }>();
     const [searchParams] = useSearchParams();
 
     const { user } = useCurrentUserProfile();
@@ -136,7 +137,6 @@ const ShowProjectPageContent: React.FC = () => {
     );
     const { features, createFeature, renameFeature, archiveFeature } = useProjectFeatures(projectId || null);
 
-    const activeTab = tab || 'description';
     const initialLabelId = searchParams.get('labelId') || null;
     const [showAddFeature, setShowAddFeature] = useState(false);
     const [archiveTarget, setArchiveTarget] = useState<{ id: string; name: string } | null>(null);
@@ -194,9 +194,8 @@ const ShowProjectPageContent: React.FC = () => {
         return [...base, ...featureTabs];
     }, [features, t]);
 
-    const handleTabChange = (key: string) => {
-        navigate(`/app/tribes/${tribeId}/projects/${projectId}/${key}`);
-    };
+    const basePath = `/app/tribes/${tribeId ?? ''}/projects/${projectId ?? ''}`;
+    const { activeTab, breadcrumbTabs, handleTabChange } = useUrlTab(tabs, basePath);
 
     const activeTabLabel = tabs.find(t => t.key === activeTab)?.label || '';
 
@@ -207,13 +206,6 @@ const ShowProjectPageContent: React.FC = () => {
         { label: project?.name || t('common.loading'), path: `/app/tribes/${tribeId}/projects/${projectId}` },
         { label: activeTabLabel || t('common.loading') },
     ], [tribe?.name, project?.name, tribeId, projectId, activeTabLabel, t]);
-
-    const breadcrumbTabs = useMemo(() => tabs.map(t => ({
-        key: t.key,
-        label: t.label,
-        path: `/app/tribes/${tribeId}/projects/${projectId}/${t.key}`,
-        isActive: t.key === activeTab,
-    })), [tabs, tribeId, projectId, activeTab]);
 
     const attachmentCardStyle: React.CSSProperties = {
         padding: '12px 16px',

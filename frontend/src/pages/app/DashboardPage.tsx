@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo} from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
@@ -11,6 +11,7 @@ import DashboardTasksTab from '@/features/dashboard/tabs/DashboardTasksTab';
 import DashboardTribesTab from '@/features/dashboard/tabs/DashboardTribesTab';
 import {ThemedCard} from "@/components/common/layout/ThemedCard.tsx";
 import {errorStyle} from "@/styles/theme.styles.tsx";
+import { useUrlTab } from '@/hooks/useUrlTab';
 
 const TABS = (t: (k: string) => string) => [
     { key: 'tasks', label: t('dashboard.tabs.tasks'), Component: DashboardTasksTab },
@@ -20,11 +21,10 @@ const TABS = (t: (k: string) => string) => [
 const DashboardPageContent: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { tab } = useParams<{ tab?: string }>();
     const { data: authorization, error: authorizationError, verifyAuthorization } = useVerifyAuthorization();
 
     const tabs = useMemo(() => TABS(t), [t]);
-    const activeTab = tab && tabs.find(tb => tb.key === tab) ? tab : tabs[0].key;
+    const { activeTab, breadcrumbTabs, handleTabChange } = useUrlTab(tabs, '/app/dashboard');
     const ActiveComponent = tabs.find(tb => tb.key === activeTab)?.Component ?? DashboardTasksTab;
 
     const breadcrumbs = useMemo(() => [
@@ -32,21 +32,12 @@ const DashboardPageContent: React.FC = () => {
         { label: t('dashboard.title') },
     ], [t]);
 
-    const breadcrumbTabs = useMemo(() => tabs.map(tb => ({
-        key: tb.key,
-        label: tb.label,
-        path: `/app/dashboard/${tb.key}`,
-        isActive: tb.key === activeTab,
-    })), [tabs, activeTab]);
-
     // Check authorization
     useEffect(() => {
         verifyAuthorization(['admin','can_create_own_tribes']).catch((err) => {
             console.error('Authorization check failed:', err);
         });
     }, [verifyAuthorization]);
-
-    const handleTabChange = (key: string) => navigate(`/app/dashboard/${key}`);
 
     const headerActions = (
         <>
