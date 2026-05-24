@@ -118,6 +118,10 @@ const ProjectDocumentFormPageContent: React.FC = () => {
         ? `/app/tribes/${tribeId}/projects/${projectId}/documents/${projectDocumentId}`
         : `/app/tribes/${tribeId}/projects/${projectId}`;
 
+    const menuActions = useMemo((): MenuAction[] => [
+        { icon: 'x', label: t('common.cancel'), onClick: () => navigate(cancelPath) },
+    ], [t, navigate, cancelPath]);
+
     if (isEdit && loadingDoc) {
         return (
             <AppLayout breadcrumbs={breadcrumbs}>
@@ -151,10 +155,6 @@ const ProjectDocumentFormPageContent: React.FC = () => {
         boxSizing: 'border-box',
         outline: 'none',
     };
-
-    const menuActions = useMemo((): MenuAction[] => [
-        { icon: 'x', label: t('common.cancel'), onClick: () => navigate(cancelPath) },
-    ], [t, navigate, cancelPath]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions}>

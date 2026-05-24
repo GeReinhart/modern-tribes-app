@@ -37,6 +37,8 @@ import {PublicationsPage} from "@/pages/public/PublicationsPage.tsx";
 import {PublicationDetailPage} from "@/pages/public/PublicationDetailPage.tsx";
 import DashboardPage from "@/pages/app/DashboardPage.tsx";
 import { BookmarksProvider } from '@/features/bookmarks/BookmarksContext';
+import { NotificationsPoller } from '@/components/notifications/NotificationsPoller';
+import { NotificationsAdminPage } from '@/pages/admin/notifications/NotificationsAdminPage';
 
 function AuthBootstrapApp() {
     return (
@@ -51,6 +53,7 @@ function AuthBootstrapApp() {
                     <AppConfigProvider>
                     <UserProfileProvider>
                     <BookmarksProvider>
+                    <NotificationsPoller />
                     <Routes>
                         <Route path="/auth/login" element={<Login/>}/>
                         <Route path="/auth/verify" element={<Verify/>}/>
@@ -78,6 +81,7 @@ function AuthBootstrapApp() {
                                 <Route path="/admin/monitoring/documents/:documentId/updated_at/:date" element={<DocumentRevisionsPage/>}/>
                                 <Route path="/admin/mails" element={<MailsPage/>}/>
                                 <Route path="/admin/publications" element={<PublicationsAdminPage/>}/>
+                                <Route path="/admin/notifications" element={<NotificationsAdminPage/>}/>
 
                             <Route path="/app" element={<Navigate to="/app/dashboard" replace/>}/>
                             <Route path="/app/dashboard" element={<Navigate to="/app/dashboard/tasks" replace/>}/>

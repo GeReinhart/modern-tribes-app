@@ -92,6 +92,7 @@ class DatabaseInitializer:
 
     async def clear_tables(self):
         tables = [
+            "notifications",
             "publications",
             "projects_documents",
             "todo_items",
@@ -443,6 +444,30 @@ class DatabaseInitializer:
         print(f"✓ Created {count} represents relations")
         return count
 
+    async def create_notifications(self, user_ids: Dict[str, str]) -> int:
+        rows = self.load_csv("notifications.csv")
+        count = 0
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                if row["target_user_login"] not in user_ids:
+                    print(f"✗ Unknown user '{row['target_user_login']}' in notifications.csv")
+                    sys.exit(1)
+                sent_at_raw = row.get("sent_at") or ""
+                sent_at = datetime.fromisoformat(sent_at_raw).replace(tzinfo=timezone.utc) if sent_at_raw else None
+                await conn.execute(
+                    """INSERT INTO notifications
+                       (url_param_id, target_user_id, message, sent_at, notification_status)
+                       VALUES ($1, $2, $3, $4, $5)""",
+                    _generate_url_param_id(),
+                    user_ids[row["target_user_login"]],
+                    row["message"],
+                    sent_at,
+                    row.get("notification_status") or "planned",
+                )
+                count += 1
+        print(f"✓ Created {count} notifications")
+        return count
+
     async def create_app_config(self) -> None:
         async with self.pool.acquire() as conn:
             await conn.execute("""
@@ -480,6 +505,7 @@ class DatabaseInitializer:
             mail_ids = await self.create_mails()
             mails_to_count = await self.create_mails_to(mail_ids, user_ids)
             represents_count = await self.create_represents(person_ids, user_ids)
+            notifications_count = await self.create_notifications(user_ids)
             await self.create_app_config()
 
             print("\n✅ Database initialization completed successfully!\n")
@@ -499,6 +525,7 @@ class DatabaseInitializer:
             print(f"   • Mails:                    {len(mail_ids)}")
             print(f"   • Mail recipients:          {mails_to_count}")
             print(f"   • Represents relations:     {represents_count}")
+            print(f"   • Notifications:            {notifications_count}")
 
         except Exception as e:
             print(f"\n✗ Error during initialization: {e}")

@@ -438,6 +438,24 @@ CREATE INDEX IF NOT EXISTS idx_kanban_cards_feature_instance ON kanban_cards(fea
 CREATE INDEX IF NOT EXISTS idx_kanban_cards_column ON kanban_cards(column_id);
 CREATE INDEX IF NOT EXISTS idx_kanban_cards_parent ON kanban_cards(parent_card_id);
 
+-- Notifications table (migration 011)
+CREATE TABLE IF NOT EXISTS notifications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    url_param_id VARCHAR(12) UNIQUE NOT NULL,
+    target_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    message TEXT NOT NULL,
+    sent_at TIMESTAMP WITH TIME ZONE NULL,
+    notification_status VARCHAR(20) NOT NULL DEFAULT 'planned'
+        CHECK (notification_status IN ('planned', 'sent', 'failed')),
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_notifications_target_status ON notifications(target_user_id, notification_status);
+
 -- updated_at triggers
 CREATE OR REPLACE TRIGGER update_permissions_updated_at BEFORE UPDATE ON permissions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE OR REPLACE TRIGGER update_roles_updated_at BEFORE UPDATE ON roles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -457,6 +475,7 @@ CREATE OR REPLACE TRIGGER update_projects_documents_updated_at BEFORE UPDATE ON 
 CREATE OR REPLACE TRIGGER update_publications_updated_at BEFORE UPDATE ON publications FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE OR REPLACE TRIGGER update_kanban_columns_updated_at BEFORE UPDATE ON kanban_columns FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE OR REPLACE TRIGGER update_kanban_cards_updated_at BEFORE UPDATE ON kanban_cards FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_notifications_updated_at BEFORE UPDATE ON notifications FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- User tab configs table (migration 007)
 CREATE TABLE IF NOT EXISTS user_tab_configs (

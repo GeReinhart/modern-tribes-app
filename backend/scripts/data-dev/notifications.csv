@@ -1,0 +1,4 @@
+target_user_login,message,notification_status,sent_at
+user1,Welcome to Modern Tribes! Your account is ready.,sent,2026-05-25T09:00:00
+user1,Reminder: project review meeting tomorrow at 10am.,planned,
+user2,Your document has been published successfully.,sent,2026-05-25T10:30:00

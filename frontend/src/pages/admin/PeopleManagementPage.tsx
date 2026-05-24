@@ -30,6 +30,8 @@ import { StatusBadge } from '@/components/common/layout/StatusBadge';
 
 import { useCrudPage } from '@/hooks/useCrudPage';
 import { userService } from '@/services/user.service';
+import { SendNotificationModal } from '@/pages/admin/notifications/SendNotificationModal';
+import { UserSearchResult } from '@/types/notification.types';
 
 // ─── Users Tab ───────────────────────────────────────────────────────────────
 
@@ -55,6 +57,7 @@ const UsersTab: React.FC = () => {
     const [magicLinkAction, setMagicLinkAction] = useState<{ userId: string; type: 'send' | 'generate' } | null>(null);
     const [sendFeedback, setSendFeedback] = useState<{ success: boolean; message: string } | null>(null);
     const [copied, setCopied] = useState(false);
+    const [notificationModalUser, setNotificationModalUser] = useState<UserSearchResult | null>(null);
 
     const handleSendMagicLink = useCallback(async (user: UserWithRolesAndPermissions) => {
         setMagicLinkAction({ userId: user.id, type: 'send' });
@@ -186,7 +189,7 @@ const UsersTab: React.FC = () => {
             render: (u: UserWithRolesAndPermissions) => {
                 const isActing = magicLinkAction?.userId === u.id;
                 return (
-                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }} onClick={e => e.stopPropagation()}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }} onClick={e => e.stopPropagation()}>
                         <ThemedButton variant="secondary" onClick={() => navigate(`/admin/users/${u.url_param_id}/edit`)}>{t('common.edit')}</ThemedButton>
                         <ThemedButton variant="danger" onClick={() => crud.openDeleteSingle(u)}>{t('common.delete')}</ThemedButton>
                         <ThemedButton
@@ -204,6 +207,18 @@ const UsersTab: React.FC = () => {
                             onClick={() => handleGenerateMagicLink(u)}
                         >
                             {t('admin.people.generateMagicLink')}
+                        </ThemedButton>
+                        <ThemedButton
+                            variant="secondary"
+                            onClick={() => setNotificationModalUser({
+                                id: u.id,
+                                url_param_id: u.url_param_id,
+                                login: u.login,
+                                email: u.email,
+                                full_name: (u.person_id ? getPersonName(u.person_id) : null) ?? u.login,
+                            })}
+                        >
+                            {t('admin.people.sendNotification')}
                         </ThemedButton>
                     </div>
                 );
@@ -269,6 +284,19 @@ const UsersTab: React.FC = () => {
                 confirmText={t('common.delete')}
                 variant="danger"
                 isLoading={mutationLoading}
+            />
+            <SendNotificationModal
+                user={notificationModalUser}
+                onClose={() => setNotificationModalUser(null)}
+                onSuccess={name => {
+                    setNotificationModalUser(null);
+                    setSendFeedback({ success: true, message: t('admin.notifications.success', { name }) });
+                    setTimeout(() => setSendFeedback(null), 4000);
+                }}
+                onError={() => {
+                    setSendFeedback({ success: false, message: t('admin.notifications.error') });
+                    setTimeout(() => setSendFeedback(null), 6000);
+                }}
             />
             <ThemedModal
                 isOpen={magicLinkModal.isOpen}

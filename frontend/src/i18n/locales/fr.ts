@@ -141,6 +141,7 @@ const fr: Record<string, string> = {
     'admin.people.magicLinkWarning': 'Ce lien donne un accès direct au compte. Partagez-le de manière sécurisée et uniquement avec l\'utilisateur concerné.',
     'admin.people.copyLink': 'Copier le lien',
     'admin.people.copied': 'Copié !',
+    'admin.people.sendNotification': 'Envoyer une notification',
     'admin.editUser': "Modifier l'utilisateur",
     'admin.userNotFound': 'Utilisateur introuvable',
     'admin.editTribe': 'Modifier la tribu',
@@ -452,6 +453,19 @@ const fr: Record<string, string> = {
 
     'labels.edit': 'Modifier le label',
     'labels.delete': 'Supprimer le label',
+    'admin.notifications': 'Notifications',
+    'admin.notifications.title': 'Notifications',
+    'admin.notifications.subtitle': 'Envoyer des notifications aux utilisateurs',
+    'admin.notifications.searchPlaceholder': 'Rechercher des utilisateurs…',
+    'admin.notifications.name': 'Nom',
+    'admin.notifications.email': 'Email',
+    'admin.notifications.sendAction': 'Envoyer une notification',
+    'admin.notifications.modalTitle': 'Envoyer une notification à {{name}}',
+    'admin.notifications.messagePlaceholder': 'Saisissez votre message…',
+    'admin.notifications.send': 'Envoyer',
+    'admin.notifications.success': 'Notification programmée pour {{name}}',
+    'admin.notifications.error': 'Échec de l\'envoi de la notification',
+    'admin.notifications.noResults': 'Aucun utilisateur trouvé. Tapez pour rechercher.',
 };
 
 export default fr;

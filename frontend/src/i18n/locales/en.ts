@@ -141,6 +141,7 @@ const en: Record<string, string> = {
     'admin.people.magicLinkWarning': 'This link gives direct access to the account. Share it securely and only with the intended user.',
     'admin.people.copyLink': 'Copy Link',
     'admin.people.copied': 'Copied!',
+    'admin.people.sendNotification': 'Send notification',
     'admin.editUser': 'Edit User',
     'admin.userNotFound': 'User not found',
     'admin.editTribe': 'Edit Tribe',
@@ -452,6 +453,19 @@ const en: Record<string, string> = {
 
     'labels.edit': 'Edit label',
     'labels.delete': 'Delete label',
+    'admin.notifications': 'Notifications',
+    'admin.notifications.title': 'Notifications',
+    'admin.notifications.subtitle': 'Send notifications to users',
+    'admin.notifications.searchPlaceholder': 'Search users…',
+    'admin.notifications.name': 'Name',
+    'admin.notifications.email': 'Email',
+    'admin.notifications.sendAction': 'Send notification',
+    'admin.notifications.modalTitle': 'Send notification to {{name}}',
+    'admin.notifications.messagePlaceholder': 'Enter your message…',
+    'admin.notifications.send': 'Send',
+    'admin.notifications.success': 'Notification queued for {{name}}',
+    'admin.notifications.error': 'Failed to send notification',
+    'admin.notifications.noResults': 'No users found. Type to search.',
 };
 
 export default en;

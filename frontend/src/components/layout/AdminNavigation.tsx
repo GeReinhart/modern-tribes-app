@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemedSvgIcon, IconName } from '@/components/common/icons/ThemedSvgIcon';
 
-type AdminPage = 'authorization' | 'tribes' | 'documents' | 'monitoring' | 'mails' | 'people' | 'config' | 'features' | 'publications';
+type AdminPage = 'authorization' | 'tribes' | 'documents' | 'monitoring' | 'mails' | 'people' | 'config' | 'features' | 'publications' | 'notifications';
 
 interface AdminNavigationProps {
     currentPage: AdminPage;
@@ -22,7 +22,8 @@ const items: Array<{ page: AdminPage | 'app'; icon: IconName; labelKey: string; 
     { page: 'documents',     icon: 'file-text',     labelKey: 'admin.documents',    path: '/admin/documents' },
     { page: 'config',        icon: 'settings',      labelKey: 'admin.config',       path: '/admin/config' },
     { page: 'features',      icon: 'plus',          labelKey: 'admin.features',     path: '/admin/features' },
-    { page: 'publications',  icon: 'upload',        labelKey: 'publications.title', path: '/admin/publications' },
+    { page: 'publications',  icon: 'upload',        labelKey: 'publications.title',    path: '/admin/publications' },
+    { page: 'notifications', icon: 'bell',          labelKey: 'admin.notifications',   path: '/admin/notifications' },
 ];
 
 export const AdminNavigation: React.FC<AdminNavigationProps> = ({ currentPage }) => {
@@ -31,7 +32,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({ currentPage })
     const { theme } = useTheme();
 
     return (
-        <div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)' }}>
             {items.map(({ page, icon, labelKey, path }) => {
                 const isActive = page === currentPage;
                 const color = isActive ? theme.colors.primary : theme.colors.text;

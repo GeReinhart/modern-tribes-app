@@ -81,3 +81,27 @@ async def get_users_with_roles_and_permissions(pool) -> list[dict]:
             """
         )
     return [row_with_json_to_dict(row) for row in rows]
+
+
+async def search_users(pool, q: str, limit: int = 50) -> list[dict]:
+    pattern = f"%{q}%"
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT u.id, u.url_param_id, u.login, u.email,
+                   COALESCE(p.first_name || ' ' || p.last_name, u.login) AS full_name
+            FROM users u
+            LEFT JOIN persons p ON u.person_id = p.id
+            WHERE u.status = 'active'
+              AND (
+                  u.login ILIKE $1
+                  OR u.email ILIKE $1
+                  OR (p.first_name || ' ' || p.last_name) ILIKE $1
+              )
+            ORDER BY COALESCE(p.first_name || ' ' || p.last_name, u.login)
+            LIMIT $2
+            """,
+            pattern,
+            limit,
+        )
+        return [dict(r) for r in rows]

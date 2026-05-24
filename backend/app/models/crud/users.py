@@ -50,6 +50,14 @@ class User(UserBase):
     )
 
 
+class UserSearchResult(BaseModel):
+    id: str
+    url_param_id: str
+    login: str
+    email: str
+    full_name: str
+
+
 class UserWithRoles(User):
     roles: Optional[List[Role]] = []
     permissions: Optional[List[str]] = []
