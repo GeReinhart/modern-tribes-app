@@ -9,6 +9,7 @@ fi
 COMMIT_MSG="$1"
 FEATURE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 BACKEND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../backend" && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "==> Committing on $FEATURE_BRANCH..."
 git add -A
@@ -33,5 +34,9 @@ git push --force-with-lease origin deploy
 echo "==> Upgrade prod database..."
 cd $BACKEND_DIR
 set -a && source .env.prod && set +a && alembic upgrade head
+
+echo "==> Back to main..."
+cd $ROOT_DIR
+git checkout main
 
 echo "==> Done."
