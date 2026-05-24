@@ -365,18 +365,6 @@ const ShowTribePageContent: React.FC = () => {
                                         }}
                                     >
                                         <ThemedText variant="primary" size="small">{project.project_name}</ThemedText>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                                            {project.direct_position && (
-                                                <ThemedBadge variant={project.direct_position === 'manager' ? 'accent' : project.direct_position === 'member' ? 'primary' : 'ghost'}>
-                                                    {t(`positions.${project.direct_position}`)}
-                                                </ThemedBadge>
-                                            )}
-                                            {project.represented_persons.map((p, i) => (
-                                                <ThemedBadge key={i} variant={p.position === 'manager' ? 'accent' : p.position === 'member' ? 'primary' : 'ghost'}>
-                                                    {t(`positions.${p.position}`)} {t('tribes.as')} {p.first_name} {p.last_name}
-                                                </ThemedBadge>
-                                            ))}
-                                        </div>
                                     </div>
                                 ))}
                             </div>
