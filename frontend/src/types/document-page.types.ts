@@ -41,3 +41,8 @@ export interface DocumentPageUpdate {
     attachments?: AttachmentFile[];
     order_index?: number;
 }
+
+export interface DocumentPageReorderItem {
+    page_id: string;
+    order_index: number;
+}

@@ -335,6 +335,7 @@ CREATE TABLE IF NOT EXISTS projects_documents (
     project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
+    toc_depth INTEGER NOT NULL DEFAULT 4,
     status VARCHAR(50) NOT NULL DEFAULT 'active'
         CONSTRAINT projects_documents_status_check CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),

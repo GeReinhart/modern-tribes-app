@@ -34,6 +34,7 @@ export interface ProjectDocument {
     content_summary: string | null;
     attachments: AttachmentFile[];
     labels: LabelInfo[];
+    toc_depth: number;
     status: string;
     publication_url_param_id: string | null;
     created_at: string;
@@ -47,6 +48,7 @@ export interface ProjectDocumentCreate {
     content_html: string;
     attachments: AttachmentFile[];
     label_names: string[];
+    toc_depth?: number;
 }
 
 export interface ProjectDocumentUpdate {
@@ -54,4 +56,5 @@ export interface ProjectDocumentUpdate {
     content_html?: string;
     attachments?: AttachmentFile[];
     label_names?: string[];
+    toc_depth?: number;
 }

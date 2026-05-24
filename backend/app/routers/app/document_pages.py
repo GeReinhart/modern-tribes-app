@@ -6,7 +6,7 @@ from ..auth.authorization import require_any_permission_decorator
 from ...models.auth.auth import PermissionEnum
 from ...models.app.document_page import (
     DocumentPageCreate, DocumentPageUpdate,
-    DocumentPageResponse,
+    DocumentPageResponse, PageReorderRequest,
 )
 from ...core.database import get_database
 from ...services import document_page_service
@@ -50,6 +50,25 @@ async def create_page(
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position='member')
     return await document_page_service.create_page(project_id, project_document_id, data, pool, current_user)
+
+
+@router.patch(
+    "/projects/{project_id}/documents/{project_document_id}/pages/reorder",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def reorder_pages(
+    project_id: str,
+    project_document_id: str,
+    data: PageReorderRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
+    await check_project_access_or_admin(project_id, current_user, pool, min_position='member')
+    await document_page_service.reorder_pages(project_id, project_document_id, data.items, pool, current_user)
+    return None
 
 
 @router.get(

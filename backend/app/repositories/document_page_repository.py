@@ -127,6 +127,21 @@ async def update_page(
     return await get_page(pool, page_id)
 
 
+async def reorder_pages(pool, project_document_id: str, page_orders: list, user_id: str) -> None:
+    now = datetime.now(timezone.utc)
+    uid = UUID(user_id)
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            for item in page_orders:
+                await conn.execute(
+                    """UPDATE document_pages
+                       SET order_index = $1, updated_at = $2, updated_by = $3
+                       WHERE id = $4 AND project_document_id = $5""",
+                    item['order_index'], now, uid,
+                    UUID(item['page_id']), UUID(project_document_id),
+                )
+
+
 async def archive_page(pool, page_id: str, user_id: str) -> bool:
     now = datetime.now(timezone.utc)
     uid = UUID(user_id)

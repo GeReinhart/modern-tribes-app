@@ -128,6 +128,22 @@ async def update_page(
     return _build_response(row)
 
 
+async def reorder_pages(
+    project_id: str,
+    project_document_id: str,
+    items: list,
+    pool,
+    current_user: dict,
+) -> None:
+    await _verify_document_belongs_to_project(pool, project_id, project_document_id)
+    await repo.reorder_pages(
+        pool,
+        project_document_id,
+        [{'page_id': item.page_id, 'order_index': item.order_index} for item in items],
+        str(current_user['id']),
+    )
+
+
 async def archive_page(
     project_id: str,
     project_document_id: str,

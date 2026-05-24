@@ -36,7 +36,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
     const { document: doc, loading, error } = useProjectDocument(projectId || null, projectDocumentId || null);
     const { projects: tribeProjects } = useUserProjectsByTribe(tribeId || '', user?.id || '', { enabled: !!tribeId && !!user?.id });
 
-    const { pages, loading: pagesLoading } = useDocumentPages(projectId || null, projectDocumentId || null);
+    const { pages, loading: pagesLoading, refetch: refetchPages } = useDocumentPages(projectId || null, projectDocumentId || null);
     const [readerMode, setReaderMode] = useState(false);
     const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
     const [archiving, setArchiving] = useState(false);
@@ -129,6 +129,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
                     contentHtml={doc.content_html}
                     attachments={doc.attachments ?? []}
                     pages={pages}
+                    tocDepth={doc.toc_depth ?? 4}
                     onClose={() => setReaderMode(false)}
                 />
             </AppLayout>
@@ -174,6 +175,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
                     loading={pagesLoading}
                     canEdit={canEdit}
                     onReadPage={() => setReaderMode(true)}
+                    onReordered={refetchPages}
                 />
             </ThemedSection>
             <ThemedConfirmDialog isOpen={showArchiveConfirm} onClose={() => setShowArchiveConfirm(false)} onConfirm={handleArchive}

@@ -5,6 +5,15 @@ from datetime import datetime
 from ..uploads.files import AttachmentFile
 
 
+class PageReorderItem(BaseModel):
+    page_id: str
+    order_index: int
+
+
+class PageReorderRequest(BaseModel):
+    items: List[PageReorderItem]
+
+
 class DocumentPageCreate(BaseModel):
     title: str
     content_html: str = ''

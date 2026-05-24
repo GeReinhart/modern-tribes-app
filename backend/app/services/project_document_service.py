@@ -93,6 +93,7 @@ async def _build_response(pd_row: dict, pool) -> ProjectDocumentResponse:
         content_summary=document.get("content_summary"),
         attachments=attachments,
         labels=labels,
+        toc_depth=pd_row.get("toc_depth") or 4,
         status=pd_row["status"],
         publication_url_param_id=publication_url_param_id,
         created_at=pd_row["created_at"],
@@ -127,10 +128,10 @@ async def create_project_document(
     async with pool.acquire() as conn:
         pd_row = await conn.fetchrow(
             """INSERT INTO projects_documents
-                   (project_id, document_id, title, status, url_param_id, created_at, updated_at, created_by, updated_by)
-               VALUES ($1, $2, $3, 'active', $4, $5, $5, $6, $6)
+                   (project_id, document_id, title, toc_depth, status, url_param_id, created_at, updated_at, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, 'active', $5, $6, $6, $7, $7)
                RETURNING *""",
-            UUID(project_id), UUID(document_id), data.title, url_param_id, now, uid
+            UUID(project_id), UUID(document_id), data.title, data.toc_depth, url_param_id, now, uid
         )
 
     return await _build_response(row_to_dict(pd_row), pool)
@@ -231,6 +232,13 @@ async def update_project_document(
             await conn.execute(
                 "UPDATE projects_documents SET title = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
                 data.title, now, uid, UUID(project_document_id)
+            )
+
+    if data.toc_depth is not None:
+        async with pool.acquire() as conn:
+            await conn.execute(
+                "UPDATE projects_documents SET toc_depth = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
+                data.toc_depth, now, uid, UUID(project_document_id)
             )
 
     if data.content_html is not None:

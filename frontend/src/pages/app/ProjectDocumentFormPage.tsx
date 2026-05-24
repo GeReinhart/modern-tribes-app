@@ -44,6 +44,7 @@ const ProjectDocumentFormPageContent: React.FC = () => {
     const [content, setContent] = useState('');
     const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
     const [labelNames, setLabelNames] = useState<string[]>([]);
+    const [tocDepth, setTocDepth] = useState<number>(4);
     const [allLabelSuggestions, setAllLabelSuggestions] = useState<string[]>([]);
     const [initialized, setInitialized] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -61,6 +62,7 @@ const ProjectDocumentFormPageContent: React.FC = () => {
             setContent(existingDoc.content_html);
             setAttachments(existingDoc.attachments);
             setLabelNames(existingDoc.labels.map(l => l.name));
+            setTocDepth(existingDoc.toc_depth ?? 4);
             setInitialized(true);
         }
         if (!isEdit && !initialized) {
@@ -96,6 +98,7 @@ const ProjectDocumentFormPageContent: React.FC = () => {
                     content_html: content,
                     attachments,
                     label_names: labelNames,
+                    toc_depth: tocDepth,
                 });
                 navigate(`/app/tribes/${tribeId}/projects/${projectId}/documents/${projectDocumentId}`);
             } else {
@@ -104,6 +107,7 @@ const ProjectDocumentFormPageContent: React.FC = () => {
                     content_html: content,
                     attachments,
                     label_names: labelNames,
+                    toc_depth: tocDepth,
                 });
                 navigate(`/app/tribes/${tribeId}/projects/${projectId}/documents/${created.url_param_id}`);
             }
@@ -202,6 +206,24 @@ const ProjectDocumentFormPageContent: React.FC = () => {
                                 suggestions={allLabelSuggestions}
                                 placeholder={t('projectDocuments.labelsPlaceholder')}
                             />
+                        </div>
+
+                        <div style={{ marginBottom: '16px' }}>
+                            <ThemedText size="small" variant="secondary" style={{ marginBottom: '8px' }}>
+                                {t('projectDocuments.tocDepthLabel')}
+                            </ThemedText>
+                            <div style={{ display: 'flex', gap: '6px' }}>
+                                {([1, 2, 3, 4] as const).map(d => (
+                                    <button
+                                        key={d}
+                                        type="button"
+                                        onClick={() => setTocDepth(d)}
+                                        style={{ padding: '4px 12px', borderRadius: '6px', border: `1px solid ${tocDepth === d ? theme.colors.primary : theme.colors.border}`, backgroundColor: tocDepth === d ? theme.colors.primary : theme.colors.surface, color: tocDepth === d ? '#fff' : theme.colors.secondary, cursor: 'pointer', fontSize: 'var(--font-sm)', fontWeight: tocDepth === d ? 600 : 400 }}
+                                    >
+                                        H{d}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
                         <div style={{ marginBottom: '16px' }}>

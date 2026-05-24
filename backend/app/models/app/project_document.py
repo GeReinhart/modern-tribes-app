@@ -15,6 +15,7 @@ class ProjectDocumentCreate(BaseModel):
     content_html: str = Field(default='')
     attachments: List[AttachmentFile] = []
     label_names: List[str] = []
+    toc_depth: int = Field(default=4, ge=1, le=4)
 
 
 class ProjectDocumentUpdate(BaseModel):
@@ -22,6 +23,7 @@ class ProjectDocumentUpdate(BaseModel):
     content_html: Optional[str] = None
     attachments: Optional[List[AttachmentFile]] = None
     label_names: Optional[List[str]] = None
+    toc_depth: Optional[int] = Field(None, ge=1, le=4)
 
 
 class ProjectDocumentSummary(BaseModel):
@@ -47,6 +49,7 @@ class ProjectDocumentResponse(BaseModel):
     content_summary: Optional[str] = None
     attachments: List[AttachmentFile] = []
     labels: List[LabelInfo] = []
+    toc_depth: int = 4
     status: str
     publication_url_param_id: Optional[str] = None
     created_at: datetime

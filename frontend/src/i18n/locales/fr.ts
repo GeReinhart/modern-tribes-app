@@ -396,6 +396,8 @@ const fr: Record<string, string> = {
     'documentPages.read': 'Lire',
     'documentPages.exitRead': 'Quitter le mode lecture',
     'documentPages.pageOf': 'Page {{index}}',
+    'documentPages.tableOfContents': 'Table des matières',
+    'projectDocuments.tocDepthLabel': 'Profondeur de la table des matières (mode lecture)',
 
     'publications.title': 'Publications',
     'publications.searchPlaceholder': 'Rechercher des publications...',

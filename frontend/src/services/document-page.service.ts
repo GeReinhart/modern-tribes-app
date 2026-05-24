@@ -3,6 +3,7 @@ import {
     DocumentPage,
     DocumentPageCreate,
     DocumentPageUpdate,
+    DocumentPageReorderItem,
 } from '../types/document-page.types';
 
 class DocumentPageService {
@@ -28,6 +29,10 @@ class DocumentPageService {
 
     archive(projectId: string, projectDocumentId: string, pageId: string): Promise<void> {
         return apiService.patch<void>(`${this.base(projectId, projectDocumentId)}/${pageId}/archive`);
+    }
+
+    reorder(projectId: string, projectDocumentId: string, items: DocumentPageReorderItem[]): Promise<void> {
+        return apiService.patch<void>(`${this.base(projectId, projectDocumentId)}/reorder`, { items });
     }
 }
 

@@ -396,6 +396,8 @@ const en: Record<string, string> = {
     'documentPages.read': 'Read',
     'documentPages.exitRead': 'Exit reader',
     'documentPages.pageOf': 'Page {{index}}',
+    'documentPages.tableOfContents': 'Table of Contents',
+    'projectDocuments.tocDepthLabel': 'Table of contents depth (reader view)',
 
     'publications.title': 'Publications',
     'publications.searchPlaceholder': 'Search publications...',
