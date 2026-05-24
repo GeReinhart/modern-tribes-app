@@ -8,6 +8,7 @@ interface Props {
     boardLabels: KanbanLabel[];
     persons: PersonOption[];
     canEdit: boolean;
+    isConfiguring: boolean;
     onClose: () => void;
     onUpdate: (cardId: string, data: CardUpdate) => Promise<void>;
     onToggleLabel: (cardId: string, labelId: string, currentLabelIds: string[]) => Promise<void>;
@@ -15,7 +16,7 @@ interface Props {
 }
 
 const KanbanCardModal: React.FC<Props> = ({
-    card, boardLabels, persons, canEdit, onClose, onUpdate, onToggleLabel, onCreateLabel,
+    card, boardLabels, persons, canEdit, isConfiguring, onClose, onUpdate, onToggleLabel, onCreateLabel,
 }) => {
     const labels: TaskLabelInfo[] = boardLabels.map(l => ({ ...l, feature_instance_id: card.feature_instance_id }));
 
@@ -42,7 +43,7 @@ const KanbanCardModal: React.FC<Props> = ({
             labels={labels}
             persons={persons}
             canEdit={canEdit}
-            canCreateLabel={canEdit}
+            canCreateLabel={isConfiguring}
             onClose={onClose}
             onUpdate={handleUpdate}
             onToggleLabel={onToggleLabel}

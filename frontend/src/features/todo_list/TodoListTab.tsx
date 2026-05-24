@@ -25,7 +25,10 @@ const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, a
     const [showArchived, setShowArchived] = useState(false);
     const [filterLabelId, setFilterLabelId] = useState<string | null>(null);
     const [filterPersonId, setFilterPersonId] = useState<string | null>(null);
+    const [configuring, setConfiguring] = useState(false);
     const addInputRef = useRef<HTMLInputElement>(null);
+
+    const isConfiguring = isManager && configuring;
 
     const activeItems = items.filter(i => i.status !== 'archived');
     const archivedCount = items.filter(i => i.status === 'archived').length;
@@ -65,7 +68,7 @@ const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, a
                         activeLabelIds={activeItemLabelIds}
                         filterLabelId={filterLabelId}
                         onFilter={setFilterLabelId}
-                        isManager={isManager}
+                        canEditLabels={isConfiguring}
                         onUpdate={updateLabel}
                         onDelete={deleteLabel}
                     />
@@ -87,7 +90,16 @@ const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, a
 
                 {/* Right: actions aligned with each filter row */}
                 <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
-                    {/* Archive toggle + external actions */}
+                    {/* Row 1 (with labels): configure */}
+                    {isManager && (
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <button onClick={() => setConfiguring(v => !v)} title={configuring ? t('features.todo.doneConfiguring') : t('features.todo.configure')}
+                                style={{ background: configuring ? theme.colors.primary : 'none', border: `1px solid ${configuring ? theme.colors.primary : theme.colors.border}`, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px 10px' }}>
+                                <ThemedSvgIcon name="settings" color={configuring ? theme.colors.surface : theme.colors.secondary} size={16} />
+                            </button>
+                        </div>
+                    )}
+                    {/* Row 2 (with persons): archive toggle + external actions */}
                     {(assignedPersons.length > 0 || actions || archivedCount > 0) && (
                         <div style={{ display: 'flex', gap: '8px' }}>
                             {archivedCount > 0 && (
@@ -108,7 +120,7 @@ const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, a
                 )}
                 {visibleItems.map(item => (
                     <TodoRow key={item.id} item={item} labels={labels} persons={persons}
-                        canEdit={canEdit} isManager={isManager} featureInstanceId={featureInstanceId}
+                        canEdit={canEdit} isConfiguring={isConfiguring} featureInstanceId={featureInstanceId}
                         onToggle={(id, done) => updateItem(id, { todo_status: done ? 'done' : 'todo' })}
                         onSetStatus={(id, s) => updateItem(id, { status: s })}
                         onUpdate={updateItem} onToggleLabel={toggleLabel} onCreateLabel={createLabel}

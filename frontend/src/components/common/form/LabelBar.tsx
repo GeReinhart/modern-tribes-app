@@ -21,13 +21,13 @@ interface LabelBarProps {
     activeLabelIds: Set<string>;
     filterLabelId: string | null;
     onFilter: (id: string | null) => void;
-    isManager: boolean;
+    canEditLabels: boolean;
     onUpdate: (id: string, data: { name?: string; color?: string }) => Promise<void>;
     onDelete: (id: string) => Promise<void>;
 }
 
 export const LabelBar: React.FC<LabelBarProps> = ({
-    labels, activeLabelIds, filterLabelId, onFilter, isManager, onUpdate, onDelete,
+    labels, activeLabelIds, filterLabelId, onFilter, canEditLabels, onUpdate, onDelete,
 }) => {
     const { t } = useTranslation();
     const { theme } = useTheme();
@@ -101,7 +101,7 @@ export const LabelBar: React.FC<LabelBarProps> = ({
                             style={{ padding: '4px 12px', borderRadius: '16px', fontSize: 'var(--font-xs)', fontWeight: isActive ? 700 : 500, cursor: isUsed ? 'pointer' : 'default', border: `1px solid ${label.color}`, backgroundColor: isActive ? `${label.color}20` : 'transparent', color: label.color, transition: 'all 0.15s', whiteSpace: 'nowrap' }}>
                             {label.name}
                         </button>
-                        {isManager && (
+                        {canEditLabels && (
                             <>
                                 <button type="button" title={t('labels.edit')} onClick={() => startEdit(label)}
                                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center', opacity: 0.4 }}>

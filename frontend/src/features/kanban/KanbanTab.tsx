@@ -75,7 +75,7 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
                         activeLabelIds={activeCardLabelIds}
                         filterLabelId={filterLabelId}
                         onFilter={setFilterLabelId}
-                        isManager={isManager}
+                        canEditLabels={isManager && configuring}
                         onUpdate={updateLabel}
                         onDelete={deleteLabel}
                     />
@@ -149,6 +149,7 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
                         onReorderCard={reorderCard}
                         onToggleLabel={toggleCardLabel}
                         onCreateLabel={createLabel}
+                        isConfiguring={isManager && configuring}
                     />
                 ))}
 

@@ -11,7 +11,7 @@ interface Props {
     labels: TodoLabel[];
     persons: PersonOption[];
     canEdit: boolean;
-    isManager: boolean;
+    isConfiguring: boolean;
     featureInstanceId: string;
     onToggle: (id: string, done: boolean) => void;
     onSetStatus: (id: string, status: 'pending' | 'active' | 'archived') => void;
@@ -21,7 +21,7 @@ interface Props {
 }
 
 const TodoRow: React.FC<Props> = ({
-    item, labels, persons, canEdit, isManager, featureInstanceId,
+    item, labels, persons, canEdit, isConfiguring, featureInstanceId,
     onToggle, onSetStatus, onUpdate, onToggleLabel, onCreateLabel,
 }) => {
     const { t } = useTranslation();
@@ -120,7 +120,7 @@ const TodoRow: React.FC<Props> = ({
             {modalOpen && (
                 <TodoItemModal
                     item={item} labels={labels} persons={persons}
-                    canEdit={canEdit && !isArchived} isManager={isManager}
+                    canEdit={canEdit && !isArchived} isConfiguring={isConfiguring}
                     featureInstanceId={featureInstanceId}
                     onClose={() => setModalOpen(false)}
                     onUpdate={onUpdate} onToggleLabel={onToggleLabel} onCreateLabel={onCreateLabel}

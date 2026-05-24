@@ -325,6 +325,8 @@ const en: Record<string, string> = {
     'features.todo.showArchived': 'Show {{count}} archived item(s)',
     'features.todo.hideArchived': 'Hide archived items',
     'features.todo.dueDate': 'Due date',
+    'features.todo.configure': 'Configure labels',
+    'features.todo.doneConfiguring': 'Done configuring',
     'features.kanban.empty': 'No cards yet.',
     'features.kanban.addCard': 'Add',
     'features.kanban.addCardPlaceholder': 'Card title...',

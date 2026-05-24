@@ -9,7 +9,7 @@ interface Props {
     labels: TodoLabel[];
     persons: PersonOption[];
     canEdit: boolean;
-    isManager: boolean;
+    isConfiguring: boolean;
     featureInstanceId: string;
     onClose: () => void;
     onUpdate: (itemId: string, data: TodoItemUpdate) => Promise<void>;
@@ -18,7 +18,7 @@ interface Props {
 }
 
 const TodoItemModal: React.FC<Props> = ({
-    item, labels, persons, canEdit, isManager, featureInstanceId,
+    item, labels, persons, canEdit, isConfiguring, featureInstanceId,
     onClose, onUpdate, onToggleLabel, onCreateLabel,
 }) => {
     const taskLabels: TaskLabelInfo[] = labels.map(l => ({ ...l, feature_instance_id: featureInstanceId }));
@@ -49,7 +49,7 @@ const TodoItemModal: React.FC<Props> = ({
             labels={taskLabels}
             persons={persons}
             canEdit={canEdit}
-            canCreateLabel={isManager}
+            canCreateLabel={isConfiguring}
             onClose={onClose}
             onUpdate={handleUpdate}
             onToggleLabel={handleToggleLabel}
