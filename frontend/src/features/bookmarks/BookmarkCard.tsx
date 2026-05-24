@@ -52,6 +52,7 @@ export const BookmarkCard: React.FC<BookmarkCardProps> = ({
                 justifyContent: 'space-between',
                 alignItems: 'flex-start',
                 gap: '8px',
+                maxWidth: '600px'
             }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <button
