@@ -1,3 +1,4 @@
+import json
 from typing import List
 from uuid import UUID
 
@@ -32,11 +33,10 @@ async def _verify_page_belongs_to_document(pool, project_document_id: str, page_
 
 
 def _build_response(row: dict) -> DocumentPageResponse:
-    raw_attachments = row.get('attachments') or []
-    attachments = [
-        AttachmentFile(**a) if isinstance(a, dict) else a
-        for a in raw_attachments
-    ]
+    raw = row.get('attachments') or '[]'
+    if isinstance(raw, str):
+        raw = json.loads(raw)
+    attachments = [AttachmentFile(**a) if isinstance(a, dict) else a for a in raw]
     return DocumentPageResponse(
         id=row['id'],
         url_param_id=row['url_param_id'],
