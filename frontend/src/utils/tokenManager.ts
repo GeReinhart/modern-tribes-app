@@ -9,12 +9,19 @@ function decodeJwtPayload(segment: string): { exp?: number } {
     return JSON.parse(atob(padded));
 }
 
+// Tokens are only proactively discarded when well past their expiry.
+// This buffer deliberately over-tolerates client/server clock skew.
+// The server's 401 is the authoritative signal for true expiry.
+const CLOCK_SKEW_BUFFER_SECONDS = 5 * 60;
+
 function isTokenExpired(token: string): boolean {
     try {
         const payload = decodeJwtPayload(token.split('.')[1]);
-        return Date.now() / 1000 > (payload.exp ?? 0);
+        if (!payload.exp) return false;
+        return Date.now() / 1000 > payload.exp + CLOCK_SKEW_BUFFER_SECONDS;
     } catch {
-        return true;
+        // Malformed token: don't assume expired; let the server reject it via 401.
+        return false;
     }
 }
 
@@ -28,11 +35,21 @@ export const tokenManager = {
         return token;
     },
     setAccessToken: (token: string | null): void => {
-        token ? localStorage.setItem('access_token', token) : localStorage.removeItem('access_token');
+        if (token) {
+            try {
+                localStorage.setItem('access_token', token);
+            } catch (e) {
+                console.error('[Auth] setAccessToken: localStorage write failed', e);
+            }
+        } else {
+            localStorage.removeItem('access_token');
+        }
     },
     getRefreshToken: (): string | null => localStorage.getItem('refresh_token'),
     setRefreshToken: (token: string | null): void => {
-        token ? localStorage.setItem('refresh_token', token) : localStorage.removeItem('refresh_token');
+        token
+            ? localStorage.setItem('refresh_token', token)
+            : localStorage.removeItem('refresh_token');
     },
     clearAll: (): void => {
         localStorage.removeItem('access_token');

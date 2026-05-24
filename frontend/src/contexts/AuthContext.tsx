@@ -90,7 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Access token absent or expired — try to restore session via refresh token.
         const refreshToken = tokenManager.getRefreshToken();
         if (refreshToken) {
-            doRefresh().then((newToken) => {
+            tokenManager.tryRefresh().then((newToken) => {
                 if (newToken) {
                     fetchUser(newToken);
                 } else {
