@@ -28,7 +28,7 @@ class ApiService {
                 },
             });
 
-            if (response.status === 401 && !isRetry) {
+            if ((response.status === 401 || response.status === 403) && !isRetry) {
                 const newToken = await tokenManager.tryRefresh();
                 if (newToken) {
                     return this.request<T>(endpoint, options, true);
