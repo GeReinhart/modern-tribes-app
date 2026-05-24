@@ -41,8 +41,8 @@ async def delete_publication_by_id(pool, publication_id: str) -> str:
 async def fetch_publication_by_id(pool, publication_id: str) -> Optional[dict]:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            """SELECT pub.id, pub.url_param_id, pub.document_id, pub.published_at,
-                      pd.title, d.content_html, d.content_summary,
+            """SELECT pub.id, pub.url_param_id, pub.document_id, pub.project_document_id,
+                      pub.published_at, pd.title, d.content_html, d.content_summary,
                       u.login AS published_by_login,
                       COALESCE(ap.first_name || ' ' || ap.last_name, au.login) AS author_name
                FROM publications pub

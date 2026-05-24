@@ -6,4 +6,6 @@ export interface SearchResult {
     tribe_name: string | null;
     project_id: string | null;
     project_name: string | null;
+    page_id: string | null;
+    project_document_id: string | null;
 }

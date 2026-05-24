@@ -94,6 +94,7 @@ class DatabaseInitializer:
         tables = [
             "notifications",
             "publications",
+            "document_pages",
             "projects_documents",
             "todo_items",
             "projects_features",
@@ -344,6 +345,31 @@ class DatabaseInitializer:
         print(f"✓ Created {count} publications")
         return count
 
+    async def create_document_pages(self, pd_ids: Dict[str, str]) -> int:
+        rows = self.load_csv("document_pages.csv")
+        count = 0
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                key = f"{row['project']}|{row['document_title']}"
+                if key not in pd_ids:
+                    print(f"✗ Unknown project document '{key}' in document_pages.csv")
+                    sys.exit(1)
+                summary = row.get("content_summary") or None
+                content_html = f"<p>{summary}</p>" if summary else ""
+                content_text = summary or ""
+                await conn.execute(
+                    """INSERT INTO document_pages
+                       (url_param_id, project_document_id, title, content_html,
+                        content_summary, content_text, order_index)
+                       VALUES ($1, $2, $3, $4, $5, $6, $7)""",
+                    _generate_url_param_id(), pd_ids[key],
+                    row["title"], content_html, summary, content_text,
+                    int(row.get("order_index") or 0),
+                )
+                count += 1
+        print(f"✓ Created {count} document pages")
+        return count
+
     async def create_projects_features(
         self, project_ids: Dict[str, str]
     ) -> Dict[str, str]:
@@ -500,6 +526,7 @@ class DatabaseInitializer:
             label_ids = await self.create_labels()
             pd_ids, doc_ids = await self.create_project_documents(project_ids, label_ids)
             publications_count = await self.create_publications(pd_ids, doc_ids)
+            pages_count = await self.create_document_pages(pd_ids)
             feature_ids = await self.create_projects_features(project_ids)
             todo_count = await self.create_todo_items(feature_ids)
             mail_ids = await self.create_mails()
@@ -520,6 +547,7 @@ class DatabaseInitializer:
             print(f"   • Labels:                   {len(label_ids)}")
             print(f"   • Project documents:        {len(pd_ids)}")
             print(f"   • Publications:             {publications_count}")
+            print(f"   • Document pages:           {pages_count}")
             print(f"   • Project features:         {len(feature_ids)}")
             print(f"   • Todo items:               {todo_count}")
             print(f"   • Mails:                    {len(mail_ids)}")

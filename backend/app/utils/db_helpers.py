@@ -14,7 +14,7 @@ TABLES_WITH_STATUS = frozenset({
 })
 
 URL_PARAM_ID_TABLES = frozenset({
-    'users', 'tribes', 'projects', 'projects_documents', 'publications'
+    'users', 'tribes', 'projects', 'projects_documents', 'publications', 'document_pages'
 })
 
 

@@ -8,6 +8,7 @@ from ..models.app.project_document import LabelInfo
 from ..models.uploads.files import AttachmentFile
 from ..utils.attachments_helpers import get_document_with_attachments
 from ..repositories import publication_repository
+from . import document_page_service as page_svc
 
 
 async def _get_labels(pool, document_id: str) -> List[LabelInfo]:
@@ -66,15 +67,18 @@ async def _build_publication_detail(row: dict, pool) -> PublicationDetail:
     document = await get_document_with_attachments(pool, str(row["document_id"]))
     attachments = _extract_attachments(document)
     labels = await _get_labels(pool, str(row["document_id"]))
+    pages = await page_svc.list_pages_for_publication(str(row["project_document_id"]), pool)
     return PublicationDetail(
         id=str(row["id"]),
         url_param_id=row["url_param_id"],
         document_id=str(row["document_id"]),
+        project_document_id=str(row["project_document_id"]),
         title=row["title"],
         content_html=(document or {}).get("content_html") or "",
         content_summary=(document or {}).get("content_summary"),
         labels=labels,
         attachments=attachments,
+        pages=pages,
         published_at=row["published_at"],
         published_by_login=row.get("published_by_login"),
         author_name=row.get("author_name"),

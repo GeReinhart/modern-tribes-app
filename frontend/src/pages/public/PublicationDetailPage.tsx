@@ -6,7 +6,8 @@ import { PublicLayout } from '@/components/layout/PublicLayout';
 import { DocumentAttachments } from '@/components/common/document/DocumentAttachments';
 import { publicationService } from '@/services/publication.service';
 import { PublicationDetail } from '@/types/publication.types';
-import { ArrowLeft, Tag } from 'lucide-react';
+import { DocumentPage } from '@/types/document-page.types';
+import { ArrowLeft, Tag, BookOpen } from 'lucide-react';
 
 function PublicationMeta({ pub }: { pub: PublicationDetail }) {
     const { t } = useTranslation();
@@ -70,18 +71,42 @@ const PublicationDetailPageContent: React.FC = () => {
     if (loading) return <PublicLayout>{backButton}<div style={{ color: theme.colors.secondary, padding: '32px' }}>{t('common.loading')}</div></PublicLayout>;
     if (error || !publication) return <PublicLayout>{backButton}<div style={{ color: theme.colors.danger }}>{error}</div></PublicLayout>;
 
+    const contentStyle: React.CSSProperties = {
+        padding: '20px', borderRadius: '10px', marginBottom: '24px',
+        backgroundColor: theme.colors.surface, border: `1px solid ${theme.colors.border}`,
+    };
+
     return (
         <PublicLayout>
             <div style={{ maxWidth: '800px', margin: '0 auto' }}>
                 {backButton}
                 <PublicationMeta pub={publication} />
                 {publication.content_html && (
-                    <div className="prose max-w-none" style={{
-                        padding: '20px', borderRadius: '10px', marginBottom: '24px',
-                        backgroundColor: theme.colors.surface, border: `1px solid ${theme.colors.border}`,
-                    }} dangerouslySetInnerHTML={{ __html: publication.content_html }} />
+                    <div className="prose max-w-none" style={contentStyle}
+                        dangerouslySetInnerHTML={{ __html: publication.content_html }} />
                 )}
                 <DocumentAttachments attachments={publication.attachments} />
+                {publication.pages.map((page: DocumentPage, idx: number) => (
+                    <div key={page.id} style={{ marginTop: '32px' }}>
+                        <div style={{
+                            display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px',
+                            paddingBottom: '8px', borderBottom: `2px solid ${theme.colors.primary}30`,
+                        }}>
+                            <BookOpen size={16} color={theme.colors.primary} />
+                            <span style={{ color: theme.colors.secondary, fontSize: 'var(--font-xs)', fontWeight: 500 }}>
+                                {t('documentPages.pageOf', { index: idx + 1 })}
+                            </span>
+                            <span style={{ fontWeight: 700, fontSize: 'var(--font-lg)', color: theme.colors.text }}>
+                                {page.title}
+                            </span>
+                        </div>
+                        {page.content_html && (
+                            <div className="prose max-w-none" style={contentStyle}
+                                dangerouslySetInnerHTML={{ __html: page.content_html }} />
+                        )}
+                        <DocumentAttachments attachments={page.attachments} />
+                    </div>
+                ))}
             </div>
         </PublicLayout>
     );

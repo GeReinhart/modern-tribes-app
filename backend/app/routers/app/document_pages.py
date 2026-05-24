@@ -1,0 +1,111 @@
+from fastapi import APIRouter, Depends, status
+from typing import List
+
+from ..auth.authentification import get_current_user
+from ..auth.authorization import require_any_permission_decorator
+from ...models.auth.auth import PermissionEnum
+from ...models.app.document_page import (
+    DocumentPageCreate, DocumentPageUpdate,
+    DocumentPageResponse,
+)
+from ...core.database import get_database
+from ...services import document_page_service
+from ...utils.project_access import check_project_access_or_admin
+from ...utils.db_helpers import resolve_url_param_id
+
+router = APIRouter(prefix="/project-documents", tags=["app_document_pages"])
+
+
+@router.get(
+    "/projects/{project_id}/documents/{project_document_id}/pages",
+    response_model=List[DocumentPageResponse],
+)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def list_pages(
+    project_id: str,
+    project_document_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
+    await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
+    return await document_page_service.list_pages(project_id, project_document_id, pool)
+
+
+@router.post(
+    "/projects/{project_id}/documents/{project_document_id}/pages",
+    response_model=DocumentPageResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def create_page(
+    project_id: str,
+    project_document_id: str,
+    data: DocumentPageCreate,
+    current_user: dict = Depends(get_current_user),
+):
+    pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
+    await check_project_access_or_admin(project_id, current_user, pool, min_position='member')
+    return await document_page_service.create_page(project_id, project_document_id, data, pool, current_user)
+
+
+@router.get(
+    "/projects/{project_id}/documents/{project_document_id}/pages/{page_id}",
+    response_model=DocumentPageResponse,
+)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_page(
+    project_id: str,
+    project_document_id: str,
+    page_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
+    page_id = await resolve_url_param_id(pool, "document_pages", page_id)
+    await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
+    return await document_page_service.get_page(project_id, project_document_id, page_id, pool)
+
+
+@router.put(
+    "/projects/{project_id}/documents/{project_document_id}/pages/{page_id}",
+    response_model=DocumentPageResponse,
+)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def update_page(
+    project_id: str,
+    project_document_id: str,
+    page_id: str,
+    data: DocumentPageUpdate,
+    current_user: dict = Depends(get_current_user),
+):
+    pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
+    page_id = await resolve_url_param_id(pool, "document_pages", page_id)
+    await check_project_access_or_admin(project_id, current_user, pool, min_position='member')
+    return await document_page_service.update_page(project_id, project_document_id, page_id, data, pool, current_user)
+
+
+@router.patch(
+    "/projects/{project_id}/documents/{project_document_id}/pages/{page_id}/archive",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def archive_page(
+    project_id: str,
+    project_document_id: str,
+    page_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
+    page_id = await resolve_url_param_id(pool, "document_pages", page_id)
+    await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
+    await document_page_service.archive_page(project_id, project_document_id, page_id, pool, current_user)
+    return None

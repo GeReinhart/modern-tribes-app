@@ -17,6 +17,7 @@ import {EditProjectDocumentPage} from "@/pages/app/EditProjectDocumentPage.tsx";
 import ShowProjectPage from "@/pages/app/ShowProjectPage.tsx";
 import {ProjectDocumentFormPage} from "@/pages/app/ProjectDocumentFormPage.tsx";
 import {ProjectDocumentViewPage} from "@/pages/app/ProjectDocumentViewPage.tsx";
+import {DocumentPageFormPage} from "@/pages/app/DocumentPageFormPage.tsx";
 import ProfilePage from "@/pages/app/ProfilePage.tsx";
 import {AuthorizationPage} from "@/pages/admin/AuthorizationPage.tsx";
 import {TribesProjectsPage} from "@/pages/admin/TribesProjectsPage.tsx";
@@ -99,6 +100,8 @@ function AuthBootstrapApp() {
                             <Route path="/app/tribes/:tribeId/projects/:projectId/documents/new" element={<ProjectDocumentFormPage/>}/>
                             <Route path="/app/tribes/:tribeId/projects/:projectId/documents/:projectDocumentId" element={<ProjectDocumentViewPage/>}/>
                             <Route path="/app/tribes/:tribeId/projects/:projectId/documents/:projectDocumentId/edit" element={<ProjectDocumentFormPage/>}/>
+                            <Route path="/app/tribes/:tribeId/projects/:projectId/documents/:projectDocumentId/pages/new" element={<DocumentPageFormPage/>}/>
+                            <Route path="/app/tribes/:tribeId/projects/:projectId/documents/:projectDocumentId/pages/:pageId/edit" element={<DocumentPageFormPage/>}/>
                             <Route path="/app/projects" element={<ProjectsPage/>}/>
                             <Route path="/app/search" element={<SearchPage/>}/>
                             <Route path="/app/about" element={<AboutPage/>}/>

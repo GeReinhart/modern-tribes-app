@@ -14,17 +14,19 @@ const SearchResultCard: React.FC<{ result: SearchResult }> = ({ result }) => {
     const { theme } = useTheme();
     const navigate = useNavigate();
 
-    const targetPath = result.project_id && result.tribe_id
-        ? `/app/tribes/${result.tribe_id}/projects/${result.project_id}`
-        : result.tribe_id
-            ? `/app/tribes/${result.tribe_id}`
-            : null;
+    const targetPath = result.project_document_id && result.tribe_id && result.project_id
+        ? `/app/tribes/${result.tribe_id}/projects/${result.project_id}/documents/${result.project_document_id}`
+        : result.project_id && result.tribe_id
+            ? `/app/tribes/${result.tribe_id}/projects/${result.project_id}`
+            : result.tribe_id
+                ? `/app/tribes/${result.tribe_id}`
+                : null;
 
     const contextLabel = result.project_id
         ? result.project_name
         : result.tribe_name;
 
-    const contextType = result.project_id ? 'project' : 'tribe';
+    const contextType = result.project_document_id ? 'document' : result.project_id ? 'project' : 'tribe';
 
     return (
         <ThemedCard variant="primary">
@@ -90,7 +92,7 @@ const SearchResultCard: React.FC<{ result: SearchResult }> = ({ result }) => {
                             gap: '6px',
                         }}
                     >
-                        {contextType === 'project' ? contextLabel : result.tribe_name}
+                        {contextType !== 'tribe' ? contextLabel : result.tribe_name}
                         <ThemedSvgIcon name="arrow-right" color={theme.colors.primary} size={14} />
                     </button>
                 )}

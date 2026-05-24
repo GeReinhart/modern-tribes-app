@@ -359,6 +359,26 @@ CREATE TABLE IF NOT EXISTS publications (
     updated_by UUID REFERENCES users(id)
 );
 
+-- Document pages table (migration 012)
+CREATE TABLE IF NOT EXISTS document_pages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    url_param_id VARCHAR(6) UNIQUE NOT NULL,
+    project_document_id UUID NOT NULL REFERENCES projects_documents(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    content_html TEXT NOT NULL DEFAULT '',
+    content_summary TEXT,
+    content_text TEXT,
+    attachments JSONB NOT NULL DEFAULT '[]',
+    revisions JSONB NOT NULL DEFAULT '[]',
+    order_index INTEGER NOT NULL DEFAULT 0,
+    status VARCHAR(50) NOT NULL DEFAULT 'active'
+        CONSTRAINT document_pages_status_check CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents(created_at);
 CREATE INDEX IF NOT EXISTS idx_documents_content_fts ON documents USING GIN(to_tsvector('french', COALESCE(content_text, '')));
@@ -398,6 +418,9 @@ CREATE INDEX IF NOT EXISTS idx_projects_documents_status ON projects_documents(s
 CREATE INDEX IF NOT EXISTS idx_publications_document_id ON publications(document_id);
 CREATE INDEX IF NOT EXISTS idx_publications_project_document_id ON publications(project_document_id);
 CREATE INDEX IF NOT EXISTS idx_publications_published_at ON publications(published_at DESC);
+CREATE INDEX IF NOT EXISTS idx_document_pages_project_document_id ON document_pages(project_document_id);
+CREATE INDEX IF NOT EXISTS idx_document_pages_status ON document_pages(project_document_id, status);
+CREATE INDEX IF NOT EXISTS idx_document_pages_content_fts ON document_pages USING GIN(to_tsvector('french', COALESCE(content_text, '')));
 
 -- Kanban columns table (migration 024)
 CREATE TABLE IF NOT EXISTS kanban_columns (
@@ -476,6 +499,7 @@ CREATE OR REPLACE TRIGGER update_publications_updated_at BEFORE UPDATE ON public
 CREATE OR REPLACE TRIGGER update_kanban_columns_updated_at BEFORE UPDATE ON kanban_columns FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE OR REPLACE TRIGGER update_kanban_cards_updated_at BEFORE UPDATE ON kanban_cards FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE OR REPLACE TRIGGER update_notifications_updated_at BEFORE UPDATE ON notifications FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_document_pages_updated_at BEFORE UPDATE ON document_pages FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- User tab configs table (migration 007)
 CREATE TABLE IF NOT EXISTS user_tab_configs (

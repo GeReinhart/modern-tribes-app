@@ -1,5 +1,6 @@
 import { LabelInfo } from './project-document.types';
 import { AttachmentFile } from './document.types';
+import { DocumentPage } from './document-page.types';
 
 export interface PublicationSummary {
     id: string;
@@ -16,11 +17,13 @@ export interface PublicationDetail {
     id: string;
     url_param_id: string;
     document_id: string;
+    project_document_id: string;
     title: string;
     content_html: string;
     content_summary: string | null;
     labels: LabelInfo[];
     attachments: AttachmentFile[];
+    pages: DocumentPage[];
     published_at: string;
     published_by_login: string | null;
     author_name: string | null;

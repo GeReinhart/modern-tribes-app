@@ -8,7 +8,10 @@ import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSp
 import { ThemedBadge } from '@/components/common/layout/ThemedBadge';
 import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog';
 import { DocumentAttachments } from '@/components/common/document/DocumentAttachments';
+import { DocumentPagesSection } from '@/components/common/document/DocumentPagesSection';
+import { DocumentReader } from '@/components/common/document/DocumentReader';
 import { useDocumentViewMenuActions } from '@/components/common/document/useDocumentViewMenuActions';
+import { useDocumentPages } from '@/hooks/useDocumentPages';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
 import { useProjectWithDocument, useUserProjectsByTribe } from '@/hooks/useProjects';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
@@ -33,6 +36,8 @@ const ProjectDocumentViewPageContent: React.FC = () => {
     const { document: doc, loading, error } = useProjectDocument(projectId || null, projectDocumentId || null);
     const { projects: tribeProjects } = useUserProjectsByTribe(tribeId || '', user?.id || '', { enabled: !!tribeId && !!user?.id });
 
+    const { pages, loading: pagesLoading } = useDocumentPages(projectId || null, projectDocumentId || null);
+    const [readerMode, setReaderMode] = useState(false);
     const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
     const [archiving, setArchiving] = useState(false);
     const [showPublishConfirm, setShowPublishConfirm] = useState(false);
@@ -102,15 +107,33 @@ const ProjectDocumentViewPageContent: React.FC = () => {
         finally { setArchiving(false); setShowArchiveConfirm(false); }
     };
 
-    const menuActions = useDocumentViewMenuActions({
+    const docMenuActions = useDocumentViewMenuActions({
         tribeId: tribeId!, projectId: projectId!, projectDocumentId: projectDocumentId!,
         docStatus: doc?.status ?? '', canEdit, isManager,
         effectivePublicationUrlParamId, publishing, archiving,
         onPublish: () => setShowPublishConfirm(true), onUnpublish: () => setShowUnpublishConfirm(true), onArchive: () => setShowArchiveConfirm(true),
     });
+    const menuActions = useMemo(() => [
+        ...docMenuActions,
+        { icon: 'eye' as const, label: t('documentPages.read'), onClick: () => setReaderMode(true) },
+    ], [docMenuActions, t]);
 
     if (loading) return <AppLayout breadcrumbs={breadcrumbs}><div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}><ThemedLoadingSpinner size="sm" /></div></AppLayout>;
     if (error || !doc) return <AppLayout breadcrumbs={breadcrumbs}><div style={errorStyle}><strong>{t('common.error')}</strong> {error || t('projectDocuments.notFound')}</div></AppLayout>;
+
+    if (readerMode) {
+        return (
+            <AppLayout breadcrumbs={breadcrumbs}>
+                <DocumentReader
+                    title={doc.title}
+                    contentHtml={doc.content_html}
+                    attachments={doc.attachments ?? []}
+                    pages={pages}
+                    onClose={() => setReaderMode(false)}
+                />
+            </AppLayout>
+        );
+    }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions}>
@@ -143,6 +166,15 @@ const ProjectDocumentViewPageContent: React.FC = () => {
                         dangerouslySetInnerHTML={{ __html: doc.content_html }} />
                 )}
                 <DocumentAttachments attachments={doc.attachments ?? []} />
+                <DocumentPagesSection
+                    tribeId={tribeId!}
+                    projectId={projectId!}
+                    projectDocumentId={projectDocumentId!}
+                    pages={pages}
+                    loading={pagesLoading}
+                    canEdit={canEdit}
+                    onReadPage={() => setReaderMode(true)}
+                />
             </ThemedSection>
             <ThemedConfirmDialog isOpen={showArchiveConfirm} onClose={() => setShowArchiveConfirm(false)} onConfirm={handleArchive}
                 title={t('projectDocuments.archiveTitle')} message={t('projectDocuments.archiveMessage', { title: doc.title })}
