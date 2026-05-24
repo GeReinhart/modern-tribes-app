@@ -79,6 +79,7 @@ async def _build_publication_detail(row: dict, pool) -> PublicationDetail:
         labels=labels,
         attachments=attachments,
         pages=pages,
+        toc_depth=row.get("toc_depth") or 4,
         published_at=row["published_at"],
         published_by_login=row.get("published_by_login"),
         author_name=row.get("author_name"),

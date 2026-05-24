@@ -29,6 +29,7 @@ class PublicationDetail(BaseModel):
     labels: List[LabelInfo] = []
     attachments: List[AttachmentFile] = []
     pages: List[DocumentPageResponse] = []
+    toc_depth: int = 4
     published_at: datetime
     published_by_login: Optional[str] = None
     author_name: Optional[str] = None

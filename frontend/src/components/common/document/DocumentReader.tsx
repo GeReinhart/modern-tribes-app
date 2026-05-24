@@ -13,7 +13,7 @@ export interface DocumentReaderProps {
     attachments: AttachmentFile[];
     pages: DocumentPage[];
     tocDepth: number;
-    onClose: () => void;
+    onClose?: () => void;
 }
 
 interface TocItem {
@@ -110,12 +110,14 @@ export const DocumentReader: React.FC<DocumentReaderProps> = ({ title, contentHt
     const contentStyle: React.CSSProperties = { padding: '24px', backgroundColor: theme.colors.surface, borderRadius: '10px', border: `1px solid ${theme.colors.border}`, marginBottom: '24px' };
     return (
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-                <h1 style={{ color: theme.colors.text, fontSize: 'var(--font-xl)', fontWeight: 800, margin: 0 }}>{title}</h1>
-                <button type="button" onClick={onClose} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '8px', border: `1px solid ${theme.colors.border}`, backgroundColor: theme.colors.surface, color: theme.colors.secondary, cursor: 'pointer', fontSize: 'var(--font-sm)' }}>
-                    <X size={14} />{t('documentPages.exitRead')}
-                </button>
-            </div>
+            {onClose && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+                    <h1 style={{ color: theme.colors.text, fontSize: 'var(--font-xl)', fontWeight: 800, margin: 0 }}>{title}</h1>
+                    <button type="button" onClick={onClose} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '8px', border: `1px solid ${theme.colors.border}`, backgroundColor: theme.colors.surface, color: theme.colors.secondary, cursor: 'pointer', fontSize: 'var(--font-sm)' }}>
+                        <X size={14} />{t('documentPages.exitRead')}
+                    </button>
+                </div>
+            )}
             <ReaderToc items={tocItems} />
             <div id="reader-main">
                 {mainHtml && <div className="prose max-w-none" style={contentStyle} dangerouslySetInnerHTML={{ __html: mainHtml }} />}

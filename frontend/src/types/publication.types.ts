@@ -24,6 +24,7 @@ export interface PublicationDetail {
     labels: LabelInfo[];
     attachments: AttachmentFile[];
     pages: DocumentPage[];
+    toc_depth: number;
     published_at: string;
     published_by_login: string | null;
     author_name: string | null;
