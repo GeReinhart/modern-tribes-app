@@ -149,7 +149,6 @@ const KanbanTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, act
                         onReorderCard={reorderCard}
                         onToggleLabel={toggleCardLabel}
                         onCreateLabel={createLabel}
-                        isConfiguring={isManager && configuring}
                     />
                 ))}
 

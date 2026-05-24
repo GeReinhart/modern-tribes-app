@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { TabDefinition } from '@/hooks/useUrlTab';
-import { TabWithConfig } from './types';
+import { TabConfigItem, TabWithConfig } from './types';
 import { tabConfigService } from './tabConfig.service';
 
 interface UseTabConfigResult {
@@ -11,17 +11,7 @@ interface UseTabConfigResult {
     isLoading: boolean;
 }
 
-function buildDefaultConfigs(allTabs: TabDefinition[]): TabWithConfig[] {
-    return allTabs.map((tab, index) => ({
-        key: tab.key,
-        label: tab.label,
-        visible: true,
-        order: index,
-        is_default: index === 0,
-    }));
-}
-
-function mergeWithSaved(allTabs: TabDefinition[], saved: { key: string; visible: boolean; order: number; is_default: boolean }[]): TabWithConfig[] {
+function mergeWithSaved(allTabs: TabDefinition[], saved: TabConfigItem[]): TabWithConfig[] {
     const savedMap = new Map(saved.map(s => [s.key, s]));
     const merged: TabWithConfig[] = allTabs.map((tab, index) => {
         const s = savedMap.get(tab.key);
@@ -43,9 +33,7 @@ function mergeWithSaved(allTabs: TabDefinition[], saved: { key: string; visible:
 }
 
 export function useTabConfig(contextKey: string, allTabs: TabDefinition[]): UseTabConfigResult {
-    const [tabsWithConfig, setTabsWithConfig] = useState<TabWithConfig[]>(() =>
-        buildDefaultConfigs(allTabs)
-    );
+    const [savedConfigs, setSavedConfigs] = useState<TabConfigItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -54,24 +42,22 @@ export function useTabConfig(contextKey: string, allTabs: TabDefinition[]): UseT
         setIsLoading(true);
         tabConfigService.get(contextKey)
             .then(resp => {
-                if (cancelled) return;
-                setTabsWithConfig(mergeWithSaved(allTabs, resp.tab_configs));
+                if (!cancelled) setSavedConfigs(resp.tab_configs);
             })
             .catch(() => {
-                if (cancelled) return;
-                setTabsWithConfig(buildDefaultConfigs(allTabs));
+                if (!cancelled) setSavedConfigs([]);
             })
             .finally(() => {
                 if (!cancelled) setIsLoading(false);
             });
         return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [contextKey]);
 
-    useEffect(() => {
-        setTabsWithConfig(prev => mergeWithSaved(allTabs, prev));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [allTabs.map(t => t.key).join(',')]);
+    const tabsWithConfig = useMemo(
+        () => mergeWithSaved(allTabs, savedConfigs),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [allTabs.map(t => t.key).join(','), savedConfigs],
+    );
 
     const visibleTabs = useMemo(
         () => tabsWithConfig.filter(t => t.visible).map(({ key, label }) => ({ key, label })),
@@ -85,9 +71,8 @@ export function useTabConfig(contextKey: string, allTabs: TabDefinition[]): UseT
 
     const saveConfig = useCallback(async (updated: TabWithConfig[]) => {
         const saved = await tabConfigService.save(contextKey, updated);
-        setTabsWithConfig(mergeWithSaved(allTabs, saved.tab_configs));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [contextKey, allTabs.map(t => t.key).join(',')]);
+        setSavedConfigs(saved.tab_configs);
+    }, [contextKey]);
 
     return { visibleTabs, defaultTabKey, tabsWithConfig, saveConfig, isLoading };
 }

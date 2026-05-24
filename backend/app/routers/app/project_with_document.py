@@ -22,6 +22,8 @@ async def create_project_with_document(
 ):
     pool = get_database()
     await check_own_tribe_position_or_admin(data.tribe_id, current_user, pool, required_position="manager")
+    resolved_tribe_id = await resolve_url_param_id(pool, "tribes", data.tribe_id)
+    data = data.model_copy(update={"tribe_id": resolved_tribe_id})
     return await project_service.create_project_with_document(data, pool, current_user)
 
 

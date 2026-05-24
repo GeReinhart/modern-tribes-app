@@ -12,7 +12,7 @@ from ..utils.attachments_helpers import (
     create_document_with_attachments,
     update_document_attachments,
 )
-from ..utils.db_helpers import row_to_dict
+from ..utils.db_helpers import row_to_dict, generate_url_param_id
 from ..utils.document_helpers import update_document_content_with_revision
 
 
@@ -43,10 +43,10 @@ async def create_project_with_document(
 
     async with pool.acquire() as conn:
         project_row = await conn.fetchrow(
-            """INSERT INTO projects (name, document_id, status, created_at, updated_at, created_by, updated_by)
-               VALUES ($1, $2, 'active', $3, $3, $4, $4)
+            """INSERT INTO projects (url_param_id, name, document_id, status, created_at, updated_at, created_by, updated_by)
+               VALUES ($1, $2, $3, 'active', $4, $4, $5, $5)
                RETURNING *""",
-            data.name, UUID(str(document["id"])), now, uid,
+            generate_url_param_id(), data.name, UUID(str(document["id"])), now, uid,
         )
         await conn.execute(
             """INSERT INTO tribes_projects (tribe_id, project_id, relation)

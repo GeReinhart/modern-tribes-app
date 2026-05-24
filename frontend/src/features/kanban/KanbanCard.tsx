@@ -24,12 +24,11 @@ interface Props {
     onReorder: (cardId: string, direction: ReorderDirection) => Promise<void>;
     onToggleLabel: (cardId: string, labelId: string, currentLabelIds: string[]) => Promise<void>;
     onCreateLabel: (data: LabelCreate) => Promise<KanbanLabel | null>;
-    isConfiguring: boolean;
 }
 
 const KanbanCard: React.FC<Props> = ({
     card, canEdit, isFirstCol, isLastCol, isFirstInCol, isLastInCol,
-    accentColor, boardLabels, persons, isConfiguring,
+    accentColor, boardLabels, persons,
     onUpdate, onArchive, onRestore, onMove, onReorder, onToggleLabel, onCreateLabel,
 }) => {
     const { t } = useTranslation();
@@ -170,7 +169,6 @@ const KanbanCard: React.FC<Props> = ({
                     boardLabels={boardLabels}
                     persons={persons}
                     canEdit={canEdit && !isArchived}
-                    isConfiguring={isConfiguring}
                     onClose={() => setModalOpen(false)}
                     onUpdate={onUpdate}
                     onToggleLabel={onToggleLabel}

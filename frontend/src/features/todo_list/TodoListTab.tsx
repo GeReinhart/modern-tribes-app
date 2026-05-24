@@ -120,7 +120,7 @@ const TodoListTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager, a
                 )}
                 {visibleItems.map(item => (
                     <TodoRow key={item.id} item={item} labels={labels} persons={persons}
-                        canEdit={canEdit} isConfiguring={isConfiguring} featureInstanceId={featureInstanceId}
+                        canEdit={canEdit} featureInstanceId={featureInstanceId}
                         onToggle={(id, done) => updateItem(id, { todo_status: done ? 'done' : 'todo' })}
                         onSetStatus={(id, s) => updateItem(id, { status: s })}
                         onUpdate={updateItem} onToggleLabel={toggleLabel} onCreateLabel={createLabel}

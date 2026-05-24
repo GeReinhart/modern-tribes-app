@@ -30,14 +30,13 @@ interface Props {
     onReorderCard: (cardId: string, direction: ReorderDirection) => Promise<void>;
     onToggleLabel: (cardId: string, labelId: string, currentLabelIds: string[]) => Promise<void>;
     onCreateLabel: (data: LabelCreate) => Promise<KanbanLabel | null>;
-    isConfiguring: boolean;
 }
 
 const KanbanColumn: React.FC<Props> = ({
     column, board, featureInstanceId, canEdit, configuring, isFirst, isLast, canDelete,
     showArchived, filterLabelId, filterPersonId, persons,
     onRename, onMove, onDelete, onCreateCard, onUpdateCard, onArchiveCard, onRestoreCard,
-    onMoveCard, onReorderCard, onToggleLabel, onCreateLabel, isConfiguring,
+    onMoveCard, onReorderCard, onToggleLabel, onCreateLabel,
 }) => {
     const { t } = useTranslation();
     const { theme } = useTheme();
@@ -120,7 +119,7 @@ const KanbanColumn: React.FC<Props> = ({
                         accentColor={accentColor}
                         boardLabels={board.labels}
                         persons={persons}
-                        isConfiguring={isConfiguring}
+
                         onUpdate={onUpdateCard} onArchive={onArchiveCard} onRestore={onRestoreCard}
                         onMove={onMoveCard} onReorder={onReorderCard} onToggleLabel={onToggleLabel} onCreateLabel={onCreateLabel}
                     />
@@ -140,7 +139,7 @@ const KanbanColumn: React.FC<Props> = ({
                                 accentColor={accentColor}
                                 boardLabels={board.labels}
                                 persons={persons}
-                                isConfiguring={isConfiguring}
+        
                                 onUpdate={onUpdateCard} onArchive={onArchiveCard} onRestore={onRestoreCard}
                                 onMove={onMoveCard} onReorder={onReorderCard} onToggleLabel={onToggleLabel} onCreateLabel={onCreateLabel}
                             />
