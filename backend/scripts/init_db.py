@@ -3,6 +3,8 @@ import re
 import asyncio
 import argparse
 import csv
+import random
+import string
 from datetime import datetime, timezone
 from typing import Dict, List, Tuple
 from dotenv import load_dotenv
@@ -18,6 +20,13 @@ POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
 POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", "5432"))
 
 ALEMBIC_REVISION = "001"
+
+
+_URL_PARAM_CHARS = string.ascii_letters + string.digits
+
+
+def _generate_url_param_id() -> str:
+    return ''.join(random.choices(_URL_PARAM_CHARS, k=6))
 
 
 def _strip_html(html: str) -> str:
@@ -171,8 +180,8 @@ class DatabaseInitializer:
         async with self.pool.acquire() as conn:
             for row in rows:
                 r = await conn.fetchrow(
-                    "INSERT INTO tribes (name) VALUES ($1) RETURNING id",
-                    row["name"],
+                    "INSERT INTO tribes (url_param_id, name) VALUES ($1, $2) RETURNING id",
+                    _generate_url_param_id(), row["name"],
                 )
                 ids[row["name"]] = str(r["id"])
         print(f"✓ Created {len(ids)} tribes")
@@ -192,8 +201,8 @@ class DatabaseInitializer:
                     print(f"✗ Unknown person '{row['person']}' in users.csv")
                     sys.exit(1)
                 r = await conn.fetchrow(
-                    "INSERT INTO users (login, email, person_id) VALUES ($1, $2, $3) RETURNING id",
-                    row["login"], row["email"], person_ids[row["person"]],
+                    "INSERT INTO users (url_param_id, login, email, person_id) VALUES ($1, $2, $3, $4) RETURNING id",
+                    _generate_url_param_id(), row["login"], row["email"], person_ids[row["person"]],
                 )
                 user_id = r["id"]
                 ids[row["login"]] = str(user_id)
@@ -210,8 +219,8 @@ class DatabaseInitializer:
         async with self.pool.acquire() as conn:
             for row in rows:
                 r = await conn.fetchrow(
-                    "INSERT INTO projects (name, description) VALUES ($1, $2) RETURNING id",
-                    row["name"], row.get("description") or None,
+                    "INSERT INTO projects (url_param_id, name, description) VALUES ($1, $2, $3) RETURNING id",
+                    _generate_url_param_id(), row["name"], row.get("description") or None,
                 )
                 ids[row["name"]] = str(r["id"])
         print(f"✓ Created {len(ids)} projects")
@@ -296,8 +305,8 @@ class DatabaseInitializer:
                 )
                 doc_id = str(doc_r["id"])
                 pd_r = await conn.fetchrow(
-                    "INSERT INTO projects_documents (project_id, document_id, title) VALUES ($1, $2, $3) RETURNING id",
-                    project_ids[project], doc_id, title,
+                    "INSERT INTO projects_documents (url_param_id, project_id, document_id, title) VALUES ($1, $2, $3, $4) RETURNING id",
+                    _generate_url_param_id(), project_ids[project], doc_id, title,
                 )
                 pd_id = str(pd_r["id"])
                 key = f"{project}|{title}"
@@ -327,8 +336,8 @@ class DatabaseInitializer:
                     print(f"✗ Unknown project document '{key}' in publications.csv")
                     sys.exit(1)
                 await conn.execute(
-                    "INSERT INTO publications (document_id, project_document_id, status) VALUES ($1, $2, 'active')",
-                    doc_ids[key], pd_ids[key],
+                    "INSERT INTO publications (url_param_id, document_id, project_document_id, status) VALUES ($1, $2, $3, 'active')",
+                    _generate_url_param_id(), doc_ids[key], pd_ids[key],
                 )
                 count += 1
         print(f"✓ Created {count} publications")
