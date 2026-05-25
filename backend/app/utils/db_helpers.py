@@ -1,12 +1,11 @@
-from fastapi import HTTPException
-from typing import Optional, Dict, Any, List
-from datetime import datetime
-import asyncpg
+import json
 import random
 import string
+from typing import Any, Dict, List, Optional
 from uuid import UUID
-import json
 
+import asyncpg
+from fastapi import HTTPException
 
 TABLES_WITH_STATUS = frozenset({
     'permissions', 'roles', 'documents', 'persons',

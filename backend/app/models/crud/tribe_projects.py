@@ -1,8 +1,8 @@
-from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
 
-from .positions import PositionEnum
+from pydantic import BaseModel
+
+from app.models.crud.positions import PositionEnum
 
 
 class TribeProjectInput(BaseModel):

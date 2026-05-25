@@ -1,6 +1,6 @@
-from html.parser import HTMLParser
 import json
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 from uuid import UUID
 
 

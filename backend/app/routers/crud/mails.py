@@ -1,20 +1,17 @@
-from fastapi import APIRouter, status, Depends
 from typing import List
 from uuid import UUID
 
-from ..auth.authorization import get_current_user
-from ...models.crud.mails import Mail, MailCreate, MailUpdate, MailTo, MailToCreate
-from ...core.database import get_database
-from ...utils.db_helpers import (
-    get_all_documents,
-    get_document_by_id,
-    create_document,
-    update_document,
-    delete_document,
-    check_document_exists,
-)
-from ...models.auth.auth import PermissionEnum
-from ...routers.auth.authorization import require_permission_decorator
+from fastapi import APIRouter, Depends, status
+
+from app.core.database import get_database
+from app.models.auth.auth import PermissionEnum
+from app.models.crud.mails import (Mail, MailCreate, MailTo, MailToCreate,
+                                   MailUpdate)
+from app.routers.auth.authorization import (get_current_user,
+                                            require_permission_decorator)
+from app.utils.db_helpers import (check_document_exists, create_document,
+                                  delete_document, get_all_documents,
+                                  get_document_by_id, update_document)
 
 router = APIRouter(prefix="/mails", tags=["crud_mails"])
 

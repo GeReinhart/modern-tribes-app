@@ -1,21 +1,20 @@
 from datetime import datetime, timezone
-from typing import Optional, List
+from typing import List, Optional
 from uuid import UUID
 
 from fastapi import HTTPException, status
 
-from ..models.app.project_document import (
-    ProjectDocumentCreate, ProjectDocumentUpdate, ProjectDocumentResponse,
-    ProjectDocumentSummary, ProjectDocumentLabel, LabelInfo,
-)
-from ..models.uploads.files import AttachmentFile
-from ..utils.db_helpers import row_to_dict, generate_url_param_id
-from ..utils.attachments_helpers import (
-    get_document_with_attachments,
-    create_document_with_attachments,
-    update_document_attachments,
-)
-from ..utils.document_helpers import update_document_content_with_revision
+from app.models.app.project_document import (LabelInfo, ProjectDocumentCreate,
+                                             ProjectDocumentLabel,
+                                             ProjectDocumentResponse,
+                                             ProjectDocumentSummary,
+                                             ProjectDocumentUpdate)
+from app.models.uploads.files import AttachmentFile
+from app.utils.attachments_helpers import (create_document_with_attachments,
+                                           get_document_with_attachments,
+                                           update_document_attachments)
+from app.utils.db_helpers import generate_url_param_id, row_to_dict
+from app.utils.document_helpers import update_document_content_with_revision
 
 
 async def _upsert_label(pool, name: str) -> str:

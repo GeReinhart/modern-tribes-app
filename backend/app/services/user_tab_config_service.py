@@ -1,5 +1,6 @@
-from ..models.app.user_tab_configs import UserTabConfigResponse, UserTabConfigRequest
-from ..repositories import user_tab_configs_repository
+from app.models.app.user_tab_configs import (UserTabConfigRequest,
+                                             UserTabConfigResponse)
+from app.repositories import user_tab_configs_repository
 
 
 async def get_tab_config(user_id: str, context_key: str, pool) -> UserTabConfigResponse:

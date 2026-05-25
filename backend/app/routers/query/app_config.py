@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends
 from typing import List
 
-from ..auth.authentification import get_current_user
-from ...models.crud.app_config import AppConfigPublic
-from ...core.database import get_database
-from ...utils.db_helpers import get_all_documents
+from fastapi import APIRouter, Depends
+
+from app.core.database import get_database
+from app.models.crud.app_config import AppConfigPublic
+from app.routers.auth.authentification import get_current_user
+from app.utils.db_helpers import get_all_documents
 
 router = APIRouter(prefix="/app-config", tags=["query_app_config"])
 

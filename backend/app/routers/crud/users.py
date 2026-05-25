@@ -1,25 +1,25 @@
 from datetime import datetime, timezone
-from fastapi import APIRouter, status, HTTPException, Depends
 from typing import List
 from uuid import UUID
 
-from ..auth.authentification import get_current_user
-from ...models.crud.users import User, UserCreate, UserUpdate, UserWithRoles
-from ...core.config import settings
-from ...core.database import get_database
-from ...core.email import magic_link_html
-from ...core.security import create_magic_token
-from ...utils.db_helpers import (
-    get_all_documents, check_document_exists, create_document,
-    update_document, delete_document, check_unique_field, resolve_url_param_id,
-)
-from ...utils.ownership import check_own_user_or_admin
-from ...utils.validators import EntityValidator
-from ...models.auth.auth import PermissionEnum
-from ...repositories import user_repository as user_repo
-from ...routers.auth.authorization import (
-    require_permission_decorator, require_any_permission_decorator
-)
+from fastapi import APIRouter, Depends, HTTPException, status
+
+from app.core.config import settings
+from app.core.database import get_database
+from app.core.email import magic_link_html
+from app.core.security import create_magic_token
+from app.models.auth.auth import PermissionEnum
+from app.models.crud.users import User, UserCreate, UserUpdate, UserWithRoles
+from app.repositories import user_repository as user_repo
+from app.routers.auth.authentification import get_current_user
+from app.routers.auth.authorization import (require_any_permission_decorator,
+                                            require_permission_decorator)
+from app.utils.db_helpers import (check_document_exists, check_unique_field,
+                                  create_document, delete_document,
+                                  get_all_documents, resolve_url_param_id,
+                                  update_document)
+from app.utils.ownership import check_own_user_or_admin
+from app.utils.validators import EntityValidator
 
 router = APIRouter(prefix="/users", tags=["crud_users"])
 

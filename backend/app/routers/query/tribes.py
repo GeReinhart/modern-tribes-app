@@ -1,15 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from uuid import UUID
+
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from ..auth.authentification import get_current_user
-from ..auth.authorization import require_any_permission_decorator
-from ...utils.ownership import check_own_user_or_admin
-from ...models.auth.auth import PermissionEnum
-from ...models.crud.positions import PositionEnum
-from ...core.database import get_database
-from ...utils.db_helpers import validate_uuid, resolve_url_param_id
+from app.core.database import get_database
+from app.models.auth.auth import PermissionEnum
+from app.models.crud.positions import PositionEnum
+from app.routers.auth.authentification import get_current_user
+from app.routers.auth.authorization import require_any_permission_decorator
+from app.utils.db_helpers import resolve_url_param_id
+from app.utils.ownership import check_own_user_or_admin
 
 router = APIRouter(prefix="/tribes", tags=["query_tribes"])
 

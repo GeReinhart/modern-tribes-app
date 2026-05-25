@@ -1,7 +1,9 @@
-from pydantic import BaseModel, Field, ConfigDict, HttpUrl
-from typing import Optional, List
 from datetime import datetime
-from ..uploads.files import AttachmentFile
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
+
+from app.models.uploads.files import AttachmentFile
 
 
 class DocumentBase(BaseModel):

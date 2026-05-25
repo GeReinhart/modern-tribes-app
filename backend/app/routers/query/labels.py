@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from ..auth.authentification import get_current_user
-from ..auth.authorization import require_any_permission_decorator
-from ...models.auth.auth import PermissionEnum
-from ...core.database import get_database
-from ...repositories import feature_labels_repository as repo
+from app.core.database import get_database
+from app.models.auth.auth import PermissionEnum
+from app.repositories import feature_labels_repository as repo
+from app.routers.auth.authentification import get_current_user
+from app.routers.auth.authorization import require_any_permission_decorator
 
 router = APIRouter(prefix="/labels", tags=["query_labels"])
 

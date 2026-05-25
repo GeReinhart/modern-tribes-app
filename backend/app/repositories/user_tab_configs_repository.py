@@ -1,7 +1,7 @@
 import json
 from uuid import UUID
 
-from ..utils.db_helpers import row_with_json_to_dict
+from app.utils.db_helpers import row_with_json_to_dict
 
 
 async def get_tab_config(pool, user_id: str, context_key: str) -> dict | None:

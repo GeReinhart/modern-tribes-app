@@ -1,13 +1,16 @@
 from fastapi import HTTPException, status
 
-from ..models.app.tribes_with_positions import (
-    TribeWithPositionsCreate, TribeWithPositionsUpdate, TribeWithPositionsResponse,
-    TribeProjectResponse, AttachmentFile
-)
-from ..repositories import tribe_repository as tribe_repo
-from ..utils.attachments_helpers import get_document_with_attachments, create_document_with_attachments, update_document_attachments
-from ..utils.db_helpers import check_unique_field
-from ..utils.validators import EntityValidator
+from app.models.app.tribes_with_positions import (AttachmentFile,
+                                                  TribeProjectResponse,
+                                                  TribeWithPositionsCreate,
+                                                  TribeWithPositionsResponse,
+                                                  TribeWithPositionsUpdate)
+from app.repositories import tribe_repository as tribe_repo
+from app.utils.attachments_helpers import (create_document_with_attachments,
+                                           get_document_with_attachments,
+                                           update_document_attachments)
+from app.utils.db_helpers import check_unique_field
+from app.utils.validators import EntityValidator
 
 
 async def get_tribe_with_positions(tribe_id: str, pool) -> TribeWithPositionsResponse:
@@ -35,8 +38,7 @@ async def create_tribe_with_positions(data: TribeWithPositionsCreate, pool, curr
     try:
         return await _persist_tribe_create(data, document, pool, current_user['id'])
     except Exception as e:
-        from uuid import UUID
-        from ..utils.db_helpers import delete_document as _del
+        from app.utils.db_helpers import delete_document as _del
         await _del(pool, "documents", str(document["id"]), "Document")
         raise e
 

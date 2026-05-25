@@ -2,15 +2,14 @@ from typing import List
 
 from fastapi import APIRouter, Depends, status
 
-from ..auth.authentification import get_current_user
-from ..auth.authorization import require_permission_decorator
-from ...core.database import get_database
-from ...models.app.notification import (
-    NotificationCreate, NotificationResponse,
-    NotificationStatusUpdate,
-)
-from ...models.auth.auth import PermissionEnum
-from ...services import notification_service
+from app.core.database import get_database
+from app.models.app.notification import (NotificationCreate,
+                                         NotificationResponse,
+                                         NotificationStatusUpdate)
+from app.models.auth.auth import PermissionEnum
+from app.routers.auth.authentification import get_current_user
+from app.routers.auth.authorization import require_permission_decorator
+from app.services import notification_service
 
 router = APIRouter(prefix="/notifications", tags=["app_notifications"])
 

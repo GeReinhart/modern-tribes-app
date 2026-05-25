@@ -1,6 +1,8 @@
-import asyncpg
 from typing import Optional
-from .config import settings
+
+import asyncpg
+
+from app.core.config import settings
 
 
 class Database:

@@ -1,9 +1,11 @@
 from fastapi import HTTPException
-from ..models.app.user_bookmarks import (
-    UserBookmarksResponse, UserBookmarkCreate, UserBookmarkItem,
-    UserBookmarksReorderRequest, UserBookmarkUpdate,
-)
-from ..repositories import user_bookmarks_repository
+
+from app.models.app.user_bookmarks import (UserBookmarkCreate,
+                                           UserBookmarkItem,
+                                           UserBookmarksReorderRequest,
+                                           UserBookmarksResponse,
+                                           UserBookmarkUpdate)
+from app.repositories import user_bookmarks_repository
 
 
 async def get_bookmarks(user_id: str, pool) -> UserBookmarksResponse:

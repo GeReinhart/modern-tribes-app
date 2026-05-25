@@ -1,14 +1,15 @@
-from typing import Optional, List
+from typing import List, Optional
 from uuid import UUID
 
 from fastapi import HTTPException, status
 
-from ..models.app.publication import PublicationSummary, PublicationDetail, PublicationAdminItem
-from ..models.app.project_document import LabelInfo
-from ..models.uploads.files import AttachmentFile
-from ..utils.attachments_helpers import get_document_with_attachments
-from ..repositories import publication_repository
-from . import document_page_service as page_svc
+from app.models.app.project_document import LabelInfo
+from app.models.app.publication import (PublicationAdminItem,
+                                        PublicationDetail, PublicationSummary)
+from app.models.uploads.files import AttachmentFile
+from app.repositories import publication_repository
+from app.services import document_page_service as page_svc
+from app.utils.attachments_helpers import get_document_with_attachments
 
 
 async def _get_labels(pool, document_id: str) -> List[LabelInfo]:

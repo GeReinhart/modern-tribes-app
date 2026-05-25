@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Query
 from typing import List, Optional
 
-from ...models.app.publication import PublicationSummary, PublicationDetail
-from ...models.app.project_document import LabelInfo
-from ...core.database import get_database
-from ...services import publication_service
-from ...utils.db_helpers import resolve_url_param_id
+from fastapi import APIRouter, Query
+
+from app.core.database import get_database
+from app.models.app.project_document import LabelInfo
+from app.models.app.publication import PublicationDetail, PublicationSummary
+from app.services import publication_service
+from app.utils.db_helpers import resolve_url_param_id
 
 router = APIRouter(prefix="/public/publications", tags=["public_publications"])
 

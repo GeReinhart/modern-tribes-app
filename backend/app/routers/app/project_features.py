@@ -1,19 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, Query, status
 from typing import Optional
 from uuid import UUID
 
-from ..auth.authentification import get_current_user
-from ..auth.authorization import require_any_permission_decorator
-from ...models.auth.auth import PermissionEnum
-from ...models.app.project_features import (
-    ProjectFeatureInstanceCreate,
-    ProjectFeatureInstanceUpdate,
-    ProjectFeatureInstanceResponse,
-    FeatureTypeInfo,
-)
-from ...core.database import get_database
-from ...utils.project_access import check_project_access_or_admin
-from ...utils.db_helpers import resolve_url_param_id
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+
+from app.core.database import get_database
+from app.models.app.project_features import (FeatureTypeInfo,
+                                             ProjectFeatureInstanceCreate,
+                                             ProjectFeatureInstanceResponse,
+                                             ProjectFeatureInstanceUpdate)
+from app.models.auth.auth import PermissionEnum
+from app.routers.auth.authentification import get_current_user
+from app.routers.auth.authorization import require_any_permission_decorator
+from app.utils.db_helpers import resolve_url_param_id
+from app.utils.project_access import check_project_access_or_admin
 
 router = APIRouter(prefix="/project-features", tags=["app_project_features"])
 

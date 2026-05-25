@@ -2,12 +2,12 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from ...models.crud.users import UserSearchResult, UserWithPermissions
-from ...core.database import get_database
-from ...repositories import user_repository as user_repo
-from ...routers.auth.authentification import get_current_user
-from ...routers.auth.authorization import require_permission_decorator
-from ...models.auth.auth import PermissionEnum
+from app.core.database import get_database
+from app.models.auth.auth import PermissionEnum
+from app.models.crud.users import UserSearchResult, UserWithPermissions
+from app.repositories import user_repository as user_repo
+from app.routers.auth.authentification import get_current_user
+from app.routers.auth.authorization import require_permission_decorator
 
 router = APIRouter(prefix="/users", tags=["query_users"])
 

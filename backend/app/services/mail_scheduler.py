@@ -1,9 +1,9 @@
 import asyncio
 import logging
 
-from ..core.config import settings
-from ..core.database import get_database
-from ..core.email import send_email
+from app.core.config import settings
+from app.core.database import get_database
+from app.core.email import send_email
 
 logger = logging.getLogger(__name__)
 

@@ -1,51 +1,42 @@
+import asyncio
+import logging
+import os
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-from contextlib import asynccontextmanager
-import asyncio
-import logging
-import os
-import features  # noqa: F401 — triggers feature self-registration
-from .core.config import settings
-from .services.mail_scheduler import mail_scheduler
-from .core.database import connect_to_postgres, close_postgres_connection
-from .routers.uploads import (
-    uploads,
-)
-from .routers.crud import (
-    roles,
-    users,
-    permissions,
-    persons,
-    tribes as crud_tribes,
-    positions,
-    represents,
-    mails,
-    labels,
-    label_entities,
-    projects,
-    documents,
-    document_entities,
-    app_config,
 
-)
-from .routers.auth import authentification
-from .routers.auth import authorization
-from .routers.app import tribes_with_positions, project_with_document, project_features, project_documents, document_pages, publications as app_publications, user_tab_configs, user_bookmarks, notifications as app_notifications
-from .routers.public import publications as public_publications
-from .routers.query import (
-    tribes as query_tribes,
-    users as query_users,
-    monitoring as query_monitoring,
-    mails as query_mails,
-    projects as query_projects,
-    search as query_search,
-    app_config as query_app_config,
-    features as query_features,
-    my_tasks as query_my_tasks,
-    labels as query_labels,
-)
+import features  # noqa: F401 — triggers feature self-registration
+from app.core.config import settings
+from app.core.database import close_postgres_connection, connect_to_postgres
+from app.routers.app import document_pages
+from app.routers.app import notifications as app_notifications
+from app.routers.app import (project_documents, project_features,
+                             project_with_document)
+from app.routers.app import publications as app_publications
+from app.routers.app import (tribes_with_positions, user_bookmarks,
+                             user_tab_configs)
+from app.routers.auth import authentification, authorization
+from app.routers.crud import (app_config, document_entities, documents,
+                              label_entities, labels, mails, permissions,
+                              persons, positions, projects, represents, roles)
+from app.routers.crud import tribes as crud_tribes
+from app.routers.crud import users
+from app.routers.public import publications as public_publications
+from app.routers.query import app_config as query_app_config
+from app.routers.query import features as query_features
+from app.routers.query import labels as query_labels
+from app.routers.query import mails as query_mails
+from app.routers.query import monitoring as query_monitoring
+from app.routers.query import my_tasks as query_my_tasks
+from app.routers.query import projects as query_projects
+from app.routers.query import search as query_search
+from app.routers.query import tribes as query_tribes
+from app.routers.query import users as query_users
+from app.routers.uploads import uploads
+from app.services.mail_scheduler import mail_scheduler
 
 # Configure logging
 logging.basicConfig(
@@ -158,6 +149,7 @@ app.include_router(query_labels.router, prefix="/api/query")
 
 # Feature routers (registered via features package self-registration)
 from features.registry import get_all_routers as _get_feature_routers
+
 for _feature_router in _get_feature_routers():
     app.include_router(_feature_router, prefix="/api/features")
 

@@ -2,9 +2,9 @@ from datetime import datetime, timezone
 from typing import List
 from uuid import UUID
 
-from ..models.uploads.files import AttachmentFile
-from ..utils.db_helpers import row_to_dict
-from ..utils.document_helpers import extract_content_summary, strip_html
+from app.models.uploads.files import AttachmentFile
+from app.utils.db_helpers import row_to_dict
+from app.utils.document_helpers import extract_content_summary, strip_html
 
 
 async def get_document_with_attachments(pool, document_id: str) -> dict:

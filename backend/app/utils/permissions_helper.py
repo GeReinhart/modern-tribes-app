@@ -1,7 +1,7 @@
-from uuid import UUID
 from typing import List
+from uuid import UUID
+
 import asyncpg
-from .db_helpers import row_to_dict
 
 
 async def get_user_permissions(pool: asyncpg.Pool, user_id: str) -> List[str]:

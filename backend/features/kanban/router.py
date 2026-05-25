@@ -10,7 +10,7 @@ from app.utils.project_access import check_project_access_or_admin
 from app.utils.document_helpers import strip_html, extract_content_summary
 from app.repositories import kanban_repository as repo
 from app.repositories import feature_labels_repository as labels_repo
-from .models import (
+from features.kanban.models import (
     KanbanBoard, KanbanColumnResponse, KanbanCardResponse, KanbanLabel, PersonOption,
     ColumnCreate, ColumnUpdate, CardCreate, CardUpdate, MoveCard, ReorderCard,
     LabelCreate, LabelUpdate,

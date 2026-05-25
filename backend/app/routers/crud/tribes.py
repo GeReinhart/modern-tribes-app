@@ -3,28 +3,18 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 
-from ...core.database import get_database
-from ...models.auth.auth import PermissionEnum
-from ...routers.auth.authorization import (
-    require_permission_decorator
-)
-
-from ...models.crud.tribes import Tribe, TribeCreate, TribeUpdate
-from ...models.crud.tribe_projects import TribeProjectInput, TribeProject
-from ...repositories import tribe_repository as tribe_repo
-from ...routers.auth.authentification import get_current_user
-from ...utils.db_helpers import (
-    get_all_documents,
-    get_document_by_id,
-    create_document,
-    update_document,
-    delete_document,
-    check_unique_field,
-    check_document_exists,
-    row_to_dict,
-    resolve_url_param_id,
-)
-from ...utils.validators import EntityValidator
+from app.core.database import get_database
+from app.models.auth.auth import PermissionEnum
+from app.models.crud.tribe_projects import TribeProject, TribeProjectInput
+from app.models.crud.tribes import Tribe, TribeCreate, TribeUpdate
+from app.repositories import tribe_repository as tribe_repo
+from app.routers.auth.authentification import get_current_user
+from app.routers.auth.authorization import require_permission_decorator
+from app.utils.db_helpers import (check_document_exists, check_unique_field,
+                                  create_document, delete_document,
+                                  get_all_documents, get_document_by_id,
+                                  resolve_url_param_id, update_document)
+from app.utils.validators import EntityValidator
 
 router = APIRouter(prefix="/tribes", tags=["crud_tribes"])
 

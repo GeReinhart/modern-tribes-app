@@ -2,9 +2,9 @@ from datetime import datetime, timezone
 from typing import List
 from uuid import UUID
 
-from ..models.app.tribes_with_positions import PersonWithPosition
-from ..utils.db_helpers import row_to_dict, generate_url_param_id
-from ..utils.document_helpers import update_document_content_with_revision
+from app.models.app.tribes_with_positions import PersonWithPosition
+from app.utils.db_helpers import generate_url_param_id, row_to_dict
+from app.utils.document_helpers import update_document_content_with_revision
 
 
 async def get_tribe_by_id(pool, tribe_id: str) -> dict | None:

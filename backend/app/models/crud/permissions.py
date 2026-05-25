@@ -1,8 +1,9 @@
-from pydantic import BaseModel, Field, ConfigDict, EmailStr
-from typing import Optional, List
 from datetime import datetime
+from typing import Optional
 
-from ...models.auth.auth import PermissionEnum
+from pydantic import BaseModel, ConfigDict
+
+from app.models.auth.auth import PermissionEnum
 
 
 # Permission Models

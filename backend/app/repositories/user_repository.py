@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from ..utils.db_helpers import row_with_json_to_dict
+from app.utils.db_helpers import row_with_json_to_dict
 
 
 async def update_user_roles(conn, user_id: str, role_ids: list[str]) -> None:

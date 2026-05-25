@@ -1,10 +1,11 @@
-from pydantic import BaseModel
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
 
-from .project_document import LabelInfo
-from .document_page import DocumentPageResponse
-from ..uploads.files import AttachmentFile
+from pydantic import BaseModel
+
+from app.models.app.document_page import DocumentPageResponse
+from app.models.app.project_document import LabelInfo
+from app.models.uploads.files import AttachmentFile
 
 
 class PublicationSummary(BaseModel):

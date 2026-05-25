@@ -1,16 +1,18 @@
 import asyncio
-import uuid
 import logging
-import filetype
-import boto3
-from botocore.client import BaseClient, Config
-from pathlib import Path
+import uuid
 from datetime import datetime
-from typing import Tuple
-from fastapi import UploadFile, HTTPException
-from PIL import Image
 from io import BytesIO
-from ..core.config import settings
+from pathlib import Path
+from typing import Tuple
+
+import boto3
+import filetype
+from botocore.client import BaseClient, Config
+from fastapi import HTTPException, UploadFile
+from PIL import Image
+
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 

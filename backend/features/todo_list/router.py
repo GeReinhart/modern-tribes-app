@@ -8,7 +8,7 @@ from app.core.database import get_database
 from app.utils.project_access import check_project_access_or_admin
 from app.utils.document_helpers import strip_html, extract_content_summary
 from app.repositories import todo_repository, persons_repository, feature_labels_repository as labels_repo
-from .models import (
+from features.todo_list.models import (
     TodoItemCreate, TodoItemUpdate, TodoItemResponse,
     TodoLabel, TodoLabelCreate, TodoLabelUpdate, PersonOption,
 )

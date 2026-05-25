@@ -1,13 +1,14 @@
-from fastapi import APIRouter, Depends, Query
-from typing import Optional
-from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 
-from ..auth.authentification import get_current_user
-from ..auth.authorization import require_any_permission_decorator
-from ...models.auth.auth import PermissionEnum
-from ...core.database import get_database
+from fastapi import APIRouter, Depends, Query
+from pydantic import BaseModel
+
+from app.core.database import get_database
+from app.models.auth.auth import PermissionEnum
+from app.routers.auth.authentification import get_current_user
+from app.routers.auth.authorization import require_any_permission_decorator
 
 router = APIRouter(prefix="/features", tags=["query_features"])
 

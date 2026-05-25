@@ -1,8 +1,9 @@
-from pydantic import BaseModel, Field
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
 
-from ..uploads.files import AttachmentFile
+from pydantic import BaseModel, Field
+
+from app.models.uploads.files import AttachmentFile
 
 
 class LabelInfo(BaseModel):

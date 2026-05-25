@@ -1,9 +1,11 @@
 import logging
 import uuid
-from fastapi import APIRouter, UploadFile, File, HTTPException, Request
+
+from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 from fastapi.responses import JSONResponse
-from ...models.uploads.files import UploadFileResponse
-from ...utils.file_handler import file_handler
+
+from app.models.uploads.files import UploadFileResponse
+from app.utils.file_handler import file_handler
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/uploads", tags=["upload"])

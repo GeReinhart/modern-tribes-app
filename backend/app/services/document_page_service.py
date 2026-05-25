@@ -4,12 +4,11 @@ from uuid import UUID
 
 from fastapi import HTTPException, status
 
-from ..models.app.document_page import (
-    DocumentPageCreate, DocumentPageUpdate,
-    DocumentPageResponse,
-)
-from ..models.uploads.files import AttachmentFile
-from ..repositories import document_page_repository as repo
+from app.models.app.document_page import (DocumentPageCreate,
+                                          DocumentPageResponse,
+                                          DocumentPageUpdate)
+from app.models.uploads.files import AttachmentFile
+from app.repositories import document_page_repository as repo
 
 
 async def _verify_document_belongs_to_project(pool, project_id: str, project_document_id: str) -> None:

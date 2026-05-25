@@ -1,13 +1,14 @@
-from fastapi import APIRouter, Depends, Query, HTTPException, status
-from pydantic import BaseModel
 from typing import Optional
 from uuid import UUID
 
-from ..auth.authentification import get_current_user
-from ..auth.authorization import require_any_permission_decorator
-from ...models.auth.auth import PermissionEnum
-from ...core.database import get_database
-from ...utils.permissions_helper import get_user_permissions
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel
+
+from app.core.database import get_database
+from app.models.auth.auth import PermissionEnum
+from app.routers.auth.authentification import get_current_user
+from app.routers.auth.authorization import require_any_permission_decorator
+from app.utils.permissions_helper import get_user_permissions
 
 router = APIRouter(prefix="/search", tags=["query_search"])
 

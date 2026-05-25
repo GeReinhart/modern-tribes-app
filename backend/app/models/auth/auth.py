@@ -1,9 +1,9 @@
-from pydantic import BaseModel, Field, ConfigDict, EmailStr
-from typing import Optional, List
 from datetime import datetime
-
-
 from enum import Enum
+from typing import List, Optional
+
+from pydantic import BaseModel, EmailStr, Field
+
 
 class PermissionEnum(str, Enum):
     ADMIN = "admin"

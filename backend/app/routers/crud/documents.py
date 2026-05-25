@@ -1,24 +1,18 @@
-from fastapi import APIRouter, status, Depends
+import json
 from typing import List
 from uuid import UUID
-import json
 
-from ..auth.authentification import get_current_user
-from ...models.crud.documents import Document, DocumentCreate, DocumentUpdate
-from ...core.database import get_database
-from ...utils.db_helpers import (
-    get_all_documents,
-    get_document_by_id,
-    create_document,
-    update_document,
-    delete_document,
-    check_document_exists
-)
-from ...models.auth.auth import PermissionEnum
-from ...routers.auth.authorization import (
-    require_permission_decorator
-)
-from ...utils.document_helpers import extract_content_summary, strip_html
+from fastapi import APIRouter, Depends, status
+
+from app.core.database import get_database
+from app.models.auth.auth import PermissionEnum
+from app.models.crud.documents import Document, DocumentCreate, DocumentUpdate
+from app.routers.auth.authentification import get_current_user
+from app.routers.auth.authorization import require_permission_decorator
+from app.utils.db_helpers import (check_document_exists, create_document,
+                                  delete_document, get_all_documents,
+                                  get_document_by_id, update_document)
+from app.utils.document_helpers import extract_content_summary, strip_html
 
 router = APIRouter(prefix="/documents", tags=["crud_documents"])
 

@@ -1,18 +1,22 @@
 from datetime import datetime, timezone
 from uuid import UUID
-from fastapi import APIRouter, HTTPException, Depends, Request, Response, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from ...core.database import get_database
-from ...core.email import magic_link_html
-from ...core.security import create_magic_token
-from ...core.config import settings
+from fastapi import (APIRouter, Depends, HTTPException, Request, Response,
+                     status)
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
-from ...models.auth.auth import MagicLinkRequest, MagicLinkResponse, TokenResponse, UserResponse, SessionResponse, RefreshRequest, RefreshResponse
-from ...repositories import auth_repository as auth_repo
-from ...services import auth_service
-from ...utils.db_helpers import create_document
-from ...utils.permissions_helper import get_user_permissions
+
+from app.core.config import settings
+from app.core.database import get_database
+from app.core.email import magic_link_html
+from app.core.security import create_magic_token
+from app.models.auth.auth import (MagicLinkRequest, MagicLinkResponse,
+                                  RefreshRequest, RefreshResponse,
+                                  SessionResponse, TokenResponse, UserResponse)
+from app.repositories import auth_repository as auth_repo
+from app.services import auth_service
+from app.utils.db_helpers import create_document
+from app.utils.permissions_helper import get_user_permissions
 
 router = APIRouter()
 security = HTTPBearer()
@@ -133,7 +137,7 @@ async def refresh_token(body: RefreshRequest):
 
 @router.post("/auth/logout")
 async def logout(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    from ...core.security import verify_access_token
+    from app.core.security import verify_access_token
     payload = verify_access_token(credentials.credentials)
     if payload:
         pool = get_database()

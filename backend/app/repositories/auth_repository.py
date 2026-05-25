@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from ..utils.db_helpers import row_to_dict
+from app.utils.db_helpers import row_to_dict
 
 
 async def get_user_by_email(pool, email: str) -> dict | None:

@@ -1,13 +1,13 @@
 from functools import wraps
-from typing import Callable, Any, List, Optional
+from typing import Any, Callable
 
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
-from .authentification import get_current_user
-from ...core.database import get_database
-from ...models.auth.auth import Authorization, PermissionEnum
-from ...utils.ownership import check_own_tribe_position_or_admin
-from ...utils.permissions_helper import get_user_permissions
+from app.core.database import get_database
+from app.models.auth.auth import Authorization, PermissionEnum
+from app.routers.auth.authentification import get_current_user
+from app.utils.ownership import check_own_tribe_position_or_admin
+from app.utils.permissions_helper import get_user_permissions
 
 router = APIRouter()
 

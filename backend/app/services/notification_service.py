@@ -1,8 +1,7 @@
 from fastapi import HTTPException, status
 
-from ..repositories import notification_repository as notification_repo
-from ..repositories import user_repository as user_repo
-from ..utils.db_helpers import check_document_exists, generate_url_param_id
+from app.repositories import notification_repository as notification_repo
+from app.utils.db_helpers import check_document_exists, generate_url_param_id
 
 
 async def create_for_user(pool, target_user_id: str, message: str, current_user_id: str) -> dict:

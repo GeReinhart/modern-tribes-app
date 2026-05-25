@@ -1,7 +1,9 @@
-from pydantic import BaseModel, Field, ConfigDict
-from typing import Optional, List
 from datetime import datetime
-from ..uploads.files import AttachmentFile
+from typing import List, Optional
+
+from pydantic import BaseModel, ConfigDict
+
+from app.models.uploads.files import AttachmentFile
 
 
 class TribeProjectResponse(BaseModel):

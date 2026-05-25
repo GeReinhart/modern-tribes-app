@@ -1,9 +1,11 @@
-from pydantic import BaseModel, Field, ConfigDict, EmailStr
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
 
-from .roles import Role
-from ..auth.auth import UserSession
+from pydantic import BaseModel, ConfigDict, EmailStr
+
+from app.models.auth.auth import UserSession
+from app.models.crud.roles import Role
+
 
 # User Models
 class UserBase(BaseModel):

@@ -2,10 +2,12 @@ from datetime import datetime, timedelta, timezone
 
 from fastapi import HTTPException, status
 
-from ..core.config import settings
-from ..core.security import verify_magic_token, create_access_token, generate_session_id, create_refresh_token, hash_refresh_token
-from ..models.auth.auth import TokenResponse, UserResponse, RefreshResponse
-from ..repositories import auth_repository as auth_repo
+from app.core.config import settings
+from app.core.security import (create_access_token, create_refresh_token,
+                               generate_session_id, hash_refresh_token,
+                               verify_magic_token)
+from app.models.auth.auth import RefreshResponse, TokenResponse, UserResponse
+from app.repositories import auth_repository as auth_repo
 
 
 async def create_session_for_magic_link(token: str, user_agent: str | None, ip_address: str | None, pool) -> TokenResponse:
@@ -68,7 +70,7 @@ async def refresh_access_token(raw_refresh_token: str, pool) -> RefreshResponse:
 
 
 async def validate_session(token: str, pool) -> dict:
-    from ..core.security import verify_access_token
+    from app.core.security import verify_access_token
     payload = verify_access_token(token)
     if not payload:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")

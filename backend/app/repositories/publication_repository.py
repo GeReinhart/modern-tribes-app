@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
-from ..utils.db_helpers import generate_url_param_id
+from app.utils.db_helpers import generate_url_param_id
 
 
 async def insert_publication(

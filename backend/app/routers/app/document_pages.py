@@ -1,17 +1,18 @@
-from fastapi import APIRouter, Depends, status
 from typing import List
 
-from ..auth.authentification import get_current_user
-from ..auth.authorization import require_any_permission_decorator
-from ...models.auth.auth import PermissionEnum
-from ...models.app.document_page import (
-    DocumentPageCreate, DocumentPageUpdate,
-    DocumentPageResponse, PageReorderRequest,
-)
-from ...core.database import get_database
-from ...services import document_page_service
-from ...utils.project_access import check_project_access_or_admin
-from ...utils.db_helpers import resolve_url_param_id
+from fastapi import APIRouter, Depends, status
+
+from app.core.database import get_database
+from app.models.app.document_page import (DocumentPageCreate,
+                                          DocumentPageResponse,
+                                          DocumentPageUpdate,
+                                          PageReorderRequest)
+from app.models.auth.auth import PermissionEnum
+from app.routers.auth.authentification import get_current_user
+from app.routers.auth.authorization import require_any_permission_decorator
+from app.services import document_page_service
+from app.utils.db_helpers import resolve_url_param_id
+from app.utils.project_access import check_project_access_or_admin
 
 router = APIRouter(prefix="/project-documents", tags=["app_document_pages"])
 

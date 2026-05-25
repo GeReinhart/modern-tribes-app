@@ -3,9 +3,9 @@ from uuid import UUID
 
 from fastapi import HTTPException, status
 
-from .db_helpers import get_document_by_id, row_to_dict, resolve_url_param_id
-from .permissions_helper import get_user_permissions
-from ..models.auth.auth import PermissionEnum
+from app.models.auth.auth import PermissionEnum
+from app.utils.db_helpers import get_document_by_id, resolve_url_param_id
+from app.utils.permissions_helper import get_user_permissions
 
 
 async def check_own_user_or_admin(user_id: str, current_user: dict, pool) -> None:

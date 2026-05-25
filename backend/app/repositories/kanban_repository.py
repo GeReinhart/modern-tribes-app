@@ -1,7 +1,9 @@
+from datetime import date
 from typing import Optional
 from uuid import UUID
-from datetime import date
-from app.repositories.persons_repository import fetch_persons_for_feature  # noqa: F401 – re-exported for callers
+
+from app.repositories.persons_repository import \
+    fetch_persons_for_feature  # noqa: F401 – re-exported for callers
 
 
 async def fetch_board(pool, feature_instance_id: str) -> dict:

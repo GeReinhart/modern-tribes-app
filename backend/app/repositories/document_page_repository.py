@@ -3,8 +3,8 @@ from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
-from ..utils.db_helpers import row_to_dict, generate_url_param_id
-from ..utils.document_helpers import extract_content_summary, strip_html
+from app.utils.db_helpers import generate_url_param_id, row_to_dict
+from app.utils.document_helpers import extract_content_summary, strip_html
 
 
 async def create_page(

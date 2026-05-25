@@ -1,5 +1,5 @@
-from ..registry import register_feature, FeatureDefinition
-from .router import router, label_router
+from features.registry import register_feature, FeatureDefinition
+from features.todo_list.router import router, label_router
 
 register_feature(FeatureDefinition(
     feature_type="todo_list",

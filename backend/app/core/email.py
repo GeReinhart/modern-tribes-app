@@ -1,6 +1,7 @@
 import httpx
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
-from .config import settings
+from fastapi_mail import ConnectionConfig, FastMail, MessageSchema
+
+from app.core.config import settings
 
 
 def _smtp_client() -> FastMail:

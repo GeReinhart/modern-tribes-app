@@ -1,8 +1,9 @@
-from pydantic import BaseModel
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
 
-from ..uploads.files import AttachmentFile
+from pydantic import BaseModel
+
+from app.models.uploads.files import AttachmentFile
 
 
 class ProjectWithDocumentCreate(BaseModel):
