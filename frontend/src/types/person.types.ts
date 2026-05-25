@@ -9,7 +9,7 @@ export interface PersonBase {
   document_id?: string | null;
 }
 
-export interface PersonCreate extends PersonBase {}
+export type PersonCreate = PersonBase;
 
 export interface PersonUpdate {
   first_name?: string;

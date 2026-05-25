@@ -50,9 +50,11 @@ export const tokenManager = {
   },
   getRefreshToken: (): string | null => localStorage.getItem('refresh_token'),
   setRefreshToken: (token: string | null): void => {
-    token
-      ? localStorage.setItem('refresh_token', token)
-      : localStorage.removeItem('refresh_token');
+    if (token) {
+      localStorage.setItem('refresh_token', token);
+    } else {
+      localStorage.removeItem('refresh_token');
+    }
   },
   clearAll: (): void => {
     localStorage.removeItem('access_token');

@@ -6,7 +6,7 @@ export interface PositionBase {
   position: PositionEnum;
 }
 
-export interface PositionCreate extends PositionBase {}
+export type PositionCreate = PositionBase;
 
 export interface PositionUpdate {
   tribe_id?: string;

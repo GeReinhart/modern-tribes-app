@@ -3,7 +3,7 @@ export interface ProjectBase {
   document_id: string;
 }
 
-export interface ProjectCreate extends ProjectBase {}
+export type ProjectCreate = ProjectBase;
 
 export interface ProjectUpdate {
   name?: string;

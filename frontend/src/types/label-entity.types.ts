@@ -5,7 +5,7 @@ export interface LabelEntityBase {
   document_id?: string | null;
 }
 
-export interface LabelEntityCreate extends LabelEntityBase {}
+export type LabelEntityCreate = LabelEntityBase;
 
 export interface LabelEntityUpdate {
   label_id?: string;

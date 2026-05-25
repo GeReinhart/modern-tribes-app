@@ -4,7 +4,7 @@ export interface DocumentEntityBase {
   related_document_id?: string | null;
 }
 
-export interface DocumentEntityCreate extends DocumentEntityBase {}
+export type DocumentEntityCreate = DocumentEntityBase;
 
 export interface DocumentEntityUpdate {
   document_id?: string;

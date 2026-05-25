@@ -20,7 +20,7 @@ export interface TribeBase {
   document_id?: string | null;
 }
 
-export interface TribeCreate extends TribeBase {}
+export type TribeCreate = TribeBase;
 
 export interface TribeUpdate {
   name?: string;

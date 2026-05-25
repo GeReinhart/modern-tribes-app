@@ -98,6 +98,17 @@ const EditProjectPageContent: React.FC = () => {
     }
   };
 
+  const menuActions = useMemo(
+    (): MenuAction[] => [
+      {
+        icon: 'x',
+        label: t('common.cancel'),
+        onClick: () => navigate(`/app/tribes/${tribeId}/projects/${projectId}`),
+      },
+    ],
+    [t, navigate, tribeId, projectId],
+  );
+
   if (loadingProject) {
     return (
       <AppLayout breadcrumbs={breadcrumbs}>
@@ -117,17 +128,6 @@ const EditProjectPageContent: React.FC = () => {
       </AppLayout>
     );
   }
-
-  const menuActions = useMemo(
-    (): MenuAction[] => [
-      {
-        icon: 'x',
-        label: t('common.cancel'),
-        onClick: () => navigate(`/app/tribes/${tribeId}/projects/${projectId}`),
-      },
-    ],
-    [t, navigate, tribeId, projectId],
-  );
 
   return (
     <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions}>

@@ -2,7 +2,7 @@ export interface LabelBase {
   name: string;
 }
 
-export interface LabelCreate extends LabelBase {}
+export type LabelCreate = LabelBase;
 
 export interface LabelUpdate {
   name?: string;
