@@ -28,7 +28,7 @@ async def resolve_url_param_id(pool: asyncpg.Pool, table: str, id_param: str) ->
     try:
         UUID(id_param)
         return id_param
-    except ValueError, AttributeError:
+    except (ValueError, AttributeError):
         if table not in URL_PARAM_ID_TABLES:
             raise HTTPException(status_code=400, detail="Invalid ID format")
         async with pool.acquire() as conn:
@@ -68,7 +68,7 @@ def row_with_json_to_dict(row):
         elif isinstance(value, str) and value.startswith("["):
             try:
                 data[key] = json.loads(value)
-            except json.JSONDecodeError, TypeError:
+            except (json.JSONDecodeError, TypeError):
                 pass
 
     return data
@@ -79,7 +79,7 @@ def validate_uuid(id_str: str, field_name: str = "ID") -> str:
     try:
         UUID(id_str)
         return id_str
-    except ValueError, AttributeError:
+    except (ValueError, AttributeError):
         raise HTTPException(status_code=400, detail=f"Invalid {field_name} format")
 
 
