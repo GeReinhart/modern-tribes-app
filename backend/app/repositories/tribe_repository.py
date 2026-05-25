@@ -174,6 +174,30 @@ async def sync_positions(
                 )
 
 
+async def get_tribes_with_members_for_project(pool, project_id: str) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT
+                t.id           AS tribe_id,
+                t.url_param_id AS tribe_url_param_id,
+                t.name         AS tribe_name,
+                p.id           AS person_id,
+                p.first_name,
+                p.last_name,
+                pos.position
+            FROM tribes t
+            JOIN tribes_projects tp ON tp.tribe_id = t.id
+            JOIN positions pos ON pos.tribe_id = t.id AND pos.status = 'active'
+            JOIN persons p ON p.id = pos.person_id AND p.status = 'active'
+            WHERE tp.project_id = $1 AND t.status = 'active'
+            ORDER BY t.name, p.last_name, p.first_name
+            """,
+            UUID(project_id),
+        )
+    return [dict(r) for r in rows]
+
+
 async def get_persons_with_positions(pool, positions: list[dict]) -> List[PersonWithPosition]:
     if not positions:
         return []

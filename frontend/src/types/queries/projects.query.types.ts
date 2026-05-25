@@ -23,3 +23,17 @@ export interface ProjectEntry {
     position: PositionEnum;
   }>;
 }
+
+export interface ProjectTribeMember {
+  person_id: string;
+  first_name: string;
+  last_name: string;
+  position: PositionEnum;
+}
+
+export interface ProjectTribeWithMembers {
+  tribe_id: string;
+  tribe_url_param_id: string;
+  tribe_name: string;
+  members: ProjectTribeMember[];
+}

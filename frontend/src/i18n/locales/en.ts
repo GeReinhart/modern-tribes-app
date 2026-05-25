@@ -52,6 +52,8 @@ const en: Record<string, string> = {
   'projects.updateSuccess': 'Project updated successfully.',
   'projects.notFound': 'Project not found',
   'projects.noProjects': 'No projects linked to this tribe yet.',
+  'projects.tabTribes': 'Tribes',
+  'projects.noTribesLinked': 'No tribes linked to this project.',
 
   'tribes.title': 'Tribes',
   'tribes.subtitle': "The tribes I'm involved with.",

@@ -43,6 +43,8 @@ These rules apply to all code you write or modify, in any language or layer.
 - **When adding code, first check if a related file already exists.** Add to it rather than creating a new one, unless it would violate the file size rule.
 - **New shared logic must go in a shared module immediately**, not inline at the call site.
 
+- **MUST**: follow ./docs/Packages.md 
+
 ### Refactoring Triggers
 
 When you encounter any of the following, refactor before continuing:

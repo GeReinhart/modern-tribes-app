@@ -5,10 +5,13 @@ from fastapi import HTTPException, status
 
 from app.models.app.project_with_document import (
     AttachmentFile,
+    ProjectTribeMemberResponse,
+    ProjectTribeWithMembersResponse,
     ProjectWithDocumentCreate,
     ProjectWithDocumentResponse,
     ProjectWithDocumentUpdate,
 )
+from app.repositories import tribe_repository as tribe_repo
 from app.utils.attachments_helpers import (
     create_document_with_attachments,
     get_document_with_attachments,
@@ -140,3 +143,28 @@ async def _build_response(project: dict, pool) -> ProjectWithDocumentResponse:
         created_at=project["created_at"],
         updated_at=project["updated_at"],
     )
+
+
+async def get_project_tribes_with_members(
+    project_id: str, pool
+) -> list[ProjectTribeWithMembersResponse]:
+    rows = await tribe_repo.get_tribes_with_members_for_project(pool, project_id)
+    tribes: dict[str, ProjectTribeWithMembersResponse] = {}
+    for row in rows:
+        tid = str(row["tribe_id"])
+        if tid not in tribes:
+            tribes[tid] = ProjectTribeWithMembersResponse(
+                tribe_id=tid,
+                tribe_url_param_id=row["tribe_url_param_id"],
+                tribe_name=row["tribe_name"],
+                members=[],
+            )
+        tribes[tid].members.append(
+            ProjectTribeMemberResponse(
+                person_id=str(row["person_id"]),
+                first_name=row["first_name"],
+                last_name=row["last_name"],
+                position=row["position"],
+            )
+        )
+    return list(tribes.values())

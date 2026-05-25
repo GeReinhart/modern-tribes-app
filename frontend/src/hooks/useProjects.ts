@@ -8,6 +8,7 @@ import {
 } from '../types/app/project_with_document.types';
 import { Project, ProjectCreate, ProjectUpdate } from '../types/project.types';
 import { UserProjectEntry } from '../types/queries/projects.query.types';
+import { ProjectTribeWithMembers } from '../types/queries/projects.query.types';
 import { useApi } from './useApi';
 import { createEntityHooks } from './useEntityCrud';
 
@@ -149,4 +150,24 @@ export function useProjectWithDocumentMutations() {
     loading,
     error,
   };
+}
+
+export function useProjectTribesWithMembers(projectId: string | null) {
+  const [tribes, setTribes] = useState<ProjectTribeWithMembers[]>([]);
+  const { loading, error, execute } = useApi<ProjectTribeWithMembers[]>();
+
+  const fetch = useCallback(() => {
+    if (!projectId) return;
+    execute(() => projectService.getTribesWithMembers(projectId)).then(
+      (data) => {
+        if (data) setTribes(data);
+      },
+    );
+  }, [projectId, execute]);
+
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
+
+  return { tribes, loading, error, refetch: fetch };
 }

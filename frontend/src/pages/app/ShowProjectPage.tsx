@@ -7,6 +7,7 @@ import { ThemedSection } from '@/components/common/layout/ThemedSection';
 import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
 import { ThemedText } from '@/components/common/layout/ThemedText';
 import { ProjectDocumentsTab } from '@/components/entities/projects/ProjectDocumentsTab';
+import { ProjectTribesTab } from '@/components/entities/projects/ProjectTribesTab';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { getFeatureComponent } from '@/features/registry';
@@ -19,6 +20,7 @@ import {
   useProjectFeatures,
 } from '@/hooks/useProjectFeatures';
 import {
+  useProjectTribesWithMembers,
   useProjectWithDocument,
   useUserProjectsByTribe,
 } from '@/hooks/useProjects';
@@ -198,6 +200,9 @@ const ShowProjectPageContent: React.FC = () => {
   );
   const { features, createFeature, renameFeature, archiveFeature } =
     useProjectFeatures(projectId || null);
+  const { tribes: projectTribes } = useProjectTribesWithMembers(
+    projectId || null,
+  );
 
   const initialLabelId = searchParams.get('labelId') || null;
   const [showAddFeature, setShowAddFeature] = useState(false);
@@ -264,9 +269,13 @@ const ShowProjectPageContent: React.FC = () => {
       { key: 'description', label: t('tribes.tabDescription') },
       { key: 'documents', label: t('projectDocuments.tab') },
     ];
+    const tribeTab =
+      projectTribes.length > 1
+        ? [{ key: 'tribes', label: t('projects.tabTribes') }]
+        : [];
     const featureTabs = features.map((f) => ({ key: f.id, label: f.name }));
-    return [...base, ...featureTabs];
-  }, [features, t]);
+    return [...base, ...tribeTab, ...featureTabs];
+  }, [features, projectTribes.length, t]);
 
   const contextKey = projectId ? `project:${projectId}` : '';
   const { visibleTabs, defaultTabKey, tabsWithConfig, saveConfig } =
@@ -415,6 +424,12 @@ const ShowProjectPageContent: React.FC = () => {
               canEdit={canEdit}
               initialLabelId={initialLabelId}
             />
+          )}
+
+          {activeTab === 'tribes' && (
+              <ThemedSection themeId="default">
+                 <ProjectTribesTab tribes={projectTribes} />
+              </ThemedSection>
           )}
 
           {activeTab === 'description' && (

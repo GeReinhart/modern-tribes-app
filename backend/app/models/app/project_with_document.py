@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+from app.models.crud.positions import PositionEnum
 from app.models.uploads.files import AttachmentFile
 
 
@@ -29,3 +30,17 @@ class ProjectWithDocumentResponse(BaseModel):
     status: str
     created_at: datetime
     updated_at: datetime
+
+
+class ProjectTribeMemberResponse(BaseModel):
+    person_id: str
+    first_name: str
+    last_name: str
+    position: PositionEnum
+
+
+class ProjectTribeWithMembersResponse(BaseModel):
+    tribe_id: str
+    tribe_url_param_id: str
+    tribe_name: str
+    members: List[ProjectTribeMemberResponse]

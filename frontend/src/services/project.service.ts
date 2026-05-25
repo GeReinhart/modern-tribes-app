@@ -4,7 +4,10 @@ import {
   ProjectWithDocumentUpdate,
 } from '../types/app/project_with_document.types';
 import { Project, ProjectCreate, ProjectUpdate } from '../types/project.types';
-import { UserProjectEntry } from '../types/queries/projects.query.types';
+import {
+  ProjectTribeWithMembers,
+  UserProjectEntry,
+} from '../types/queries/projects.query.types';
 import { apiService } from './api.service';
 
 class ProjectService {
@@ -69,6 +72,14 @@ class ProjectService {
     return apiService.put<ProjectWithDocumentResponse>(
       `/projects/${projectId}/with-document`,
       data,
+    );
+  }
+
+  async getTribesWithMembers(
+    projectId: string,
+  ): Promise<ProjectTribeWithMembers[]> {
+    return apiService.get<ProjectTribeWithMembers[]>(
+      `/projects/${projectId}/tribes-with-members`,
     );
   }
 }
