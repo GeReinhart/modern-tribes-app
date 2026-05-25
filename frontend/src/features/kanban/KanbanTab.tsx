@@ -254,7 +254,7 @@ const KanbanTab: React.FC<Props> = ({
       <div
         style={{
           display: 'flex',
-          gap: '14px',
+          gap: '6px',
           alignItems: 'flex-start',
           overflowX: 'auto',
         }}

@@ -129,7 +129,7 @@ const KanbanColumn: React.FC<Props> = ({
         borderRadius: '10px',
         border: `1px solid ${theme.colors.border}`,
         borderTop: `3px solid ${accentColor}`,
-        padding: '12px',
+        padding: '5px',
       }}
     >
       <div
