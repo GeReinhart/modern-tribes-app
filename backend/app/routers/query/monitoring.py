@@ -202,7 +202,7 @@ async def get_document_revisions(document_id: str, current_user: dict = Depends(
     """Get all revision snapshots for a document, current version first"""
     try:
         uid = UUID(document_id)
-    except ValueError, AttributeError:
+    except (ValueError, AttributeError):
         raise HTTPException(status_code=400, detail="Invalid document ID format")
     pool = get_database()
     async with pool.acquire() as conn:

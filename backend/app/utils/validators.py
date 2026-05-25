@@ -53,5 +53,5 @@ def validate_uuid_format(id: str) -> str:
     try:
         UUID(id)
         return id
-    except ValueError, AttributeError:
+    except (ValueError, AttributeError):
         raise HTTPException(status_code=400, detail="Invalid UUID format")
