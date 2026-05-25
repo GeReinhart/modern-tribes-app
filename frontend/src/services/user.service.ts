@@ -1,44 +1,66 @@
+import {
+  User,
+  UserCreate,
+  UserUpdate,
+  UserWithRolesAndPermissions,
+} from '../types/user.types';
 import { apiService } from './api.service';
-import {User, UserCreate, UserUpdate, UserWithRolesAndPermissions} from '../types/user.types';
 
 class UserService {
-    private endpoint = '/crud/users';
+  private endpoint = '/crud/users';
 
-    async getAll(): Promise<User[]> {
-        return apiService.get<User[]>(this.endpoint);
-    }
+  async getAll(): Promise<User[]> {
+    return apiService.get<User[]>(this.endpoint);
+  }
 
-    async getById(id: string): Promise<User> {
-        return apiService.get<User>(`${this.endpoint}/${id}`);
-    }
+  async getById(id: string): Promise<User> {
+    return apiService.get<User>(`${this.endpoint}/${id}`);
+  }
 
-    async getAllWithRolesAndPermissions(): Promise<UserWithRolesAndPermissions[]> {
-        return apiService.get<UserWithRolesAndPermissions[]>(`${this.endpoint}/with/roles/permissions`);
-    }
+  async getAllWithRolesAndPermissions(): Promise<
+    UserWithRolesAndPermissions[]
+  > {
+    return apiService.get<UserWithRolesAndPermissions[]>(
+      `${this.endpoint}/with/roles/permissions`,
+    );
+  }
 
-    async getByIdWithRolesAndPermissions(id: string): Promise<UserWithRolesAndPermissions> {
-        return apiService.get<UserWithRolesAndPermissions>(`${this.endpoint}/${id}/with/roles/permissions`);
-    }
+  async getByIdWithRolesAndPermissions(
+    id: string,
+  ): Promise<UserWithRolesAndPermissions> {
+    return apiService.get<UserWithRolesAndPermissions>(
+      `${this.endpoint}/${id}/with/roles/permissions`,
+    );
+  }
 
-    async create(data: UserCreate): Promise<User> {
-        return apiService.post<User>(this.endpoint, data);
-    }
+  async create(data: UserCreate): Promise<User> {
+    return apiService.post<User>(this.endpoint, data);
+  }
 
-    async update(id: string, data: UserUpdate): Promise<User> {
-        return apiService.put<User>(`${this.endpoint}/${id}`, data);
-    }
+  async update(id: string, data: UserUpdate): Promise<User> {
+    return apiService.put<User>(`${this.endpoint}/${id}`, data);
+  }
 
-    async delete(id: string): Promise<void> {
-        return apiService.delete<void>(`${this.endpoint}/${id}`);
-    }
+  async delete(id: string): Promise<void> {
+    return apiService.delete<void>(`${this.endpoint}/${id}`);
+  }
 
-    async sendMagicLink(userId: string): Promise<{ message: string; email: string }> {
-        return apiService.post<{ message: string; email: string }>(`${this.endpoint}/${userId}/magic-link/send`, {});
-    }
+  async sendMagicLink(
+    userId: string,
+  ): Promise<{ message: string; email: string }> {
+    return apiService.post<{ message: string; email: string }>(
+      `${this.endpoint}/${userId}/magic-link/send`,
+      {},
+    );
+  }
 
-    async generateMagicLink(userId: string): Promise<{ magic_link: string; email: string }> {
-        return apiService.get<{ magic_link: string; email: string }>(`${this.endpoint}/${userId}/magic-link/generate`);
-    }
+  async generateMagicLink(
+    userId: string,
+  ): Promise<{ magic_link: string; email: string }> {
+    return apiService.get<{ magic_link: string; email: string }>(
+      `${this.endpoint}/${userId}/magic-link/generate`,
+    );
+  }
 }
 
 export const userService = new UserService();

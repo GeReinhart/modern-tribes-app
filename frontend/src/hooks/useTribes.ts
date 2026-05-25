@@ -1,181 +1,194 @@
-import { useState, useEffect, useCallback } from 'react';
+import { UserPersonPositionTribe } from '@/types/queries/tribes.query.types.ts';
+
+import { useCallback, useEffect, useState } from 'react';
+
 import { tribeService } from '../services/tribe.service';
 import {
-    Tribe,
-    TribeCreate,
-    TribeUpdate,
-    TribeProject,
-    TribeWithPersonsWithPosition,
-    TribeWithPositions,
+  Tribe,
+  TribeCreate,
+  TribeProject,
+  TribeUpdate,
+  TribeWithPersonsWithPosition,
+  TribeWithPositions,
 } from '../types/tribe.types';
 import { useApi } from './useApi';
-import {UserPersonPositionTribe} from "@/types/queries/tribes.query.types.ts";
 
 export function useTribes() {
-    const [tribes, setTribes] = useState<Tribe[]>([]);
-    const { loading, error, execute } = useApi<Tribe[]>();
+  const [tribes, setTribes] = useState<Tribe[]>([]);
+  const { loading, error, execute } = useApi<Tribe[]>();
 
-    const fetchTribes = useCallback(async () => {
-        try {
-            const data = await execute(() => tribeService.getAll());
-            if (data) setTribes(data);
-        } catch (error) {
-            console.error('Error fetching tribes:', error);
-        }
-    }, [execute]);
+  const fetchTribes = useCallback(async () => {
+    try {
+      const data = await execute(() => tribeService.getAll());
+      if (data) setTribes(data);
+    } catch (error) {
+      console.error('Error fetching tribes:', error);
+    }
+  }, [execute]);
 
-    useEffect(() => {
-        fetchTribes();
-    }, [fetchTribes]);
+  useEffect(() => {
+    fetchTribes();
+  }, [fetchTribes]);
 
-    return {
-        tribes,
-        loading,
-        error,
-        refetch: fetchTribes,
-    };
+  return {
+    tribes,
+    loading,
+    error,
+    refetch: fetchTribes,
+  };
 }
 
-export function useUserTribes(userId: string, options: { enabled?: boolean } = {}) {
-    const { enabled = true } = options;
-    const [tribes, setTribes] = useState<UserPersonPositionTribe[]>([]);
-    const { loading, error, execute } = useApi<UserPersonPositionTribe[]>();
+export function useUserTribes(
+  userId: string,
+  options: { enabled?: boolean } = {},
+) {
+  const { enabled = true } = options;
+  const [tribes, setTribes] = useState<UserPersonPositionTribe[]>([]);
+  const { loading, error, execute } = useApi<UserPersonPositionTribe[]>();
 
-    const fetchTribes = useCallback(async () => {
-        if (!userId) return; // Guard clause
+  const fetchTribes = useCallback(async () => {
+    if (!userId) return; // Guard clause
 
-        try {
-            const data = await execute(() => tribeService.getAllByUser(userId));
-            if (data) setTribes(data);
-        } catch (error) {
-            console.error('Error fetching tribes:', error);
-        }
-    }, [execute, userId]);
+    try {
+      const data = await execute(() => tribeService.getAllByUser(userId));
+      if (data) setTribes(data);
+    } catch (error) {
+      console.error('Error fetching tribes:', error);
+    }
+  }, [execute, userId]);
 
-    useEffect(() => {
-        if (enabled && userId) { // Only fetch if enabled and userId exists
-            fetchTribes();
-        }
-    }, [fetchTribes, enabled, userId]);
+  useEffect(() => {
+    if (enabled && userId) {
+      // Only fetch if enabled and userId exists
+      fetchTribes();
+    }
+  }, [fetchTribes, enabled, userId]);
 
-    return {
-        tribes,
-        loading,
-        error,
-        refetch: fetchTribes,
-    };
+  return {
+    tribes,
+    loading,
+    error,
+    refetch: fetchTribes,
+  };
 }
 
 export function useTribe(id: string | null) {
-    const { data: tribe, loading, error, execute } = useApi<Tribe>();
+  const { data: tribe, loading, error, execute } = useApi<Tribe>();
 
-    useEffect(() => {
-        if (id) {
-            execute(() => tribeService.getById(id));
-        }
-    }, [id, execute]);
+  useEffect(() => {
+    if (id) {
+      execute(() => tribeService.getById(id));
+    }
+  }, [id, execute]);
 
-    return { tribe, loading, error };
+  return { tribe, loading, error };
 }
-
 
 export function useTribePositions(id: string) {
-    const [tribePositions, setTribePositions] = useState<TribeWithPositions>();
-    const { loading, error, execute } = useApi<TribeWithPositions>();
+  const [tribePositions, setTribePositions] = useState<TribeWithPositions>();
+  const { loading, error, execute } = useApi<TribeWithPositions>();
 
-    const fetchTribePositions = useCallback(async () => {
-        try {
-            const data = await execute(() => tribeService.getTribePositions(id));
-            if (data) setTribePositions(data);
-        } catch (error) {
-            console.error('Error fetching tribes:', error);
-        }
-    }, [execute]);
+  const fetchTribePositions = useCallback(async () => {
+    try {
+      const data = await execute(() => tribeService.getTribePositions(id));
+      if (data) setTribePositions(data);
+    } catch (error) {
+      console.error('Error fetching tribes:', error);
+    }
+  }, [execute]);
 
-    useEffect(() => {
-        fetchTribePositions();
-    }, [fetchTribePositions]);
+  useEffect(() => {
+    fetchTribePositions();
+  }, [fetchTribePositions]);
 
-    return {
-        tribePositions,
-        loading,
-        error,
-        refetch: fetchTribePositions,
-    };
+  return {
+    tribePositions,
+    loading,
+    error,
+    refetch: fetchTribePositions,
+  };
 }
 
-export function useTribePersonsPosition(id: string ) {
-    const { data: tribePersonsPosition, loading, error, execute } = useApi<TribeWithPersonsWithPosition>();
+export function useTribePersonsPosition(id: string) {
+  const {
+    data: tribePersonsPosition,
+    loading,
+    error,
+    execute,
+  } = useApi<TribeWithPersonsWithPosition>();
 
-    useEffect(() => {
-        if (id) {
-            execute(() => tribeService.getTribePersonsPosition(id));
-        }
-    }, [id, execute]);
+  useEffect(() => {
+    if (id) {
+      execute(() => tribeService.getTribePersonsPosition(id));
+    }
+  }, [id, execute]);
 
-    return { tribePersonsPosition, loading, error };
+  return { tribePersonsPosition, loading, error };
 }
-
 
 export function useTribeProjects(id: string | null) {
-    const [tribeProjects, setTribeProjects] = useState<TribeProject[]>([]);
-    const [hasFetched, setHasFetched] = useState(!id);
-    const { loading, error, execute } = useApi<TribeProject[]>();
+  const [tribeProjects, setTribeProjects] = useState<TribeProject[]>([]);
+  const [hasFetched, setHasFetched] = useState(!id);
+  const { loading, error, execute } = useApi<TribeProject[]>();
 
-    const fetch = useCallback(async () => {
-        if (!id) { setHasFetched(true); return; }
-        try {
-            const data = await execute(() => tribeService.getTribeProjects(id));
-            if (data) setTribeProjects(data);
-        } catch (err) {
-            console.error('Error fetching tribe projects:', err);
-        }
-        setHasFetched(true);
-    }, [id, execute]);
+  const fetch = useCallback(async () => {
+    if (!id) {
+      setHasFetched(true);
+      return;
+    }
+    try {
+      const data = await execute(() => tribeService.getTribeProjects(id));
+      if (data) setTribeProjects(data);
+    } catch (err) {
+      console.error('Error fetching tribe projects:', err);
+    }
+    setHasFetched(true);
+  }, [id, execute]);
 
-    useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
 
-    return { tribeProjects, loading, hasFetched, error };
+  return { tribeProjects, loading, hasFetched, error };
 }
 
 export function useTribeMutations() {
-    const { loading, error, execute } = useApi<Tribe>();
+  const { loading, error, execute } = useApi<Tribe>();
 
+  const getTribeById = useCallback(
+    async (id: string) => {
+      return execute(() => tribeService.getById(id));
+    },
+    [execute],
+  );
 
-    const getTribeById = useCallback(
-        async (id: string,) => {
-            return execute(() => tribeService.getById(id));
-        },
-        [execute]
-    );
+  const createTribe = useCallback(
+    async (data: TribeCreate) => {
+      return execute(() => tribeService.create(data));
+    },
+    [execute],
+  );
 
-    const createTribe = useCallback(
-        async (data: TribeCreate) => {
-            return execute(() => tribeService.create(data));
-        },
-        [execute]
-    );
+  const updateTribe = useCallback(
+    async (id: string, data: TribeUpdate) => {
+      return execute(() => tribeService.update(id, data));
+    },
+    [execute],
+  );
 
-    const updateTribe = useCallback(
-        async (id: string, data: TribeUpdate) => {
-            return execute(() => tribeService.update(id, data));
-        },
-        [execute]
-    );
+  const deleteTribe = useCallback(
+    async (id: string) => {
+      return execute(() => tribeService.delete(id) as any);
+    },
+    [execute],
+  );
 
-    const deleteTribe = useCallback(
-        async (id: string) => {
-            return execute(() => tribeService.delete(id) as any);
-        },
-        [execute]
-    );
-
-    return {
-        getTribeById,
-        createTribe,
-        updateTribe,
-        deleteTribe,
-        loading,
-        error,
-    };
+  return {
+    getTribeById,
+    createTribe,
+    updateTribe,
+    deleteTribe,
+    loading,
+    error,
+  };
 }

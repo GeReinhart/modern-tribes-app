@@ -1,52 +1,70 @@
-import React from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 
+import React from 'react';
+
 interface Tab {
-    key: string;
-    label: string;
+  key: string;
+  label: string;
 }
 
 interface ThemedTabsProps {
-    tabs: Tab[];
-    activeTab: string;
-    onTabChange: (key: string) => void;
-    configButton?: React.ReactNode;
+  tabs: Tab[];
+  activeTab: string;
+  onTabChange: (key: string) => void;
+  configButton?: React.ReactNode;
 }
 
-export const ThemedTabs: React.FC<ThemedTabsProps> = ({ tabs, activeTab, onTabChange, configButton }) => {
-    const { theme } = useTheme();
+export const ThemedTabs: React.FC<ThemedTabsProps> = ({
+  tabs,
+  activeTab,
+  onTabChange,
+  configButton,
+}) => {
+  const { theme } = useTheme();
 
-    return (
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', borderBottom: `2px solid ${theme.colors.primary}30`, marginBottom: '0' }}>
-            {tabs.map(tab => {
-                const isActive = activeTab === tab.key;
-                return (
-                    <button
-                        key={tab.key}
-                        onClick={() => onTabChange(tab.key)}
-                        style={{
-                            padding: '10px 24px',
-                            border: 'none',
-                            borderBottom: isActive ? `3px solid ${theme.colors.primary}` : '3px solid transparent',
-                            marginBottom: '-2px',
-                            background: isActive ? `${theme.colors.primary}15` : 'transparent',
-                            color: isActive ? theme.colors.primary : theme.colors.text,
-                            fontWeight: isActive ? 600 : 400,
-                            cursor: 'pointer',
-                            borderRadius: '6px 6px 0 0',
-                            fontSize: '14px',
-                            transition: 'all 0.15s',
-                        }}
-                    >
-                        {tab.label}
-                    </button>
-                );
-            })}
-            {configButton && (
-                <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
-                    {configButton}
-                </div>
-            )}
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'flex-end',
+        gap: '2px',
+        borderBottom: `2px solid ${theme.colors.primary}30`,
+        marginBottom: '0',
+      }}
+    >
+      {tabs.map((tab) => {
+        const isActive = activeTab === tab.key;
+        return (
+          <button
+            key={tab.key}
+            onClick={() => onTabChange(tab.key)}
+            style={{
+              padding: '10px 24px',
+              border: 'none',
+              borderBottom: isActive
+                ? `3px solid ${theme.colors.primary}`
+                : '3px solid transparent',
+              marginBottom: '-2px',
+              background: isActive
+                ? `${theme.colors.primary}15`
+                : 'transparent',
+              color: isActive ? theme.colors.primary : theme.colors.text,
+              fontWeight: isActive ? 600 : 400,
+              cursor: 'pointer',
+              borderRadius: '6px 6px 0 0',
+              fontSize: '14px',
+              transition: 'all 0.15s',
+            }}
+          >
+            {tab.label}
+          </button>
+        );
+      })}
+      {configButton && (
+        <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
+          {configButton}
         </div>
-    );
+      )}
+    </div>
+  );
 };

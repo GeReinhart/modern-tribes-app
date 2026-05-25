@@ -1,13 +1,14 @@
-import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNotificationPoller } from '@/hooks/useNotificationPoller';
 
+import React from 'react';
+
 function ActivePoller(): null {
-    useNotificationPoller();
-    return null;
+  useNotificationPoller();
+  return null;
 }
 
 export function NotificationsPoller(): React.ReactElement | null {
-    const { isAuthenticated } = useAuth();
-    return isAuthenticated ? <ActivePoller /> : null;
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <ActivePoller /> : null;
 }

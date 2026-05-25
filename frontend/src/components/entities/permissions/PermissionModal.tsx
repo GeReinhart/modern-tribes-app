@@ -1,45 +1,59 @@
-import React from 'react';
-import { Permission, PermissionCreate, PermissionUpdate } from '@/types/permission.types.ts';
-import { PermissionForm } from './PermissionForm.tsx';
+import {
+  ModalBody,
+  ThemedModal,
+} from '@/components/common/layout/ThemedModal.tsx';
 import { FormMode } from '@/types/common.types.ts';
-import { ThemedModal, ModalBody } from "@/components/common/layout/ThemedModal.tsx";
+import {
+  Permission,
+  PermissionCreate,
+  PermissionUpdate,
+} from '@/types/permission.types.ts';
+
+import React from 'react';
+
+import { PermissionForm } from './PermissionForm.tsx';
 
 interface PermissionModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    permission?: Permission;
-    mode: FormMode;
-    onSubmit: (data: PermissionCreate | PermissionUpdate) => Promise<void>;
+  isOpen: boolean;
+  onClose: () => void;
+  permission?: Permission;
+  mode: FormMode;
+  onSubmit: (data: PermissionCreate | PermissionUpdate) => Promise<void>;
 }
 
 export const PermissionModal: React.FC<PermissionModalProps> = ({
-    isOpen,
-    onClose,
-    permission,
-    mode,
-    onSubmit,
+  isOpen,
+  onClose,
+  permission,
+  mode,
+  onSubmit,
 }) => {
-    const titles = {
-        create: 'Create New Permission',
-        edit: 'Edit Permission',
-        view: 'View Permission',
-    };
+  const titles = {
+    create: 'Create New Permission',
+    edit: 'Edit Permission',
+    view: 'View Permission',
+  };
 
-    const handleSubmit = async (data: PermissionCreate | PermissionUpdate) => {
-        await onSubmit(data);
-        onClose();
-    };
+  const handleSubmit = async (data: PermissionCreate | PermissionUpdate) => {
+    await onSubmit(data);
+    onClose();
+  };
 
-    return (
-        <ThemedModal isOpen={isOpen} onClose={onClose} title={titles[mode]} size="md">
-            <ModalBody>
-                <PermissionForm
-                    permission={permission}
-                    mode={mode}
-                    onSubmit={handleSubmit}
-                    onCancel={onClose}
-                />
-            </ModalBody>
-        </ThemedModal>
-    );
+  return (
+    <ThemedModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={titles[mode]}
+      size="md"
+    >
+      <ModalBody>
+        <PermissionForm
+          permission={permission}
+          mode={mode}
+          onSubmit={handleSubmit}
+          onCancel={onClose}
+        />
+      </ModalBody>
+    </ThemedModal>
+  );
 };

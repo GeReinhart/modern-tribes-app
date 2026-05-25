@@ -1,26 +1,37 @@
-import { useState, useEffect, useCallback } from 'react';
-import { RecentChange } from '@/types/monitoring.types.ts';
 import { monitoringService } from '@/services/monitoring.service.ts';
+import { RecentChange } from '@/types/monitoring.types.ts';
 
-export const useRecentChanges = (hours: number, userEmail?: string, status?: string) => {
-    const [data, setData] = useState<RecentChange[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+import { useCallback, useEffect, useState } from 'react';
 
-    const fetch = useCallback(async () => {
-        setLoading(true);
-        try {
-            const result = await monitoringService.getRecentChanges(hours, userEmail, status);
-            setData(result);
-            setError(null);
-        } catch {
-            setError('Failed to load recent changes');
-        } finally {
-            setLoading(false);
-        }
-    }, [hours, userEmail, status]);
+export const useRecentChanges = (
+  hours: number,
+  userEmail?: string,
+  status?: string,
+) => {
+  const [data, setData] = useState<RecentChange[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => { fetch(); }, [fetch]);
+  const fetch = useCallback(async () => {
+    setLoading(true);
+    try {
+      const result = await monitoringService.getRecentChanges(
+        hours,
+        userEmail,
+        status,
+      );
+      setData(result);
+      setError(null);
+    } catch {
+      setError('Failed to load recent changes');
+    } finally {
+      setLoading(false);
+    }
+  }, [hours, userEmail, status]);
 
-    return { data, loading, error, refetch: fetch };
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
+
+  return { data, loading, error, refetch: fetch };
 };

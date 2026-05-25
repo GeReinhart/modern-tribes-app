@@ -1,2 +1,5 @@
-import './todo_list';  // triggers self-registration
-import './kanban';    // triggers self-registration
+// triggers self-registration
+import './kanban';
+import './todo_list';
+
+// triggers self-registration

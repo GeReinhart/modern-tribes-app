@@ -1,15 +1,15 @@
 export interface LabelBase {
-    name: string;
+  name: string;
 }
 
 export interface LabelCreate extends LabelBase {}
 
 export interface LabelUpdate {
-    name?: string;
+  name?: string;
 }
 
 export interface Label extends LabelBase {
-    id: string;
-    created_at: string;
-    updated_at: string;
+  id: string;
+  created_at: string;
+  updated_at: string;
 }

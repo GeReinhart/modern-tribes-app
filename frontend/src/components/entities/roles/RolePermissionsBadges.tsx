@@ -1,28 +1,36 @@
-import React from 'react';
-import { Permission } from '@/types/permission.types';
 import { ThemedBadge } from '@/components/common/layout/ThemedBadge.tsx';
+import { Permission } from '@/types/permission.types';
+
+import React from 'react';
 
 interface RolePermissionsBadgesProps {
-    permissions: Permission[];
-    maxDisplay?: number;
+  permissions: Permission[];
+  maxDisplay?: number;
 }
 
-export const RolePermissionsBadges: React.FC<RolePermissionsBadgesProps> = ({ permissions, maxDisplay }) => {
-    if (!permissions || permissions.length === 0) {
-        return <ThemedBadge variant="secondary">No permissions assigned</ThemedBadge>;
-    }
-
-    const display = maxDisplay ? permissions.slice(0, maxDisplay) : permissions;
-    const remainingCount = permissions.length - display.length;
-
+export const RolePermissionsBadges: React.FC<RolePermissionsBadgesProps> = ({
+  permissions,
+  maxDisplay,
+}) => {
+  if (!permissions || permissions.length === 0) {
     return (
-        <div className="flex flex-wrap gap-1">
-            {display.map((p) => (
-                <ThemedBadge key={p.id} variant="primary">{p.name}</ThemedBadge>
-            ))}
-            {remainingCount > 0 && (
-                <ThemedBadge variant="secondary">+{remainingCount} more</ThemedBadge>
-            )}
-        </div>
+      <ThemedBadge variant="secondary">No permissions assigned</ThemedBadge>
     );
+  }
+
+  const display = maxDisplay ? permissions.slice(0, maxDisplay) : permissions;
+  const remainingCount = permissions.length - display.length;
+
+  return (
+    <div className="flex flex-wrap gap-1">
+      {display.map((p) => (
+        <ThemedBadge key={p.id} variant="primary">
+          {p.name}
+        </ThemedBadge>
+      ))}
+      {remainingCount > 0 && (
+        <ThemedBadge variant="secondary">+{remainingCount} more</ThemedBadge>
+      )}
+    </div>
+  );
 };
