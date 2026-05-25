@@ -26,6 +26,7 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({
     <div
       style={{
         display: 'flex',
+        flexWrap: 'wrap',
         alignItems: 'flex-end',
         gap: '2px',
         borderBottom: `2px solid ${theme.colors.primary}30`,
