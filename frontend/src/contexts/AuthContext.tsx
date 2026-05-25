@@ -42,13 +42,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     i18n.changeLanguage(userData.language);
                     localStorage.setItem('user_language', userData.language);
                 }
-            } else {
+            } else if (response.status === 401 || response.status === 403) {
+                // Token is definitively rejected — clear it.
                 tokenManager.clearAll();
                 setToken(null);
             }
+            // Other HTTP errors (5xx) or network/CORS failures leave the token intact.
         } catch {
-            tokenManager.clearAll();
-            setToken(null);
+            // Network error or CORS failure — token may still be valid.
         } finally {
             setIsLoading(false);
         }

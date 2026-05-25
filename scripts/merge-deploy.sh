@@ -10,7 +10,11 @@ COMMIT_MSG="$1"
 FEATURE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 BACKEND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../backend" && pwd)"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+echo "==> Check code..."
+./scripts/check-backend.sh || { echo "✗ Backend checks failed. Aborting."; exit 1; }
+./scripts/check-frontend.sh || { echo "✗ Frontend checks failed. Aborting."; exit 1; }
 
+cd $ROOT_DIR
 echo "==> Committing on $FEATURE_BRANCH..."
 git add -A
 git commit -m "$COMMIT_MSG"
