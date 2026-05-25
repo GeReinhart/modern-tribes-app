@@ -473,6 +473,7 @@ const en: Record<string, string> = {
   'bookmarks.edit.color': 'Color',
   'dashboard.tasks.empty': 'No upcoming tasks assigned to you.',
   'dashboard.tasks.openSource': 'Open in project',
+  'dashboard.tasks.todoStatus': 'Todo',
 
   'tabConfig.configure': 'Configure tabs',
   'tabConfig.title': 'Tab configuration',

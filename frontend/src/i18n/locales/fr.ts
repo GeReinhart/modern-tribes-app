@@ -489,6 +489,7 @@ const fr: Record<string, string> = {
   'bookmarks.edit.color': 'Couleur',
   'dashboard.tasks.empty': 'Aucune tâche à venir qui vous est assignée.',
   'dashboard.tasks.openSource': 'Ouvrir dans le projet',
+  'dashboard.tasks.todoStatus': 'À faire',
 
   'tabConfig.configure': 'Configurer les onglets',
   'tabConfig.title': 'Configuration des onglets',

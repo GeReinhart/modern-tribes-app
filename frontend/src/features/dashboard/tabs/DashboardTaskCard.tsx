@@ -57,6 +57,9 @@ const DashboardTaskCard: React.FC<Props> = ({
       .map((w) => w[0]?.toUpperCase() ?? '')
       .join('');
 
+  const statusLabel =
+    task.source === 'todo' ? t('dashboard.tasks.todoStatus') : task.column_name;
+
   const handleUpdate = (_id: string, patch: TaskPatch) => onUpdate(patch);
   const handleToggleLabel = (
     _id: string,
@@ -157,6 +160,19 @@ const DashboardTaskCard: React.FC<Props> = ({
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+            <span
+              style={{
+                fontSize: '10px',
+                fontWeight: 600,
+                padding: '1px 5px',
+                borderRadius: '8px',
+                background: theme.colors.secondary + '22',
+                color: theme.colors.secondary,
+                flexShrink: 0,
+              }}
+            >
+              {statusLabel}
+            </span>
             <div style={{ flex: 1 }} />
 
             {task.size && (
