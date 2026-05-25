@@ -3,7 +3,7 @@
 # Will make sure the import are will organized
 
 set -euo pipefail
-pip install absolufy-imports autoflake isort
+pip install absolufy-imports autoflake isort black
 
 BACKEND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../backend" && pwd)"
 
@@ -20,6 +20,8 @@ autoflake --in-place --remove-all-unused-imports --recursive app/
 # Step 3 — sort imports, only on app/
 isort --skip venv app/
 
+# Step 4 - Format
+black app/
 
 
 

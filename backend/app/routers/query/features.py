@@ -85,6 +85,8 @@ async def set_feature_status(
     async with pool.acquire() as conn:
         await conn.execute(
             "UPDATE projects_features SET status = $1, updated_by = $2 WHERE id = $3",
-            status, UUID(str(current_user["id"])), UUID(feature_id),
+            status,
+            UUID(str(current_user["id"])),
+            UUID(feature_id),
         )
     return {"status": status}

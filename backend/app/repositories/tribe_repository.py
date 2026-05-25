@@ -20,20 +20,28 @@ async def create_tribe(pool, name: str, document_id: str, user_id: str) -> dict:
         row = await conn.fetchrow(
             """INSERT INTO tribes (name, document_id, created_at, updated_at, created_by, updated_by, url_param_id)
                VALUES ($1, $2, $3, $4, $5, $5, $6) RETURNING *""",
-            name, UUID(document_id), now, now, UUID(user_id), url_param_id
+            name,
+            UUID(document_id),
+            now,
+            now,
+            UUID(user_id),
+            url_param_id,
         )
     return row_to_dict(row)
 
 
 async def get_tribe_projects(pool, tribe_id: str) -> list[dict]:
     async with pool.acquire() as conn:
-        rows = await conn.fetch("""
+        rows = await conn.fetch(
+            """
             SELECT tp.id, tp.tribe_id, tp.project_id, tp.relation, tp.created_at,
                    p.name AS project_name
             FROM tribes_projects tp
             JOIN projects p ON p.id = tp.project_id
             WHERE tp.tribe_id = $1
-        """, UUID(tribe_id))
+        """,
+            UUID(tribe_id),
+        )
     return [row_to_dict(row) for row in rows] if rows else []
 
 
@@ -45,7 +53,10 @@ async def sync_tribe_projects(pool, tribe_id: str, projects: list) -> list[dict]
             await conn.execute(
                 """INSERT INTO tribes_projects (tribe_id, project_id, relation, created_at)
                    VALUES ($1, $2, $3, $4)""",
-                UUID(tribe_id), UUID(proj["project_id"]), proj["relation"], now
+                UUID(tribe_id),
+                UUID(proj["project_id"]),
+                proj["relation"],
+                now,
             )
     return await get_tribe_projects(pool, tribe_id)
 
@@ -59,7 +70,9 @@ async def archive_tribe(pool, tribe_id: str, user_id: str) -> None:
     async with pool.acquire() as conn:
         await conn.execute(
             "UPDATE tribes SET status = 'archived', updated_at = $1, updated_by = $2 WHERE id = $3",
-            datetime.now(timezone.utc), UUID(user_id), UUID(tribe_id)
+            datetime.now(timezone.utc),
+            UUID(user_id),
+            UUID(tribe_id),
         )
 
 
@@ -67,7 +80,9 @@ async def touch_tribe(pool, tribe_id: str, user_id: str) -> None:
     async with pool.acquire() as conn:
         await conn.execute(
             "UPDATE tribes SET updated_at = $1, updated_by = $2 WHERE id = $3",
-            datetime.now(timezone.utc), UUID(user_id), UUID(tribe_id)
+            datetime.now(timezone.utc),
+            UUID(user_id),
+            UUID(tribe_id),
         )
 
 
@@ -75,7 +90,10 @@ async def update_tribe_name(pool, tribe_id: str, name: str, user_id: str) -> Non
     async with pool.acquire() as conn:
         await conn.execute(
             "UPDATE tribes SET name = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
-            name, datetime.now(timezone.utc), UUID(user_id), UUID(tribe_id)
+            name,
+            datetime.now(timezone.utc),
+            UUID(user_id),
+            UUID(tribe_id),
         )
 
 
@@ -83,7 +101,10 @@ async def update_tribe_document_id(pool, tribe_id: str, document_id: str, user_i
     async with pool.acquire() as conn:
         await conn.execute(
             "UPDATE tribes SET document_id = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
-            UUID(document_id), datetime.now(timezone.utc), UUID(user_id), UUID(tribe_id)
+            UUID(document_id),
+            datetime.now(timezone.utc),
+            UUID(user_id),
+            UUID(tribe_id),
         )
 
 
@@ -99,7 +120,12 @@ async def create_positions(pool, tribe_id: str, positions_data: list, user_id: s
             row = await conn.fetchrow(
                 """INSERT INTO positions (tribe_id, person_id, position, created_at, updated_at, created_by, updated_by)
                    VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING *""",
-                UUID(tribe_id), UUID(pos.person_id), pos.position, now, now, UUID(user_id)
+                UUID(tribe_id),
+                UUID(pos.person_id),
+                pos.position,
+                now,
+                now,
+                UUID(user_id),
             )
             created.append(row_to_dict(row))
     return created
@@ -107,11 +133,15 @@ async def create_positions(pool, tribe_id: str, positions_data: list, user_id: s
 
 async def get_positions_by_tribe(pool, tribe_id: str) -> list[dict]:
     async with pool.acquire() as conn:
-        rows = await conn.fetch("SELECT * FROM positions WHERE tribe_id = $1 AND status = 'active'", UUID(tribe_id))
+        rows = await conn.fetch(
+            "SELECT * FROM positions WHERE tribe_id = $1 AND status = 'active'", UUID(tribe_id)
+        )
     return [row_to_dict(row) for row in rows] if rows else []
 
 
-async def sync_positions(pool, tribe_id: str, new_positions: list, current_positions: list[dict], user_id: str) -> None:
+async def sync_positions(
+    pool, tribe_id: str, new_positions: list, current_positions: list[dict], user_id: str
+) -> None:
     current_map = {str(p["person_id"]): str(p["id"]) for p in current_positions}
     new_map = {pos.person_id: pos.position for pos in new_positions}
     async with pool.acquire() as conn:
@@ -125,14 +155,22 @@ async def sync_positions(pool, tribe_id: str, new_positions: list, current_posit
                 if current_pos["position"] != pos.position:
                     await conn.execute(
                         "UPDATE positions SET position = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
-                        pos.position, datetime.now(timezone.utc), UUID(user_id), UUID(position_id)
+                        pos.position,
+                        datetime.now(timezone.utc),
+                        UUID(user_id),
+                        UUID(position_id),
                     )
             else:
                 now = datetime.now(timezone.utc)
                 await conn.execute(
                     """INSERT INTO positions (tribe_id, person_id, position, created_at, updated_at, created_by, updated_by)
                        VALUES ($1, $2, $3, $4, $5, $6, $6)""",
-                    UUID(tribe_id), UUID(pos.person_id), pos.position, now, now, UUID(user_id)
+                    UUID(tribe_id),
+                    UUID(pos.person_id),
+                    pos.position,
+                    now,
+                    now,
+                    UUID(user_id),
                 )
 
 
@@ -144,7 +182,9 @@ async def get_persons_with_positions(pool, positions: list[dict]) -> List[Person
     async with pool.acquire() as conn:
         for person_id in person_ids:
             try:
-                row = await conn.fetchrow("SELECT * FROM persons WHERE id = $1 AND status = 'active'", UUID(person_id))
+                row = await conn.fetchrow(
+                    "SELECT * FROM persons WHERE id = $1 AND status = 'active'", UUID(person_id)
+                )
                 if row:
                     persons_map[person_id] = row_to_dict(row)
             except Exception:
@@ -159,7 +199,7 @@ async def get_persons_with_positions(pool, positions: list[dict]) -> List[Person
             position=pos["position"],
             position_id=str(pos["id"]),
             created_at=p["created_at"],
-            updated_at=p["updated_at"]
+            updated_at=p["updated_at"],
         )
         for pos in positions
         if (p := persons_map.get(str(pos["person_id"])))

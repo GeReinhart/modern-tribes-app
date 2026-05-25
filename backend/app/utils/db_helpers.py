@@ -7,19 +7,18 @@ from uuid import UUID
 import asyncpg
 from fastapi import HTTPException
 
-TABLES_WITH_STATUS = frozenset({
-    'permissions', 'roles', 'documents', 'persons',
-    'users', 'projects', 'tribes', 'positions', 'labels'
-})
+TABLES_WITH_STATUS = frozenset(
+    {"permissions", "roles", "documents", "persons", "users", "projects", "tribes", "positions", "labels"}
+)
 
-URL_PARAM_ID_TABLES = frozenset({
-    'users', 'tribes', 'projects', 'projects_documents', 'publications', 'document_pages'
-})
+URL_PARAM_ID_TABLES = frozenset(
+    {"users", "tribes", "projects", "projects_documents", "publications", "document_pages"}
+)
 
 
 def generate_url_param_id() -> str:
     chars = string.ascii_letters + string.digits
-    return ''.join(random.choices(chars, k=6))
+    return "".join(random.choices(chars, k=6))
 
 
 async def resolve_url_param_id(pool: asyncpg.Pool, table: str, id_param: str) -> str:
@@ -29,16 +28,14 @@ async def resolve_url_param_id(pool: asyncpg.Pool, table: str, id_param: str) ->
     try:
         UUID(id_param)
         return id_param
-    except (ValueError, AttributeError):
+    except ValueError, AttributeError:
         if table not in URL_PARAM_ID_TABLES:
             raise HTTPException(status_code=400, detail="Invalid ID format")
         async with pool.acquire() as conn:
-            row = await conn.fetchrow(
-                f"SELECT id FROM {table} WHERE url_param_id = $1", id_param
-            )
+            row = await conn.fetchrow(f"SELECT id FROM {table} WHERE url_param_id = $1", id_param)
         if not row:
             raise HTTPException(status_code=404, detail="Not found")
-        return str(row['id'])
+        return str(row["id"])
 
 
 def uuid_to_str_recursively(data: Any) -> Any:
@@ -58,6 +55,7 @@ def row_to_dict(row: asyncpg.Record) -> Dict[str, Any]:
         return None
     return {key: uuid_to_str_recursively(value) for key, value in dict(row).items()}
 
+
 def row_with_json_to_dict(row):
     """Convert asyncpg row to dict, convert UUIDs to strings, and parse JSON fields"""
     data = dict(row)
@@ -67,70 +65,55 @@ def row_with_json_to_dict(row):
         if isinstance(value, UUID):
             data[key] = str(value)
         # Parse JSON strings
-        elif isinstance(value, str) and value.startswith('['):
+        elif isinstance(value, str) and value.startswith("["):
             try:
                 data[key] = json.loads(value)
-            except (json.JSONDecodeError, TypeError):
+            except json.JSONDecodeError, TypeError:
                 pass
 
     return data
+
 
 def validate_uuid(id_str: str, field_name: str = "ID") -> str:
     """Validate UUID string format"""
     try:
         UUID(id_str)
         return id_str
-    except (ValueError, AttributeError):
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid {field_name} format"
-        )
+    except ValueError, AttributeError:
+        raise HTTPException(status_code=400, detail=f"Invalid {field_name} format")
 
 
 async def check_document_exists(
-        pool: asyncpg.Pool,
-        table: str,
-        doc_id: str,
-        entity_name: str = "Document"
+    pool: asyncpg.Pool, table: str, doc_id: str, entity_name: str = "Document"
 ) -> Dict[str, Any]:
     """Check if a document exists and return it"""
     validate_uuid(doc_id, entity_name)
 
     async with pool.acquire() as conn:
-        row = await conn.fetchrow(
-            f"SELECT * FROM {table} WHERE id = $1",
-            UUID(doc_id)
-        )
+        row = await conn.fetchrow(f"SELECT * FROM {table} WHERE id = $1", UUID(doc_id))
 
     if not row:
-        raise HTTPException(
-            status_code=404,
-            detail=f"{entity_name} not found"
-        )
+        raise HTTPException(status_code=404, detail=f"{entity_name} not found")
 
     return row_to_dict(row)
 
 
 async def check_unique_field(
-        pool: asyncpg.Pool,
-        table: str,
-        field: str,
-        value: Any,
-        exclude_id: Optional[str] = None,
-        error_message: Optional[str] = None
+    pool: asyncpg.Pool,
+    table: str,
+    field: str,
+    value: Any,
+    exclude_id: Optional[str] = None,
+    error_message: Optional[str] = None,
 ) -> None:
     """Check if a field value is unique in a table"""
     async with pool.acquire() as conn:
         if exclude_id:
             row = await conn.fetchrow(
-                f"SELECT id FROM {table} WHERE {field} = $1 AND id != $2",
-                value, UUID(exclude_id)
+                f"SELECT id FROM {table} WHERE {field} = $1 AND id != $2", value, UUID(exclude_id)
             )
         else:
-            row = await conn.fetchrow(
-                f"SELECT id FROM {table} WHERE {field} = $1",
-                value
-            )
+            row = await conn.fetchrow(f"SELECT id FROM {table} WHERE {field} = $1", value)
 
     if row:
         message = error_message or f"{field} already exists"
@@ -147,12 +130,7 @@ async def _fetch_reference_row(pool: asyncpg.Pool, table: str, ref_id: str) -> b
     return bool(row)
 
 
-async def validate_reference(
-        pool: asyncpg.Pool,
-        table: str,
-        ref_id: Optional[str],
-        field_name: str
-) -> None:
+async def validate_reference(pool: asyncpg.Pool, table: str, ref_id: Optional[str], field_name: str) -> None:
     """Validate a foreign key reference"""
     if not ref_id:
         return
@@ -167,11 +145,11 @@ async def validate_reference(
 
 
 async def get_all_documents(
-        pool: asyncpg.Pool,
-        table: str,
-        filter_query: Optional[str] = None,
-        params: Optional[List] = None,
-        any_status: bool = False,
+    pool: asyncpg.Pool,
+    table: str,
+    filter_query: Optional[str] = None,
+    params: Optional[List] = None,
+    any_status: bool = False,
 ) -> List[Dict[str, Any]]:
     """Get all documents from a table"""
     status_clause = "status = 'active'" if (table in TABLES_WITH_STATUS and not any_status) else None
@@ -194,10 +172,7 @@ async def get_all_documents(
 
 
 async def get_document_by_id(
-        pool: asyncpg.Pool,
-        table: str,
-        doc_id: str,
-        entity_name: str = "Document"
+    pool: asyncpg.Pool, table: str, doc_id: str, entity_name: str = "Document"
 ) -> Dict[str, Any]:
     """Get a single document by ID, filtering inactive entities"""
     validate_uuid(doc_id, entity_name)
@@ -212,15 +187,11 @@ async def get_document_by_id(
     return row_to_dict(row)
 
 
-async def create_document(
-        pool: asyncpg.Pool,
-        table: str,
-        data: Dict[str, Any]
-) -> Dict[str, Any]:
+async def create_document(pool: asyncpg.Pool, table: str, data: Dict[str, Any]) -> Dict[str, Any]:
     """Create a new document"""
-    if table in URL_PARAM_ID_TABLES and 'url_param_id' not in data:
+    if table in URL_PARAM_ID_TABLES and "url_param_id" not in data:
         data = dict(data)
-        data['url_param_id'] = generate_url_param_id()
+        data["url_param_id"] = generate_url_param_id()
     columns = list(data.keys())
     placeholders = [f"${i+1}" for i in range(len(columns))]
     values = [data[col] for col in columns]
@@ -252,11 +223,7 @@ def _build_update_query(table: str, doc_id: str, data: Dict[str, Any]) -> tuple[
 
 
 async def update_document(
-        pool: asyncpg.Pool,
-        table: str,
-        doc_id: str,
-        data: Dict[str, Any],
-        entity_name: str = "Document"
+    pool: asyncpg.Pool, table: str, doc_id: str, data: Dict[str, Any], entity_name: str = "Document"
 ) -> Dict[str, Any]:
     """Update an existing document"""
     validate_uuid(doc_id, entity_name)
@@ -269,55 +236,33 @@ async def update_document(
     return row_to_dict(row)
 
 
-async def delete_document(
-        pool: asyncpg.Pool,
-        table: str,
-        doc_id: str,
-        entity_name: str = "Document"
-) -> None:
+async def delete_document(pool: asyncpg.Pool, table: str, doc_id: str, entity_name: str = "Document") -> None:
     """Delete a document"""
     validate_uuid(doc_id, entity_name)
 
     async with pool.acquire() as conn:
-        result = await conn.execute(
-            f"DELETE FROM {table} WHERE id = $1",
-            UUID(doc_id)
-        )
+        result = await conn.execute(f"DELETE FROM {table} WHERE id = $1", UUID(doc_id))
 
     if result == "DELETE 0":
-        raise HTTPException(
-            status_code=404,
-            detail=f"{entity_name} not found"
-        )
+        raise HTTPException(status_code=404, detail=f"{entity_name} not found")
 
 
 async def check_cascade_constraint(
-        pool: asyncpg.Pool,
-        table: str,
-        field: str,
-        value: str,
-        entity_name: str,
-        dependent_entity: str
+    pool: asyncpg.Pool, table: str, field: str, value: str, entity_name: str, dependent_entity: str
 ) -> None:
     """Check if deleting would violate referential integrity"""
     async with pool.acquire() as conn:
-        count = await conn.fetchval(
-            f"SELECT COUNT(*) FROM {table} WHERE {field} = $1",
-            UUID(value)
-        )
+        count = await conn.fetchval(f"SELECT COUNT(*) FROM {table} WHERE {field} = $1", UUID(value))
 
     if count > 0:
         raise HTTPException(
             status_code=400,
-            detail=f"Cannot delete {entity_name}. {count} {dependent_entity}(s) are using this {entity_name}. Please update or remove these {dependent_entity}s first."
+            detail=f"Cannot delete {entity_name}. {count} {dependent_entity}(s) are using this {entity_name}. Please update or remove these {dependent_entity}s first.",
         )
 
 
 async def validate_references_list(
-        pool: asyncpg.Pool,
-        table: str,
-        ref_ids: List[str],
-        field_name: str
+    pool: asyncpg.Pool, table: str, ref_ids: List[str], field_name: str
 ) -> None:
     """Validate a list of foreign key references"""
     if not ref_ids:

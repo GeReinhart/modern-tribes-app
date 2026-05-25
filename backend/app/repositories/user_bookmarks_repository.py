@@ -15,8 +15,14 @@ async def get_bookmarks(pool, user_id: str) -> list:
 
 
 async def add_bookmark(
-    pool, user_id: str, page_path: str, page_title: str,
-    current_user_id: str, description: str | None, color_text: str | None, color_background: str | None,
+    pool,
+    user_id: str,
+    page_path: str,
+    page_title: str,
+    current_user_id: str,
+    description: str | None,
+    color_text: str | None,
+    color_background: str | None,
 ) -> dict:
     async with pool.acquire() as conn:
         max_order = await conn.fetchval(
@@ -40,15 +46,26 @@ async def add_bookmark(
                 updated_at = NOW()
             RETURNING {_SELECT_FIELDS}
             """,
-            UUID(user_id), page_path, page_title, description, color_text, color_background,
-            max_order + 1, UUID(current_user_id),
+            UUID(user_id),
+            page_path,
+            page_title,
+            description,
+            color_text,
+            color_background,
+            max_order + 1,
+            UUID(current_user_id),
         )
     return dict(row)
 
 
 async def update_bookmark(
-    pool, user_id: str, bookmark_id: str, page_title: str,
-    description: str | None, color_text: str | None, color_background: str | None,
+    pool,
+    user_id: str,
+    bookmark_id: str,
+    page_title: str,
+    description: str | None,
+    color_text: str | None,
+    color_background: str | None,
     current_user_id: str,
 ) -> dict | None:
     async with pool.acquire() as conn:
@@ -60,8 +77,13 @@ async def update_bookmark(
             WHERE id = $6::uuid AND user_id = $7::uuid AND status = 'active'
             RETURNING {_SELECT_FIELDS}
             """,
-            page_title, description, color_text, color_background,
-            UUID(current_user_id), UUID(bookmark_id), UUID(user_id),
+            page_title,
+            description,
+            color_text,
+            color_background,
+            UUID(current_user_id),
+            UUID(bookmark_id),
+            UUID(user_id),
         )
     return dict(row) if row else None
 
@@ -71,7 +93,8 @@ async def remove_bookmark(pool, user_id: str, bookmark_id: str) -> None:
         await conn.execute(
             "UPDATE user_bookmarks SET status = 'archived', updated_at = NOW() "
             "WHERE id = $1::uuid AND user_id = $2::uuid",
-            UUID(bookmark_id), UUID(user_id),
+            UUID(bookmark_id),
+            UUID(user_id),
         )
 
 
@@ -81,7 +104,10 @@ async def reorder_bookmarks(pool, user_id: str, ordered_ids: list, current_user_
             await conn.execute(
                 "UPDATE user_bookmarks SET display_order = $1, updated_by = $2::uuid, updated_at = NOW() "
                 "WHERE id = $3::uuid AND user_id = $4::uuid AND status = 'active'",
-                order, UUID(current_user_id), UUID(bookmark_id), UUID(user_id),
+                order,
+                UUID(current_user_id),
+                UUID(bookmark_id),
+                UUID(user_id),
             )
         rows = await conn.fetch(
             f"SELECT {_SELECT_FIELDS} FROM user_bookmarks "

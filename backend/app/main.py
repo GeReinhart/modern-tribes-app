@@ -13,17 +13,28 @@ from app.core.config import settings
 from app.core.database import close_postgres_connection, connect_to_postgres
 from app.routers.app import document_pages
 from app.routers.app import notifications as app_notifications
-from app.routers.app import (project_documents, project_features,
-                             project_with_document)
+from app.routers.app import project_documents, project_features, project_with_document
 from app.routers.app import publications as app_publications
-from app.routers.app import (tribes_with_positions, user_bookmarks,
-                             user_tab_configs)
+from app.routers.app import tribes_with_positions, user_bookmarks, user_tab_configs
 from app.routers.auth import authentification, authorization
-from app.routers.crud import (app_config, document_entities, documents,
-                              label_entities, labels, mails, permissions,
-                              persons, positions, projects, represents, roles)
+from app.routers.crud import (
+    app_config,
+    document_entities,
+    documents,
+    label_entities,
+    labels,
+    mails,
+    permissions,
+    persons,
+    positions,
+    projects,
+    represents,
+    roles,
+)
 from app.routers.crud import tribes as crud_tribes
-from app.routers.crud import users
+from app.routers.crud import (
+    users,
+)
 from app.routers.public import publications as public_publications
 from app.routers.query import app_config as query_app_config
 from app.routers.query import features as query_features
@@ -41,7 +52,7 @@ from app.services.mail_scheduler import mail_scheduler
 # Configure logging
 logging.basicConfig(
     level=logging.INFO if settings.DEBUG else logging.WARNING,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -88,6 +99,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, exc: Exception):
@@ -160,11 +172,7 @@ app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads"
 @app.get("/")
 async def root():
     """Root endpoint"""
-    return {
-        "name": settings.APP_NAME,
-        "version": settings.APP_VERSION,
-        "status": "running"
-    }
+    return {"name": settings.APP_NAME, "version": settings.APP_VERSION, "status": "running"}
 
 
 @app.get("/health")
@@ -181,5 +189,5 @@ if __name__ == "__main__":
         host=settings.HOST,
         port=settings.PORT,
         reload=settings.DEBUG,
-        log_level="info" if settings.DEBUG else "warning"
+        log_level="info" if settings.DEBUG else "warning",
     )

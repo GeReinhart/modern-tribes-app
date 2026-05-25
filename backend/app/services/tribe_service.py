@@ -1,14 +1,18 @@
 from fastapi import HTTPException, status
 
-from app.models.app.tribes_with_positions import (AttachmentFile,
-                                                  TribeProjectResponse,
-                                                  TribeWithPositionsCreate,
-                                                  TribeWithPositionsResponse,
-                                                  TribeWithPositionsUpdate)
+from app.models.app.tribes_with_positions import (
+    AttachmentFile,
+    TribeProjectResponse,
+    TribeWithPositionsCreate,
+    TribeWithPositionsResponse,
+    TribeWithPositionsUpdate,
+)
 from app.repositories import tribe_repository as tribe_repo
-from app.utils.attachments_helpers import (create_document_with_attachments,
-                                           get_document_with_attachments,
-                                           update_document_attachments)
+from app.utils.attachments_helpers import (
+    create_document_with_attachments,
+    get_document_with_attachments,
+    update_document_attachments,
+)
 from app.utils.db_helpers import check_unique_field
 from app.utils.validators import EntityValidator
 
@@ -32,13 +36,18 @@ async def get_tribe_with_positions(tribe_id: str, pool) -> TribeWithPositionsRes
     return _build_response(tribe, document, persons, tribe_projects)
 
 
-async def create_tribe_with_positions(data: TribeWithPositionsCreate, pool, current_user: dict) -> TribeWithPositionsResponse:
+async def create_tribe_with_positions(
+    data: TribeWithPositionsCreate, pool, current_user: dict
+) -> TribeWithPositionsResponse:
     await _validate_tribe_create(data, pool)
-    document = await create_document_with_attachments(pool, data.document_content_html, data.document_attachments, current_user['id'])
+    document = await create_document_with_attachments(
+        pool, data.document_content_html, data.document_attachments, current_user["id"]
+    )
     try:
-        return await _persist_tribe_create(data, document, pool, current_user['id'])
+        return await _persist_tribe_create(data, document, pool, current_user["id"])
     except Exception as e:
         from app.utils.db_helpers import delete_document as _del
+
         await _del(pool, "documents", str(document["id"]), "Document")
         raise e
 
@@ -47,16 +56,18 @@ async def archive_tribe(tribe_id: str, pool, current_user: dict) -> None:
     tribe = await tribe_repo.get_tribe_by_id(pool, tribe_id)
     if not tribe:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tribe not found")
-    await tribe_repo.archive_tribe(pool, tribe_id, current_user['id'])
+    await tribe_repo.archive_tribe(pool, tribe_id, current_user["id"])
 
 
-async def update_tribe_with_positions(tribe_id: str, data: TribeWithPositionsUpdate, pool, current_user: dict) -> TribeWithPositionsResponse:
+async def update_tribe_with_positions(
+    tribe_id: str, data: TribeWithPositionsUpdate, pool, current_user: dict
+) -> TribeWithPositionsResponse:
     tribe = await tribe_repo.get_tribe_by_id(pool, tribe_id)
     if not tribe:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tribe not found")
 
     await _validate_tribe_update(data, tribe, tribe_id, pool)
-    await _apply_tribe_updates(tribe_id, tribe, data, pool, current_user['id'])
+    await _apply_tribe_updates(tribe_id, tribe, data, pool, current_user["id"])
 
     return await get_tribe_with_positions(tribe_id, pool)
 
@@ -66,9 +77,11 @@ async def _validate_tribe_create(data: TribeWithPositionsCreate, pool) -> None:
     validator = EntityValidator(pool)
     person_ids = [pos.person_id for pos in data.positions]
     if person_ids:
-        await validator.validate_reference_lists([{'table': 'persons', 'ids': person_ids, 'name': 'Person'}])
+        await validator.validate_reference_lists([{"table": "persons", "ids": person_ids, "name": "Person"}])
     if not any(pos.position == "manager" for pos in data.positions):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="At least one Manager position is required")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="At least one Manager position is required"
+        )
 
 
 async def _persist_tribe_create(data, document, pool, user_id: str) -> TribeWithPositionsResponse:
@@ -84,17 +97,25 @@ async def _persist_tribe_create(data, document, pool, user_id: str) -> TribeWith
 
 async def _validate_tribe_update(data: TribeWithPositionsUpdate, tribe: dict, tribe_id: str, pool) -> None:
     if data.name and data.name != tribe.get("name"):
-        await check_unique_field(pool, "tribes", "name", data.name, exclude_id=tribe_id, error_message="Tribe name already exists")
+        await check_unique_field(
+            pool, "tribes", "name", data.name, exclude_id=tribe_id, error_message="Tribe name already exists"
+        )
     if data.positions is not None:
         validator = EntityValidator(pool)
         person_ids = [pos.person_id for pos in data.positions]
         if person_ids:
-            await validator.validate_reference_lists([{'table': 'persons', 'ids': person_ids, 'name': 'Person'}])
+            await validator.validate_reference_lists(
+                [{"table": "persons", "ids": person_ids, "name": "Person"}]
+            )
         if not any(pos.position == "manager" for pos in data.positions):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="At least one Manager position is required")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="At least one Manager position is required"
+            )
 
 
-async def _apply_tribe_updates(tribe_id: str, tribe: dict, data: TribeWithPositionsUpdate, pool, user_id: str) -> None:
+async def _apply_tribe_updates(
+    tribe_id: str, tribe: dict, data: TribeWithPositionsUpdate, pool, user_id: str
+) -> None:
     await tribe_repo.touch_tribe(pool, tribe_id, user_id)
 
     if data.name:
@@ -105,15 +126,14 @@ async def _apply_tribe_updates(tribe_id: str, tribe: dict, data: TribeWithPositi
 
     if not document_id and has_document_changes:
         document = await create_document_with_attachments(
-            pool,
-            data.document_content_html or "",
-            data.document_attachments or [],
-            user_id
+            pool, data.document_content_html or "", data.document_attachments or [], user_id
         )
         await tribe_repo.update_tribe_document_id(pool, tribe_id, str(document["id"]), user_id)
     elif document_id:
         if data.document_content_html is not None:
-            await tribe_repo.update_tribe_document_content(pool, str(document_id), data.document_content_html, user_id)
+            await tribe_repo.update_tribe_document_content(
+                pool, str(document_id), data.document_content_html, user_id
+            )
         if data.document_attachments is not None:
             await update_document_attachments(pool, str(document_id), data.document_attachments, user_id)
 
@@ -122,7 +142,9 @@ async def _apply_tribe_updates(tribe_id: str, tribe: dict, data: TribeWithPositi
         await tribe_repo.sync_positions(pool, tribe_id, data.positions, current_positions, user_id)
 
 
-def _build_response(tribe: dict, document: dict | None, persons: list, tribe_projects: list) -> TribeWithPositionsResponse:
+def _build_response(
+    tribe: dict, document: dict | None, persons: list, tribe_projects: list
+) -> TribeWithPositionsResponse:
     attachments = [
         AttachmentFile(**att) if isinstance(att, dict) else att
         for att in (document.get("attachments", []) if document else [])
@@ -138,5 +160,5 @@ def _build_response(tribe: dict, document: dict | None, persons: list, tribe_pro
         projects=projects,
         persons=persons,
         created_at=tribe["created_at"],
-        updated_at=tribe["updated_at"]
+        updated_at=tribe["updated_at"],
     )

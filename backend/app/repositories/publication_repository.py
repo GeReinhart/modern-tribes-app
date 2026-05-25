@@ -5,9 +5,7 @@ from uuid import UUID
 from app.utils.db_helpers import generate_url_param_id
 
 
-async def insert_publication(
-    pool, document_id: str, project_document_id: str, published_by: str
-) -> dict:
+async def insert_publication(pool, document_id: str, project_document_id: str, published_by: str) -> dict:
     now = datetime.now(timezone.utc)
     url_param_id = generate_url_param_id()
     async with pool.acquire() as conn:
@@ -17,25 +15,23 @@ async def insert_publication(
                     status, url_param_id, created_at, updated_at)
                VALUES ($1, $2, $3, $4, 'active', $5, $3, $3)
                RETURNING id, url_param_id""",
-            UUID(document_id), UUID(project_document_id), now, UUID(published_by), url_param_id
+            UUID(document_id),
+            UUID(project_document_id),
+            now,
+            UUID(published_by),
+            url_param_id,
         )
     return {"id": str(row["id"]), "url_param_id": row["url_param_id"]}
 
 
 async def delete_publication_by_document(pool, document_id: str) -> str:
     async with pool.acquire() as conn:
-        return await conn.execute(
-            "DELETE FROM publications WHERE document_id = $1",
-            UUID(document_id)
-        )
+        return await conn.execute("DELETE FROM publications WHERE document_id = $1", UUID(document_id))
 
 
 async def delete_publication_by_id(pool, publication_id: str) -> str:
     async with pool.acquire() as conn:
-        return await conn.execute(
-            "DELETE FROM publications WHERE id = $1",
-            UUID(publication_id)
-        )
+        return await conn.execute("DELETE FROM publications WHERE id = $1", UUID(publication_id))
 
 
 async def fetch_publication_by_id(pool, publication_id: str) -> Optional[dict]:
@@ -52,7 +48,7 @@ async def fetch_publication_by_id(pool, publication_id: str) -> Optional[dict]:
                LEFT JOIN users au ON au.id = d.created_by
                LEFT JOIN persons ap ON ap.id = au.person_id
                WHERE pub.id = $1 AND pub.status = 'active'""",
-            UUID(publication_id)
+            UUID(publication_id),
         )
     return dict(row) if row else None
 
@@ -60,22 +56,19 @@ async def fetch_publication_by_id(pool, publication_id: str) -> Optional[dict]:
 async def fetch_publication_id_by_document(pool, document_id: str) -> Optional[str]:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            "SELECT id FROM publications WHERE document_id = $1 AND status = 'active'",
-            UUID(document_id)
+            "SELECT id FROM publications WHERE document_id = $1 AND status = 'active'", UUID(document_id)
         )
     return str(row["id"]) if row else None
 
 
 async def fetch_publication_labels(pool) -> list[dict]:
     async with pool.acquire() as conn:
-        rows = await conn.fetch(
-            """SELECT DISTINCT l.id, l.name FROM labels l
+        rows = await conn.fetch("""SELECT DISTINCT l.id, l.name FROM labels l
                JOIN label_entities le ON le.label_id = l.id
                JOIN publications pub ON pub.document_id = le.entity_id
                WHERE le.entity_type = 'document' AND l.status = 'active'
                AND pub.status = 'active'
-               ORDER BY l.name ASC"""
-        )
+               ORDER BY l.name ASC""")
     return [dict(r) for r in rows]
 
 

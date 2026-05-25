@@ -12,8 +12,8 @@ class MailBase(BaseModel):
 
 
 class MailCreate(MailBase):
-    mail_status: str = 'not_sent'
-    status: str = 'pending'
+    mail_status: str = "not_sent"
+    status: str = "pending"
 
 
 class MailUpdate(BaseModel):

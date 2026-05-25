@@ -7,11 +7,18 @@ from app.core.database import get_database
 from app.models.auth.auth import PermissionEnum
 from app.models.crud.persons import Person, PersonCreate, PersonUpdate
 from app.routers.auth.authentification import get_current_user
-from app.routers.auth.authorization import (require_any_permission_decorator,
-                                            require_permission_decorator)
-from app.utils.db_helpers import (check_document_exists, create_document,
-                                  delete_document, get_all_documents,
-                                  get_document_by_id, update_document)
+from app.routers.auth.authorization import (
+    require_any_permission_decorator,
+    require_permission_decorator,
+)
+from app.utils.db_helpers import (
+    check_document_exists,
+    create_document,
+    delete_document,
+    get_all_documents,
+    get_document_by_id,
+    update_document,
+)
 from app.utils.ownership import check_own_person_or_admin
 from app.utils.validators import EntityValidator
 
@@ -22,7 +29,9 @@ ENTITY_NAME = "Person"
 
 
 @router.get("/", response_model=List[Person])
-@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_CREATE_OWN_TRIBES, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+@require_any_permission_decorator(
+    PermissionEnum.ADMIN, PermissionEnum.CAN_CREATE_OWN_TRIBES, PermissionEnum.CAN_ACCESS_OWN_TRIBES
+)
 async def get_persons(current_user: dict = Depends(get_current_user)):
     pool = get_database()
     return await get_all_documents(pool, TABLE, any_status=True)
@@ -41,11 +50,13 @@ async def get_person(person_id: str, current_user: dict = Depends(get_current_us
 async def create_person(person: PersonCreate, current_user: dict = Depends(get_current_user)):
     pool = get_database()
     validator = EntityValidator(pool)
-    references = [{'table': 'documents', 'id': person.document_id, 'name': 'Document'}] if person.document_id else []
+    references = (
+        [{"table": "documents", "id": person.document_id, "name": "Document"}] if person.document_id else []
+    )
     await validator.validate_references(references)
     person_dict = person.model_dump()
-    person_dict['created_by'] = UUID(current_user['id'])
-    person_dict['updated_by'] = UUID(current_user['id'])
+    person_dict["created_by"] = UUID(current_user["id"])
+    person_dict["updated_by"] = UUID(current_user["id"])
     return await create_document(pool, TABLE, person_dict)
 
 
@@ -56,10 +67,12 @@ async def update_person(person_id: str, person: PersonUpdate, current_user: dict
     await check_own_person_or_admin(person_id, current_user, pool)
     validator = EntityValidator(pool)
     await check_document_exists(pool, TABLE, person_id, ENTITY_NAME)
-    references = [{'table': 'documents', 'id': person.document_id, 'name': 'Document'}] if person.document_id else []
+    references = (
+        [{"table": "documents", "id": person.document_id, "name": "Document"}] if person.document_id else []
+    )
     await validator.validate_references(references)
     person_dict = person.model_dump(exclude_unset=True)
-    person_dict['updated_by'] = UUID(current_user['id'])
+    person_dict["updated_by"] = UUID(current_user["id"])
     return await update_document(pool, TABLE, person_id, person_dict, ENTITY_NAME)
 
 

@@ -17,7 +17,7 @@ class RecentChange(BaseModel):
     entity: str
     entity_id: str
     entity_summary: Optional[str] = None
-    entity_status: str = 'active'
+    entity_status: str = "active"
     created_at: datetime
     created_by: Optional[str] = None
     updated_at: datetime
@@ -198,14 +198,11 @@ ORDER BY updated_at DESC
 
 @router.get("/documents/{document_id}/revisions", response_model=List[DocumentRevision])
 @require_permission_decorator(PermissionEnum.ADMIN)
-async def get_document_revisions(
-    document_id: str,
-    current_user: dict = Depends(get_current_user)
-):
+async def get_document_revisions(document_id: str, current_user: dict = Depends(get_current_user)):
     """Get all revision snapshots for a document, current version first"""
     try:
         uid = UUID(document_id)
-    except (ValueError, AttributeError):
+    except ValueError, AttributeError:
         raise HTTPException(status_code=400, detail="Invalid document ID format")
     pool = get_database()
     async with pool.acquire() as conn:
@@ -229,7 +226,7 @@ async def get_recent_changes(
     hours: int = Query(default=4, ge=1, le=720),
     user_email: Optional[str] = Query(default=None),
     status: Optional[str] = Query(default=None),
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(get_current_user),
 ):
     """Get recent changes across all entities within the last N hours"""
     pool = get_database()

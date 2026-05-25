@@ -12,7 +12,7 @@ class DocumentBase(BaseModel):
 
 
 class DocumentCreate(DocumentBase):
-    status: str = 'active'
+    status: str = "active"
 
 
 class DocumentUpdate(BaseModel):
@@ -20,12 +20,12 @@ class DocumentUpdate(BaseModel):
     attachments: Optional[List[AttachmentFile]] = Field(None, description="File attachments")
     status: Optional[str] = None
 
+
 class Document(DocumentBase):
     id: str
-    status: str = 'active'
+    status: str = "active"
     content_summary: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None
     updated_by: Optional[str] = None
-

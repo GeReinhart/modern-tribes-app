@@ -15,8 +15,9 @@ class UserBase(BaseModel):
     person_id: Optional[str] = None
     sessions: List[UserSession] = []
 
+
 class UserCreate(UserBase):
-    status: str = 'active'
+    status: str = "active"
 
 
 class UserUpdate(BaseModel):
@@ -31,7 +32,7 @@ class UserUpdate(BaseModel):
 class User(UserBase):
     id: str
     url_param_id: str
-    status: str = 'active'
+    status: str = "active"
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None
@@ -46,9 +47,9 @@ class User(UserBase):
                 "login": "Alain",
                 "role_ids": ["507f1f77-bcf8-6cd7-9943-9012abcd1234"],
                 "created_at": "2024-01-01T00:00:00",
-                "updated_at": "2024-01-01T00:00:00"
+                "updated_at": "2024-01-01T00:00:00",
             }
-        }
+        },
     )
 
 

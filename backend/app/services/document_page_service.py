@@ -4,9 +4,11 @@ from uuid import UUID
 
 from fastapi import HTTPException, status
 
-from app.models.app.document_page import (DocumentPageCreate,
-                                          DocumentPageResponse,
-                                          DocumentPageUpdate)
+from app.models.app.document_page import (
+    DocumentPageCreate,
+    DocumentPageResponse,
+    DocumentPageUpdate,
+)
 from app.models.uploads.files import AttachmentFile
 from app.repositories import document_page_repository as repo
 
@@ -15,7 +17,8 @@ async def _verify_document_belongs_to_project(pool, project_id: str, project_doc
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "SELECT id FROM projects_documents WHERE id = $1 AND project_id = $2",
-            UUID(project_document_id), UUID(project_id),
+            UUID(project_document_id),
+            UUID(project_id),
         )
     if not row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found in project")
@@ -25,33 +28,33 @@ async def _verify_page_belongs_to_document(pool, project_document_id: str, page_
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "SELECT id FROM document_pages WHERE id = $1 AND project_document_id = $2",
-            UUID(page_id), UUID(project_document_id),
+            UUID(page_id),
+            UUID(project_document_id),
         )
     if not row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Page not found")
 
 
 def _build_response(row: dict) -> DocumentPageResponse:
-    raw = row.get('attachments') or '[]'
+    raw = row.get("attachments") or "[]"
     if isinstance(raw, str):
         raw = json.loads(raw)
     attachments = [AttachmentFile(**a) if isinstance(a, dict) else a for a in raw]
     return DocumentPageResponse(
-        id=row['id'],
-        url_param_id=row['url_param_id'],
-        project_document_id=row['project_document_id'],
-        title=row['title'],
-        content_html=row['content_html'],
-        content_summary=row.get('content_summary'),
+        id=row["id"],
+        url_param_id=row["url_param_id"],
+        project_document_id=row["project_document_id"],
+        title=row["title"],
+        content_html=row["content_html"],
+        content_summary=row.get("content_summary"),
         attachments=attachments,
-        order_index=row['order_index'],
-        status=row['status'],
-        created_at=row['created_at'],
-        updated_at=row['updated_at'],
-        created_by=row.get('created_by'),
-        updated_by=row.get('updated_by'),
+        order_index=row["order_index"],
+        status=row["status"],
+        created_at=row["created_at"],
+        updated_at=row["updated_at"],
+        created_by=row.get("created_by"),
+        updated_by=row.get("updated_by"),
     )
-
 
 
 async def create_page(
@@ -69,7 +72,7 @@ async def create_page(
         content_html=data.content_html,
         attachments=data.attachments,
         order_index=data.order_index,
-        user_id=str(current_user['id']),
+        user_id=str(current_user["id"]),
     )
     return _build_response(row)
 
@@ -120,7 +123,7 @@ async def update_page(
         content_html=data.content_html,
         attachments=data.attachments,
         order_index=data.order_index,
-        user_id=str(current_user['id']),
+        user_id=str(current_user["id"]),
     )
     if not row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Page not found")
@@ -138,8 +141,8 @@ async def reorder_pages(
     await repo.reorder_pages(
         pool,
         project_document_id,
-        [{'page_id': item.page_id, 'order_index': item.order_index} for item in items],
-        str(current_user['id']),
+        [{"page_id": item.page_id, "order_index": item.order_index} for item in items],
+        str(current_user["id"]),
     )
 
 
@@ -152,6 +155,6 @@ async def archive_page(
 ) -> None:
     await _verify_document_belongs_to_project(pool, project_id, project_document_id)
     await _verify_page_belongs_to_document(pool, project_document_id, page_id)
-    archived = await repo.archive_page(pool, page_id, str(current_user['id']))
+    archived = await repo.archive_page(pool, page_id, str(current_user["id"]))
     if not archived:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Page not found")

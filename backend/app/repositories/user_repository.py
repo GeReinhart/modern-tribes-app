@@ -8,7 +8,7 @@ async def update_user_roles(conn, user_id: str, role_ids: list[str]) -> None:
     if role_ids:
         await conn.executemany(
             "INSERT INTO user_roles (user_id, role_id) VALUES ($1::uuid, $2::uuid)",
-            [(UUID(user_id), UUID(rid)) for rid in role_ids]
+            [(UUID(user_id), UUID(rid)) for rid in role_ids],
         )
 
 
@@ -44,14 +44,14 @@ async def get_user_with_roles_and_permissions(pool, user_id: str) -> dict | None
             WHERE u.id = $1::uuid
             GROUP BY u.id, u.login, u.email, u.person_id, u.created_at, u.updated_at
             """,
-            UUID(user_id)
+            UUID(user_id),
         )
     return row_with_json_to_dict(result) if result else None
 
+
 async def get_users_with_roles_and_permissions(pool) -> list[dict]:
     async with pool.acquire() as conn:
-        rows = await conn.fetch(
-            """
+        rows = await conn.fetch("""
             SELECT
                 u.*,
                 COALESCE(
@@ -78,8 +78,7 @@ async def get_users_with_roles_and_permissions(pool) -> list[dict]:
                      LEFT JOIN role_permissions rp ON r.id = rp.role_id
                      LEFT JOIN permissions p ON rp.permission_id = p.id
             GROUP BY u.id, u.login, u.email, u.person_id, u.created_at, u.updated_at
-            """
-        )
+            """)
     return [row_with_json_to_dict(row) for row in rows]
 
 

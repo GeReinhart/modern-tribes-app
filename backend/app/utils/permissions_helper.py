@@ -13,7 +13,7 @@ async def get_user_permissions(pool: asyncpg.Pool, user_id: str) -> List[str]:
                         JOIN role_permissions rp ON ur.role_id = rp.role_id
                         JOIN permissions p ON rp.permission_id = p.id
                WHERE u.id = $1""",
-            UUID(user_id)
+            UUID(user_id),
         )
 
-    return [row['name'] for row in rows]
+    return [row["name"] for row in rows]

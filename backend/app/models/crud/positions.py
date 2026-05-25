@@ -18,7 +18,8 @@ class PositionBase(BaseModel):
 
 
 class PositionCreate(PositionBase):
-    status: str = 'active'
+    status: str = "active"
+
 
 class PositionUpdate(BaseModel):
     tribe_id: Optional[str] = None
@@ -29,7 +30,7 @@ class PositionUpdate(BaseModel):
 
 class Position(PositionBase):
     id: str
-    status: str = 'active'
+    status: str = "active"
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None
@@ -44,7 +45,7 @@ class Position(PositionBase):
                 "person_id": "507f1f77bcf86cd799439016",
                 "position": "manager",
                 "created_at": "2024-01-01T00:00:00",
-                "updated_at": "2024-01-01T00:00:00"
+                "updated_at": "2024-01-01T00:00:00",
             }
-        }
+        },
     )

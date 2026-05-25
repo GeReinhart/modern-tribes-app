@@ -3,11 +3,13 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, Query, status
 
 from app.core.database import get_database
-from app.models.app.project_document import (ProjectDocumentCreate,
-                                             ProjectDocumentLabel,
-                                             ProjectDocumentResponse,
-                                             ProjectDocumentSummary,
-                                             ProjectDocumentUpdate)
+from app.models.app.project_document import (
+    ProjectDocumentCreate,
+    ProjectDocumentLabel,
+    ProjectDocumentResponse,
+    ProjectDocumentSummary,
+    ProjectDocumentUpdate,
+)
 from app.models.auth.auth import PermissionEnum
 from app.routers.auth.authentification import get_current_user
 from app.routers.auth.authorization import require_any_permission_decorator
@@ -28,7 +30,7 @@ async def list_project_documents(
 ):
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
+    await check_project_access_or_admin(project_id, current_user, pool, min_position="guest")
     return await project_document_service.list_project_documents(
         project_id, pool, search_query=q, label_id=label_id
     )
@@ -47,7 +49,7 @@ async def create_project_document(
 ):
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='member')
+    await check_project_access_or_admin(project_id, current_user, pool, min_position="member")
     return await project_document_service.create_project_document(project_id, data, pool, current_user)
 
 
@@ -61,7 +63,7 @@ async def get_project_document(
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
+    await check_project_access_or_admin(project_id, current_user, pool, min_position="guest")
     return await project_document_service.get_project_document(project_id, project_document_id, pool)
 
 
@@ -76,7 +78,7 @@ async def update_project_document(
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='member')
+    await check_project_access_or_admin(project_id, current_user, pool, min_position="member")
     return await project_document_service.update_project_document(
         project_id, project_document_id, data, pool, current_user
     )
@@ -95,7 +97,7 @@ async def archive_project_document(
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
+    await check_project_access_or_admin(project_id, current_user, pool, min_position="manager")
     await project_document_service.archive_project_document(
         project_id, project_document_id, pool, current_user
     )
@@ -115,7 +117,7 @@ async def publish_project_document(
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
+    await check_project_access_or_admin(project_id, current_user, pool, min_position="manager")
     return await publication_service.publish_document(project_id, project_document_id, pool, current_user)
 
 
@@ -132,7 +134,7 @@ async def unpublish_project_document(
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
+    await check_project_access_or_admin(project_id, current_user, pool, min_position="manager")
     await publication_service.unpublish_document(project_id, project_document_id, pool, current_user)
     return None
 
@@ -145,5 +147,5 @@ async def get_project_document_labels(
 ):
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
+    await check_project_access_or_admin(project_id, current_user, pool, min_position="guest")
     return await project_document_service.get_project_document_labels(project_id, pool)

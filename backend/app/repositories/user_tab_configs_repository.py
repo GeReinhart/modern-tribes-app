@@ -9,7 +9,8 @@ async def get_tab_config(pool, user_id: str, context_key: str) -> dict | None:
         row = await conn.fetchrow(
             "SELECT * FROM user_tab_configs "
             "WHERE user_id = $1::uuid AND context_key = $2 AND status = 'active'",
-            UUID(user_id), context_key,
+            UUID(user_id),
+            context_key,
         )
     return row_with_json_to_dict(row) if row else None
 
@@ -29,6 +30,9 @@ async def upsert_tab_config(
                 updated_at  = NOW()
             RETURNING *
             """,
-            UUID(user_id), context_key, json.dumps(tab_configs), UUID(current_user_id),
+            UUID(user_id),
+            context_key,
+            json.dumps(tab_configs),
+            UUID(current_user_id),
         )
     return row_with_json_to_dict(row)

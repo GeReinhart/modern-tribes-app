@@ -21,28 +21,34 @@ async def process_pending_mails() -> None:
 
         for mail in mails:
             try:
-                recipients = await conn.fetch("""
+                recipients = await conn.fetch(
+                    """
                     SELECT u.email FROM mails_to mt
                     JOIN users u ON u.id = mt.user_id
                     WHERE mt.mail_id = $1
-                """, mail['id'])
+                """,
+                    mail["id"],
+                )
 
                 for recipient in recipients:
-                    await send_email(recipient['email'], mail['subject'], mail['content_html'])
+                    await send_email(recipient["email"], mail["subject"], mail["content_html"])
 
-                await conn.execute("""
+                await conn.execute(
+                    """
                     UPDATE mails
                     SET status = 'archived',
                         mail_status = 'sent',
                         sent_at = NOW(),
                         updated_at = NOW()
                     WHERE id = $1
-                """, mail['id'])
+                """,
+                    mail["id"],
+                )
 
-                logger.info("Mail %s sent to %d recipient(s)", mail['id'], len(recipients))
+                logger.info("Mail %s sent to %d recipient(s)", mail["id"], len(recipients))
 
             except Exception:
-                logger.exception("Failed to send mail %s", mail['id'])
+                logger.exception("Failed to send mail %s", mail["id"])
 
 
 async def mail_scheduler() -> None:

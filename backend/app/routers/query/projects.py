@@ -14,7 +14,7 @@ from app.utils.ownership import check_own_user_or_admin
 
 router = APIRouter(prefix="/projects", tags=["query_projects"])
 
-_POSITION_RANK = {'guest': 0, 'member': 1, 'manager': 2}
+_POSITION_RANK = {"guest": 0, "member": 1, "manager": 2}
 
 _QUERY = """
     SELECT

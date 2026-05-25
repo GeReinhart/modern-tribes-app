@@ -10,7 +10,7 @@ class RepresentsBase(BaseModel):
 
 
 class RepresentsCreate(RepresentsBase):
-    status: str = 'active'
+    status: str = "active"
 
 
 class RepresentsUpdate(BaseModel):
@@ -21,7 +21,7 @@ class RepresentsUpdate(BaseModel):
 
 class Represents(RepresentsBase):
     id: str
-    status: str = 'active'
+    status: str = "active"
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None

@@ -11,6 +11,7 @@ class PermissionEnum(str, Enum):
     CAN_ACCESS_OWN_TRIBES = "can_access_attached_tribes"
     CAN_MANAGE_OWN_PROFILE = "can_manage_own_profile"
 
+
 class UserSession(BaseModel):
     session_id: str
     user_agent: Optional[str] = None
@@ -23,9 +24,11 @@ class UserSession(BaseModel):
 class MagicLinkRequest(BaseModel):
     email: EmailStr
 
+
 class MagicLinkResponse(BaseModel):
     message: str
     email: EmailStr
+
 
 class TokenResponse(BaseModel):
     access_token: str
@@ -33,20 +36,24 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
     user: "UserResponse"
 
+
 class RefreshRequest(BaseModel):
     refresh_token: str
+
 
 class RefreshResponse(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
 
+
 class UserResponse(BaseModel):
     id: str
     email: EmailStr
     permissions: Optional[List[str]] = []
     created_at: datetime
-    language: str = 'en'
+    language: str = "en"
+
 
 class SessionResponse(BaseModel):
     session_id: str

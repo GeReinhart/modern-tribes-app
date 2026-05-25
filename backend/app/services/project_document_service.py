@@ -4,15 +4,20 @@ from uuid import UUID
 
 from fastapi import HTTPException, status
 
-from app.models.app.project_document import (LabelInfo, ProjectDocumentCreate,
-                                             ProjectDocumentLabel,
-                                             ProjectDocumentResponse,
-                                             ProjectDocumentSummary,
-                                             ProjectDocumentUpdate)
+from app.models.app.project_document import (
+    LabelInfo,
+    ProjectDocumentCreate,
+    ProjectDocumentLabel,
+    ProjectDocumentResponse,
+    ProjectDocumentSummary,
+    ProjectDocumentUpdate,
+)
 from app.models.uploads.files import AttachmentFile
-from app.utils.attachments_helpers import (create_document_with_attachments,
-                                           get_document_with_attachments,
-                                           update_document_attachments)
+from app.utils.attachments_helpers import (
+    create_document_with_attachments,
+    get_document_with_attachments,
+    update_document_attachments,
+)
 from app.utils.db_helpers import generate_url_param_id, row_to_dict
 from app.utils.document_helpers import update_document_content_with_revision
 
@@ -21,14 +26,12 @@ async def _upsert_label(pool, name: str) -> str:
     """Find or create a label by name (case-insensitive). Returns label id."""
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            "SELECT id FROM labels WHERE LOWER(name) = LOWER($1) AND status = 'active' LIMIT 1",
-            name
+            "SELECT id FROM labels WHERE LOWER(name) = LOWER($1) AND status = 'active' LIMIT 1", name
         )
         if row:
             return str(row["id"])
         row = await conn.fetchrow(
-            "INSERT INTO labels (name, status) VALUES ($1, 'active') RETURNING id",
-            name
+            "INSERT INTO labels (name, status) VALUES ($1, 'active') RETURNING id", name
         )
         return str(row["id"])
 
@@ -37,8 +40,7 @@ async def _sync_document_labels(pool, document_id: str, label_names: List[str]) 
     """Replace all label_entities for a document with the given label names."""
     async with pool.acquire() as conn:
         await conn.execute(
-            "DELETE FROM label_entities WHERE entity_type = 'document' AND entity_id = $1",
-            UUID(document_id)
+            "DELETE FROM label_entities WHERE entity_type = 'document' AND entity_id = $1", UUID(document_id)
         )
 
     for name in label_names:
@@ -48,7 +50,8 @@ async def _sync_document_labels(pool, document_id: str, label_names: List[str]) 
         async with pool.acquire() as conn:
             await conn.execute(
                 "INSERT INTO label_entities (label_id, entity_type, entity_id) VALUES ($1, 'document', $2)",
-                UUID(label_id), UUID(document_id)
+                UUID(label_id),
+                UUID(document_id),
             )
 
 
@@ -59,7 +62,7 @@ async def _get_document_labels(pool, document_id: str) -> List[LabelInfo]:
                JOIN label_entities le ON le.label_id = l.id
                WHERE le.entity_type = 'document' AND le.entity_id = $1 AND l.status = 'active'
                ORDER BY l.name ASC""",
-            UUID(document_id)
+            UUID(document_id),
         )
     return [LabelInfo(id=str(r["id"]), name=r["name"]) for r in rows]
 
@@ -70,15 +73,13 @@ async def _build_response(pd_row: dict, pool) -> ProjectDocumentResponse:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document content not found")
 
     attachments = [
-        AttachmentFile(**att) if isinstance(att, dict) else att
-        for att in document.get("attachments", [])
+        AttachmentFile(**att) if isinstance(att, dict) else att for att in document.get("attachments", [])
     ]
     labels = await _get_document_labels(pool, str(pd_row["document_id"]))
 
     async with pool.acquire() as conn:
         pub_row = await conn.fetchrow(
-            "SELECT url_param_id FROM publications WHERE document_id = $1",
-            UUID(str(pd_row["document_id"]))
+            "SELECT url_param_id FROM publications WHERE document_id = $1", UUID(str(pd_row["document_id"]))
         )
     publication_url_param_id = pub_row["url_param_id"] if pub_row else None
 
@@ -130,19 +131,24 @@ async def create_project_document(
                    (project_id, document_id, title, toc_depth, status, url_param_id, created_at, updated_at, created_by, updated_by)
                VALUES ($1, $2, $3, $4, 'active', $5, $6, $6, $7, $7)
                RETURNING *""",
-            UUID(project_id), UUID(document_id), data.title, data.toc_depth, url_param_id, now, uid
+            UUID(project_id),
+            UUID(document_id),
+            data.title,
+            data.toc_depth,
+            url_param_id,
+            now,
+            uid,
         )
 
     return await _build_response(row_to_dict(pd_row), pool)
 
 
-async def get_project_document(
-    project_id: str, project_document_id: str, pool
-) -> ProjectDocumentResponse:
+async def get_project_document(project_id: str, project_document_id: str, pool) -> ProjectDocumentResponse:
     async with pool.acquire() as conn:
         pd_row = await conn.fetchrow(
             "SELECT * FROM projects_documents WHERE id = $1 AND project_id = $2",
-            UUID(project_document_id), UUID(project_id)
+            UUID(project_document_id),
+            UUID(project_id),
         )
     if not pd_row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
@@ -189,18 +195,20 @@ async def list_project_documents(
     for row in rows:
         document_id = str(row["document_id"])
         labels = await _get_document_labels(pool, document_id)
-        results.append(ProjectDocumentSummary(
-            id=str(row["id"]),
-            url_param_id=row["url_param_id"],
-            document_id=document_id,
-            title=row["title"],
-            content_summary=row["content_summary"],
-            labels=labels,
-            status=row["status"],
-            publication_url_param_id=row["publication_url_param_id"],
-            created_at=row["created_at"],
-            updated_at=row["updated_at"],
-        ))
+        results.append(
+            ProjectDocumentSummary(
+                id=str(row["id"]),
+                url_param_id=row["url_param_id"],
+                document_id=document_id,
+                title=row["title"],
+                content_summary=row["content_summary"],
+                labels=labels,
+                status=row["status"],
+                publication_url_param_id=row["publication_url_param_id"],
+                created_at=row["created_at"],
+                updated_at=row["updated_at"],
+            )
+        )
 
     return results
 
@@ -218,7 +226,8 @@ async def update_project_document(
     async with pool.acquire() as conn:
         pd_row = await conn.fetchrow(
             "SELECT * FROM projects_documents WHERE id = $1 AND project_id = $2",
-            UUID(project_document_id), UUID(project_id)
+            UUID(project_document_id),
+            UUID(project_id),
         )
     if not pd_row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
@@ -230,14 +239,20 @@ async def update_project_document(
         async with pool.acquire() as conn:
             await conn.execute(
                 "UPDATE projects_documents SET title = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
-                data.title, now, uid, UUID(project_document_id)
+                data.title,
+                now,
+                uid,
+                UUID(project_document_id),
             )
 
     if data.toc_depth is not None:
         async with pool.acquire() as conn:
             await conn.execute(
                 "UPDATE projects_documents SET toc_depth = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
-                data.toc_depth, now, uid, UUID(project_document_id)
+                data.toc_depth,
+                now,
+                uid,
+                UUID(project_document_id),
             )
 
     if data.content_html is not None:
@@ -262,7 +277,10 @@ async def archive_project_document(
         result = await conn.execute(
             """UPDATE projects_documents SET status = 'archived', updated_at = $1, updated_by = $2
                WHERE id = $3 AND project_id = $4""",
-            now, uid, UUID(project_document_id), UUID(project_id)
+            now,
+            uid,
+            UUID(project_document_id),
+            UUID(project_id),
         )
 
     if result == "UPDATE 0":
@@ -279,9 +297,6 @@ async def get_project_document_labels(project_id: str, pool) -> List[ProjectDocu
                WHERE pd.project_id = $1 AND pd.status = 'active' AND l.status = 'active'
                GROUP BY l.id, l.name
                ORDER BY usage_count DESC, l.name ASC""",
-            UUID(project_id)
+            UUID(project_id),
         )
-    return [
-        ProjectDocumentLabel(id=str(r["id"]), name=r["name"], usage_count=r["usage_count"])
-        for r in rows
-    ]
+    return [ProjectDocumentLabel(id=str(r["id"]), name=r["name"], usage_count=r["usage_count"]) for r in rows]

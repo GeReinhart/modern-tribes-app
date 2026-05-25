@@ -12,12 +12,19 @@ from app.models.auth.auth import PermissionEnum
 from app.models.crud.users import User, UserCreate, UserUpdate, UserWithRoles
 from app.repositories import user_repository as user_repo
 from app.routers.auth.authentification import get_current_user
-from app.routers.auth.authorization import (require_any_permission_decorator,
-                                            require_permission_decorator)
-from app.utils.db_helpers import (check_document_exists, check_unique_field,
-                                  create_document, delete_document,
-                                  get_all_documents, resolve_url_param_id,
-                                  update_document)
+from app.routers.auth.authorization import (
+    require_any_permission_decorator,
+    require_permission_decorator,
+)
+from app.utils.db_helpers import (
+    check_document_exists,
+    check_unique_field,
+    create_document,
+    delete_document,
+    get_all_documents,
+    resolve_url_param_id,
+    update_document,
+)
 from app.utils.ownership import check_own_user_or_admin
 from app.utils.validators import EntityValidator
 
@@ -34,15 +41,11 @@ async def get_users(current_user: dict = Depends(get_current_user)):
     return await get_all_documents(pool, TABLE, any_status=True)
 
 
-
 @router.get("/with/roles/permissions", response_model=List[UserWithRoles])
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_userswith_roles_permissions(current_user: dict = Depends(get_current_user)):
     pool = get_database()
     return await user_repo.get_users_with_roles_and_permissions(pool)
-
-
-
 
 
 @router.get("/{user_id}", response_model=User)
@@ -75,19 +78,19 @@ async def create_user(user: UserCreate, current_user: dict = Depends(get_current
     pool = get_database()
     validator = EntityValidator(pool)
     await check_unique_field(pool, TABLE, "email", user.email, error_message="Email already registered")
-    references = [{'table': 'persons', 'id': user.person_id, 'name': 'Person'}] if user.person_id else []
+    references = [{"table": "persons", "id": user.person_id, "name": "Person"}] if user.person_id else []
     if user.role_ids:
-        await validator.validate_reference_lists([{'table': 'roles', 'ids': user.role_ids, 'name': 'Role'}])
+        await validator.validate_reference_lists([{"table": "roles", "ids": user.role_ids, "name": "Role"}])
     await validator.validate_references(references)
     data = user.model_dump()
-    role_ids = data.pop('role_ids', None)
-    data.pop('sessions', None)
-    data['created_by'] = UUID(current_user['id'])
-    data['updated_by'] = UUID(current_user['id'])
+    role_ids = data.pop("role_ids", None)
+    data.pop("sessions", None)
+    data["created_by"] = UUID(current_user["id"])
+    data["updated_by"] = UUID(current_user["id"])
     created = await create_document(pool, TABLE, data)
     if role_ids:
         async with pool.acquire() as conn:
-            await user_repo.update_user_roles(conn, created['id'], role_ids)
+            await user_repo.update_user_roles(conn, created["id"], role_ids)
     return created
 
 
@@ -100,15 +103,17 @@ async def update_user(user_id: str, user: UserUpdate, current_user: dict = Depen
     validator = EntityValidator(pool)
     existing_user = await check_document_exists(pool, TABLE, user_id, ENTITY_NAME)
     if user.email and user.email != existing_user.get("email"):
-        await check_unique_field(pool, TABLE, "email", user.email, exclude_id=user_id, error_message="Email already registered")
-    references = [{'table': 'persons', 'id': user.person_id, 'name': 'Person'}] if user.person_id else []
+        await check_unique_field(
+            pool, TABLE, "email", user.email, exclude_id=user_id, error_message="Email already registered"
+        )
+    references = [{"table": "persons", "id": user.person_id, "name": "Person"}] if user.person_id else []
     await validator.validate_references(references)
     if user.role_ids is not None:
-        await validator.validate_reference_lists([{'table': 'roles', 'ids': user.role_ids, 'name': 'Role'}])
+        await validator.validate_reference_lists([{"table": "roles", "ids": user.role_ids, "name": "Role"}])
     data = user.model_dump(exclude_unset=True)
-    role_ids = data.pop('role_ids', None)
-    data.pop('sessions', None)
-    data['updated_by'] = UUID(current_user['id'])
+    role_ids = data.pop("role_ids", None)
+    data.pop("sessions", None)
+    data["updated_by"] = UUID(current_user["id"])
     updated = await update_document(pool, TABLE, user_id, data, ENTITY_NAME)
     if role_ids is not None:
         async with pool.acquire() as conn:
@@ -142,7 +147,8 @@ async def admin_send_magic_link(user_id: str, current_user: dict = Depends(get_c
               AND m.mail_status = 'not_sent'
             LIMIT 1
             """,
-            user["id"], "magic-link",
+            user["id"],
+            "magic-link",
         )
     if existing:
         raise HTTPException(
@@ -154,20 +160,28 @@ async def admin_send_magic_link(user_id: str, current_user: dict = Depends(get_c
     subject = f"Sign in to {settings.APP_NAME}"
     html = magic_link_html(magic_link)
     now = datetime.now(timezone.utc)
-    mail = await create_document(pool, "mails", {
-        "subject": subject,
-        "content_html": html,
-        "mail_type": "magic-link",
-        "mail_status": "not_sent",
-        "planned_at": now,
-        "status": "pending",
-        "created_by": UUID(current_user["id"]),
-        "updated_by": UUID(current_user["id"]),
-    })
-    await create_document(pool, "mails_to", {
-        "mail_id": mail["id"],
-        "user_id": user["id"],
-    })
+    mail = await create_document(
+        pool,
+        "mails",
+        {
+            "subject": subject,
+            "content_html": html,
+            "mail_type": "magic-link",
+            "mail_status": "not_sent",
+            "planned_at": now,
+            "status": "pending",
+            "created_by": UUID(current_user["id"]),
+            "updated_by": UUID(current_user["id"]),
+        },
+    )
+    await create_document(
+        pool,
+        "mails_to",
+        {
+            "mail_id": mail["id"],
+            "user_id": user["id"],
+        },
+    )
     return {"message": "Magic link sent", "email": user["email"]}
 
 

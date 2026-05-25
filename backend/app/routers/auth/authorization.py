@@ -11,6 +11,7 @@ from app.utils.permissions_helper import get_user_permissions
 
 router = APIRouter()
 
+
 # ============ HELPER FUNCTION ============
 async def _get_user_permissions_or_raise(current_user: dict) -> list[str]:
     """
@@ -18,10 +19,7 @@ async def _get_user_permissions_or_raise(current_user: dict) -> list[str]:
     Raises HTTPException if user is not authenticated
     """
     if not current_user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
 
     pool = get_database()
     user_id = str(current_user.get("id"))
@@ -31,8 +29,7 @@ async def _get_user_permissions_or_raise(current_user: dict) -> list[str]:
 # ============ ENDPOINT ============
 @router.get("/auth/permissions/any/{permissions}", response_model=Authorization)
 async def current_user_has_at_least_one_permission(
-        permissions: str,
-        current_user: dict = Depends(get_current_user)
+    permissions: str, current_user: dict = Depends(get_current_user)
 ):
     """Check if current user has at least one of the specified permissions"""
     user_permissions = await _get_user_permissions_or_raise(current_user)
@@ -41,9 +38,9 @@ async def current_user_has_at_least_one_permission(
     has_permission = any(perm in user_permissions for perm in required_permissions)
 
     return Authorization(
-        authorized=has_permission,
-        message="" if has_permission else f"Required any of: {permissions}"
+        authorized=has_permission, message="" if has_permission else f"Required any of: {permissions}"
     )
+
 
 async def _check_permissions(permissions: str, current_user: dict) -> tuple[bool, str]:
     """Check if user has at least one of the required permissions"""
@@ -59,9 +56,7 @@ async def _check_permissions(permissions: str, current_user: dict) -> tuple[bool
 
 
 async def _authorize_tribe_access(
-        tribe_id: str,
-        current_user: dict,
-        position: str | None = None
+    tribe_id: str, current_user: dict, position: str | None = None
 ) -> Authorization:
     """Check tribe ownership/position access"""
     try:
@@ -72,14 +67,9 @@ async def _authorize_tribe_access(
         return Authorization(authorized=False, message=e.detail)
 
 
-@router.get(
-    "/auth/permissions/any/{permissions}/own/tribe/{tribe_id}",
-    response_model=Authorization
-)
+@router.get("/auth/permissions/any/{permissions}/own/tribe/{tribe_id}", response_model=Authorization)
 async def check_permission_and_tribe(
-        permissions: str,
-        tribe_id: str,
-        current_user: dict = Depends(get_current_user)
+    permissions: str, tribe_id: str, current_user: dict = Depends(get_current_user)
 ):
     """Check if user has permission and owns tribe"""
     authorized, message = await _check_permissions(permissions, current_user)
@@ -91,13 +81,10 @@ async def check_permission_and_tribe(
 
 @router.get(
     "/auth/permissions/any/{permissions}/own/tribe/{tribe_id}/position/{position}",
-    response_model=Authorization
+    response_model=Authorization,
 )
 async def check_permission_and_tribe_and_position(
-        permissions: str,
-        tribe_id: str,
-        position: str,
-        current_user: dict = Depends(get_current_user)
+    permissions: str, tribe_id: str, position: str, current_user: dict = Depends(get_current_user)
 ):
     """Check if user has permission, owns tribe, and has position"""
     authorized, message = await _check_permissions(permissions, current_user)
@@ -106,9 +93,11 @@ async def check_permission_and_tribe_and_position(
 
     return await _authorize_tribe_access(tribe_id, current_user, position)
 
+
 # ============ DECORATORS ============
 def require_permission_decorator(permission: str):
     """Decorator to check if user has a specific permission"""
+
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args: Any, current_user: dict = None, **kwargs: Any) -> Any:
@@ -116,17 +105,19 @@ def require_permission_decorator(permission: str):
 
             if permission not in user_permissions:
                 raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"Permission required: {permission}"
+                    status_code=status.HTTP_403_FORBIDDEN, detail=f"Permission required: {permission}"
                 )
 
             return await func(*args, current_user=current_user, **kwargs)
+
         return wrapper
+
     return decorator
 
 
 def require_any_permission_decorator(*permissions: str):
     """Decorator to check if user has ANY of the specified permissions"""
+
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args: Any, current_user: dict = None, **kwargs: Any) -> Any:
@@ -136,17 +127,19 @@ def require_any_permission_decorator(*permissions: str):
 
             if not has_permission:
                 raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"Required any of: {', '.join(permissions)}"
+                    status_code=status.HTTP_403_FORBIDDEN, detail=f"Required any of: {', '.join(permissions)}"
                 )
 
             return await func(*args, current_user=current_user, **kwargs)
+
         return wrapper
+
     return decorator
 
 
 def require_all_permissions_decorator(*permissions: str):
     """Decorator to check if user has ALL of the specified permissions"""
+
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args: Any, current_user: dict = None, **kwargs: Any) -> Any:
@@ -160,10 +153,11 @@ def require_all_permissions_decorator(*permissions: str):
             if not has_permission:
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"Required permissions: {', '.join(permissions)}"
+                    detail=f"Required permissions: {', '.join(permissions)}",
                 )
 
             return await func(*args, current_user=current_user, **kwargs)
-        return wrapper
-    return decorator
 
+        return wrapper
+
+    return decorator

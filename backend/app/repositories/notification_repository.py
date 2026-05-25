@@ -2,7 +2,9 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 
-async def insert_notification(pool, target_user_id: str, message: str, current_user_id: str, url_param_id: str) -> dict:
+async def insert_notification(
+    pool, target_user_id: str, message: str, current_user_id: str, url_param_id: str
+) -> dict:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """
@@ -37,7 +39,9 @@ async def list_pending_for_user(pool, user_id: str) -> list[dict]:
         return [dict(r) for r in rows]
 
 
-async def update_notification_status(pool, notification_id: str, target_user_id: str, new_status: str) -> dict:
+async def update_notification_status(
+    pool, notification_id: str, target_user_id: str, new_status: str
+) -> dict:
     sent_at = datetime.now(timezone.utc) if new_status == "sent" else None
     async with pool.acquire() as conn:
         row = await conn.fetchrow(

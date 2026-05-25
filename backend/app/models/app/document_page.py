@@ -17,7 +17,7 @@ class PageReorderRequest(BaseModel):
 
 class DocumentPageCreate(BaseModel):
     title: str
-    content_html: str = ''
+    content_html: str = ""
     attachments: List[AttachmentFile] = []
     order_index: int = 0
 

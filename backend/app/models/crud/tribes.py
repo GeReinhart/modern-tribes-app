@@ -10,7 +10,7 @@ class TribeBase(BaseModel):
 
 
 class TribeCreate(TribeBase):
-    status: str = 'active'
+    status: str = "active"
 
 
 class TribeUpdate(BaseModel):
@@ -22,7 +22,7 @@ class TribeUpdate(BaseModel):
 class Tribe(TribeBase):
     id: str
     url_param_id: str
-    status: str = 'active'
+    status: str = "active"
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None
@@ -36,7 +36,7 @@ class Tribe(TribeBase):
                 "name": "Engineering",
                 "document_id": "507f1f77-bcf8-6cd7-9943-9016abcd1234",
                 "created_at": "2024-01-01T00:00:00",
-                "updated_at": "2024-01-01T00:00:00"
+                "updated_at": "2024-01-01T00:00:00",
             }
-        }
+        },
     )

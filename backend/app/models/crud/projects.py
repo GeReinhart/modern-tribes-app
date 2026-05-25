@@ -10,7 +10,7 @@ class ProjectBase(BaseModel):
 
 
 class ProjectCreate(ProjectBase):
-    status: str = 'active'
+    status: str = "active"
 
 
 class ProjectUpdate(BaseModel):
@@ -22,7 +22,7 @@ class ProjectUpdate(BaseModel):
 class Project(ProjectBase):
     id: str
     url_param_id: str
-    status: str = 'active'
+    status: str = "active"
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None
@@ -36,7 +36,7 @@ class Project(ProjectBase):
                 "name": "Website Redesign",
                 "document_id": "507f1f77bcf86cd799439016",
                 "created_at": "2024-01-01T00:00:00",
-                "updated_at": "2024-01-01T00:00:00"
+                "updated_at": "2024-01-01T00:00:00",
             }
-        }
+        },
     )

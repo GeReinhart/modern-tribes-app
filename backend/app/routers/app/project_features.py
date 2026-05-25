@@ -4,10 +4,12 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.core.database import get_database
-from app.models.app.project_features import (FeatureTypeInfo,
-                                             ProjectFeatureInstanceCreate,
-                                             ProjectFeatureInstanceResponse,
-                                             ProjectFeatureInstanceUpdate)
+from app.models.app.project_features import (
+    FeatureTypeInfo,
+    ProjectFeatureInstanceCreate,
+    ProjectFeatureInstanceResponse,
+    ProjectFeatureInstanceUpdate,
+)
 from app.models.auth.auth import PermissionEnum
 from app.routers.auth.authentification import get_current_user
 from app.routers.auth.authorization import require_any_permission_decorator
@@ -21,6 +23,7 @@ router = APIRouter(prefix="/project-features", tags=["app_project_features"])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_feature_types(current_user: dict = Depends(get_current_user)):
     from features.registry import get_available_feature_types
+
     return [FeatureTypeInfo(**ft) for ft in get_available_feature_types()]
 
 
@@ -33,7 +36,7 @@ async def list_project_features(
 ):
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
+    await check_project_access_or_admin(project_id, current_user, pool, min_position="guest")
     if status_filter:
         query = "SELECT * FROM projects_features WHERE project_id = $1 AND status = $2 ORDER BY position ASC, created_at ASC"
         params = [UUID(project_id), status_filter]
@@ -59,14 +62,18 @@ async def list_project_features(
     ]
 
 
-@router.post("/projects/{project_id}/features", response_model=ProjectFeatureInstanceResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/projects/{project_id}/features",
+    response_model=ProjectFeatureInstanceResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def create_project_feature(
     project_id: str, data: ProjectFeatureInstanceCreate, current_user: dict = Depends(get_current_user)
 ):
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
+    await check_project_access_or_admin(project_id, current_user, pool, min_position="manager")
     user_id = UUID(str(current_user["id"]))
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
@@ -75,7 +82,11 @@ async def create_project_feature(
             VALUES ($1, $2, $3, $4, $5, $5)
             RETURNING *
             """,
-            UUID(project_id), data.feature_type, data.name, data.position, user_id
+            UUID(project_id),
+            data.feature_type,
+            data.name,
+            data.position,
+            user_id,
         )
     return ProjectFeatureInstanceResponse(
         id=str(row["id"]),
@@ -94,11 +105,14 @@ async def create_project_feature(
 @router.patch("/projects/{project_id}/features/{feature_id}", response_model=ProjectFeatureInstanceResponse)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def update_project_feature(
-    project_id: str, feature_id: str, data: ProjectFeatureInstanceUpdate, current_user: dict = Depends(get_current_user)
+    project_id: str,
+    feature_id: str,
+    data: ProjectFeatureInstanceUpdate,
+    current_user: dict = Depends(get_current_user),
 ):
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
+    await check_project_access_or_admin(project_id, current_user, pool, min_position="manager")
     user_id = UUID(str(current_user["id"]))
     updates: dict = {"updated_by": user_id}
     if data.name is not None:
@@ -114,7 +128,9 @@ async def update_project_feature(
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             f"UPDATE projects_features SET {set_clauses} WHERE id = $1 AND project_id = ${len(values)+2} RETURNING *",
-            UUID(feature_id), *values, UUID(project_id)
+            UUID(feature_id),
+            *values,
+            UUID(project_id),
         )
     if not row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Feature instance not found.")

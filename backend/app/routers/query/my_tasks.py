@@ -56,15 +56,15 @@ class MyTasksResponse(BaseModel):
 def _to_kanban(row: dict) -> MyKanbanTask:
     return MyKanbanTask(
         **{k: row[k] for k in MyTaskBase.model_fields if k in row},
-        column_id=row['column_id'],
-        column_name=row['column_name'],
+        column_id=row["column_id"],
+        column_name=row["column_name"],
     )
 
 
 def _to_todo(row: dict) -> MyTodoTask:
     return MyTodoTask(
         **{k: row[k] for k in MyTaskBase.model_fields if k in row},
-        todo_status=row['todo_status'],
+        todo_status=row["todo_status"],
     )
 
 
@@ -79,10 +79,16 @@ async def get_my_tasks(
 ):
     pool = get_database()
     user_id = current_user["id"]
-    filters = {k: v for k, v in {
-        'tribe_id': tribe_id, 'project_id': project_id,
-        'person_id': person_id, 'label_id': label_id,
-    }.items() if v is not None}
+    filters = {
+        k: v
+        for k, v in {
+            "tribe_id": tribe_id,
+            "project_id": project_id,
+            "person_id": person_id,
+            "label_id": label_id,
+        }.items()
+        if v is not None
+    }
     kanban_rows, todo_rows = await _fetch_both(pool, user_id, filters)
     return MyTasksResponse(
         kanban=[_to_kanban(r) for r in kanban_rows],

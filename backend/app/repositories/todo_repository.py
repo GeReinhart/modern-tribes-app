@@ -2,8 +2,7 @@ from datetime import date, datetime, timezone
 from typing import Optional
 from uuid import UUID
 
-from app.repositories.persons_repository import \
-    fetch_persons_for_feature  # noqa: F401
+from app.repositories.persons_repository import fetch_persons_for_feature  # noqa: F401
 
 
 async def fetch_todo_items(pool, feature_instance_id: str) -> list[dict]:
@@ -50,7 +49,10 @@ async def insert_todo_item(pool, feature_instance_id: str, title: str, position:
         row = await conn.fetchrow(
             """INSERT INTO todo_items (feature_instance_id, title, position, created_by, updated_by)
                VALUES ($1, $2, $3, $4, $4) RETURNING *""",
-            UUID(feature_instance_id), title, position, UUID(user_id),
+            UUID(feature_instance_id),
+            title,
+            position,
+            UUID(user_id),
         )
     return dict(row)
 
@@ -64,33 +66,55 @@ async def update_todo_item_basic(pool, item_id: str, updates: dict, user_id: str
     async with pool.acquire() as conn:
         await conn.execute(
             f"UPDATE todo_items SET {set_clauses} WHERE id = $1",
-            UUID(item_id), *fields.values(),
+            UUID(item_id),
+            *fields.values(),
         )
 
 
-async def update_todo_fields(pool, item_id: str, size: Optional[int], clear_size: bool,
-                             assigned_person_id: Optional[str], clear_assignee: bool,
-                             due_date: Optional[date], clear_due_date: bool, user_id: str) -> None:
+async def update_todo_fields(
+    pool,
+    item_id: str,
+    size: Optional[int],
+    clear_size: bool,
+    assigned_person_id: Optional[str],
+    clear_assignee: bool,
+    due_date: Optional[date],
+    clear_due_date: bool,
+    user_id: str,
+) -> None:
     uid = UUID(user_id)
     iid = UUID(item_id)
     async with pool.acquire() as conn:
         if clear_size:
             await conn.execute("UPDATE todo_items SET size = NULL, updated_by = $1 WHERE id = $2", uid, iid)
         elif size is not None:
-            await conn.execute("UPDATE todo_items SET size = $1, updated_by = $2 WHERE id = $3", size, uid, iid)
+            await conn.execute(
+                "UPDATE todo_items SET size = $1, updated_by = $2 WHERE id = $3", size, uid, iid
+            )
         if clear_assignee:
-            await conn.execute("UPDATE todo_items SET assigned_person_id = NULL, updated_by = $1 WHERE id = $2", uid, iid)
+            await conn.execute(
+                "UPDATE todo_items SET assigned_person_id = NULL, updated_by = $1 WHERE id = $2", uid, iid
+            )
         elif assigned_person_id is not None:
-            await conn.execute("UPDATE todo_items SET assigned_person_id = $1, updated_by = $2 WHERE id = $3",
-                               UUID(assigned_person_id), uid, iid)
+            await conn.execute(
+                "UPDATE todo_items SET assigned_person_id = $1, updated_by = $2 WHERE id = $3",
+                UUID(assigned_person_id),
+                uid,
+                iid,
+            )
         if clear_due_date:
-            await conn.execute("UPDATE todo_items SET due_date = NULL, updated_by = $1 WHERE id = $2", uid, iid)
+            await conn.execute(
+                "UPDATE todo_items SET due_date = NULL, updated_by = $1 WHERE id = $2", uid, iid
+            )
         elif due_date is not None:
-            await conn.execute("UPDATE todo_items SET due_date = $1, updated_by = $2 WHERE id = $3", due_date, uid, iid)
+            await conn.execute(
+                "UPDATE todo_items SET due_date = $1, updated_by = $2 WHERE id = $3", due_date, uid, iid
+            )
 
 
-async def upsert_document(pool, item_id: str, content_html: str, content_text: str,
-                          content_summary: str, user_id: str) -> None:
+async def upsert_document(
+    pool, item_id: str, content_html: str, content_text: str, content_summary: str, user_id: str
+) -> None:
     uid = UUID(user_id)
     iid = UUID(item_id)
     now = datetime.now(timezone.utc)
@@ -100,14 +124,20 @@ async def upsert_document(pool, item_id: str, content_html: str, content_text: s
             new_doc_id = await conn.fetchval(
                 """INSERT INTO documents (content_html, content_text, content_summary, created_by, updated_by)
                    VALUES ($1, $2, $3, $4, $4) RETURNING id""",
-                content_html, content_text, content_summary, uid,
+                content_html,
+                content_text,
+                content_summary,
+                uid,
             )
             await conn.execute("UPDATE todo_items SET document_id = $1 WHERE id = $2", new_doc_id, iid)
         else:
             await conn.execute(
                 """UPDATE documents SET content_html=$1, content_text=$2, content_summary=$3,
                    updated_at=$4, updated_by=$5 WHERE id=$6""",
-                content_html, content_text, content_summary, now, uid, doc_id,
+                content_html,
+                content_text,
+                content_summary,
+                now,
+                uid,
+                doc_id,
             )
-
-

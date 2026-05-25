@@ -7,7 +7,7 @@ from app.models.auth.auth import PermissionEnum
 from app.utils.db_helpers import resolve_url_param_id
 from app.utils.permissions_helper import get_user_permissions
 
-_POSITION_ORDER = {'guest': 0, 'member': 1, 'manager': 2}
+_POSITION_ORDER = {"guest": 0, "member": 1, "manager": 2}
 
 
 async def get_project_position(project_id: str, user_id: UUID, pool) -> Optional[str]:
@@ -30,7 +30,8 @@ async def get_project_position(project_id: str, user_id: UUID, pool) -> Optional
             JOIN tribes_projects tp ON tp.tribe_id = pos.tribe_id
             WHERE r.user_id = $1 AND tp.project_id = $2 AND pos.status = 'active'
             """,
-            user_id, UUID(project_id)
+            user_id,
+            UUID(project_id),
         )
     if not rows:
         return None
@@ -42,7 +43,7 @@ async def check_project_access_or_admin(
     project_id: str,
     current_user: dict,
     pool,
-    min_position: str = 'guest',
+    min_position: str = "guest",
 ) -> str:
     """
     Verify current_user has at least min_position on the project.
@@ -54,11 +55,13 @@ async def check_project_access_or_admin(
     user_permissions = await get_user_permissions(pool, str(user_id))
 
     if PermissionEnum.ADMIN in user_permissions:
-        return 'manager'
+        return "manager"
 
     position = await get_project_position(project_id, user_id, pool)
     if position is None:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You do not have access to this project.")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="You do not have access to this project."
+        )
 
     required_level = _POSITION_ORDER.get(min_position, 0)
     effective_level = _POSITION_ORDER.get(position, -1)

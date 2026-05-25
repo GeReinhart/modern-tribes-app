@@ -25,7 +25,7 @@ async def create_page(
                    (url_param_id, project_document_id, title, content_html,
                     content_summary, content_text, attachments, order_index,
                     status, created_at, updated_at, created_by, updated_by)
-               VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, 'active', $9, $9, $10, $10)
+               VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8, 'active', $9, $9, $10, $10)                              
                RETURNING *""",
             url_param_id,
             UUID(project_document_id),
@@ -33,7 +33,7 @@ async def create_page(
             content_html,
             extract_content_summary(content_html),
             strip_html(content_html),
-            json.dumps([a.model_dump() if hasattr(a, 'model_dump') else a for a in attachments]),
+            json.dumps([a.model_dump() if hasattr(a, "model_dump") else a for a in attachments]),
             order_index,
             now,
             uid,
@@ -80,18 +80,29 @@ async def update_page(
         async with pool.acquire() as conn:
             await conn.execute(
                 "UPDATE document_pages SET title = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
-                title, now, uid, UUID(page_id),
+                title,
+                now,
+                uid,
+                UUID(page_id),
             )
 
     if content_html is not None:
         # Snapshot current content as a revision
-        revisions_raw = page.get('revisions') or '[]'
-        current_revisions = json.loads(revisions_raw) if isinstance(revisions_raw, str) else (revisions_raw or [])
-        current_revisions.append({
-            'content_html': page.get('content_html', ''),
-            'updated_at': page['updated_at'].isoformat() if hasattr(page.get('updated_at'), 'isoformat') else str(page.get('updated_at')),
-            'updated_by': page.get('updated_by'),
-        })
+        revisions_raw = page.get("revisions") or "[]"
+        current_revisions = (
+            json.loads(revisions_raw) if isinstance(revisions_raw, str) else (revisions_raw or [])
+        )
+        current_revisions.append(
+            {
+                "content_html": page.get("content_html", ""),
+                "updated_at": (
+                    page["updated_at"].isoformat()
+                    if hasattr(page.get("updated_at"), "isoformat")
+                    else str(page.get("updated_at"))
+                ),
+                "updated_by": page.get("updated_by"),
+            }
+        )
         async with pool.acquire() as conn:
             await conn.execute(
                 """UPDATE document_pages
@@ -111,7 +122,7 @@ async def update_page(
         async with pool.acquire() as conn:
             await conn.execute(
                 "UPDATE document_pages SET attachments = $1::jsonb, updated_at = $2, updated_by = $3 WHERE id = $4",
-                json.dumps([a.model_dump() if hasattr(a, 'model_dump') else a for a in attachments]),
+                json.dumps([a.model_dump() if hasattr(a, "model_dump") else a for a in attachments]),
                 now,
                 uid,
                 UUID(page_id),
@@ -121,7 +132,10 @@ async def update_page(
         async with pool.acquire() as conn:
             await conn.execute(
                 "UPDATE document_pages SET order_index = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
-                order_index, now, uid, UUID(page_id),
+                order_index,
+                now,
+                uid,
+                UUID(page_id),
             )
 
     return await get_page(pool, page_id)
@@ -137,8 +151,11 @@ async def reorder_pages(pool, project_document_id: str, page_orders: list, user_
                     """UPDATE document_pages
                        SET order_index = $1, updated_at = $2, updated_by = $3
                        WHERE id = $4 AND project_document_id = $5""",
-                    item['order_index'], now, uid,
-                    UUID(item['page_id']), UUID(project_document_id),
+                    item["order_index"],
+                    now,
+                    uid,
+                    UUID(item["page_id"]),
+                    UUID(project_document_id),
                 )
 
 
@@ -148,6 +165,8 @@ async def archive_page(pool, page_id: str, user_id: str) -> bool:
     async with pool.acquire() as conn:
         result = await conn.execute(
             "UPDATE document_pages SET status = 'archived', updated_at = $1, updated_by = $2 WHERE id = $3",
-            now, uid, UUID(page_id),
+            now,
+            uid,
+            UUID(page_id),
         )
     return result != "UPDATE 0"

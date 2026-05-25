@@ -45,7 +45,6 @@ class Settings(BaseSettings):
     # Mail scheduler
     MAIL_CRON_INTERVAL_SECONDS: int = 60
 
-
     # CORS
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 

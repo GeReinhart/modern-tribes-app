@@ -87,14 +87,14 @@ def _build_filter_clauses(filters: dict, id_col: str, label_exists: str) -> tupl
     clauses = []
     params = []
     idx = 2
-    for key, col in [('tribe_id', 't.id'), ('project_id', 'p.id'), ('person_id', id_col)]:
+    for key, col in [("tribe_id", "t.id"), ("project_id", "p.id"), ("person_id", id_col)]:
         if filters.get(key):
             clauses.append(f"{col} = ${idx}")
             params.append(UUID(filters[key]))
             idx += 1
-    if filters.get('label_id'):
+    if filters.get("label_id"):
         clauses.append(f"EXISTS ({label_exists.format(f'${idx}')})")
-        params.append(UUID(filters['label_id']))
+        params.append(UUID(filters["label_id"]))
     return (" AND " + " AND ".join(clauses)) if clauses else "", params
 
 
@@ -105,69 +105,69 @@ async def _fetch_label_details(conn, label_ids: list[str]) -> dict[str, dict]:
         "SELECT id, name, color FROM labels WHERE id = ANY($1::uuid[])",
         [UUID(lid) for lid in label_ids],
     )
-    return {str(r['id']): {'id': str(r['id']), 'name': r['name'], 'color': r['color']} for r in rows}
+    return {str(r["id"]): {"id": str(r["id"]), "name": r["name"], "color": r["color"]} for r in rows}
 
 
 def _kanban_row_to_dict(row, label_map: dict) -> dict:
-    label_ids = [str(lid) for lid in (row.get('label_ids') or [])]
+    label_ids = [str(lid) for lid in (row.get("label_ids") or [])]
     return {
-        'id': str(row['id']),
-        'feature_instance_id': str(row['feature_instance_id']),
-        'column_id': str(row['column_id']),
-        'column_name': row['column_name'],
-        'title': row['title'],
-        'assigned_person_id': str(row['assigned_person_id']) if row.get('assigned_person_id') else None,
-        'assigned_person_name': row.get('assigned_person_name'),
-        'size': row.get('size'),
-        'due_date': row.get('due_date'),
-        'document_content_html': row.get('document_content_html'),
-        'feature_instance_name': row['feature_instance_name'],
-        'project_id': str(row['project_id']),
-        'project_name': row['project_name'],
-        'tribe_id': str(row['tribe_id']) if row.get('tribe_id') else None,
-        'tribe_name': row.get('tribe_name'),
-        'label_ids': label_ids,
-        'labels': [label_map[lid] for lid in label_ids if lid in label_map],
+        "id": str(row["id"]),
+        "feature_instance_id": str(row["feature_instance_id"]),
+        "column_id": str(row["column_id"]),
+        "column_name": row["column_name"],
+        "title": row["title"],
+        "assigned_person_id": str(row["assigned_person_id"]) if row.get("assigned_person_id") else None,
+        "assigned_person_name": row.get("assigned_person_name"),
+        "size": row.get("size"),
+        "due_date": row.get("due_date"),
+        "document_content_html": row.get("document_content_html"),
+        "feature_instance_name": row["feature_instance_name"],
+        "project_id": str(row["project_id"]),
+        "project_name": row["project_name"],
+        "tribe_id": str(row["tribe_id"]) if row.get("tribe_id") else None,
+        "tribe_name": row.get("tribe_name"),
+        "label_ids": label_ids,
+        "labels": [label_map[lid] for lid in label_ids if lid in label_map],
     }
 
 
 def _todo_row_to_dict(row, label_map: dict) -> dict:
-    label_ids = [str(lid) for lid in (row.get('label_ids') or [])]
+    label_ids = [str(lid) for lid in (row.get("label_ids") or [])]
     return {
-        'id': str(row['id']),
-        'feature_instance_id': str(row['feature_instance_id']),
-        'title': row['title'],
-        'todo_status': row['todo_status'],
-        'assigned_person_id': str(row['assigned_person_id']) if row.get('assigned_person_id') else None,
-        'assigned_person_name': row.get('assigned_person_name'),
-        'size': row.get('size'),
-        'due_date': row.get('due_date'),
-        'document_content_html': row.get('document_content_html'),
-        'feature_instance_name': row['feature_instance_name'],
-        'project_id': str(row['project_id']),
-        'project_name': row['project_name'],
-        'tribe_id': str(row['tribe_id']) if row.get('tribe_id') else None,
-        'tribe_name': row.get('tribe_name'),
-        'label_ids': label_ids,
-        'labels': [label_map[lid] for lid in label_ids if lid in label_map],
+        "id": str(row["id"]),
+        "feature_instance_id": str(row["feature_instance_id"]),
+        "title": row["title"],
+        "todo_status": row["todo_status"],
+        "assigned_person_id": str(row["assigned_person_id"]) if row.get("assigned_person_id") else None,
+        "assigned_person_name": row.get("assigned_person_name"),
+        "size": row.get("size"),
+        "due_date": row.get("due_date"),
+        "document_content_html": row.get("document_content_html"),
+        "feature_instance_name": row["feature_instance_name"],
+        "project_id": str(row["project_id"]),
+        "project_name": row["project_name"],
+        "tribe_id": str(row["tribe_id"]) if row.get("tribe_id") else None,
+        "tribe_name": row.get("tribe_name"),
+        "label_ids": label_ids,
+        "labels": [label_map[lid] for lid in label_ids if lid in label_map],
     }
 
 
 async def fetch_my_tasks_kanban(pool, user_id: str, filters: dict) -> list[dict]:
-    extra_where, extra_params = _build_filter_clauses(filters, 'c.assigned_person_id', _KANBAN_LABEL_EXISTS)
+    extra_where, extra_params = _build_filter_clauses(filters, "c.assigned_person_id", _KANBAN_LABEL_EXISTS)
     query = _KANBAN_BASE + extra_where + " ORDER BY c.id, t.name ASC NULLS LAST"
     async with pool.acquire() as conn:
         rows = await conn.fetch(query, UUID(user_id), *extra_params)
-        all_label_ids = list({lid for r in rows for lid in (r['label_ids'] or [])})
+        all_label_ids = list({lid for r in rows for lid in (r["label_ids"] or [])})
         label_map = await _fetch_label_details(conn, all_label_ids)
     return [_kanban_row_to_dict(r, label_map) for r in rows]
 
 
 async def fetch_my_tasks_todo(pool, user_id: str, filters: dict) -> list[dict]:
-    extra_where, extra_params = _build_filter_clauses(filters, 'i.assigned_person_id', _TODO_LABEL_EXISTS)
+    extra_where, extra_params = _build_filter_clauses(filters, "i.assigned_person_id", _TODO_LABEL_EXISTS)
     query = _TODO_BASE + extra_where + " ORDER BY i.id, t.name ASC NULLS LAST"
     async with pool.acquire() as conn:
         rows = await conn.fetch(query, UUID(user_id), *extra_params)
-        all_label_ids = list({lid for r in rows for lid in (r['label_ids'] or [])})
+        all_label_ids = list({lid for r in rows for lid in (r["label_ids"] or [])})
         label_map = await _fetch_label_details(conn, all_label_ids)
     return [_todo_row_to_dict(r, label_map) for r in rows]

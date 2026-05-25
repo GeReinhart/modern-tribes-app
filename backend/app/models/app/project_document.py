@@ -13,7 +13,7 @@ class LabelInfo(BaseModel):
 
 class ProjectDocumentCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=255)
-    content_html: str = Field(default='')
+    content_html: str = Field(default="")
     attachments: List[AttachmentFile] = []
     label_names: List[str] = []
     toc_depth: int = Field(default=4, ge=1, le=4)

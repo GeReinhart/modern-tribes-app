@@ -20,7 +20,7 @@ class PersonBase(BaseModel):
 
 
 class PersonCreate(PersonBase):
-    status: str = 'active'
+    status: str = "active"
 
 
 class PersonUpdate(BaseModel):
@@ -33,7 +33,7 @@ class PersonUpdate(BaseModel):
 
 class Person(PersonBase):
     id: str
-    status: str = 'active'
+    status: str = "active"
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None
@@ -49,7 +49,7 @@ class Person(PersonBase):
                 "gender": "male",
                 "document_id": "507f1f77bcf86cd799439016",
                 "created_at": "2024-01-01T00:00:00",
-                "updated_at": "2024-01-01T00:00:00"
+                "updated_at": "2024-01-01T00:00:00",
             }
-        }
+        },
     )

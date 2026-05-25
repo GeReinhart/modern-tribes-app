@@ -12,7 +12,7 @@ class RoleBase(BaseModel):
 
 
 class RoleCreate(RoleBase):
-    status: str = 'active'
+    status: str = "active"
 
 
 class RoleUpdate(BaseModel):
@@ -21,13 +21,14 @@ class RoleUpdate(BaseModel):
     permission_ids: Optional[List[str]] = None
     status: Optional[str] = None
 
+
 class RoleWithPermissions(BaseModel):
     id: str
     name: str
     description: Optional[str] = None
     permission_ids: List[str] = []
     permissions: List[Any] = []
-    status: str = 'active'
+    status: str = "active"
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None
@@ -36,7 +37,7 @@ class RoleWithPermissions(BaseModel):
 
 class Role(RoleBase):
     id: str
-    status: str = 'active'
+    status: str = "active"
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None
@@ -50,8 +51,7 @@ class Role(RoleBase):
                 "name": "Admin",
                 "description": "",
                 "created_at": "2024-01-01T00:00:00",
-                "updated_at": "2024-01-01T00:00:00"
+                "updated_at": "2024-01-01T00:00:00",
             }
-        }
+        },
     )
-

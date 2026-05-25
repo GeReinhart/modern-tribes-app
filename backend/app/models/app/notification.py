@@ -28,5 +28,3 @@ class NotificationResponse(BaseModel):
     sent_at: datetime | None
     notification_status: NotificationStatus
     created_at: datetime
-
-

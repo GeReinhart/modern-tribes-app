@@ -5,13 +5,17 @@ from fastapi import APIRouter, Depends, status
 
 from app.core.database import get_database
 from app.models.auth.auth import PermissionEnum
-from app.models.crud.app_config import (AppConfig, AppConfigCreate,
-                                        AppConfigUpdate)
+from app.models.crud.app_config import AppConfig, AppConfigCreate, AppConfigUpdate
 from app.routers.auth.authentification import get_current_user
 from app.routers.auth.authorization import require_permission_decorator
-from app.utils.db_helpers import (check_document_exists, check_unique_field,
-                                  create_document, delete_document,
-                                  get_all_documents, update_document)
+from app.utils.db_helpers import (
+    check_document_exists,
+    check_unique_field,
+    create_document,
+    delete_document,
+    get_all_documents,
+    update_document,
+)
 
 router = APIRouter(prefix="/app-config", tags=["crud_app_config"])
 
@@ -38,7 +42,9 @@ async def create_config(entry: AppConfigCreate, current_user: dict = Depends(get
 
 @router.put("/{config_id}", response_model=AppConfig)
 @require_permission_decorator(PermissionEnum.ADMIN)
-async def update_config(config_id: str, entry: AppConfigUpdate, current_user: dict = Depends(get_current_user)):
+async def update_config(
+    config_id: str, entry: AppConfigUpdate, current_user: dict = Depends(get_current_user)
+):
     pool = get_database()
     await check_document_exists(pool, TABLE, config_id, ENTITY_NAME)
     data = entry.model_dump(exclude_unset=True)

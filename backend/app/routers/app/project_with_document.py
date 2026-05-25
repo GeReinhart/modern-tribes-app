@@ -3,9 +3,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status
 
 from app.core.database import get_database
-from app.models.app.project_with_document import (ProjectWithDocumentCreate,
-                                                  ProjectWithDocumentResponse,
-                                                  ProjectWithDocumentUpdate)
+from app.models.app.project_with_document import (
+    ProjectWithDocumentCreate,
+    ProjectWithDocumentResponse,
+    ProjectWithDocumentUpdate,
+)
 from app.models.auth.auth import PermissionEnum
 from app.routers.auth.authentification import get_current_user
 from app.routers.auth.authorization import require_any_permission_decorator
@@ -16,7 +18,9 @@ from app.utils.ownership import check_own_tribe_position_or_admin
 router = APIRouter(prefix="/projects", tags=["app_projects"])
 
 
-@router.post("/with-document", response_model=ProjectWithDocumentResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/with-document", response_model=ProjectWithDocumentResponse, status_code=status.HTTP_201_CREATED
+)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def create_project_with_document(
     data: ProjectWithDocumentCreate, current_user: dict = Depends(get_current_user)
@@ -46,9 +50,10 @@ async def update_project_with_document(
     # Verify the user is a manager of at least one tribe linked to this project
     async with pool.acquire() as conn:
         tribe_row = await conn.fetchrow(
-            "SELECT tribe_id FROM tribes_projects WHERE project_id = $1 LIMIT 1",
-            UUID(project_id)
+            "SELECT tribe_id FROM tribes_projects WHERE project_id = $1 LIMIT 1", UUID(project_id)
         )
     if tribe_row:
-        await check_own_tribe_position_or_admin(str(tribe_row["tribe_id"]), current_user, pool, required_position="manager")
+        await check_own_tribe_position_or_admin(
+            str(tribe_row["tribe_id"]), current_user, pool, required_position="manager"
+        )
     return await project_service.update_project_with_document(project_id, data, pool, current_user)

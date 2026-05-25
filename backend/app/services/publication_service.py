@@ -4,8 +4,11 @@ from uuid import UUID
 from fastapi import HTTPException, status
 
 from app.models.app.project_document import LabelInfo
-from app.models.app.publication import (PublicationAdminItem,
-                                        PublicationDetail, PublicationSummary)
+from app.models.app.publication import (
+    PublicationAdminItem,
+    PublicationDetail,
+    PublicationSummary,
+)
 from app.models.uploads.files import AttachmentFile
 from app.repositories import publication_repository
 from app.services import document_page_service as page_svc
@@ -19,7 +22,7 @@ async def _get_labels(pool, document_id: str) -> List[LabelInfo]:
                JOIN label_entities le ON le.label_id = l.id
                WHERE le.entity_type = 'document' AND le.entity_id = $1 AND l.status = 'active'
                ORDER BY l.name ASC""",
-            UUID(document_id)
+            UUID(document_id),
         )
     return [LabelInfo(id=str(r["id"]), name=r["name"]) for r in rows]
 
@@ -28,16 +31,15 @@ async def _resolve_project_document(project_id: str, project_document_id: str, p
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "SELECT * FROM projects_documents WHERE id = $1 AND project_id = $2 AND status = 'active'",
-            UUID(project_document_id), UUID(project_id)
+            UUID(project_document_id),
+            UUID(project_id),
         )
     if not row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
     return dict(row)
 
 
-async def publish_document(
-    project_id: str, project_document_id: str, pool, current_user: dict
-) -> dict:
+async def publish_document(project_id: str, project_document_id: str, pool, current_user: dict) -> dict:
     pd = await _resolve_project_document(project_id, project_document_id, pool)
     existing = await publication_repository.fetch_publication_id_by_document(pool, str(pd["document_id"]))
     if existing:
@@ -48,9 +50,7 @@ async def publish_document(
     return {"publication_url_param_id": result["url_param_id"]}
 
 
-async def unpublish_document(
-    project_id: str, project_document_id: str, pool, current_user: dict
-) -> None:
+async def unpublish_document(project_id: str, project_document_id: str, pool, current_user: dict) -> None:
     pd = await _resolve_project_document(project_id, project_document_id, pool)
     result = await publication_repository.delete_publication_by_document(pool, str(pd["document_id"]))
     if result == "DELETE 0":
@@ -91,8 +91,7 @@ def _extract_attachments(document: Optional[dict]) -> List[AttachmentFile]:
     if not document:
         return []
     return [
-        AttachmentFile(**att) if isinstance(att, dict) else att
-        for att in document.get("attachments", [])
+        AttachmentFile(**att) if isinstance(att, dict) else att for att in document.get("attachments", [])
     ]
 
 

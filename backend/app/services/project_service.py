@@ -3,13 +3,17 @@ from uuid import UUID
 
 from fastapi import HTTPException, status
 
-from app.models.app.project_with_document import (AttachmentFile,
-                                                  ProjectWithDocumentCreate,
-                                                  ProjectWithDocumentResponse,
-                                                  ProjectWithDocumentUpdate)
-from app.utils.attachments_helpers import (create_document_with_attachments,
-                                           get_document_with_attachments,
-                                           update_document_attachments)
+from app.models.app.project_with_document import (
+    AttachmentFile,
+    ProjectWithDocumentCreate,
+    ProjectWithDocumentResponse,
+    ProjectWithDocumentUpdate,
+)
+from app.utils.attachments_helpers import (
+    create_document_with_attachments,
+    get_document_with_attachments,
+    update_document_attachments,
+)
 from app.utils.db_helpers import generate_url_param_id, row_to_dict
 from app.utils.document_helpers import update_document_content_with_revision
 
@@ -44,13 +48,18 @@ async def create_project_with_document(
             """INSERT INTO projects (url_param_id, name, document_id, status, created_at, updated_at, created_by, updated_by)
                VALUES ($1, $2, $3, 'active', $4, $4, $5, $5)
                RETURNING *""",
-            generate_url_param_id(), data.name, UUID(str(document["id"])), now, uid,
+            generate_url_param_id(),
+            data.name,
+            UUID(str(document["id"])),
+            now,
+            uid,
         )
         await conn.execute(
             """INSERT INTO tribes_projects (tribe_id, project_id, relation)
                VALUES ($1, $2, 'manager')
                ON CONFLICT (tribe_id, project_id) DO NOTHING""",
-            UUID(data.tribe_id), project_row["id"],
+            UUID(data.tribe_id),
+            project_row["id"],
         )
 
     return await _build_response(row_to_dict(project_row), pool)
@@ -72,7 +81,10 @@ async def update_project_with_document(
         async with pool.acquire() as conn:
             await conn.execute(
                 "UPDATE projects SET name = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
-                data.name, now, uid, UUID(project_id),
+                data.name,
+                now,
+                uid,
+                UUID(project_id),
             )
 
     document_id = project.get("document_id")
@@ -85,13 +97,20 @@ async def update_project_with_document(
         async with pool.acquire() as conn:
             await conn.execute(
                 "UPDATE projects SET document_id = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
-                UUID(str(document["id"])), now, uid, UUID(project_id),
+                UUID(str(document["id"])),
+                now,
+                uid,
+                UUID(project_id),
             )
     elif document_id:
         if data.document_content_html is not None:
-            await update_document_content_with_revision(pool, str(document_id), data.document_content_html, current_user["id"])
+            await update_document_content_with_revision(
+                pool, str(document_id), data.document_content_html, current_user["id"]
+            )
         if data.document_attachments is not None:
-            await update_document_attachments(pool, str(document_id), data.document_attachments, current_user["id"])
+            await update_document_attachments(
+                pool, str(document_id), data.document_attachments, current_user["id"]
+            )
 
     return await get_project_with_document(project_id, pool)
 

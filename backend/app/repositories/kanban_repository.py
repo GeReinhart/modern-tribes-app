@@ -2,8 +2,9 @@ from datetime import date
 from typing import Optional
 from uuid import UUID
 
-from app.repositories.persons_repository import \
-    fetch_persons_for_feature  # noqa: F401 – re-exported for callers
+from app.repositories.persons_repository import (  # noqa: F401 – re-exported for callers
+    fetch_persons_for_feature,
+)
 
 
 async def fetch_board(pool, feature_instance_id: str) -> dict:
@@ -64,7 +65,10 @@ async def insert_column(pool, feature_instance_id: str, name: str, position: int
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "INSERT INTO kanban_columns (feature_instance_id, name, position, created_by, updated_by) VALUES ($1, $2, $3, $4, $4) RETURNING id, name, position",
-            UUID(feature_instance_id), name, position, UUID(user_id),
+            UUID(feature_instance_id),
+            name,
+            position,
+            UUID(user_id),
         )
     return dict(row)
 
@@ -73,7 +77,8 @@ async def shift_columns_up(pool, feature_instance_id: str, from_position: int) -
     async with pool.acquire() as conn:
         await conn.execute(
             "UPDATE kanban_columns SET position = position + 1 WHERE feature_instance_id = $1 AND position >= $2 AND status = 'active'",
-            UUID(feature_instance_id), from_position,
+            UUID(feature_instance_id),
+            from_position,
         )
 
 
@@ -81,7 +86,9 @@ async def update_column(pool, column_id: str, name: str, user_id: str) -> Option
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "UPDATE kanban_columns SET name = $1, updated_by = $2 WHERE id = $3 RETURNING id, name, position",
-            name, UUID(user_id), UUID(column_id),
+            name,
+            UUID(user_id),
+            UUID(column_id),
         )
     return dict(row) if row else None
 
@@ -95,10 +102,18 @@ async def swap_column_positions(pool, col_id_a: str, col_id_b: str, user_id: str
     async with pool.acquire() as conn:
         pos_a = await conn.fetchval("SELECT position FROM kanban_columns WHERE id = $1", UUID(col_id_a))
         pos_b = await conn.fetchval("SELECT position FROM kanban_columns WHERE id = $1", UUID(col_id_b))
-        await conn.execute("UPDATE kanban_columns SET position=$1, updated_by=$2 WHERE id=$3", pos_b, UUID(user_id), UUID(col_id_a))
-        await conn.execute("UPDATE kanban_columns SET position=$1, updated_by=$2 WHERE id=$3", pos_a, UUID(user_id), UUID(col_id_b))
-
-
+        await conn.execute(
+            "UPDATE kanban_columns SET position=$1, updated_by=$2 WHERE id=$3",
+            pos_b,
+            UUID(user_id),
+            UUID(col_id_a),
+        )
+        await conn.execute(
+            "UPDATE kanban_columns SET position=$1, updated_by=$2 WHERE id=$3",
+            pos_a,
+            UUID(user_id),
+            UUID(col_id_b),
+        )
 
 
 async def fetch_card(pool, card_id: str) -> Optional[dict]:
@@ -122,49 +137,97 @@ async def fetch_card(pool, card_id: str) -> Optional[dict]:
 
 
 async def insert_card(
-    pool, feature_instance_id: str, column_id: str,
-    title: str, assigned_person_id: Optional[str], position: int, user_id: str,
+    pool,
+    feature_instance_id: str,
+    column_id: str,
+    title: str,
+    assigned_person_id: Optional[str],
+    position: int,
+    user_id: str,
 ) -> dict:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """INSERT INTO kanban_cards
                (feature_instance_id, column_id, title, assigned_person_id, position, created_by, updated_by)
                VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING id""",
-            UUID(feature_instance_id), UUID(column_id),
+            UUID(feature_instance_id),
+            UUID(column_id),
             title,
             UUID(assigned_person_id) if assigned_person_id else None,
-            position, UUID(user_id),
+            position,
+            UUID(user_id),
         )
     return await fetch_card(pool, str(row["id"]))
 
 
 async def update_card_fields(
-    pool, card_id: str, title: Optional[str], assigned_person_id: Optional[str],
-    clear_assignee: bool, size: Optional[int], clear_size: bool,
-    due_date: Optional[date], clear_due_date: bool, user_id: str,
+    pool,
+    card_id: str,
+    title: Optional[str],
+    assigned_person_id: Optional[str],
+    clear_assignee: bool,
+    size: Optional[int],
+    clear_size: bool,
+    due_date: Optional[date],
+    clear_due_date: bool,
+    user_id: str,
 ) -> None:
     async with pool.acquire() as conn:
         if title is not None:
-            await conn.execute("UPDATE kanban_cards SET title = $1, updated_by = $2 WHERE id = $3", title, UUID(user_id), UUID(card_id))
+            await conn.execute(
+                "UPDATE kanban_cards SET title = $1, updated_by = $2 WHERE id = $3",
+                title,
+                UUID(user_id),
+                UUID(card_id),
+            )
         if clear_assignee:
-            await conn.execute("UPDATE kanban_cards SET assigned_person_id = NULL, updated_by = $1 WHERE id = $2", UUID(user_id), UUID(card_id))
+            await conn.execute(
+                "UPDATE kanban_cards SET assigned_person_id = NULL, updated_by = $1 WHERE id = $2",
+                UUID(user_id),
+                UUID(card_id),
+            )
         elif assigned_person_id is not None:
-            await conn.execute("UPDATE kanban_cards SET assigned_person_id = $1, updated_by = $2 WHERE id = $3", UUID(assigned_person_id), UUID(user_id), UUID(card_id))
+            await conn.execute(
+                "UPDATE kanban_cards SET assigned_person_id = $1, updated_by = $2 WHERE id = $3",
+                UUID(assigned_person_id),
+                UUID(user_id),
+                UUID(card_id),
+            )
         if clear_size:
-            await conn.execute("UPDATE kanban_cards SET size = NULL, updated_by = $1 WHERE id = $2", UUID(user_id), UUID(card_id))
+            await conn.execute(
+                "UPDATE kanban_cards SET size = NULL, updated_by = $1 WHERE id = $2",
+                UUID(user_id),
+                UUID(card_id),
+            )
         elif size is not None:
-            await conn.execute("UPDATE kanban_cards SET size = $1, updated_by = $2 WHERE id = $3", size, UUID(user_id), UUID(card_id))
+            await conn.execute(
+                "UPDATE kanban_cards SET size = $1, updated_by = $2 WHERE id = $3",
+                size,
+                UUID(user_id),
+                UUID(card_id),
+            )
         if clear_due_date:
-            await conn.execute("UPDATE kanban_cards SET due_date = NULL, updated_by = $1 WHERE id = $2", UUID(user_id), UUID(card_id))
+            await conn.execute(
+                "UPDATE kanban_cards SET due_date = NULL, updated_by = $1 WHERE id = $2",
+                UUID(user_id),
+                UUID(card_id),
+            )
         elif due_date is not None:
-            await conn.execute("UPDATE kanban_cards SET due_date = $1, updated_by = $2 WHERE id = $3", due_date, UUID(user_id), UUID(card_id))
+            await conn.execute(
+                "UPDATE kanban_cards SET due_date = $1, updated_by = $2 WHERE id = $3",
+                due_date,
+                UUID(user_id),
+                UUID(card_id),
+            )
 
 
 async def set_card_document(pool, card_id: str, document_id: str, user_id: str) -> None:
     async with pool.acquire() as conn:
         await conn.execute(
             "UPDATE kanban_cards SET document_id = $1, updated_by = $2 WHERE id = $3",
-            UUID(document_id), UUID(user_id), UUID(card_id),
+            UUID(document_id),
+            UUID(user_id),
+            UUID(card_id),
         )
 
 
@@ -172,7 +235,8 @@ async def archive_card(pool, card_id: str, user_id: str) -> None:
     async with pool.acquire() as conn:
         await conn.execute(
             "UPDATE kanban_cards SET status = 'archived', updated_by = $1 WHERE id = $2 OR parent_card_id = $2",
-            UUID(user_id), UUID(card_id),
+            UUID(user_id),
+            UUID(card_id),
         )
 
 
@@ -180,7 +244,8 @@ async def restore_card(pool, card_id: str, user_id: str) -> None:
     async with pool.acquire() as conn:
         await conn.execute(
             "UPDATE kanban_cards SET status = 'active', updated_by = $1 WHERE id = $2",
-            UUID(user_id), UUID(card_id),
+            UUID(user_id),
+            UUID(card_id),
         )
 
 
@@ -188,7 +253,9 @@ async def move_card_to_column(pool, card_id: str, column_id: str, user_id: str) 
     async with pool.acquire() as conn:
         await conn.execute(
             "UPDATE kanban_cards SET column_id = $1, updated_by = $2 WHERE id = $3",
-            UUID(column_id), UUID(user_id), UUID(card_id),
+            UUID(column_id),
+            UUID(user_id),
+            UUID(card_id),
         )
 
 
@@ -197,20 +264,40 @@ async def _apply_reorder(conn, cards: list[dict], idx: int, direction: str, user
         if idx == 0:
             return []
         new_pos = cards[0]["position"] - 1
-        await conn.execute("UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3", new_pos, UUID(user_id), cards[idx]["id"])
+        await conn.execute(
+            "UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3",
+            new_pos,
+            UUID(user_id),
+            cards[idx]["id"],
+        )
         return [cards[idx]["id"]]
     if direction == "bottom":
         if idx == len(cards) - 1:
             return []
         new_pos = cards[-1]["position"] + 1
-        await conn.execute("UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3", new_pos, UUID(user_id), cards[idx]["id"])
+        await conn.execute(
+            "UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3",
+            new_pos,
+            UUID(user_id),
+            cards[idx]["id"],
+        )
         return [cards[idx]["id"]]
     target_idx = idx - 1 if direction == "up" else idx + 1
     if target_idx < 0 or target_idx >= len(cards):
         return []
     pos_a, pos_b = cards[idx]["position"], cards[target_idx]["position"]
-    await conn.execute("UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3", pos_b, UUID(user_id), cards[idx]["id"])
-    await conn.execute("UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3", pos_a, UUID(user_id), cards[target_idx]["id"])
+    await conn.execute(
+        "UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3",
+        pos_b,
+        UUID(user_id),
+        cards[idx]["id"],
+    )
+    await conn.execute(
+        "UPDATE kanban_cards SET position=$1, updated_by=$2 WHERE id=$3",
+        pos_a,
+        UUID(user_id),
+        cards[target_idx]["id"],
+    )
     return [cards[idx]["id"], cards[target_idx]["id"]]
 
 
@@ -232,4 +319,3 @@ async def reorder_card_in_column(pool, card_id: str, direction: str, user_id: st
             return []
         affected_ids = await _apply_reorder(conn, cards, idx, direction, user_id)
     return [c for c in [await fetch_card(pool, str(aid)) for aid in affected_ids] if c]
-

@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, status
 
 from app.core.database import get_database
-from app.models.app.tribes_with_positions import (TribeWithPositionsCreate,
-                                                  TribeWithPositionsResponse,
-                                                  TribeWithPositionsUpdate)
+from app.models.app.tribes_with_positions import (
+    TribeWithPositionsCreate,
+    TribeWithPositionsResponse,
+    TribeWithPositionsUpdate,
+)
 from app.models.auth.auth import PermissionEnum
 from app.routers.auth.authentification import get_current_user
 from app.routers.auth.authorization import require_any_permission_decorator
@@ -14,9 +16,13 @@ from app.utils.ownership import check_own_tribe_position_or_admin
 router = APIRouter(prefix="/tribes", tags=["app_tribes"])
 
 
-@router.post("/with-positions", response_model=TribeWithPositionsResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/with-positions", response_model=TribeWithPositionsResponse, status_code=status.HTTP_201_CREATED
+)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_CREATE_OWN_TRIBES)
-async def create_tribe_with_positions(data: TribeWithPositionsCreate, current_user: dict = Depends(get_current_user)):
+async def create_tribe_with_positions(
+    data: TribeWithPositionsCreate, current_user: dict = Depends(get_current_user)
+):
     pool = get_database()
     return await tribe_service.create_tribe_with_positions(data, pool, current_user)
 
@@ -32,7 +38,9 @@ async def get_tribe_with_positions(tribe_id: str, current_user: dict = Depends(g
 
 @router.put("/{tribe_id}/with-positions", response_model=TribeWithPositionsResponse)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
-async def update_tribe_with_positions(tribe_id: str, data: TribeWithPositionsUpdate, current_user: dict = Depends(get_current_user)):
+async def update_tribe_with_positions(
+    tribe_id: str, data: TribeWithPositionsUpdate, current_user: dict = Depends(get_current_user)
+):
     pool = get_database()
     tribe_id = await resolve_url_param_id(pool, "tribes", tribe_id)
     await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position="manager")

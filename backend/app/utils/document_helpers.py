@@ -16,11 +16,11 @@ class _TextStripper(HTMLParser):
 def strip_html(html: str) -> str:
     parser = _TextStripper()
     parser.feed(html)
-    return ' '.join(' '.join(parser._parts).split())
+    return " ".join(" ".join(parser._parts).split())
 
 
 class _ContentSummaryParser(HTMLParser):
-    _HEADER_TAGS = {'h1', 'h2', 'h3', 'h4', 'h5', 'h6'}
+    _HEADER_TAGS = {"h1", "h2", "h3", "h4", "h5", "h6"}
 
     def __init__(self):
         super().__init__()
@@ -44,24 +44,30 @@ class _ContentSummaryParser(HTMLParser):
         self._plain_parts.append(data)
 
 
-async def update_document_content_with_revision(pool, document_id: str, content_html: str, user_id: str) -> None:
+async def update_document_content_with_revision(
+    pool, document_id: str, content_html: str, user_id: str
+) -> None:
     """Fetch current document, snapshot it into revisions, then update content_html."""
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             "SELECT content_html, updated_at, updated_by, revisions FROM documents WHERE id = $1",
-            UUID(document_id)
+            UUID(document_id),
         )
         if not row:
             return
 
         revisions_raw = row["revisions"]
-        current_revisions = json.loads(revisions_raw) if isinstance(revisions_raw, str) else (revisions_raw or [])
+        current_revisions = (
+            json.loads(revisions_raw) if isinstance(revisions_raw, str) else (revisions_raw or [])
+        )
         updated_at = row["updated_at"]
-        current_revisions.append({
-            "content_html": row["content_html"],
-            "updated_at": updated_at.isoformat() if hasattr(updated_at, "isoformat") else str(updated_at),
-            "updated_by": str(row["updated_by"]) if row["updated_by"] else None,
-        })
+        current_revisions.append(
+            {
+                "content_html": row["content_html"],
+                "updated_at": updated_at.isoformat() if hasattr(updated_at, "isoformat") else str(updated_at),
+                "updated_by": str(row["updated_by"]) if row["updated_by"] else None,
+            }
+        )
 
         await conn.execute(
             "UPDATE documents SET content_html = $1, content_summary = $2, content_text = $3, updated_at = $4, updated_by = $5, revisions = $6::jsonb WHERE id = $7",
@@ -80,9 +86,9 @@ def extract_content_summary(html: str) -> str:
     parser.feed(html)
 
     if parser._header_parts:
-        return ''.join(parser._header_parts).strip()
+        return "".join(parser._header_parts).strip()
 
-    plain = ''.join(parser._plain_parts).strip()
+    plain = "".join(parser._plain_parts).strip()
     if len(plain) <= 30:
         return plain
-    return plain[:30] + '...'
+    return plain[:30] + "..."

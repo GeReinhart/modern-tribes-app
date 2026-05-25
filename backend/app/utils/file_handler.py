@@ -55,8 +55,13 @@ class FileHandler:
         return self._s3
 
     def _put(self, key: str, content: bytes, content_type: str) -> None:
-        logger.warning("Cellar PUT: bucket=%s key=%s content_type=%s size=%d",
-                       settings.CELLAR_BUCKET_NAME, key, content_type, len(content))
+        logger.warning(
+            "Cellar PUT: bucket=%s key=%s content_type=%s size=%d",
+            settings.CELLAR_BUCKET_NAME,
+            key,
+            content_type,
+            len(content),
+        )
         try:
             self._client().put_object(
                 Bucket=settings.CELLAR_BUCKET_NAME,
@@ -108,8 +113,13 @@ class FileHandler:
         if kind and kind.mime.startswith("image/"):
             return kind.mime
         ext = self.get_file_extension(filename)
-        fallback = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png",
-                    "gif": "image/gif", "webp": "image/webp"}
+        fallback = {
+            "jpg": "image/jpeg",
+            "jpeg": "image/jpeg",
+            "png": "image/png",
+            "gif": "image/gif",
+            "webp": "image/webp",
+        }
         return fallback.get(ext, "image/jpeg")
 
     async def save_image(self, file: UploadFile) -> Tuple[str, str]:
