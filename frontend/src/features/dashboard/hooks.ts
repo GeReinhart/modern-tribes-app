@@ -17,9 +17,11 @@ import type {
 export function useMyTasks(filters: MyTasksFilters) {
   const { data, loading, error, execute } = useApi<MyTasksResponse>();
 
+  const filtersKey = JSON.stringify(filters);
   const fetch = useCallback(async () => {
     await execute(() => getMyTasks(filters));
-  }, [JSON.stringify(filters), execute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtersKey, execute]);
 
   useEffect(() => {
     fetch();

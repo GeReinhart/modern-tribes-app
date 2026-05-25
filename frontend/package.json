@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "lint:fix": "eslint --fix \"src/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint --fix --max-warnings 0 \"src/**/*.{ts,tsx}\"",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "cleancode": "npm run lint:fix && npm run format"
   },

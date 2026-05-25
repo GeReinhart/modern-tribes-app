@@ -114,8 +114,8 @@ export function useProjectWithDocumentMutations() {
       setError(null);
       try {
         return await projectService.createWithDocument(data);
-      } catch (e: any) {
-        setError(e.message || 'Error');
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Error');
         return null;
       } finally {
         setLoading(false);
@@ -133,8 +133,8 @@ export function useProjectWithDocumentMutations() {
       setError(null);
       try {
         return await projectService.updateWithDocument(projectId, data);
-      } catch (e: any) {
-        setError(e.message || 'Error');
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Error');
         return null;
       } finally {
         setLoading(false);

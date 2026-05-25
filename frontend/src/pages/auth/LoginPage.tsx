@@ -31,8 +31,9 @@ export default function LoginPage() {
       setSentEmail(email);
       setSuccess(true);
       setEmail('');
-    } catch (err: any) {
-      if (err?.status === 404) {
+    } catch (err: unknown) {
+      const status = err instanceof Error ? (err as Error & { status?: number }).status : undefined;
+      if (status === 404) {
         setError(t('auth.emailNotFound'));
       } else {
         setError(t('validation.errorOccurred'));

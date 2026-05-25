@@ -16,7 +16,7 @@ import {
   useUserMutations,
   useUserWithRolesAndPermissions,
 } from '@/hooks/useUsers';
-import { UserCreate, UserUpdate } from '@/types/user.types';
+import { User, UserCreate, UserUpdate } from '@/types/user.types';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -78,8 +78,8 @@ const UserEditPageContent: React.FC = () => {
       ]);
 
       navigate('/admin/people');
-    } catch (err: any) {
-      setSubmitError(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      setSubmitError(err instanceof Error ? err.message : 'An error occurred');
       throw err;
     }
   };
@@ -117,7 +117,7 @@ const UserEditPageContent: React.FC = () => {
       )}
       <ThemedCard>
         <UserForm
-          user={user as any}
+          user={user as User}
           mode="edit"
           onSubmit={handleSubmit}
           onCancel={() => navigate('/admin/people')}

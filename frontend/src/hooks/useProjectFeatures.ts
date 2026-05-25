@@ -36,8 +36,8 @@ export function useProjectFeatures(projectId: string | null) {
         const created = await projectFeaturesService.create(projectId, data);
         setFeatures((prev) => [...prev, created]);
         return created;
-      } catch (e: any) {
-        setError(e.message);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'An error occurred');
         return null;
       }
     },
@@ -58,8 +58,8 @@ export function useProjectFeatures(projectId: string | null) {
             f.id === featureId ? { ...f, name: updated.name } : f,
           ),
         );
-      } catch (e: any) {
-        setError(e.message);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'An error occurred');
       }
     },
     [projectId],
@@ -73,8 +73,8 @@ export function useProjectFeatures(projectId: string | null) {
           status: 'archived',
         });
         setFeatures((prev) => prev.filter((f) => f.id !== featureId));
-      } catch (e: any) {
-        setError(e.message);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'An error occurred');
       }
     },
     [projectId],

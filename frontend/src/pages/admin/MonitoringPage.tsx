@@ -171,7 +171,7 @@ const MonitoringPageContent: React.FC = () => {
         ),
       },
     ],
-    [t, navigate, theme.colors.primary, theme.colors.secondary],
+    [t, navigate, theme.colors.primary, theme.colors.secondary, theme.colors.danger, theme.colors.text],
   );
 
   const headerActions = <AdminNavigation currentPage="monitoring" />;

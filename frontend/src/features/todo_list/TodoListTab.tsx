@@ -58,8 +58,10 @@ const TodoListTab: React.FC<Props> = ({
   );
 
   useEffect(() => {
-    if (filterLabelId && !activeItemLabelIds.has(filterLabelId))
-      setFilterLabelId(null);
+    const labelIds = new Set(
+      items.filter((i) => i.status !== 'archived').flatMap((i) => i.label_ids),
+    );
+    if (filterLabelId && !labelIds.has(filterLabelId)) setFilterLabelId(null);
   }, [items, filterLabelId]);
 
   const visibleItems = items

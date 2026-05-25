@@ -128,7 +128,7 @@ const ShowTribePageContent: React.FC = () => {
       { key: 'projects', label: t('tribes.tabProjects') },
       { key: 'members', label: t('tribes.tabMembers') },
     ],
-    [t, dedupedProjects.length, tribe?.persons.length],
+    [t],
   );
 
   const contextKey = tribeId ? `tribe:${tribeId}` : '';

@@ -21,6 +21,22 @@ const COMPACT_BUTTONS = [
   'redo',
 ];
 
+interface UploadResponse {
+  error?: number | boolean;
+  message?: string;
+  files?: string[];
+  url?: string;
+}
+
+interface UploaderContext {
+  j?: {
+    selection: { insertImage: (src: string, style: null, width: number) => void };
+    alert?: (msg: string) => void;
+  };
+  selection?: { insertImage: (src: string, style: null, width: number) => void };
+  alert?: (msg: string) => void;
+}
+
 interface JoditEditorComponentProps {
   content: string;
   onChange: (content: string) => void;
@@ -50,32 +66,32 @@ const JoditEditorComponent = ({
         prepareData: function (formData: FormData) {
           return formData;
         },
-        isSuccess: function (resp: any) {
+        isSuccess: function (resp: UploadResponse) {
           return !resp.error || resp.error === 0;
         },
-        getMessage: function (resp: any) {
-          return resp.message;
+        getMessage: function (resp: UploadResponse) {
+          return resp.message ?? '';
         },
-        process: function (resp: any) {
+        process: function (resp: UploadResponse) {
           return {
-            files: resp.files || [resp.url],
+            files: resp.files || [resp.url ?? ''],
             path: '',
             baseurl: '',
             error: resp.error ? 1 : 0,
-            message: resp.message,
+            message: resp.message ?? '',
           };
         },
-        defaultHandlerSuccess: function (this: any, data: any) {
+        defaultHandlerSuccess: function (this: UploaderContext, data: { files?: string[] }) {
           const files = data.files || [];
           if (files.length) {
             const jodit = this.j || this;
-            jodit.selection.insertImage(files[0], null, 250);
+            jodit.selection?.insertImage(files[0], null, 250);
           }
         },
-        error: function (this: any, e: Error) {
+        error: function (this: UploaderContext, e: Error) {
           console.error('Upload error:', e);
           const jodit = this.j || this;
-          if (jodit && jodit.alert) {
+          if (jodit?.alert) {
             jodit.alert('Upload failed: ' + e.message);
           }
         },

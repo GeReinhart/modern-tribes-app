@@ -67,8 +67,8 @@ const CreateProjectPageContent: React.FC = () => {
       });
       if (!result) throw new Error('Failed to create project');
       navigate(`/app/tribes/${tribeId}/projects/${result.url_param_id}`);
-    } catch (err: any) {
-      setError(err.message || t('validation.errorOccurred'));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('validation.errorOccurred'));
     } finally {
       setSubmitting(false);
     }

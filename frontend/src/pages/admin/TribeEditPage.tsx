@@ -614,8 +614,8 @@ const TribeEditPageContent: React.FC = () => {
       await tribeService.syncTribeProjects(savedId, projectRows);
       await syncPositions(savedId);
       navigate('/admin/tribes');
-    } catch (err: any) {
-      setError(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setSaving(false);
     }

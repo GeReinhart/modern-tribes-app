@@ -111,8 +111,8 @@ function FeaturesPageContent() {
           f.id === confirm.id ? { ...f, status: updated.status } : f,
         ),
       );
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'An error occurred');
     } finally {
       setActioning(false);
       setConfirm(null);
@@ -137,8 +137,8 @@ function FeaturesPageContent() {
       setFeatures((prev) => [...prev, created]);
       setShowCreateForm(false);
       setCreateForm({ feature_type: '', name: '' });
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : 'An error occurred');
     } finally {
       setCreating(false);
     }

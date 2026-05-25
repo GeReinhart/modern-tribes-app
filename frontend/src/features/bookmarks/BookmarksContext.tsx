@@ -115,6 +115,7 @@ export const BookmarksProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useBookmarks = (): BookmarksContextType => {
   const ctx = useContext(BookmarksContext);
   if (!ctx)

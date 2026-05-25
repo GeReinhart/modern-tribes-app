@@ -71,7 +71,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
     }
   };
 
-  const handleChange = (field: keyof typeof formData, value: any) => {
+  const handleChange = (field: keyof typeof formData, value: string | string[]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }));

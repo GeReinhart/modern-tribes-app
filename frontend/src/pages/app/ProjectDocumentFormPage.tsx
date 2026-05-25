@@ -129,8 +129,8 @@ const ProjectDocumentFormPageContent: React.FC = () => {
           `/app/tribes/${tribeId}/projects/${projectId}/documents/${created.url_param_id}`,
         );
       }
-    } catch (err: any) {
-      setError(err.message || t('validation.errorOccurred'));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('validation.errorOccurred'));
     } finally {
       setSubmitting(false);
     }

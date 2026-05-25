@@ -31,8 +31,8 @@ export function useKanban(featureInstanceId: string | null) {
     try {
       setBoard(await kanbanService.getBoard(featureInstanceId));
       setLoaded(true);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'An error occurred');
     }
   }, [featureInstanceId]);
 
@@ -68,8 +68,8 @@ export function useKanban(featureInstanceId: string | null) {
           ),
         }));
         return col;
-      } catch (e: any) {
-        setError(e.message);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'An error occurred');
         return null;
       }
     },
@@ -85,8 +85,8 @@ export function useKanban(featureInstanceId: string | null) {
           c.id === columnId ? { ...c, name: updated.name } : c,
         ),
       }));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'An error occurred');
     }
   }, []);
 
@@ -102,8 +102,8 @@ export function useKanban(featureInstanceId: string | null) {
             .map((c) => map.get(c.id) ?? c)
             .sort((a, b) => a.position - b.position),
         }));
-      } catch (e: any) {
-        setError(e.message);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'An error occurred');
       }
     },
     [],
@@ -116,8 +116,8 @@ export function useKanban(featureInstanceId: string | null) {
         ...prev,
         columns: prev.columns.filter((c) => c.id !== columnId),
       }));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'An error occurred');
     }
   }, []);
 
@@ -127,8 +127,8 @@ export function useKanban(featureInstanceId: string | null) {
         const card = await kanbanService.createCard(data);
         setBoard((prev) => ({ ...prev, cards: [...prev.cards, card] }));
         return card;
-      } catch (e: any) {
-        setError(e.message);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'An error occurred');
         return null;
       }
     },
@@ -142,8 +142,8 @@ export function useKanban(featureInstanceId: string | null) {
         ...prev,
         cards: prev.cards.map((c) => (c.id === cardId ? updated : c)),
       }));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'An error occurred');
     }
   }, []);
 
@@ -156,8 +156,8 @@ export function useKanban(featureInstanceId: string | null) {
           c.id === cardId ? { ...c, status: 'archived' as const } : c,
         ),
       }));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'An error occurred');
     }
   }, []);
 
@@ -168,8 +168,8 @@ export function useKanban(featureInstanceId: string | null) {
         ...prev,
         cards: prev.cards.map((c) => (c.id === cardId ? updated : c)),
       }));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'An error occurred');
     }
   }, []);
 
@@ -177,8 +177,8 @@ export function useKanban(featureInstanceId: string | null) {
     async (cardId: string, direction: MoveDirection) => {
       try {
         patchCards(await kanbanService.moveCard(cardId, direction));
-      } catch (e: any) {
-        setError(e.message);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'An error occurred');
       }
     },
     [patchCards],
@@ -233,9 +233,9 @@ export function useKanban(featureInstanceId: string | null) {
       });
       try {
         patchCards(await kanbanService.reorderCard(cardId, direction));
-      } catch (e: any) {
+      } catch (e: unknown) {
         setBoard((prev) => ({ ...prev, cards: previousCards }));
-        setError(e.message);
+        setError(e instanceof Error ? e.message : 'An error occurred');
       }
     },
     [patchCards],
@@ -247,8 +247,8 @@ export function useKanban(featureInstanceId: string | null) {
         const label = await kanbanService.createLabel(data);
         setBoard((prev) => ({ ...prev, labels: [...prev.labels, label] }));
         return label;
-      } catch (e: any) {
-        setError(e.message);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'An error occurred');
         return null;
       }
     },
@@ -263,8 +263,8 @@ export function useKanban(featureInstanceId: string | null) {
           ...prev,
           labels: prev.labels.map((l) => (l.id === labelId ? updated : l)),
         }));
-      } catch (e: any) {
-        setError(e.message);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'An error occurred');
       }
     },
     [],
@@ -281,8 +281,8 @@ export function useKanban(featureInstanceId: string | null) {
           label_ids: c.label_ids.filter((id) => id !== labelId),
         })),
       }));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'An error occurred');
     }
   }, []);
 
@@ -297,8 +297,8 @@ export function useKanban(featureInstanceId: string | null) {
           ...prev,
           cards: prev.cards.map((c) => (c.id === cardId ? updated : c)),
         }));
-      } catch (e: any) {
-        setError(e.message);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'An error occurred');
       }
     },
     [],

@@ -289,7 +289,7 @@ const ShowProjectPageContent: React.FC = () => {
       },
       { label: project?.name || t('common.loading') },
     ],
-    [tribe?.name, project?.name, tribeId, projectId, t],
+    [tribe?.name, project?.name, tribeId, t],
   );
 
   const menuActions = useMemo(

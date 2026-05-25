@@ -36,7 +36,7 @@ export function useTribeMutations() {
 
   const deleteTribe = useCallback(
     async (id: string) => {
-      return execute(() => tribeService.delete(id) as any);
+      return execute(() => tribeService.delete(id) as unknown as Promise<Tribe>);
     },
     [execute],
   );

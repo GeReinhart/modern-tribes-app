@@ -325,6 +325,7 @@ const UsersTab: React.FC = () => {
     ],
     [
       t,
+      navigate,
       theme.colors.secondary,
       theme.colors.primary,
       theme.colors.accent,

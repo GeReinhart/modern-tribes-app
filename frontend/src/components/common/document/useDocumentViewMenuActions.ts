@@ -105,7 +105,7 @@ export const useDocumentViewMenuActions = ({
       tribeId,
       projectId,
       projectDocumentId,
-      docStatus,
+      isActive,
       canEdit,
       isManager,
       effectivePublicationUrlParamId,

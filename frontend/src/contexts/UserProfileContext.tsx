@@ -51,6 +51,7 @@ export function UserProfileProvider({
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useCurrentUserProfile() {
   const context = useContext(UserProfileContext);
   if (!context)

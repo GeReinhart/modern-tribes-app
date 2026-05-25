@@ -95,7 +95,7 @@ export function useTribePositions(id: string) {
     } catch (error) {
       console.error('Error fetching tribes:', error);
     }
-  }, [execute]);
+  }, [execute, id]);
 
   useEffect(() => {
     fetchTribePositions();
@@ -178,7 +178,7 @@ export function useTribeMutations() {
 
   const deleteTribe = useCallback(
     async (id: string) => {
-      return execute(() => tribeService.delete(id) as any);
+      return execute(() => tribeService.delete(id) as unknown as Promise<Tribe>);
     },
     [execute],
   );

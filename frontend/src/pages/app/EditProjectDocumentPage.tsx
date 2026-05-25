@@ -80,8 +80,8 @@ const EditProjectDocumentPageContent: React.FC = () => {
       });
       if (!result) throw new Error('Failed to update document');
       navigate(`/app/tribes/${tribeId}/projects/${projectId}`);
-    } catch (err: any) {
-      setError(err.message || t('validation.errorOccurred'));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('validation.errorOccurred'));
     } finally {
       setSubmitting(false);
     }

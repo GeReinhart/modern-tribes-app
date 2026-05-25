@@ -55,8 +55,8 @@ export const PositionForm: React.FC<PositionFormProps> = ({
 
     try {
       await onSubmit(mode === 'create' ? formData : { ...formData, status });
-    } catch (err: any) {
-      setError(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }

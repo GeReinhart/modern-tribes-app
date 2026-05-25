@@ -66,7 +66,7 @@ export const PermissionForm: React.FC<PermissionFormProps> = ({
     }
   };
 
-  const handleChange = (field: keyof typeof formData, value: any) => {
+  const handleChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }));
