@@ -95,6 +95,7 @@ const DashboardTaskCard: React.FC<Props> = ({
               style={{
                 flex: 1,
                 fontSize: 'var(--font-lg)',
+                fontWeight: 500,
                 color: theme.colors.text,
                 cursor: 'pointer',
                 lineHeight: 1.4,

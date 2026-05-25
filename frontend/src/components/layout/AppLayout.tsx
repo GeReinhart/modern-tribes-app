@@ -40,15 +40,15 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     flex: 1,
     display: 'flex',
     justifyContent: 'center',
-    padding: '0 24px 24px',
+    padding: '0 12px 12px',
   };
 
   const contentStyle: React.CSSProperties = {
     width: '100%',
-    maxWidth: '1000px',
+    maxWidth: '1100px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '24px',
+    gap: '12px',
   };
 
   return (
