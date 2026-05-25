@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# Will make sure the import are will organized
+# Will make sure
+#   - the import are will organized
+#   - the code is formatted
 
 set -euo pipefail
 pip install absolufy-imports autoflake isort black
@@ -20,6 +22,8 @@ autoflake --in-place --remove-all-unused-imports --recursive app/
 # Step 3 — sort imports, only on app/
 isort --skip venv app/
 
+
+echo "==> Format Python code..."
 # Step 4 - Format
 black app/
 

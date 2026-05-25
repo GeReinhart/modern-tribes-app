@@ -1,27 +1,24 @@
 #!/usr/bin/env bash
 
-# Will make sure the import are will organized
+# Will make sure
+#   - the import are will organized
+#   - the code is formatted
 
 set -euo pipefail
-pip install absolufy-imports autoflake isort black
+FRONTEND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../frontend" && pwd)"
 
-BACKEND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../backend" && pwd)"
+echo "==> Organize TypedScript / React imports..."
+cd "$FRONTEND_DIR"
 
-echo "==> Organize Python imports..."
-cd "$BACKEND_DIR"
+# absolute imports + remove unused
+npm run lint:fix
 
+# sort + format
+npm run format
 
-# Step 1 — absolute imports, skip venv
-PYTHONWARNINGS=ignore::SyntaxWarning absolufy-imports $(find app -name "*.py")
+# To address issues that do not require attention
+npm audit fix
+# Run `npm audit fix --force` from time to time
 
-# Step 2 — remove unused imports, skip venv
-autoflake --in-place --remove-all-unused-imports --recursive app/
-
-# Step 3 — sort imports, only on app/
-isort --skip venv app/
-
-# Step 4 - Format
-black app/
-
-
-
+# Check it's still building
+npm run build
