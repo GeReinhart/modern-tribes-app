@@ -1,16 +1,10 @@
 import { ApplicationLogo } from '@/components/common/icons/ApplicationLogo';
-import {
-  IconName,
-  ThemedSvgIcon,
-} from '@/components/common/icons/ThemedSvgIcon';
-import UserBadge from '@/components/entities/users/CurrentUserBadge.tsx';
+import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { useTheme } from '@/contexts/ThemeContext';
-import { BookmarkToggle } from '@/features/bookmarks/BookmarkToggle';
 import { MenuAction } from '@/types/menu.types';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb';
 
@@ -18,27 +12,19 @@ interface AppHeaderProps {
   actions?: React.ReactNode;
   secondaryActions?: React.ReactNode;
   menuActions?: MenuAction[];
-  showUserBadge?: boolean;
   breadcrumbs?: BreadcrumbItem[];
   breadcrumbTabs?: BreadcrumbTab[];
-  bookmarkTitle?: string | null;
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
   actions,
   secondaryActions,
   menuActions,
-  showUserBadge = true,
   breadcrumbs,
   breadcrumbTabs,
-  bookmarkTitle,
 }) => {
   const { theme, currentThemeKey } = useTheme();
   const navigate = useNavigate();
-  const location = useLocation();
-  const { t } = useTranslation();
-  const isSearchActive = location.pathname === '/app/search';
-  const isAboutActive = location.pathname === '/app/about';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -64,7 +50,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     position: 'sticky',
     top: 0,
     zIndex: 100,
-    backgroundColor: `${theme.colors.primary}18`,
+    backgroundColor: theme.colors.surface,
     borderBottom: `1px solid ${theme.colors.primary}40`,
     boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
     marginBottom: 'var(--space-lg)',
@@ -79,13 +65,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: 'var(--space-lg)',
-  };
-
-  const rightSectionStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 'var(--space-md)',
-    flexShrink: 0,
   };
 
   const menuStyle: React.CSSProperties = {
@@ -140,19 +119,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   };
 
   const hasMenuContent = true;
-  const hasPrecedingMenuContent =
-    (breadcrumbs && breadcrumbs.length > 0) ||
-    actions ||
-    secondaryActions ||
-    (menuActions && menuActions.length > 0);
   const pageTitle =
     breadcrumbs && breadcrumbs.length > 0
       ? breadcrumbs[breadcrumbs.length - 1].label
       : undefined;
-  const bookmarkDescription =
-    breadcrumbs && breadcrumbs.length > 0
-      ? breadcrumbs.map((b) => b.label).join(' / ')
-      : null;
 
   return (
     <header style={headerStyle}>
@@ -306,54 +276,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                     </div>
                   );
                 })}
-
-              {/* Separator before app nav */}
-              {hasPrecedingMenuContent && <div style={menuSeparatorStyle} />}
-
-              {/* App navigation — Search & About */}
-              {[
-                {
-                  path: '/app/search',
-                  icon: 'search' as IconName,
-                  label: t('search.title'),
-                  active: isSearchActive,
-                },
-                {
-                  path: '/app/about',
-                  icon: 'info' as IconName,
-                  label: t('about.title'),
-                  active: isAboutActive,
-                },
-              ].map((item) => (
-                <div
-                  key={item.path}
-                  role="menuitem"
-                  style={{
-                    ...menuNavItemStyle(true, item.active),
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                  }}
-                  onClick={() => handleNavItem(item.path)}
-                  onMouseEnter={(e) => {
-                    if (!item.active)
-                      e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!item.active)
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
-                >
-                  <ThemedSvgIcon
-                    name={item.icon}
-                    color={
-                      item.active ? theme.colors.primary : theme.colors.text
-                    }
-                    size={16}
-                  />
-                  {item.label}
-                </div>
-              ))}
             </div>
           )}
         </div>
@@ -372,20 +294,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             >
               {pageTitle}
             </span>
-          </div>
-        )}
-
-        {/* Right - Bookmark + User Badge */}
-        {showUserBadge && (
-          <div style={rightSectionStyle}>
-            {bookmarkTitle && (
-              <BookmarkToggle
-                pagePath={location.pathname}
-                pageTitle={bookmarkTitle}
-                pageDescription={bookmarkDescription}
-              />
-            )}
-            <UserBadge />
           </div>
         )}
       </div>

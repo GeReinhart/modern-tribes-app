@@ -6,6 +6,7 @@ const ZOOM_KEY = 'app-zoom';
 const ZOOM_MIN = 0.5;
 const ZOOM_MAX = 2.0;
 const ZOOM_DEFAULT = 1.0;
+const ZOOM_PHONE_DEFAULT = 1.5;
 
 const detectPhone = (): boolean => {
   const { innerWidth, innerHeight } = window;
@@ -14,9 +15,11 @@ const detectPhone = (): boolean => {
 
 const loadZoom = (): number => {
   const stored = localStorage.getItem(ZOOM_KEY);
-  if (!stored) return ZOOM_DEFAULT;
+  if (!stored) return detectPhone() ? ZOOM_PHONE_DEFAULT : ZOOM_DEFAULT;
   const val = parseFloat(stored);
-  return isNaN(val) ? ZOOM_DEFAULT : Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, val));
+  return isNaN(val)
+    ? ZOOM_DEFAULT
+    : Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, val));
 };
 
 export const useResponsive = () => {

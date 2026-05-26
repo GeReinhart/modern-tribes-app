@@ -12,7 +12,6 @@ interface AppLayoutProps {
   headerActions?: React.ReactNode;
   secondaryActions?: React.ReactNode;
   menuActions?: MenuAction[];
-  showUserBadge?: boolean;
   breadcrumbs?: BreadcrumbItem[];
   breadcrumbTabs?: BreadcrumbTab[];
   bookmarkTitle?: string | null;
@@ -23,7 +22,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   headerActions,
   secondaryActions,
   menuActions,
-  showUserBadge = true,
   breadcrumbs,
   breadcrumbTabs,
   bookmarkTitle,
@@ -52,21 +50,27 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     gap: '12px',
   };
 
+  const bookmarkDescription =
+    breadcrumbs && breadcrumbs.length > 0
+      ? breadcrumbs.map((b) => b.label).join(' / ')
+      : null;
+
   return (
     <div style={layoutStyle}>
       <AppHeader
         actions={headerActions}
         secondaryActions={secondaryActions}
         menuActions={menuActions}
-        showUserBadge={showUserBadge}
         breadcrumbs={breadcrumbs}
         breadcrumbTabs={breadcrumbTabs}
-        bookmarkTitle={bookmarkTitle}
       />
       <main style={mainStyle}>
         <div style={contentStyle}>{children}</div>
       </main>
-      <AppFooter />
+      <AppFooter
+        bookmarkTitle={bookmarkTitle}
+        bookmarkDescription={bookmarkDescription}
+      />
     </div>
   );
 };
