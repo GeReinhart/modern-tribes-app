@@ -42,8 +42,8 @@ export const BookmarkToggle: React.FC<BookmarkToggleProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        width: '40px',
-        height: '40px',
+        width: '20px',
+        height: '20px',
         borderRadius: '50%',
         border: `2px solid ${bookmarked ? theme.colors.primary : theme.colors.border}`,
         backgroundColor: bookmarked
