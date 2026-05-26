@@ -85,7 +85,7 @@ const TocEntryItem: React.FC<{ item: TocItem }> = ({ item }) => {
           color: isSection ? theme.colors.text : theme.colors.primary,
           fontWeight: isSection ? 600 : 400,
           cursor: 'pointer',
-          fontSize: 'var(--font-sm)',
+          fontSize: 'var(--font-lg)',
           textAlign: 'left',
         }}
       >
