@@ -1,0 +1,50 @@
+{
+  "name": "Modern Tribes",
+  "description": [
+    "a backend and a frontend",
+    "a platform with all the common tools needed for most application",
+    "a feature set that make this application special",
+    "the platform and the features have code in both backend and frontend",
+    "the platform depends on external services and tird party libraries",
+    "the features depends on external services and tird party libraries and the platform",
+    "the platform do not depends on features"
+  ],
+  "backend": {
+    "stack": [
+      "postgres for the database",
+      "python fastapi for the backend"
+    ]
+  },
+  "frontend": {
+    "stack": [
+      "typed script",
+      "react"
+    ]
+  },
+  "platform": {
+    "functionalities": [
+      {
+        "code": "aut",
+        "package": "authentication",
+        "description": [
+          "authentication of the user",
+          "magic link send by email with a token"
+        ],
+        "backend": {
+          "tables": [
+            "users",
+            "users_sessions"
+          ],
+          "path": [
+            "backend/app/authentication/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/authentication/**"
+          ]
+        }
+      }
+    ]
+  }
+}
