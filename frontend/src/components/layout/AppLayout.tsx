@@ -44,7 +44,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
   const contentStyle: React.CSSProperties = {
     width: '100%',
-    maxWidth: '1100px',
+    maxWidth: '1420px',
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',

@@ -57,7 +57,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   };
 
   const headerInnerStyle: React.CSSProperties = {
-    maxWidth: '1100px',
+    maxWidth: '1420px',
     width: '100%',
     margin: '0 auto',
     padding: 'var(--header-pad)',

@@ -29,6 +29,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({
   const navigate = useNavigate();
 
   const footerStyle: React.CSSProperties = {
+
     position: 'sticky',
     bottom: 0,
     zIndex: 10,
