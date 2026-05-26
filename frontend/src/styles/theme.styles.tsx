@@ -130,10 +130,10 @@ export const getCardStyle = (
   bordered: boolean = true,
 ): CSSProperties => ({
   border: bordered ? `3px solid ${theme.colors[variant]}` : 'none',
-  borderRadius: '12px',
+  borderRadius: 'var(--radius-lg)',
   padding: 'var(--card-pad)',
   background: `linear-gradient(135deg, ${theme.colors.primary}08, ${theme.colors.accent}08)`,
-  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+  boxShadow: 'var(--shadow-sm)',
   margin: 'var(--space-md) 0',
 });
 
@@ -141,7 +141,7 @@ export const getMemberCardStyle = (theme: Theme): CSSProperties => ({
   padding: 'var(--space-sm) var(--space-md)',
   backgroundColor: theme.colors.surface,
   border: `1px solid ${theme.colors.border}`,
-  borderRadius: '8px',
+  borderRadius: 'var(--radius-md)',
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
@@ -152,7 +152,7 @@ export const getAttachmentCardStyle = (theme: Theme): CSSProperties => ({
   padding: 'var(--space-sm) var(--space-md)',
   backgroundColor: theme.colors.surface,
   border: `1px solid ${theme.colors.border}`,
-  borderRadius: '8px',
+  borderRadius: 'var(--radius-md)',
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
@@ -171,8 +171,8 @@ export const getBadgeStyle = (
   backgroundColor: theme.colors[variant],
   color: 'white',
   padding: 'var(--space-xs) var(--space-md)',
-  borderRadius: '16px',
-  fontSize: 'var(--font-sm)',
+  borderRadius: 'var(--radius-full)',
+  fontSize: 'var(--font-xs)',
   fontWeight: 'bold',
   display: 'inline-block',
   margin: '0 var(--space-xs)',
@@ -189,11 +189,11 @@ export const getPositionBadgeStyle = (
   };
 
   return {
-    padding: '4px 12px',
+    padding: 'var(--space-xs) var(--space-md)',
     backgroundColor: colors[type],
     color: 'white',
-    borderRadius: '12px',
-    fontSize: '12px',
+    borderRadius: 'var(--radius-lg)',
+    fontSize: 'var(--font-xs)',
     fontWeight: 600,
     textTransform: 'uppercase',
   };
@@ -252,10 +252,10 @@ export const getButtonStyle = (
   padding: 'var(--btn-pad-v) var(--btn-pad-h)',
   fontSize: 'var(--btn-font)',
   fontWeight: 'bold',
-  borderRadius: '8px',
+  borderRadius: 'var(--radius-md)',
   cursor: disabled ? 'not-allowed' : 'pointer',
   transition: 'all 0.3s ease',
-  boxShadow: disabled ? 'none' : '0 2px 4px rgba(0,0,0,0.1)',
+  boxShadow: disabled ? 'none' : 'var(--shadow-sm)',
   width: fullWidth ? '100%' : 'auto',
   opacity: disabled ? 0.6 : 1,
   display: 'inline-flex',
@@ -274,10 +274,10 @@ export const getSubmitButtonStyle = (
   padding: 'var(--btn-pad-v) var(--btn-pad-h)',
   fontSize: 'var(--btn-font)',
   fontWeight: 'bold',
-  borderRadius: '8px',
+  borderRadius: 'var(--radius-md)',
   cursor: isLoading ? 'not-allowed' : 'pointer',
   transition: 'all 0.3s ease',
-  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+  boxShadow: 'var(--shadow-sm)',
   opacity: isLoading ? 0.7 : 1,
   display: 'flex',
   alignItems: 'center',
@@ -291,9 +291,9 @@ export const clearButtonStyle: CSSProperties = {
   border: 'none',
   color: '#666',
   cursor: 'pointer',
-  fontSize: '14px',
+  fontSize: 'var(--font-sm)',
   textDecoration: 'underline',
-  padding: '4px 8px',
+  padding: 'var(--space-xs) var(--space-sm)',
 };
 
 // ============================================
@@ -301,7 +301,7 @@ export const clearButtonStyle: CSSProperties = {
 // ============================================
 
 export const containerStyle: CSSProperties = {
-  padding: '8px',
+  padding: 'var(--space-sm)',
   fontFamily: 'Arial, sans-serif',
   maxWidth: '1400px',
   margin: '0 auto',
@@ -312,15 +312,15 @@ export const containerStyle: CSSProperties = {
 export const formContainerStyle: CSSProperties = {
   backgroundColor: 'white',
   padding: 'var(--space-xl)',
-  borderRadius: '12px',
-  boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+  borderRadius: 'var(--radius-lg)',
+  boxShadow: 'var(--shadow-sm)',
 };
 
 export const getInputStyle = (theme: Theme): CSSProperties => ({
   width: '100%',
   padding: 'var(--space-sm)',
   fontSize: 'var(--font-md)',
-  borderRadius: '8px',
+  borderRadius: 'var(--radius-md)',
   border: `2px solid ${theme.colors.secondary}`,
   marginTop: 'var(--space-sm)',
   marginBottom: 'var(--space-md)',
@@ -332,7 +332,7 @@ export const getFilterInputStyle = (theme: Theme): CSSProperties => ({
   width: '100%',
   padding: 'var(--space-sm) var(--space-md)',
   fontSize: 'var(--font-md)',
-  borderRadius: '8px',
+  borderRadius: 'var(--radius-md)',
   border: `2px solid ${theme.colors.secondary}`,
   marginTop: 'var(--space-sm)',
   marginBottom: 'var(--space-md)',
@@ -342,10 +342,10 @@ export const getFilterInputStyle = (theme: Theme): CSSProperties => ({
 });
 
 export const getPersonCardStyle = (theme: Theme): CSSProperties => ({
-  padding: '16px',
-  borderRadius: '8px',
+  padding: 'var(--space-md)',
+  borderRadius: 'var(--radius-md)',
   border: `2px solid ${theme.colors.secondary}20`,
-  marginBottom: '12px',
+  marginBottom: 'var(--space-md)',
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
@@ -361,13 +361,13 @@ export const getSelectedPersonCardStyle = (theme: Theme): CSSProperties => ({
 });
 
 export const getPositionSelectStyle = (theme: Theme): CSSProperties => ({
-  padding: '8px 12px',
-  borderRadius: '6px',
+  padding: 'var(--space-sm) var(--space-md)',
+  borderRadius: 'var(--radius-sm)',
   border: `2px solid ${theme.colors.accent}`,
-  fontSize: '14px',
+  fontSize: 'var(--font-sm)',
   fontWeight: 'bold',
   cursor: 'pointer',
-  marginLeft: '12px',
+  marginLeft: 'var(--space-md)',
 });
 
 export const getFilterCheckboxStyle = (
@@ -376,12 +376,12 @@ export const getFilterCheckboxStyle = (
 ): CSSProperties => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
-  marginTop: '12px',
-  marginBottom: '16px',
-  padding: '12px',
+  gap: 'var(--space-sm)',
+  marginTop: 'var(--space-md)',
+  marginBottom: 'var(--space-md)',
+  padding: 'var(--space-md)',
   backgroundColor: `${theme.colors.primary}08`,
-  borderRadius: '8px',
+  borderRadius: 'var(--radius-md)',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
   border: `2px solid ${checked ? theme.colors.primary : 'transparent'}`,
@@ -391,18 +391,18 @@ export const errorStyle: CSSProperties = {
   backgroundColor: '#fee',
   border: '2px solid #f00',
   color: '#c00',
-  padding: '16px',
-  borderRadius: '8px',
-  marginBottom: '20px',
+  padding: 'var(--space-md)',
+  borderRadius: 'var(--radius-md)',
+  marginBottom: 'var(--space-lg)',
 };
 
 export const successStyle: CSSProperties = {
   backgroundColor: '#efe',
   border: '2px solid #0c0',
   color: '#060',
-  padding: '16px',
-  borderRadius: '8px',
-  marginBottom: '20px',
+  padding: 'var(--space-md)',
+  borderRadius: 'var(--radius-md)',
+  marginBottom: 'var(--space-lg)',
 };
 
 export const formActionsStyle: CSSProperties = {
@@ -413,10 +413,10 @@ export const formActionsStyle: CSSProperties = {
 };
 
 export const personListContainerStyle: CSSProperties = {
-  marginTop: '20px',
+  marginTop: 'var(--space-lg)',
   maxHeight: '500px',
   overflowY: 'auto',
-  paddingRight: '8px',
+  paddingRight: 'var(--space-sm)',
 };
 
 export const personInfoContainerStyle: CSSProperties = {
@@ -428,7 +428,7 @@ export const personInfoContainerStyle: CSSProperties = {
 export const checkboxStyle: CSSProperties = {
   width: '20px',
   height: '20px',
-  marginRight: '12px',
+  marginRight: 'var(--space-md)',
   cursor: 'pointer',
 };
 
@@ -436,7 +436,7 @@ export const filterHeaderStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  marginBottom: '8px',
+  marginBottom: 'var(--space-sm)',
 };
 
 // ============================================
@@ -460,24 +460,24 @@ export const loadingOverlayStyle: CSSProperties = {
 
 export const loadingContentStyle: CSSProperties = {
   backgroundColor: 'white',
-  padding: '40px 60px',
-  borderRadius: '16px',
-  boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+  padding: 'var(--space-xl)',
+  borderRadius: 'var(--radius-lg)',
+  boxShadow: 'var(--shadow-lg)',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  gap: '20px',
+  gap: 'var(--space-lg)',
 };
 
 export const loadingTextStyle: CSSProperties = {
-  fontSize: '18px',
+  fontSize: 'var(--font-lg)',
   fontWeight: '600',
   color: '#333',
-  marginTop: '10px',
+  marginTop: 'var(--space-sm)',
 };
 
 export const loadingSubTextStyle: CSSProperties = {
-  fontSize: '14px',
+  fontSize: 'var(--font-sm)',
   color: '#666',
   textAlign: 'center',
 };
@@ -509,19 +509,19 @@ export const centerContainerStyle: CSSProperties = {
 export const flexCenterStyle: CSSProperties = {
   display: 'flex',
   justifyContent: 'center',
-  padding: '48px',
+  padding: 'var(--space-xl)',
 };
 
 export const downloadLinkStyle = (theme: Theme): CSSProperties => ({
   display: 'flex',
   alignItems: 'center',
-  gap: '6px',
-  padding: '8px 12px',
+  gap: 'var(--space-xs)',
+  padding: 'var(--space-sm) var(--space-md)',
   backgroundColor: theme.colors.primary,
   color: 'white',
-  borderRadius: '6px',
+  borderRadius: 'var(--radius-sm)',
   textDecoration: 'none',
-  fontSize: '14px',
+  fontSize: 'var(--font-sm)',
   fontWeight: 500,
   transition: 'opacity 0.2s ease',
 });

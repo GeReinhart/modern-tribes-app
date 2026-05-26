@@ -41,7 +41,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     flex: 1,
     display: 'flex',
     justifyContent: 'center',
-    padding: '0 12px 12px',
+    padding: 'var(--main-pad)',
   };
 
   const contentStyle: React.CSSProperties = {

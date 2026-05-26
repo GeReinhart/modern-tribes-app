@@ -46,6 +46,8 @@ export function ThemedTable<T>({
     data.length > 0 &&
     data.every((item) => selectedRows.has(getRowId(item)));
 
+  const cellPadding = 'var(--space-sm) var(--space-md)';
+
   return (
     <div style={{ overflowX: 'auto' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -59,7 +61,7 @@ export function ThemedTable<T>({
             {onRowSelect && (
               <th
                 style={{
-                  padding: '12px',
+                  padding: cellPadding,
                   textAlign: 'left',
                   color: theme.colors.primary,
                   fontWeight: 600,
@@ -77,11 +79,11 @@ export function ThemedTable<T>({
               <th
                 key={column.key}
                 style={{
-                  padding: '12px',
+                  padding: cellPadding,
                   textAlign: 'left',
                   color: theme.colors.primary,
                   fontWeight: 600,
-                  fontSize: '14px',
+                  fontSize: 'var(--font-sm)',
                 }}
               >
                 {column.header}
@@ -123,7 +125,7 @@ export function ThemedTable<T>({
               >
                 {onRowSelect && (
                   <td
-                    style={{ padding: '12px' }}
+                    style={{ padding: cellPadding }}
                     onClick={(e) => e.stopPropagation()}
                   >
                     <input
@@ -142,9 +144,9 @@ export function ThemedTable<T>({
                   <td
                     key={column.key}
                     style={{
-                      padding: '12px',
+                      padding: cellPadding,
                       color: theme.colors.text,
-                      fontSize: '14px',
+                      fontSize: 'var(--font-sm)',
                     }}
                   >
                     {column.render(item)}
@@ -158,9 +160,10 @@ export function ThemedTable<T>({
       {data.length === 0 && (
         <div
           style={{
-            padding: '48px',
+            padding: 'var(--space-xl)',
             textAlign: 'center',
             color: theme.colors.text,
+            fontSize: 'var(--font-sm)',
           }}
         >
           No data found

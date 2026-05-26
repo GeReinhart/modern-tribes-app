@@ -29,12 +29,15 @@ export const ThemedCard: React.FC<{
   const theme = themeOverride || contextTheme;
 
   const style: CSSProperties = {
-    border: bordered ? `3px solid ${theme.colors[variant]}` : 'none',
-    borderRadius: '12px',
-    padding: '24px',
+    border: `1px solid ${theme.colors.border}`,
+    borderLeft: bordered
+      ? `3px solid ${theme.colors[variant]}`
+      : `1px solid ${theme.colors.border}`,
+    borderRadius: 'var(--radius-md)',
+    padding: 'var(--card-pad)',
     background: `linear-gradient(135deg, ${theme.colors.primary}08, ${theme.colors.accent}08)`,
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-    margin: '16px 0',
+    boxShadow: 'var(--shadow-sm)',
+    margin: 'var(--space-md) 0',
     cursor: onClick ? 'pointer' : 'default',
   };
 

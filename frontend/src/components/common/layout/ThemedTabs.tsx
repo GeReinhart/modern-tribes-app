@@ -28,7 +28,7 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'flex-end',
-        gap: '2px',
+        gap: 'var(--space-xs)',
         borderBottom: `2px solid ${theme.colors.primary}30`,
         marginBottom: '0',
       }}
@@ -40,7 +40,7 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
             style={{
-              padding: '10px 24px',
+              padding: 'var(--space-sm) var(--space-lg)',
               border: 'none',
               borderBottom: isActive
                 ? `3px solid ${theme.colors.primary}`
@@ -52,8 +52,8 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({
               color: isActive ? theme.colors.primary : theme.colors.text,
               fontWeight: isActive ? 600 : 400,
               cursor: 'pointer',
-              borderRadius: '6px 6px 0 0',
-              fontSize: '14px',
+              borderRadius: 'var(--radius-sm) var(--radius-sm) 0 0',
+              fontSize: 'var(--font-sm)',
               transition: 'all 0.15s',
             }}
           >
@@ -62,7 +62,7 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({
         );
       })}
       {configButton && (
-        <div style={{ marginLeft: 'auto', paddingBottom: '4px' }}>
+        <div style={{ marginLeft: 'auto', paddingBottom: 'var(--space-xs)' }}>
           {configButton}
         </div>
       )}

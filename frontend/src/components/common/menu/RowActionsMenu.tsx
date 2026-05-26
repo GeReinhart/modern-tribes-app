@@ -48,8 +48,8 @@ export function RowActionsMenu({
           background: 'none',
           border: 'none',
           cursor: 'pointer',
-          padding: '4px',
-          borderRadius: '4px',
+          padding: 'var(--space-xs)',
+          borderRadius: 'var(--radius-sm)',
           color: theme.colors.text,
         }}
       >
@@ -68,10 +68,10 @@ export function RowActionsMenu({
             zIndex: 50,
             background: theme.colors.surface,
             border: `1px solid ${theme.colors.border}`,
-            borderRadius: '6px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            borderRadius: 'var(--radius-md)',
+            boxShadow: 'var(--shadow-md)',
             minWidth: '180px',
-            padding: '4px 0',
+            padding: 'var(--space-xs) 0',
           }}
         >
           {actions.map((action) => (
@@ -82,16 +82,16 @@ export function RowActionsMenu({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: 'var(--space-sm)',
                 width: '100%',
-                padding: '8px 12px',
+                padding: 'var(--space-sm) var(--space-md)',
                 background: 'none',
                 border: 'none',
                 cursor: action.disabled ? 'not-allowed' : 'pointer',
                 color:
                   action.variant === 'danger' ? '#ef4444' : theme.colors.text,
                 opacity: action.disabled ? 0.5 : 1,
-                fontSize: '14px',
+                fontSize: 'var(--font-sm)',
                 textAlign: 'left',
               }}
             >

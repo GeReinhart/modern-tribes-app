@@ -71,24 +71,24 @@ const DashboardTaskCard: React.FC<Props> = ({
     <>
       <div
         style={{
-          borderRadius: '8px',
+          borderRadius: 'var(--radius-md)',
           border: `1px solid ${theme.colors.border}`,
           borderLeft: `3px solid ${borderColor}`,
-          marginBottom: '8px',
+          marginBottom: 'var(--space-sm)',
           backgroundColor: theme.colors.surface,
-          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+          boxShadow: 'var(--shadow-sm)',
         }}
       >
         <div
           style={{
-            padding: '8px 10px',
+            padding: 'var(--space-sm)',
             display: 'flex',
             flexDirection: 'column',
-            gap: '4px',
+            gap: 'var(--space-xs)',
           }}
         >
           <div
-            style={{ display: 'flex', alignItems: 'flex-start', gap: '4px' }}
+            style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-xs)' }}
           >
             <span
               onClick={() => setModalOpen(true)}
@@ -148,7 +148,7 @@ const DashboardTaskCard: React.FC<Props> = ({
           </div>
           <div
             style={{
-              fontSize: '10px',
+              fontSize: 'var(--font-xxs)',
               color: theme.colors.secondary,
               lineHeight: 1.3,
             }}
@@ -160,13 +160,13 @@ const DashboardTaskCard: React.FC<Props> = ({
               · {task.feature_instance_name}
             </span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)' }}>
             <span
               style={{
-                fontSize: '10px',
+                fontSize: 'var(--font-xxs)',
                 fontWeight: 600,
-                padding: '1px 5px',
-                borderRadius: '8px',
+                padding: 'var(--space-xs)',
+                borderRadius: 'var(--radius-md)',
                 background: theme.colors.secondary + '22',
                 color: theme.colors.secondary,
                 flexShrink: 0,
@@ -179,10 +179,10 @@ const DashboardTaskCard: React.FC<Props> = ({
             {task.size && (
               <span
                 style={{
-                  fontSize: '10px',
+                  fontSize: 'var(--font-xxs)',
                   fontWeight: 700,
-                  padding: '1px 5px',
-                  borderRadius: '8px',
+                  padding: 'var(--space-xs)',
+                  borderRadius: 'var(--radius-md)',
                   background: fibColor(task.size),
                   color: theme.colors.surface,
                   flexShrink: 0,
@@ -193,10 +193,10 @@ const DashboardTaskCard: React.FC<Props> = ({
             )}
             <span
               style={{
-                fontSize: '10px',
+                fontSize: 'var(--font-xxs)',
                 fontWeight: 600,
-                padding: '1px 5px',
-                borderRadius: '8px',
+                padding: 'var(--space-xs)',
+                borderRadius: 'var(--radius-md)',
                 background: overdue ? uc : uc + '28',
                 color: overdue ? '#fff' : uc,
                 flexShrink: 0,
@@ -207,9 +207,9 @@ const DashboardTaskCard: React.FC<Props> = ({
             {task.assigned_person_name && persons.length > 1 && (
               <span
                 style={{
-                  fontSize: '11px',
-                  padding: '2px 6px',
-                  borderRadius: '10px',
+                  fontSize: 'var(--font-xs)',
+                  padding: 'var(--space-xs) var(--space-sm)',
+                  borderRadius: 'var(--radius-lg)',
                   background: theme.colors.primary + '22',
                   color: theme.colors.primary,
                   fontWeight: 600,

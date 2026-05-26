@@ -21,12 +21,12 @@ export const ThemedBadge: React.FC<{
   const style: CSSProperties = {
     backgroundColor: theme.colors[variant],
     color: 'white',
-    padding: '4px 12px',
-    borderRadius: '16px',
-    fontSize: '12px',
+    padding: 'var(--space-xs) var(--space-md)',
+    borderRadius: 'var(--radius-full)',
+    fontSize: 'var(--font-xs)',
     fontWeight: 'bold',
     display: 'inline-block',
-    margin: '0 4px',
+    margin: '0 var(--space-xs)',
   };
 
   return <span style={style}>{children}</span>;

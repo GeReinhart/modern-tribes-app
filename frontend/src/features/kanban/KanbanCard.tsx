@@ -79,28 +79,28 @@ const KanbanCard: React.FC<Props> = ({
     <>
       <div
         style={{
-          borderRadius: '8px',
+          borderRadius: 'var(--radius-md)',
           border: `1px solid ${theme.colors.border}`,
           borderLeft: `3px solid ${borderColor}`,
-          marginBottom: '8px',
+          marginBottom: 'var(--space-sm)',
           backgroundColor: isArchived
             ? `${theme.colors.surface}88`
             : theme.colors.surface,
-          boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+          boxShadow: 'var(--shadow-sm)',
           opacity: isArchived ? 0.65 : 1,
         }}
       >
         <div
           style={{
-            padding: '8px 10px',
+            padding: 'var(--space-sm)',
             display: 'flex',
             flexDirection: 'column',
-            gap: '6px',
+            gap: 'var(--space-sm)',
           }}
         >
           {/* Line 1: title + edit/archive + expand */}
           <div
-            style={{ display: 'flex', alignItems: 'flex-start', gap: '4px' }}
+            style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-xs)' }}
           >
             <span
               onClick={() => setModalOpen(true)}
@@ -185,9 +185,9 @@ const KanbanCard: React.FC<Props> = ({
                 style={{
                   background: 'none',
                   border: `1px solid ${theme.colors.success}`,
-                  borderRadius: '4px',
+                  borderRadius: 'var(--radius-sm)',
                   cursor: 'pointer',
-                  padding: '1px 3px',
+                  padding: 'var(--space-xs)',
                   display: 'flex',
                   alignItems: 'center',
                   flexShrink: 0,
@@ -376,10 +376,10 @@ const KanbanCard: React.FC<Props> = ({
             {card.size && (
               <span
                 style={{
-                  fontSize: '10px',
+                  fontSize: 'var(--font-xxs)',
                   fontWeight: 700,
-                  padding: '1px 5px',
-                  borderRadius: '8px',
+                  padding: 'var(--space-xs)',
+                  borderRadius: 'var(--radius-md)',
                   background: fibColor(card.size),
                   color: theme.colors.surface,
                   flexShrink: 0,
@@ -398,10 +398,10 @@ const KanbanCard: React.FC<Props> = ({
                 return (
                   <span
                     style={{
-                      fontSize: '10px',
+                      fontSize: 'var(--font-xxs)',
                       fontWeight: 600,
-                      padding: '1px 5px',
-                      borderRadius: '8px',
+                      padding: 'var(--space-xs)',
+                      borderRadius: 'var(--radius-md)',
                       background: overdue ? uc : uc + '28',
                       color: overdue ? '#fff' : uc,
                       flexShrink: 0,
@@ -415,9 +415,9 @@ const KanbanCard: React.FC<Props> = ({
             {card.assigned_person_name && persons.length > 1 && (
               <span
                 style={{
-                  fontSize: '11px',
-                  padding: '2px 6px',
-                  borderRadius: '10px',
+                  fontSize: 'var(--font-xs)',
+                  padding: 'var(--space-xs) var(--space-sm)',
+                  borderRadius: 'var(--radius-lg)',
                   background: accentColor + '22',
                   color: accentColor,
                   fontWeight: 600,
@@ -468,18 +468,18 @@ const KanbanCard: React.FC<Props> = ({
           <div
             style={{
               backgroundColor: theme.colors.surface,
-              borderRadius: '12px',
+              borderRadius: 'var(--radius-lg)',
               border: `1px solid ${theme.colors.border}`,
-              padding: '24px',
+              padding: 'var(--card-pad)',
               maxWidth: '360px',
               width: '100%',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
+              boxShadow: 'var(--shadow-lg)',
               display: 'flex',
               flexDirection: 'column',
-              gap: '16px',
+              gap: 'var(--space-md)',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
               <ThemedSvgIcon
                 name="archive"
                 color={theme.colors.danger}
@@ -508,7 +508,7 @@ const KanbanCard: React.FC<Props> = ({
               style={{
                 display: 'flex',
                 justifyContent: 'flex-end',
-                gap: '8px',
+                gap: 'var(--space-sm)',
               }}
             >
               <ThemedButton

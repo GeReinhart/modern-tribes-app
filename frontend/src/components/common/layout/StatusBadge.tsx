@@ -17,11 +17,11 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   return (
     <span
       style={{
-        padding: '2px 8px',
-        borderRadius: '9999px',
+        padding: 'var(--space-xs) var(--space-sm)',
+        borderRadius: 'var(--radius-full)',
         backgroundColor: `${color}20`,
         color,
-        fontSize: '11px',
+        fontSize: 'var(--font-xs)',
         fontWeight: 600,
         border: `1px solid ${color}50`,
         whiteSpace: 'nowrap',

@@ -28,17 +28,17 @@ export const ThemedText: React.FC<{
   const { theme: contextTheme } = useTheme();
   const theme = themeOverride || contextTheme;
 
-  const sizes = {
-    small: '14px',
-    medium: '18px',
-    large: '24px',
+  const sizes: Record<string, string> = {
+    small: 'var(--font-sm)',
+    medium: 'var(--font-lg)',
+    large: 'var(--font-xl)',
   };
 
   const style: CSSProperties = {
     color: theme.colors[variant],
     fontSize: sizes[size],
     fontWeight: '600',
-    margin: '8px 0',
+    margin: 'var(--space-sm) 0',
     ...customStyle,
   };
 

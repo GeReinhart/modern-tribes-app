@@ -72,10 +72,10 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
       : 'var(--btn-pad-v) var(--btn-pad-h)',
     fontSize: 'var(--btn-font)',
     fontWeight: 'bold',
-    borderRadius: '8px',
+    borderRadius: 'var(--radius-md)',
     cursor: isDisabled ? 'not-allowed' : 'pointer',
     transition: 'all 0.3s ease',
-    boxShadow: isDisabled ? 'none' : '0 2px 4px rgba(0,0,0,0.1)',
+    boxShadow: isDisabled ? 'none' : 'var(--shadow-sm)',
     width: fullWidth ? '100%' : 'auto',
     opacity: isDisabled ? 0.6 : 1,
     display: 'inline-flex',
@@ -98,13 +98,13 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
       onMouseEnter={(e) => {
         if (!isDisabled) {
           e.currentTarget.style.transform = 'translateY(-2px)';
-          e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+          e.currentTarget.style.boxShadow = 'var(--shadow-md)';
         }
       }}
       onMouseLeave={(e) => {
         if (!isDisabled) {
           e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+          e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
         }
       }}
       {...props}

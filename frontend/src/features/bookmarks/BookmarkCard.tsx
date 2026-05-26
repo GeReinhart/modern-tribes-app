@@ -59,14 +59,14 @@ export const BookmarkCard: React.FC<BookmarkCardProps> = ({
     <>
       <div
         style={{
-          padding: '12px 16px',
+          padding: 'var(--space-sm) var(--space-md)',
           backgroundColor: bgColor,
           border: `1px solid ${theme.colors.border}`,
-          borderRadius: '8px',
+          borderRadius: 'var(--radius-md)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          gap: '8px',
+          gap: 'var(--space-sm)',
           maxWidth: '600px',
         }}
       >
@@ -80,7 +80,7 @@ export const BookmarkCard: React.FC<BookmarkCardProps> = ({
               padding: 0,
               textAlign: 'left',
               color: textColor,
-              fontSize: '14px',
+              fontSize: 'var(--font-sm)',
               fontWeight: 700,
               display: 'block',
               width: '100%',
@@ -92,9 +92,9 @@ export const BookmarkCard: React.FC<BookmarkCardProps> = ({
           {bookmark.description && (
             <p
               style={{
-                margin: '4px 0 0',
+                margin: 'var(--space-xs) 0 0',
                 color: textColor,
-                fontSize: '12px',
+                fontSize: 'var(--font-xs)',
                 opacity: 0.8,
                 wordBreak: 'break-word',
               }}
@@ -107,7 +107,7 @@ export const BookmarkCard: React.FC<BookmarkCardProps> = ({
         <div
           style={{
             display: 'flex',
-            gap: '2px',
+            gap: 'var(--space-xs)',
             alignItems: 'center',
             flexShrink: 0,
           }}

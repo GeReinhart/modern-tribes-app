@@ -26,8 +26,8 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
   const containerStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    fontSize: '14px',
+    gap: 'var(--space-sm)',
+    fontSize: 'var(--font-sm)',
     color: theme.colors.text,
   };
 
