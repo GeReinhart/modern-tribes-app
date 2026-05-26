@@ -64,8 +64,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     position: 'sticky',
     top: 0,
     zIndex: 100,
-    backgroundColor: theme.colors.surface,
-    borderBottom: `2px solid ${theme.colors.border}`,
+    backgroundColor: `${theme.colors.primary}18`,
+    borderBottom: `1px solid ${theme.colors.primary}40`,
+    boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
     marginBottom: 'var(--space-lg)',
   };
 

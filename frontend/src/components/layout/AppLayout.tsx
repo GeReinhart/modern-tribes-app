@@ -3,6 +3,7 @@ import { MenuAction } from '@/types/menu.types';
 
 import React from 'react';
 
+import { AppFooter } from './AppFooter';
 import { AppHeader } from './AppHeader';
 import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb';
 
@@ -65,6 +66,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       <main style={mainStyle}>
         <div style={contentStyle}>{children}</div>
       </main>
+      <AppFooter />
     </div>
   );
 };

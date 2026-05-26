@@ -3,7 +3,10 @@ import { useResponsive } from '@/hooks/useResponsive';
 import React, { ReactNode, createContext, useContext } from 'react';
 
 interface ResponsiveContextType {
+  isPhone: boolean;
   isMobile: boolean;
+  zoom: number;
+  updateZoom: (zoom: number) => void;
 }
 
 const ResponsiveContext = createContext<ResponsiveContextType | undefined>(
@@ -13,9 +16,9 @@ const ResponsiveContext = createContext<ResponsiveContextType | undefined>(
 export const ResponsiveProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { isMobile } = useResponsive();
+  const { isPhone, isMobile, zoom, updateZoom } = useResponsive();
   return (
-    <ResponsiveContext.Provider value={{ isMobile }}>
+    <ResponsiveContext.Provider value={{ isPhone, isMobile, zoom, updateZoom }}>
       {children}
     </ResponsiveContext.Provider>
   );

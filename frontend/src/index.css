@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Spacing & typography tokens */
+/* Spacing & typography tokens — overridden at runtime by applyCssVariables() */
 :root {
     --space-xs: 4px;
     --space-sm: 8px;
@@ -20,40 +20,13 @@
     --header-pad: 16px 24px;
     --card-pad: 24px;
     --main-pad: 0 24px 24px;
+    --logo-size: 90px;
 }
 
-@media (max-width: 768px) {
-    :root {
-        --space-xs: 2px;
-        --space-sm: 4px;
-        --space-md: 8px;
-        --space-lg: 12px;
-        --space-xl: 16px;
-        --font-xs: 10px;
-        --font-sm: 11px;
-        --font-md: 13px;
-        --font-lg: 14px;
-        --font-xl: 17px;
-        --btn-pad-v: 6px;
-        --btn-pad-h: 10px;
-        --btn-font: 12px;
-        --header-pad: 8px 12px;
-        --card-pad: 12px;
-        --main-pad: 0 12px 12px;
-    }
-}
-
-/* Header logo responsive sizing */
+/* Header logo responsive sizing — controlled via --logo-size */
 .header-logo svg {
-    width: 90px;
-    height: 90px;
-}
-
-@media (max-width: 768px) {
-    .header-logo svg {
-        width: 48px;
-        height: 48px;
-    }
+    width: var(--logo-size);
+    height: var(--logo-size);
 }
 
 /* Custom scrollbar */
