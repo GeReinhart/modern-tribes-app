@@ -99,6 +99,7 @@ const fr: Record<string, string> = {
   'tribes.noMembers':
     "Aucun membre pour l'instant. Cliquez sur « Modifier la tribu » pour en ajouter.",
   'tribes.membersCount': 'Membres ({{count}})',
+  'tribes.tribesCount': 'Tribus ({{count}})',
   'tribes.attachmentsCount': 'Pièces jointes ({{count}})',
   'tribes.download': 'Télécharger',
   'tribes.descriptionSection': 'Description',

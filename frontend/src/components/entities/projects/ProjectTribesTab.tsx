@@ -1,11 +1,13 @@
 import { ThemedBadge } from '@/components/common/layout/ThemedBadge';
 import { ThemedCard } from '@/components/common/layout/ThemedCard';
 import { ThemedText } from '@/components/common/layout/ThemedText';
+import { PositionEnum } from '@/types/position.types';
 import { ProjectTribeWithMembers } from '@/types/queries/projects.query.types';
 
-import { ChevronDown, ChevronRight } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 type BadgeVariant = 'primary' | 'accent' | 'ghost';
 
@@ -15,8 +17,49 @@ const POSITION_VARIANT: Record<string, BadgeVariant> = {
   guest: 'ghost',
 };
 
-const TribeMembersCard: React.FC<{ tribe: ProjectTribeWithMembers }> = ({
-  tribe,
+interface MemberTribeEntry {
+  tribe_id: string;
+  tribe_name: string;
+  position: PositionEnum;
+}
+
+interface ProjectMemberWithTribes {
+  person_id: string;
+  first_name: string;
+  last_name: string;
+  tribes: MemberTribeEntry[];
+}
+
+function toMemberOriented(
+  tribes: ProjectTribeWithMembers[],
+): ProjectMemberWithTribes[] {
+  const memberMap = new Map<string, ProjectMemberWithTribes>();
+  for (const tribe of tribes) {
+    for (const member of tribe.members) {
+      if (!memberMap.has(member.person_id)) {
+        memberMap.set(member.person_id, {
+          person_id: member.person_id,
+          first_name: member.first_name,
+          last_name: member.last_name,
+          tribes: [],
+        });
+      }
+      memberMap.get(member.person_id)!.tribes.push({
+        tribe_id: tribe.tribe_id,
+        tribe_name: tribe.tribe_name,
+        position: member.position,
+      });
+    }
+  }
+  return Array.from(memberMap.values()).sort(
+    (a, b) =>
+      a.last_name.localeCompare(b.last_name) ||
+      a.first_name.localeCompare(b.first_name),
+  );
+}
+
+const MemberTribesCard: React.FC<{ member: ProjectMemberWithTribes }> = ({
+  member,
 }) => {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
@@ -37,11 +80,11 @@ const TribeMembersCard: React.FC<{ tribe: ProjectTribeWithMembers }> = ({
         }}
       >
         <ThemedText variant="primary" size="medium" as="span">
-          {tribe.tribe_name}
+          {member.first_name} {member.last_name}
         </ThemedText>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <ThemedText variant="secondary" size="small">
-            {t('tribes.membersCount', { count: tribe.members.length })}
+            {t('tribes.tribesCount', { count: member.tribes.length })}
           </ThemedText>
           {expanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         </div>
@@ -56,9 +99,9 @@ const TribeMembersCard: React.FC<{ tribe: ProjectTribeWithMembers }> = ({
             gap: '8px',
           }}
         >
-          {tribe.members.map((member) => (
+          {member.tribes.map((tribe) => (
             <div
-              key={member.person_id}
+              key={tribe.tribe_id}
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -66,10 +109,12 @@ const TribeMembersCard: React.FC<{ tribe: ProjectTribeWithMembers }> = ({
               }}
             >
               <ThemedText variant="primary" size="small">
-                {member.first_name} {member.last_name}
+                {tribe.tribe_name}
               </ThemedText>
-              <ThemedBadge variant={POSITION_VARIANT[member.position] ?? 'ghost'}>
-                {t(`positions.${member.position}`)}
+              <ThemedBadge
+                variant={POSITION_VARIANT[tribe.position] ?? 'ghost'}
+              >
+                {t(`positions.${tribe.position}`)}
               </ThemedBadge>
             </div>
           ))}
@@ -87,8 +132,9 @@ export const ProjectTribesTab: React.FC<ProjectTribesTabProps> = ({
   tribes,
 }) => {
   const { t } = useTranslation();
+  const members = toMemberOriented(tribes);
 
-  if (tribes.length === 0) {
+  if (members.length === 0) {
     return (
       <ThemedText variant="secondary" size="small">
         {t('projects.noTribesLinked')}
@@ -98,8 +144,8 @@ export const ProjectTribesTab: React.FC<ProjectTribesTabProps> = ({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-      {tribes.map((tribe) => (
-        <TribeMembersCard key={tribe.tribe_id} tribe={tribe} />
+      {members.map((member) => (
+        <MemberTribesCard key={member.person_id} member={member} />
       ))}
     </div>
   );

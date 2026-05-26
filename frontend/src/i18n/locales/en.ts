@@ -93,6 +93,7 @@ const en: Record<string, string> = {
   'tribes.updateSuccess': 'Tribe updated successfully!',
   'tribes.noMembers': 'No members yet. Click "Edit Tribe" to add members.',
   'tribes.membersCount': 'Members ({{count}})',
+  'tribes.tribesCount': 'Tribes ({{count}})',
   'tribes.attachmentsCount': 'Attachments ({{count}})',
   'tribes.download': 'Download',
   'tribes.descriptionSection': 'Description',
