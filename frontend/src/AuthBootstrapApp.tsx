@@ -22,7 +22,7 @@ import { NotificationsAdminPage } from '@/pages/admin/notifications/Notification
 import AboutPage from '@/pages/app/AboutPage.tsx';
 import { CreateProjectPage } from '@/pages/app/CreateProjectPage.tsx';
 import CreateTribeForm from '@/pages/app/CreateTribePage.tsx';
-import DashboardPage from '@/pages/app/DashboardPage.tsx';
+import DashboardPage from '@/features/dashboard/DashboardPage';
 import { DocumentPageFormPage } from '@/pages/app/DocumentPageFormPage.tsx';
 import { EditProjectDocumentPage } from '@/pages/app/EditProjectDocumentPage.tsx';
 import { EditProjectPage } from '@/pages/app/EditProjectPage.tsx';
