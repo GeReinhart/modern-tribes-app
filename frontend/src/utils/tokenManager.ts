@@ -60,6 +60,19 @@ export const tokenManager = {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
   },
+  // Returns milliseconds until the stored access token expires (negative if already past).
+  // Reads the raw token without the expiry-eviction side-effect of getAccessToken().
+  getTokenExpiresInMs: (): number | null => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return null;
+    try {
+      const payload = decodeJwtPayload(token.split('.')[1]);
+      if (!payload.exp) return null;
+      return payload.exp * 1000 - Date.now();
+    } catch {
+      return null;
+    }
+  },
   setRefresher: (fn: Refresher): void => {
     _refresher = fn;
   },

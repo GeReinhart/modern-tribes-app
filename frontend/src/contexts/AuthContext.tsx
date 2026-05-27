@@ -1,4 +1,5 @@
 import { getAPIBaseUrl } from '@/config/env';
+import { useProactiveTokenRefresh } from '@/hooks/useProactiveTokenRefresh';
 import i18n from '@/i18n/index';
 import { authService } from '@/services/auth.service';
 import { tokenManager } from '@/utils/tokenManager';
@@ -40,30 +41,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const hasFetched = useRef(false);
 
-  const fetchUser = useCallback(async (accessToken: string) => {
-    try {
-      const response = await fetch(`${getAPIBaseUrl()}/auth/me`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-        if (userData.language) {
-          i18n.changeLanguage(userData.language);
-          localStorage.setItem('user_language', userData.language);
+  const fetchUser = useCallback(
+    async (accessToken: string, allowRefresh = true) => {
+      try {
+        const response = await fetch(`${getAPIBaseUrl()}/auth/me`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (response.ok) {
+          const userData = await response.json();
+          setUser(userData);
+          if (userData.language) {
+            i18n.changeLanguage(userData.language);
+            localStorage.setItem('user_language', userData.language);
+          }
+          return;
         }
-      } else if (response.status === 401 || response.status === 403) {
-        // Token is definitively rejected — clear it.
+        if (
+          (response.status === 401 || response.status === 403) &&
+          allowRefresh
+        ) {
+          const newToken = await tokenManager.tryRefresh();
+          if (newToken) {
+            await fetchUser(newToken, false);
+            return;
+          }
+        }
+        // Token definitively rejected and refresh unavailable — clear session.
         tokenManager.clearAll();
         setToken(null);
+      } catch {
+        // Network error or CORS failure — token may still be valid.
+      } finally {
+        setIsLoading(false);
       }
-      // Other HTTP errors (5xx) or network/CORS failures leave the token intact.
-    } catch {
-      // Network error or CORS failure — token may still be valid.
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   // Called by tokenManager when api.service.ts encounters a 401.
   const doRefresh = useCallback(async (): Promise<string | null> => {
@@ -75,13 +88,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       tokenManager.setRefreshToken(data.refresh_token);
       setToken(data.access_token);
       return data.access_token;
-    } catch {
-      tokenManager.clearAll();
-      setToken(null);
-      setUser(null);
+    } catch (err) {
+      // Only clear the session on a definitive auth rejection (401/403).
+      // Network errors and 5xx are transient — keep tokens so the next attempt can retry.
+      const status = (err as Error & { status?: number }).status;
+      if (status === 401 || status === 403) {
+        tokenManager.clearAll();
+        setToken(null);
+        setUser(null);
+      }
       return null;
     }
   }, []);
+
+  useProactiveTokenRefresh(token);
 
   useEffect(() => {
     tokenManager.setRefresher(doRefresh);

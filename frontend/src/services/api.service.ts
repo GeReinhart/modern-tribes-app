@@ -27,11 +27,16 @@ class ApiService {
         },
       });
 
-      if ((response.status === 401 || response.status === 403) && !isRetry) {
-        const newToken = await tokenManager.tryRefresh();
-        if (newToken) {
-          return this.request<T>(endpoint, options, true);
+      if (response.status === 401) {
+        if (!isRetry) {
+          const newToken = await tokenManager.tryRefresh();
+          if (newToken) {
+            return this.request<T>(endpoint, options, true);
+          }
         }
+        // Refresh failed or retry still got 401 — session is dead, go to login
+        window.location.replace('/auth/login');
+        return new Promise<T>(() => {});
       }
 
       if (!response.ok) {

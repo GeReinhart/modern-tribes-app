@@ -49,7 +49,11 @@ export const authService = {
 
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
-      throw new Error(data.detail || 'Token refresh failed');
+      const err: Error & { status?: number } = new Error(
+        data.detail || 'Token refresh failed',
+      );
+      err.status = response.status;
+      throw err;
     }
 
     return response.json();
