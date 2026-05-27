@@ -31,7 +31,7 @@
           "magic link send by email with a token"
         ],
         "backend": {
-          "tables": [
+          "schema": [
             "users",
             "users_sessions"
           ],
@@ -54,7 +54,7 @@
           "user -> roles -> permissions"
         ],
         "backend": {
-          "tables": [
+          "schema": [
             "users_roles",
             "roles",
             "roles_permissions"
@@ -68,7 +68,29 @@
             "frontend/src/authorization/**"
           ]
         }
+      },
+      {
+        "code": "i18",
+        "package": "i18n",
+        "description": [
+          "translate the messages to the user on its language",
+          "the language is set by the user and stored in the user table"
+        ],
+        "backend": {
+          "schema": [
+            "users.language"
+          ],
+          "path": [
+
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/i18n/**"
+          ]
+        }
       }
+
     ]
   }
 }

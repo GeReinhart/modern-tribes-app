@@ -1,7 +1,7 @@
 import AuthBootstrapApp from '@/AuthBootstrapApp.tsx';
 import '@/features';
 // triggers feature self-registration
-import i18n from '@/i18n/index';
+import i18n from '@/platform/i18n/index';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';

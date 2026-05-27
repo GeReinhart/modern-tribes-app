@@ -1,5 +1,5 @@
 import { getAPIBaseUrl } from '@/config/env';
-import i18n from '@/i18n/index';
+import i18n from '@/platform/i18n/index';
 
 import React, {
   createContext,
