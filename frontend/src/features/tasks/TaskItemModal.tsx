@@ -3,13 +3,13 @@ import { ThemedButton } from '@/components/common/form/ThemedButton';
 import ThemedDateSelection from '@/components/common/form/ThemedDateSelection';
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { useTheme } from '@/contexts/ThemeContext';
-import { FIBONACCI, fibColor } from '@/types/features';
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import TaskItemModalLabels from './TaskItemModalLabels';
 import type { TaskItemModalProps, TaskLabelInfo, TaskPatch } from './types';
+import { FIBONACCI, fibColor } from './types';
 
 const sectionLabel: React.CSSProperties = {
   fontSize: '11px',

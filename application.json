@@ -143,8 +143,18 @@
             "frontend/src/features/tasks/**"
           ]
         }
+      },
+      {
+        "package": "dashboard",
+        "description": [
+          "show elements from todo, kanban as task, the favorites"
+        ],
+        "frontend": {
+          "path": [
+            "frontend/src/features/dasboard/**"
+          ]
+        }
       }
-
     ]
   }
 }

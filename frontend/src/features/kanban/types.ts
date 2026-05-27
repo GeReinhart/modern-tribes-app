@@ -33,7 +33,7 @@ export interface KanbanBoard {
   labels: KanbanLabel[];
 }
 
-export type { PersonOption } from '@/types/features';
+export type { PersonOption } from '@/features/tasks/types';
 
 export interface CardCreate {
   feature_instance_id: string;
@@ -73,4 +73,4 @@ export interface LabelUpdate {
 export type MoveDirection = 'prev' | 'next';
 export type ReorderDirection = 'up' | 'down' | 'top' | 'bottom';
 
-export { FIBONACCI, fibColor, urgencyColor } from '@/types/features';
+export { FIBONACCI, fibColor, urgencyColor } from '@/features/tasks/types';

@@ -1,4 +1,4 @@
-import type { TaskPatch } from '@/components/tasks/types.ts';
+import type { TaskPatch } from '@/features/tasks/types';
 import { kanbanService } from '@/features/kanban/service.ts';
 import type { CardUpdate } from '@/features/kanban/types.ts';
 import { todoListService } from '@/features/todo_list/service.ts';

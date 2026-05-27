@@ -1,5 +1,5 @@
-export type { PersonOption } from '@/types/features';
-export { FIBONACCI, fibColor, urgencyColor } from '@/types/features';
+export type { PersonOption } from '@/features/tasks/types';
+export { FIBONACCI, fibColor, urgencyColor } from '@/features/tasks/types';
 
 export interface TodoLabel {
   id: string;

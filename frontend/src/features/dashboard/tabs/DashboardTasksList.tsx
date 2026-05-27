@@ -1,6 +1,6 @@
-import type { TaskLabelInfo, TaskPatch } from '@/components/tasks/types.ts';
+import type { TaskLabelInfo, TaskPatch } from '@/features/tasks/types';
 import { useTheme } from '@/contexts/ThemeContext.tsx';
-import type { PersonOption } from '@/types/features.ts';
+import type { PersonOption } from '@/features/tasks/types';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

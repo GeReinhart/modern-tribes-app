@@ -1,9 +1,9 @@
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon.tsx';
-import TaskItemModal from '@/components/tasks/TaskItemModal.tsx';
-import type { TaskLabelInfo, TaskPatch } from '@/components/tasks/types.ts';
+import TaskItemModal from '@/features/tasks/TaskItemModal';
+import type { TaskLabelInfo, TaskPatch } from '@/features/tasks/types';
+import { fibColor, urgencyColor } from '@/features/tasks/types';
 import { useTheme } from '@/contexts/ThemeContext.tsx';
-import type { PersonOption } from '@/types/features.ts';
-import { fibColor, urgencyColor } from '@/types/features.ts';
+import type { PersonOption } from '@/features/tasks/types';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

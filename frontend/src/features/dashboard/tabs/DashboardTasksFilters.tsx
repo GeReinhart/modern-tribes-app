@@ -1,5 +1,5 @@
 import { useTheme } from '@/contexts/ThemeContext.tsx';
-import type { PersonOption } from '@/types/features.ts';
+import type { PersonOption } from '@/features/tasks/types';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
