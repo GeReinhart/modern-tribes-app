@@ -2,8 +2,6 @@ from datetime import date, datetime, timezone
 from typing import Optional
 from uuid import UUID
 
-from app.repositories.persons_repository import fetch_persons_for_feature  # noqa: F401
-
 
 async def fetch_todo_items(pool, feature_instance_id: str) -> list[dict]:
     async with pool.acquire() as conn:

@@ -1,6 +1,6 @@
 import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
 import { useTheme } from '@/contexts/ThemeContext';
-import { PersonOption, fibColor, urgencyColor } from '@/types/features';
+import { PersonOption, fibColor, urgencyColor } from './types';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

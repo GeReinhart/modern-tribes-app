@@ -1,6 +1,6 @@
 import TaskItemModal from '@/components/tasks/TaskItemModal';
 import type { TaskLabelInfo, TaskPatch } from '@/components/tasks/types';
-import type { PersonOption } from '@/types/features';
+import type { PersonOption } from './types';
 
 import React from 'react';
 

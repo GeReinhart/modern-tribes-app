@@ -36,12 +36,12 @@
             "users_sessions"
           ],
           "path": [
-            "backend/app/authentication/**"
+            "backend/app/platform/authentication/**"
           ]
         },
         "frontend": {
           "path": [
-            "frontend/src/authentication/**"
+            "frontend/src/platform/authentication/**"
           ]
         }
       },
@@ -60,12 +60,12 @@
             "roles_permissions"
           ],
           "path": [
-            "backend/app/authorization/**"
+            "backend/app/platform/authorization/**"
           ]
         },
         "frontend": {
           "path": [
-            "frontend/src/authorization/**"
+            "frontend/src/platform/authorization/**"
           ]
         }
       },
@@ -86,11 +86,31 @@
         },
         "frontend": {
           "path": [
-            "frontend/src/i18n/**"
+            "frontend/src/platform/i18n/**"
           ]
         }
       }
 
+    ]
+  },
+  "features": {
+    "features": [
+      {
+        "code": "tod",
+        "package": "todo_list",
+        "description": [
+          "todo list",
+          "item with due date, assigned to a user and labels"
+        ],
+        "backend": {
+          "schema": [
+            "todo_items"
+          ],
+          "path": [
+            "backend/app/features/todo_list/**"
+          ]
+        }
+      }
     ]
   }
 }

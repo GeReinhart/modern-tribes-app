@@ -1,4 +1,4 @@
-import { PersonOption } from '@/types/features';
+import { PersonOption } from './types';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 

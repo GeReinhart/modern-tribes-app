@@ -1,5 +1,5 @@
 import { apiService } from '@/services/api.service';
-import { PersonOption } from '@/types/features';
+import { PersonOption } from './types';
 
 import {
   TodoItem,

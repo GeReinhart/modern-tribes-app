@@ -7,7 +7,8 @@ from app.platform.authorization.models import PermissionEnum
 from app.core.database import get_database
 from app.platform.authorization.project_access import check_project_access_or_admin
 from app.utils.document_helpers import strip_html, extract_content_summary
-from app.repositories import todo_repository, persons_repository, feature_labels_repository as labels_repo
+from features.todo_list import repository as todo_repository
+from app.repositories import persons_repository, feature_labels_repository as labels_repo
 from features.todo_list.models import (
     TodoItemCreate, TodoItemUpdate, TodoItemResponse,
     TodoLabel, TodoLabelCreate, TodoLabelUpdate, PersonOption,
