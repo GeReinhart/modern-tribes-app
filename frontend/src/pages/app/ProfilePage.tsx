@@ -4,12 +4,12 @@ import { ThemedCard } from '@/components/common/layout/ThemedCard.tsx';
 import { ThemedDivider } from '@/components/common/layout/ThemedDivider.tsx';
 import { ThemedText } from '@/components/common/layout/ThemedText.tsx';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { useAuth } from '@/contexts/AuthContext.tsx';
+import { useAuth } from '@/platform/authentication/AuthContext.tsx';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile.ts';
 import { usePerson } from '@/hooks/usePersons.ts';
 import { useRepresentsByUserId } from '@/hooks/useRepresents.ts';
-import { authService } from '@/services/auth.service.ts';
+import { authService } from '@/platform/authentication/service';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

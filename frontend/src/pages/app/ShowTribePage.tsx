@@ -15,7 +15,7 @@ import { useUserProjectsByTribe } from '@/hooks/useProjects';
 import { useUserTribes } from '@/hooks/useTribes';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
 import { useUrlTab } from '@/hooks/useUrlTab';
-import { useVerifyAuthorization } from '@/hooks/userVerifyAuthorization.ts';
+import { useVerifyAuthorization } from '@/platform/authorization/useVerifyAuthorization';
 import { tribeWithPositionService } from '@/services/app/tribe_with_positions.service.ts';
 import { errorStyle } from '@/styles/theme.styles';
 import { AttachmentFile } from '@/types/document.types.ts';

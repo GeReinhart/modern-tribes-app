@@ -3,10 +3,11 @@ import { ThemedSubmitButton } from '@/components/common/form/ThemedSubmitButton.
 import { ApplicationLogo } from '@/components/common/icons/ApplicationLogo.tsx';
 import { ThemedText } from '@/components/common/layout/ThemedText';
 import { ThemeProvider } from '@/contexts/ThemeContext.tsx';
-import { authService } from '@/services/auth.service.ts';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { authService } from './service';
 
 export default function LoginPage() {
   const { t } = useTranslation();

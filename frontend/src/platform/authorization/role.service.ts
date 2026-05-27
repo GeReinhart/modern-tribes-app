@@ -1,10 +1,11 @@
+import { apiService } from '@/services/api.service';
+
 import {
   Role,
   RoleCreate,
   RoleUpdate,
   RoleWithPermissions,
-} from '../types/role.types';
-import { apiService } from './api.service';
+} from './role.types';
 
 class RoleService {
   private endpoint = '/crud/roles';

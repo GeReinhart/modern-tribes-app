@@ -3,38 +3,34 @@ import {
   ThemedModal,
 } from '@/components/common/layout/ThemedModal.tsx';
 import { FormMode } from '@/types/common.types.ts';
-import {
-  Permission,
-  PermissionCreate,
-  PermissionUpdate,
-} from '@/types/permission.types.ts';
 
 import React from 'react';
 
-import { PermissionForm } from './PermissionForm.tsx';
+import { Role, RoleCreate, RoleUpdate } from '../../role.types';
+import { RoleForm } from './RoleForm.tsx';
 
-interface PermissionModalProps {
+interface RoleModalProps {
   isOpen: boolean;
   onClose: () => void;
-  permission?: Permission;
+  role?: Role;
   mode: FormMode;
-  onSubmit: (data: PermissionCreate | PermissionUpdate) => Promise<void>;
+  onSubmit: (data: RoleCreate | RoleUpdate) => Promise<void>;
 }
 
-export const PermissionModal: React.FC<PermissionModalProps> = ({
+export const RoleModal: React.FC<RoleModalProps> = ({
   isOpen,
   onClose,
-  permission,
+  role,
   mode,
   onSubmit,
 }) => {
   const titles = {
-    create: 'Create New Permission',
-    edit: 'Edit Permission',
-    view: 'View Permission',
+    create: 'Create New Role',
+    edit: 'Edit Role',
+    view: 'View Role',
   };
 
-  const handleSubmit = async (data: PermissionCreate | PermissionUpdate) => {
+  const handleSubmit = async (data: RoleCreate | RoleUpdate) => {
     await onSubmit(data);
     onClose();
   };
@@ -47,8 +43,8 @@ export const PermissionModal: React.FC<PermissionModalProps> = ({
       size="md"
     >
       <ModalBody>
-        <PermissionForm
-          permission={permission}
+        <RoleForm
+          role={role}
           mode={mode}
           onSubmit={handleSubmit}
           onCancel={onClose}

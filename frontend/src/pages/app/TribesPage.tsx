@@ -6,7 +6,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemeProvider } from '@/contexts/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile.ts';
 import { useUserTribes } from '@/hooks/useTribes.ts';
-import { useVerifyAuthorization } from '@/hooks/userVerifyAuthorization.ts';
+import { useVerifyAuthorization } from '@/platform/authorization/useVerifyAuthorization';
 import { errorStyle } from '@/styles/theme.styles.tsx';
 import { MenuAction } from '@/types/menu.types';
 import { TribeEntry } from '@/types/queries/tribes.query.types.ts';

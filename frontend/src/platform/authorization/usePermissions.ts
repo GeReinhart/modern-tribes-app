@@ -1,10 +1,11 @@
-import { permissionService } from '../services/permission.service';
+import { createEntityHooks } from '@/hooks/useEntityCrud';
+
 import {
   Permission,
   PermissionCreate,
   PermissionUpdate,
-} from '../types/permission.types';
-import { createEntityHooks } from './useEntityCrud';
+} from './permission.types';
+import { permissionService } from './permission.service';
 
 const { useList, useById, useMutations } = createEntityHooks<
   Permission,

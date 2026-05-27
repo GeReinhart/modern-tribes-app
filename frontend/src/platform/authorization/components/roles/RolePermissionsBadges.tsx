@@ -1,7 +1,8 @@
 import { ThemedBadge } from '@/components/common/layout/ThemedBadge.tsx';
-import { Permission } from '@/types/permission.types';
 
 import React from 'react';
+
+import { Permission } from '../../permission.types';
 
 interface RolePermissionsBadgesProps {
   permissions: Permission[];

@@ -1,14 +1,15 @@
+import { useApi } from '@/hooks/useApi';
+import { createEntityHooks } from '@/hooks/useEntityCrud';
+
 import { useEffect } from 'react';
 
-import { roleService } from '../services/role.service';
 import {
   Role,
   RoleCreate,
   RoleUpdate,
   RoleWithPermissions,
-} from '../types/role.types';
-import { useApi } from './useApi';
-import { createEntityHooks } from './useEntityCrud';
+} from './role.types';
+import { roleService } from './role.service';
 
 const { useList, useById, useMutations } = createEntityHooks<
   Role,

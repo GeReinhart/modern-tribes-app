@@ -1,10 +1,11 @@
+import { apiService } from '@/services/api.service';
+
 import {
   Permission,
   PermissionCreate,
   PermissionUpdate,
   PermissionWithUsers,
-} from '../types/permission.types';
-import { apiService } from './api.service';
+} from './permission.types';
 
 class PermissionService {
   private endpoint = '/crud/permissions';

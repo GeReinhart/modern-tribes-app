@@ -1,5 +1,5 @@
 import { getAPIBaseUrl } from '@/config/env';
-import { tokenManager } from '@/utils/tokenManager';
+import { tokenManager } from '@/platform/authentication/tokenManager';
 
 class ApiService {
   private getAuthHeaders(): Record<string, string> {

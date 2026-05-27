@@ -3,13 +3,14 @@ import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
 import { ThemedSelect } from '@/components/common/form/ThemedSelect.tsx';
 import { ThemedTextarea } from '@/components/common/form/ThemedTextarea.tsx';
 import { FormMode } from '@/types/common.types.ts';
+
+import React, { useState } from 'react';
+
 import {
   Permission,
   PermissionCreate,
   PermissionUpdate,
-} from '@/types/permission.types.ts';
-
-import React, { useState } from 'react';
+} from '../../permission.types';
 
 interface PermissionFormProps {
   permission?: Permission;

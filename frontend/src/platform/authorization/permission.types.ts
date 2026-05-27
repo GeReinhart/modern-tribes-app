@@ -1,4 +1,4 @@
-import { BaseEntity } from './common.types';
+import { BaseEntity } from '@/types/common.types';
 
 export interface Permission extends BaseEntity {
   name: string;

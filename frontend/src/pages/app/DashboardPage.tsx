@@ -10,7 +10,7 @@ import { TabConfigPopup } from '@/features/tab-config/TabConfigPopup';
 import { useTabConfig } from '@/features/tab-config/useTabConfig';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
 import { useUrlTab } from '@/hooks/useUrlTab';
-import { useVerifyAuthorization } from '@/hooks/userVerifyAuthorization.ts';
+import { useVerifyAuthorization } from '@/platform/authorization/useVerifyAuthorization';
 import { errorStyle } from '@/styles/theme.styles.tsx';
 import { MenuAction } from '@/types/menu.types';
 

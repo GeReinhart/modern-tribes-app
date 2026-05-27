@@ -1,6 +1,5 @@
 import { getAPIBaseUrl } from '@/config/env';
-import { apiService } from '@/services/api.service.ts';
-import { Authorization, PermissionEnum } from '@/types/authorization.types.ts';
+import { apiService } from '@/services/api.service';
 
 export const authService = {
   sendMagicLink: async (email: string): Promise<void> => {
@@ -61,25 +60,5 @@ export const authService = {
 
   updateLanguage: async (language: string): Promise<void> => {
     await apiService.patch('/auth/me/language', { language });
-  },
-
-  verifyAuthorization: async (
-    permissions: PermissionEnum[],
-    tribe_id?: string,
-    position?: string,
-  ): Promise<Authorization> => {
-    const permissionsStr = permissions.join(',');
-
-    let url = `/auth/permissions/any/${permissionsStr}`;
-
-    if (tribe_id) {
-      url += `/own/tribe/${tribe_id}`;
-
-      if (position) {
-        url += `/position/${position}`;
-      }
-    }
-
-    return apiService.get<Authorization>(url);
   },
 };

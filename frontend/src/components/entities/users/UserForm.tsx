@@ -4,7 +4,7 @@ import { ThemedMultiSelect } from '@/components/common/form/ThemedMultiSelect.ts
 import { ThemedSelect } from '@/components/common/form/ThemedSelect.tsx';
 import { useTheme } from '@/contexts/ThemeContext.tsx';
 import { usePersons } from '@/hooks/usePersons.ts';
-import { useRoles } from '@/hooks/useRoles.ts';
+import { useRoles } from '@/platform/authorization/useRoles';
 import { FormMode } from '@/types/common.types.ts';
 import { User, UserCreate, UserUpdate } from '@/types/user.types.ts';
 

@@ -1,4 +1,4 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/platform/authentication/AuthContext';
 import { appConfigService } from '@/services/app-config.service';
 import { AppConfigValues } from '@/types/app-config.types';
 

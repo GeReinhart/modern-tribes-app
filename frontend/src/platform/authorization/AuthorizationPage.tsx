@@ -7,9 +7,6 @@ import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSp
 import { ThemedTable } from '@/components/common/layout/ThemedTable';
 import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
 import { ThemedText } from '@/components/common/layout/ThemedText';
-import { PermissionModal } from '@/components/entities/permissions/PermissionModal';
-import { RoleModal } from '@/components/entities/roles/RoleModal';
-import { RolePermissionsBadges } from '@/components/entities/roles/RolePermissionsBadges';
 import {
   AdminNavigation,
   adminMainThemeId,
@@ -18,22 +15,22 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { useCurrentUserProfile } from '@/contexts/UserProfileContext';
 import { useCrudPage } from '@/hooks/useCrudPage';
-import { usePermissionMutations, usePermissions } from '@/hooks/usePermissions';
-import { useRoleMutations, useRolesWithPermissions } from '@/hooks/useRoles';
-import {
-  Permission,
-  PermissionCreate,
-  PermissionUpdate,
-} from '@/types/permission.types';
-import {
-  RoleCreate,
-  RoleUpdate,
-  RoleWithPermissions,
-} from '@/types/role.types';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router-dom';
+
+import { PermissionModal } from './components/permissions/PermissionModal';
+import { RoleModal } from './components/roles/RoleModal';
+import { RolePermissionsBadges } from './components/roles/RolePermissionsBadges';
+import {
+  Permission,
+  PermissionCreate,
+  PermissionUpdate,
+} from './permission.types';
+import { RoleCreate, RoleUpdate, RoleWithPermissions } from './role.types';
+import { usePermissionMutations, usePermissions } from './usePermissions';
+import { useRoleMutations, useRolesWithPermissions } from './useRoles';
 
 // ─── Roles Tab ────────────────────────────────────────────────────────────────
 

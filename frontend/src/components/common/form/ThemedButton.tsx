@@ -3,7 +3,7 @@ import {
   ThemedSvgIcon,
 } from '@/components/common/icons/ThemedSvgIcon.tsx';
 import { Theme } from '@/components/themes/themes.ts';
-import { useAuth } from '@/contexts/AuthContext.tsx';
+import { useAuth } from '@/platform/authentication/AuthContext.tsx';
 import { useResponsiveContext } from '@/contexts/ResponsiveContext.tsx';
 import { useTheme } from '@/contexts/ThemeContext.tsx';
 

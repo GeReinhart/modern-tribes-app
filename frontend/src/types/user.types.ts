@@ -1,4 +1,4 @@
-import { Role } from '@/types/role.types.ts';
+import { Role } from '@/platform/authorization/role.types';
 
 import { BaseEntity } from './common.types';
 

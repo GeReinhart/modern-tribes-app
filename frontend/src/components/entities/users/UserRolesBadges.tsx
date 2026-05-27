@@ -1,5 +1,5 @@
 import { ThemedBadge } from '@/components/common/layout/ThemedBadge.tsx';
-import { Role } from '@/types/role.types';
+import { Role } from '@/platform/authorization/role.types';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

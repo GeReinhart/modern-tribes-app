@@ -1,13 +1,13 @@
-import ProtectedRoute from '@/components/auth/ProtectedRoute.tsx';
+import ProtectedRoute from '@/platform/authentication/ProtectedRoute.tsx';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary.tsx';
 import { NotificationsPoller } from '@/components/notifications/NotificationsPoller';
 import { AppConfigProvider } from '@/contexts/AppConfigContext.tsx';
-import { AuthProvider } from '@/contexts/AuthContext.tsx';
+import { AuthProvider } from '@/platform/authentication/AuthContext.tsx';
 import { ResponsiveProvider } from '@/contexts/ResponsiveContext.tsx';
 import { UserProfileProvider } from '@/contexts/UserProfileContext.tsx';
 import { BookmarksProvider } from '@/features/bookmarks/BookmarksContext';
 import { AppConfigPage } from '@/pages/admin/AppConfigPage.tsx';
-import { AuthorizationPage } from '@/pages/admin/AuthorizationPage.tsx';
+import { AuthorizationPage } from '@/platform/authorization/AuthorizationPage.tsx';
 import { DocumentRevisionsPage } from '@/pages/admin/DocumentRevisionsPage.tsx';
 import { DocumentsCrudPage } from '@/pages/admin/DocumentsCrudPage.tsx';
 import { FeaturesPage } from '@/pages/admin/FeaturesPage.tsx';
@@ -35,8 +35,8 @@ import ShowProjectPage from '@/pages/app/ShowProjectPage.tsx';
 import ShowTribePage from '@/pages/app/ShowTribePage.tsx';
 import { TribesPage } from '@/pages/app/TribesPage.tsx';
 import UpdateTribePage from '@/pages/app/UpdateTribePage.tsx';
-import Login from '@/pages/auth/LoginPage.tsx';
-import Verify from '@/pages/auth/VerifyPage.tsx';
+import Login from '@/platform/authentication/LoginPage.tsx';
+import Verify from '@/platform/authentication/VerifyPage.tsx';
 import { PublicationDetailPage } from '@/pages/public/PublicationDetailPage.tsx';
 import { PublicationsPage } from '@/pages/public/PublicationsPage.tsx';
 

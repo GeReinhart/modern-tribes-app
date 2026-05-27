@@ -3,11 +3,12 @@ import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
 import { ThemedMultiSelect } from '@/components/common/form/ThemedMultiSelect.tsx';
 import { ThemedSelect } from '@/components/common/form/ThemedSelect.tsx';
 import { ThemedTextarea } from '@/components/common/form/ThemedTextarea.tsx';
-import { usePermissions } from '@/hooks/usePermissions.ts';
 import { FormMode } from '@/types/common.types.ts';
-import { Role, RoleCreate, RoleUpdate } from '@/types/role.types.ts';
 
 import React, { useState } from 'react';
+
+import { usePermissions } from '../../usePermissions';
+import { Role, RoleCreate, RoleUpdate } from '../../role.types';
 
 interface RoleFormProps {
   role?: Role;

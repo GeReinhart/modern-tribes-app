@@ -1,7 +1,7 @@
-import { authService } from '@/services/auth.service.ts';
-import { Authorization, PermissionEnum } from '@/types/authorization.types.ts';
-
 import { useCallback, useState } from 'react';
+
+import { authorizationService } from './service';
+import { Authorization, PermissionEnum } from './types';
 
 interface UseVerifyAuthorizationState {
   data: Authorization | null;
@@ -25,7 +25,7 @@ export const useVerifyAuthorization = () => {
       setState({ data: null, loading: true, error: null });
 
       try {
-        const result = await authService.verifyAuthorization(
+        const result = await authorizationService.verifyAuthorization(
           permissions,
           tribe_id,
           position,

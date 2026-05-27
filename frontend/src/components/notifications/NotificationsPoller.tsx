@@ -1,4 +1,4 @@
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/platform/authentication/AuthContext';
 import { useNotificationPoller } from '@/hooks/useNotificationPoller';
 
 import React from 'react';

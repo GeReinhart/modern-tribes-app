@@ -1,6 +1,6 @@
-import { tokenManager } from '@/utils/tokenManager';
-
 import { useEffect, useRef } from 'react';
+
+import { tokenManager } from './tokenManager';
 
 const REFRESH_BEFORE_EXPIRY_MS = 5 * 60 * 1000;
 const MIN_SCHEDULE_DELAY_MS = 30_000;

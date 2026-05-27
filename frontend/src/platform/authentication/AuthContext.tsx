@@ -1,8 +1,5 @@
 import { getAPIBaseUrl } from '@/config/env';
-import { useProactiveTokenRefresh } from '@/hooks/useProactiveTokenRefresh';
 import i18n from '@/i18n/index';
-import { authService } from '@/services/auth.service';
-import { tokenManager } from '@/utils/tokenManager';
 
 import React, {
   createContext,
@@ -12,6 +9,10 @@ import React, {
   useRef,
   useState,
 } from 'react';
+
+import { authService } from './service';
+import { tokenManager } from './tokenManager';
+import { useProactiveTokenRefresh } from './useProactiveTokenRefresh';
 
 interface User {
   id: string;

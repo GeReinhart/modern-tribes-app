@@ -1,0 +1,25 @@
+import { apiService } from '@/services/api.service';
+
+import { Authorization, PermissionEnum } from './types';
+
+export const authorizationService = {
+  verifyAuthorization: async (
+    permissions: PermissionEnum[],
+    tribe_id?: string,
+    position?: string,
+  ): Promise<Authorization> => {
+    const permissionsStr = permissions.join(',');
+
+    let url = `/auth/permissions/any/${permissionsStr}`;
+
+    if (tribe_id) {
+      url += `/own/tribe/${tribe_id}`;
+
+      if (position) {
+        url += `/position/${position}`;
+      }
+    }
+
+    return apiService.get<Authorization>(url);
+  },
+};

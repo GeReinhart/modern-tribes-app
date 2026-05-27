@@ -1,4 +1,5 @@
-import { BaseEntity } from './common.types';
+import { BaseEntity } from '@/types/common.types';
+
 import { Permission } from './permission.types';
 
 export interface Role extends BaseEntity {
