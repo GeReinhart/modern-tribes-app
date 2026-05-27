@@ -2,10 +2,6 @@ from datetime import date
 from typing import Optional
 from uuid import UUID
 
-from app.repositories.persons_repository import (  # noqa: F401 – re-exported for callers
-    fetch_persons_for_feature,
-)
-
 
 async def fetch_board(pool, feature_instance_id: str) -> dict:
     async with pool.acquire() as conn:

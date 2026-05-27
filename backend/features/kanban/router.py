@@ -8,8 +8,8 @@ from app.platform.authorization.models import PermissionEnum
 from app.core.database import get_database
 from app.platform.authorization.project_access import check_project_access_or_admin
 from app.utils.document_helpers import strip_html, extract_content_summary
-from app.repositories import kanban_repository as repo
-from app.repositories import feature_labels_repository as labels_repo
+from features.kanban import repository as repo
+from app.repositories import persons_repository, feature_labels_repository as labels_repo
 from features.kanban.models import (
     KanbanBoard, KanbanColumnResponse, KanbanCardResponse, KanbanLabel, PersonOption,
     ColumnCreate, ColumnUpdate, CardCreate, CardUpdate, MoveCard, ReorderCard,
@@ -78,7 +78,7 @@ async def get_board(feature_instance_id: str, current_user: dict = Depends(get_c
 async def list_persons(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
     pool = get_database()
     await _require_feature_access(feature_instance_id, current_user, pool, "guest")
-    rows = await repo.fetch_persons_for_feature(pool, feature_instance_id, str(current_user["id"]))
+    rows = await persons_repository.fetch_persons_for_feature(pool, feature_instance_id, str(current_user["id"]))
     return [PersonOption(id=str(r["id"]), name=r["name"]) for r in rows]
 
 

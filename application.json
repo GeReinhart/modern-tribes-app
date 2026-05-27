@@ -24,7 +24,6 @@
   "platform": {
     "functionalities": [
       {
-        "code": "aut",
         "package": "authentication",
         "description": [
           "authentication of the user",
@@ -46,7 +45,6 @@
         }
       },
       {
-        "code": "atz",
         "package": "authorization",
         "description": [
           "authorization of the user",
@@ -70,7 +68,6 @@
         }
       },
       {
-        "code": "i18",
         "package": "i18n",
         "description": [
           "translate the messages to the user on its language",
@@ -96,11 +93,10 @@
   "features": {
     "features": [
       {
-        "code": "tod",
         "package": "todo_list",
         "description": [
           "todo list",
-          "item with due date, assigned to a user and labels"
+          "task with due date, assigned to a user and labels"
         ],
         "backend": {
           "schema": [
@@ -109,8 +105,46 @@
           "path": [
             "backend/app/features/todo_list/**"
           ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/features/todo_list/**"
+          ]
+        }
+      },
+      {
+        "package": "kanban",
+        "description": [
+          "kanban board",
+          "task with due date, assigned to a user, labels and a column"
+        ],
+        "backend": {
+          "schema": [
+            "kanban_columns",
+            "kanban_cards"
+          ],
+          "path": [
+            "backend/app/features/kanban/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/features/kanban/**"
+          ]
+        }
+      },
+      {
+        "package": "tasks",
+        "description": [
+          "common elements from todo, dashboard and kanban"
+        ],
+        "frontend": {
+          "path": [
+            "frontend/src/features/tasks/**"
+          ]
         }
       }
+
     ]
   }
 }
