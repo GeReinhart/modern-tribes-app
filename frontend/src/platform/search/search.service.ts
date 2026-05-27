@@ -1,5 +1,5 @@
-import { SearchResult } from '../types/search.types';
-import { apiService } from './api.service';
+import { SearchResult } from './search.types';
+import { apiService } from '@/services/api.service';
 
 class SearchService {
   async search(q: string): Promise<SearchResult[]> {

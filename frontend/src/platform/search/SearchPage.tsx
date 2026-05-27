@@ -4,12 +4,13 @@ import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSp
 import { ThemedText } from '@/components/common/layout/ThemedText';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
-import { useSearch } from '@/hooks/useSearch';
-import { SearchResult } from '@/types/search.types';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+
+import { useSearch } from './useSearch';
+import { SearchResult } from './search.types';
 
 const SearchResultCard: React.FC<{ result: SearchResult }> = ({ result }) => {
   const { theme } = useTheme();
@@ -185,7 +186,7 @@ const SearchPageContent: React.FC = () => {
           }}
         >
           {results.map((result) => (
-            <SearchResultCard key={result.document_id} result={result} />
+            <SearchResultCard key={result.entity_id} result={result} />
           ))}
         </div>
       )}

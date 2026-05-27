@@ -12,6 +12,7 @@ from app.models.app.project_with_document import (
     ProjectWithDocumentUpdate,
 )
 from app.repositories import tribe_repository as tribe_repo
+from app.platform.search import index_repository as search_index_repo
 from app.utils.attachments_helpers import (
     create_document_with_attachments,
     get_document_with_attachments,
@@ -65,6 +66,9 @@ async def create_project_with_document(
             project_row["id"],
         )
 
+    await search_index_repo.index_project_document(
+        pool, str(project_row["id"]), str(document["id"]), str(current_user["id"])
+    )
     return await _build_response(row_to_dict(project_row), pool)
 
 
@@ -105,10 +109,16 @@ async def update_project_with_document(
                 uid,
                 UUID(project_id),
             )
+        await search_index_repo.index_project_document(
+            pool, project_id, str(document["id"]), str(current_user["id"])
+        )
     elif document_id:
         if data.document_content_html is not None:
             await update_document_content_with_revision(
                 pool, str(document_id), data.document_content_html, current_user["id"]
+            )
+            await search_index_repo.index_project_document(
+                pool, project_id, str(document_id), str(current_user["id"])
             )
         if data.document_attachments is not None:
             await update_document_attachments(

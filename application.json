@@ -86,8 +86,27 @@
             "frontend/src/platform/i18n/**"
           ]
         }
+      },
+      {
+        "package": "i18n",
+        "description": [
+          "full text search",
+          "can target any element in the database"
+        ],
+        "backend": {
+          "schema": [
+            "search_index"
+          ],
+          "path": [
+            "backend/app/platform/search/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/platform/search/**"
+          ]
+        }
       }
-
     ]
   },
   "features": {

@@ -18,6 +18,7 @@ from app.utils.attachments_helpers import (
     get_document_with_attachments,
     update_document_attachments,
 )
+from app.platform.search import index_repository as search_index_repo
 from app.utils.db_helpers import generate_url_param_id, row_to_dict
 from app.utils.document_helpers import update_document_content_with_revision
 
@@ -140,7 +141,9 @@ async def create_project_document(
             uid,
         )
 
-    return await _build_response(row_to_dict(pd_row), pool)
+    pd = row_to_dict(pd_row)
+    await search_index_repo.index_projects_document(pool, str(pd["id"]), str(uid))
+    return await _build_response(pd, pool)
 
 
 async def get_project_document(project_id: str, project_document_id: str, pool) -> ProjectDocumentResponse:
@@ -257,6 +260,9 @@ async def update_project_document(
 
     if data.content_html is not None:
         await update_document_content_with_revision(pool, document_id, data.content_html, current_user["id"])
+        await search_index_repo.index_projects_document(
+            pool, project_document_id, str(current_user["id"])
+        )
 
     if data.attachments is not None:
         await update_document_attachments(pool, document_id, data.attachments, current_user["id"])
@@ -274,7 +280,17 @@ async def archive_project_document(
     uid = UUID(str(current_user["id"]))
 
     async with pool.acquire() as conn:
-        result = await conn.execute(
+        pd_row = await conn.fetchrow(
+            "SELECT document_id FROM projects_documents WHERE id = $1 AND project_id = $2",
+            UUID(project_document_id),
+            UUID(project_id),
+        )
+
+    if not pd_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
+
+    async with pool.acquire() as conn:
+        await conn.execute(
             """UPDATE projects_documents SET status = 'archived', updated_at = $1, updated_by = $2
                WHERE id = $3 AND project_id = $4""",
             now,
@@ -283,8 +299,9 @@ async def archive_project_document(
             UUID(project_id),
         )
 
-    if result == "UPDATE 0":
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
+    await search_index_repo.archive_entity(
+        pool, "document", str(pd_row["document_id"]), str(current_user["id"])
+    )
 
 
 async def get_project_document_labels(project_id: str, pool) -> List[ProjectDocumentLabel]:

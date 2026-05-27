@@ -1,5 +1,6 @@
 export interface SearchResult {
-  document_id: string;
+  entity_id: string;
+  entity_type: string;
   headline: string;
   content_summary: string | null;
   tribe_id: string | null;

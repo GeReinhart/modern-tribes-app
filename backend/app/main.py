@@ -44,7 +44,7 @@ from app.routers.query import mails as query_mails
 from app.routers.query import monitoring as query_monitoring
 from app.routers.query import my_tasks as query_my_tasks
 from app.routers.query import projects as query_projects
-from app.routers.query import search as query_search
+from app.platform.search import router as search_platform_router
 from app.routers.query import tribes as query_tribes
 from app.routers.query import users as query_users
 from app.routers.uploads import uploads
@@ -154,7 +154,7 @@ app.include_router(query_users.router, prefix="/api/query")
 app.include_router(query_monitoring.router, prefix="/api/query")
 app.include_router(query_mails.router, prefix="/api/query")
 app.include_router(query_projects.router, prefix="/api/query")
-app.include_router(query_search.router, prefix="/api/query")
+app.include_router(search_platform_router.router, prefix="/api/query")
 app.include_router(query_app_config.router, prefix="/api/query")
 app.include_router(query_features.router, prefix="/api/query")
 app.include_router(query_my_tasks.router, prefix="/api/query")

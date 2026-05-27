@@ -8,6 +8,7 @@ from app.models.app.tribes_with_positions import (
     TribeWithPositionsUpdate,
 )
 from app.repositories import tribe_repository as tribe_repo
+from app.platform.search import index_repository as search_index_repo
 from app.utils.attachments_helpers import (
     create_document_with_attachments,
     get_document_with_attachments,
@@ -89,6 +90,7 @@ async def _persist_tribe_create(data, document, pool, user_id: str) -> TribeWith
     try:
         positions = await tribe_repo.create_positions(pool, str(tribe["id"]), data.positions, user_id)
         persons = await tribe_repo.get_persons_with_positions(pool, positions)
+        await search_index_repo.index_tribe_document(pool, str(tribe["id"]), str(document["id"]), user_id)
         return _build_response(tribe, document, persons, [])
     except Exception as e:
         await tribe_repo.delete_tribe(pool, str(tribe["id"]))
@@ -129,11 +131,13 @@ async def _apply_tribe_updates(
             pool, data.document_content_html or "", data.document_attachments or [], user_id
         )
         await tribe_repo.update_tribe_document_id(pool, tribe_id, str(document["id"]), user_id)
+        await search_index_repo.index_tribe_document(pool, tribe_id, str(document["id"]), user_id)
     elif document_id:
         if data.document_content_html is not None:
             await tribe_repo.update_tribe_document_content(
                 pool, str(document_id), data.document_content_html, user_id
             )
+            await search_index_repo.index_tribe_document(pool, tribe_id, str(document_id), user_id)
         if data.document_attachments is not None:
             await update_document_attachments(pool, str(document_id), data.document_attachments, user_id)
 

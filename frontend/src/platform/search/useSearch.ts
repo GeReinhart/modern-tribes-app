@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { searchService } from '../services/search.service';
-import { SearchResult } from '../types/search.types';
+import { searchService } from './search.service';
+import { SearchResult } from './search.types';
 
 const DEBOUNCE_MS = 300;
 const MIN_QUERY_LENGTH = 2;

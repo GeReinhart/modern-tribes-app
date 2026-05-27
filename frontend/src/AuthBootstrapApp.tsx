@@ -30,7 +30,7 @@ import ProfilePage from '@/pages/app/ProfilePage.tsx';
 import { ProjectDocumentFormPage } from '@/pages/app/ProjectDocumentFormPage.tsx';
 import { ProjectDocumentViewPage } from '@/pages/app/ProjectDocumentViewPage.tsx';
 import { ProjectsPage } from '@/pages/app/ProjectsPage.tsx';
-import { SearchPage } from '@/pages/app/SearchPage.tsx';
+import { SearchPage } from '@/platform/search/SearchPage';
 import ShowProjectPage from '@/pages/app/ShowProjectPage.tsx';
 import ShowTribePage from '@/pages/app/ShowTribePage.tsx';
 import { TribesPage } from '@/pages/app/TribesPage.tsx';

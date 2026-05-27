@@ -11,6 +11,7 @@ from app.models.app.document_page import (
 )
 from app.models.uploads.files import AttachmentFile
 from app.repositories import document_page_repository as repo
+from app.platform.search import index_repository as search_index_repo
 
 
 async def _verify_document_belongs_to_project(pool, project_id: str, project_document_id: str) -> None:
@@ -74,6 +75,7 @@ async def create_page(
         order_index=data.order_index,
         user_id=str(current_user["id"]),
     )
+    await search_index_repo.index_page(pool, str(row["id"]), str(current_user["id"]))
     return _build_response(row)
 
 
@@ -127,6 +129,8 @@ async def update_page(
     )
     if not row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Page not found")
+    if data.content_html is not None:
+        await search_index_repo.index_page(pool, page_id, str(current_user["id"]))
     return _build_response(row)
 
 
@@ -158,3 +162,4 @@ async def archive_page(
     archived = await repo.archive_page(pool, page_id, str(current_user["id"]))
     if not archived:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Page not found")
+    await search_index_repo.archive_entity(pool, "page", page_id, str(current_user["id"]))
