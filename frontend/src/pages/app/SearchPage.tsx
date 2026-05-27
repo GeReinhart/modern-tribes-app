@@ -24,23 +24,15 @@ const SearchResultCard: React.FC<{ result: SearchResult }> = ({ result }) => {
           ? `/app/tribes/${result.tribe_id}`
           : null;
 
-  const contextLabel = result.project_id
-    ? result.project_name
-    : result.tribe_name;
-
-  const contextType = result.project_document_id
-    ? 'document'
-    : result.project_id
-      ? 'project'
-      : 'tribe';
-
   return (
     <ThemedCard variant="primary">
       <div
+        onClick={targetPath ? () => navigate(targetPath) : undefined}
         style={{
           display: 'flex',
           flexDirection: 'column',
           gap: 'var(--space-sm)',
+          cursor: targetPath ? 'pointer' : 'default',
         }}
       >
         <div
@@ -79,6 +71,21 @@ const SearchResultCard: React.FC<{ result: SearchResult }> = ({ result }) => {
               {result.project_name}
             </span>
           )}
+          {targetPath && (
+            <span
+              style={{
+                marginLeft: 'auto',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <ThemedSvgIcon
+                name="arrow-right"
+                color={theme.colors.primary}
+                size={14}
+              />
+            </span>
+          )}
         </div>
 
         {result.content_summary && (
@@ -95,34 +102,6 @@ const SearchResultCard: React.FC<{ result: SearchResult }> = ({ result }) => {
           }}
           dangerouslySetInnerHTML={{ __html: result.headline }}
         />
-
-        {targetPath && (
-          <button
-            onClick={() => navigate(targetPath)}
-            style={{
-              alignSelf: 'flex-start',
-              marginTop: 'var(--space-xs)',
-              padding: '4px 12px',
-              borderRadius: '8px',
-              border: `1px solid ${theme.colors.primary}`,
-              backgroundColor: 'transparent',
-              color: theme.colors.primary,
-              cursor: 'pointer',
-              fontSize: 'var(--font-sm)',
-              fontWeight: 500,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            {contextType !== 'tribe' ? contextLabel : result.tribe_name}
-            <ThemedSvgIcon
-              name="arrow-right"
-              color={theme.colors.primary}
-              size={14}
-            />
-          </button>
-        )}
       </div>
     </ThemedCard>
   );
