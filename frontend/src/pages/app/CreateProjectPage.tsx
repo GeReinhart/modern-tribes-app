@@ -1,29 +1,83 @@
 import FileUploader from '@/components/common/editor/FileUploader';
 import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
+import { ThemedInput } from '@/components/common/form/ThemedInput';
 import { ThemedLoadingOverlay } from '@/components/common/layout/ThemedLoadingOverlay';
 import { ThemedSection } from '@/components/common/layout/ThemedSection';
 import { ThemedText } from '@/components/common/layout/ThemedText';
+import {
+  CreateTabsConfigSection,
+  DraftTabConfig,
+} from '@/components/entities/projects/CreateTabsConfigSection';
+import {
+  FeatureDraft,
+  FeatureInstancesSection,
+} from '@/components/entities/projects/FeatureInstancesSection';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { tabConfigService } from '@/features/tab-config/tabConfig.service';
 import { useProjectWithDocumentMutations } from '@/hooks/useProjects';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
+import { projectFeaturesService } from '@/services/project-features.service';
 import {
   errorStyle,
   formActionsStyle,
   formContainerStyle,
-  getInputStyle,
 } from '@/styles/theme.styles';
 import { AttachmentFile } from '@/types/document.types';
 import { MenuAction } from '@/types/menu.types';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
+const BUILT_IN_TABS = (t: (k: string) => string): DraftTabConfig[] => [
+  {
+    key: 'description',
+    label: t('tribes.tabDescription'),
+    visible: true,
+    order: 0,
+    is_default: true,
+  },
+  {
+    key: 'documents',
+    label: t('projectDocuments.tab'),
+    visible: true,
+    order: 1,
+    is_default: false,
+  },
+];
+
+function buildDraftTabs(
+  builtIn: DraftTabConfig[],
+  features: FeatureDraft[],
+  t: (k: string) => string,
+): DraftTabConfig[] {
+  const featureTabs: DraftTabConfig[] = features.map((f, i) => ({
+    key: `feature_${f.localId}`,
+    label: f.name || `${t('features.featureType')} ${i + 1}`,
+    visible: true,
+    order: builtIn.length + i,
+    is_default: false,
+  }));
+  return [...builtIn, ...featureTabs];
+}
+
+function mergeTabsOnFeaturesChange(
+  prev: DraftTabConfig[],
+  newTabs: DraftTabConfig[],
+): DraftTabConfig[] {
+  const prevMap = new Map(prev.map((t) => [t.key, t]));
+  return newTabs.map((t) => {
+    const existing = prevMap.get(t.key);
+    return existing
+      ? { ...t, visible: existing.visible, is_default: existing.is_default }
+      : t;
+  });
+}
+
 const CreateProjectPageContent: React.FC = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
   const navigate = useNavigate();
   const { tribeId } = useParams<{ tribeId: string }>();
 
@@ -34,10 +88,17 @@ const CreateProjectPageContent: React.FC = () => {
   const [name, setName] = useState('');
   const [documentContent, setDocumentContent] = useState('');
   const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
+  const [featureDrafts, setFeatureDrafts] = useState<FeatureDraft[]>([]);
+  const [draftTabs, setDraftTabs] = useState<DraftTabConfig[]>(() =>
+    BUILT_IN_TABS(t),
+  );
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const inputStyle = getInputStyle(theme);
+  useEffect(() => {
+    const newTabs = buildDraftTabs(BUILT_IN_TABS(t), featureDrafts, t);
+    setDraftTabs((prev) => mergeTabsOnFeaturesChange(prev, newTabs));
+  }, [featureDrafts, t]);
 
   const breadcrumbs = [
     { label: t('common.home'), path: '/app' },
@@ -51,11 +112,7 @@ const CreateProjectPageContent: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) {
-      setError(t('projects.name').replace(' *', '') + ' is required');
-      return;
-    }
-    if (!tribeId) return;
+    if (!name.trim() || !tribeId) return;
     setSubmitting(true);
     setError(null);
     try {
@@ -66,9 +123,43 @@ const CreateProjectPageContent: React.FC = () => {
         document_attachments: attachments,
       });
       if (!result) throw new Error('Failed to create project');
+
+      const createdFeatures = await Promise.all(
+        featureDrafts
+          .filter((f) => f.feature_type && f.name.trim())
+          .map((f, i) =>
+            projectFeaturesService.create(result.url_param_id, {
+              feature_type: f.feature_type,
+              name: f.name.trim(),
+              position: i,
+            }),
+          ),
+      );
+
+      const tabConfigPayload = draftTabs.map((tab) => {
+        const featureIndex = featureDrafts.findIndex(
+          (f) => `feature_${f.localId}` === tab.key,
+        );
+        const resolvedKey =
+          featureIndex >= 0 && createdFeatures[featureIndex]
+            ? createdFeatures[featureIndex].id
+            : tab.key;
+        return {
+          key: resolvedKey,
+          label: tab.label,
+          visible: tab.visible,
+          order: tab.order,
+          is_default: tab.is_default,
+        };
+      });
+
+      await tabConfigService.save(`project:${result.id}`, tabConfigPayload);
+
       navigate(`/app/tribes/${tribeId}/projects/${result.url_param_id}`);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t('validation.errorOccurred'));
+      setError(
+        err instanceof Error ? err.message : t('validation.errorOccurred'),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -98,27 +189,26 @@ const CreateProjectPageContent: React.FC = () => {
       <form onSubmit={handleSubmit}>
         <div style={formContainerStyle}>
           <ThemedSection themeId="main_1">
-            <label>
-              <ThemedText size="medium" as="h3">
-                {t('projects.name')}
-              </ThemedText>
-              <input
-                type="text"
-                style={inputStyle}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder={t('projects.name').replace(' *', '')}
-                disabled={submitting || loading}
-              />
-            </label>
+            <ThemedText size="medium" as="h3" style={{ marginBottom: '8px' }}>
+              {t('projects.name')}
+            </ThemedText>
+            <ThemedInput
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={t('projects.name').replace(' *', '')}
+              disabled={submitting || loading}
+              required
+            />
 
             <ThemedText size="medium" as="h3" style={{ marginTop: '16px' }}>
-              {t('projects.description')}
+              {t('projects.descriptionOptional')}
             </ThemedText>
             <div className="border border-gray-300 rounded-lg overflow-hidden">
               <JoditEditorComponent
                 content={documentContent}
                 onChange={setDocumentContent}
+                compact
+                minHeight={200}
               />
             </div>
             <div className="mb-6">
@@ -127,6 +217,14 @@ const CreateProjectPageContent: React.FC = () => {
                 onAttachmentsChange={setAttachments}
               />
             </div>
+
+            <FeatureInstancesSection
+              drafts={featureDrafts}
+              onChange={setFeatureDrafts}
+              disabled={submitting || loading}
+            />
+
+            <CreateTabsConfigSection tabs={draftTabs} onChange={setDraftTabs} />
           </ThemedSection>
 
           <div style={formActionsStyle}>

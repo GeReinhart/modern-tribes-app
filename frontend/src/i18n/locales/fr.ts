@@ -56,6 +56,9 @@ const fr: Record<string, string> = {
   'projects.noProjects': 'Aucun projet lié à cette tribu pour le moment.',
   'projects.tabTribes': 'Tribus',
   'projects.noTribesLinked': 'Aucune tribu liée à ce projet.',
+  'projects.descriptionOptional': 'Description',
+  'projects.features': 'Fonctionnalités',
+  'projects.tabsConfig': 'Onglets',
 
   'tribes.title': 'Tribus',
   'tribes.subtitle': 'Les tribus auxquelles je participe.',
@@ -340,6 +343,7 @@ const fr: Record<string, string> = {
   'search.empty': 'Aucun résultat trouvé pour votre recherche.',
 
   'features.addFeature': 'Ajouter une fonctionnalité',
+  'features.remove': 'Supprimer',
   'features.featureType': 'Type de fonctionnalité',
   'features.selectType': 'Sélectionner un type...',
   'features.featureName': 'Nom',

@@ -54,6 +54,9 @@ const en: Record<string, string> = {
   'projects.noProjects': 'No projects linked to this tribe yet.',
   'projects.tabTribes': 'Tribes',
   'projects.noTribesLinked': 'No tribes linked to this project.',
+  'projects.descriptionOptional': 'Description',
+  'projects.features': 'Features',
+  'projects.tabsConfig': 'Tabs',
 
   'tribes.title': 'Tribes',
   'tribes.subtitle': "The tribes I'm involved with.",
@@ -328,6 +331,7 @@ const en: Record<string, string> = {
   'search.empty': 'No results found for your query.',
 
   'features.addFeature': 'Add Feature',
+  'features.remove': 'Remove',
   'features.featureType': 'Feature Type',
   'features.selectType': 'Select a type...',
   'features.featureName': 'Name',
