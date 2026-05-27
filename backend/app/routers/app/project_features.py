@@ -10,11 +10,11 @@ from app.models.app.project_features import (
     ProjectFeatureInstanceResponse,
     ProjectFeatureInstanceUpdate,
 )
-from app.models.auth.auth import PermissionEnum
-from app.routers.auth.authentification import get_current_user
-from app.routers.auth.authorization import require_any_permission_decorator
+from app.platform.authorization.models import PermissionEnum
+from app.platform.authentication.router import get_current_user
+from app.platform.authorization.router import require_any_permission_decorator
 from app.utils.db_helpers import resolve_url_param_id
-from app.utils.project_access import check_project_access_or_admin
+from app.platform.authorization.project_access import check_project_access_or_admin
 
 router = APIRouter(prefix="/project-features", tags=["app_project_features"])
 

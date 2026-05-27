@@ -8,8 +8,9 @@ from pydantic import BaseModel
 from app.core.config import settings
 from app.core.database import get_database
 from app.core.email import magic_link_html
-from app.core.security import create_magic_token
-from app.models.auth.auth import (
+from app.platform.authentication import repository as auth_repo
+from app.platform.authentication import service as auth_service
+from app.platform.authentication.models import (
     MagicLinkRequest,
     MagicLinkResponse,
     RefreshRequest,
@@ -18,10 +19,9 @@ from app.models.auth.auth import (
     TokenResponse,
     UserResponse,
 )
-from app.repositories import auth_repository as auth_repo
-from app.services import auth_service
+from app.platform.authentication.security import create_magic_token
+from app.platform.authorization.permissions import get_user_permissions
 from app.utils.db_helpers import create_document
-from app.utils.permissions_helper import get_user_permissions
 
 router = APIRouter()
 security = HTTPBearer()
@@ -157,7 +157,7 @@ async def refresh_token(body: RefreshRequest):
 
 @router.post("/auth/logout")
 async def logout(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    from app.core.security import verify_access_token
+    from app.platform.authentication.security import verify_access_token
 
     payload = verify_access_token(credentials.credentials)
     if payload:

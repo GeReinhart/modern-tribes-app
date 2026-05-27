@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 
 from app.core.database import get_database
 from app.models.crud.app_config import AppConfigPublic
-from app.routers.auth.authentification import get_current_user
+from app.platform.authentication.router import get_current_user
 from app.utils.db_helpers import get_all_documents
 
 router = APIRouter(prefix="/app-config", tags=["query_app_config"])

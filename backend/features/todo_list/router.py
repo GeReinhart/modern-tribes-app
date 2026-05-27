@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from uuid import UUID
 
-from app.routers.auth.authentification import get_current_user
-from app.routers.auth.authorization import require_any_permission_decorator
-from app.models.auth.auth import PermissionEnum
+from app.platform.authentication.router import get_current_user
+from app.platform.authorization.router import require_any_permission_decorator
+from app.platform.authorization.models import PermissionEnum
 from app.core.database import get_database
-from app.utils.project_access import check_project_access_or_admin
+from app.platform.authorization.project_access import check_project_access_or_admin
 from app.utils.document_helpers import strip_html, extract_content_summary
 from app.repositories import todo_repository, persons_repository, feature_labels_repository as labels_repo
 from features.todo_list.models import (

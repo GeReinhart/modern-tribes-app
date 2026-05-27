@@ -7,12 +7,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.config import settings
 from app.core.database import get_database
 from app.core.email import magic_link_html
-from app.core.security import create_magic_token
-from app.models.auth.auth import PermissionEnum
+from app.platform.authentication.security import create_magic_token
+from app.platform.authorization.models import PermissionEnum
 from app.models.crud.users import User, UserCreate, UserUpdate, UserWithRoles
 from app.repositories import user_repository as user_repo
-from app.routers.auth.authentification import get_current_user
-from app.routers.auth.authorization import (
+from app.platform.authentication.router import get_current_user
+from app.platform.authorization.router import (
     require_any_permission_decorator,
     require_permission_decorator,
 )
@@ -25,7 +25,7 @@ from app.utils.db_helpers import (
     resolve_url_param_id,
     update_document,
 )
-from app.utils.ownership import check_own_user_or_admin
+from app.platform.authorization.ownership import check_own_user_or_admin
 from app.utils.validators import EntityValidator
 
 router = APIRouter(prefix="/users", tags=["crud_users"])

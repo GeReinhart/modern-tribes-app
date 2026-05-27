@@ -1,15 +1,7 @@
 from datetime import datetime
-from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel, EmailStr, Field
-
-
-class PermissionEnum(str, Enum):
-    ADMIN = "admin"
-    CAN_CREATE_OWN_TRIBES = "can_create_own_tribes"
-    CAN_ACCESS_OWN_TRIBES = "can_access_attached_tribes"
-    CAN_MANAGE_OWN_PROFILE = "can_manage_own_profile"
 
 
 class UserSession(BaseModel):
@@ -62,8 +54,3 @@ class SessionResponse(BaseModel):
     created_at: datetime
     last_activity: datetime
     expires_at: datetime
-
-
-class Authorization(BaseModel):
-    authorized: bool
-    message: str

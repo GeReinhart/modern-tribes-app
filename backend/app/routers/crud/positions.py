@@ -4,12 +4,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status
 
 from app.core.database import get_database
-from app.models.auth.auth import PermissionEnum
+from app.platform.authorization.models import PermissionEnum
 from app.models.crud.positions import Position, PositionCreate, PositionUpdate
-from app.routers.auth.authorization import (
-    get_current_user,
-    require_permission_decorator,
-)
+from app.platform.authentication.router import get_current_user
+from app.platform.authorization.router import require_permission_decorator
 from app.utils.db_helpers import (
     check_document_exists,
     create_document,

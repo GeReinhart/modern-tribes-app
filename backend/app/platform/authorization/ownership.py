@@ -3,9 +3,9 @@ from uuid import UUID
 
 from fastapi import HTTPException, status
 
-from app.models.auth.auth import PermissionEnum
+from app.platform.authorization.models import PermissionEnum
+from app.platform.authorization.permissions import get_user_permissions
 from app.utils.db_helpers import get_document_by_id, resolve_url_param_id
-from app.utils.permissions_helper import get_user_permissions
 
 
 async def check_own_user_or_admin(user_id: str, current_user: dict, pool) -> None:
@@ -55,13 +55,11 @@ async def check_own_tribe_position_or_admin(
     person_id = user_doc.get("person_id")
 
     async with pool.acquire() as conn:
-        # Direct membership via the user's own person
         direct_rows = await conn.fetch(
             "SELECT position FROM positions WHERE tribe_id = $1 AND person_id = $2",
             UUID(tribe_id),
             UUID(person_id),
         )
-        # Membership via the represents relation
         represents_rows = await conn.fetch(
             """
             SELECT pos.position FROM positions pos

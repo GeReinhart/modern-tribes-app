@@ -6,12 +6,12 @@ from app.models.app.tribes_with_positions import (
     TribeWithPositionsResponse,
     TribeWithPositionsUpdate,
 )
-from app.models.auth.auth import PermissionEnum
-from app.routers.auth.authentification import get_current_user
-from app.routers.auth.authorization import require_any_permission_decorator
+from app.platform.authorization.models import PermissionEnum
+from app.platform.authentication.router import get_current_user
+from app.platform.authorization.router import require_any_permission_decorator
 from app.services import tribe_service
 from app.utils.db_helpers import resolve_url_param_id
-from app.utils.ownership import check_own_tribe_position_or_admin
+from app.platform.authorization.ownership import check_own_tribe_position_or_admin
 
 router = APIRouter(prefix="/tribes", tags=["app_tribes"])
 

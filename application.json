@@ -44,6 +44,30 @@
             "frontend/src/authentication/**"
           ]
         }
+      },
+      {
+        "code": "atz",
+        "package": "authorization",
+        "description": [
+          "authorization of the user",
+          "access control base on permissions",
+          "user -> roles -> permissions"
+        ],
+        "backend": {
+          "tables": [
+            "users_roles",
+            "roles",
+            "roles_permissions"
+          ],
+          "path": [
+            "backend/app/authorization/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/authorization/**"
+          ]
+        }
       }
     ]
   }

@@ -24,7 +24,6 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 
 
 def create_magic_token(email: str) -> str:
-    """Create a short-lived magic link token"""
     data = {
         "sub": email,
         "type": "magic_link",
@@ -34,7 +33,6 @@ def create_magic_token(email: str) -> str:
 
 
 def verify_magic_token(token: str) -> Optional[str]:
-    """Verify magic link token and return email"""
     try:
         print(f"Magic token received to be verified: {token[:20]}...")
 
@@ -51,9 +49,7 @@ def verify_magic_token(token: str) -> Optional[str]:
 
 
 def verify_access_token(token: str) -> Optional[Dict]:
-    """Verify access token and return payload"""
     try:
-
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         return payload
     except JWTError as e:

@@ -4,10 +4,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status
 
 from app.core.database import get_database
-from app.models.auth.auth import PermissionEnum
+from app.platform.authorization.models import PermissionEnum
 from app.models.crud.persons import Person, PersonCreate, PersonUpdate
-from app.routers.auth.authentification import get_current_user
-from app.routers.auth.authorization import (
+from app.platform.authentication.router import get_current_user
+from app.platform.authorization.router import (
     require_any_permission_decorator,
     require_permission_decorator,
 )
@@ -19,7 +19,7 @@ from app.utils.db_helpers import (
     get_document_by_id,
     update_document,
 )
-from app.utils.ownership import check_own_person_or_admin
+from app.platform.authorization.ownership import check_own_person_or_admin
 from app.utils.validators import EntityValidator
 
 router = APIRouter(prefix="/persons", tags=["crud_persons"])

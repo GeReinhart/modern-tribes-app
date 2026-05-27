@@ -8,9 +8,9 @@ from app.models.app.user_bookmarks import (
     UserBookmarksResponse,
     UserBookmarkUpdate,
 )
-from app.models.auth.auth import PermissionEnum
-from app.routers.auth.authentification import get_current_user
-from app.routers.auth.authorization import require_any_permission_decorator
+from app.platform.authorization.models import PermissionEnum
+from app.platform.authentication.router import get_current_user
+from app.platform.authorization.router import require_any_permission_decorator
 from app.services import user_bookmarks_service
 
 router = APIRouter(prefix="/user-bookmarks", tags=["app_user_bookmarks"])

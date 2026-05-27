@@ -4,20 +4,16 @@ from typing import Any, Callable
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.database import get_database
-from app.models.auth.auth import Authorization, PermissionEnum
-from app.routers.auth.authentification import get_current_user
-from app.utils.ownership import check_own_tribe_position_or_admin
-from app.utils.permissions_helper import get_user_permissions
+from app.platform.authentication.router import get_current_user
+from app.platform.authorization.models import Authorization, PermissionEnum
+from app.platform.authorization.ownership import check_own_tribe_position_or_admin
+from app.platform.authorization.permissions import get_user_permissions
 
 router = APIRouter()
 
 
 # ============ HELPER FUNCTION ============
 async def _get_user_permissions_or_raise(current_user: dict) -> list[str]:
-    """
-    Helper function to fetch user permissions
-    Raises HTTPException if user is not authenticated
-    """
     if not current_user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
 
@@ -43,7 +39,6 @@ async def current_user_has_at_least_one_permission(
 
 
 async def _check_permissions(permissions: str, current_user: dict) -> tuple[bool, str]:
-    """Check if user has at least one of the required permissions"""
     user_permissions = await _get_user_permissions_or_raise(current_user)
     required_permissions = [p.strip() for p in permissions.split(",")] + [PermissionEnum.ADMIN.value]
 
@@ -58,7 +53,6 @@ async def _check_permissions(permissions: str, current_user: dict) -> tuple[bool
 async def _authorize_tribe_access(
     tribe_id: str, current_user: dict, position: str | None = None
 ) -> Authorization:
-    """Check tribe ownership/position access"""
     try:
         pool = get_database()
         await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position=position)
@@ -96,8 +90,6 @@ async def check_permission_and_tribe_and_position(
 
 # ============ DECORATORS ============
 def require_permission_decorator(permission: str):
-    """Decorator to check if user has a specific permission"""
-
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args: Any, current_user: dict = None, **kwargs: Any) -> Any:
@@ -116,8 +108,6 @@ def require_permission_decorator(permission: str):
 
 
 def require_any_permission_decorator(*permissions: str):
-    """Decorator to check if user has ANY of the specified permissions"""
-
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args: Any, current_user: dict = None, **kwargs: Any) -> Any:
@@ -138,8 +128,6 @@ def require_any_permission_decorator(*permissions: str):
 
 
 def require_all_permissions_decorator(*permissions: str):
-    """Decorator to check if user has ALL of the specified permissions"""
-
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args: Any, current_user: dict = None, **kwargs: Any) -> Any:

@@ -5,12 +5,12 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from app.core.database import get_database
-from app.models.auth.auth import PermissionEnum
+from app.platform.authorization.models import PermissionEnum
 from app.models.crud.positions import PositionEnum
-from app.routers.auth.authentification import get_current_user
-from app.routers.auth.authorization import require_any_permission_decorator
+from app.platform.authentication.router import get_current_user
+from app.platform.authorization.router import require_any_permission_decorator
 from app.utils.db_helpers import resolve_url_param_id
-from app.utils.ownership import check_own_user_or_admin
+from app.platform.authorization.ownership import check_own_user_or_admin
 
 router = APIRouter(prefix="/tribes", tags=["query_tribes"])
 

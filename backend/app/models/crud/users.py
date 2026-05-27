@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr
 
-from app.models.auth.auth import UserSession
+from app.platform.authentication.models import UserSession
 from app.models.crud.roles import Role
 
 

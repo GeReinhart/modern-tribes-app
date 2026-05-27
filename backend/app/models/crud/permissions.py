@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from app.models.auth.auth import PermissionEnum
+from app.platform.authorization.models import PermissionEnum
 
 
 # Permission Models

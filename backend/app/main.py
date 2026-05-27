@@ -16,7 +16,8 @@ from app.routers.app import notifications as app_notifications
 from app.routers.app import project_documents, project_features, project_with_document
 from app.routers.app import publications as app_publications
 from app.routers.app import tribes_with_positions, user_bookmarks, user_tab_configs
-from app.routers.auth import authentification, authorization
+from app.platform.authentication.router import router as authentification_router
+from app.platform.authorization.router import router as authorization_router
 from app.routers.crud import (
     app_config,
     document_entities,
@@ -133,8 +134,8 @@ app.include_router(document_entities.router, prefix="/api/crud")
 app.include_router(app_config.router, prefix="/api/crud")
 app.include_router(uploads.router)
 
-app.include_router(authentification.router, prefix="/api", tags=["auth"])
-app.include_router(authorization.router, prefix="/api", tags=["auth"])
+app.include_router(authentification_router, prefix="/api", tags=["auth"])
+app.include_router(authorization_router, prefix="/api", tags=["auth"])
 
 app.include_router(tribes_with_positions.router, prefix="/api")
 app.include_router(project_with_document.router, prefix="/api")

@@ -3,15 +3,15 @@ from datetime import datetime, timedelta, timezone
 from fastapi import HTTPException, status
 
 from app.core.config import settings
-from app.core.security import (
+from app.platform.authentication import repository as auth_repo
+from app.platform.authentication.models import RefreshResponse, TokenResponse, UserResponse
+from app.platform.authentication.security import (
     create_access_token,
     create_refresh_token,
     generate_session_id,
     hash_refresh_token,
     verify_magic_token,
 )
-from app.models.auth.auth import RefreshResponse, TokenResponse, UserResponse
-from app.repositories import auth_repository as auth_repo
 
 
 async def create_session_for_magic_link(
@@ -92,7 +92,7 @@ async def refresh_access_token(raw_refresh_token: str, pool) -> RefreshResponse:
 
 
 async def validate_session(token: str, pool) -> dict:
-    from app.core.security import verify_access_token
+    from app.platform.authentication.security import verify_access_token
 
     payload = verify_access_token(token)
     if not payload:

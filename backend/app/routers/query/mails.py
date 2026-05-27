@@ -3,10 +3,10 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, Query
 
 from app.core.database import get_database
-from app.models.auth.auth import PermissionEnum
+from app.platform.authorization.models import PermissionEnum
 from app.models.crud.mails import MailWithRecipients
-from app.routers.auth.authentification import get_current_user
-from app.routers.auth.authorization import require_permission_decorator
+from app.platform.authentication.router import get_current_user
+from app.platform.authorization.router import require_permission_decorator
 
 router = APIRouter(prefix="/mails", tags=["query_mails"])
 
