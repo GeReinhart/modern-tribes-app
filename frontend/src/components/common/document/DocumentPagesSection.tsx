@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { BookOpen, ChevronDown, ChevronUp, Pencil, Plus } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronUp, Pencil } from 'lucide-react';
 
 interface DocumentPagesSectionProps {
   tribeId: string;
@@ -124,28 +124,6 @@ export const DocumentPagesSection: React.FC<DocumentPagesSectionProps> = ({
             )}
           </span>
         </div>
-        {canEdit && (
-          <button
-            type="button"
-            onClick={() => navigate(`${baseRoute}/new`)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '8px',
-              backgroundColor: theme.colors.primary,
-              color: 'white',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: 'var(--font-sm)',
-              fontWeight: 500,
-            }}
-          >
-            <Plus size={14} />
-            {t('documentPages.addPage')}
-          </button>
-        )}
       </div>
 
       {!hasPages && (

@@ -1,14 +1,12 @@
-import FileUploader from '@/components/common/editor/FileUploader';
-import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
-import { LabelSelector } from '@/components/common/form/LabelSelector';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
+import { DocumentFormPagesEditor } from '@/components/common/document/DocumentFormPagesEditor';
 import { ThemedCard } from '@/components/common/layout/ThemedCard';
 import { ThemedLoadingOverlay } from '@/components/common/layout/ThemedLoadingOverlay';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
-import { ThemedSection } from '@/components/common/layout/ThemedSection';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { ProjectDocumentFields } from '@/components/entities/documents/ProjectDocumentFields';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { useDocumentPages } from '@/hooks/useDocumentPages';
 import { useProjectDocument } from '@/hooks/useProjectDocuments';
 import { useProjectWithDocument } from '@/hooks/useProjects';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
@@ -28,7 +26,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 const ProjectDocumentFormPageContent: React.FC = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
   const navigate = useNavigate();
   const { tribeId, projectId, projectDocumentId } = useParams<{
     tribeId: string;
@@ -41,6 +38,14 @@ const ProjectDocumentFormPageContent: React.FC = () => {
   const { tribe } = useTribeWithPositions(tribeId || null);
   const { project } = useProjectWithDocument(projectId || null);
   const { document: existingDoc, loading: loadingDoc } = useProjectDocument(
+    isEdit ? projectId || null : null,
+    isEdit ? projectDocumentId || null : null,
+  );
+  const {
+    pages,
+    loading: pagesLoading,
+    refetch: refetchPages,
+  } = useDocumentPages(
     isEdit ? projectId || null : null,
     isEdit ? projectDocumentId || null : null,
   );
@@ -177,18 +182,6 @@ const ProjectDocumentFormPageContent: React.FC = () => {
     );
   }
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '8px 12px',
-    border: `1px solid ${theme.colors.border}`,
-    borderRadius: '8px',
-    backgroundColor: theme.colors.surface,
-    color: theme.colors.text,
-    fontSize: 'var(--font-sm)',
-    boxSizing: 'border-box',
-    outline: 'none',
-  };
-
   return (
     <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions}>
       {submitting && (
@@ -209,94 +202,30 @@ const ProjectDocumentFormPageContent: React.FC = () => {
 
       <form onSubmit={handleSubmit}>
         <div style={formContainerStyle}>
-          <ThemedSection themeId="main_1">
-            <div style={{ marginBottom: '16px' }}>
-              <label
-                style={{
-                  display: 'block',
-                  fontSize: 'var(--font-sm)',
-                  fontWeight: 500,
-                  color: theme.colors.secondary,
-                  marginBottom: '6px',
-                }}
-              >
-                {t('projectDocuments.title')} *
-              </label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder={t('projectDocuments.titlePlaceholder')}
-                style={inputStyle}
-                required
-                autoFocus
-              />
-            </div>
+          <ProjectDocumentFields
+            title={title}
+            onTitleChange={setTitle}
+            labelNames={labelNames}
+            onLabelNamesChange={setLabelNames}
+            allLabelSuggestions={allLabelSuggestions}
+            tocDepth={tocDepth}
+            onTocDepthChange={setTocDepth}
+            content={content}
+            onContentChange={setContent}
+            attachments={attachments}
+            onAttachmentsChange={setAttachments}
+          />
 
-            <div style={{ marginBottom: '16px' }}>
-              <LabelSelector
-                label={t('projectDocuments.labels')}
-                value={labelNames}
-                onChange={setLabelNames}
-                suggestions={allLabelSuggestions}
-                placeholder={t('projectDocuments.labelsPlaceholder')}
-              />
-            </div>
-
-            <div style={{ marginBottom: '16px' }}>
-              <ThemedText
-                size="small"
-                variant="secondary"
-                style={{ marginBottom: '8px' }}
-              >
-                {t('projectDocuments.tocDepthLabel')}
-              </ThemedText>
-              <div style={{ display: 'flex', gap: '6px' }}>
-                {([1, 2, 3, 4] as const).map((d) => (
-                  <button
-                    key={d}
-                    type="button"
-                    onClick={() => setTocDepth(d)}
-                    style={{
-                      padding: '4px 12px',
-                      borderRadius: '6px',
-                      border: `1px solid ${tocDepth === d ? theme.colors.primary : theme.colors.border}`,
-                      backgroundColor:
-                        tocDepth === d
-                          ? theme.colors.primary
-                          : theme.colors.surface,
-                      color: tocDepth === d ? '#fff' : theme.colors.secondary,
-                      cursor: 'pointer',
-                      fontSize: 'var(--font-sm)',
-                      fontWeight: tocDepth === d ? 600 : 400,
-                    }}
-                  >
-                    H{d}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '16px' }}>
-              <ThemedText
-                size="small"
-                variant="secondary"
-                style={{ marginBottom: '8px' }}
-              >
-                {t('projects.description')}
-              </ThemedText>
-              <div className="border border-gray-300 rounded-lg overflow-hidden">
-                <JoditEditorComponent content={content} onChange={setContent} />
-              </div>
-            </div>
-
-            <div>
-              <FileUploader
-                attachments={attachments}
-                onAttachmentsChange={setAttachments}
-              />
-            </div>
-          </ThemedSection>
+          {isEdit && projectDocumentId && (
+            <DocumentFormPagesEditor
+              tribeId={tribeId!}
+              projectId={projectId!}
+              projectDocumentId={projectDocumentId}
+              pages={pages}
+              loading={pagesLoading}
+              onReordered={refetchPages}
+            />
+          )}
 
           <div style={formActionsStyle}>
             <ThemedButton
