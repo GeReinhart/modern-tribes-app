@@ -4,7 +4,7 @@ import {
   ProjectFeatureInstanceCreate,
   ProjectFeatureInstanceUpdate,
 } from '../types/project-features.types';
-import { apiService } from './api.service';
+import { apiService } from '../platform/api/api.service.ts';
 
 class ProjectFeaturesService {
   async getFeatureTypes(): Promise<FeatureTypeInfo[]> {

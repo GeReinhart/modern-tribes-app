@@ -1,12 +1,12 @@
-import { ThemedText } from '@/components/common/layout/ThemedText';
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemeProvider } from '@/platform/themes/ThemeContext.tsx';
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useAuth } from './AuthContext';
-import { authService } from './service';
+import { authService } from './authentication-service.ts';
 
 export default function Verify() {
   const { t } = useTranslation();

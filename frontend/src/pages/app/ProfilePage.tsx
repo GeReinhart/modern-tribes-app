@@ -1,15 +1,15 @@
 import { ThemedButton } from '@/components/common/form/ThemedButton.tsx';
-import { ThemedBadge } from '@/components/common/layout/ThemedBadge.tsx';
-import { ThemedCard } from '@/components/common/layout/ThemedCard.tsx';
-import { ThemedDivider } from '@/components/common/layout/ThemedDivider.tsx';
-import { ThemedText } from '@/components/common/layout/ThemedText.tsx';
+import { ThemedBadge } from '@/platform/themes/layout/ThemedBadge.tsx';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard.tsx';
+import { ThemedDivider } from '@/platform/themes/layout/ThemedDivider.tsx';
+import { ThemedText } from '@/platform/themes/layout/ThemedText.tsx';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/platform/authentication/AuthContext.tsx';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext.tsx';
+import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile.ts';
 import { usePerson } from '@/hooks/usePersons.ts';
 import { useRepresentsByUserId } from '@/hooks/useRepresents.ts';
-import { authService } from '@/platform/authentication/service';
+import { authService } from '@/platform/authentication/authentication-service.ts';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

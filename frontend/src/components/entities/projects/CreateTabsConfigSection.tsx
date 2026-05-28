@@ -1,5 +1,5 @@
-import { ThemedText } from '@/components/common/layout/ThemedText';
-import { useTheme } from '@/contexts/ThemeContext';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

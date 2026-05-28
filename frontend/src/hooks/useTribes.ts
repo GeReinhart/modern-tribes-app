@@ -11,11 +11,11 @@ import {
   TribeWithPersonsWithPosition,
   TribeWithPositions,
 } from '../types/tribe.types';
-import { useApi } from './useApi';
+import { apiHooks } from '../platform/api/api-hooks.ts';
 
 export function useTribes() {
   const [tribes, setTribes] = useState<Tribe[]>([]);
-  const { loading, error, execute } = useApi<Tribe[]>();
+  const { loading, error, execute } = apiHooks<Tribe[]>();
 
   const fetchTribes = useCallback(async () => {
     try {
@@ -44,7 +44,7 @@ export function useUserTribes(
 ) {
   const { enabled = true } = options;
   const [tribes, setTribes] = useState<UserPersonPositionTribe[]>([]);
-  const { loading, error, execute } = useApi<UserPersonPositionTribe[]>();
+  const { loading, error, execute } = apiHooks<UserPersonPositionTribe[]>();
 
   const fetchTribes = useCallback(async () => {
     if (!userId) return; // Guard clause
@@ -73,7 +73,7 @@ export function useUserTribes(
 }
 
 export function useTribe(id: string | null) {
-  const { data: tribe, loading, error, execute } = useApi<Tribe>();
+  const { data: tribe, loading, error, execute } = apiHooks<Tribe>();
 
   useEffect(() => {
     if (id) {
@@ -86,7 +86,7 @@ export function useTribe(id: string | null) {
 
 export function useTribePositions(id: string) {
   const [tribePositions, setTribePositions] = useState<TribeWithPositions>();
-  const { loading, error, execute } = useApi<TribeWithPositions>();
+  const { loading, error, execute } = apiHooks<TribeWithPositions>();
 
   const fetchTribePositions = useCallback(async () => {
     try {
@@ -115,7 +115,7 @@ export function useTribePersonsPosition(id: string) {
     loading,
     error,
     execute,
-  } = useApi<TribeWithPersonsWithPosition>();
+  } = apiHooks<TribeWithPersonsWithPosition>();
 
   useEffect(() => {
     if (id) {
@@ -129,7 +129,7 @@ export function useTribePersonsPosition(id: string) {
 export function useTribeProjects(id: string | null) {
   const [tribeProjects, setTribeProjects] = useState<TribeProject[]>([]);
   const [hasFetched, setHasFetched] = useState(!id);
-  const { loading, error, execute } = useApi<TribeProject[]>();
+  const { loading, error, execute } = apiHooks<TribeProject[]>();
 
   const fetch = useCallback(async () => {
     if (!id) {
@@ -153,7 +153,7 @@ export function useTribeProjects(id: string | null) {
 }
 
 export function useTribeMutations() {
-  const { loading, error, execute } = useApi<Tribe>();
+  const { loading, error, execute } = apiHooks<Tribe>();
 
   const getTribeById = useCallback(
     async (id: string) => {

@@ -1,9 +1,9 @@
-import FileUploader from '@/components/common/editor/FileUploader';
-import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
+import EditorFileUploader from '@/platform/documents/editor/EditorFileUploader.tsx';
+import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
 import { LabelSelector } from '@/components/common/form/LabelSelector';
-import { ThemedSection } from '@/components/common/layout/ThemedSection';
-import { ThemedText } from '@/components/common/layout/ThemedText';
-import { useTheme } from '@/contexts/ThemeContext';
+import { ThemedSection } from '@/platform/themes/layout/ThemedSection';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { AttachmentFile } from '@/types/document.types';
 
 import React from 'react';
@@ -118,12 +118,12 @@ export const ProjectDocumentFields: React.FC<ProjectDocumentFieldsProps> = ({
           {t('projects.description')}
         </ThemedText>
         <div className="border border-gray-300 rounded-lg overflow-hidden">
-          <JoditEditorComponent content={content} onChange={onContentChange} />
+          <EditorJoditComponent content={content} onChange={onContentChange} />
         </div>
       </div>
 
       <div>
-        <FileUploader attachments={attachments} onAttachmentsChange={onAttachmentsChange} />
+        <EditorFileUploader attachments={attachments} onAttachmentsChange={onAttachmentsChange} />
       </div>
     </ThemedSection>
   );

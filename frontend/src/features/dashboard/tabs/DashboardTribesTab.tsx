@@ -1,8 +1,8 @@
-import { ThemedCard } from '@/components/common/layout/ThemedCard.tsx';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
-import { ThemedText } from '@/components/common/layout/ThemedText.tsx';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard.tsx';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
+import { ThemedText } from '@/platform/themes/layout/ThemedText.tsx';
 import { TribeCard } from '@/components/entities/tribes/TribeCard.tsx';
-import { useTheme } from '@/contexts/ThemeContext.tsx';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile.ts';
 import { useUserTribes } from '@/hooks/useTribes.ts';
 import type { TribeEntry } from '@/types/queries/tribes.query.types.ts';

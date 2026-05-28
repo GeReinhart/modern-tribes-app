@@ -1,7 +1,7 @@
 import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
+import { ThemedSvgIcon } from '@/platform/themes/icons/ThemedSvgIcon';
 import { LABEL_COLORS } from '@/components/themes/themes';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

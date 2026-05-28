@@ -1,8 +1,8 @@
 import { EntityAuditBadge } from '@/components/common/audit/EntityAuditBadge';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
-import { ThemedText } from '@/components/common/layout/ThemedText';
-import { useTheme } from '@/contexts/ThemeContext';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import {
   useProjectDocumentLabels,
   useProjectDocuments,

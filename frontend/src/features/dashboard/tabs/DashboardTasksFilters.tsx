@@ -1,4 +1,4 @@
-import { useTheme } from '@/contexts/ThemeContext.tsx';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import type { PersonOption } from '@/features/tasks/types';
 
 import React from 'react';
@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { FolderOpen, Layers, Tag, User } from 'lucide-react';
 
-import type { DashboardTask, MyTasksFilters } from '../types.ts';
+import type { DashboardTask, MyTasksFilters } from '../dashboard-types.ts';
 
 interface Props {
   tasks: DashboardTask[];

@@ -1,5 +1,5 @@
-import { ApplicationLogo } from '@/components/common/icons/ApplicationLogo';
-import { useTheme } from '@/contexts/ThemeContext';
+import { ApplicationLogo } from '@/platform/themes/icons/ApplicationLogo';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 
 import React from 'react';
 

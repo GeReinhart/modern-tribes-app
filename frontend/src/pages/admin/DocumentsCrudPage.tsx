@@ -1,18 +1,18 @@
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
-import { StatusBadge } from '@/components/common/layout/StatusBadge.tsx';
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog.tsx';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
-import { ThemedTable } from '@/components/common/layout/ThemedTable.tsx';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { StatusBadge } from '@/platform/themes/layout/StatusBadge.tsx';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
+import { ThemedConfirmDialog } from '@/platform/themes/layout/ThemedConfirmDialog.tsx';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
+import { ThemedTable } from '@/platform/themes/layout/ThemedTable.tsx';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import { DocumentModal } from '@/components/entities/documents/DocumentModal';
 import {
   AdminNavigation,
   adminMainThemeId,
 } from '@/components/layout/AdminNavigation';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage';
 import { useDocumentMutations, useDocuments } from '@/hooks/useDocuments';
 import {

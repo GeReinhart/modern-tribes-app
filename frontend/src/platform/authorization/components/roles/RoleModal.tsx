@@ -1,7 +1,7 @@
 import {
   ModalBody,
   ThemedModal,
-} from '@/components/common/layout/ThemedModal.tsx';
+} from '@/platform/themes/layout/ThemedModal.tsx';
 import { FormMode } from '@/types/common.types.ts';
 
 import React from 'react';

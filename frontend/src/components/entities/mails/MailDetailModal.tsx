@@ -1,13 +1,13 @@
-import { StatusBadge } from '@/components/common/layout/StatusBadge.tsx';
-import { ThemedBadge } from '@/components/common/layout/ThemedBadge.tsx';
-import { ThemedDivider } from '@/components/common/layout/ThemedDivider.tsx';
+import { StatusBadge } from '@/platform/themes/layout/StatusBadge.tsx';
+import { ThemedBadge } from '@/platform/themes/layout/ThemedBadge.tsx';
+import { ThemedDivider } from '@/platform/themes/layout/ThemedDivider.tsx';
 import {
   ModalBody,
   ThemedModal,
-} from '@/components/common/layout/ThemedModal.tsx';
-import { ThemedText } from '@/components/common/layout/ThemedText.tsx';
-import { useTheme } from '@/contexts/ThemeContext.tsx';
-import { MailWithRecipients } from '@/types/mail.types.ts';
+} from '@/platform/themes/layout/ThemedModal.tsx';
+import { ThemedText } from '@/platform/themes/layout/ThemedText.tsx';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
+import { MailWithRecipients } from '@/platform/mail/mail.types.ts';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

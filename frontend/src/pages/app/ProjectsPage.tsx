@@ -1,10 +1,10 @@
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedDivider } from '@/components/common/layout/ThemedDivider';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
+import { ThemedDivider } from '@/platform/themes/layout/ThemedDivider';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import { ProjectCard } from '@/components/entities/projects/ProjectCard';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ThemeProvider } from '@/platform/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
 import { useUserProjects } from '@/hooks/useProjects';
 import { MenuAction } from '@/types/menu.types';

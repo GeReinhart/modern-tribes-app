@@ -5,7 +5,7 @@ import {
   ProjectDocumentSummary,
   ProjectDocumentUpdate,
 } from '../types/project-document.types';
-import { apiService } from './api.service';
+import { apiService } from '../platform/api/api.service.ts';
 
 class ProjectDocumentService {
   private base(projectId: string) {

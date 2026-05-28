@@ -1,20 +1,20 @@
 import { ThemedSelect } from '@/components/common/form/ThemedSelect.tsx';
-import { StatusBadge } from '@/components/common/layout/StatusBadge.tsx';
-import { ThemedBadge } from '@/components/common/layout/ThemedBadge.tsx';
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
-import { ThemedTable } from '@/components/common/layout/ThemedTable.tsx';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { StatusBadge } from '@/platform/themes/layout/StatusBadge.tsx';
+import { ThemedBadge } from '@/platform/themes/layout/ThemedBadge.tsx';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
+import { ThemedTable } from '@/platform/themes/layout/ThemedTable.tsx';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import { MailDetailModal } from '@/components/entities/mails/MailDetailModal';
 import {
   AdminNavigation,
   adminMainThemeId,
 } from '@/components/layout/AdminNavigation';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
-import { useMails } from '@/hooks/useMails';
+import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
+import { useMails } from '@/platform/mail/useMails.ts';
 import { useUsers } from '@/hooks/useUsers';
-import { MailWithRecipients } from '@/types/mail.types';
+import { MailWithRecipients } from '@/platform/mail/mail.types.ts';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

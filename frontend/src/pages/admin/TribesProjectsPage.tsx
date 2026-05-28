@@ -1,24 +1,24 @@
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedInput } from '@/components/common/form/ThemedInput';
 import { ThemedSelect } from '@/components/common/form/ThemedSelect';
-import { StatusBadge } from '@/components/common/layout/StatusBadge';
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
+import { StatusBadge } from '@/platform/themes/layout/StatusBadge';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
+import { ThemedConfirmDialog } from '@/platform/themes/layout/ThemedConfirmDialog';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
 import {
   ThemedModal,
   ThemedModalBody,
-} from '@/components/common/layout/ThemedModal';
-import { ThemedTable } from '@/components/common/layout/ThemedTable';
-import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+} from '@/platform/themes/layout/ThemedModal';
+import { ThemedTable } from '@/platform/themes/layout/ThemedTable';
+import { ThemedTabs } from '@/platform/themes/layout/ThemedTabs';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import { ProjectModal } from '@/components/entities/projects/ProjectModal';
 import {
   AdminNavigation,
   adminMainThemeId,
 } from '@/components/layout/AdminNavigation';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage';
 import { usePersons } from '@/hooks/usePersons';
 import { usePositions } from '@/hooks/usePositions';

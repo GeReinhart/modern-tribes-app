@@ -3,7 +3,7 @@ import {
   RepresentsCreate,
   RepresentsUpdate,
 } from '../types/represents.types';
-import { apiService } from './api.service';
+import { apiService } from '../platform/api/api.service.ts';
 
 class RepresentsService {
   private endpoint = '/crud/represents';

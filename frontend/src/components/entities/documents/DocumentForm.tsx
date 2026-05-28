@@ -1,5 +1,5 @@
-import FileUploader from '@/components/common/editor/FileUploader.tsx';
-import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent.tsx';
+import EditorFileUploader from '@/platform/documents/editor/EditorFileUploader.tsx';
+import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/components/common/form/ThemedButton.tsx';
 import { ThemedSelect } from '@/components/common/form/ThemedSelect.tsx';
 import { FormMode } from '@/types/common.types.ts';
@@ -92,7 +92,7 @@ export const DocumentForm: React.FC<DocumentFormProps> = ({
               Content
             </label>
             <div className="border border-gray-300 rounded-lg overflow-hidden">
-              <JoditEditorComponent
+              <EditorJoditComponent
                 content={formData.content_html}
                 onChange={handleContentChange}
               />
@@ -101,7 +101,7 @@ export const DocumentForm: React.FC<DocumentFormProps> = ({
 
           {/* File Uploader */}
           <div className="mb-6">
-            <FileUploader
+            <EditorFileUploader
               attachments={formData.attachments}
               onAttachmentsChange={handleAttachmentsChange}
             />

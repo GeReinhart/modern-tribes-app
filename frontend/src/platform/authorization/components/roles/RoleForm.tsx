@@ -7,7 +7,7 @@ import { FormMode } from '@/types/common.types.ts';
 
 import React, { useState } from 'react';
 
-import { usePermissions } from '../../usePermissions';
+import { permissionsHooks } from '../../permissions-hooks.ts';
 import { Role, RoleCreate, RoleUpdate } from '../../role.types';
 
 interface RoleFormProps {
@@ -23,7 +23,7 @@ export const RoleForm: React.FC<RoleFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const { permissions, loading: permissionLoading } = usePermissions();
+  const { permissions, loading: permissionLoading } = permissionsHooks();
   const [formData, setFormData] = useState({
     name: role?.name || '',
     description: role?.description || '',

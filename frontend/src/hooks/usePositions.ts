@@ -1,4 +1,4 @@
-import { useApi } from '@/hooks/useApi';
+import { apiHooks } from '@/platform/api/api-hooks.ts';
 import { createEntityHooks } from '@/hooks/useEntityCrud';
 import { positionService } from '@/services/position.service';
 import {
@@ -28,7 +28,7 @@ export function usePosition(id: string | null) {
 export function usePositionsByTribe(tribe_id: string | null) {
   const [positions, setPositions] = useState<Position[]>([]);
   const [hasFetched, setHasFetched] = useState(!tribe_id);
-  const { loading, error, execute } = useApi<Position[]>();
+  const { loading, error, execute } = apiHooks<Position[]>();
 
   const fetch = useCallback(async () => {
     if (!tribe_id) {
@@ -61,8 +61,8 @@ export function usePositionMutations() {
     loading,
     error,
   } = useMutations();
-  const { execute } = useApi<Position>();
-  const { execute: executeVoid } = useApi<void>();
+  const { execute } = apiHooks<Position>();
+  const { execute: executeVoid } = apiHooks<void>();
 
   const updatePositionByForeignIds = useCallback(
     (person_id: string, tribe_id: string, data: PositionUpdate) =>

@@ -1,12 +1,12 @@
-import FileUploader from '@/components/common/editor/FileUploader.tsx';
-import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent.tsx';
+import EditorFileUploader from '@/platform/documents/editor/EditorFileUploader.tsx';
+import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedLoadingOverlay } from '@/components/common/layout/ThemedLoadingOverlay.tsx';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
-import { ThemedSection } from '@/components/common/layout/ThemedSection.tsx';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { ThemedLoadingOverlay } from '@/platform/themes/layout/ThemedLoadingOverlay.tsx';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
+import { ThemedSection } from '@/platform/themes/layout/ThemedSection.tsx';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext.tsx';
+import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { usePersons } from '@/hooks/usePersons';
 import { useTribeWithPositionsMutations } from '@/hooks/useTribesWithPositions';
 import {
@@ -25,7 +25,7 @@ import {
   personInfoContainerStyle,
   personListContainerStyle,
   successStyle,
-} from '@/styles/theme.styles';
+} from '@/platform/themes/theme.styles.tsx';
 import { AttachmentFile } from '@/types/document.types.ts';
 import { MenuAction } from '@/types/menu.types';
 import { PositionEnum } from '@/types/position.types';
@@ -334,14 +334,14 @@ const CreateTribeFormContent: React.FC = () => {
             </ThemedText>
             <label>
               <div className="border border-gray-300 rounded-lg overflow-hidden">
-                <JoditEditorComponent
+                <EditorJoditComponent
                   content={formData.documentContent}
                   onChange={handleContentChange}
                 />
               </div>
               {/* File Uploader */}
               <div className="mb-6">
-                <FileUploader
+                <EditorFileUploader
                   attachments={formData.attachments}
                   onAttachmentsChange={handleAttachmentsChange}
                 />

@@ -1,14 +1,14 @@
 import { ThemedSelect } from '@/components/common/form/ThemedSelect.tsx';
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
-import { ThemedTable } from '@/components/common/layout/ThemedTable.tsx';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
+import { ThemedTable } from '@/platform/themes/layout/ThemedTable.tsx';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,
 } from '@/components/layout/AdminNavigation';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { useRecentChanges } from '@/hooks/useRecentChanges.ts';
 import { useUsers } from '@/hooks/useUsers.ts';
 import { RecentChange } from '@/types/monitoring.types.ts';

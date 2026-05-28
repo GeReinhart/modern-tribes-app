@@ -1,3 +1,11 @@
+import { DocumentAttachments } from '@/platform/documents/DocumentAttachments.tsx';
+import { DocumentPagesSection } from '@/platform/documents/DocumentPagesSection.tsx';
+import { DocumentReader } from '@/platform/documents/DocumentReader.tsx';
+import { documentViewMenuActionsHooks } from '@/platform/documents/DocumentViewMenuActions-hooks.ts';
+import { ThemedBadge } from '@/platform/themes/layout/ThemedBadge';
+import { ThemedConfirmDialog } from '@/platform/themes/layout/ThemedConfirmDialog';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
+import { ThemedSection } from '@/platform/themes/layout/ThemedSection';
 import { EntityAuditBadge } from '@/components/common/audit/EntityAuditBadge';
 import { DocumentAttachments } from '@/components/common/document/DocumentAttachments';
 import { DocumentPagesSection } from '@/components/common/document/DocumentPagesSection';
@@ -8,7 +16,7 @@ import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDia
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
 import { ThemedSection } from '@/components/common/layout/ThemedSection';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
 import { useDocumentPages } from '@/hooks/useDocumentPages';
 import { useProjectDocument } from '@/hooks/useProjectDocuments';
@@ -19,7 +27,7 @@ import {
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
 import { projectDocumentService } from '@/services/project-document.service';
 import { publicationService } from '@/services/publication.service';
-import { errorStyle } from '@/styles/theme.styles';
+import { errorStyle } from '@/platform/themes/theme.styles.tsx';
 import { ProjectEntry } from '@/types/queries/projects.query.types';
 
 import React, { useMemo, useState } from 'react';
@@ -178,7 +186,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
     }
   };
 
-  const docMenuActions = useDocumentViewMenuActions({
+  const docMenuActions = documentViewMenuActionsHooks({
     tribeId: tribeId!,
     projectId: projectId!,
     projectDocumentId: projectDocumentId!,

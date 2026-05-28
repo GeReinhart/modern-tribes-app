@@ -3,7 +3,7 @@ import {
   PositionCreate,
   PositionUpdate,
 } from '../types/position.types';
-import { apiService } from './api.service';
+import { apiService } from '../platform/api/api.service.ts';
 
 class PositionService {
   private endpoint = '/crud/positions';

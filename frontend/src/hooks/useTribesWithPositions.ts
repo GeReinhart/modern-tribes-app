@@ -1,4 +1,4 @@
-import { useApi } from '@/hooks/useApi';
+import { apiHooks } from '@/platform/api/api-hooks.ts';
 import { tribeWithPositionService } from '@/services/app/tribe_with_positions.service';
 import { tribeService } from '@/services/tribe.service';
 import {
@@ -11,7 +11,7 @@ import { Tribe, TribeCreate, TribeUpdate } from '@/types/tribe.types';
 import { useCallback, useEffect, useState } from 'react';
 
 export function useTribeMutations() {
-  const { loading, error, execute } = useApi<Tribe>();
+  const { loading, error, execute } = apiHooks<Tribe>();
 
   const getTribeById = useCallback(
     async (id: string) => {
@@ -53,7 +53,7 @@ export function useTribeMutations() {
 
 export function useTribeWithPositions(tribeId: string | null) {
   const [tribe, setTribe] = useState<TribeWithPositionsResponse | null>(null);
-  const { loading, error, execute } = useApi<TribeWithPositionsResponse>();
+  const { loading, error, execute } = apiHooks<TribeWithPositionsResponse>();
 
   const fetchTribe = useCallback(async () => {
     if (!tribeId) return;
@@ -81,7 +81,7 @@ export function useTribeWithPositions(tribeId: string | null) {
 }
 
 export function useTribeWithPositionsMutations() {
-  const { loading, error, execute } = useApi<TribeWithPositionsResponse>();
+  const { loading, error, execute } = apiHooks<TribeWithPositionsResponse>();
 
   const createTribeWithPositions = useCallback(
     async (data: TribeWithPositionsCreate) => {

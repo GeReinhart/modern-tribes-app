@@ -1,10 +1,10 @@
-import FileUploader from '@/components/common/editor/FileUploader';
-import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
+import EditorFileUploader from '@/platform/documents/editor/EditorFileUploader.tsx';
+import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedInput } from '@/components/common/form/ThemedInput';
-import { ThemedLoadingOverlay } from '@/components/common/layout/ThemedLoadingOverlay';
-import { ThemedSection } from '@/components/common/layout/ThemedSection';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { ThemedLoadingOverlay } from '@/platform/themes/layout/ThemedLoadingOverlay';
+import { ThemedSection } from '@/platform/themes/layout/ThemedSection';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import {
   CreateTabsConfigSection,
   DraftTabConfig,
@@ -14,7 +14,7 @@ import {
   FeatureInstancesSection,
 } from '@/components/entities/projects/FeatureInstancesSection';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ThemeProvider } from '@/platform/themes/ThemeContext.tsx';
 import { tabConfigService } from '@/features/tab-config/tabConfig.service';
 import { useProjectWithDocumentMutations } from '@/hooks/useProjects';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
@@ -23,7 +23,7 @@ import {
   errorStyle,
   formActionsStyle,
   formContainerStyle,
-} from '@/styles/theme.styles';
+} from '@/platform/themes/theme.styles.tsx';
 import { AttachmentFile } from '@/types/document.types';
 import { MenuAction } from '@/types/menu.types';
 
@@ -204,7 +204,7 @@ const CreateProjectPageContent: React.FC = () => {
               {t('projects.descriptionOptional')}
             </ThemedText>
             <div className="border border-gray-300 rounded-lg overflow-hidden">
-              <JoditEditorComponent
+              <EditorJoditComponent
                 content={documentContent}
                 onChange={setDocumentContent}
                 compact
@@ -212,7 +212,7 @@ const CreateProjectPageContent: React.FC = () => {
               />
             </div>
             <div className="mb-6">
-              <FileUploader
+              <EditorFileUploader
                 attachments={attachments}
                 onAttachmentsChange={setAttachments}
               />

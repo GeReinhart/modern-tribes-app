@@ -1,6 +1,6 @@
-import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
-import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog';
-import { useTheme } from '@/contexts/ThemeContext';
+import { ThemedSvgIcon } from '@/platform/themes/icons/ThemedSvgIcon';
+import { ThemedConfirmDialog } from '@/platform/themes/layout/ThemedConfirmDialog';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

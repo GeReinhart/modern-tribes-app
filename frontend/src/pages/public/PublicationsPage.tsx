@@ -1,5 +1,5 @@
 import { PublicLayout } from '@/components/layout/PublicLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { usePublicationLabels, usePublications } from '@/hooks/usePublications';
 import { LabelInfo } from '@/types/project-document.types';
 import { PublicationSummary } from '@/types/publication.types';

@@ -1,4 +1,4 @@
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 
 import React, { forwardRef, useEffect } from 'react';
 import DatePicker from 'react-datepicker';

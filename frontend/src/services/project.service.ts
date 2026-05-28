@@ -8,7 +8,7 @@ import {
   ProjectTribeWithMembers,
   UserProjectEntry,
 } from '../types/queries/projects.query.types';
-import { apiService } from './api.service';
+import { apiService } from '../platform/api/api.service.ts';
 
 class ProjectService {
   private endpoint = '/crud/projects';

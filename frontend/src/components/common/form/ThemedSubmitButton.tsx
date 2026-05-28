@@ -1,5 +1,5 @@
 import { Theme } from '@/components/themes/themes.ts';
-import { useTheme } from '@/contexts/ThemeContext.tsx';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 
 import React from 'react';
 

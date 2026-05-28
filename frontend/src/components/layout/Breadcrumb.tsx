@@ -1,4 +1,4 @@
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';

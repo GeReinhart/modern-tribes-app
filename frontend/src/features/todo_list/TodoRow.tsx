@@ -1,5 +1,5 @@
-import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
-import { useTheme } from '@/contexts/ThemeContext';
+import { ThemedSvgIcon } from '@/platform/themes/icons/ThemedSvgIcon';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { PersonOption, fibColor, urgencyColor } from './types';
 
 import React, { useState } from 'react';

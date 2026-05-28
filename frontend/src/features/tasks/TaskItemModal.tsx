@@ -1,9 +1,10 @@
 import { EntityAuditBadge } from '@/components/common/audit/EntityAuditBadge';
 import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
+import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import ThemedDateSelection from '@/components/common/form/ThemedDateSelection';
-import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon';
-import { useTheme } from '@/contexts/ThemeContext';
+import { ThemedSvgIcon } from '@/platform/themes/icons/ThemedSvgIcon';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -266,7 +267,7 @@ const TaskItemModal: React.FC<TaskItemModalProps> = ({
               {t('features.kanban.notes')}
             </div>
             {canEdit ? (
-              <JoditEditorComponent
+              <EditorJoditComponent
                 content={notes}
                 onChange={setNotes}
                 minHeight={320}

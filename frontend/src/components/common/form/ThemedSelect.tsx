@@ -1,5 +1,5 @@
 import { Theme } from '@/components/themes/themes.ts';
-import { useTheme } from '@/contexts/ThemeContext.tsx';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { SelectOption } from '@/types/common.types.ts';
 
 import React, { useEffect, useRef, useState } from 'react';

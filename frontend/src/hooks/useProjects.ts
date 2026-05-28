@@ -9,7 +9,7 @@ import {
 import { Project, ProjectCreate, ProjectUpdate } from '../types/project.types';
 import { UserProjectEntry } from '../types/queries/projects.query.types';
 import { ProjectTribeWithMembers } from '../types/queries/projects.query.types';
-import { useApi } from './useApi';
+import { apiHooks } from '../platform/api/api-hooks.ts';
 import { createEntityHooks } from './useEntityCrud';
 
 const { useList, useById, useMutations } = createEntityHooks<
@@ -43,7 +43,7 @@ export function useUserProjects(
   options: { enabled?: boolean } = {},
 ) {
   const [projects, setProjects] = useState<UserProjectEntry[]>([]);
-  const { loading, error, execute } = useApi<UserProjectEntry[]>();
+  const { loading, error, execute } = apiHooks<UserProjectEntry[]>();
 
   const fetch = useCallback(() => {
     if (!userId) return;
@@ -65,7 +65,7 @@ export function useUserProjectsByTribe(
   options: { enabled?: boolean } = {},
 ) {
   const [projects, setProjects] = useState<UserProjectEntry[]>([]);
-  const { loading, error, execute } = useApi<UserProjectEntry[]>();
+  const { loading, error, execute } = apiHooks<UserProjectEntry[]>();
 
   const fetch = useCallback(() => {
     if (!tribeId || !userId) return;
@@ -87,7 +87,7 @@ export function useProjectWithDocument(projectId: string | null) {
   const [project, setProject] = useState<ProjectWithDocumentResponse | null>(
     null,
   );
-  const { loading, error, execute } = useApi<ProjectWithDocumentResponse>();
+  const { loading, error, execute } = apiHooks<ProjectWithDocumentResponse>();
 
   const fetch = useCallback(() => {
     if (!projectId) return;
@@ -154,7 +154,7 @@ export function useProjectWithDocumentMutations() {
 
 export function useProjectTribesWithMembers(projectId: string | null) {
   const [tribes, setTribes] = useState<ProjectTribeWithMembers[]>([]);
-  const { loading, error, execute } = useApi<ProjectTribeWithMembers[]>();
+  const { loading, error, execute } = apiHooks<ProjectTribeWithMembers[]>();
 
   const fetch = useCallback(() => {
     if (!projectId) return;

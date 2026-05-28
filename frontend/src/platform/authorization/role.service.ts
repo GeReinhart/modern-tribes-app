@@ -1,4 +1,4 @@
-import { apiService } from '@/services/api.service';
+import { apiService } from '@/platform/api/api.service.ts';
 
 import {
   Role,

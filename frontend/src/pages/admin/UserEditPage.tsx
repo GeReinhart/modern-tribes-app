@@ -1,13 +1,13 @@
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import { UserForm } from '@/components/entities/users/UserForm';
 import {
   AdminNavigation,
   adminMainThemeId,
 } from '@/components/layout/AdminNavigation';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ThemeProvider } from '@/platform/themes/ThemeContext.tsx';
 import {
   useRepresentsByUserId,
   useRepresentsMutations,

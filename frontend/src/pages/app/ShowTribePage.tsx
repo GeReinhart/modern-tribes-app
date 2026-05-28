@@ -1,12 +1,12 @@
-import { ConfirmDialog } from '@/components/common/layout/ConfirmDialog.tsx';
-import { ThemedBadge } from '@/components/common/layout/ThemedBadge';
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
-import { ThemedSection } from '@/components/common/layout/ThemedSection.tsx';
-import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { ConfirmDialog } from '@/platform/themes/layout/ConfirmDialog.tsx';
+import { ThemedBadge } from '@/platform/themes/layout/ThemedBadge';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
+import { ThemedSection } from '@/platform/themes/layout/ThemedSection.tsx';
+import { ThemedTabs } from '@/platform/themes/layout/ThemedTabs';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext.tsx';
+import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { TabConfigButton } from '@/features/tab-config/TabConfigButton';
 import { TabConfigPopup } from '@/features/tab-config/TabConfigPopup';
 import { useTabConfig } from '@/features/tab-config/useTabConfig';
@@ -15,9 +15,9 @@ import { useUserProjectsByTribe } from '@/hooks/useProjects';
 import { useUserTribes } from '@/hooks/useTribes';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
 import { useUrlTab } from '@/hooks/useUrlTab';
-import { useVerifyAuthorization } from '@/platform/authorization/useVerifyAuthorization';
+import { authorizationHooks } from '@/platform/authorization/authorization-hooks.ts';
 import { tribeWithPositionService } from '@/services/app/tribe_with_positions.service.ts';
-import { errorStyle } from '@/styles/theme.styles';
+import { errorStyle } from '@/platform/themes/theme.styles.tsx';
 import { AttachmentFile } from '@/types/document.types.ts';
 import { MenuAction } from '@/types/menu.types';
 import { ProjectEntry } from '@/types/queries/projects.query.types';
@@ -45,7 +45,7 @@ const ShowTribePageContent: React.FC = () => {
     data: authorization,
     error: authorizationError,
     verifyAuthorization,
-  } = useVerifyAuthorization();
+  } = authorizationHooks();
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [archiving, setArchiving] = useState(false);
   const [showTabConfig, setShowTabConfig] = useState(false);

@@ -1,11 +1,11 @@
 import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { DocumentFormPagesEditor } from '@/components/common/document/DocumentFormPagesEditor';
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedLoadingOverlay } from '@/components/common/layout/ThemedLoadingOverlay';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
+import { DocumentFormPagesEditor } from '@/platform/documents/DocumentFormPagesEditor.tsx';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
+import { ThemedLoadingOverlay } from '@/platform/themes/layout/ThemedLoadingOverlay';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
 import { ProjectDocumentFields } from '@/components/entities/documents/ProjectDocumentFields';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ThemeProvider } from '@/platform/themes/ThemeContext.tsx';
 import { useDocumentPages } from '@/hooks/useDocumentPages';
 import { useProjectDocument } from '@/hooks/useProjectDocuments';
 import { useProjectWithDocument } from '@/hooks/useProjects';
@@ -16,7 +16,7 @@ import {
   errorStyle,
   formActionsStyle,
   formContainerStyle,
-} from '@/styles/theme.styles';
+} from '@/platform/themes/theme.styles.tsx';
 import { AttachmentFile } from '@/types/document.types';
 import { MenuAction } from '@/types/menu.types';
 

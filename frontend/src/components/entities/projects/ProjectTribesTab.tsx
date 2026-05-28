@@ -1,6 +1,6 @@
-import { ThemedBadge } from '@/components/common/layout/ThemedBadge';
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { ThemedBadge } from '@/platform/themes/layout/ThemedBadge';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import { PositionEnum } from '@/types/position.types';
 import { ProjectTribeWithMembers } from '@/types/queries/projects.query.types';
 

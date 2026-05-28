@@ -1,13 +1,13 @@
 import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
 import { ThemedSubmitButton } from '@/components/common/form/ThemedSubmitButton.tsx';
-import { ApplicationLogo } from '@/components/common/icons/ApplicationLogo.tsx';
-import { ThemedText } from '@/components/common/layout/ThemedText';
-import { ThemeProvider } from '@/contexts/ThemeContext.tsx';
+import { ApplicationLogo } from '@/platform/themes/icons/ApplicationLogo.tsx';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemeProvider } from '@/platform/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { authService } from './service';
+import { authService } from './authentication-service.ts';
 
 export default function LoginPage() {
   const { t } = useTranslation();

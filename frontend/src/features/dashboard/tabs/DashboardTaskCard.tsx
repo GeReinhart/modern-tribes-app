@@ -1,15 +1,15 @@
-import { ThemedSvgIcon } from '@/components/common/icons/ThemedSvgIcon.tsx';
+import { ThemedSvgIcon } from '@/platform/themes/icons/ThemedSvgIcon.tsx';
 import TaskItemModal from '@/features/tasks/TaskItemModal';
 import type { TaskLabelInfo, TaskPatch } from '@/features/tasks/types';
 import { fibColor, urgencyColor } from '@/features/tasks/types';
-import { useTheme } from '@/contexts/ThemeContext.tsx';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import type { PersonOption } from '@/features/tasks/types';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import type { DashboardTask } from '../types.ts';
+import type { DashboardTask } from '../dashboard-types.ts';
 
 interface Props {
   task: DashboardTask;

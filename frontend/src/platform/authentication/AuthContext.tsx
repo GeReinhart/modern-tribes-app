@@ -10,7 +10,7 @@ import React, {
   useState,
 } from 'react';
 
-import { authService } from './service';
+import { authService } from './authentication-service.ts';
 import { tokenManager } from './tokenManager';
 import { useProactiveTokenRefresh } from './useProactiveTokenRefresh';
 

@@ -1,13 +1,13 @@
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import { TribeCard } from '@/components/entities/tribes/TribeCard.tsx';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider } from '@/contexts/ThemeContext.tsx';
+import { ThemeProvider } from '@/platform/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile.ts';
 import { useUserTribes } from '@/hooks/useTribes.ts';
-import { useVerifyAuthorization } from '@/platform/authorization/useVerifyAuthorization';
-import { errorStyle } from '@/styles/theme.styles.tsx';
+import { authorizationHooks } from '@/platform/authorization/authorization-hooks.ts';
+import { errorStyle } from '@/platform/themes/theme.styles.tsx';
 import { MenuAction } from '@/types/menu.types';
 import { TribeEntry } from '@/types/queries/tribes.query.types.ts';
 
@@ -26,7 +26,7 @@ const TribesPageContent: React.FC = () => {
     data: authorization,
     error: authorizationError,
     verifyAuthorization,
-  } = useVerifyAuthorization();
+  } = authorizationHooks();
 
   const dedupedTribes = useMemo((): TribeEntry[] => {
     const map = new Map<string, TribeEntry>();

@@ -1,18 +1,18 @@
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedSelect } from '@/components/common/form/ThemedSelect';
-import { StatusBadge } from '@/components/common/layout/StatusBadge';
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
-import { ThemedTable } from '@/components/common/layout/ThemedTable';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { StatusBadge } from '@/platform/themes/layout/StatusBadge';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
+import { ThemedConfirmDialog } from '@/platform/themes/layout/ThemedConfirmDialog';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
+import { ThemedTable } from '@/platform/themes/layout/ThemedTable';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,
 } from '@/components/layout/AdminNavigation';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
-import { apiService } from '@/services/api.service';
+import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
+import { apiService } from '@/platform/api/api.service.ts';
 import { projectFeaturesService } from '@/services/project-features.service';
 import { projectService } from '@/services/project.service';
 import {

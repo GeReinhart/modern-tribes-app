@@ -6,7 +6,7 @@ import {
   DocumentCreate,
   DocumentUpdate,
 } from '../types/document.types';
-import { useApi } from './useApi';
+import { apiHooks } from '../platform/api/api-hooks.ts';
 import { createEntityHooks } from './useEntityCrud';
 
 const { useList, useById, useMutations } = createEntityHooks<
@@ -33,7 +33,7 @@ export function useDocumentMutations() {
     loading,
     error,
   } = useMutations();
-  const { execute } = useApi<Document>();
+  const { execute } = apiHooks<Document>();
 
   const getDocumentById = useCallback(
     (id: string) => execute(() => documentService.getById(id)),

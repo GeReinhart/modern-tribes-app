@@ -7,7 +7,7 @@ import {
   UserUpdate,
   UserWithRolesAndPermissions,
 } from '../types/user.types';
-import { useApi } from './useApi';
+import { apiHooks } from '../platform/api/api-hooks.ts';
 import { createEntityHooks } from './useEntityCrud';
 
 const { useList, useById, useMutations } = createEntityHooks<
@@ -32,7 +32,7 @@ export function useUsersWithRolesAndPermissions() {
     loading,
     error,
     execute,
-  } = useApi<UserWithRolesAndPermissions[]>();
+  } = apiHooks<UserWithRolesAndPermissions[]>();
   const hasFetched = useRef(false);
   useEffect(() => {
     if (hasFetched.current) return;
@@ -53,7 +53,7 @@ export function useUserWithRolesAndPermissions(id: string | null) {
     loading,
     error,
     execute,
-  } = useApi<UserWithRolesAndPermissions>();
+  } = apiHooks<UserWithRolesAndPermissions>();
   const lastFetchedId = useRef<string | null>(null);
   useEffect(() => {
     if (!id || lastFetchedId.current === id) return;

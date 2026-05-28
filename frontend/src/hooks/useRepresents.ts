@@ -1,4 +1,4 @@
-import { useApi } from '@/hooks/useApi';
+import { apiHooks } from '@/platform/api/api-hooks.ts';
 import { createEntityHooks } from '@/hooks/useEntityCrud';
 import { representsService } from '@/services/represents.service';
 import {
@@ -43,7 +43,7 @@ export function useRepresentsMutations() {
 }
 
 export function useRepresentsByUserId(userId: string | null) {
-  const { data, loading, error, execute } = useApi<Represents[]>();
+  const { data, loading, error, execute } = apiHooks<Represents[]>();
 
   const fetch = useCallback(async () => {
     if (!userId) return;

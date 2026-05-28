@@ -1,5 +1,5 @@
 import { Label, LabelCreate, LabelUpdate } from '../types/label.types';
-import { apiService } from './api.service';
+import { apiService } from '../platform/api/api.service.ts';
 
 class LabelService {
   private endpoint = '/crud/labels';

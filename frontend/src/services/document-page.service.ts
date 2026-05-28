@@ -4,7 +4,7 @@ import {
   DocumentPageReorderItem,
   DocumentPageUpdate,
 } from '../types/document-page.types';
-import { apiService } from './api.service';
+import { apiService } from '../platform/api/api.service.ts';
 
 class DocumentPageService {
   private base(projectId: string, projectDocumentId: string) {

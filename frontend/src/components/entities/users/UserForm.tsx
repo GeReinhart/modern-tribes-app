@@ -2,9 +2,9 @@ import { ThemedButton } from '@/components/common/form/ThemedButton.tsx';
 import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
 import { ThemedMultiSelect } from '@/components/common/form/ThemedMultiSelect.tsx';
 import { ThemedSelect } from '@/components/common/form/ThemedSelect.tsx';
-import { useTheme } from '@/contexts/ThemeContext.tsx';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { usePersons } from '@/hooks/usePersons.ts';
-import { useRoles } from '@/platform/authorization/useRoles';
+import { rolesHooks } from '@/platform/authorization/roles-hooks.ts';
 import { FormMode } from '@/types/common.types.ts';
 import { User, UserCreate, UserUpdate } from '@/types/user.types.ts';
 
@@ -37,7 +37,7 @@ export const UserForm: React.FC<UserFormProps> = ({
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const { roles, loading: rolesLoading } = useRoles();
+  const { roles, loading: rolesLoading } = rolesHooks();
   const { persons, loading: personsLoading } = usePersons();
 
   const [formData, setFormData] = useState({

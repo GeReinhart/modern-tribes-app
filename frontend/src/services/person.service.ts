@@ -1,5 +1,5 @@
 import { Person, PersonCreate, PersonUpdate } from '../types/person.types';
-import { apiService } from './api.service';
+import { apiService } from '../platform/api/api.service.ts';
 
 class PersonService {
   private endpoint = '/crud/persons';

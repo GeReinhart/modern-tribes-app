@@ -1,13 +1,13 @@
-import FileUploader from '@/components/common/editor/FileUploader';
-import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
+import EditorFileUploader from '@/platform/documents/editor/EditorFileUploader.tsx';
+import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedLoadingOverlay } from '@/components/common/layout/ThemedLoadingOverlay';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
-import { ThemedSection } from '@/components/common/layout/ThemedSection';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
+import { ThemedLoadingOverlay } from '@/platform/themes/layout/ThemedLoadingOverlay';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
+import { ThemedSection } from '@/platform/themes/layout/ThemedSection';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { useDocumentPage } from '@/hooks/useDocumentPages';
 import { useProjectWithDocument } from '@/hooks/useProjects';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
@@ -16,7 +16,7 @@ import {
   errorStyle,
   formActionsStyle,
   formContainerStyle,
-} from '@/styles/theme.styles';
+} from '@/platform/themes/theme.styles.tsx';
 import { AttachmentFile } from '@/types/document.types';
 import { MenuAction } from '@/types/menu.types';
 
@@ -213,11 +213,11 @@ const DocumentPageFormPageContent: React.FC = () => {
                 {t('projects.description')}
               </ThemedText>
               <div className="border border-gray-300 rounded-lg overflow-hidden">
-                <JoditEditorComponent content={content} onChange={setContent} />
+                <EditorJoditComponent content={content} onChange={setContent} />
               </div>
             </div>
             <div>
-              <FileUploader
+              <EditorFileUploader
                 attachments={attachments}
                 onAttachmentsChange={setAttachments}
               />

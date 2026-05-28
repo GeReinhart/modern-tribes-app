@@ -1,7 +1,7 @@
-import { ThemedCard } from '@/components/common/layout/ThemedCard.tsx';
-import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard.tsx';
+import { ThemedTabs } from '@/platform/themes/layout/ThemedTabs';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider } from '@/contexts/ThemeContext';
+import { ThemeProvider } from '@/platform/themes/ThemeContext.tsx';
 import DashboardBookmarksTab from '@/features/bookmarks/DashboardBookmarksTab';
 import DashboardTasksTab from '@/features/dashboard/tabs/DashboardTasksTab';
 import DashboardTribesTab from '@/features/dashboard/tabs/DashboardTribesTab';
@@ -10,8 +10,8 @@ import { TabConfigPopup } from '@/features/tab-config/TabConfigPopup';
 import { useTabConfig } from '@/features/tab-config/useTabConfig';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
 import { useUrlTab } from '@/hooks/useUrlTab';
-import { useVerifyAuthorization } from '@/platform/authorization/useVerifyAuthorization';
-import { errorStyle } from '@/styles/theme.styles.tsx';
+import { authorizationHooks } from '@/platform/authorization/authorization-hooks.ts';
+import { errorStyle } from '@/platform/themes/theme.styles.tsx';
 import { MenuAction } from '@/types/menu.types';
 
 import React, { useEffect, useMemo, useState } from 'react';
@@ -43,7 +43,7 @@ const DashboardPageContent: React.FC = () => {
     data: authorization,
     error: authorizationError,
     verifyAuthorization,
-  } = useVerifyAuthorization();
+  } = authorizationHooks();
   const { user } = useCurrentUserProfile();
   const [showTabConfig, setShowTabConfig] = useState(false);
 

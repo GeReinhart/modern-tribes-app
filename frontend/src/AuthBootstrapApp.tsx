@@ -6,7 +6,7 @@ import { AuthProvider } from '@/platform/authentication/AuthContext.tsx';
 import { ResponsiveProvider } from '@/contexts/ResponsiveContext.tsx';
 import { UserProfileProvider } from '@/contexts/UserProfileContext.tsx';
 import { BookmarksProvider } from '@/features/bookmarks/BookmarksContext';
-import { AppConfigPage } from '@/pages/admin/AppConfigPage.tsx';
+import { AdminAppConfigPage } from '@/platform/app-config/AdminAppConfigPage.tsx';
 import { AuthorizationPage } from '@/platform/authorization/AuthorizationPage.tsx';
 import { DocumentRevisionsPage } from '@/pages/admin/DocumentRevisionsPage.tsx';
 import { DocumentsCrudPage } from '@/pages/admin/DocumentsCrudPage.tsx';
@@ -18,8 +18,8 @@ import { PublicationsAdminPage } from '@/pages/admin/PublicationsAdminPage.tsx';
 import { TribeEditPage } from '@/pages/admin/TribeEditPage.tsx';
 import { TribesProjectsPage } from '@/pages/admin/TribesProjectsPage.tsx';
 import { UserEditPage } from '@/pages/admin/UserEditPage.tsx';
-import { NotificationsAdminPage } from '@/pages/admin/notifications/NotificationsAdminPage';
-import AboutPage from '@/pages/app/AboutPage.tsx';
+import { AdminNotificationsPage } from '@/platform/notifications/AdminNotificationsPage.tsx';
+import AboutPage from '@/platform/about/AboutPage.tsx';
 import { CreateProjectPage } from '@/pages/app/CreateProjectPage.tsx';
 import CreateTribeForm from '@/pages/app/CreateTribePage.tsx';
 import DashboardPage from '@/features/dashboard/DashboardPage';
@@ -117,7 +117,7 @@ function AuthBootstrapApp() {
                         path="/admin/documents"
                         element={<DocumentsCrudPage />}
                       />
-                      <Route path="/admin/config" element={<AppConfigPage />} />
+                      <Route path="/admin/config" element={<AdminAppConfigPage />} />
                       <Route
                         path="/admin/features"
                         element={<FeaturesPage />}
@@ -141,7 +141,7 @@ function AuthBootstrapApp() {
                       />
                       <Route
                         path="/admin/notifications"
-                        element={<NotificationsAdminPage />}
+                        element={<AdminNotificationsPage />}
                       />
 
                       <Route

@@ -1,18 +1,18 @@
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedInput } from '@/components/common/form/ThemedInput';
-import { StatusBadge } from '@/components/common/layout/StatusBadge';
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
-import { ThemedTable } from '@/components/common/layout/ThemedTable';
-import { ThemedTabs } from '@/components/common/layout/ThemedTabs';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { StatusBadge } from '@/platform/themes/layout/StatusBadge';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
+import { ThemedConfirmDialog } from '@/platform/themes/layout/ThemedConfirmDialog';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
+import { ThemedTable } from '@/platform/themes/layout/ThemedTable';
+import { ThemedTabs } from '@/platform/themes/layout/ThemedTabs';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,
 } from '@/components/layout/AdminNavigation';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/contexts/UserProfileContext';
 import { useCrudPage } from '@/hooks/useCrudPage';
 
@@ -29,8 +29,8 @@ import {
   PermissionUpdate,
 } from './permission.types';
 import { RoleCreate, RoleUpdate, RoleWithPermissions } from './role.types';
-import { usePermissionMutations, usePermissions } from './usePermissions';
-import { useRoleMutations, useRolesWithPermissions } from './useRoles';
+import { usePermissionMutations, permissionsHooks } from './permissions-hooks.ts';
+import { useRoleMutations, useRolesWithPermissions } from './roles-hooks.ts';
 
 // ─── Roles Tab ────────────────────────────────────────────────────────────────
 
@@ -208,7 +208,7 @@ const PermissionsTab: React.FC = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
-  const { permissions, loading, error, refetch } = usePermissions();
+  const { permissions, loading, error, refetch } = permissionsHooks();
   const {
     createPermission,
     updatePermission,

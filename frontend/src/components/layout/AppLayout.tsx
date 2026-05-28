@@ -1,4 +1,4 @@
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { MenuAction } from '@/types/menu.types';
 
 import React from 'react';

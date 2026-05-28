@@ -1,16 +1,16 @@
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
 import type { TaskLabelInfo, TaskPatch } from '@/features/tasks/types';
-import { useTheme } from '@/contexts/ThemeContext.tsx';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import type { PersonOption } from '@/features/tasks/types';
 
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { useMyTaskMutations, useMyTasks } from '../hooks.ts';
+import { useMyTaskMutations, useMyTasks } from '../dashboard-hooks.ts';
 import type {
   DashboardTask,
   MyTasksFilters,
   MyTasksResponse,
-} from '../types.ts';
+} from '../dashboard-types.ts';
 import DashboardTasksFilters from './DashboardTasksFilters.tsx';
 import DashboardTasksList from './DashboardTasksList.tsx';
 

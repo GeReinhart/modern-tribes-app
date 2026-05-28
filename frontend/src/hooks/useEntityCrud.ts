@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useApi } from './useApi';
+import { apiHooks } from '../platform/api/api-hooks.ts';
 
 interface EntityService<T, CreateDto, UpdateDto> {
   getAll: () => Promise<T[]>;
@@ -16,7 +16,7 @@ export function createEntityHooks<T, CreateDto, UpdateDto>(
 ) {
   function useList() {
     const [items, setItems] = useState<T[]>([]);
-    const { loading, error, execute } = useApi<T[]>();
+    const { loading, error, execute } = apiHooks<T[]>();
     const hasFetched = useRef(false);
 
     const refetch = useCallback(async () => {
@@ -38,7 +38,7 @@ export function createEntityHooks<T, CreateDto, UpdateDto>(
   }
 
   function useById(id: string | null) {
-    const { data: item, loading, error, execute } = useApi<T>();
+    const { data: item, loading, error, execute } = apiHooks<T>();
     useEffect(() => {
       if (id) execute(() => service.getById(id));
     }, [id, execute]);
@@ -46,8 +46,8 @@ export function createEntityHooks<T, CreateDto, UpdateDto>(
   }
 
   function useMutations() {
-    const { loading, error, execute } = useApi<T>();
-    const { execute: executeVoid } = useApi<void>();
+    const { loading, error, execute } = apiHooks<T>();
+    const { execute: executeVoid } = apiHooks<void>();
 
     const create = useCallback(
       (data: CreateDto) => execute(() => service.create(data)),

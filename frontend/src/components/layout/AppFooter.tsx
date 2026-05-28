@@ -1,10 +1,10 @@
 import {
   IconName,
   ThemedSvgIcon,
-} from '@/components/common/icons/ThemedSvgIcon';
-import { ZoomControl } from '@/components/common/layout/ZoomControl';
+} from '@/platform/themes/icons/ThemedSvgIcon';
+import { ZoomControl } from '@/platform/themes/layout/ZoomControl';
 import { UserAvatarIcon } from '@/components/entities/users/UserAvatarIcon';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { BookmarkToggle } from '@/features/bookmarks/BookmarkToggle';
 
 import React from 'react';

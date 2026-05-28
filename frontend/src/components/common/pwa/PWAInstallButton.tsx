@@ -1,6 +1,6 @@
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { useResponsiveContext } from '@/contexts/ResponsiveContext';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 
 import React, { useState } from 'react';

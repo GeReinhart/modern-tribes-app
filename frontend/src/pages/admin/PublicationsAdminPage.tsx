@@ -1,14 +1,14 @@
 import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedConfirmDialog } from '@/components/common/layout/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
-import { ThemedSection } from '@/components/common/layout/ThemedSection';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { ThemedConfirmDialog } from '@/platform/themes/layout/ThemedConfirmDialog';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
+import { ThemedSection } from '@/platform/themes/layout/ThemedSection';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,
 } from '@/components/layout/AdminNavigation';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { publicationService } from '@/services/publication.service';
 import { PublicationAdminItem } from '@/types/publication.types';
 

@@ -1,7 +1,7 @@
 import { ThemedButton } from '@/components/common/form/ThemedButton.tsx';
 import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
 import { ThemedSelect } from '@/components/common/form/ThemedSelect.tsx';
-import { useTheme } from '@/contexts/ThemeContext.tsx';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { useDocuments } from '@/hooks/useDocuments.ts';
 import { useProjects } from '@/hooks/useProjects.ts';
 import { useTribeProjects } from '@/hooks/useTribes.ts';

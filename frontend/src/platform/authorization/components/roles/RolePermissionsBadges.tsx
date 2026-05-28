@@ -1,4 +1,4 @@
-import { ThemedBadge } from '@/components/common/layout/ThemedBadge.tsx';
+import { ThemedBadge } from '@/platform/themes/layout/ThemedBadge.tsx';
 
 import React from 'react';
 

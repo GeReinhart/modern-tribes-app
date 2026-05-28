@@ -1,13 +1,13 @@
-import FileUploader from '@/components/common/editor/FileUploader.tsx';
-import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent.tsx';
+import EditorFileUploader from '@/platform/documents/editor/EditorFileUploader.tsx';
+import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedCard } from '@/components/common/layout/ThemedCard';
-import { ThemedLoadingOverlay } from '@/components/common/layout/ThemedLoadingOverlay.tsx';
-import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner.tsx';
-import { ThemedSection } from '@/components/common/layout/ThemedSection.tsx';
-import { ThemedText } from '@/components/common/layout/ThemedText';
+import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
+import { ThemedLoadingOverlay } from '@/platform/themes/layout/ThemedLoadingOverlay.tsx';
+import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
+import { ThemedSection } from '@/platform/themes/layout/ThemedSection.tsx';
+import { ThemedText } from '@/platform/themes/layout/ThemedText';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/contexts/ThemeContext.tsx';
+import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { usePersons } from '@/hooks/usePersons';
 import {
   useTribeWithPositions,
@@ -29,7 +29,7 @@ import {
   personInfoContainerStyle,
   personListContainerStyle,
   successStyle,
-} from '@/styles/theme.styles';
+} from '@/platform/themes/theme.styles.tsx';
 import { TribeWithPositionsUpdate } from '@/types/app/tribe_with_positions.types.ts';
 import { AttachmentFile } from '@/types/document.types.ts';
 import { MenuAction } from '@/types/menu.types';
@@ -451,7 +451,7 @@ const UpdateTribePageContent: React.FC = () => {
               </ThemedText>
               <div className="border border-gray-300 rounded-lg overflow-hidden">
                 {initialized && (
-                  <JoditEditorComponent
+                  <EditorJoditComponent
                     content={documentContent}
                     onChange={setDocumentContent}
                   />
@@ -459,7 +459,7 @@ const UpdateTribePageContent: React.FC = () => {
               </div>
 
               <div className="mb-6">
-                <FileUploader
+                <EditorFileUploader
                   attachments={attachments}
                   onAttachmentsChange={setAttachments}
                 />

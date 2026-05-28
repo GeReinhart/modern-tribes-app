@@ -1,11 +1,11 @@
 import type { TaskLabelInfo, TaskPatch } from '@/features/tasks/types';
-import { useTheme } from '@/contexts/ThemeContext.tsx';
+import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import type { PersonOption } from '@/features/tasks/types';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { DashboardTask, MyTasksResponse } from '../types.ts';
+import type { DashboardTask, MyTasksResponse } from '../dashboard-types.ts';
 import DashboardTaskCard from './DashboardTaskCard.tsx';
 
 interface Props {
