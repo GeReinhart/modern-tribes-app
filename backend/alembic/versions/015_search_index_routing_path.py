@@ -16,20 +16,26 @@ def upgrade() -> None:
     op.execute("ALTER TABLE search_index ADD COLUMN routing_path TEXT")
 
     op.execute("""
-        UPDATE search_index si
-        SET routing_path = CASE
-            WHEN si.project_document_id IS NOT NULL AND si.project_id IS NOT NULL
-                THEN '/app/tribes/' || t.url_param_id
-                     || '/projects/' || p.url_param_id
-                     || '/documents/' || si.project_document_id
-            WHEN si.project_id IS NOT NULL
-                THEN '/app/tribes/' || t.url_param_id
-                     || '/projects/' || p.url_param_id
-            ELSE '/app/tribes/' || t.url_param_id
-        END
-        FROM tribes t
-        LEFT JOIN projects p ON p.id = si.project_id
-        WHERE t.id = si.tribe_id
+        UPDATE search_index
+        SET routing_path = sub.routing_path
+        FROM (
+            SELECT
+                si.id,
+                CASE
+                    WHEN si.project_document_id IS NOT NULL AND si.project_id IS NOT NULL
+                        THEN '/app/tribes/' || t.url_param_id
+                             || '/projects/' || p.url_param_id
+                             || '/documents/' || si.project_document_id
+                    WHEN si.project_id IS NOT NULL
+                        THEN '/app/tribes/' || t.url_param_id
+                             || '/projects/' || p.url_param_id
+                    ELSE '/app/tribes/' || t.url_param_id
+                END AS routing_path
+            FROM search_index si
+            JOIN tribes t ON t.id = si.tribe_id
+            LEFT JOIN projects p ON p.id = si.project_id
+        ) sub
+        WHERE search_index.id = sub.id
     """)
 
     op.execute("DROP INDEX IF EXISTS idx_search_index_tribe")
