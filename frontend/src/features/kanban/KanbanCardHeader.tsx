@@ -63,13 +63,15 @@ const KanbanCardHeader: React.FC<Props> = ({
 
       {!isArchived && (
         <>
-          <button
-            onClick={onOpenModal}
-            title={t('common.edit')}
-            style={{ ...btnStyle, opacity: 0.7 }}
-          >
-            <ThemedSvgIcon name="pencil" color={theme.colors.text} size={12} />
-          </button>
+          {canEdit && (
+            <button
+              onClick={onOpenModal}
+              title={t('common.edit')}
+              style={{ ...btnStyle, opacity: 0.7 }}
+            >
+              <ThemedSvgIcon name="pencil" color={theme.colors.text} size={12} />
+            </button>
+          )}
           {canEdit && (
             <button
               onClick={onRequestArchive}

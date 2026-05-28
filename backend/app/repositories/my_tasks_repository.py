@@ -28,13 +28,10 @@ _KANBAN_BASE = """
     LEFT JOIN persons pe ON pe.id = c.assigned_person_id
     WHERE c.status = 'active'
     AND c.due_date IS NOT NULL
-    AND (
-        c.assigned_person_id IS NULL
-        OR c.assigned_person_id IN (
-            SELECT u.person_id FROM users u WHERE u.id = $1 AND u.person_id IS NOT NULL
-            UNION
-            SELECT r.person_id FROM represents r WHERE r.user_id = $1 AND r.status = 'active'
-        )
+    AND c.assigned_person_id IN (
+        SELECT u.person_id FROM users u WHERE u.id = $1 AND u.person_id IS NOT NULL
+        UNION
+        SELECT r.person_id FROM represents r WHERE r.user_id = $1 AND r.status = 'active'
     )
     AND col.position < (
         SELECT MAX(kc2.position) FROM kanban_columns kc2
@@ -69,13 +66,10 @@ _TODO_BASE = """
     WHERE i.status = 'active'
     AND i.todo_status = 'todo'
     AND i.due_date IS NOT NULL
-    AND (
-        i.assigned_person_id IS NULL
-        OR i.assigned_person_id IN (
-            SELECT u.person_id FROM users u WHERE u.id = $1 AND u.person_id IS NOT NULL
-            UNION
-            SELECT r.person_id FROM represents r WHERE r.user_id = $1 AND r.status = 'active'
-        )
+    AND i.assigned_person_id IN (
+        SELECT u.person_id FROM users u WHERE u.id = $1 AND u.person_id IS NOT NULL
+        UNION
+        SELECT r.person_id FROM represents r WHERE r.user_id = $1 AND r.status = 'active'
     )
 """
 

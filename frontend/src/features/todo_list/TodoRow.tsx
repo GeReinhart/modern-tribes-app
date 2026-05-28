@@ -101,7 +101,7 @@ const TodoRow: React.FC<Props> = ({
         >
           {item.title}
         </span>
-        {!isArchived && (
+        {canEdit && !isArchived && (
           <button
             onClick={() => setModalOpen(true)}
             title={t('common.edit')}
