@@ -1,8 +1,8 @@
-import { GithubIcon } from '@/platform/themes/icons/GithubIcon.tsx';
-import { ThemedSection } from '@/platform/themes/components/ThemedSection.tsx';
-import { ThemedText } from '@/platform/themes/components/ThemedText.tsx';
-import { AppLayout } from '@/components/layout/AppLayout.tsx';
-import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
+import { GithubIcon } from '@/platform/layout/themes/icons/GithubIcon.tsx';
+import { ThemedSection } from '@/platform/layout/themes/components/ThemedSection.tsx';
+import { ThemedText } from '@/platform/layout/themes/components/ThemedText.tsx';
+import { AppLayout } from '@/platform/layout/AppLayout.tsx';
+import { ThemeProvider, useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

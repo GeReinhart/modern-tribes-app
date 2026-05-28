@@ -1,17 +1,17 @@
-import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
-import { ThemedSelect } from '@/platform/themes/components/ThemedSelect.tsx';
-import { StatusBadge } from '@/platform/themes/components/StatusBadge';
-import { ThemedCard } from '@/platform/themes/components/ThemedCard';
-import { ThemedConfirmDialog } from '@/platform/themes/components/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner';
-import { ThemedTable } from '@/platform/themes/components/ThemedTable';
-import { ThemedText } from '@/platform/themes/components/ThemedText';
+import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
+import { ThemedSelect } from '@/platform/layout/themes/components/ThemedSelect.tsx';
+import { StatusBadge } from '@/platform/layout/themes/components/StatusBadge';
+import { ThemedCard } from '@/platform/layout/themes/components/ThemedCard';
+import { ThemedConfirmDialog } from '@/platform/layout/themes/components/ThemedConfirmDialog';
+import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner';
+import { ThemedTable } from '@/platform/layout/themes/components/ThemedTable';
+import { ThemedText } from '@/platform/layout/themes/components/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,
-} from '@/components/layout/AdminNavigation';
-import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
+} from '@/platform/layout/AdminNavigation';
+import { AppLayout } from '@/platform/layout/AppLayout';
+import { ThemeProvider, useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
 import { apiService } from '@/platform/api/api.service.ts';
 import { projectFeaturesService } from '@/services/project-features.service';
 import { projectService } from '@/services/project.service';

@@ -1,4 +1,4 @@
-import { useTheme } from '@/platform/themes/ThemeContext.tsx';
+import { useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
 import { DocumentPage } from '@/types/document-page.types.ts';
 import { AttachmentFile } from '@/types/document.types.ts';
 import { HeadingItem, extractAndInjectHeadings } from '@/utils/toc.utils.ts';

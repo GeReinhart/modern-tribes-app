@@ -1,8 +1,8 @@
-import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
-import { ThemedInput } from '@/platform/themes/components/ThemedInput.tsx';
-import { ThemedMultiSelect } from '@/platform/themes/components/ThemedMultiSelect.tsx';
-import { ThemedSelect } from '@/platform/themes/components/ThemedSelect.tsx';
-import { useTheme } from '@/platform/themes/ThemeContext.tsx';
+import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
+import { ThemedInput } from '@/platform/layout/themes/components/ThemedInput.tsx';
+import { ThemedMultiSelect } from '@/platform/layout/themes/components/ThemedMultiSelect.tsx';
+import { ThemedSelect } from '@/platform/layout/themes/components/ThemedSelect.tsx';
+import { useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
 import { usePersons } from '@/hooks/usePersons.ts';
 import { rolesHooks } from '@/platform/authorization/roles-hooks.ts';
 import { FormMode } from '@/types/common.types.ts';

@@ -1,15 +1,15 @@
-import { ThemedInput } from '@/platform/themes/components/ThemedInput.tsx';
-import { ThemedCard } from '@/platform/themes/components/ThemedCard.tsx';
-import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
-import { ThemedTable } from '@/platform/themes/components/ThemedTable.tsx';
-import { ThemedText } from '@/platform/themes/components/ThemedText.tsx';
+import { ThemedInput } from '@/platform/layout/themes/components/ThemedInput.tsx';
+import { ThemedCard } from '@/platform/layout/themes/components/ThemedCard.tsx';
+import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedTable } from '@/platform/layout/themes/components/ThemedTable.tsx';
+import { ThemedText } from '@/platform/layout/themes/components/ThemedText.tsx';
 import { RowActionsMenu } from '@/components/common/menu/RowActionsMenu.tsx';
 import {
   AdminNavigation,
   adminMainThemeId,
-} from '@/components/layout/AdminNavigation.tsx';
-import { AppLayout } from '@/components/layout/AppLayout.tsx';
-import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
+} from '@/platform/layout/AdminNavigation.tsx';
+import { AppLayout } from '@/platform/layout/AppLayout.tsx';
+import { ThemeProvider, useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/contexts/UserProfileContext.tsx';
 import { useUserSearch } from '@/hooks/useUserSearch.ts';
 import { UserSearchResult } from '@/types/notification.types.ts';

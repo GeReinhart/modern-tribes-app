@@ -1,5 +1,5 @@
-import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
-import { useTheme } from '@/platform/themes/ThemeContext.tsx';
+import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
+import { useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

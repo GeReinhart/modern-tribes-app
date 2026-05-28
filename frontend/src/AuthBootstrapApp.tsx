@@ -8,16 +8,16 @@ import { UserProfileProvider } from '@/contexts/UserProfileContext.tsx';
 import { BookmarksProvider } from '@/features/bookmarks/BookmarksContext';
 import { AdminAppConfigPage } from '@/platform/app-config/AdminAppConfigPage.tsx';
 import { AuthorizationPage } from '@/platform/authorization/AuthorizationPage.tsx';
-import { DocumentRevisionsPage } from '@/pages/admin/DocumentRevisionsPage.tsx';
-import { DocumentsCrudPage } from '@/pages/admin/DocumentsCrudPage.tsx';
+import { DocumentRevisionsPage } from '@/platform/revisions/DocumentRevisionsPage.tsx';
+import { AdminDocumentsPage } from '@/platform/documents/AdminDocumentsPage.tsx';
 import { FeaturesPage } from '@/pages/admin/FeaturesPage.tsx';
-import { MailsPage } from '@/pages/admin/MailsPage.tsx';
+import { AdminMailsPage } from '@/platform/mail/AdminMailsPage.tsx';
 import { MonitoringPage } from '@/pages/admin/MonitoringPage.tsx';
-import { PeopleManagementPage } from '@/pages/admin/PeopleManagementPage.tsx';
+import { AdminPeoplePage } from '@/platform/people/AdminPeoplePage.tsx';
 import { PublicationsAdminPage } from '@/pages/admin/PublicationsAdminPage.tsx';
 import { TribeEditPage } from '@/pages/admin/TribeEditPage.tsx';
 import { TribesProjectsPage } from '@/pages/admin/TribesProjectsPage.tsx';
-import { UserEditPage } from '@/pages/admin/UserEditPage.tsx';
+import { AdminUserEditPage } from '@/platform/people/AdminUserEditPage.tsx';
 import { AdminNotificationsPage } from '@/platform/notifications/AdminNotificationsPage.tsx';
 import AboutPage from '@/platform/about/AboutPage.tsx';
 import { CreateProjectPage } from '@/pages/app/CreateProjectPage.tsx';
@@ -26,7 +26,7 @@ import DashboardPage from '@/features/dashboard/DashboardPage';
 import { DocumentPageFormPage } from '@/pages/app/DocumentPageFormPage.tsx';
 import { EditProjectDocumentPage } from '@/pages/app/EditProjectDocumentPage.tsx';
 import { EditProjectPage } from '@/pages/app/EditProjectPage.tsx';
-import ProfilePage from '@/pages/app/ProfilePage.tsx';
+import ProfilePage from '@/platform/people/ProfilePage.tsx';
 import { ProjectDocumentFormPage } from '@/pages/app/ProjectDocumentFormPage.tsx';
 import { ProjectDocumentViewPage } from '@/pages/app/ProjectDocumentViewPage.tsx';
 import { ProjectsPage } from '@/pages/app/ProjectsPage.tsx';
@@ -75,7 +75,7 @@ function AuthBootstrapApp() {
                       />
                       <Route
                         path="/admin/people"
-                        element={<PeopleManagementPage />}
+                        element={<AdminPeoplePage />}
                       />
                       <Route
                         path="/admin/users"
@@ -83,7 +83,7 @@ function AuthBootstrapApp() {
                       />
                       <Route
                         path="/admin/users/:userId/edit"
-                        element={<UserEditPage />}
+                        element={<AdminUserEditPage />}
                       />
                       <Route
                         path="/admin/authorization"
@@ -115,7 +115,7 @@ function AuthBootstrapApp() {
                       />
                       <Route
                         path="/admin/documents"
-                        element={<DocumentsCrudPage />}
+                        element={<AdminDocumentsPage />}
                       />
                       <Route path="/admin/config" element={<AdminAppConfigPage />} />
                       <Route
@@ -134,7 +134,7 @@ function AuthBootstrapApp() {
                         path="/admin/monitoring/documents/:documentId/updated_at/:date"
                         element={<DocumentRevisionsPage />}
                       />
-                      <Route path="/admin/mails" element={<MailsPage />} />
+                      <Route path="/admin/mails" element={<AdminMailsPage />} />
                       <Route
                         path="/admin/publications"
                         element={<PublicationsAdminPage />}

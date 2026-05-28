@@ -2,6 +2,12 @@ import { DocumentAttachments } from '@/platform/documents/DocumentAttachments.ts
 import { DocumentPagesSection } from '@/platform/documents/DocumentPagesSection.tsx';
 import { DocumentReader } from '@/platform/documents/DocumentReader.tsx';
 import { documentViewMenuActionsHooks } from '@/platform/documents/DocumentViewMenuActions-hooks.ts';
+import { ThemedBadge } from '@/platform/layout/themes/components/ThemedBadge';
+import { ThemedConfirmDialog } from '@/platform/layout/themes/components/ThemedConfirmDialog';
+import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner';
+import { ThemedSection } from '@/platform/layout/themes/components/ThemedSection';
+import { AppLayout } from '@/platform/layout/AppLayout';
+import { ThemeProvider, useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
 import { ThemedBadge } from '@/platform/themes/layout/ThemedBadge';
 import { ThemedConfirmDialog } from '@/platform/themes/layout/ThemedConfirmDialog';
 import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
@@ -31,7 +37,7 @@ import {
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
 import { projectDocumentService } from '@/services/project-document.service';
 import { publicationService } from '@/services/publication.service';
-import { errorStyle } from '@/platform/themes/theme.styles.tsx';
+import { errorStyle } from '@/platform/layout/themes/theme.styles.tsx';
 import { ProjectEntry } from '@/types/queries/projects.query.types';
 
 import React, { useMemo, useState } from 'react';

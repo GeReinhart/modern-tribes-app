@@ -1,7 +1,7 @@
 import EditorFileUploader from '@/platform/documents/editor/EditorFileUploader.tsx';
 import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
-import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
-import { ThemedSelect } from '@/platform/themes/components/ThemedSelect.tsx';
+import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
+import { ThemedSelect } from '@/platform/layout/themes/components/ThemedSelect.tsx';
 import { FormMode } from '@/types/common.types.ts';
 import {
   AttachmentFile,

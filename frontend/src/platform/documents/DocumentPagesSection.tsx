@@ -1,5 +1,5 @@
-import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
-import { useTheme } from '@/platform/themes/ThemeContext.tsx';
+import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner.tsx';
+import { useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
 import { documentPageService } from '@/services/document-page.service.ts';
 import { DocumentPage } from '@/types/document-page.types.ts';
 import { EntityAuditBadge } from '@/components/common/audit/EntityAuditBadge';

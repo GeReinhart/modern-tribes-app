@@ -1,9 +1,9 @@
 import EditorFileUploader from '@/platform/documents/editor/EditorFileUploader.tsx';
 import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
-import { LabelSelector } from '@/platform/themes/components/LabelSelector.tsx';
-import { ThemedSection } from '@/platform/themes/components/ThemedSection.tsx';
-import { ThemedText } from '@/platform/themes/components/ThemedText.tsx';
-import { useTheme } from '@/platform/themes/ThemeContext.tsx';
+import { LabelSelector } from '@/platform/layout/themes/components/LabelSelector.tsx';
+import { ThemedSection } from '@/platform/layout/themes/components/ThemedSection.tsx';
+import { ThemedText } from '@/platform/layout/themes/components/ThemedText.tsx';
+import { useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
 import { AttachmentFile } from '@/types/document.types.ts';
 
 import React from 'react';

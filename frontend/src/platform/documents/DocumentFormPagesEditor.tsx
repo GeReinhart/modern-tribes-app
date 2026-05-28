@@ -1,6 +1,6 @@
 import { DocumentPagesSection } from '@/platform/documents/DocumentPagesSection.tsx';
-import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
-import { ThemedSection } from '@/platform/themes/components/ThemedSection.tsx';
+import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
+import { ThemedSection } from '@/platform/layout/themes/components/ThemedSection.tsx';
 import { DocumentPage } from '@/types/document-page.types.ts';
 
 import React from 'react';

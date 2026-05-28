@@ -1,4 +1,4 @@
-import { ThemedModal } from '@/platform/themes/components/ThemedModal.tsx';
+import { ThemedModal } from '@/platform/layout/themes/components/ThemedModal.tsx';
 import { FormMode } from '@/types/common.types.ts';
 import {
   Document,

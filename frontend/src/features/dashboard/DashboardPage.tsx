@@ -1,7 +1,7 @@
-import { ThemedCard } from '@/platform/themes/components/ThemedCard.tsx';
-import { ThemedTabs } from '@/platform/themes/components/ThemedTabs';
-import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider } from '@/platform/themes/ThemeContext.tsx';
+import { ThemedCard } from '@/platform/layout/themes/components/ThemedCard.tsx';
+import { ThemedTabs } from '@/platform/layout/themes/components/ThemedTabs';
+import { AppLayout } from '@/platform/layout/AppLayout';
+import { ThemeProvider } from '@/platform/layout/themes/ThemeContext.tsx';
 import DashboardBookmarksTab from '@/features/bookmarks/DashboardBookmarksTab';
 import DashboardTasksTab from '@/features/dashboard/tabs/DashboardTasksTab';
 import DashboardTribesTab from '@/features/dashboard/tabs/DashboardTribesTab';
@@ -11,7 +11,7 @@ import { useTabConfig } from '@/features/tab-config/useTabConfig';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
 import { useUrlTab } from '@/hooks/useUrlTab';
 import { authorizationHooks } from '@/platform/authorization/authorization-hooks.ts';
-import { errorStyle } from '@/platform/themes/theme.styles.tsx';
+import { errorStyle } from '@/platform/layout/themes/theme.styles.tsx';
 import { MenuAction } from '@/types/menu.types';
 
 import React, { useEffect, useMemo, useState } from 'react';

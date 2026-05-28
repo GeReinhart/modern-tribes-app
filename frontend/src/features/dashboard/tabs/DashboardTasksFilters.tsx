@@ -1,4 +1,4 @@
-import { useTheme } from '@/platform/themes/ThemeContext.tsx';
+import { useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
 import type { PersonOption } from '@/features/tasks/types';
 
 import React from 'react';

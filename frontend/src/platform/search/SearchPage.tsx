@@ -1,9 +1,9 @@
-import { ThemedSvgIcon } from '@/platform/themes/icons/ThemedSvgIcon';
-import { ThemedCard } from '@/platform/themes/components/ThemedCard';
-import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner';
-import { ThemedText } from '@/platform/themes/components/ThemedText';
-import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
+import { ThemedSvgIcon } from '@/platform/layout/themes/icons/ThemedSvgIcon';
+import { ThemedCard } from '@/platform/layout/themes/components/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner';
+import { ThemedText } from '@/platform/layout/themes/components/ThemedText';
+import { AppLayout } from '@/platform/layout/AppLayout';
+import { ThemeProvider, useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -1,14 +1,14 @@
-import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
-import { ThemedCard } from '@/platform/themes/components/ThemedCard.tsx';
-import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
-import { ThemedText } from '@/platform/themes/components/ThemedText.tsx';
+import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
+import { ThemedCard } from '@/platform/layout/themes/components/ThemedCard.tsx';
+import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedText } from '@/platform/layout/themes/components/ThemedText.tsx';
 import {
   AdminNavigation,
   adminMainThemeId,
-} from '@/components/layout/AdminNavigation.tsx';
-import { AppLayout } from '@/components/layout/AppLayout.tsx';
+} from '@/platform/layout/AdminNavigation.tsx';
+import { AppLayout } from '@/platform/layout/AppLayout.tsx';
 import { useAppConfig } from '@/contexts/AppConfigContext.tsx';
-import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
+import { ThemeProvider, useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
 import { apiHooks } from '@/platform/api/api-hooks.ts';
 import { appConfigService } from '@/platform/app-config/app-config.service.ts';
 import { AppConfigCreate, AppConfigEntry } from '@/platform/app-config/app-config.types.ts';

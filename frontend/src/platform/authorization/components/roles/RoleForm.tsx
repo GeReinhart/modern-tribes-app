@@ -1,8 +1,8 @@
-import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
-import { ThemedInput } from '@/platform/themes/components/ThemedInput.tsx';
-import { ThemedMultiSelect } from '@/platform/themes/components/ThemedMultiSelect.tsx';
-import { ThemedSelect } from '@/platform/themes/components/ThemedSelect.tsx';
-import { ThemedTextarea } from '@/platform/themes/components/ThemedTextarea.tsx';
+import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
+import { ThemedInput } from '@/platform/layout/themes/components/ThemedInput.tsx';
+import { ThemedMultiSelect } from '@/platform/layout/themes/components/ThemedMultiSelect.tsx';
+import { ThemedSelect } from '@/platform/layout/themes/components/ThemedSelect.tsx';
+import { ThemedTextarea } from '@/platform/layout/themes/components/ThemedTextarea.tsx';
 import { FormMode } from '@/types/common.types.ts';
 
 import React, { useState } from 'react';

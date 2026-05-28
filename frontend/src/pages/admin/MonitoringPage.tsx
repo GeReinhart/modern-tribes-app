@@ -1,14 +1,14 @@
-import { ThemedSelect } from '@/platform/themes/components/ThemedSelect.tsx';
-import { ThemedCard } from '@/platform/themes/components/ThemedCard';
-import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
-import { ThemedTable } from '@/platform/themes/components/ThemedTable.tsx';
-import { ThemedText } from '@/platform/themes/components/ThemedText';
+import { ThemedSelect } from '@/platform/layout/themes/components/ThemedSelect.tsx';
+import { ThemedCard } from '@/platform/layout/themes/components/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedTable } from '@/platform/layout/themes/components/ThemedTable.tsx';
+import { ThemedText } from '@/platform/layout/themes/components/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,
-} from '@/components/layout/AdminNavigation';
-import { AppLayout } from '@/components/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
+} from '@/platform/layout/AdminNavigation';
+import { AppLayout } from '@/platform/layout/AppLayout';
+import { ThemeProvider, useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
 import { useRecentChanges } from '@/hooks/useRecentChanges.ts';
 import { useUsers } from '@/hooks/useUsers.ts';
 import { RecentChange } from '@/types/monitoring.types.ts';
