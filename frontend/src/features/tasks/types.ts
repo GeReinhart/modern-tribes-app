@@ -54,6 +54,10 @@ export interface TaskEditValue {
   assigned_person_id: string | null;
   document_content_html: string | null;
   label_ids: string[];
+  created_by?: string | null;
+  updated_by?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 export interface TaskItemModalProps {

@@ -460,6 +460,8 @@ const en: Record<string, string> = {
   'files.uploadFailed': 'Upload failed',
 
   'common.saving': 'Saving...',
+  'common.createdBy': 'Created',
+  'common.updatedBy': 'Updated',
 
   'dashboard.title': 'Dashboard',
   'dashboard.tabs.tasks': 'Tasks',

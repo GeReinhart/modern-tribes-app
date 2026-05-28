@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.core.database import get_database
 from app.platform.authorization.models import PermissionEnum
-from app.models.crud.users import UserSearchResult, UserWithPermissions
+from app.models.crud.users import UserDisplayInfo, UserSearchResult, UserWithPermissions
 from app.repositories import user_repository as user_repo
 from app.platform.authentication.router import get_current_user
 from app.platform.authorization.router import require_permission_decorator
@@ -22,6 +22,18 @@ async def search_users(
 ):
     pool = get_database()
     return await user_repo.search_users(pool, q)
+
+
+@router.get("/{user_id}/display", response_model=UserDisplayInfo)
+async def get_user_display_info(
+    user_id: str,
+    _current_user: dict = Depends(get_current_user),
+):
+    pool = get_database()
+    info = await user_repo.get_user_display_info(pool, user_id)
+    if not info:
+        raise HTTPException(status_code=404, detail=f"{ENTITY_NAME} not found")
+    return info
 
 
 @router.get("/{user_id}/with/permissions", response_model=UserWithPermissions)

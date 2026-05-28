@@ -1,3 +1,4 @@
+import { EntityAuditBadge } from '@/components/common/audit/EntityAuditBadge';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
 import { ThemedText } from '@/components/common/layout/ThemedText';
@@ -291,6 +292,14 @@ export const ProjectDocumentsTab: React.FC<ProjectDocumentsTabProps> = ({
                   </span>
                 ))}
               </div>
+            )}
+            {doc.created_by && (
+              <EntityAuditBadge
+                createdBy={doc.created_by}
+                updatedBy={doc.updated_by}
+                createdAt={doc.created_at}
+                updatedAt={doc.updated_at}
+              />
             )}
           </div>
         ))}

@@ -1,3 +1,4 @@
+import { EntityAuditBadge } from '@/components/common/audit/EntityAuditBadge';
 import { ThemedLoadingSpinner } from '@/components/common/layout/ThemedLoadingSpinner';
 import { useTheme } from '@/contexts/ThemeContext';
 import { documentPageService } from '@/services/document-page.service';
@@ -174,6 +175,14 @@ export const DocumentPagesSection: React.FC<DocumentPagesSectionProps> = ({
               >
                 {page.content_summary}
               </div>
+            )}
+            {page.created_by && (
+              <EntityAuditBadge
+                createdBy={page.created_by}
+                updatedBy={page.updated_by}
+                createdAt={page.created_at}
+                updatedAt={page.updated_at}
+              />
             )}
           </div>
           <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>

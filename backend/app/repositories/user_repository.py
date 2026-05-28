@@ -82,6 +82,21 @@ async def get_users_with_roles_and_permissions(pool) -> list[dict]:
     return [row_with_json_to_dict(row) for row in rows]
 
 
+async def get_user_display_info(pool, user_id: str) -> dict | None:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            """
+            SELECT u.id AS user_id, u.login,
+                   p.first_name, p.last_name
+            FROM users u
+            LEFT JOIN persons p ON p.id = u.person_id
+            WHERE u.id = $1::uuid
+            """,
+            UUID(user_id),
+        )
+    return dict(row) if row else None
+
+
 async def search_users(pool, q: str, limit: int = 50) -> list[dict]:
     pattern = f"%{q}%"
     async with pool.acquire() as conn:

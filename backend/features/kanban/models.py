@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
-from datetime import date
+from datetime import date, datetime
 
 
 class KanbanLabel(BaseModel):
@@ -30,6 +30,10 @@ class KanbanCardResponse(BaseModel):
     size: Optional[int] = None
     due_date: Optional[date] = None
     label_ids: list[str] = []
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    created_by: Optional[str] = None
+    updated_by: Optional[str] = None
 
 
 class KanbanBoard(BaseModel):

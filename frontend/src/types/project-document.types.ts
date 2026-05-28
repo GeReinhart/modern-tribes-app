@@ -22,6 +22,8 @@ export interface ProjectDocumentSummary {
   publication_url_param_id: string | null;
   created_at: string;
   updated_at: string;
+  created_by: string | null;
+  updated_by: string | null;
 }
 
 export interface ProjectDocument {

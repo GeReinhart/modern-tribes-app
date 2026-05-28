@@ -82,3 +82,10 @@ class UserWithPermissions(User):
         """Check if user has all specified permissions"""
         user_perms = set(self.permissions)
         return set(permissions).issubset(user_perms)
+
+
+class UserDisplayInfo(BaseModel):
+    user_id: str
+    login: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None

@@ -476,6 +476,8 @@ const fr: Record<string, string> = {
   'files.uploadFailed': 'Échec du téléversement',
 
   'common.saving': 'Enregistrement...',
+  'common.createdBy': 'Créé le',
+  'common.updatedBy': 'Modifié le',
 
   'dashboard.title': 'Tableau de bord',
   'dashboard.tabs.tasks': 'Tâches',

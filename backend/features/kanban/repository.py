@@ -15,6 +15,9 @@ async def fetch_board(pool, feature_instance_id: str) -> dict:
             """SELECT kc.id, kc.feature_instance_id, kc.column_id,
                       kc.title, kc.assigned_person_id, kc.position, kc.status,
                       kc.document_id, kc.size, kc.due_date,
+                      kc.created_at, kc.updated_at,
+                      kc.created_by::text AS created_by,
+                      kc.updated_by::text AS updated_by,
                       d.content_html AS document_content_html,
                       p.first_name || ' ' || p.last_name AS assigned_person_name,
                       ARRAY(
@@ -115,7 +118,12 @@ async def swap_column_positions(pool, col_id_a: str, col_id_b: str, user_id: str
 async def fetch_card(pool, card_id: str) -> Optional[dict]:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            """SELECT kc.*, kc.size,
+            """SELECT kc.id, kc.feature_instance_id, kc.column_id,
+                      kc.title, kc.assigned_person_id, kc.position, kc.status,
+                      kc.document_id, kc.size, kc.due_date,
+                      kc.created_at, kc.updated_at,
+                      kc.created_by::text AS created_by,
+                      kc.updated_by::text AS updated_by,
                       d.content_html AS document_content_html,
                       p.first_name || ' ' || p.last_name AS assigned_person_name,
                       ARRAY(

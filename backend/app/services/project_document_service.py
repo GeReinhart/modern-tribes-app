@@ -182,7 +182,9 @@ async def list_project_documents(
 
     where_clause = " AND ".join(conditions)
     query = f"""
-        SELECT pd.id, pd.url_param_id, pd.document_id, pd.title, pd.status, pd.created_at, pd.updated_at,
+        SELECT pd.id, pd.url_param_id, pd.document_id, pd.title, pd.status,
+               pd.created_at, pd.updated_at,
+               pd.created_by::text AS created_by, pd.updated_by::text AS updated_by,
                d.content_summary, pub.url_param_id AS publication_url_param_id
         FROM projects_documents pd
         JOIN documents d ON d.id = pd.document_id
@@ -210,6 +212,8 @@ async def list_project_documents(
                 publication_url_param_id=row["publication_url_param_id"],
                 created_at=row["created_at"],
                 updated_at=row["updated_at"],
+                created_by=row["created_by"],
+                updated_by=row["updated_by"],
             )
         )
 

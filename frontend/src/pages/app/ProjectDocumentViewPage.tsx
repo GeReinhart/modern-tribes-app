@@ -1,3 +1,4 @@
+import { EntityAuditBadge } from '@/components/common/audit/EntityAuditBadge';
 import { DocumentAttachments } from '@/components/common/document/DocumentAttachments';
 import { DocumentPagesSection } from '@/components/common/document/DocumentPagesSection';
 import { DocumentReader } from '@/components/common/document/DocumentReader';
@@ -351,6 +352,14 @@ const ProjectDocumentViewPageContent: React.FC = () => {
           onReadPage={() => setReaderMode(true)}
           onReordered={refetchPages}
         />
+        {doc.created_by && (
+          <EntityAuditBadge
+            createdBy={doc.created_by}
+            updatedBy={doc.updated_by}
+            createdAt={doc.created_at}
+            updatedAt={doc.updated_at}
+          />
+        )}
       </ThemedSection>
       <ThemedConfirmDialog
         isOpen={showArchiveConfirm}

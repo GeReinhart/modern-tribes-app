@@ -1,3 +1,4 @@
+import { EntityAuditBadge } from '@/components/common/audit/EntityAuditBadge';
 import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
 import { ThemedButton } from '@/components/common/form/ThemedButton';
 import ThemedDateSelection from '@/components/common/form/ThemedDateSelection';
@@ -291,6 +292,14 @@ const TaskItemModal: React.FC<TaskItemModalProps> = ({
               </div>
             )}
           </div>
+          {value.created_by && value.created_at && value.updated_at && (
+            <EntityAuditBadge
+              createdBy={value.created_by}
+              updatedBy={value.updated_by ?? null}
+              createdAt={value.created_at}
+              updatedAt={value.updated_at}
+            />
+          )}
         </div>
         <div
           style={{

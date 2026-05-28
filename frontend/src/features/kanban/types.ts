@@ -25,6 +25,10 @@ export interface KanbanCard {
   size: number | null;
   due_date: string | null;
   label_ids: string[];
+  created_at: string | null;
+  updated_at: string | null;
+  created_by: string | null;
+  updated_by: string | null;
 }
 
 export interface KanbanBoard {
