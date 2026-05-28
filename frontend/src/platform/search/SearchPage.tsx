@@ -115,12 +115,6 @@ const SearchPageContent: React.FC = () => {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs} bookmarkTitle={t('search.title')}>
-      <div style={{ marginBottom: 'var(--space-lg)' }}>
-        <ThemedText variant="secondary" size="small">
-          {t('search.subtitle')}
-        </ThemedText>
-      </div>
-
       <div style={{ marginBottom: 'var(--space-xl)' }}>
         <input
           type="search"

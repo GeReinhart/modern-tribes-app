@@ -327,7 +327,7 @@ const en: Record<string, string> = {
 
   'search.title': 'Search',
   'search.subtitle': 'Search through documents you have access to.',
-  'search.placeholder': 'Search documents...',
+  'search.placeholder': 'Search...',
   'search.empty': 'No results found for your query.',
 
   'features.addFeature': 'Add Feature',

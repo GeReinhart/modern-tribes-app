@@ -339,7 +339,7 @@ const fr: Record<string, string> = {
 
   'search.title': 'Recherche',
   'search.subtitle': 'Recherchez dans les documents auxquels vous avez accès.',
-  'search.placeholder': 'Rechercher dans les documents...',
+  'search.placeholder': 'Rechercher...',
   'search.empty': 'Aucun résultat trouvé pour votre recherche.',
 
   'features.addFeature': 'Ajouter une fonctionnalité',
