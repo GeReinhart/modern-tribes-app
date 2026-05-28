@@ -3,10 +3,7 @@ export interface SearchResult {
   entity_type: string;
   headline: string;
   content_summary: string | null;
-  tribe_id: string | null;
+  routing_path: string;
   tribe_name: string | null;
-  project_id: string | null;
   project_name: string | null;
-  page_id: string | null;
-  project_document_id: string | null;
 }

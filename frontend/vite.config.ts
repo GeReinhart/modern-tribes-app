@@ -11,7 +11,7 @@ export default defineConfig({
       includeAssets: ['modern-tribes.round-icon.svg', 'icon-192x192.png', 'icon-512x512.png'],
       manifest: {
         name: 'Modern Tribes',
-        short_name: 'Mod Tribes',
+        short_name: 'Modern Tribes',
         description: 'Connect and manage your modern tribes',
         theme_color: '#4f46e5',
         background_color: '#ffffff',

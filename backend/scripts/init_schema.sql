@@ -538,17 +538,14 @@ CREATE TABLE IF NOT EXISTS user_bookmarks (
 );
 CREATE OR REPLACE TRIGGER update_user_bookmarks_updated_at BEFORE UPDATE ON user_bookmarks FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Search index table (migration 014)
+-- Search index table (migration 015)
 CREATE TABLE IF NOT EXISTS search_index (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     entity_type VARCHAR(100) NOT NULL,
     entity_id UUID NOT NULL,
     content_text TEXT,
     content_summary TEXT,
-    tribe_id UUID NOT NULL REFERENCES tribes(id) ON DELETE CASCADE,
-    project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
-    project_document_id VARCHAR(6),
-    page_url_param_id VARCHAR(6),
+    routing_path TEXT,
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CONSTRAINT search_index_status_check CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -558,6 +555,6 @@ CREATE TABLE IF NOT EXISTS search_index (
     UNIQUE (entity_type, entity_id)
 );
 CREATE INDEX IF NOT EXISTS idx_search_index_entity ON search_index(entity_type, entity_id);
-CREATE INDEX IF NOT EXISTS idx_search_index_tribe ON search_index(tribe_id);
+CREATE INDEX IF NOT EXISTS idx_search_index_routing_path ON search_index(routing_path);
 CREATE INDEX IF NOT EXISTS idx_search_index_content_fts ON search_index USING GIN(to_tsvector('french', COALESCE(content_text, '')));
 CREATE OR REPLACE TRIGGER update_search_index_updated_at BEFORE UPDATE ON search_index FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

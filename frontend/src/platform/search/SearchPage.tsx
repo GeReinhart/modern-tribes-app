@@ -16,24 +16,15 @@ const SearchResultCard: React.FC<{ result: SearchResult }> = ({ result }) => {
   const { theme } = useTheme();
   const navigate = useNavigate();
 
-  const targetPath =
-    result.project_document_id && result.tribe_id && result.project_id
-      ? `/app/tribes/${result.tribe_id}/projects/${result.project_id}/documents/${result.project_document_id}`
-      : result.project_id && result.tribe_id
-        ? `/app/tribes/${result.tribe_id}/projects/${result.project_id}`
-        : result.tribe_id
-          ? `/app/tribes/${result.tribe_id}`
-          : null;
-
   return (
     <ThemedCard variant="primary">
       <div
-        onClick={targetPath ? () => navigate(targetPath) : undefined}
+        onClick={() => navigate(result.routing_path)}
         style={{
           display: 'flex',
           flexDirection: 'column',
           gap: 'var(--space-sm)',
-          cursor: targetPath ? 'pointer' : 'default',
+          cursor: 'pointer',
         }}
       >
         <div
@@ -72,21 +63,19 @@ const SearchResultCard: React.FC<{ result: SearchResult }> = ({ result }) => {
               {result.project_name}
             </span>
           )}
-          {targetPath && (
-            <span
-              style={{
-                marginLeft: 'auto',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <ThemedSvgIcon
-                name="arrow-right"
-                color={theme.colors.primary}
-                size={14}
-              />
-            </span>
-          )}
+          <span
+            style={{
+              marginLeft: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <ThemedSvgIcon
+              name="arrow-right"
+              color={theme.colors.primary}
+              size={14}
+            />
+          </span>
         </div>
 
         {result.content_summary && (

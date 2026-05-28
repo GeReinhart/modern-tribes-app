@@ -1,5 +1,4 @@
 from typing import Optional
-from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
@@ -19,12 +18,9 @@ class SearchResult(BaseModel):
     entity_type: str
     headline: str
     content_summary: Optional[str]
-    tribe_id: Optional[str]
+    routing_path: str
     tribe_name: Optional[str]
-    project_id: Optional[str]
     project_name: Optional[str]
-    page_id: Optional[str] = None
-    project_document_id: Optional[str] = None
 
 
 @router.get("/", response_model=list[SearchResult])
@@ -57,12 +53,9 @@ async def search(
             entity_type=r["entity_type"],
             headline=r["headline"],
             content_summary=r["content_summary"],
-            tribe_id=r["tribe_id"],
+            routing_path=r["routing_path"],
             tribe_name=r["tribe_name"],
-            project_id=r["project_id"],
             project_name=r["project_name"],
-            page_id=r["page_url_param_id"],
-            project_document_id=r["project_document_id"],
         )
         for r in rows
     ]
