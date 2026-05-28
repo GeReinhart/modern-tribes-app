@@ -1,6 +1,6 @@
 import { BreadcrumbTab } from '@/components/layout/Breadcrumb';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 export interface TabDefinition {
@@ -23,6 +23,13 @@ export function useUrlTab(
   const navigate = useNavigate();
 
   const activeTab = tab || defaultTabKey || tabs[0]?.key || '';
+
+  useEffect(() => {
+    if (!tab || tabs.length === 0 || !defaultTabKey) return;
+    if (!tabs.some((t) => t.key === tab)) {
+      navigate(`${basePath}/${defaultTabKey}`, { replace: true });
+    }
+  }, [tab, tabs, defaultTabKey, basePath, navigate]);
 
   const breadcrumbTabs = useMemo(
     () =>

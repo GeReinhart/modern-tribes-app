@@ -150,7 +150,7 @@ function AuthBootstrapApp() {
                       />
                       <Route
                         path="/app/dashboard"
-                        element={<Navigate to="/app/dashboard/tasks" replace />}
+                        element={<DashboardPage />}
                       />
                       <Route
                         path="/app/dashboard/:tab"
