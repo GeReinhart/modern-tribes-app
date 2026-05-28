@@ -1,17 +1,26 @@
-from fastapi import APIRouter, status, Depends
 from typing import List
+from uuid import UUID
 
-from ..auth.authentification import get_current_user
-from ..auth.authorization import require_any_permission_decorator, require_permission_decorator
-from ...models.crud.persons import Person, PersonCreate, PersonUpdate
-from ...core.database import get_database
-from ...utils.db_helpers import (
-    get_all_documents, get_document_by_id, create_document,
-    update_document, delete_document, check_document_exists
+from fastapi import APIRouter, Depends, status
+
+from app.core.database import get_database
+from app.platform.authorization.models import PermissionEnum
+from app.models.crud.persons import Person, PersonCreate, PersonUpdate
+from app.platform.authentication.router import get_current_user
+from app.platform.authorization.router import (
+    require_any_permission_decorator,
+    require_permission_decorator,
 )
-from ...utils.ownership import check_own_person_or_admin
-from ...utils.validators import EntityValidator
-from ...models.auth.auth import PermissionEnum
+from app.utils.db_helpers import (
+    check_document_exists,
+    create_document,
+    delete_document,
+    get_all_documents,
+    get_document_by_id,
+    update_document,
+)
+from app.platform.authorization.ownership import check_own_person_or_admin
+from app.utils.validators import EntityValidator
 
 router = APIRouter(prefix="/persons", tags=["crud_persons"])
 
@@ -20,10 +29,12 @@ ENTITY_NAME = "Person"
 
 
 @router.get("/", response_model=List[Person])
-@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_CREATE_OWN_TRIBES, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+@require_any_permission_decorator(
+    PermissionEnum.ADMIN, PermissionEnum.CAN_CREATE_OWN_TRIBES, PermissionEnum.CAN_ACCESS_OWN_TRIBES
+)
 async def get_persons(current_user: dict = Depends(get_current_user)):
     pool = get_database()
-    return await get_all_documents(pool, TABLE)
+    return await get_all_documents(pool, TABLE, any_status=True)
 
 
 @router.get("/{person_id}", response_model=Person)
@@ -39,9 +50,14 @@ async def get_person(person_id: str, current_user: dict = Depends(get_current_us
 async def create_person(person: PersonCreate, current_user: dict = Depends(get_current_user)):
     pool = get_database()
     validator = EntityValidator(pool)
-    references = [{'table': 'documents', 'id': person.document_id, 'name': 'Document'}] if person.document_id else []
+    references = (
+        [{"table": "documents", "id": person.document_id, "name": "Document"}] if person.document_id else []
+    )
     await validator.validate_references(references)
-    return await create_document(pool, TABLE, person.model_dump())
+    person_dict = person.model_dump()
+    person_dict["created_by"] = UUID(current_user["id"])
+    person_dict["updated_by"] = UUID(current_user["id"])
+    return await create_document(pool, TABLE, person_dict)
 
 
 @router.put("/{person_id}", response_model=Person)
@@ -51,9 +67,13 @@ async def update_person(person_id: str, person: PersonUpdate, current_user: dict
     await check_own_person_or_admin(person_id, current_user, pool)
     validator = EntityValidator(pool)
     await check_document_exists(pool, TABLE, person_id, ENTITY_NAME)
-    references = [{'table': 'documents', 'id': person.document_id, 'name': 'Document'}] if person.document_id else []
+    references = (
+        [{"table": "documents", "id": person.document_id, "name": "Document"}] if person.document_id else []
+    )
     await validator.validate_references(references)
-    return await update_document(pool, TABLE, person_id, person.model_dump(exclude_unset=True), ENTITY_NAME)
+    person_dict = person.model_dump(exclude_unset=True)
+    person_dict["updated_by"] = UUID(current_user["id"])
+    return await update_document(pool, TABLE, person_id, person_dict, ENTITY_NAME)
 
 
 @router.delete("/{person_id}", status_code=status.HTTP_204_NO_CONTENT)

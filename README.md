@@ -1,72 +1,115 @@
-# Modern tribes application
+# Modern Tribes App
 
-A full-stack application for managing stuff in modern tribes with a Python FastAPI backend, MongoDB database, and React frontend.
+## Vision
 
-## Tech Stack
+Modern life calls for lightweight, flexible tools to organise the groups we belong to — families, sports clubs, project teams, event crews. **Modern Tribes** calls these groups *tribes*.
 
-See [details](./docs/Stack.md)
+Key ideas:
 
+- A person can belong to many tribes simultaneously, whether long-lived (a family) or short-lived (a weekend event).
+- **User ≠ Person.** An adult can represent a child or anyone without their own account.
+- Tribes own projects, and projects host pluggable feature modules — Kanban boards, todo lists, documents, and more.
 
-## Environment Variables
+## Stack
 
-### Backend (.env)
+| Layer | Technology |
+| --- | --- |
+| Backend | Python 3.12 · FastAPI · asyncpg |
+| Database | PostgreSQL 16 (JSONB, full-text search, Alembic migrations) |
+| Frontend | React 18 · TypeScript · Vite · Tailwind CSS · PWA |
+| Auth | Magic-link (passwordless) · JWT + refresh tokens |
+| Email | SMTP via MailHog (dev) |
+| Packaging | Docker / Podman |
 
-```env
-MONGODB_URL=mongodb://localhost:27017
-DATABASE_NAME=modern_tribes_db
-CORS_ORIGINS=http://localhost:5173,http://localhost:3000
-```
+## Features
 
-## Production Deployment
+### Platform (tag `0.1.x`)
 
-### Backend
+A reusable base that can be forked to bootstrap any new application.
+
+**Technical**
+- Passwordless authentication via magic link + JWT
+- Granular permission system with roles
+- Entity lifecycle (active / archived) with full audit trail
+- Internationalisation (i18n) — EN / FR
+- Themeable UI with multiple colour themes
+- Installable PWA (mobile home screen)
+- Outbound email with scheduling
+- Rich-text editor with image upload and storage
+- Document revision history
+- Full-text search on document content
+- Database schema migrations (Alembic)
+- Docker / Podman packaging
+
+**Functional**
+- User / Person separation (one user can represent multiple people)
+- Tribe management with per-tribe membership and roles
+- Projects attached to tribes
+- Project documents with labels and publication workflow
+
+### Application features (tag `1.x.y`)
+
+Pluggable modules added to projects:
+
+- **Todo list** — tasks with status tracking, notes, and archive
+- **Kanban** — columnar board (up to 4 columns), card notes, theme-coloured columns
+
+## Development setup
+
+### Prerequisites
+
+- Node.js 18+
+- Python 3.12+ and `python3-devel` (`sudo dnf install python3-devel` on Fedora)
+- Docker Compose or Podman Compose
+
+### 1 — Infrastructure (PostgreSQL, pgAdmin, MailHog)
 
 ```bash
-# Install production dependencies
+cp .env.example .env
+podman-compose up -d        # or: docker compose up -d
+```
+
+| Service | URL |
+| --- | --- |
+| pgAdmin | http://localhost:8081 |
+| MailHog | http://localhost:8025 |
+| PostgreSQL | localhost:5432 |
+
+### 2 — Backend
+
+```bash
+cd backend
+python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 
-# Run with Gunicorn
-gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker
+# Seed schema + development data
+set -a && source .env && set +a && python scripts/init_db.py
+
+# Start with auto-reload
+set -a && source .env && set +a && uvicorn app.main:app --reload --port 8000
 ```
 
-### Frontend
+API docs: http://localhost:8000/docs
+
+### 3 — Frontend
 
 ```bash
-# Build for production
-npm run build
-
-# The dist/ folder can be served with any static file server
+cd frontend
+npm install
+npm run dev        # http://localhost:3000
 ```
 
-## PWA Installation
+## Project goals
 
-The app can be installed as a Progressive Web App:
+This project serves two purposes:
 
-1. Open the app in a browser (Chrome, Edge, Safari)
-2. Click the install icon in the address bar
-3. The app will be installed on your device/desktop
-4. Launch it like a native app!
+1. **Practical tool** — a real application for organizing everyday tribe life.
+2. **Technical showcase** — exploration of a modern full-stack Python/React architecture and a concrete experiment in collaborative development with Generative AI.
 
+## Known prod instances
 
-## Troubleshooting
-
-### MongoDB Connection Issues
-
-- Ensure Docker is running: `docker ps`
-- Check if MongoDB container is up: `docker-compose ps`
-- Restart container: `docker-compose restart`
-
-### CORS Issues
-
-- Verify `CORS_ORIGINS` in backend `.env` includes your frontend URL
-- Check browser console for specific CORS errors
-
-### Frontend Build Issues
-
-- Delete `node_modules` and reinstall: `rm -rf node_modules && npm install`
-- Clear Vite cache: `rm -rf node_modules/.vite`
+- https://www.reinhart.online/public/publications (hosted on https://www.clever.cloud/)
 
 ## License
 
-Apache License - see LICENSE file
-
+Apache 2.0 — see [LICENSE](./LICENSE).

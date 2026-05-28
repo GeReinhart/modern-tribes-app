@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field, ConfigDict, model_validator
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class DocumentEntityBase(BaseModel):
@@ -8,7 +9,7 @@ class DocumentEntityBase(BaseModel):
     project_id: Optional[str] = None
     related_document_id: Optional[str] = None
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_at_least_one_relation(self):
         """Ensure at least one relation is provided"""
         if not any([self.project_id, self.related_document_id]):
@@ -40,7 +41,7 @@ class DocumentEntity(DocumentEntityBase):
                 "project_id": "507f1f77bcf86cd799439019",
                 "related_document_id": None,
                 "created_at": "2024-01-01T00:00:00",
-                "updated_at": "2024-01-01T00:00:00"
+                "updated_at": "2024-01-01T00:00:00",
             }
-        }
+        },
     )

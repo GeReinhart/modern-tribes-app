@@ -10,6 +10,7 @@ ENV/
 .env
 *.log
 .env.local
+.env.prod
 .env.*.local
 
 # Node
@@ -42,5 +43,8 @@ build/
 /ai_prompt.txt
 /extract/
 /backend/data/
-/.claude/
+/.claude/settings.local.json
 /frontend/.vite/
+/backend/.env.prod
+/.env.prod
+/target/

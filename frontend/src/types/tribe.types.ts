@@ -1,42 +1,47 @@
-import {Project} from "@/types/project.types.ts";
-import {Position} from "@/types/position.types.ts";
-import {PersonWithPosition} from "@/types/person.types.ts";
+import { PersonWithPosition } from '@/types/person.types.ts';
+import { Position } from '@/types/position.types.ts';
 
-export interface TribeBase {
-    name: string;
-    document_id?: string | null;
-    project_ids?: string[];
+export type TribeProjectRelation = 'manager' | 'member' | 'guest';
+
+export interface TribeProjectInput {
+  project_id: string;
+  relation: TribeProjectRelation;
 }
 
-export interface TribeCreate extends TribeBase {}
+export interface TribeProject extends TribeProjectInput {
+  id: string;
+  tribe_id: string;
+  created_at: string;
+  project_name: string;
+}
+
+export interface TribeBase {
+  name: string;
+  document_id?: string | null;
+}
+
+export type TribeCreate = TribeBase;
 
 export interface TribeUpdate {
-    name?: string;
-    document_id?: string | null;
-    project_ids?: string[];
+  name?: string;
+  document_id?: string | null;
+  status?: string;
 }
 
 export interface Tribe extends TribeBase {
-    id: string;
-    created_at: string;
-    updated_at: string;
+  id: string;
+  url_param_id: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface TribeWithPositions extends Tribe {
-    position_count: number;
-    positions?: Position[];
+  position_count: number;
+  positions?: Position[];
 }
 
 export interface TribeWithPersonsWithPosition extends Tribe {
-    person_count: number;
-    persons?: PersonWithPosition[];
+  person_count: number;
+  persons?: PersonWithPosition[];
 }
-
-
-
-export interface TribeWithProjects extends Tribe {
-    project_count: number;
-    projects?: Project[];
-}
-
-

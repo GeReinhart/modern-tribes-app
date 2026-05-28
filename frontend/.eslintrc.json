@@ -1,0 +1,12 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "unused-imports", "no-relative-import-paths"],
+  "rules": {
+    "no-relative-import-paths/no-relative-import-paths": [
+      "warn",
+      { "allowSameFolder": false, "rootDir": "src", "prefix": "" }
+    ],
+    "unused-imports/no-unused-imports": "error",
+    "@typescript-eslint/no-unused-vars": "warn"
+  }
+}

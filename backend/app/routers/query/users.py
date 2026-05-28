@@ -1,12 +1,27 @@
-from fastapi import APIRouter, HTTPException
+from typing import List
 
-from ...models.crud.users import UserWithPermissions
-from ...core.database import get_database
-from ...repositories import user_repository as user_repo
+from fastapi import APIRouter, Depends, HTTPException, Query
+
+from app.core.database import get_database
+from app.platform.authorization.models import PermissionEnum
+from app.models.crud.users import UserSearchResult, UserWithPermissions
+from app.repositories import user_repository as user_repo
+from app.platform.authentication.router import get_current_user
+from app.platform.authorization.router import require_permission_decorator
 
 router = APIRouter(prefix="/users", tags=["query_users"])
 
 ENTITY_NAME = "User"
+
+
+@router.get("/search", response_model=List[UserSearchResult])
+@require_permission_decorator(PermissionEnum.ADMIN)
+async def search_users(
+    q: str = Query(min_length=1),
+    current_user: dict = Depends(get_current_user),
+):
+    pool = get_database()
+    return await user_repo.search_users(pool, q)
 
 
 @router.get("/{user_id}/with/permissions", response_model=UserWithPermissions)

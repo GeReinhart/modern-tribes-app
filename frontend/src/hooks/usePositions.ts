@@ -1,56 +1,92 @@
-import { useState, useEffect, useCallback } from 'react';
-import { positionService } from '@/services/position.service';
-import { Position, PositionCreate, PositionUpdate } from '@/types/position.types';
 import { useApi } from '@/hooks/useApi';
 import { createEntityHooks } from '@/hooks/useEntityCrud';
+import { positionService } from '@/services/position.service';
+import {
+  Position,
+  PositionCreate,
+  PositionUpdate,
+} from '@/types/position.types';
 
-const { useList, useById, useMutations } = createEntityHooks<Position, PositionCreate, PositionUpdate>(positionService, 'positions');
+import { useCallback, useEffect, useState } from 'react';
+
+const { useList, useById, useMutations } = createEntityHooks<
+  Position,
+  PositionCreate,
+  PositionUpdate
+>(positionService, 'positions');
 
 export function usePositions() {
-    const { items: positions, ...rest } = useList();
-    return { positions, ...rest };
+  const { items: positions, ...rest } = useList();
+  return { positions, ...rest };
 }
 
 export function usePosition(id: string | null) {
-    const { item: position, ...rest } = useById(id);
-    return { position, ...rest };
+  const { item: position, ...rest } = useById(id);
+  return { position, ...rest };
 }
 
 export function usePositionsByTribe(tribe_id: string | null) {
-    const [positions, setPositions] = useState<Position[]>([]);
-    const { loading, error, execute } = useApi<Position[]>();
+  const [positions, setPositions] = useState<Position[]>([]);
+  const [hasFetched, setHasFetched] = useState(!tribe_id);
+  const { loading, error, execute } = useApi<Position[]>();
 
-    const fetch = useCallback(async () => {
-        if (!tribe_id) return;
-        try {
-            const data = await execute(() => positionService.getAllByTribeId(tribe_id));
-            if (data) setPositions(data);
-        } catch {
-            console.error('Error fetching positions by tribe');
-        }
-    }, [tribe_id, execute]);
+  const fetch = useCallback(async () => {
+    if (!tribe_id) {
+      setHasFetched(true);
+      return;
+    }
+    try {
+      const data = await execute(() =>
+        positionService.getAllByTribeId(tribe_id),
+      );
+      if (data) setPositions(data);
+    } catch {
+      console.error('Error fetching positions by tribe');
+    }
+    setHasFetched(true);
+  }, [tribe_id, execute]);
 
-    useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
 
-    return { positions, loading, error, refetch: fetch };
+  return { positions, loading, hasFetched, error, refetch: fetch };
 }
 
 export function usePositionMutations() {
-    const { create: createPosition, update: updatePosition, remove: deletePosition, loading, error } = useMutations();
-    const { execute } = useApi<Position>();
-    const { execute: executeVoid } = useApi<void>();
+  const {
+    create: createPosition,
+    update: updatePosition,
+    remove: deletePosition,
+    loading,
+    error,
+  } = useMutations();
+  const { execute } = useApi<Position>();
+  const { execute: executeVoid } = useApi<void>();
 
-    const updatePositionByForeignIds = useCallback(
-        (person_id: string, tribe_id: string, data: PositionUpdate) =>
-            execute(() => positionService.updateByForeignIds(person_id, tribe_id, data)),
-        [execute]
-    );
+  const updatePositionByForeignIds = useCallback(
+    (person_id: string, tribe_id: string, data: PositionUpdate) =>
+      execute(() =>
+        positionService.updateByForeignIds(person_id, tribe_id, data),
+      ),
+    [execute],
+  );
 
-    const deletePositionByForeignIds = useCallback(
-        (person_id: string, tribe_id: string) =>
-            executeVoid(() => positionService.deleteByForeignIds(person_id, tribe_id)),
-        [executeVoid]
-    );
+  const deletePositionByForeignIds = useCallback(
+    (person_id: string, tribe_id: string) =>
+      executeVoid(() =>
+        positionService.deleteByForeignIds(person_id, tribe_id),
+      ),
+    [executeVoid],
+  );
 
-    return { createPosition, updatePosition, deletePosition, updatePositionByForeignIds, deletePositionByForeignIds, loading, error };
+  return {
+    createPosition,
+    updatePosition,
+    deletePosition,
+    updatePositionByForeignIds,
+    deletePositionByForeignIds,
+    loading,
+    error,
+  };
 }

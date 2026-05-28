@@ -1,19 +1,19 @@
 export interface DocumentEntityBase {
-    document_id: string;
-    project_id?: string | null;
-    related_document_id?: string | null;
+  document_id: string;
+  project_id?: string | null;
+  related_document_id?: string | null;
 }
 
-export interface DocumentEntityCreate extends DocumentEntityBase {}
+export type DocumentEntityCreate = DocumentEntityBase;
 
 export interface DocumentEntityUpdate {
-    document_id?: string;
-    project_id?: string | null;
-    related_document_id?: string | null;
+  document_id?: string;
+  project_id?: string | null;
+  related_document_id?: string | null;
 }
 
 export interface DocumentEntity extends DocumentEntityBase {
-    id: string;
-    created_at: string;
-    updated_at: string;
+  id: string;
+  created_at: string;
+  updated_at: string;
 }

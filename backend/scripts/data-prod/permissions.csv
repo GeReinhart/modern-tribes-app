@@ -1,0 +1,5 @@
+name,description
+admin,Full administrative access
+can_create_own_tribes,Can create tribes
+can_access_attached_tribes,Can access to all elements of its tribes given its position
+can_manage_own_profile,Can update its own profile

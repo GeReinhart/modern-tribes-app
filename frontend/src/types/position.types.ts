@@ -1,21 +1,23 @@
-export type PositionEnum = 'chief' | 'member' | 'guest' ;
+export type PositionEnum = 'manager' | 'member' | 'guest';
 
 export interface PositionBase {
-    tribe_id: string | null;
-    person_id: string | null;
-    position: PositionEnum;
+  tribe_id: string | null;
+  person_id: string | null;
+  position: PositionEnum;
 }
 
-export interface PositionCreate extends PositionBase {}
+export type PositionCreate = PositionBase;
 
 export interface PositionUpdate {
-    tribe_id?: string;
-    person_id?: string;
-    position?: PositionEnum;
+  tribe_id?: string;
+  person_id?: string;
+  position?: PositionEnum;
+  status?: string;
 }
 
 export interface Position extends PositionBase {
-    id: string;
-    created_at: string;
-    updated_at: string;
+  id: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
 }

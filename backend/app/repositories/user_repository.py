@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from ..utils.db_helpers import row_with_json_to_dict
+from app.utils.db_helpers import row_with_json_to_dict
 
 
 async def update_user_roles(conn, user_id: str, role_ids: list[str]) -> None:
@@ -8,7 +8,7 @@ async def update_user_roles(conn, user_id: str, role_ids: list[str]) -> None:
     if role_ids:
         await conn.executemany(
             "INSERT INTO user_roles (user_id, role_id) VALUES ($1::uuid, $2::uuid)",
-            [(UUID(user_id), UUID(rid)) for rid in role_ids]
+            [(UUID(user_id), UUID(rid)) for rid in role_ids],
         )
 
 
@@ -44,14 +44,14 @@ async def get_user_with_roles_and_permissions(pool, user_id: str) -> dict | None
             WHERE u.id = $1::uuid
             GROUP BY u.id, u.login, u.email, u.person_id, u.created_at, u.updated_at
             """,
-            UUID(user_id)
+            UUID(user_id),
         )
     return row_with_json_to_dict(result) if result else None
 
+
 async def get_users_with_roles_and_permissions(pool) -> list[dict]:
     async with pool.acquire() as conn:
-        rows = await conn.fetch(
-            """
+        rows = await conn.fetch("""
             SELECT
                 u.*,
                 COALESCE(
@@ -78,6 +78,29 @@ async def get_users_with_roles_and_permissions(pool) -> list[dict]:
                      LEFT JOIN role_permissions rp ON r.id = rp.role_id
                      LEFT JOIN permissions p ON rp.permission_id = p.id
             GROUP BY u.id, u.login, u.email, u.person_id, u.created_at, u.updated_at
-            """
-        )
+            """)
     return [row_with_json_to_dict(row) for row in rows]
+
+
+async def search_users(pool, q: str, limit: int = 50) -> list[dict]:
+    pattern = f"%{q}%"
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT u.id, u.url_param_id, u.login, u.email,
+                   COALESCE(p.first_name || ' ' || p.last_name, u.login) AS full_name
+            FROM users u
+            LEFT JOIN persons p ON u.person_id = p.id
+            WHERE u.status = 'active'
+              AND (
+                  u.login ILIKE $1
+                  OR u.email ILIKE $1
+                  OR (p.first_name || ' ' || p.last_name) ILIKE $1
+              )
+            ORDER BY COALESCE(p.first_name || ' ' || p.last_name, u.login)
+            LIMIT $2
+            """,
+            pattern,
+            limit,
+        )
+        return [dict(r) for r in rows]

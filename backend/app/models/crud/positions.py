@@ -1,11 +1,12 @@
-from pydantic import BaseModel, Field, ConfigDict
-from typing import Optional, List
 from datetime import datetime
 from enum import Enum
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict
 
 
 class PositionEnum(str, Enum):
-    CHIEF = "chief"
+    MANAGER = "manager"
     MEMBER = "member"
     GUEST = "guest"
 
@@ -17,18 +18,23 @@ class PositionBase(BaseModel):
 
 
 class PositionCreate(PositionBase):
-    pass
+    status: str = "active"
+
 
 class PositionUpdate(BaseModel):
     tribe_id: Optional[str] = None
     person_id: Optional[str] = None
     position: PositionEnum
+    status: Optional[str] = None
 
 
 class Position(PositionBase):
     id: str
+    status: str = "active"
     created_at: datetime
     updated_at: datetime
+    created_by: Optional[str] = None
+    updated_by: Optional[str] = None
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -37,9 +43,9 @@ class Position(PositionBase):
                 "id": "507f1f77bcf86cd799439014",
                 "tribe_ids": "507f1f77bcf86cd799439015",
                 "person_id": "507f1f77bcf86cd799439016",
-                "position": "chief",
+                "position": "manager",
                 "created_at": "2024-01-01T00:00:00",
-                "updated_at": "2024-01-01T00:00:00"
+                "updated_at": "2024-01-01T00:00:00",
             }
-        }
+        },
     )

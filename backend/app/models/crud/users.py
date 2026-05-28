@@ -1,9 +1,11 @@
-from pydantic import BaseModel, Field, ConfigDict, EmailStr
-from typing import Optional, List
 from datetime import datetime
+from typing import List, Optional
 
-from .roles import Role
-from ..auth.auth import UserSession
+from pydantic import BaseModel, ConfigDict, EmailStr
+
+from app.platform.authentication.models import UserSession
+from app.models.crud.roles import Role
+
 
 # User Models
 class UserBase(BaseModel):
@@ -13,8 +15,9 @@ class UserBase(BaseModel):
     person_id: Optional[str] = None
     sessions: List[UserSession] = []
 
+
 class UserCreate(UserBase):
-    pass
+    status: str = "active"
 
 
 class UserUpdate(BaseModel):
@@ -23,12 +26,17 @@ class UserUpdate(BaseModel):
     role_ids: Optional[List[str]] = None
     person_id: Optional[str] = None
     sessions: List[UserSession] = []
+    status: Optional[str] = None
 
 
 class User(UserBase):
     id: str
+    url_param_id: str
+    status: str = "active"
     created_at: datetime
     updated_at: datetime
+    created_by: Optional[str] = None
+    updated_by: Optional[str] = None
     sessions: List[UserSession] = []
 
     model_config = ConfigDict(
@@ -39,10 +47,18 @@ class User(UserBase):
                 "login": "Alain",
                 "role_ids": ["507f1f77-bcf8-6cd7-9943-9012abcd1234"],
                 "created_at": "2024-01-01T00:00:00",
-                "updated_at": "2024-01-01T00:00:00"
+                "updated_at": "2024-01-01T00:00:00",
             }
-        }
+        },
     )
+
+
+class UserSearchResult(BaseModel):
+    id: str
+    url_param_id: str
+    login: str
+    email: str
+    full_name: str
 
 
 class UserWithRoles(User):
