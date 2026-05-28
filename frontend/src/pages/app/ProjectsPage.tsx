@@ -1,7 +1,7 @@
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
-import { ThemedDivider } from '@/platform/themes/layout/ThemedDivider';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard';
+import { ThemedDivider } from '@/platform/themes/components/ThemedDivider';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import { ProjectCard } from '@/components/entities/projects/ProjectCard';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemeProvider } from '@/platform/themes/ThemeContext.tsx';

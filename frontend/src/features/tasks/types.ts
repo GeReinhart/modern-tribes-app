@@ -1,4 +1,4 @@
-import { FIB_COLORS, URGENCY_COLORS } from '@/components/themes/themes';
+import { FIB_COLORS, URGENCY_COLORS } from '@/platform/themes/themes.ts';
 
 export interface PersonOption {
   id: string;

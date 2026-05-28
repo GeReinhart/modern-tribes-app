@@ -1,8 +1,8 @@
 import { EntityAuditBadge } from '@/components/common/audit/EntityAuditBadge';
 import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
 import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
-import { ThemedButton } from '@/components/common/form/ThemedButton';
-import ThemedDateSelection from '@/components/common/form/ThemedDateSelection';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import ThemedDateSelection from '@/platform/themes/components/ThemedDateSelection.tsx';
 import { ThemedSvgIcon } from '@/platform/themes/icons/ThemedSvgIcon';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 

@@ -1,5 +1,5 @@
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard.tsx';
-import { ThemedTabs } from '@/platform/themes/layout/ThemedTabs';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard.tsx';
+import { ThemedTabs } from '@/platform/themes/components/ThemedTabs';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemeProvider } from '@/platform/themes/ThemeContext.tsx';
 import DashboardBookmarksTab from '@/features/bookmarks/DashboardBookmarksTab';

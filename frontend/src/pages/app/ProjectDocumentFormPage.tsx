@@ -1,9 +1,9 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
 import { DocumentFormPagesEditor } from '@/platform/documents/DocumentFormPagesEditor.tsx';
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
-import { ThemedLoadingOverlay } from '@/platform/themes/layout/ThemedLoadingOverlay';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
-import { ProjectDocumentFields } from '@/components/entities/documents/ProjectDocumentFields';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard';
+import { ThemedLoadingOverlay } from '@/platform/themes/components/ThemedLoadingOverlay';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner';
+import { ProjectDocumentFields } from '@/platform/documents/ProjectDocumentFields.tsx';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemeProvider } from '@/platform/themes/ThemeContext.tsx';
 import { useDocumentPages } from '@/hooks/useDocumentPages';

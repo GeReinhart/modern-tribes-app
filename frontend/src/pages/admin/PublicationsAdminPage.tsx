@@ -1,8 +1,8 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedConfirmDialog } from '@/platform/themes/layout/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
-import { ThemedSection } from '@/platform/themes/layout/ThemedSection';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import { ThemedConfirmDialog } from '@/platform/themes/components/ThemedConfirmDialog';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner';
+import { ThemedSection } from '@/platform/themes/components/ThemedSection';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,

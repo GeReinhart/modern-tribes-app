@@ -1,9 +1,9 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton.tsx';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
 import {
   ModalBody,
   ModalFooter,
   ThemedModal,
-} from '@/platform/themes/layout/ThemedModal.tsx';
+} from '@/platform/themes/components/ThemedModal.tsx';
 
 import React from 'react';
 

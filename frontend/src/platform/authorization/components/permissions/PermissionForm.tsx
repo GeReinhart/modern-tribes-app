@@ -1,7 +1,7 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton.tsx';
-import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
-import { ThemedSelect } from '@/components/common/form/ThemedSelect.tsx';
-import { ThemedTextarea } from '@/components/common/form/ThemedTextarea.tsx';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import { ThemedInput } from '@/platform/themes/components/ThemedInput.tsx';
+import { ThemedSelect } from '@/platform/themes/components/ThemedSelect.tsx';
+import { ThemedTextarea } from '@/platform/themes/components/ThemedTextarea.tsx';
 import { FormMode } from '@/types/common.types.ts';
 
 import React, { useState } from 'react';

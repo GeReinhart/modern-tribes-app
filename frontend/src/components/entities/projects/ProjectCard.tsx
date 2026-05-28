@@ -1,6 +1,6 @@
-import { ThemedBadge } from '@/platform/themes/layout/ThemedBadge';
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedBadge } from '@/platform/themes/components/ThemedBadge';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import { ProjectEntry } from '@/types/queries/projects.query.types';
 
 import React from 'react';

@@ -1,11 +1,11 @@
-import { ThemedSelect } from '@/components/common/form/ThemedSelect.tsx';
-import { StatusBadge } from '@/platform/themes/layout/StatusBadge.tsx';
-import { ThemedBadge } from '@/platform/themes/layout/ThemedBadge.tsx';
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
-import { ThemedTable } from '@/platform/themes/layout/ThemedTable.tsx';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
-import { MailDetailModal } from '@/components/entities/mails/MailDetailModal';
+import { ThemedSelect } from '@/platform/themes/components/ThemedSelect.tsx';
+import { StatusBadge } from '@/platform/themes/components/StatusBadge.tsx';
+import { ThemedBadge } from '@/platform/themes/components/ThemedBadge.tsx';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedTable } from '@/platform/themes/components/ThemedTable.tsx';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
+import { MailDetailModal } from '@/platform/mail/MailDetailModal.tsx';
 import {
   AdminNavigation,
   adminMainThemeId,

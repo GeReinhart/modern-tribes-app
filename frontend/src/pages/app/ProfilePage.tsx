@@ -1,8 +1,8 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton.tsx';
-import { ThemedBadge } from '@/platform/themes/layout/ThemedBadge.tsx';
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard.tsx';
-import { ThemedDivider } from '@/platform/themes/layout/ThemedDivider.tsx';
-import { ThemedText } from '@/platform/themes/layout/ThemedText.tsx';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import { ThemedBadge } from '@/platform/themes/components/ThemedBadge.tsx';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard.tsx';
+import { ThemedDivider } from '@/platform/themes/components/ThemedDivider.tsx';
+import { ThemedText } from '@/platform/themes/components/ThemedText.tsx';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useAuth } from '@/platform/authentication/AuthContext.tsx';
 import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';

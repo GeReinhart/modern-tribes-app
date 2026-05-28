@@ -1,6 +1,6 @@
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard.tsx';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
-import { ThemedText } from '@/platform/themes/layout/ThemedText.tsx';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard.tsx';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedText } from '@/platform/themes/components/ThemedText.tsx';
 import { TribeCard } from '@/components/entities/tribes/TribeCard.tsx';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile.ts';

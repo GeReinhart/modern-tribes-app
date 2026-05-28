@@ -1,5 +1,5 @@
-import { ThemedSection } from '@/platform/themes/layout/ThemedSection';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedSection } from '@/platform/themes/components/ThemedSection';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

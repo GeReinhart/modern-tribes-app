@@ -2,7 +2,7 @@ import { ThemeProvider } from '@/platform/themes/ThemeContext.tsx';
 
 import React, { ReactNode } from 'react';
 
-import { themesById } from '@/components/themes/themes.ts';
+import { themesById } from '@/platform/themes/themes.ts';
 
 interface ThemedSectionProps {
   children: ReactNode;

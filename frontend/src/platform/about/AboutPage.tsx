@@ -1,6 +1,6 @@
 import { GithubIcon } from '@/platform/themes/icons/GithubIcon.tsx';
-import { ThemedSection } from '@/platform/themes/layout/ThemedSection.tsx';
-import { ThemedText } from '@/platform/themes/layout/ThemedText.tsx';
+import { ThemedSection } from '@/platform/themes/components/ThemedSection.tsx';
+import { ThemedText } from '@/platform/themes/components/ThemedText.tsx';
 import { AppLayout } from '@/components/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 

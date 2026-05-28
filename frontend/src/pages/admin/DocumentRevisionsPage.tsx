@@ -1,8 +1,8 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/platform/themes/icons/ThemedSvgIcon';
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,

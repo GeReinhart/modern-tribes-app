@@ -1,10 +1,10 @@
 import EditorFileUploader from '@/platform/documents/editor/EditorFileUploader.tsx';
 import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
-import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedLoadingOverlay } from '@/platform/themes/layout/ThemedLoadingOverlay.tsx';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
-import { ThemedSection } from '@/platform/themes/layout/ThemedSection.tsx';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import { ThemedLoadingOverlay } from '@/platform/themes/components/ThemedLoadingOverlay.tsx';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedSection } from '@/platform/themes/components/ThemedSection.tsx';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { usePersons } from '@/hooks/usePersons';

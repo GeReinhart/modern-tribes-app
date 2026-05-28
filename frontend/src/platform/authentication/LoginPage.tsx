@@ -1,7 +1,7 @@
-import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
-import { ThemedSubmitButton } from '@/components/common/form/ThemedSubmitButton.tsx';
+import { ThemedInput } from '@/platform/themes/components/ThemedInput.tsx';
+import { ThemedSubmitButton } from '@/platform/themes/components/ThemedSubmitButton.tsx';
 import { ApplicationLogo } from '@/platform/themes/icons/ApplicationLogo.tsx';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import { ThemeProvider } from '@/platform/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';

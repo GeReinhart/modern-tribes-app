@@ -1,5 +1,5 @@
-import { LabelBar } from '@/components/common/form/LabelBar';
-import { ThemedButton } from '@/components/common/form/ThemedButton';
+import { LabelBar } from '@/platform/themes/components/LabelBar.tsx';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/platform/themes/icons/ThemedSvgIcon';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 

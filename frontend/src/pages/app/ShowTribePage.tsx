@@ -1,10 +1,10 @@
-import { ConfirmDialog } from '@/platform/themes/layout/ConfirmDialog.tsx';
-import { ThemedBadge } from '@/platform/themes/layout/ThemedBadge';
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
-import { ThemedSection } from '@/platform/themes/layout/ThemedSection.tsx';
-import { ThemedTabs } from '@/platform/themes/layout/ThemedTabs';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ConfirmDialog } from '@/platform/themes/components/ConfirmDialog.tsx';
+import { ThemedBadge } from '@/platform/themes/components/ThemedBadge';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedSection } from '@/platform/themes/components/ThemedSection.tsx';
+import { ThemedTabs } from '@/platform/themes/components/ThemedTabs';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { ThemeProvider, useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { TabConfigButton } from '@/features/tab-config/TabConfigButton';

@@ -1,4 +1,4 @@
-import { ThemedBadge } from '@/platform/themes/layout/ThemedBadge.tsx';
+import { ThemedBadge } from '@/platform/themes/components/ThemedBadge.tsx';
 import { Role } from '@/platform/authorization/role.types';
 
 import React from 'react';

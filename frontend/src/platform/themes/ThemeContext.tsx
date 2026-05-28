@@ -1,4 +1,4 @@
-import { Theme, predefinedThemes } from '@/components/themes/themes.ts';
+import { Theme, predefinedThemes } from '@/platform/themes/themes.ts';
 
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 

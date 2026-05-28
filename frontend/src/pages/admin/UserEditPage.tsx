@@ -1,6 +1,6 @@
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import { UserForm } from '@/components/entities/users/UserForm';
 import {
   AdminNavigation,

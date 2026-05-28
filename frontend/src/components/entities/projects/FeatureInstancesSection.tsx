@@ -1,7 +1,7 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedInput } from '@/components/common/form/ThemedInput';
-import { ThemedSelect } from '@/components/common/form/ThemedSelect';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import { ThemedInput } from '@/platform/themes/components/ThemedInput.tsx';
+import { ThemedSelect } from '@/platform/themes/components/ThemedSelect.tsx';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import { useFeatureTypes } from '@/hooks/useProjectFeatures';
 import { FeatureTypeInfo } from '@/types/project-features.types';
 

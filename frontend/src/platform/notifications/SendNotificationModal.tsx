@@ -1,10 +1,10 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton.tsx';
-import { ThemedTextarea } from '@/components/common/form/ThemedTextarea.tsx';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import { ThemedTextarea } from '@/platform/themes/components/ThemedTextarea.tsx';
 import {
   ModalBody,
   ModalFooter,
   ThemedModal,
-} from '@/platform/themes/layout/ThemedModal.tsx';
+} from '@/platform/themes/components/ThemedModal.tsx';
 import { notificationService } from '@/services/notification.service.ts';
 import { UserSearchResult } from '@/types/notification.types.ts';
 

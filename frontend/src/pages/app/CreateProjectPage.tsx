@@ -1,10 +1,10 @@
 import EditorFileUploader from '@/platform/documents/editor/EditorFileUploader.tsx';
 import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
-import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedInput } from '@/components/common/form/ThemedInput';
-import { ThemedLoadingOverlay } from '@/platform/themes/layout/ThemedLoadingOverlay';
-import { ThemedSection } from '@/platform/themes/layout/ThemedSection';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import { ThemedInput } from '@/platform/themes/components/ThemedInput.tsx';
+import { ThemedLoadingOverlay } from '@/platform/themes/components/ThemedLoadingOverlay';
+import { ThemedSection } from '@/platform/themes/components/ThemedSection';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import {
   CreateTabsConfigSection,
   DraftTabConfig,

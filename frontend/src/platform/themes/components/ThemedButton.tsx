@@ -2,7 +2,7 @@ import {
   IconName,
   ThemedSvgIcon,
 } from '@/platform/themes/icons/ThemedSvgIcon.tsx';
-import { Theme } from '@/components/themes/themes.ts';
+import { Theme } from '@/platform/themes/themes.ts';
 import { useAuth } from '@/platform/authentication/AuthContext.tsx';
 import { useResponsiveContext } from '@/contexts/ResponsiveContext.tsx';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';

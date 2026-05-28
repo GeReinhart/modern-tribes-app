@@ -1,4 +1,4 @@
-import { Theme } from '@/components/themes/themes.ts';
+import { Theme } from '@/platform/themes/themes.ts';
 
 import { CSSProperties } from 'react';
 

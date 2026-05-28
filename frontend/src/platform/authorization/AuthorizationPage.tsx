@@ -1,12 +1,12 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedInput } from '@/components/common/form/ThemedInput';
-import { StatusBadge } from '@/platform/themes/layout/StatusBadge';
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
-import { ThemedConfirmDialog } from '@/platform/themes/layout/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
-import { ThemedTable } from '@/platform/themes/layout/ThemedTable';
-import { ThemedTabs } from '@/platform/themes/layout/ThemedTabs';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import { ThemedInput } from '@/platform/themes/components/ThemedInput.tsx';
+import { StatusBadge } from '@/platform/themes/components/StatusBadge';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard';
+import { ThemedConfirmDialog } from '@/platform/themes/components/ThemedConfirmDialog';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner';
+import { ThemedTable } from '@/platform/themes/components/ThemedTable';
+import { ThemedTabs } from '@/platform/themes/components/ThemedTabs';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,

@@ -1,4 +1,4 @@
-import { ThemedSvgIcon } from '@/platform/themes/icons/ThemedSvgIcon';
+import { ThemedSvgIcon } from '@/platform/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';

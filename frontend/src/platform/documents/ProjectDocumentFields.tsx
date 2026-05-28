@@ -1,10 +1,10 @@
 import EditorFileUploader from '@/platform/documents/editor/EditorFileUploader.tsx';
 import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
-import { LabelSelector } from '@/components/common/form/LabelSelector';
-import { ThemedSection } from '@/platform/themes/layout/ThemedSection';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { LabelSelector } from '@/platform/themes/components/LabelSelector.tsx';
+import { ThemedSection } from '@/platform/themes/components/ThemedSection.tsx';
+import { ThemedText } from '@/platform/themes/components/ThemedText.tsx';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
-import { AttachmentFile } from '@/types/document.types';
+import { AttachmentFile } from '@/types/document.types.ts';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

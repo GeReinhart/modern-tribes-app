@@ -1,4 +1,4 @@
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { documentPageService } from '@/services/document-page.service.ts';
 import { DocumentPage } from '@/types/document-page.types.ts';

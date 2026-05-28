@@ -1,9 +1,9 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedInput } from '@/components/common/form/ThemedInput';
-import { ThemedSelect } from '@/components/common/form/ThemedSelect';
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import { ThemedInput } from '@/platform/themes/components/ThemedInput.tsx';
+import { ThemedSelect } from '@/platform/themes/components/ThemedSelect.tsx';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,

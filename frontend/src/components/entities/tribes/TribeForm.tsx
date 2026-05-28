@@ -1,6 +1,6 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton.tsx';
-import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
-import { ThemedSelect } from '@/components/common/form/ThemedSelect.tsx';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import { ThemedInput } from '@/platform/themes/components/ThemedInput.tsx';
+import { ThemedSelect } from '@/platform/themes/components/ThemedSelect.tsx';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { useDocuments } from '@/hooks/useDocuments.ts';
 import { useProjects } from '@/hooks/useProjects.ts';

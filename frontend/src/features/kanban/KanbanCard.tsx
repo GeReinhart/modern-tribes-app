@@ -2,7 +2,7 @@ import {
   IconName,
   ThemedSvgIcon,
 } from '@/platform/themes/icons/ThemedSvgIcon';
-import { ThemedConfirmDialog } from '@/platform/themes/layout/ThemedConfirmDialog';
+import { ThemedConfirmDialog } from '@/platform/themes/components/ThemedConfirmDialog';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';

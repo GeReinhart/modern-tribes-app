@@ -1,4 +1,4 @@
-import { ThemedSelect } from '@/components/common/form/ThemedSelect.tsx';
+import { ThemedSelect } from '@/platform/themes/components/ThemedSelect.tsx';
 
 import React from 'react';
 

@@ -1,4 +1,4 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton.tsx';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 
 import React from 'react';

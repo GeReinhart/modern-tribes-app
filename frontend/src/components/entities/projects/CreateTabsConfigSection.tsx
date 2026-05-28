@@ -1,4 +1,4 @@
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 
 import React from 'react';

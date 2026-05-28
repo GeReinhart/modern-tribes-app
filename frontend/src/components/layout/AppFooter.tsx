@@ -2,7 +2,7 @@ import {
   IconName,
   ThemedSvgIcon,
 } from '@/platform/themes/icons/ThemedSvgIcon';
-import { ZoomControl } from '@/platform/themes/layout/ZoomControl';
+import { ZoomControl } from '@/platform/themes/components/ZoomControl';
 import { UserAvatarIcon } from '@/components/entities/users/UserAvatarIcon';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { BookmarkToggle } from '@/features/bookmarks/BookmarkToggle';

@@ -1,4 +1,4 @@
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
 import {
   loadingContentStyle,
   loadingOverlayStyle,

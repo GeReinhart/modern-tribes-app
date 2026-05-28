@@ -1,4 +1,4 @@
-import { LabelBar } from '@/components/common/form/LabelBar';
+import { LabelBar } from '@/platform/themes/components/LabelBar.tsx';
 import { ThemedSvgIcon } from '@/platform/themes/icons/ThemedSvgIcon';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 

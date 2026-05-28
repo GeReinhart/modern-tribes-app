@@ -1,11 +1,11 @@
-import { StatusBadge } from '@/platform/themes/layout/StatusBadge.tsx';
-import { ThemedBadge } from '@/platform/themes/layout/ThemedBadge.tsx';
-import { ThemedDivider } from '@/platform/themes/layout/ThemedDivider.tsx';
+import { StatusBadge } from '@/platform/themes/components/StatusBadge.tsx';
+import { ThemedBadge } from '@/platform/themes/components/ThemedBadge.tsx';
+import { ThemedDivider } from '@/platform/themes/components/ThemedDivider.tsx';
 import {
   ModalBody,
   ThemedModal,
-} from '@/platform/themes/layout/ThemedModal.tsx';
-import { ThemedText } from '@/platform/themes/layout/ThemedText.tsx';
+} from '@/platform/themes/components/ThemedModal.tsx';
+import { ThemedText } from '@/platform/themes/components/ThemedText.tsx';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import { MailWithRecipients } from '@/platform/mail/mail.types.ts';
 

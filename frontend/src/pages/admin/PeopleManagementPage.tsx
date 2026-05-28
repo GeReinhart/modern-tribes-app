@@ -1,17 +1,17 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedInput } from '@/components/common/form/ThemedInput';
-import { StatusBadge } from '@/platform/themes/layout/StatusBadge';
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
-import { ThemedConfirmDialog } from '@/platform/themes/layout/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import { ThemedInput } from '@/platform/themes/components/ThemedInput.tsx';
+import { StatusBadge } from '@/platform/themes/components/StatusBadge';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard';
+import { ThemedConfirmDialog } from '@/platform/themes/components/ThemedConfirmDialog';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner';
 import {
   ThemedModal,
   ThemedModalBody,
   ThemedModalFooter,
-} from '@/platform/themes/layout/ThemedModal';
-import { ThemedTable } from '@/platform/themes/layout/ThemedTable';
-import { ThemedTabs } from '@/platform/themes/layout/ThemedTabs';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+} from '@/platform/themes/components/ThemedModal';
+import { ThemedTable } from '@/platform/themes/components/ThemedTable';
+import { ThemedTabs } from '@/platform/themes/components/ThemedTabs';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import { PersonModal } from '@/components/entities/persons/PersonModal';
 import { UserModal } from '@/components/entities/users/UserModal';
 import { UserRolesBadges } from '@/components/entities/users/UserRolesBadges';

@@ -1,7 +1,7 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton.tsx';
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard.tsx';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
-import { ThemedText } from '@/platform/themes/layout/ThemedText.tsx';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard.tsx';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedText } from '@/platform/themes/components/ThemedText.tsx';
 import {
   AdminNavigation,
   adminMainThemeId,

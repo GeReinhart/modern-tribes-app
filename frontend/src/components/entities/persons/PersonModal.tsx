@@ -1,7 +1,7 @@
 import {
   ModalBody,
   ThemedModal,
-} from '@/platform/themes/layout/ThemedModal.tsx';
+} from '@/platform/themes/components/ThemedModal.tsx';
 import { FormMode } from '@/types/common.types.ts';
 import { Person, PersonCreate, PersonUpdate } from '@/types/person.types.ts';
 

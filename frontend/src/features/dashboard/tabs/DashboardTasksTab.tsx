@@ -1,4 +1,4 @@
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
 import type { TaskLabelInfo, TaskPatch } from '@/features/tasks/types';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import type { PersonOption } from '@/features/tasks/types';

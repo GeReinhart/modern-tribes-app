@@ -1,8 +1,8 @@
-import { ThemedSelect } from '@/components/common/form/ThemedSelect.tsx';
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
-import { ThemedTable } from '@/platform/themes/layout/ThemedTable.tsx';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedSelect } from '@/platform/themes/components/ThemedSelect.tsx';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedTable } from '@/platform/themes/components/ThemedTable.tsx';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,

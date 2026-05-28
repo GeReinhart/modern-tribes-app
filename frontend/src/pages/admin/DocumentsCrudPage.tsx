@@ -1,12 +1,12 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedInput } from '@/components/common/form/ThemedInput.tsx';
-import { StatusBadge } from '@/platform/themes/layout/StatusBadge.tsx';
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
-import { ThemedConfirmDialog } from '@/platform/themes/layout/ThemedConfirmDialog.tsx';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner.tsx';
-import { ThemedTable } from '@/platform/themes/layout/ThemedTable.tsx';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
-import { DocumentModal } from '@/components/entities/documents/DocumentModal';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import { ThemedInput } from '@/platform/themes/components/ThemedInput.tsx';
+import { StatusBadge } from '@/platform/themes/components/StatusBadge.tsx';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard';
+import { ThemedConfirmDialog } from '@/platform/themes/components/ThemedConfirmDialog.tsx';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedTable } from '@/platform/themes/components/ThemedTable.tsx';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
+import { DocumentModal } from '@/platform/documents/DocumentModal.tsx';
 import {
   AdminNavigation,
   adminMainThemeId,

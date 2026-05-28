@@ -1,4 +1,4 @@
-import { themesById } from '@/components/themes/themes.ts';
+import { themesById } from '@/platform/themes/themes.ts';
 
 import React from 'react';
 

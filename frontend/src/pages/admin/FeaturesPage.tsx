@@ -1,11 +1,11 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedSelect } from '@/components/common/form/ThemedSelect';
-import { StatusBadge } from '@/platform/themes/layout/StatusBadge';
-import { ThemedCard } from '@/platform/themes/layout/ThemedCard';
-import { ThemedConfirmDialog } from '@/platform/themes/layout/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
-import { ThemedTable } from '@/platform/themes/layout/ThemedTable';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
+import { ThemedSelect } from '@/platform/themes/components/ThemedSelect.tsx';
+import { StatusBadge } from '@/platform/themes/components/StatusBadge';
+import { ThemedCard } from '@/platform/themes/components/ThemedCard';
+import { ThemedConfirmDialog } from '@/platform/themes/components/ThemedConfirmDialog';
+import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner';
+import { ThemedTable } from '@/platform/themes/components/ThemedTable';
+import { ThemedText } from '@/platform/themes/components/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,

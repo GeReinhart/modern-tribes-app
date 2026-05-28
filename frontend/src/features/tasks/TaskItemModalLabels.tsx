@@ -1,6 +1,6 @@
-import { ThemedButton } from '@/components/common/form/ThemedButton';
+import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/platform/themes/icons/ThemedSvgIcon';
-import { LABEL_COLORS } from '@/components/themes/themes';
+import { LABEL_COLORS } from '@/platform/themes/themes.ts';
 import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 
 import React, { useRef, useState } from 'react';
