@@ -1,5 +1,5 @@
-import { notificationService } from '@/services/notification.service';
-import { UserSearchResult } from '@/types/notification.types';
+import { notificationService } from '@/services/notification.service.ts';
+import { UserSearchResult } from '@/types/notification.types.ts';
 
 import { useEffect, useRef, useState } from 'react';
 

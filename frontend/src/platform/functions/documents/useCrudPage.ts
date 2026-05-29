@@ -1,4 +1,4 @@
-import { FormMode } from '@/types/common.types';
+import { FormMode } from '@/types/common.types.ts';
 
 import { useCallback, useState } from 'react';
 

@@ -2,7 +2,7 @@ import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedBut
 import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { useDocuments } from '@/hooks/useDocuments.ts';
+import { useDocuments } from '@/platform/functions/documents/useDocuments.ts';
 import { useProjects } from '@/hooks/useProjects.ts';
 import { useTribeProjects } from '@/hooks/useTribes.ts';
 import { FormMode } from '@/types/common.types.ts';

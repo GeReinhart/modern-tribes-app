@@ -8,7 +8,7 @@ import DashboardTribesTab from '@/features/dashboard/tabs/DashboardTribesTab';
 import { TabConfigButton } from '@/features/glue/tab-config/TabConfigButton';
 import { TabConfigPopup } from '@/features/glue/tab-config/TabConfigPopup';
 import { useTabConfig } from '@/features/glue/tab-config/useTabConfig';
-import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
+import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
 import { useUrlTab } from '@/hooks/useUrlTab';
 import { authorizationHooks } from '@/platform/core/authorization/authorization-hooks.ts';
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';

@@ -3,7 +3,7 @@ import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/T
 import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
 import { TribeCard } from '@/features/tribes-projects/tribes/TribeCard.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile.ts';
+import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
 import { useUserTribes } from '@/hooks/useTribes.ts';
 import type { TribeEntry } from '@/types/queries/tribes.query.types.ts';
 

@@ -10,8 +10,8 @@ import {
 } from '@/platform/core/layout/AdminNavigation.tsx';
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { useDocuments } from '@/hooks/useDocuments.ts';
-import { usePersons } from '@/hooks/usePersons.ts';
+import { useDocuments } from '@/platform/functions/documents/useDocuments.ts';
+import { usePersons } from '@/platform/functions/people/persons/usePersons.ts';
 import { usePositionsByTribe } from '@/hooks/usePositions.ts';
 import { useProjects } from '@/hooks/useProjects.ts';
 import {

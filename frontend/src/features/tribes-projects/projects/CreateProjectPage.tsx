@@ -2,30 +2,30 @@ import EditorFileUploader from '@/platform/functions/documents/editor/EditorFile
 import EditorJoditComponent from '@/platform/functions/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInput.tsx';
-import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay';
-import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection';
-import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
+import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay.tsx';
+import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection.tsx';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
 import {
   CreateTabsConfigSection,
   DraftTabConfig,
-} from '@/features/tribes-projects/projects/CreateTabsConfigSection';
+} from '@/features/tribes-projects/projects/CreateTabsConfigSection.tsx';
 import {
   FeatureDraft,
   FeatureInstancesSection,
-} from '@/features/tribes-projects/projects/FeatureInstancesSection';
-import { AppLayout } from '@/platform/core/layout/AppLayout';
+} from '@/features/tribes-projects/projects/FeatureInstancesSection.tsx';
+import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { tabConfigService } from '@/features/glue/tab-config/tabConfig.service';
-import { useProjectWithDocumentMutations } from '@/hooks/useProjects';
-import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
-import { projectFeaturesService } from '@/services/project-features.service';
+import { tabConfigService } from '@/features/glue/tab-config/tabConfig.service.ts';
+import { useProjectWithDocumentMutations } from '@/hooks/useProjects.ts';
+import { useTribeWithPositions } from '@/hooks/useTribesWithPositions.ts';
+import { projectFeaturesService } from '@/services/project-features.service.ts';
 import {
   errorStyle,
   formActionsStyle,
   formContainerStyle,
 } from '@/platform/core/layout/themes/theme.styles.tsx';
-import { AttachmentFile } from '@/types/document.types';
-import { MenuAction } from '@/types/menu.types';
+import { AttachmentFile } from '@/types/document.types.ts';
+import { MenuAction } from '@/types/menu.types.ts';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

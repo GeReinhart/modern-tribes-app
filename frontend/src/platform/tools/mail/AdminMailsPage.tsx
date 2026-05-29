@@ -13,7 +13,7 @@ import {
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useMails } from '@/platform/tools/mail/useMails.ts';
-import { useUsers } from '@/hooks/useUsers.ts';
+import { useUsers } from '@/platform/functions/people/users/useUsers.ts';
 import { MailWithRecipients } from '@/platform/tools/mail/mail.types.ts';
 
 import React, { useMemo, useState } from 'react';

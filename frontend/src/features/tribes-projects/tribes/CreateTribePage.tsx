@@ -4,11 +4,11 @@ import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedBut
 import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay.tsx';
 import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection.tsx';
-import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
-import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
+import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { usePersons } from '@/hooks/usePersons';
-import { useTribeWithPositionsMutations } from '@/hooks/useTribesWithPositions';
+import { usePersons } from '@/platform/functions/people/persons/usePersons.ts';
+import { useTribeWithPositionsMutations } from '@/hooks/useTribesWithPositions.ts';
 import {
   checkboxStyle,
   clearButtonStyle,
@@ -27,8 +27,8 @@ import {
   successStyle,
 } from '@/platform/core/layout/themes/theme.styles.tsx';
 import { AttachmentFile } from '@/types/document.types.ts';
-import { MenuAction } from '@/types/menu.types';
-import { PositionEnum } from '@/types/position.types';
+import { MenuAction } from '@/types/menu.types.ts';
+import { PositionEnum } from '@/types/position.types.ts';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -1,16 +1,16 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
-import { ThemedConfirmDialog } from '@/platform/core/layout/themes/components/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
-import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection';
-import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
+import { ThemedConfirmDialog } from '@/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection.tsx';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
 import {
   AdminNavigation,
   adminMainThemeId,
-} from '@/platform/core/layout/AdminNavigation';
-import { AppLayout } from '@/platform/core/layout/AppLayout';
+} from '@/platform/core/layout/AdminNavigation.tsx';
+import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { publicationService } from '@/services/publication.service';
-import { PublicationAdminItem } from '@/types/publication.types';
+import { publicationService } from '@/services/publication.service.ts';
+import { PublicationAdminItem } from '@/types/publication.types.ts';
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

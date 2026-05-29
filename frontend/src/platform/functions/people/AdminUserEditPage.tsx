@@ -11,11 +11,11 @@ import { ThemeProvider } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import {
   useRepresentsByUserId,
   useRepresentsMutations,
-} from '@/hooks/useRepresents.ts';
+} from '@/platform/functions/people/represents/useRepresents.ts';
 import {
   useUserMutations,
   useUserWithRolesAndPermissions,
-} from '@/hooks/useUsers.ts';
+} from '@/platform/functions/people/users/useUsers.ts';
 import { User, UserCreate, UserUpdate } from '@/types/user.types.ts';
 
 import React, { useMemo, useState } from 'react';

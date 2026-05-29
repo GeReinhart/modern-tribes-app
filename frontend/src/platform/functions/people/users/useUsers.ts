@@ -1,14 +1,14 @@
 import { useEffect, useRef } from 'react';
 
-import { userService } from '../services/user.service';
+import { userService } from '@/services/user.service.ts';
 import {
   User,
   UserCreate,
   UserUpdate,
   UserWithRolesAndPermissions,
-} from '../types/user.types';
+} from '@/types/user.types.ts';
 import { apiHooks } from '@/platform/core/api/api-hooks.ts';
-import { createEntityHooks } from './useEntityCrud';
+import { createEntityHooks } from '@/hooks/useEntityCrud.ts';
 
 const { useList, useById, useMutations } = createEntityHooks<
   User,

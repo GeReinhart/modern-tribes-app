@@ -1,18 +1,18 @@
 import EditorFileUploader from '@/platform/functions/documents/editor/EditorFileUploader.tsx';
 import EditorJoditComponent from '@/platform/functions/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
-import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard';
+import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay.tsx';
 import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection.tsx';
-import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
-import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
+import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { usePersons } from '@/hooks/usePersons';
+import { usePersons } from '@/platform/functions/people/persons/usePersons.ts';
 import {
   useTribeWithPositions,
   useTribeWithPositionsMutations,
-} from '@/hooks/useTribesWithPositions';
+} from '@/hooks/useTribesWithPositions.ts';
 import {
   checkboxStyle,
   clearButtonStyle,
@@ -32,8 +32,8 @@ import {
 } from '@/platform/core/layout/themes/theme.styles.tsx';
 import { TribeWithPositionsUpdate } from '@/types/app/tribe_with_positions.types.ts';
 import { AttachmentFile } from '@/types/document.types.ts';
-import { MenuAction } from '@/types/menu.types';
-import { PositionEnum } from '@/types/position.types';
+import { MenuAction } from '@/types/menu.types.ts';
+import { PositionEnum } from '@/types/position.types.ts';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

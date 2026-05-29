@@ -1,26 +1,26 @@
 import EditorFileUploader from '@/platform/functions/documents/editor/EditorFileUploader.tsx';
 import EditorJoditComponent from '@/platform/functions/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
-import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard';
-import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay';
-import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
-import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection';
-import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
-import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
+import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay.tsx';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection.tsx';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
+import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import {
   useProjectWithDocument,
   useProjectWithDocumentMutations,
-} from '@/hooks/useProjects';
-import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
+} from '@/hooks/useProjects.ts';
+import { useTribeWithPositions } from '@/hooks/useTribesWithPositions.ts';
 import {
   errorStyle,
   formActionsStyle,
   formContainerStyle,
   getInputStyle,
 } from '@/platform/core/layout/themes/theme.styles.tsx';
-import { AttachmentFile } from '@/types/document.types';
-import { MenuAction } from '@/types/menu.types';
+import { AttachmentFile } from '@/types/document.types.ts';
+import { MenuAction } from '@/types/menu.types.ts';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

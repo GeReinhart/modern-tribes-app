@@ -2,25 +2,25 @@ import { DocumentAttachments } from '@/platform/functions/documents/DocumentAtta
 import { DocumentPagesSection } from '@/platform/functions/documents/DocumentPagesSection.tsx';
 import { DocumentReader } from '@/platform/functions/documents/DocumentReader.tsx';
 import { documentViewMenuActionsHooks } from '@/platform/functions/documents/DocumentViewMenuActions-hooks.ts';
-import { ThemedBadge } from '@/platform/core/layout/themes/components/ThemedBadge';
-import { ThemedConfirmDialog } from '@/platform/core/layout/themes/components/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
-import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection';
-import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemedBadge } from '@/platform/core/layout/themes/components/ThemedBadge.tsx';
+import { ThemedConfirmDialog } from '@/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection.tsx';
+import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { EntityAuditBadge } from '@/platform/core/layout/themes/components/EntityAuditBadge.tsx';
-import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
-import { useDocumentPages } from '@/hooks/useDocumentPages';
-import { useProjectDocument } from '@/hooks/useProjectDocuments';
+import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
+import { useDocumentPages } from '@/platform/functions/documents/useDocumentPages.ts';
+import { useProjectDocument } from '@/hooks/useProjectDocuments.ts';
 import {
   useProjectWithDocument,
   useUserProjectsByTribe,
-} from '@/hooks/useProjects';
-import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
-import { projectDocumentService } from '@/services/project-document.service';
-import { publicationService } from '@/services/publication.service';
+} from '@/hooks/useProjects.ts';
+import { useTribeWithPositions } from '@/hooks/useTribesWithPositions.ts';
+import { projectDocumentService } from '@/services/project-document.service.ts';
+import { publicationService } from '@/services/publication.service.ts';
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';
-import { ProjectEntry } from '@/types/queries/projects.query.types';
+import { ProjectEntry } from '@/types/queries/projects.query.types.ts';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

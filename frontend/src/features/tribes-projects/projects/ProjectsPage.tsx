@@ -1,14 +1,14 @@
-import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard';
-import { ThemedDivider } from '@/platform/core/layout/themes/components/ThemedDivider';
-import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
-import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
-import { ProjectCard } from '@/features/tribes-projects/projects/ProjectCard';
-import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
+import { ThemedDivider } from '@/platform/core/layout/themes/components/ThemedDivider.tsx';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
+import { ProjectCard } from '@/features/tribes-projects/projects/ProjectCard.tsx';
+import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
-import { useUserProjects } from '@/hooks/useProjects';
-import { MenuAction } from '@/types/menu.types';
-import { ProjectEntry } from '@/types/queries/projects.query.types';
+import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
+import { useUserProjects } from '@/hooks/useProjects.ts';
+import { MenuAction } from '@/types/menu.types.ts';
+import { ProjectEntry } from '@/types/queries/projects.query.types.ts';
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

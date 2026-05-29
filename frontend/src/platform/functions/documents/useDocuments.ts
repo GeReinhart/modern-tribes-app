@@ -1,13 +1,13 @@
 import { useCallback } from 'react';
 
-import { documentService } from '../services/document.service';
+import { documentService } from '@/services/document.service.ts';
 import {
   Document,
   DocumentCreate,
   DocumentUpdate,
-} from '../types/document.types';
+} from '@/types/document.types.ts';
 import { apiHooks } from '@/platform/core/api/api-hooks.ts';
-import { createEntityHooks } from './useEntityCrud';
+import { createEntityHooks } from '@/hooks/useEntityCrud.ts';
 
 const { useList, useById, useMutations } = createEntityHooks<
   Document,

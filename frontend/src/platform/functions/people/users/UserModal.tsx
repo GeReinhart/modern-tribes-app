@@ -5,7 +5,7 @@ import {
 import {
   useRepresentsByUserId,
   useRepresentsMutations,
-} from '@/hooks/useRepresents.ts';
+} from '@/platform/functions/people/represents/useRepresents.ts';
 import { FormMode } from '@/types/common.types.ts';
 import { User, UserCreate, UserUpdate } from '@/types/user.types.ts';
 

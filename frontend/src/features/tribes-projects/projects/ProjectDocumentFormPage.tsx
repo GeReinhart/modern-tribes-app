@@ -1,24 +1,24 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
 import { DocumentFormPagesEditor } from '@/platform/functions/documents/DocumentFormPagesEditor.tsx';
-import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard';
-import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay';
-import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
+import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
+import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay.tsx';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ProjectDocumentFields } from '@/platform/functions/documents/ProjectDocumentFields.tsx';
-import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { useDocumentPages } from '@/hooks/useDocumentPages';
-import { useProjectDocument } from '@/hooks/useProjectDocuments';
-import { useProjectWithDocument } from '@/hooks/useProjects';
-import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
-import { labelService } from '@/services/label.service';
-import { projectDocumentService } from '@/services/project-document.service';
+import { useDocumentPages } from '@/platform/functions/documents/useDocumentPages.ts';
+import { useProjectDocument } from '@/hooks/useProjectDocuments.ts';
+import { useProjectWithDocument } from '@/hooks/useProjects.ts';
+import { useTribeWithPositions } from '@/hooks/useTribesWithPositions.ts';
+import { labelService } from '@/services/label.service.ts';
+import { projectDocumentService } from '@/services/project-document.service.ts';
 import {
   errorStyle,
   formActionsStyle,
   formContainerStyle,
 } from '@/platform/core/layout/themes/theme.styles.tsx';
-import { AttachmentFile } from '@/types/document.types';
-import { MenuAction } from '@/types/menu.types';
+import { AttachmentFile } from '@/types/document.types.ts';
+import { MenuAction } from '@/types/menu.types.ts';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

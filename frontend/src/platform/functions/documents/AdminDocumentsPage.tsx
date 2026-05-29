@@ -13,8 +13,8 @@ import {
 } from '@/platform/core/layout/AdminNavigation.tsx';
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { useCrudPage } from '@/hooks/useCrudPage.ts';
-import { useDocumentMutations, useDocuments } from '@/hooks/useDocuments.ts';
+import { useCrudPage } from '@/platform/functions/documents/useCrudPage.ts';
+import { useDocumentMutations, useDocuments } from '@/platform/functions/documents/useDocuments.ts';
 import {
   Document,
   DocumentCreate,

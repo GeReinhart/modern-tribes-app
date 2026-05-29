@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { documentPageService } from '../services/document-page.service';
-import { DocumentPage } from '../types/document-page.types';
+import { documentPageService } from '@/services/document-page.service.ts';
+import { DocumentPage } from '@/types/document-page.types.ts';
 
 export function useDocumentPages(
   projectId: string | null,

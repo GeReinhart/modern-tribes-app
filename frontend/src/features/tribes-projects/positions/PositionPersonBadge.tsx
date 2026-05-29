@@ -1,5 +1,5 @@
 import { ThemedBadge } from '@/platform/core/layout/themes/components/ThemedBadge.tsx';
-import { usePerson } from '@/hooks/usePersons.ts';
+import { usePerson } from '@/platform/functions/people/persons/usePersons.ts';
 
 import React from 'react';
 

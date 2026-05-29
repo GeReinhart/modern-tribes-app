@@ -1,16 +1,16 @@
 import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
-import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard';
+import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedTable } from '@/platform/core/layout/themes/components/ThemedTable.tsx';
-import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
 import {
   AdminNavigation,
   adminMainThemeId,
-} from '@/platform/core/layout/AdminNavigation';
-import { AppLayout } from '@/platform/core/layout/AppLayout';
+} from '@/platform/core/layout/AdminNavigation.tsx';
+import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useRecentChanges } from '@/hooks/useRecentChanges.ts';
-import { useUsers } from '@/hooks/useUsers.ts';
+import { useUsers } from '@/platform/functions/people/users/useUsers.ts';
 import { RecentChange } from '@/types/monitoring.types.ts';
 
 import React, { useMemo, useState } from 'react';

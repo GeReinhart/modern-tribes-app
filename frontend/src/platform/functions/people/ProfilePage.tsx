@@ -6,9 +6,9 @@ import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { useAuth } from '@/platform/core/authentication/AuthContext.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile.ts';
-import { usePerson } from '@/hooks/usePersons.ts';
-import { useRepresentsByUserId } from '@/hooks/useRepresents.ts';
+import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
+import { usePerson } from '@/platform/functions/people/persons/usePersons.ts';
+import { useRepresentsByUserId } from '@/platform/functions/people/represents/useRepresents.ts';
 import { authService } from '@/platform/core/authentication/authentication-service.ts';
 
 import React from 'react';

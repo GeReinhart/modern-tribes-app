@@ -1,8 +1,8 @@
-import { PublicLayout } from '@/platform/core/layout/PublicLayout';
+import { PublicLayout } from '@/platform/core/layout/PublicLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { usePublicationLabels, usePublications } from '@/hooks/usePublications';
-import { LabelInfo } from '@/types/project-document.types';
-import { PublicationSummary } from '@/types/publication.types';
+import { usePublicationLabels, usePublications } from '@/hooks/usePublications.ts';
+import { LabelInfo } from '@/types/project-document.types.ts';
+import { PublicationSummary } from '@/types/publication.types.ts';
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

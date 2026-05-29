@@ -1,35 +1,35 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
-import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon';
-import { ThemedBadge } from '@/platform/core/layout/themes/components/ThemedBadge';
-import { ThemedConfirmDialog } from '@/platform/core/layout/themes/components/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
-import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection';
-import { ThemedTabs } from '@/platform/core/layout/themes/components/ThemedTabs';
-import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
-import { ProjectDocumentsTab } from '@/features/tribes-projects/projects/ProjectDocumentsTab';
-import { ProjectTribesTab } from '@/features/tribes-projects/projects/ProjectTribesTab';
-import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
+import { ThemedBadge } from '@/platform/core/layout/themes/components/ThemedBadge.tsx';
+import { ThemedConfirmDialog } from '@/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection.tsx';
+import { ThemedTabs } from '@/platform/core/layout/themes/components/ThemedTabs.tsx';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
+import { ProjectDocumentsTab } from '@/features/tribes-projects/projects/ProjectDocumentsTab.tsx';
+import { ProjectTribesTab } from '@/features/tribes-projects/projects/ProjectTribesTab.tsx';
+import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { getFeatureComponent } from '@/features/glue/registry.ts';
-import { TabConfigButton } from '@/features/glue/tab-config/TabConfigButton';
-import { TabConfigPopup } from '@/features/glue/tab-config/TabConfigPopup';
-import { useTabConfig } from '@/features/glue/tab-config/useTabConfig';
-import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
+import { TabConfigButton } from '@/features/glue/tab-config/TabConfigButton.tsx';
+import { TabConfigPopup } from '@/features/glue/tab-config/TabConfigPopup.tsx';
+import { useTabConfig } from '@/features/glue/tab-config/useTabConfig.ts';
+import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
 import {
   useFeatureTypes,
   useProjectFeatures,
-} from '@/hooks/useProjectFeatures';
+} from '@/hooks/useProjectFeatures.ts';
 import {
   useProjectTribesWithMembers,
   useProjectWithDocument,
   useUserProjectsByTribe,
-} from '@/hooks/useProjects';
-import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
-import { useUrlTab } from '@/hooks/useUrlTab';
+} from '@/hooks/useProjects.ts';
+import { useTribeWithPositions } from '@/hooks/useTribesWithPositions.ts';
+import { useUrlTab } from '@/hooks/useUrlTab.ts';
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';
-import { AttachmentFile } from '@/types/document.types';
-import { MenuAction } from '@/types/menu.types';
-import { ProjectEntry } from '@/types/queries/projects.query.types';
+import { AttachmentFile } from '@/types/document.types.ts';
+import { MenuAction } from '@/types/menu.types.ts';
+import { ProjectEntry } from '@/types/queries/projects.query.types.ts';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

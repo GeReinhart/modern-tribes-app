@@ -1,5 +1,5 @@
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile.ts';
+import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';

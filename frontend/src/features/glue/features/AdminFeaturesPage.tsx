@@ -1,25 +1,25 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
-import { StatusBadge } from '@/platform/core/layout/themes/components/StatusBadge';
-import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard';
-import { ThemedConfirmDialog } from '@/platform/core/layout/themes/components/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
-import { ThemedTable } from '@/platform/core/layout/themes/components/ThemedTable';
-import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
+import { StatusBadge } from '@/platform/core/layout/themes/components/StatusBadge.tsx';
+import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
+import { ThemedConfirmDialog } from '@/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedTable } from '@/platform/core/layout/themes/components/ThemedTable.tsx';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
 import {
   AdminNavigation,
   adminMainThemeId,
-} from '@/platform/core/layout/AdminNavigation';
-import { AppLayout } from '@/platform/core/layout/AppLayout';
+} from '@/platform/core/layout/AdminNavigation.tsx';
+import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { apiService } from '@/platform/core/api/api.service.ts';
-import { projectFeaturesService } from '@/services/project-features.service';
-import { projectService } from '@/services/project.service';
+import { projectFeaturesService } from '@/services/project-features.service.ts';
+import { projectService } from '@/services/project.service.ts';
 import {
   FeatureTypeInfo,
   ProjectFeatureInstance,
-} from '@/types/project-features.types';
-import { Project } from '@/types/project.types';
+} from '@/types/project-features.types.ts';
+import { Project } from '@/types/project.types.ts';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -1,5 +1,5 @@
-import { userDisplayService } from '@/services/user-display.service';
-import { UserDisplayInfo } from '@/types/user-display.types';
+import { userDisplayService } from '@/services/user-display.service.ts';
+import { UserDisplayInfo } from '@/types/user-display.types.ts';
 
 import { useEffect, useState } from 'react';
 

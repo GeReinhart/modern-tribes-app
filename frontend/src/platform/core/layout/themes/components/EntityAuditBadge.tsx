@@ -1,5 +1,5 @@
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { useUserDisplayInfo } from '@/hooks/useUserDisplayInfo.ts';
+import { useUserDisplayInfo } from '@/platform/functions/people/users/useUserDisplayInfo.ts';
 import { UserDisplayInfo } from '@/types/user-display.types.ts';
 
 import React from 'react';

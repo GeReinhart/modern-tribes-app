@@ -22,13 +22,13 @@ import {
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/platform/functions/people/UserProfileContext.tsx';
-import { useCrudPage } from '@/hooks/useCrudPage.ts';
-import { usePersonMutations, usePersons } from '@/hooks/usePersons.ts';
-import { useRepresents } from '@/hooks/useRepresents.ts';
+import { useCrudPage } from '@/platform/functions/documents/useCrudPage.ts';
+import { usePersonMutations, usePersons } from '@/platform/functions/people/persons/usePersons.ts';
+import { useRepresents } from '@/platform/functions/people/represents/useRepresents.ts';
 import {
   useUserMutations,
   useUsersWithRolesAndPermissions,
-} from '@/hooks/useUsers.ts';
+} from '@/platform/functions/people/users/useUsers.ts';
 import { SendNotificationModal } from '@/platform/tools/notifications/SendNotificationModal.tsx';
 import { userService } from '@/services/user.service.ts';
 import { UserSearchResult } from '@/types/notification.types.ts';
