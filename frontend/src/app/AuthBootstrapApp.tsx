@@ -19,7 +19,7 @@ import { AdminTribeEditPage } from '@/app/features/tribes-projects/AdminTribeEdi
 import { AdminTribesProjectsPage } from '@/app/features/tribes-projects/AdminTribesProjectsPage.tsx';
 import { AdminUserEditPage } from '@/app/platform/functions/people/AdminUserEditPage.tsx';
 import { AdminNotificationsPage } from '@/app/platform/tools/notifications/AdminNotificationsPage.tsx';
-import AboutPage from '@/app/platform/core/AboutPage.tsx';
+import AboutPage from '@/app/platform/core/about/AboutPage.tsx';
 import { CreateProjectPage } from '@/app/features/tribes-projects/projects/CreateProjectPage.tsx';
 import CreateTribeForm from '@/app/features/tribes-projects/tribes/CreateTribePage.tsx';
 import DashboardPage from '@/app/features/dashboard/DashboardPage.tsx';
