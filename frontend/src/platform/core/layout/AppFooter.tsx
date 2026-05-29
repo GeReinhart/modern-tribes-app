@@ -3,7 +3,7 @@ import {
   ThemedSvgIcon,
 } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ZoomControl } from '@/platform/core/layout/themes/components/ZoomControl.tsx';
-import { UserAvatarIcon } from '@/components/entities/users/UserAvatarIcon.tsx';
+import { UserAvatarIcon } from '@/platform/functions/people/users/UserAvatarIcon.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { BookmarkToggle } from '@/features/bookmarks/BookmarkToggle.tsx';
 

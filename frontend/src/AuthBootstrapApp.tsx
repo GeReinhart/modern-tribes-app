@@ -1,22 +1,22 @@
 import ProtectedRoute from '@/platform/core/authentication/ProtectedRoute.tsx';
-import { ErrorBoundary } from '@/components/common/ErrorBoundary.tsx';
-import { NotificationsPoller } from '@/components/notifications/NotificationsPoller';
-import { AppConfigProvider } from '@/contexts/AppConfigContext.tsx';
+import { ErrorBoundary } from '@/platform/core/layout/ErrorBoundary.tsx';
+import { NotificationsPoller } from '@/platform/tools/notifications/NotificationsPoller.tsx';
+import { AppConfigProvider } from '@/platform/core/app-config/AppConfigContext.tsx';
 import { AuthProvider } from '@/platform/core/authentication/AuthContext.tsx';
-import { ResponsiveProvider } from '@/contexts/ResponsiveContext.tsx';
-import { UserProfileProvider } from '@/contexts/UserProfileContext.tsx';
+import { ResponsiveProvider } from '@/platform/core/layout/ResponsiveContext.tsx';
+import { UserProfileProvider } from '@/platform/functions/people/UserProfileContext.tsx';
 import { BookmarksProvider } from '@/features/bookmarks/BookmarksContext';
 import { AdminAppConfigPage } from '@/platform/core/app-config/AdminAppConfigPage.tsx';
 import { AuthorizationPage } from '@/platform/core/authorization/AuthorizationPage.tsx';
 import { DocumentRevisionsPage } from '@/platform/tools/revisions/DocumentRevisionsPage.tsx';
 import { AdminDocumentsPage } from '@/platform/functions/documents/AdminDocumentsPage.tsx';
-import { FeaturesPage } from '@/pages/admin/FeaturesPage.tsx';
+import { AdminFeaturesPage } from '@/pages/admin/AdminFeaturesPage.tsx';
 import { AdminMailsPage } from '@/platform/tools/mail/AdminMailsPage.tsx';
-import { MonitoringPage } from '@/pages/admin/MonitoringPage.tsx';
+import { AdminMonitoringPage } from '@/pages/admin/AdminMonitoringPage.tsx';
 import { AdminPeoplePage } from '@/platform/functions/people/AdminPeoplePage.tsx';
-import { PublicationsAdminPage } from '@/pages/admin/PublicationsAdminPage.tsx';
-import { TribeEditPage } from '@/pages/admin/TribeEditPage.tsx';
-import { TribesProjectsPage } from '@/pages/admin/TribesProjectsPage.tsx';
+import { AdminPublicationsPage } from '@/pages/admin/AdminPublicationsPage.tsx';
+import { AdminTribeEditPage } from '@/features/tribes-projects/AdminTribeEditPage.tsx';
+import { AdminTribesProjectsPage } from '@/features/tribes-projects/AdminTribesProjectsPage.tsx';
 import { AdminUserEditPage } from '@/platform/functions/people/AdminUserEditPage.tsx';
 import { AdminNotificationsPage } from '@/platform/tools/notifications/AdminNotificationsPage.tsx';
 import AboutPage from '@/platform/core/AboutPage.tsx';
@@ -91,15 +91,15 @@ function AuthBootstrapApp() {
                       />
                       <Route
                         path="/admin/tribes"
-                        element={<TribesProjectsPage />}
+                        element={<AdminTribesProjectsPage />}
                       />
                       <Route
                         path="/admin/tribes/new"
-                        element={<TribeEditPage />}
+                        element={<AdminTribeEditPage />}
                       />
                       <Route
                         path="/admin/tribes/:tribeId/edit"
-                        element={<TribeEditPage />}
+                        element={<AdminTribeEditPage />}
                       />
                       <Route
                         path="/admin/tribes-projects"
@@ -120,11 +120,11 @@ function AuthBootstrapApp() {
                       <Route path="/admin/config" element={<AdminAppConfigPage />} />
                       <Route
                         path="/admin/features"
-                        element={<FeaturesPage />}
+                        element={<AdminFeaturesPage />}
                       />
                       <Route
                         path="/admin/monitoring"
-                        element={<MonitoringPage />}
+                        element={<AdminMonitoringPage />}
                       />
                       <Route
                         path="/admin/monitoring/documents/:documentId"
@@ -137,7 +137,7 @@ function AuthBootstrapApp() {
                       <Route path="/admin/mails" element={<AdminMailsPage />} />
                       <Route
                         path="/admin/publications"
-                        element={<PublicationsAdminPage />}
+                        element={<AdminPublicationsPage />}
                       />
                       <Route
                         path="/admin/notifications"

@@ -8,14 +8,14 @@ import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText'
 import {
   CreateTabsConfigSection,
   DraftTabConfig,
-} from '@/components/entities/projects/CreateTabsConfigSection';
+} from '@/features/tribes-projects/projects/CreateTabsConfigSection';
 import {
   FeatureDraft,
   FeatureInstancesSection,
-} from '@/components/entities/projects/FeatureInstancesSection';
+} from '@/features/tribes-projects/projects/FeatureInstancesSection';
 import { AppLayout } from '@/platform/core/layout/AppLayout';
 import { ThemeProvider } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { tabConfigService } from '@/features/tab-config/tabConfig.service';
+import { tabConfigService } from '@/features/glue/tab-config/tabConfig.service';
 import { useProjectWithDocumentMutations } from '@/hooks/useProjects';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
 import { projectFeaturesService } from '@/services/project-features.service';

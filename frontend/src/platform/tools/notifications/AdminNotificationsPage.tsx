@@ -3,14 +3,14 @@ import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.
 import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedTable } from '@/platform/core/layout/themes/components/ThemedTable.tsx';
 import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
-import { RowActionsMenu } from '@/components/common/menu/RowActionsMenu.tsx';
+import { RowActionsMenu } from '@/platform/core/layout/themes/components/RowActionsMenu.tsx';
 import {
   AdminNavigation,
   adminMainThemeId,
 } from '@/platform/core/layout/AdminNavigation.tsx';
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { useCurrentUserProfile } from '@/contexts/UserProfileContext.tsx';
+import { useCurrentUserProfile } from '@/platform/functions/people/UserProfileContext.tsx';
 import { useUserSearch } from '@/hooks/useUserSearch.ts';
 import { UserSearchResult } from '@/types/notification.types.ts';
 

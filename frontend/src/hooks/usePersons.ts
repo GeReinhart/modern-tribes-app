@@ -1,4 +1,4 @@
-import { personService } from '@/platform/functions/people/person.service.ts';
+import { personService } from '@/platform/functions/people/persons/person.service.ts';
 import { Person, PersonCreate, PersonUpdate } from '../types/person.types';
 import { createEntityHooks } from './useEntityCrud';
 

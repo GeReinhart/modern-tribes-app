@@ -8,7 +8,7 @@ import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/T
 import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection';
 import { AppLayout } from '@/platform/core/layout/AppLayout';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { EntityAuditBadge } from '@/components/common/audit/EntityAuditBadge';
+import { EntityAuditBadge } from '@/platform/core/layout/themes/components/EntityAuditBadge.tsx';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
 import { useDocumentPages } from '@/hooks/useDocumentPages';
 import { useProjectDocument } from '@/hooks/useProjectDocuments';

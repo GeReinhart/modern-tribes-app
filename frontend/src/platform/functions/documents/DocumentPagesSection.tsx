@@ -2,7 +2,7 @@ import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/T
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { documentPageService } from '@/services/document-page.service.ts';
 import { DocumentPage } from '@/types/document-page.types.ts';
-import { EntityAuditBadge } from '@/components/common/audit/EntityAuditBadge.tsx';
+import { EntityAuditBadge } from '@/platform/core/layout/themes/components/EntityAuditBadge.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

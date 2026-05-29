@@ -1,5 +1,5 @@
 import { getAPIBaseUrl } from '@/platform/core/env.ts';
-import { useAppConfig } from '@/contexts/AppConfigContext.tsx';
+import { useAppConfig } from '@/platform/core/app-config/AppConfigContext.tsx';
 import { uploadImage } from '@/platform/functions/documents/editor/editor-upload-utils.ts';
 
 import { useMemo, useRef } from 'react';

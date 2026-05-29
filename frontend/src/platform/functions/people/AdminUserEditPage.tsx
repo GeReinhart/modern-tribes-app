@@ -1,7 +1,7 @@
 import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
-import { UserForm } from '@/components/entities/users/UserForm.tsx';
+import { UserForm } from '@/platform/functions/people/users/UserForm.tsx';
 import {
   AdminNavigation,
   adminMainThemeId,

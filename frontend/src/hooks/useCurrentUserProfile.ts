@@ -1,1 +1,1 @@
-export { useCurrentUserProfile } from '@/contexts/UserProfileContext';
+export { useCurrentUserProfile } from '@/platform/functions/people/UserProfileContext.tsx';

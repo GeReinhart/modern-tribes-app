@@ -1,4 +1,4 @@
-import { EntityAuditBadge } from '@/components/common/audit/EntityAuditBadge';
+import { EntityAuditBadge } from '@/platform/core/layout/themes/components/EntityAuditBadge.tsx';
 import EditorJoditComponent from '@/platform/functions/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
 import ThemedDateSelection from '@/platform/core/layout/themes/components/ThemedDateSelection.tsx';

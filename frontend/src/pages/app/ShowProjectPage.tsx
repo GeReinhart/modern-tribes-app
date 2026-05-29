@@ -6,14 +6,14 @@ import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/T
 import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection';
 import { ThemedTabs } from '@/platform/core/layout/themes/components/ThemedTabs';
 import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
-import { ProjectDocumentsTab } from '@/components/entities/projects/ProjectDocumentsTab';
-import { ProjectTribesTab } from '@/components/entities/projects/ProjectTribesTab';
+import { ProjectDocumentsTab } from '@/features/tribes-projects/projects/ProjectDocumentsTab';
+import { ProjectTribesTab } from '@/features/tribes-projects/projects/ProjectTribesTab';
 import { AppLayout } from '@/platform/core/layout/AppLayout';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { getFeatureComponent } from '@/features/registry';
-import { TabConfigButton } from '@/features/tab-config/TabConfigButton';
-import { TabConfigPopup } from '@/features/tab-config/TabConfigPopup';
-import { useTabConfig } from '@/features/tab-config/useTabConfig';
+import { getFeatureComponent } from '@/features/glue/registry.ts';
+import { TabConfigButton } from '@/features/glue/tab-config/TabConfigButton';
+import { TabConfigPopup } from '@/features/glue/tab-config/TabConfigPopup';
+import { useTabConfig } from '@/features/glue/tab-config/useTabConfig';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
 import {
   useFeatureTypes,

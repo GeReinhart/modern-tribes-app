@@ -7,7 +7,7 @@ import {
   adminMainThemeId,
 } from '@/platform/core/layout/AdminNavigation.tsx';
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
-import { useAppConfig } from '@/contexts/AppConfigContext.tsx';
+import { useAppConfig } from '@/platform/core/app-config/AppConfigContext.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { apiHooks } from '@/platform/core/api/api-hooks.ts';
 import { appConfigService } from '@/platform/core/app-config/app-config.service.ts';

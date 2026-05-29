@@ -13,7 +13,7 @@ import {
 } from '@/platform/core/layout/AdminNavigation.tsx';
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { useCurrentUserProfile } from '@/contexts/UserProfileContext.tsx';
+import { useCurrentUserProfile } from '@/platform/functions/people/UserProfileContext.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage.ts';
 
 import React, { useMemo, useState } from 'react';

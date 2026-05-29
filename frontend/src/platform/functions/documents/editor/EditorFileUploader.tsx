@@ -1,4 +1,4 @@
-import { useAppConfig } from '@/contexts/AppConfigContext.tsx';
+import { useAppConfig } from '@/platform/core/app-config/AppConfigContext.tsx';
 import { AttachmentFile } from '@/types/document.types.ts';
 import { formatFileSize, uploadFile } from '@/platform/functions/documents/editor/editor-upload-utils.ts';
 

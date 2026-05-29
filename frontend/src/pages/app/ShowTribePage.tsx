@@ -7,9 +7,9 @@ import { ThemedTabs } from '@/platform/core/layout/themes/components/ThemedTabs'
 import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
 import { AppLayout } from '@/platform/core/layout/AppLayout';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { TabConfigButton } from '@/features/tab-config/TabConfigButton';
-import { TabConfigPopup } from '@/features/tab-config/TabConfigPopup';
-import { useTabConfig } from '@/features/tab-config/useTabConfig';
+import { TabConfigButton } from '@/features/glue/tab-config/TabConfigButton';
+import { TabConfigPopup } from '@/features/glue/tab-config/TabConfigPopup';
+import { useTabConfig } from '@/features/glue/tab-config/useTabConfig';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';
 import { useUserProjectsByTribe } from '@/hooks/useProjects';
 import { useUserTribes } from '@/hooks/useTribes';

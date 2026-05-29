@@ -2,7 +2,7 @@ import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard'
 import { ThemedDivider } from '@/platform/core/layout/themes/components/ThemedDivider';
 import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
 import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
-import { ProjectCard } from '@/components/entities/projects/ProjectCard';
+import { ProjectCard } from '@/features/tribes-projects/projects/ProjectCard';
 import { AppLayout } from '@/platform/core/layout/AppLayout';
 import { ThemeProvider } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile';

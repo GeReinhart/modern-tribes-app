@@ -12,16 +12,16 @@ import {
 import { ThemedTable } from '@/platform/core/layout/themes/components/ThemedTable.tsx';
 import { ThemedTabs } from '@/platform/core/layout/themes/components/ThemedTabs.tsx';
 import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
-import { PersonModal } from '@/components/entities/persons/PersonModal.tsx';
-import { UserModal } from '@/components/entities/users/UserModal.tsx';
-import { UserRolesBadges } from '@/components/entities/users/UserRolesBadges.tsx';
+import { PersonModal } from '@/platform/functions/people/persons/PersonModal.tsx';
+import { UserModal } from '@/platform/functions/people/users/UserModal.tsx';
+import { UserRolesBadges } from '@/platform/functions/people/users/UserRolesBadges.tsx';
 import {
   AdminNavigation,
   adminMainThemeId,
 } from '@/platform/core/layout/AdminNavigation.tsx';
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { useCurrentUserProfile } from '@/contexts/UserProfileContext.tsx';
+import { useCurrentUserProfile } from '@/platform/functions/people/UserProfileContext.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage.ts';
 import { usePersonMutations, usePersons } from '@/hooks/usePersons.ts';
 import { useRepresents } from '@/hooks/useRepresents.ts';

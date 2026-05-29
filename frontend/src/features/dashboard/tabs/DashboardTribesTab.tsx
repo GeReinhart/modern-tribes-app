@@ -1,7 +1,7 @@
 import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
-import { TribeCard } from '@/components/entities/tribes/TribeCard.tsx';
+import { TribeCard } from '@/features/tribes-projects/tribes/TribeCard.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile.ts';
 import { useUserTribes } from '@/hooks/useTribes.ts';
