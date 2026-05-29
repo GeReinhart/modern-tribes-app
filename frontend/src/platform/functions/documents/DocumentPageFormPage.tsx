@@ -9,8 +9,8 @@ import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useDocumentPage } from '@/platform/functions/documents/useDocumentPages.ts';
-import { useProjectWithDocument } from '@/hooks/useProjects.ts';
-import { useTribeWithPositions } from '@/hooks/useTribesWithPositions.ts';
+import { useProjectWithDocument } from '@/features/tribes-projects/projects/useProjects.ts';
+import { useTribeWithPositions } from '@/features/tribes-projects/tribes/useTribesWithPositions.ts';
 import { documentPageService } from '@/services/document-page.service.ts';
 import {
   errorStyle,

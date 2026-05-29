@@ -1,5 +1,5 @@
 import { apiHooks } from '@/platform/core/api/api-hooks.ts';
-import { createEntityHooks } from '@/hooks/useEntityCrud.ts';
+import { createEntityHooks } from '@/platform/core/api/useEntityCrud.ts';
 import { representsService } from '@/services/represents.service.ts';
 import {
   Represents,

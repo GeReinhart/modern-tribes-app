@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { projectDocumentService } from '../services/project-document.service';
+import { projectDocumentService } from '@/services/project-document.service.ts';
 import {
   ProjectDocument,
   ProjectDocumentLabel,
   ProjectDocumentSummary,
-} from '../types/project-document.types';
+} from '@/types/project-document.types.ts';
 
 export function useProjectDocuments(
   projectId: string | null,

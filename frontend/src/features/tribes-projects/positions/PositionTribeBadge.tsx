@@ -1,5 +1,5 @@
 import { ThemedBadge } from '@/platform/core/layout/themes/components/ThemedBadge.tsx';
-import { useTribe } from '@/hooks/useTribes.ts';
+import { useTribe } from '@/features/tribes-projects/tribes/useTribes.ts';
 
 import React from 'react';
 

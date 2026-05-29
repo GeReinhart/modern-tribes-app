@@ -11,10 +11,10 @@ import { TabConfigButton } from '@/features/glue/tab-config/TabConfigButton.tsx'
 import { TabConfigPopup } from '@/features/glue/tab-config/TabConfigPopup.tsx';
 import { useTabConfig } from '@/features/glue/tab-config/useTabConfig.ts';
 import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
-import { useUserProjectsByTribe } from '@/hooks/useProjects.ts';
-import { useUserTribes } from '@/hooks/useTribes.ts';
-import { useTribeWithPositions } from '@/hooks/useTribesWithPositions.ts';
-import { useUrlTab } from '@/hooks/useUrlTab.ts';
+import { useUserProjectsByTribe } from '@/features/tribes-projects/projects/useProjects.ts';
+import { useUserTribes } from '@/features/tribes-projects/tribes/useTribes.ts';
+import { useTribeWithPositions } from '@/features/tribes-projects/tribes/useTribesWithPositions.ts';
+import { useUrlTab } from '@/features/glue/url-tab/useUrlTab.ts';
 import { authorizationHooks } from '@/platform/core/authorization/authorization-hooks.ts';
 import { tribeWithPositionService } from '@/services/app/tribe_with_positions.service.ts';
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';

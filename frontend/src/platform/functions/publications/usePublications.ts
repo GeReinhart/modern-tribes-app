@@ -1,6 +1,6 @@
-import { publicationService } from '@/services/publication.service';
-import { LabelInfo } from '@/types/project-document.types';
-import { PublicationSummary } from '@/types/publication.types';
+import { publicationService } from '@/services/publication.service.ts';
+import { LabelInfo } from '@/types/project-document.types.ts';
+import { PublicationSummary } from '@/types/publication.types.ts';
 
 import { useEffect, useState } from 'react';
 

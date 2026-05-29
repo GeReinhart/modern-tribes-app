@@ -18,14 +18,14 @@ import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurr
 import {
   useFeatureTypes,
   useProjectFeatures,
-} from '@/hooks/useProjectFeatures.ts';
+} from '@/features/glue/features/useProjectFeatures.ts';
 import {
   useProjectTribesWithMembers,
   useProjectWithDocument,
   useUserProjectsByTribe,
-} from '@/hooks/useProjects.ts';
-import { useTribeWithPositions } from '@/hooks/useTribesWithPositions.ts';
-import { useUrlTab } from '@/hooks/useUrlTab.ts';
+} from '@/features/tribes-projects/projects/useProjects.ts';
+import { useTribeWithPositions } from '@/features/tribes-projects/tribes/useTribesWithPositions.ts';
+import { useUrlTab } from '@/features/glue/url-tab/useUrlTab.ts';
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';
 import { AttachmentFile } from '@/types/document.types.ts';
 import { MenuAction } from '@/types/menu.types.ts';

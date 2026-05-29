@@ -11,12 +11,12 @@ import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeCont
 import { EntityAuditBadge } from '@/platform/core/layout/themes/components/EntityAuditBadge.tsx';
 import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
 import { useDocumentPages } from '@/platform/functions/documents/useDocumentPages.ts';
-import { useProjectDocument } from '@/hooks/useProjectDocuments.ts';
+import { useProjectDocument } from '@/features/tribes-projects/projects/useProjectDocuments.ts';
 import {
   useProjectWithDocument,
   useUserProjectsByTribe,
-} from '@/hooks/useProjects.ts';
-import { useTribeWithPositions } from '@/hooks/useTribesWithPositions.ts';
+} from '@/features/tribes-projects/projects/useProjects.ts';
+import { useTribeWithPositions } from '@/features/tribes-projects/tribes/useTribesWithPositions.ts';
 import { projectDocumentService } from '@/services/project-document.service.ts';
 import { publicationService } from '@/services/publication.service.ts';
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';

@@ -1,12 +1,12 @@
 import { apiHooks } from '@/platform/core/api/api-hooks.ts';
-import { tribeWithPositionService } from '@/services/app/tribe_with_positions.service';
-import { tribeService } from '@/services/tribe.service';
+import { tribeWithPositionService } from '@/services/app/tribe_with_positions.service.ts';
+import { tribeService } from '@/services/tribe.service.ts';
 import {
   TribeWithPositionsCreate,
   TribeWithPositionsResponse,
   TribeWithPositionsUpdate,
 } from '@/types/app/tribe_with_positions.types.ts';
-import { Tribe, TribeCreate, TribeUpdate } from '@/types/tribe.types';
+import { Tribe, TribeCreate, TribeUpdate } from '@/types/tribe.types.ts';
 
 import { useCallback, useEffect, useState } from 'react';
 

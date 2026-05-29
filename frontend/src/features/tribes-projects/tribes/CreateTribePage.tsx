@@ -8,7 +8,7 @@ import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { usePersons } from '@/platform/functions/people/persons/usePersons.ts';
-import { useTribeWithPositionsMutations } from '@/hooks/useTribesWithPositions.ts';
+import { useTribeWithPositionsMutations } from '@/features/tribes-projects/tribes/useTribesWithPositions.ts';
 import {
   checkboxStyle,
   clearButtonStyle,

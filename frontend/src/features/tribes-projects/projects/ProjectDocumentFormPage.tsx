@@ -7,9 +7,9 @@ import { ProjectDocumentFields } from '@/platform/functions/documents/ProjectDoc
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useDocumentPages } from '@/platform/functions/documents/useDocumentPages.ts';
-import { useProjectDocument } from '@/hooks/useProjectDocuments.ts';
-import { useProjectWithDocument } from '@/hooks/useProjects.ts';
-import { useTribeWithPositions } from '@/hooks/useTribesWithPositions.ts';
+import { useProjectDocument } from '@/features/tribes-projects/projects/useProjectDocuments.ts';
+import { useProjectWithDocument } from '@/features/tribes-projects/projects/useProjects.ts';
+import { useTribeWithPositions } from '@/features/tribes-projects/tribes/useTribesWithPositions.ts';
 import { labelService } from '@/services/label.service.ts';
 import { projectDocumentService } from '@/services/project-document.service.ts';
 import {

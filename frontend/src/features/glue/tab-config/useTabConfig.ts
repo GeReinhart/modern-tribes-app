@@ -1,4 +1,4 @@
-import { TabDefinition } from '@/hooks/useUrlTab.ts';
+import { TabDefinition } from '@/features/glue/url-tab/useUrlTab.ts';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 

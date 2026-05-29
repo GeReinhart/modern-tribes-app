@@ -1,5 +1,5 @@
 import { useAuth } from '@/platform/core/authentication/AuthContext.tsx';
-import { useNotificationPoller } from '@/hooks/useNotificationPoller.ts';
+import { useNotificationPoller } from '@/platform/tools/notifications/useNotificationPoller.ts';
 
 import React from 'react';
 

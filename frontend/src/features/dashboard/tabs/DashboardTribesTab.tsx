@@ -4,7 +4,7 @@ import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.
 import { TribeCard } from '@/features/tribes-projects/tribes/TribeCard.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
-import { useUserTribes } from '@/hooks/useTribes.ts';
+import { useUserTribes } from '@/features/tribes-projects/tribes/useTribes.ts';
 import type { TribeEntry } from '@/types/queries/tribes.query.types.ts';
 
 import React, { useMemo } from 'react';

@@ -6,7 +6,7 @@ import { ProjectCard } from '@/features/tribes-projects/projects/ProjectCard.tsx
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
-import { useUserProjects } from '@/hooks/useProjects.ts';
+import { useUserProjects } from '@/features/tribes-projects/projects/useProjects.ts';
 import { MenuAction } from '@/types/menu.types.ts';
 import { ProjectEntry } from '@/types/queries/projects.query.types.ts';
 

@@ -9,7 +9,7 @@ import {
 } from '@/platform/core/layout/AdminNavigation.tsx';
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { useRecentChanges } from '@/hooks/useRecentChanges.ts';
+import { useRecentChanges } from '@/platform/functions/monitoring/useRecentChanges.ts';
 import { useUsers } from '@/platform/functions/people/users/useUsers.ts';
 import { RecentChange } from '@/types/monitoring.types.ts';
 

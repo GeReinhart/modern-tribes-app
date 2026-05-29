@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { projectFeaturesService } from '../services/project-features.service';
+import { projectFeaturesService } from '@/services/project-features.service.ts';
 import {
   FeatureTypeInfo,
   ProjectFeatureInstance,
   ProjectFeatureInstanceCreate,
-} from '../types/project-features.types';
+} from '@/types/project-features.types.ts';
 
 export function useProjectFeatures(projectId: string | null) {
   const [features, setFeatures] = useState<ProjectFeatureInstance[]>([]);

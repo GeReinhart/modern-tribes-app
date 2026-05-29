@@ -12,7 +12,7 @@ import { usePersons } from '@/platform/functions/people/persons/usePersons.ts';
 import {
   useTribeWithPositions,
   useTribeWithPositionsMutations,
-} from '@/hooks/useTribesWithPositions.ts';
+} from '@/features/tribes-projects/tribes/useTribesWithPositions.ts';
 import {
   checkboxStyle,
   clearButtonStyle,

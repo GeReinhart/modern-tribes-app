@@ -1,4 +1,4 @@
-import { useResponsive } from '@/hooks/useResponsive.ts';
+import { useResponsive } from '@/platform/core/responsive/useResponsive.ts';
 
 import React, { ReactNode, createContext, useContext } from 'react';
 

@@ -11,8 +11,8 @@ import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeCont
 import {
   useProjectWithDocument,
   useProjectWithDocumentMutations,
-} from '@/hooks/useProjects.ts';
-import { useTribeWithPositions } from '@/hooks/useTribesWithPositions.ts';
+} from '@/features/tribes-projects/projects/useProjects.ts';
+import { useTribeWithPositions } from '@/features/tribes-projects/tribes/useTribesWithPositions.ts';
 import {
   errorStyle,
   formActionsStyle,

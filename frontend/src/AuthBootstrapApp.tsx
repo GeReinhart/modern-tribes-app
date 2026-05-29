@@ -3,7 +3,7 @@ import { ErrorBoundary } from '@/platform/core/layout/ErrorBoundary.tsx';
 import { NotificationsPoller } from '@/platform/tools/notifications/NotificationsPoller.tsx';
 import { AppConfigProvider } from '@/platform/core/app-config/AppConfigContext.tsx';
 import { AuthProvider } from '@/platform/core/authentication/AuthContext.tsx';
-import { ResponsiveProvider } from '@/platform/core/layout/ResponsiveContext.tsx';
+import { ResponsiveProvider } from '@/platform/core/responsive/ResponsiveContext.tsx';
 import { UserProfileProvider } from '@/platform/functions/people/UserProfileContext.tsx';
 import { BookmarksProvider } from '@/features/bookmarks/BookmarksContext';
 import { AdminAppConfigPage } from '@/platform/core/app-config/AdminAppConfigPage.tsx';

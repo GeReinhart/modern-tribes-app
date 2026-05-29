@@ -4,7 +4,7 @@ import {
 } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { Theme } from '@/platform/core/layout/themes/themes.ts';
 import { useAuth } from '@/platform/core/authentication/AuthContext.tsx';
-import { useResponsiveContext } from '@/platform/core/layout/ResponsiveContext.tsx';
+import { useResponsiveContext } from '@/platform/core/responsive/ResponsiveContext.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { CSSProperties } from 'react';

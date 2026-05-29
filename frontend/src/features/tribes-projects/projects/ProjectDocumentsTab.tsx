@@ -6,7 +6,7 @@ import { EntityAuditBadge } from '@/platform/core/layout/themes/components/Entit
 import {
   useProjectDocumentLabels,
   useProjectDocuments,
-} from '@/hooks/useProjectDocuments.ts';
+} from '@/features/tribes-projects/projects/useProjectDocuments.ts';
 import { ProjectDocumentSummary } from '@/types/project-document.types.ts';
 
 import React, { useEffect, useState } from 'react';

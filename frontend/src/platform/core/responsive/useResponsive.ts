@@ -1,4 +1,4 @@
-import { applyCssVariables } from '@/utils/cssVariables';
+import { applyCssVariables } from '@/utils/cssVariables.ts';
 
 import { useEffect, useState } from 'react';
 

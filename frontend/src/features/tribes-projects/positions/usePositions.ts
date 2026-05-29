@@ -1,11 +1,11 @@
 import { apiHooks } from '@/platform/core/api/api-hooks.ts';
-import { createEntityHooks } from '@/hooks/useEntityCrud';
-import { positionService } from '@/services/position.service';
+import { createEntityHooks } from '@/platform/core/api/useEntityCrud.ts';
+import { positionService } from '@/services/position.service.ts';
 import {
   Position,
   PositionCreate,
   PositionUpdate,
-} from '@/types/position.types';
+} from '@/types/position.types.ts';
 
 import { useCallback, useEffect, useState } from 'react';
 

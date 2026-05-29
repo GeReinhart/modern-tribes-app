@@ -5,7 +5,7 @@ import { TribeCard } from '@/features/tribes-projects/tribes/TribeCard.tsx';
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
-import { useUserTribes } from '@/hooks/useTribes.ts';
+import { useUserTribes } from '@/features/tribes-projects/tribes/useTribes.ts';
 import { authorizationHooks } from '@/platform/core/authorization/authorization-hooks.ts';
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';
 import { MenuAction } from '@/types/menu.types.ts';

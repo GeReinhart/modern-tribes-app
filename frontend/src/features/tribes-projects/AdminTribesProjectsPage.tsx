@@ -21,9 +21,9 @@ import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useCrudPage } from '@/platform/functions/documents/useCrudPage.ts';
 import { usePersons } from '@/platform/functions/people/persons/usePersons.ts';
-import { usePositions } from '@/hooks/usePositions.ts';
-import { useProjectMutations, useProjects } from '@/hooks/useProjects.ts';
-import { useTribeMutations, useTribes } from '@/hooks/useTribes.ts';
+import { usePositions } from '@/features/tribes-projects/positions/usePositions.ts';
+import { useProjectMutations, useProjects } from '@/features/tribes-projects/projects/useProjects.ts';
+import { useTribeMutations, useTribes } from '@/features/tribes-projects/tribes/useTribes.ts';
 import { Project, ProjectCreate, ProjectUpdate } from '@/types/project.types.ts';
 import { Tribe, TribeCreate, TribeUpdate } from '@/types/tribe.types.ts';
 

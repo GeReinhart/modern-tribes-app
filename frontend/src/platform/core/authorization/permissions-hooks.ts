@@ -1,4 +1,4 @@
-import { createEntityHooks } from '@/hooks/useEntityCrud.ts';
+import { createEntityHooks } from '@/platform/core/api/useEntityCrud.ts';
 
 import {
   Permission,

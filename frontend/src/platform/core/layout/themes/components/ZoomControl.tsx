@@ -1,4 +1,4 @@
-import { useResponsiveContext } from '@/platform/core/layout/ResponsiveContext.tsx';
+import { useResponsiveContext } from '@/platform/core/responsive/ResponsiveContext.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 
 import React from 'react';

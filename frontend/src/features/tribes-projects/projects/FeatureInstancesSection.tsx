@@ -2,7 +2,7 @@ import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedBut
 import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
-import { useFeatureTypes } from '@/hooks/useProjectFeatures.ts';
+import { useFeatureTypes } from '@/features/glue/features/useProjectFeatures.ts';
 import { FeatureTypeInfo } from '@/types/project-features.types.ts';
 
 import React, { useMemo } from 'react';

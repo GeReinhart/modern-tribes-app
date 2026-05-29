@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { projectService } from '../services/project.service';
+import { projectService } from '@/services/project.service.ts';
 import {
   ProjectWithDocumentCreate,
   ProjectWithDocumentResponse,
   ProjectWithDocumentUpdate,
-} from '../types/app/project_with_document.types';
-import { Project, ProjectCreate, ProjectUpdate } from '../types/project.types';
-import { UserProjectEntry } from '../types/queries/projects.query.types';
-import { ProjectTribeWithMembers } from '../types/queries/projects.query.types';
+} from '@/types/app/project_with_document.types.ts';
+import { Project, ProjectCreate, ProjectUpdate } from '@/types/project.types.ts';
+import { UserProjectEntry } from '@/types/queries/projects.query.types.ts';
+import { ProjectTribeWithMembers } from '@/types/queries/projects.query.types.ts';
 import { apiHooks } from '@/platform/core/api/api-hooks.ts';
-import { createEntityHooks } from './useEntityCrud';
+import { createEntityHooks } from '@/platform/core/api/useEntityCrud.ts';
 
 const { useList, useById, useMutations } = createEntityHooks<
   Project,

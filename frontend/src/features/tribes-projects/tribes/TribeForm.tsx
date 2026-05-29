@@ -3,8 +3,8 @@ import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInpu
 import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useDocuments } from '@/platform/functions/documents/useDocuments.ts';
-import { useProjects } from '@/hooks/useProjects.ts';
-import { useTribeProjects } from '@/hooks/useTribes.ts';
+import { useProjects } from '@/features/tribes-projects/projects/useProjects.ts';
+import { useTribeProjects } from '@/features/tribes-projects/tribes/useTribes.ts';
 import { FormMode } from '@/types/common.types.ts';
 import {
   Tribe,

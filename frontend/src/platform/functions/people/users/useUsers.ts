@@ -8,7 +8,7 @@ import {
   UserWithRolesAndPermissions,
 } from '@/types/user.types.ts';
 import { apiHooks } from '@/platform/core/api/api-hooks.ts';
-import { createEntityHooks } from '@/hooks/useEntityCrud.ts';
+import { createEntityHooks } from '@/platform/core/api/useEntityCrud.ts';
 
 const { useList, useById, useMutations } = createEntityHooks<
   User,

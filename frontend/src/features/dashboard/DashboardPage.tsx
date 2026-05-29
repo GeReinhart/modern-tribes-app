@@ -9,7 +9,7 @@ import { TabConfigButton } from '@/features/glue/tab-config/TabConfigButton';
 import { TabConfigPopup } from '@/features/glue/tab-config/TabConfigPopup';
 import { useTabConfig } from '@/features/glue/tab-config/useTabConfig';
 import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
-import { useUrlTab } from '@/hooks/useUrlTab';
+import { useUrlTab } from '@/features/glue/url-tab/useUrlTab.ts';
 import { authorizationHooks } from '@/platform/core/authorization/authorization-hooks.ts';
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';
 import { MenuAction } from '@/types/menu.types';
