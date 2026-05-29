@@ -5,10 +5,10 @@ import {
   ProjectWithDocumentCreate,
   ProjectWithDocumentResponse,
   ProjectWithDocumentUpdate,
-} from '@/types/app/project_with_document.types.ts';
-import { Project, ProjectCreate, ProjectUpdate } from '@/types/project.types.ts';
-import { UserProjectEntry } from '@/types/queries/projects.query.types.ts';
-import { ProjectTribeWithMembers } from '@/types/queries/projects.query.types.ts';
+} from '@/features/tribes-projects/projects/project_with_document.types.ts';
+import { Project, ProjectCreate, ProjectUpdate } from '@/features/tribes-projects/projects/project.types.ts';
+import { UserProjectEntry } from '@/features/tribes-projects/projects/projects.query.types.ts';
+import { ProjectTribeWithMembers } from '@/features/tribes-projects/projects/projects.query.types.ts';
 import { apiHooks } from '@/platform/core/api/api-hooks.ts';
 import { createEntityHooks } from '@/platform/core/api/useEntityCrud.ts';
 

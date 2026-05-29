@@ -4,7 +4,7 @@ import {
   NotificationCreate,
   NotificationStatus,
   UserSearchResult,
-} from '@/types/notification.types.ts';
+} from '@/platform/tools/notifications/notification.types.ts';
 
 class NotificationService {
   async searchUsers(q: string): Promise<UserSearchResult[]> {

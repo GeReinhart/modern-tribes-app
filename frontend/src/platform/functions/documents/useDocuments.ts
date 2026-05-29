@@ -5,7 +5,7 @@ import {
   Document,
   DocumentCreate,
   DocumentUpdate,
-} from '@/types/document.types.ts';
+} from '@/platform/functions/documents/document.types.ts';
 import { apiHooks } from '@/platform/core/api/api-hooks.ts';
 import { createEntityHooks } from '@/platform/core/api/useEntityCrud.ts';
 

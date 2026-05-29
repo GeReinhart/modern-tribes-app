@@ -1,7 +1,7 @@
 import { ApplicationLogo } from '@/platform/core/layout/themes/icons/ApplicationLogo.tsx';
 import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { MenuAction } from '@/types/menu.types.ts';
+import { MenuAction } from '@/platform/core/layout/menu.types.ts';
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';

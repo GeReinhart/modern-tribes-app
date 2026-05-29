@@ -5,7 +5,7 @@ import {
   ProjectDocument,
   ProjectDocumentLabel,
   ProjectDocumentSummary,
-} from '@/types/project-document.types.ts';
+} from '@/features/tribes-projects/projects/project-document.types.ts';
 
 export function useProjectDocuments(
   projectId: string | null,

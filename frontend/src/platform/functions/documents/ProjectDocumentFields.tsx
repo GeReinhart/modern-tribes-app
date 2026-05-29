@@ -4,7 +4,7 @@ import { LabelSelector } from '@/platform/core/layout/themes/components/LabelSel
 import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection.tsx';
 import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { AttachmentFile } from '@/types/document.types.ts';
+import { AttachmentFile } from '@/platform/functions/documents/document.types.ts';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

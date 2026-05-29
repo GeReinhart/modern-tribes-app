@@ -1,4 +1,4 @@
-import { AttachmentFile } from '@/types/document.types';
+import { AttachmentFile } from '@/platform/functions/documents/document.types.ts';
 
 export interface ProjectWithDocumentCreate {
   tribe_id: string;

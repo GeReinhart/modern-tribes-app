@@ -1,5 +1,5 @@
 import { useAppConfig } from '@/platform/core/app-config/AppConfigContext.tsx';
-import { AttachmentFile } from '@/types/document.types.ts';
+import { AttachmentFile } from '@/platform/functions/documents/document.types.ts';
 import { formatFileSize, uploadFile } from '@/platform/functions/documents/editor/editor-upload-utils.ts';
 
 import { ChangeEvent, useRef, useState } from 'react';

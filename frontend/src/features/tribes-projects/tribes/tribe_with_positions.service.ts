@@ -2,7 +2,7 @@ import {
   TribeWithPositionsCreate,
   TribeWithPositionsResponse,
   TribeWithPositionsUpdate,
-} from '@/types/app/tribe_with_positions.types.ts';
+} from '@/features/tribes-projects/tribes/tribe_with_positions.types.ts';
 
 import { apiService } from '@/platform/core/api/api.service.ts';
 

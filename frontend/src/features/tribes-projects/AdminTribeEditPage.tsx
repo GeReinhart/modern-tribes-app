@@ -21,13 +21,13 @@ import {
 } from '@/features/tribes-projects/tribes/useTribes.ts';
 import { positionService } from '@/features/tribes-projects/positions/position.service.ts';
 import { tribeService } from '@/features/tribes-projects/tribes/tribe.service.ts';
-import { PositionEnum } from '@/types/position.types.ts';
+import { PositionEnum } from '@/features/tribes-projects/positions/position.types.ts';
 import {
   TribeCreate,
   TribeProjectInput,
   TribeProjectRelation,
   TribeUpdate,
-} from '@/types/tribe.types.ts';
+} from '@/features/tribes-projects/tribes/tribe.types.ts';
 
 import React, {
   useCallback,

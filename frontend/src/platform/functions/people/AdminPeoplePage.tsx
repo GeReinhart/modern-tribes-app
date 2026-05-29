@@ -31,13 +31,13 @@ import {
 } from '@/platform/functions/people/users/useUsers.ts';
 import { SendNotificationModal } from '@/platform/tools/notifications/SendNotificationModal.tsx';
 import { userService } from '@/platform/functions/people/users/user.service.ts';
-import { UserSearchResult } from '@/types/notification.types.ts';
-import { Person, PersonCreate, PersonUpdate } from '@/types/person.types.ts';
+import { UserSearchResult } from '@/platform/tools/notifications/notification.types.ts';
+import { Person, PersonCreate, PersonUpdate } from '@/platform/functions/people/persons/person.types.ts';
 import {
   UserCreate,
   UserUpdate,
   UserWithRolesAndPermissions,
-} from '@/types/user.types.ts';
+} from '@/platform/functions/people/users/user.types.ts';
 
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

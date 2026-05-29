@@ -2,12 +2,12 @@ import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedBut
 import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { usePersons } from '@/platform/functions/people/persons/usePersons.ts';
 import { useUsers } from '@/platform/functions/people/users/useUsers.ts';
-import { FormMode } from '@/types/common.types.ts';
+import { FormMode } from '@/platform/core/common.types.ts';
 import {
   Represents,
   RepresentsCreate,
   RepresentsUpdate,
-} from '@/types/represents.types.ts';
+} from '@/platform/functions/people/represents/represents.types.ts';
 
 import React, { useEffect, useState } from 'react';
 

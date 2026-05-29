@@ -1,8 +1,8 @@
 import { ThemedBadge } from '@/platform/core/layout/themes/components/ThemedBadge.tsx';
 import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
-import { PositionEnum } from '@/types/position.types.ts';
-import { ProjectTribeWithMembers } from '@/types/queries/projects.query.types.ts';
+import { PositionEnum } from '@/features/tribes-projects/positions/position.types.ts';
+import { ProjectTribeWithMembers } from '@/features/tribes-projects/projects/projects.query.types.ts';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

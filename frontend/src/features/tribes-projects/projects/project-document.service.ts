@@ -4,7 +4,7 @@ import {
   ProjectDocumentLabel,
   ProjectDocumentSummary,
   ProjectDocumentUpdate,
-} from '@/types/project-document.types.ts';
+} from '@/features/tribes-projects/projects/project-document.types.ts';
 import { apiService } from '@/platform/core/api/api.service.ts';
 
 class ProjectDocumentService {

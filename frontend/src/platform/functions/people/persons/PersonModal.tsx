@@ -2,8 +2,8 @@ import {
   ModalBody,
   ThemedModal,
 } from '@/platform/core/layout/themes/components/ThemedModal.tsx';
-import { FormMode } from '@/types/common.types.ts';
-import { Person, PersonCreate, PersonUpdate } from '@/types/person.types.ts';
+import { FormMode } from '@/platform/core/common.types.ts';
+import { Person, PersonCreate, PersonUpdate } from '@/platform/functions/people/persons/person.types.ts';
 
 import React from 'react';
 

@@ -8,8 +8,8 @@ import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurr
 import { useUserTribes } from '@/features/tribes-projects/tribes/useTribes.ts';
 import { authorizationHooks } from '@/platform/core/authorization/authorization-hooks.ts';
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';
-import { MenuAction } from '@/types/menu.types.ts';
-import { TribeEntry } from '@/types/queries/tribes.query.types.ts';
+import { MenuAction } from '@/platform/core/layout/menu.types.ts';
+import { TribeEntry } from '@/features/tribes-projects/tribes/tribes.query.types.ts';
 
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -2,13 +2,13 @@ import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedBut
 import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { usePersons } from '@/platform/functions/people/persons/usePersons.ts';
 import { useTribes } from '@/features/tribes-projects/tribes/useTribes.ts';
-import { FormMode } from '@/types/common.types.ts';
+import { FormMode } from '@/platform/core/common.types.ts';
 import {
   Position,
   PositionCreate,
   PositionEnum,
   PositionUpdate,
-} from '@/types/position.types.ts';
+} from '@/features/tribes-projects/positions/position.types.ts';
 
 import React, { useEffect, useState } from 'react';
 

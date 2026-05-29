@@ -1,5 +1,5 @@
 import { monitoringService } from '@/platform/functions/monitoring/monitoring.service.ts';
-import { RecentChange } from '@/types/monitoring.types.ts';
+import { RecentChange } from '@/platform/functions/monitoring/monitoring.types.ts';
 
 import { useCallback, useEffect, useState } from 'react';
 

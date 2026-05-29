@@ -5,14 +5,14 @@ import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useDocuments } from '@/platform/functions/documents/useDocuments.ts';
 import { useProjects } from '@/features/tribes-projects/projects/useProjects.ts';
 import { useTribeProjects } from '@/features/tribes-projects/tribes/useTribes.ts';
-import { FormMode } from '@/types/common.types.ts';
+import { FormMode } from '@/platform/core/common.types.ts';
 import {
   Tribe,
   TribeCreate,
   TribeProjectInput,
   TribeProjectRelation,
   TribeUpdate,
-} from '@/types/tribe.types.ts';
+} from '@/features/tribes-projects/tribes/tribe.types.ts';
 
 import React, {
   useCallback,

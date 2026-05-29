@@ -11,7 +11,7 @@ import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useRecentChanges } from '@/platform/functions/monitoring/useRecentChanges.ts';
 import { useUsers } from '@/platform/functions/people/users/useUsers.ts';
-import { RecentChange } from '@/types/monitoring.types.ts';
+import { RecentChange } from '@/platform/functions/monitoring/monitoring.types.ts';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

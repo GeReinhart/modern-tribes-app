@@ -20,7 +20,7 @@ import { useTribeWithPositions } from '@/features/tribes-projects/tribes/useTrib
 import { projectDocumentService } from '@/features/tribes-projects/projects/project-document.service.ts';
 import { publicationService } from '@/platform/functions/publications/publication.service.ts';
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';
-import { ProjectEntry } from '@/types/queries/projects.query.types.ts';
+import { ProjectEntry } from '@/features/tribes-projects/projects/projects.query.types.ts';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

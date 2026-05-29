@@ -2,7 +2,7 @@ import {
   Document,
   DocumentCreate,
   DocumentUpdate,
-} from '@/types/document.types.ts';
+} from '@/platform/functions/documents/document.types.ts';
 import { apiService } from '@/platform/core/api/api.service.ts';
 
 class DocumentService {

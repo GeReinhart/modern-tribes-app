@@ -5,8 +5,8 @@ import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSel
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { usePersons } from '@/platform/functions/people/persons/usePersons.ts';
 import { rolesHooks } from '@/platform/core/authorization/roles-hooks.ts';
-import { FormMode } from '@/types/common.types.ts';
-import { User, UserCreate, UserUpdate } from '@/types/user.types.ts';
+import { FormMode } from '@/platform/core/common.types.ts';
+import { User, UserCreate, UserUpdate } from '@/platform/functions/people/users/user.types.ts';
 
 import React, {
   useCallback,

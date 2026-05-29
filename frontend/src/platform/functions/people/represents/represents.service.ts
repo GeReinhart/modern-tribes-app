@@ -2,7 +2,7 @@ import {
   Represents,
   RepresentsCreate,
   RepresentsUpdate,
-} from '@/types/represents.types.ts';
+} from '@/platform/functions/people/represents/represents.types.ts';
 import { apiService } from '@/platform/core/api/api.service.ts';
 
 class RepresentsService {

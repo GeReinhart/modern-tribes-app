@@ -12,7 +12,7 @@ import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/platform/functions/people/UserProfileContext.tsx';
 import { useUserSearch } from '@/platform/functions/people/users/useUserSearch.ts';
-import { UserSearchResult } from '@/types/notification.types.ts';
+import { UserSearchResult } from '@/platform/tools/notifications/notification.types.ts';
 
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

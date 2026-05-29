@@ -1,5 +1,5 @@
-import { PersonWithPosition } from '@/types/person.types.ts';
-import { Position } from '@/types/position.types.ts';
+import { PersonWithPosition } from '@/platform/functions/people/persons/person.types.ts';
+import { Position } from '@/features/tribes-projects/positions/position.types.ts';
 
 export type TribeProjectRelation = 'manager' | 'member' | 'guest';
 

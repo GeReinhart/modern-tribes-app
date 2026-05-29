@@ -18,8 +18,8 @@ import { projectService } from '@/features/tribes-projects/projects/project.serv
 import {
   FeatureTypeInfo,
   ProjectFeatureInstance,
-} from '@/types/project-features.types.ts';
-import { Project } from '@/types/project.types.ts';
+} from '@/features/tribes-projects/projects/project-features.types.ts';
+import { Project } from '@/features/tribes-projects/projects/project.types.ts';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

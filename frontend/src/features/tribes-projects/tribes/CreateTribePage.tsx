@@ -26,9 +26,9 @@ import {
   personListContainerStyle,
   successStyle,
 } from '@/platform/core/layout/themes/theme.styles.tsx';
-import { AttachmentFile } from '@/types/document.types.ts';
-import { MenuAction } from '@/types/menu.types.ts';
-import { PositionEnum } from '@/types/position.types.ts';
+import { AttachmentFile } from '@/platform/functions/documents/document.types.ts';
+import { MenuAction } from '@/platform/core/layout/menu.types.ts';
+import { PositionEnum } from '@/features/tribes-projects/positions/position.types.ts';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

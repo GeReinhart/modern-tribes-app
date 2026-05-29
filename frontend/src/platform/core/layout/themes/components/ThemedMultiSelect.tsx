@@ -1,6 +1,6 @@
 import { Theme } from '@/platform/core/layout/themes/themes.ts';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { SelectOption } from '@/types/common.types.ts';
+import { SelectOption } from '@/platform/core/common.types.ts';
 
 import React, { useEffect, useRef, useState } from 'react';
 

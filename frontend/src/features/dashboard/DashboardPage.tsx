@@ -12,7 +12,7 @@ import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurr
 import { useUrlTab } from '@/features/glue/url-tab/useUrlTab.ts';
 import { authorizationHooks } from '@/platform/core/authorization/authorization-hooks.ts';
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';
-import { MenuAction } from '@/types/menu.types';
+import { MenuAction } from '@/platform/core/layout/menu.types.ts';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

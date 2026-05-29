@@ -1,6 +1,6 @@
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { AttachmentFile } from '@/types/document.types.ts';
-import { formatFileSize, getFileIcon } from '@/utils/fileUtils.tsx';
+import { AttachmentFile } from '@/platform/functions/documents/document.types.ts';
+import { formatFileSize, getFileIcon } from '@/platform/functions/documents/editor/fileUtils.tsx';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

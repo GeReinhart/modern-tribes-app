@@ -16,7 +16,7 @@ import {
   useUserMutations,
   useUserWithRolesAndPermissions,
 } from '@/platform/functions/people/users/useUsers.ts';
-import { User, UserCreate, UserUpdate } from '@/types/user.types.ts';
+import { User, UserCreate, UserUpdate } from '@/platform/functions/people/users/user.types.ts';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

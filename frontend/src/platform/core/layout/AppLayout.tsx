@@ -1,5 +1,5 @@
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { MenuAction } from '@/types/menu.types.ts';
+import { MenuAction } from '@/platform/core/layout/menu.types.ts';
 
 import React from 'react';
 

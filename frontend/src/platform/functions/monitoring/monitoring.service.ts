@@ -1,5 +1,5 @@
 import { apiService } from '@/platform/core/api/api.service.ts';
-import { DocumentRevision, RecentChange } from '@/types/monitoring.types.ts';
+import { DocumentRevision, RecentChange } from '@/platform/functions/monitoring/monitoring.types.ts';
 
 export const monitoringService = {
   getRecentChanges: (

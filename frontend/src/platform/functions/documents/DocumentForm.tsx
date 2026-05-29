@@ -2,13 +2,13 @@ import EditorFileUploader from '@/platform/functions/documents/editor/EditorFile
 import EditorJoditComponent from '@/platform/functions/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
-import { FormMode } from '@/types/common.types.ts';
+import { FormMode } from '@/platform/core/common.types.ts';
 import {
   AttachmentFile,
   Document,
   DocumentCreate,
   DocumentUpdate,
-} from '@/types/document.types.ts';
+} from '@/platform/functions/documents/document.types.ts';
 
 import React, { useEffect, useState } from 'react';
 

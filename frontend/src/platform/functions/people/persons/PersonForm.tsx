@@ -2,13 +2,13 @@ import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedBut
 import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { useDocuments } from '@/platform/functions/documents/useDocuments.ts';
-import { FormMode } from '@/types/common.types.ts';
+import { FormMode } from '@/platform/core/common.types.ts';
 import {
   Gender,
   Person,
   PersonCreate,
   PersonUpdate,
-} from '@/types/person.types.ts';
+} from '@/platform/functions/people/persons/person.types.ts';
 
 import React, { useEffect, useState } from 'react';
 

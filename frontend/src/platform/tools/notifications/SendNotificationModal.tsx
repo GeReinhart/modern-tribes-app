@@ -6,7 +6,7 @@ import {
   ThemedModal,
 } from '@/platform/core/layout/themes/components/ThemedModal.tsx';
 import { notificationService } from '@/platform/tools/notifications/notification.service.ts';
-import { UserSearchResult } from '@/types/notification.types.ts';
+import { UserSearchResult } from '@/platform/tools/notifications/notification.types.ts';
 
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -6,8 +6,8 @@ import {
   useRepresentsByUserId,
   useRepresentsMutations,
 } from '@/platform/functions/people/represents/useRepresents.ts';
-import { FormMode } from '@/types/common.types.ts';
-import { User, UserCreate, UserUpdate } from '@/types/user.types.ts';
+import { FormMode } from '@/platform/core/common.types.ts';
+import { User, UserCreate, UserUpdate } from '@/platform/functions/people/users/user.types.ts';
 
 import React from 'react';
 

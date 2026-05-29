@@ -1,4 +1,4 @@
-import { UserDisplayInfo } from '@/types/user-display.types.ts';
+import { UserDisplayInfo } from '@/platform/functions/people/users/user-display.types.ts';
 import { apiService } from '@/platform/core/api/api.service.ts';
 
 class UserDisplayService {

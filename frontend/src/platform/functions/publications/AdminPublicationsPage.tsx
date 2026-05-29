@@ -10,7 +10,7 @@ import {
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { publicationService } from '@/platform/functions/publications/publication.service.ts';
-import { PublicationAdminItem } from '@/types/publication.types.ts';
+import { PublicationAdminItem } from '@/platform/functions/publications/publication.types.ts';
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

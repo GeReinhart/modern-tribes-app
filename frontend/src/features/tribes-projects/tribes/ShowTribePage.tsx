@@ -18,9 +18,9 @@ import { useUrlTab } from '@/features/glue/url-tab/useUrlTab.ts';
 import { authorizationHooks } from '@/platform/core/authorization/authorization-hooks.ts';
 import { tribeWithPositionService } from '@/features/tribes-projects/tribes/tribe_with_positions.service.ts';
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';
-import { AttachmentFile } from '@/types/document.types.ts';
-import { MenuAction } from '@/types/menu.types.ts';
-import { ProjectEntry } from '@/types/queries/projects.query.types.ts';
+import { AttachmentFile } from '@/platform/functions/documents/document.types.ts';
+import { MenuAction } from '@/platform/core/layout/menu.types.ts';
+import { ProjectEntry } from '@/features/tribes-projects/projects/projects.query.types.ts';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

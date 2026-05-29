@@ -10,7 +10,7 @@ import {
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { monitoringService } from '@/platform/functions/monitoring/monitoring.service.ts';
-import { DocumentRevision } from '@/types/monitoring.types.ts';
+import { DocumentRevision } from '@/platform/functions/monitoring/monitoring.types.ts';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

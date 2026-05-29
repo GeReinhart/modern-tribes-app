@@ -5,7 +5,7 @@ import { TribeCard } from '@/features/tribes-projects/tribes/TribeCard.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
 import { useUserTribes } from '@/features/tribes-projects/tribes/useTribes.ts';
-import type { TribeEntry } from '@/types/queries/tribes.query.types.ts';
+import type { TribeEntry } from '@/features/tribes-projects/tribes/tribes.query.types.ts';
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

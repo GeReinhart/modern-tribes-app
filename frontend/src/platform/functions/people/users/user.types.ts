@@ -1,6 +1,6 @@
-import { Role } from '@/platform/core/authorization/role.types';
+import { Role } from '@/platform/core/authorization/role.types.ts';
 
-import { BaseEntity } from './common.types';
+import { BaseEntity } from '../../../core/common.types.ts';
 
 export interface User extends BaseEntity {
   url_param_id: string;

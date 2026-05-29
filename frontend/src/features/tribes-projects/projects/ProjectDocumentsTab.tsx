@@ -7,7 +7,7 @@ import {
   useProjectDocumentLabels,
   useProjectDocuments,
 } from '@/features/tribes-projects/projects/useProjectDocuments.ts';
-import { ProjectDocumentSummary } from '@/types/project-document.types.ts';
+import { ProjectDocumentSummary } from '@/features/tribes-projects/projects/project-document.types.ts';
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

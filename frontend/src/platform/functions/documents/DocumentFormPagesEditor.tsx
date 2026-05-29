@@ -1,7 +1,7 @@
 import { DocumentPagesSection } from '@/platform/functions/documents/DocumentPagesSection.tsx';
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection.tsx';
-import { DocumentPage } from '@/types/document-page.types.ts';
+import { DocumentPage } from '@/platform/functions/documents/document-page.types.ts';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

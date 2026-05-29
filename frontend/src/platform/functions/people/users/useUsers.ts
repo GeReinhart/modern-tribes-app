@@ -6,7 +6,7 @@ import {
   UserCreate,
   UserUpdate,
   UserWithRolesAndPermissions,
-} from '@/types/user.types.ts';
+} from '@/platform/functions/people/users/user.types.ts';
 import { apiHooks } from '@/platform/core/api/api-hooks.ts';
 import { createEntityHooks } from '@/platform/core/api/useEntityCrud.ts';
 

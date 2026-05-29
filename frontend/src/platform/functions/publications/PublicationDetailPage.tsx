@@ -2,7 +2,7 @@ import { DocumentReader } from '@/platform/functions/documents/DocumentReader.ts
 import { PublicLayout } from '@/platform/core/layout/PublicLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { publicationService } from '@/platform/functions/publications/publication.service.ts';
-import { PublicationDetail } from '@/types/publication.types.ts';
+import { PublicationDetail } from '@/platform/functions/publications/publication.types.ts';
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -1,7 +1,7 @@
 import { ThemedBadge } from '@/platform/core/layout/themes/components/ThemedBadge.tsx';
 import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
-import { TribeEntry } from '@/types/queries/tribes.query.types.ts';
+import { TribeEntry } from '@/features/tribes-projects/tribes/tribes.query.types.ts';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

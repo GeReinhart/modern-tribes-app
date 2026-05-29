@@ -1,4 +1,4 @@
-import { UserPersonPositionTribe } from '@/types/queries/tribes.query.types.ts';
+import { UserPersonPositionTribe } from '@/features/tribes-projects/tribes/tribes.query.types.ts';
 
 import { useCallback, useEffect, useState } from 'react';
 
@@ -10,7 +10,7 @@ import {
   TribeUpdate,
   TribeWithPersonsWithPosition,
   TribeWithPositions,
-} from '@/types/tribe.types.ts';
+} from '@/features/tribes-projects/tribes/tribe.types.ts';
 import { apiHooks } from '@/platform/core/api/api-hooks.ts';
 
 export function useTribes() {

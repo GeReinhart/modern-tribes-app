@@ -1,7 +1,7 @@
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { DocumentPage } from '@/types/document-page.types.ts';
-import { AttachmentFile } from '@/types/document.types.ts';
-import { HeadingItem, extractAndInjectHeadings } from '@/utils/toc.utils.ts';
+import { DocumentPage } from '@/platform/functions/documents/document-page.types.ts';
+import { AttachmentFile } from '@/platform/functions/documents/document.types.ts';
+import { HeadingItem, extractAndInjectHeadings } from '@/platform/functions/documents/toc.utils.ts';
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

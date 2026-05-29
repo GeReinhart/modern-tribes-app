@@ -1,4 +1,4 @@
-import { PositionEnum } from '@/types/position.types';
+import { PositionEnum } from '@/features/tribes-projects/positions/position.types.ts';
 
 export interface UserPersonPositionTribe {
   user_id: string;

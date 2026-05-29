@@ -5,7 +5,7 @@ import {
   Represents,
   RepresentsCreate,
   RepresentsUpdate,
-} from '@/types/represents.types.ts';
+} from '@/platform/functions/people/represents/represents.types.ts';
 
 import { useCallback, useEffect } from 'react';
 

@@ -1,7 +1,7 @@
 import { useAuth } from '@/platform/core/authentication/AuthContext.tsx';
 import { usePerson } from '@/platform/functions/people/persons/usePersons.ts';
 import { useUserWithRolesAndPermissions } from '@/platform/functions/people/users/useUsers.ts';
-import type { UserWithRolesAndPermissions } from '@/types/user.types.ts';
+import type { UserWithRolesAndPermissions } from '@/platform/functions/people/users/user.types.ts';
 
 import React, { createContext, useContext } from 'react';
 

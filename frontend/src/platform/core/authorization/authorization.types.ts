@@ -1,4 +1,4 @@
-import { BaseEntity } from './common.types';
+import { BaseEntity } from '@/platform/core/common.types.ts';
 
 export type PermissionEnum =
   | 'admin'

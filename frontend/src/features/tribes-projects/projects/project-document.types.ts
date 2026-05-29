@@ -1,4 +1,4 @@
-import { AttachmentFile } from './document.types';
+import { AttachmentFile } from '../../../platform/functions/documents/document.types.ts';
 
 export interface LabelInfo {
   id: string;

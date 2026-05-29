@@ -2,7 +2,7 @@ import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedBut
 import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { ThemedTextarea } from '@/platform/core/layout/themes/components/ThemedTextarea.tsx';
-import { FormMode } from '@/types/common.types.ts';
+import { FormMode } from '@/platform/core/common.types.ts';
 
 import React, { useState } from 'react';
 

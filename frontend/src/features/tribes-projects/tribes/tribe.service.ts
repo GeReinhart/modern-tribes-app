@@ -1,4 +1,4 @@
-import { UserPersonPositionTribe } from '@/types/queries/tribes.query.types.ts';
+import { UserPersonPositionTribe } from '@/features/tribes-projects/tribes/tribes.query.types.ts';
 
 import {
   Tribe,
@@ -8,7 +8,7 @@ import {
   TribeUpdate,
   TribeWithPersonsWithPosition,
   TribeWithPositions,
-} from '@/types/tribe.types.ts';
+} from '@/features/tribes-projects/tribes/tribe.types.ts';
 import { apiService } from '@/platform/core/api/api.service.ts';
 
 class TribeService {

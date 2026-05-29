@@ -1,4 +1,4 @@
-import { Person, PersonCreate, PersonUpdate } from '@/types/person.types.ts';
+import { Person, PersonCreate, PersonUpdate } from '@/platform/functions/people/persons/person.types.ts';
 import { apiService } from '@/platform/core/api/api.service.ts';
 
 class PersonService {

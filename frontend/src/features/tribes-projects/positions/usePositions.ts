@@ -5,7 +5,7 @@ import {
   Position,
   PositionCreate,
   PositionUpdate,
-} from '@/types/position.types.ts';
+} from '@/features/tribes-projects/positions/position.types.ts';
 
 import { useCallback, useEffect, useState } from 'react';
 

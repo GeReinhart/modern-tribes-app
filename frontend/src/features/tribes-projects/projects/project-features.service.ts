@@ -3,7 +3,7 @@ import {
   ProjectFeatureInstance,
   ProjectFeatureInstanceCreate,
   ProjectFeatureInstanceUpdate,
-} from '@/types/project-features.types.ts';
+} from '@/features/tribes-projects/projects/project-features.types.ts';
 import { apiService } from '@/platform/core/api/api.service.ts';
 
 class ProjectFeaturesService {

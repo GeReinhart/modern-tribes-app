@@ -1,4 +1,4 @@
-import { AttachmentFile } from './document.types';
+import { AttachmentFile } from './document.types.ts';
 
 export interface DocumentPageSummary {
   id: string;

@@ -19,7 +19,7 @@ import {
   Document,
   DocumentCreate,
   DocumentUpdate,
-} from '@/types/document.types.ts';
+} from '@/platform/functions/documents/document.types.ts';
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

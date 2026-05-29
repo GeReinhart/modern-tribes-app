@@ -5,7 +5,7 @@ import {
   FeatureTypeInfo,
   ProjectFeatureInstance,
   ProjectFeatureInstanceCreate,
-} from '@/types/project-features.types.ts';
+} from '@/features/tribes-projects/projects/project-features.types.ts';
 
 export function useProjectFeatures(projectId: string | null) {
   const [features, setFeatures] = useState<ProjectFeatureInstance[]>([]);

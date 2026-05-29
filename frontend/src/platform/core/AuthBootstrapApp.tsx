@@ -5,7 +5,7 @@ import { AppConfigProvider } from '@/platform/core/app-config/AppConfigContext.t
 import { AuthProvider } from '@/platform/core/authentication/AuthContext.tsx';
 import { ResponsiveProvider } from '@/platform/core/responsive/ResponsiveContext.tsx';
 import { UserProfileProvider } from '@/platform/functions/people/UserProfileContext.tsx';
-import { BookmarksProvider } from '@/features/bookmarks/BookmarksContext';
+import { BookmarksProvider } from '@/features/bookmarks/BookmarksContext.tsx';
 import { AdminAppConfigPage } from '@/platform/core/app-config/AdminAppConfigPage.tsx';
 import { AuthorizationPage } from '@/platform/core/authorization/AuthorizationPage.tsx';
 import { DocumentRevisionsPage } from '@/platform/tools/revisions/DocumentRevisionsPage.tsx';
@@ -22,7 +22,7 @@ import { AdminNotificationsPage } from '@/platform/tools/notifications/AdminNoti
 import AboutPage from '@/platform/core/AboutPage.tsx';
 import { CreateProjectPage } from '@/features/tribes-projects/projects/CreateProjectPage.tsx';
 import CreateTribeForm from '@/features/tribes-projects/tribes/CreateTribePage.tsx';
-import DashboardPage from '@/features/dashboard/DashboardPage';
+import DashboardPage from '@/features/dashboard/DashboardPage.tsx';
 import { DocumentPageFormPage } from '@/platform/functions/documents/DocumentPageFormPage.tsx';
 import { EditProjectDocumentPage } from '@/features/tribes-projects/projects/EditProjectDocumentPage.tsx';
 import { EditProjectPage } from '@/features/tribes-projects/projects/EditProjectPage.tsx';
@@ -30,7 +30,7 @@ import ProfilePage from '@/platform/functions/people/ProfilePage.tsx';
 import { ProjectDocumentFormPage } from '@/features/tribes-projects/projects/ProjectDocumentFormPage.tsx';
 import { ProjectDocumentViewPage } from '@/features/tribes-projects/projects/ProjectDocumentViewPage.tsx';
 import { ProjectsPage } from '@/features/tribes-projects/projects/ProjectsPage.tsx';
-import { SearchPage } from '@/platform/functions/search/SearchPage';
+import { SearchPage } from '@/platform/functions/search/SearchPage.tsx';
 import ShowProjectPage from '@/features/tribes-projects/projects/ShowProjectPage.tsx';
 import ShowTribePage from '@/features/tribes-projects/tribes/ShowTribePage.tsx';
 import { TribesPage } from '@/features/tribes-projects/tribes/TribesPage.tsx';

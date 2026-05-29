@@ -2,13 +2,13 @@ import {
   ModalBody,
   ThemedModal,
 } from '@/platform/core/layout/themes/components/ThemedModal.tsx';
-import { FormMode } from '@/types/common.types.ts';
+import { FormMode } from '@/platform/core/common.types.ts';
 import {
   Tribe,
   TribeCreate,
   TribeProjectInput,
   TribeUpdate,
-} from '@/types/tribe.types.ts';
+} from '@/features/tribes-projects/tribes/tribe.types.ts';
 
 import React from 'react';
 

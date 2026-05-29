@@ -1,4 +1,4 @@
-import { BaseEntity } from '@/types/common.types.ts';
+import { BaseEntity } from '@/platform/core/common.types.ts';
 
 export interface Permission extends BaseEntity {
   name: string;

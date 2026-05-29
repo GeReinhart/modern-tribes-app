@@ -1,4 +1,4 @@
-import { BaseEntity } from '@/types/common.types.ts';
+import { BaseEntity } from '@/platform/core/common.types.ts';
 
 import { Permission } from './permission.types.ts';
 

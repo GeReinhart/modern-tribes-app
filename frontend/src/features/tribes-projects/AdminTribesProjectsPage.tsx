@@ -24,8 +24,8 @@ import { usePersons } from '@/platform/functions/people/persons/usePersons.ts';
 import { usePositions } from '@/features/tribes-projects/positions/usePositions.ts';
 import { useProjectMutations, useProjects } from '@/features/tribes-projects/projects/useProjects.ts';
 import { useTribeMutations, useTribes } from '@/features/tribes-projects/tribes/useTribes.ts';
-import { Project, ProjectCreate, ProjectUpdate } from '@/types/project.types.ts';
-import { Tribe, TribeCreate, TribeUpdate } from '@/types/tribe.types.ts';
+import { Project, ProjectCreate, ProjectUpdate } from '@/features/tribes-projects/projects/project.types.ts';
+import { Tribe, TribeCreate, TribeUpdate } from '@/features/tribes-projects/tribes/tribe.types.ts';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';

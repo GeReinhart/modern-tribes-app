@@ -5,8 +5,8 @@ import {
   TribeWithPositionsCreate,
   TribeWithPositionsResponse,
   TribeWithPositionsUpdate,
-} from '@/types/app/tribe_with_positions.types.ts';
-import { Tribe, TribeCreate, TribeUpdate } from '@/types/tribe.types.ts';
+} from '@/features/tribes-projects/tribes/tribe_with_positions.types.ts';
+import { Tribe, TribeCreate, TribeUpdate } from '@/features/tribes-projects/tribes/tribe.types.ts';
 
 import { useCallback, useEffect, useState } from 'react';
 

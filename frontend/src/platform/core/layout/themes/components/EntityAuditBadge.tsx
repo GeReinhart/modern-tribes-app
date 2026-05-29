@@ -1,6 +1,6 @@
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useUserDisplayInfo } from '@/platform/functions/people/users/useUserDisplayInfo.ts';
-import { UserDisplayInfo } from '@/types/user-display.types.ts';
+import { UserDisplayInfo } from '@/platform/functions/people/users/user-display.types.ts';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

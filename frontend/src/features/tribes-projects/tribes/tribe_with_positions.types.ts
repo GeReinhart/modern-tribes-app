@@ -1,6 +1,6 @@
-import { AttachmentFile } from '@/types/document.types.ts';
-import { PositionEnum } from '@/types/position.types.ts';
-import { TribeProject } from '@/types/tribe.types.ts';
+import { AttachmentFile } from '@/platform/functions/documents/document.types.ts';
+import { PositionEnum } from '@/features/tribes-projects/positions/position.types.ts';
+import { TribeProject } from '@/features/tribes-projects/tribes/tribe.types.ts';
 
 export interface PositionData {
   person_id: string;

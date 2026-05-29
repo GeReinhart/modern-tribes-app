@@ -1,4 +1,4 @@
-import { MenuAction } from '@/types/menu.types.ts';
+import { MenuAction } from '@/platform/core/layout/menu.types.ts';
 
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

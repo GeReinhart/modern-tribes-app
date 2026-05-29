@@ -1,4 +1,4 @@
-import { PositionEnum } from '@/types/position.types.ts';
+import { PositionEnum } from '@/features/tribes-projects/positions/position.types.ts';
 
 export type Gender = 'male' | 'female' | 'other' | 'prefer_not_to_say';
 

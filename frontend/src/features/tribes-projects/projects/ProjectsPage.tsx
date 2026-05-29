@@ -7,8 +7,8 @@ import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurrentUserProfile.ts';
 import { useUserProjects } from '@/features/tribes-projects/projects/useProjects.ts';
-import { MenuAction } from '@/types/menu.types.ts';
-import { ProjectEntry } from '@/types/queries/projects.query.types.ts';
+import { MenuAction } from '@/platform/core/layout/menu.types.ts';
+import { ProjectEntry } from '@/features/tribes-projects/projects/projects.query.types.ts';
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

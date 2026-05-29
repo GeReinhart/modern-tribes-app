@@ -1,9 +1,9 @@
-import { LabelInfo } from '@/types/project-document.types.ts';
+import { LabelInfo } from '@/features/tribes-projects/projects/project-document.types.ts';
 import {
   PublicationAdminItem,
   PublicationDetail,
   PublicationSummary,
-} from '@/types/publication.types.ts';
+} from '@/platform/functions/publications/publication.types.ts';
 import { apiService } from '@/platform/core/api/api.service.ts';
 
 class PublicationService {

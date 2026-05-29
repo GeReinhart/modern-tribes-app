@@ -2,7 +2,7 @@ import { notificationService } from '@/platform/tools/notifications/notification
 import {
   AppNotification,
   NotificationStatus,
-} from '@/types/notification.types.ts';
+} from '@/platform/tools/notifications/notification.types.ts';
 
 import { useCallback, useEffect, useRef } from 'react';
 

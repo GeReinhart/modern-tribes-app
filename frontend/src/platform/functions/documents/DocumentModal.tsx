@@ -1,10 +1,10 @@
 import { ThemedModal } from '@/platform/core/layout/themes/components/ThemedModal.tsx';
-import { FormMode } from '@/types/common.types.ts';
+import { FormMode } from '@/platform/core/common.types.ts';
 import {
   Document,
   DocumentCreate,
   DocumentUpdate,
-} from '@/types/document.types.ts';
+} from '@/platform/functions/documents/document.types.ts';
 
 import React from 'react';
 

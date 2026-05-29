@@ -1,5 +1,5 @@
 import { personService } from '@/platform/functions/people/persons/person.service.ts';
-import { Person, PersonCreate, PersonUpdate } from '@/types/person.types.ts';
+import { Person, PersonCreate, PersonUpdate } from '@/platform/functions/people/persons/person.types.ts';
 import { createEntityHooks } from '@/platform/core/api/useEntityCrud.ts';
 
 const { useList, useById, useMutations } = createEntityHooks<
