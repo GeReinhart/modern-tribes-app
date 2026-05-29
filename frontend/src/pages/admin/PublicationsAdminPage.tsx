@@ -1,14 +1,14 @@
-import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
-import { ThemedConfirmDialog } from '@/platform/layout/themes/components/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner';
-import { ThemedSection } from '@/platform/layout/themes/components/ThemedSection';
-import { ThemedText } from '@/platform/layout/themes/components/ThemedText';
+import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedConfirmDialog } from '@/platform/core/layout/themes/components/ThemedConfirmDialog';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
+import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,
-} from '@/platform/layout/AdminNavigation';
-import { AppLayout } from '@/platform/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
+} from '@/platform/core/layout/AdminNavigation';
+import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { publicationService } from '@/services/publication.service';
 import { PublicationAdminItem } from '@/types/publication.types';
 

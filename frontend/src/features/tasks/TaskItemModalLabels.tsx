@@ -1,7 +1,7 @@
-import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
-import { ThemedSvgIcon } from '@/platform/layout/themes/icons/ThemedSvgIcon';
-import { LABEL_COLORS } from '@/platform/layout/themes/themes.ts';
-import { useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
+import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon';
+import { LABEL_COLORS } from '@/platform/core/layout/themes/themes.ts';
+import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

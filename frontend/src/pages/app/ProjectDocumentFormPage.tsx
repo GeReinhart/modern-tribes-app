@@ -1,11 +1,11 @@
-import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
-import { DocumentFormPagesEditor } from '@/platform/documents/DocumentFormPagesEditor.tsx';
-import { ThemedCard } from '@/platform/layout/themes/components/ThemedCard';
-import { ThemedLoadingOverlay } from '@/platform/layout/themes/components/ThemedLoadingOverlay';
-import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner';
-import { ProjectDocumentFields } from '@/platform/documents/ProjectDocumentFields.tsx';
-import { AppLayout } from '@/platform/layout/AppLayout';
-import { ThemeProvider } from '@/platform/layout/themes/ThemeContext.tsx';
+import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { DocumentFormPagesEditor } from '@/platform/functions/documents/DocumentFormPagesEditor.tsx';
+import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard';
+import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
+import { ProjectDocumentFields } from '@/platform/functions/documents/ProjectDocumentFields.tsx';
+import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemeProvider } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useDocumentPages } from '@/hooks/useDocumentPages';
 import { useProjectDocument } from '@/hooks/useProjectDocuments';
 import { useProjectWithDocument } from '@/hooks/useProjects';
@@ -16,7 +16,7 @@ import {
   errorStyle,
   formActionsStyle,
   formContainerStyle,
-} from '@/platform/layout/themes/theme.styles.tsx';
+} from '@/platform/core/layout/themes/theme.styles.tsx';
 import { AttachmentFile } from '@/types/document.types';
 import { MenuAction } from '@/types/menu.types';
 

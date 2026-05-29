@@ -1,6 +1,6 @@
-import { DocumentReader } from '@/platform/documents/DocumentReader.tsx';
-import { PublicLayout } from '@/platform/layout/PublicLayout';
-import { ThemeProvider, useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
+import { DocumentReader } from '@/platform/functions/documents/DocumentReader.tsx';
+import { PublicLayout } from '@/platform/core/layout/PublicLayout';
+import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { publicationService } from '@/services/publication.service';
 import { PublicationDetail } from '@/types/publication.types';
 

@@ -4,7 +4,7 @@ import {
   UserUpdate,
   UserWithRolesAndPermissions,
 } from '../types/user.types';
-import { apiService } from '../platform/api/api.service.ts';
+import { apiService } from '@/platform/core/api/api.service.ts';
 
 class UserService {
   private endpoint = '/crud/users';

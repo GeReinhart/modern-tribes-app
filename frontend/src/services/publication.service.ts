@@ -4,7 +4,7 @@ import {
   PublicationDetail,
   PublicationSummary,
 } from '../types/publication.types';
-import { apiService } from '../platform/api/api.service.ts';
+import { apiService } from '@/platform/core/api/api.service.ts';
 
 class PublicationService {
   // Public endpoints (no auth required)

@@ -1,9 +1,9 @@
 import {
   IconName,
   ThemedSvgIcon,
-} from '@/platform/layout/themes/icons/ThemedSvgIcon';
-import { ThemedConfirmDialog } from '@/platform/layout/themes/components/ThemedConfirmDialog';
-import { useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
+} from '@/platform/core/layout/themes/icons/ThemedSvgIcon';
+import { ThemedConfirmDialog } from '@/platform/core/layout/themes/components/ThemedConfirmDialog';
+import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

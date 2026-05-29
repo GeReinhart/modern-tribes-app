@@ -9,7 +9,7 @@ import {
   TribeWithPersonsWithPosition,
   TribeWithPositions,
 } from '../types/tribe.types';
-import { apiService } from '../platform/api/api.service.ts';
+import { apiService } from '@/platform/core/api/api.service.ts';
 
 class TribeService {
   private endpoint = '/crud/tribes';

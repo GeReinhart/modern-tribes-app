@@ -1,4 +1,4 @@
-import { ThemedSvgIcon } from '@/platform/layout/themes/icons/ThemedSvgIcon';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon';
 
 import { Component, ErrorInfo, ReactNode } from 'react';
 

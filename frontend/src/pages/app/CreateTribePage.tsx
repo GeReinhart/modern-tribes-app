@@ -1,12 +1,12 @@
-import EditorFileUploader from '@/platform/documents/editor/EditorFileUploader.tsx';
-import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
-import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
-import { ThemedLoadingOverlay } from '@/platform/layout/themes/components/ThemedLoadingOverlay.tsx';
-import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner.tsx';
-import { ThemedSection } from '@/platform/layout/themes/components/ThemedSection.tsx';
-import { ThemedText } from '@/platform/layout/themes/components/ThemedText';
-import { AppLayout } from '@/platform/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
+import EditorFileUploader from '@/platform/functions/documents/editor/EditorFileUploader.tsx';
+import EditorJoditComponent from '@/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay.tsx';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection.tsx';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
+import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { usePersons } from '@/hooks/usePersons';
 import { useTribeWithPositionsMutations } from '@/hooks/useTribesWithPositions';
 import {
@@ -25,7 +25,7 @@ import {
   personInfoContainerStyle,
   personListContainerStyle,
   successStyle,
-} from '@/platform/layout/themes/theme.styles.tsx';
+} from '@/platform/core/layout/themes/theme.styles.tsx';
 import { AttachmentFile } from '@/types/document.types.ts';
 import { MenuAction } from '@/types/menu.types';
 import { PositionEnum } from '@/types/position.types';

@@ -1,10 +1,9 @@
 import { EntityAuditBadge } from '@/components/common/audit/EntityAuditBadge';
-import JoditEditorComponent from '@/components/common/editor/JoditEditorComponent';
-import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
-import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
-import ThemedDateSelection from '@/platform/layout/themes/components/ThemedDateSelection.tsx';
-import { ThemedSvgIcon } from '@/platform/layout/themes/icons/ThemedSvgIcon';
-import { useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
+import EditorJoditComponent from '@/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import ThemedDateSelection from '@/platform/core/layout/themes/components/ThemedDateSelection.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon';
+import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -1,18 +1,18 @@
-import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
-import { ThemedSelect } from '@/platform/layout/themes/components/ThemedSelect.tsx';
-import { StatusBadge } from '@/platform/layout/themes/components/StatusBadge';
-import { ThemedCard } from '@/platform/layout/themes/components/ThemedCard';
-import { ThemedConfirmDialog } from '@/platform/layout/themes/components/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner';
-import { ThemedTable } from '@/platform/layout/themes/components/ThemedTable';
-import { ThemedText } from '@/platform/layout/themes/components/ThemedText';
+import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
+import { StatusBadge } from '@/platform/core/layout/themes/components/StatusBadge';
+import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard';
+import { ThemedConfirmDialog } from '@/platform/core/layout/themes/components/ThemedConfirmDialog';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
+import { ThemedTable } from '@/platform/core/layout/themes/components/ThemedTable';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,
-} from '@/platform/layout/AdminNavigation';
-import { AppLayout } from '@/platform/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
-import { apiService } from '@/platform/api/api.service.ts';
+} from '@/platform/core/layout/AdminNavigation';
+import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
+import { apiService } from '@/platform/core/api/api.service.ts';
 import { projectFeaturesService } from '@/services/project-features.service';
 import { projectService } from '@/services/project.service';
 import {

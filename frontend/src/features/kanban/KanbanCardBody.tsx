@@ -1,4 +1,4 @@
-import { useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
+import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

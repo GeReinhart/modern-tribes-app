@@ -1,5 +1,5 @@
 import type { TaskLabelInfo, TaskPatch } from '@/features/tasks/types';
-import { useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
+import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import type { PersonOption } from '@/features/tasks/types';
 
 import React from 'react';

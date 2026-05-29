@@ -1,4 +1,4 @@
-import { IconName } from '@/platform/layout/themes/icons/ThemedSvgIcon';
+import { IconName } from '@/platform/core/layout/themes/icons/ThemedSvgIcon';
 
 export interface MenuAction {
   icon: IconName;

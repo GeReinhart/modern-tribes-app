@@ -1,7 +1,7 @@
-import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
-import { ThemedInput } from '@/platform/layout/themes/components/ThemedInput.tsx';
-import { ThemedSelect } from '@/platform/layout/themes/components/ThemedSelect.tsx';
-import { useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
+import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInput.tsx';
+import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
+import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useDocuments } from '@/hooks/useDocuments.ts';
 import { useProjects } from '@/hooks/useProjects.ts';
 import { useTribeProjects } from '@/hooks/useTribes.ts';

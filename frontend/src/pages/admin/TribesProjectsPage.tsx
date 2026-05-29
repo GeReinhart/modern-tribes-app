@@ -1,24 +1,24 @@
-import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
-import { ThemedInput } from '@/platform/layout/themes/components/ThemedInput.tsx';
-import { ThemedSelect } from '@/platform/layout/themes/components/ThemedSelect.tsx';
-import { StatusBadge } from '@/platform/layout/themes/components/StatusBadge';
-import { ThemedCard } from '@/platform/layout/themes/components/ThemedCard';
-import { ThemedConfirmDialog } from '@/platform/layout/themes/components/ThemedConfirmDialog';
-import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner';
+import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInput.tsx';
+import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
+import { StatusBadge } from '@/platform/core/layout/themes/components/StatusBadge';
+import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard';
+import { ThemedConfirmDialog } from '@/platform/core/layout/themes/components/ThemedConfirmDialog';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
 import {
   ThemedModal,
   ThemedModalBody,
-} from '@/platform/layout/themes/components/ThemedModal';
-import { ThemedTable } from '@/platform/layout/themes/components/ThemedTable';
-import { ThemedTabs } from '@/platform/layout/themes/components/ThemedTabs';
-import { ThemedText } from '@/platform/layout/themes/components/ThemedText';
+} from '@/platform/core/layout/themes/components/ThemedModal';
+import { ThemedTable } from '@/platform/core/layout/themes/components/ThemedTable';
+import { ThemedTabs } from '@/platform/core/layout/themes/components/ThemedTabs';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
 import { ProjectModal } from '@/components/entities/projects/ProjectModal';
 import {
   AdminNavigation,
   adminMainThemeId,
-} from '@/platform/layout/AdminNavigation';
-import { AppLayout } from '@/platform/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
+} from '@/platform/core/layout/AdminNavigation';
+import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useCrudPage } from '@/hooks/useCrudPage';
 import { usePersons } from '@/hooks/usePersons';
 import { usePositions } from '@/hooks/usePositions';

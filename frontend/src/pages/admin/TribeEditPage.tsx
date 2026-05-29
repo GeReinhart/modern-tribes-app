@@ -1,15 +1,15 @@
-import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
-import { ThemedInput } from '@/platform/layout/themes/components/ThemedInput.tsx';
-import { ThemedSelect } from '@/platform/layout/themes/components/ThemedSelect.tsx';
-import { ThemedCard } from '@/platform/layout/themes/components/ThemedCard';
-import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner';
-import { ThemedText } from '@/platform/layout/themes/components/ThemedText';
+import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInput.tsx';
+import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
+import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
 import {
   AdminNavigation,
   adminMainThemeId,
-} from '@/platform/layout/AdminNavigation';
-import { AppLayout } from '@/platform/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
+} from '@/platform/core/layout/AdminNavigation';
+import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useDocuments } from '@/hooks/useDocuments';
 import { usePersons } from '@/hooks/usePersons';
 import { usePositionsByTribe } from '@/hooks/usePositions';

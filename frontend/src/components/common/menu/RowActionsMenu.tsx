@@ -1,5 +1,5 @@
-import { ThemedSvgIcon } from '@/platform/layout/themes/icons/ThemedSvgIcon';
-import { useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon';
+import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { MenuAction } from '@/types/menu.types';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';

@@ -1,5 +1,5 @@
-import { ThemedBadge } from '@/platform/layout/themes/components/ThemedBadge.tsx';
-import { Role } from '@/platform/authorization/role.types';
+import { ThemedBadge } from '@/platform/core/layout/themes/components/ThemedBadge.tsx';
+import { Role } from '@/platform/core/authorization/role.types';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';

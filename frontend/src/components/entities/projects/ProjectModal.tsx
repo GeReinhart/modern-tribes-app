@@ -1,7 +1,7 @@
 import {
   ModalBody,
   ThemedModal,
-} from '@/platform/layout/themes/components/ThemedModal.tsx';
+} from '@/platform/core/layout/themes/components/ThemedModal.tsx';
 import { FormMode } from '@/types/common.types.ts';
 import {
   Project,

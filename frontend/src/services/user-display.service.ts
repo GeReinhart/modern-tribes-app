@@ -1,5 +1,5 @@
 import { UserDisplayInfo } from '@/types/user-display.types';
-import { apiService } from './api.service';
+import { apiService } from '@/platform/core/api/api.service';
 
 class UserDisplayService {
   async getDisplayInfo(userId: string): Promise<UserDisplayInfo> {

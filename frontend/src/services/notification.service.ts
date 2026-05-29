@@ -1,4 +1,4 @@
-import { apiService } from '@/platform/api/api.service.ts';
+import { apiService } from '@/platform/core/api/api.service.ts';
 import {
   AppNotification,
   NotificationCreate,

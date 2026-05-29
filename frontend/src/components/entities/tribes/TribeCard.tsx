@@ -1,6 +1,6 @@
-import { ThemedBadge } from '@/platform/layout/themes/components/ThemedBadge.tsx';
-import { ThemedCard } from '@/platform/layout/themes/components/ThemedCard';
-import { ThemedText } from '@/platform/layout/themes/components/ThemedText';
+import { ThemedBadge } from '@/platform/core/layout/themes/components/ThemedBadge.tsx';
+import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
 import { TribeEntry } from '@/types/queries/tribes.query.types.ts';
 
 import React from 'react';

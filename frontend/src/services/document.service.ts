@@ -3,7 +3,7 @@ import {
   DocumentCreate,
   DocumentUpdate,
 } from '../types/document.types';
-import { apiService } from '../platform/api/api.service.ts';
+import { apiService } from '@/platform/core/api/api.service.ts';
 
 class DocumentService {
   private endpoint = '/crud/documents';

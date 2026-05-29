@@ -4,7 +4,7 @@ import {
   TribeWithPositionsUpdate,
 } from '@/types/app/tribe_with_positions.types';
 
-import { apiService } from '../../platform/api/api.service.ts';
+import { apiService } from '@/platform/core/api/api.service.ts';
 
 export const tribeWithPositionService = {
   async createWithPositions(

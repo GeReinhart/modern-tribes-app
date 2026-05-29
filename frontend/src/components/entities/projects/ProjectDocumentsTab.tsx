@@ -1,15 +1,8 @@
-import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
-import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner';
-import { ThemedText } from '@/platform/layout/themes/components/ThemedText';
-import { useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
-import { ThemedButton } from '@/platform/themes/components/ThemedButton.tsx';
-import { ThemedLoadingSpinner } from '@/platform/themes/components/ThemedLoadingSpinner';
-import { ThemedText } from '@/platform/themes/components/ThemedText';
+import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
+import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { EntityAuditBadge } from '@/components/common/audit/EntityAuditBadge';
-import { ThemedButton } from '@/components/common/form/ThemedButton';
-import { ThemedLoadingSpinner } from '@/platform/themes/layout/ThemedLoadingSpinner';
-import { ThemedText } from '@/platform/themes/layout/ThemedText';
-import { useTheme } from '@/platform/themes/ThemeContext.tsx';
 import {
   useProjectDocumentLabels,
   useProjectDocuments,

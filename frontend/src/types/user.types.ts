@@ -1,4 +1,4 @@
-import { Role } from '@/platform/authorization/role.types';
+import { Role } from '@/platform/core/authorization/role.types';
 
 import { BaseEntity } from './common.types';
 

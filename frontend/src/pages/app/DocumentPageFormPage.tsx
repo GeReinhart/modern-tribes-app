@@ -1,13 +1,13 @@
-import EditorFileUploader from '@/platform/documents/editor/EditorFileUploader.tsx';
-import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
-import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
-import { ThemedCard } from '@/platform/layout/themes/components/ThemedCard';
-import { ThemedLoadingOverlay } from '@/platform/layout/themes/components/ThemedLoadingOverlay';
-import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner';
-import { ThemedSection } from '@/platform/layout/themes/components/ThemedSection';
-import { ThemedText } from '@/platform/layout/themes/components/ThemedText';
-import { AppLayout } from '@/platform/layout/AppLayout';
-import { ThemeProvider, useTheme } from '@/platform/layout/themes/ThemeContext.tsx';
+import EditorFileUploader from '@/platform/functions/documents/editor/EditorFileUploader.tsx';
+import EditorJoditComponent from '@/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard';
+import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner';
+import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
+import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useDocumentPage } from '@/hooks/useDocumentPages';
 import { useProjectWithDocument } from '@/hooks/useProjects';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
@@ -16,7 +16,7 @@ import {
   errorStyle,
   formActionsStyle,
   formContainerStyle,
-} from '@/platform/layout/themes/theme.styles.tsx';
+} from '@/platform/core/layout/themes/theme.styles.tsx';
 import { AttachmentFile } from '@/types/document.types';
 import { MenuAction } from '@/types/menu.types';
 

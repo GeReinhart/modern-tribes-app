@@ -1,4 +1,4 @@
-import { useAuth } from '@/platform/authentication/AuthContext';
+import { useAuth } from '@/platform/core/authentication/AuthContext';
 import { usePerson } from '@/hooks/usePersons';
 import { useUserWithRolesAndPermissions } from '@/hooks/useUsers';
 import type { UserWithRolesAndPermissions } from '@/types/user.types';

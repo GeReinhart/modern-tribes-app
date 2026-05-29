@@ -1,4 +1,4 @@
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useUserDisplayInfo } from '@/hooks/useUserDisplayInfo';
 import { UserDisplayInfo } from '@/types/user-display.types';
 

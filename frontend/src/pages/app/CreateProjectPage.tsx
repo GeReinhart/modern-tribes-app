@@ -1,10 +1,10 @@
-import EditorFileUploader from '@/platform/documents/editor/EditorFileUploader.tsx';
-import EditorJoditComponent from '@/platform/documents/editor/EditorJoditComponent.tsx';
-import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
-import { ThemedInput } from '@/platform/layout/themes/components/ThemedInput.tsx';
-import { ThemedLoadingOverlay } from '@/platform/layout/themes/components/ThemedLoadingOverlay';
-import { ThemedSection } from '@/platform/layout/themes/components/ThemedSection';
-import { ThemedText } from '@/platform/layout/themes/components/ThemedText';
+import EditorFileUploader from '@/platform/functions/documents/editor/EditorFileUploader.tsx';
+import EditorJoditComponent from '@/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInput.tsx';
+import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay';
+import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
 import {
   CreateTabsConfigSection,
   DraftTabConfig,
@@ -13,8 +13,8 @@ import {
   FeatureDraft,
   FeatureInstancesSection,
 } from '@/components/entities/projects/FeatureInstancesSection';
-import { AppLayout } from '@/platform/layout/AppLayout';
-import { ThemeProvider } from '@/platform/layout/themes/ThemeContext.tsx';
+import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemeProvider } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { tabConfigService } from '@/features/tab-config/tabConfig.service';
 import { useProjectWithDocumentMutations } from '@/hooks/useProjects';
 import { useTribeWithPositions } from '@/hooks/useTribesWithPositions';
@@ -23,7 +23,7 @@ import {
   errorStyle,
   formActionsStyle,
   formContainerStyle,
-} from '@/platform/layout/themes/theme.styles.tsx';
+} from '@/platform/core/layout/themes/theme.styles.tsx';
 import { AttachmentFile } from '@/types/document.types';
 import { MenuAction } from '@/types/menu.types';
 

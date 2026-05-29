@@ -1,5 +1,5 @@
-import { ThemedButton } from '@/platform/layout/themes/components/ThemedButton.tsx';
-import { ThemedSelect } from '@/platform/layout/themes/components/ThemedSelect.tsx';
+import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { usePersons } from '@/hooks/usePersons.ts';
 import { useUsers } from '@/hooks/useUsers.ts';
 import { FormMode } from '@/types/common.types.ts';

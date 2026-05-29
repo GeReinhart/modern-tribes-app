@@ -1,13 +1,13 @@
-import { ThemedCard } from '@/platform/layout/themes/components/ThemedCard';
-import { ThemedLoadingSpinner } from '@/platform/layout/themes/components/ThemedLoadingSpinner.tsx';
-import { ThemedText } from '@/platform/layout/themes/components/ThemedText';
+import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard';
+import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
+import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText';
 import { TribeCard } from '@/components/entities/tribes/TribeCard.tsx';
-import { AppLayout } from '@/platform/layout/AppLayout';
-import { ThemeProvider } from '@/platform/layout/themes/ThemeContext.tsx';
+import { AppLayout } from '@/platform/core/layout/AppLayout';
+import { ThemeProvider } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { useCurrentUserProfile } from '@/hooks/useCurrentUserProfile.ts';
 import { useUserTribes } from '@/hooks/useTribes.ts';
-import { authorizationHooks } from '@/platform/authorization/authorization-hooks.ts';
-import { errorStyle } from '@/platform/layout/themes/theme.styles.tsx';
+import { authorizationHooks } from '@/platform/core/authorization/authorization-hooks.ts';
+import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';
 import { MenuAction } from '@/types/menu.types';
 import { TribeEntry } from '@/types/queries/tribes.query.types.ts';
 

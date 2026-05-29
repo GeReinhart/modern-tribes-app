@@ -6,7 +6,7 @@ import {
   DocumentCreate,
   DocumentUpdate,
 } from '../types/document.types';
-import { apiHooks } from '../platform/api/api-hooks.ts';
+import { apiHooks } from '@/platform/core/api/api-hooks.ts';
 import { createEntityHooks } from './useEntityCrud';
 
 const { useList, useById, useMutations } = createEntityHooks<

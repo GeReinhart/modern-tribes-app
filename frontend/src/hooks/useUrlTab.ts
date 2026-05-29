@@ -1,4 +1,4 @@
-import { BreadcrumbTab } from '@/platform/layout/Breadcrumb';
+import { BreadcrumbTab } from '@/platform/core/layout/Breadcrumb';
 
 import { useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';

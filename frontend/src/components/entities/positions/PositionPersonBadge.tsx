@@ -1,4 +1,4 @@
-import { ThemedBadge } from '@/platform/layout/themes/components/ThemedBadge.tsx';
+import { ThemedBadge } from '@/platform/core/layout/themes/components/ThemedBadge.tsx';
 import { usePerson } from '@/hooks/usePersons.ts';
 
 import React from 'react';

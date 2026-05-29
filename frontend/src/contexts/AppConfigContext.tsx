@@ -1,6 +1,6 @@
-import { useAuth } from '@/platform/authentication/AuthContext';
-import { appConfigService } from '@/platform/app-config/app-config.service.ts';
-import { AppConfigValues } from '@/platform/app-config/app-config.types.ts';
+import { useAuth } from '@/platform/core/authentication/AuthContext';
+import { appConfigService } from '@/platform/core/app-config/app-config.service.ts';
+import { AppConfigValues } from '@/platform/core/app-config/app-config.types.ts';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
