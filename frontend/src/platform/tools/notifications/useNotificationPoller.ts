@@ -1,4 +1,4 @@
-import { notificationService } from '@/services/notification.service.ts';
+import { notificationService } from '@/platform/tools/notifications/notification.service.ts';
 import {
   AppNotification,
   NotificationStatus,

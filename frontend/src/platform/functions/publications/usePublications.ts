@@ -1,4 +1,4 @@
-import { publicationService } from '@/services/publication.service.ts';
+import { publicationService } from '@/platform/functions/publications/publication.service.ts';
 import { LabelInfo } from '@/types/project-document.types.ts';
 import { PublicationSummary } from '@/types/publication.types.ts';
 

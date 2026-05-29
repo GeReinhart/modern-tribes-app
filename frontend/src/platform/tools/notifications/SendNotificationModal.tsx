@@ -5,7 +5,7 @@ import {
   ModalFooter,
   ThemedModal,
 } from '@/platform/core/layout/themes/components/ThemedModal.tsx';
-import { notificationService } from '@/services/notification.service.ts';
+import { notificationService } from '@/platform/tools/notifications/notification.service.ts';
 import { UserSearchResult } from '@/types/notification.types.ts';
 
 import React, { useCallback, useState } from 'react';

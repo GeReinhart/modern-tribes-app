@@ -8,7 +8,7 @@ import {
   TribeUpdate,
   TribeWithPersonsWithPosition,
   TribeWithPositions,
-} from '../types/tribe.types';
+} from '@/types/tribe.types.ts';
 import { apiService } from '@/platform/core/api/api.service.ts';
 
 class TribeService {

@@ -2,7 +2,7 @@ import {
   Position,
   PositionCreate,
   PositionUpdate,
-} from '../types/position.types';
+} from '@/types/position.types.ts';
 import { apiService } from '@/platform/core/api/api.service.ts';
 
 class PositionService {

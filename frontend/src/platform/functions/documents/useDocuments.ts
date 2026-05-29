@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import { documentService } from '@/services/document.service.ts';
+import { documentService } from '@/platform/functions/documents/document.service.ts';
 import {
   Document,
   DocumentCreate,

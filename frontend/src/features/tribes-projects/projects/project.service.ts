@@ -2,12 +2,12 @@ import {
   ProjectWithDocumentCreate,
   ProjectWithDocumentResponse,
   ProjectWithDocumentUpdate,
-} from '../types/app/project_with_document.types';
-import { Project, ProjectCreate, ProjectUpdate } from '../types/project.types';
+} from '@/types/app/project_with_document.types.ts';
+import { Project, ProjectCreate, ProjectUpdate } from '@/types/project.types.ts';
 import {
   ProjectTribeWithMembers,
   UserProjectEntry,
-} from '../types/queries/projects.query.types';
+} from '@/types/queries/projects.query.types.ts';
 import { apiService } from '@/platform/core/api/api.service.ts';
 
 class ProjectService {

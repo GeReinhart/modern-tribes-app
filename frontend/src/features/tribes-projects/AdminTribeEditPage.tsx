@@ -19,8 +19,8 @@ import {
   useTribeMutations,
   useTribeProjects,
 } from '@/features/tribes-projects/tribes/useTribes.ts';
-import { positionService } from '@/services/position.service.ts';
-import { tribeService } from '@/services/tribe.service.ts';
+import { positionService } from '@/features/tribes-projects/positions/position.service.ts';
+import { tribeService } from '@/features/tribes-projects/tribes/tribe.service.ts';
 import { PositionEnum } from '@/types/position.types.ts';
 import {
   TribeCreate,

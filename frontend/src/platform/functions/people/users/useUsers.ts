@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { userService } from '@/services/user.service.ts';
+import { userService } from '@/platform/functions/people/users/user.service.ts';
 import {
   User,
   UserCreate,

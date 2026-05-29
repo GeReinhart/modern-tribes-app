@@ -16,7 +16,7 @@ import { useUserTribes } from '@/features/tribes-projects/tribes/useTribes.ts';
 import { useTribeWithPositions } from '@/features/tribes-projects/tribes/useTribesWithPositions.ts';
 import { useUrlTab } from '@/features/glue/url-tab/useUrlTab.ts';
 import { authorizationHooks } from '@/platform/core/authorization/authorization-hooks.ts';
-import { tribeWithPositionService } from '@/services/app/tribe_with_positions.service.ts';
+import { tribeWithPositionService } from '@/features/tribes-projects/tribes/tribe_with_positions.service.ts';
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';
 import { AttachmentFile } from '@/types/document.types.ts';
 import { MenuAction } from '@/types/menu.types.ts';

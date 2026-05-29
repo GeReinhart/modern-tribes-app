@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { documentPageService } from '@/services/document-page.service.ts';
+import { documentPageService } from '@/platform/functions/documents/document-page.service.ts';
 import { DocumentPage } from '@/types/document-page.types.ts';
 
 export function useDocumentPages(

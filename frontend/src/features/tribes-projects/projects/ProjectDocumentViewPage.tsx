@@ -17,8 +17,8 @@ import {
   useUserProjectsByTribe,
 } from '@/features/tribes-projects/projects/useProjects.ts';
 import { useTribeWithPositions } from '@/features/tribes-projects/tribes/useTribesWithPositions.ts';
-import { projectDocumentService } from '@/services/project-document.service.ts';
-import { publicationService } from '@/services/publication.service.ts';
+import { projectDocumentService } from '@/features/tribes-projects/projects/project-document.service.ts';
+import { publicationService } from '@/platform/functions/publications/publication.service.ts';
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';
 import { ProjectEntry } from '@/types/queries/projects.query.types.ts';
 

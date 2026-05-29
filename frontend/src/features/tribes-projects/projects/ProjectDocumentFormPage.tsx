@@ -10,8 +10,8 @@ import { useDocumentPages } from '@/platform/functions/documents/useDocumentPage
 import { useProjectDocument } from '@/features/tribes-projects/projects/useProjectDocuments.ts';
 import { useProjectWithDocument } from '@/features/tribes-projects/projects/useProjects.ts';
 import { useTribeWithPositions } from '@/features/tribes-projects/tribes/useTribesWithPositions.ts';
-import { labelService } from '@/services/label.service.ts';
-import { projectDocumentService } from '@/services/project-document.service.ts';
+import { labelService } from '@/platform/functions/labels/label.service.ts';
+import { projectDocumentService } from '@/features/tribes-projects/projects/project-document.service.ts';
 import {
   errorStyle,
   formActionsStyle,

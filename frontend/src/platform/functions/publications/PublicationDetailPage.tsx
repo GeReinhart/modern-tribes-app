@@ -1,7 +1,7 @@
 import { DocumentReader } from '@/platform/functions/documents/DocumentReader.tsx';
 import { PublicLayout } from '@/platform/core/layout/PublicLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { publicationService } from '@/services/publication.service.ts';
+import { publicationService } from '@/platform/functions/publications/publication.service.ts';
 import { PublicationDetail } from '@/types/publication.types.ts';
 
 import React, { useEffect, useState } from 'react';

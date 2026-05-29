@@ -1,4 +1,4 @@
-import { labelService } from '@/services/label.service';
+import { labelService } from '@/platform/functions/labels/label.service.ts';
 
 import { useEffect, useState } from 'react';
 

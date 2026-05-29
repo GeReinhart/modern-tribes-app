@@ -1,6 +1,6 @@
 import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { documentPageService } from '@/services/document-page.service.ts';
+import { documentPageService } from '@/platform/functions/documents/document-page.service.ts';
 import { DocumentPage } from '@/types/document-page.types.ts';
 import { EntityAuditBadge } from '@/platform/core/layout/themes/components/EntityAuditBadge.tsx';
 

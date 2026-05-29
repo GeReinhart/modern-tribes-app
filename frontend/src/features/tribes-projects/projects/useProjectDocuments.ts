@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { projectDocumentService } from '@/services/project-document.service.ts';
+import { projectDocumentService } from '@/features/tribes-projects/projects/project-document.service.ts';
 import {
   ProjectDocument,
   ProjectDocumentLabel,

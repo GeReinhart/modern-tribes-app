@@ -3,7 +3,7 @@ import {
   UserCreate,
   UserUpdate,
   UserWithRolesAndPermissions,
-} from '../types/user.types';
+} from '@/types/user.types.ts';
 import { apiService } from '@/platform/core/api/api.service.ts';
 
 class UserService {

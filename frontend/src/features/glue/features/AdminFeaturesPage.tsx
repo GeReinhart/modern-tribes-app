@@ -13,8 +13,8 @@ import {
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { apiService } from '@/platform/core/api/api.service.ts';
-import { projectFeaturesService } from '@/services/project-features.service.ts';
-import { projectService } from '@/services/project.service.ts';
+import { projectFeaturesService } from '@/features/tribes-projects/projects/project-features.service.ts';
+import { projectService } from '@/features/tribes-projects/projects/project.service.ts';
 import {
   FeatureTypeInfo,
   ProjectFeatureInstance,

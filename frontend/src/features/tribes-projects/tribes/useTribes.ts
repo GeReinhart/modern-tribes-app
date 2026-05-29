@@ -2,7 +2,7 @@ import { UserPersonPositionTribe } from '@/types/queries/tribes.query.types.ts';
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { tribeService } from '@/services/tribe.service.ts';
+import { tribeService } from '@/features/tribes-projects/tribes/tribe.service.ts';
 import {
   Tribe,
   TribeCreate,

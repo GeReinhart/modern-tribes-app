@@ -1,6 +1,6 @@
 import { apiHooks } from '@/platform/core/api/api-hooks.ts';
 import { createEntityHooks } from '@/platform/core/api/useEntityCrud.ts';
-import { positionService } from '@/services/position.service.ts';
+import { positionService } from '@/features/tribes-projects/positions/position.service.ts';
 import {
   Position,
   PositionCreate,

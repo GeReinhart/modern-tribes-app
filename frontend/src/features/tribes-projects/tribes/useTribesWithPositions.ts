@@ -1,6 +1,6 @@
 import { apiHooks } from '@/platform/core/api/api-hooks.ts';
-import { tribeWithPositionService } from '@/services/app/tribe_with_positions.service.ts';
-import { tribeService } from '@/services/tribe.service.ts';
+import { tribeWithPositionService } from '@/features/tribes-projects/tribes/tribe_with_positions.service.ts';
+import { tribeService } from '@/features/tribes-projects/tribes/tribe.service.ts';
 import {
   TribeWithPositionsCreate,
   TribeWithPositionsResponse,

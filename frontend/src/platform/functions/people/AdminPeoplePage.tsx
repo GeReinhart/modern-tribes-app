@@ -30,7 +30,7 @@ import {
   useUsersWithRolesAndPermissions,
 } from '@/platform/functions/people/users/useUsers.ts';
 import { SendNotificationModal } from '@/platform/tools/notifications/SendNotificationModal.tsx';
-import { userService } from '@/services/user.service.ts';
+import { userService } from '@/platform/functions/people/users/user.service.ts';
 import { UserSearchResult } from '@/types/notification.types.ts';
 import { Person, PersonCreate, PersonUpdate } from '@/types/person.types.ts';
 import {

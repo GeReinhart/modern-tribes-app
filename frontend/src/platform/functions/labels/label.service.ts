@@ -1,4 +1,4 @@
-import { Label, LabelCreate, LabelUpdate } from '../types/label.types';
+import { Label, LabelCreate, LabelUpdate } from '@/types/label.types.ts';
 import { apiService } from '@/platform/core/api/api.service.ts';
 
 class LabelService {

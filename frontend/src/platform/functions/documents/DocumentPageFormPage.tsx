@@ -11,7 +11,7 @@ import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeCont
 import { useDocumentPage } from '@/platform/functions/documents/useDocumentPages.ts';
 import { useProjectWithDocument } from '@/features/tribes-projects/projects/useProjects.ts';
 import { useTribeWithPositions } from '@/features/tribes-projects/tribes/useTribesWithPositions.ts';
-import { documentPageService } from '@/services/document-page.service.ts';
+import { documentPageService } from '@/platform/functions/documents/document-page.service.ts';
 import {
   errorStyle,
   formActionsStyle,

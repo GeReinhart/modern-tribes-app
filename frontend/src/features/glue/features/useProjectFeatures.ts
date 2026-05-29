@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { projectFeaturesService } from '@/services/project-features.service.ts';
+import { projectFeaturesService } from '@/features/tribes-projects/projects/project-features.service.ts';
 import {
   FeatureTypeInfo,
   ProjectFeatureInstance,

@@ -3,7 +3,7 @@ import {
   DocumentPageCreate,
   DocumentPageReorderItem,
   DocumentPageUpdate,
-} from '../types/document-page.types';
+} from '@/types/document-page.types.ts';
 import { apiService } from '@/platform/core/api/api.service.ts';
 
 class DocumentPageService {

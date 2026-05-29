@@ -1,4 +1,4 @@
-import { userDisplayService } from '@/services/user-display.service.ts';
+import { userDisplayService } from '@/platform/functions/people/users/user-display.service.ts';
 import { UserDisplayInfo } from '@/types/user-display.types.ts';
 
 import { useEffect, useState } from 'react';

@@ -18,7 +18,7 @@ import { ThemeProvider } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { tabConfigService } from '@/features/glue/tab-config/tabConfig.service.ts';
 import { useProjectWithDocumentMutations } from '@/features/tribes-projects/projects/useProjects.ts';
 import { useTribeWithPositions } from '@/features/tribes-projects/tribes/useTribesWithPositions.ts';
-import { projectFeaturesService } from '@/services/project-features.service.ts';
+import { projectFeaturesService } from '@/features/tribes-projects/projects/project-features.service.ts';
 import {
   errorStyle,
   formActionsStyle,

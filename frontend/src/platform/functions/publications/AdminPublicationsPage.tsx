@@ -9,7 +9,7 @@ import {
 } from '@/platform/core/layout/AdminNavigation.tsx';
 import { AppLayout } from '@/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { publicationService } from '@/services/publication.service.ts';
+import { publicationService } from '@/platform/functions/publications/publication.service.ts';
 import { PublicationAdminItem } from '@/types/publication.types.ts';
 
 import React, { useCallback, useEffect, useState } from 'react';
