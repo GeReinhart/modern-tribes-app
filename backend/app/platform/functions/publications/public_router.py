@@ -3,7 +3,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Query
 
 from app.platform.core.database import get_database
-from app.features.tribes_projects.projects.document_models import LabelInfo
+from app.platform.functions.labels.models import LabelInfo
 from app.platform.functions.publications.models import PublicationDetail, PublicationSummary
 from app.platform.functions.publications import service as publication_service
 from app.platform.core.utils.db_helpers import resolve_url_param_id

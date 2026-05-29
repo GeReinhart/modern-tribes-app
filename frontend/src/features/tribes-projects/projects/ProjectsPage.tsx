@@ -9,13 +9,15 @@ import { useCurrentUserProfile } from '@/platform/functions/people/users/useCurr
 import { useUserProjects } from '@/features/tribes-projects/projects/useProjects.ts';
 import { MenuAction } from '@/platform/core/layout/menu.types.ts';
 import { ProjectEntry } from '@/features/tribes-projects/projects/projects.query.types.ts';
+import { BookmarkToggle } from '@/features/bookmarks/BookmarkToggle.tsx';
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const ProjectsPageContent: React.FC = () => {
   const { t } = useTranslation();
+  const location = useLocation();
   const navigate = useNavigate();
   const { user, isLoading: currentUserLoading } = useCurrentUserProfile();
   const { projects, loading: projectsLoading } = useUserProjects(
@@ -90,7 +92,7 @@ const ProjectsPageContent: React.FC = () => {
     <AppLayout
       breadcrumbs={breadcrumbs}
       menuActions={menuActions}
-      bookmarkTitle={t('projects.title')}
+      bookmarkSlot={<BookmarkToggle pagePath={location.pathname} pageTitle={t('projects.title')} />}
     >
       <ThemedText variant="primary" size="small">
         {t('projects.subtitle')}

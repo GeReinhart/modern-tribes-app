@@ -1,4 +1,4 @@
-import { LabelInfo } from '@/features/tribes-projects/projects/project-document.types.ts';
+import { LabelInfo } from '@/platform/functions/labels/label.types.ts';
 import {
   PublicationAdminItem,
   PublicationDetail,

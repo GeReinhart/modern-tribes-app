@@ -4,11 +4,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 from app.platform.core.uploads.files import AttachmentFile
-
-
-class LabelInfo(BaseModel):
-    id: str
-    name: str
+from app.platform.functions.labels.models import LabelInfo
 
 
 class ProjectDocumentCreate(BaseModel):

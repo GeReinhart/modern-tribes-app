@@ -14,9 +14,11 @@ import { authorizationHooks } from '@/platform/core/authorization/authorization-
 import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';
 import { MenuAction } from '@/platform/core/layout/menu.types.ts';
 
+import { BookmarkToggle } from '@/features/bookmarks/BookmarkToggle.tsx';
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const TABS = (t: (k: string) => string) => [
   {
@@ -38,6 +40,7 @@ const TABS = (t: (k: string) => string) => [
 
 const DashboardPageContent: React.FC = () => {
   const { t } = useTranslation();
+  const location = useLocation();
   const navigate = useNavigate();
   const {
     data: authorization,
@@ -106,7 +109,7 @@ const DashboardPageContent: React.FC = () => {
       breadcrumbs={breadcrumbs}
       breadcrumbTabs={breadcrumbTabs}
       menuActions={menuActions}
-      bookmarkTitle={t('dashboard.title')}
+      bookmarkSlot={<BookmarkToggle pagePath={location.pathname} pageTitle={t('dashboard.title')} />}
     >
       {showTabConfig && (
         <TabConfigPopup

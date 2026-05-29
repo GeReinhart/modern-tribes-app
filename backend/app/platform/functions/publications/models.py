@@ -4,7 +4,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 from app.platform.functions.documents.page_models import DocumentPageResponse
-from app.features.tribes_projects.projects.document_models import LabelInfo
+from app.platform.functions.labels.models import LabelInfo
 from app.platform.core.uploads.files import AttachmentFile
 
 

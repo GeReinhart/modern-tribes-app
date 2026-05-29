@@ -5,14 +5,12 @@ import {
 import { ZoomControl } from '@/platform/core/layout/themes/components/ZoomControl.tsx';
 import { UserAvatarIcon } from '@/platform/functions/people/users/UserAvatarIcon.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
-import { BookmarkToggle } from '@/features/bookmarks/BookmarkToggle.tsx';
 
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface AppFooterProps {
-  bookmarkTitle?: string | null;
-  bookmarkDescription?: string | null;
+  bookmarkSlot?: React.ReactNode;
 }
 
 const NAV_ITEMS: { path: string; icon: IconName; label: string }[] = [
@@ -20,10 +18,7 @@ const NAV_ITEMS: { path: string; icon: IconName; label: string }[] = [
   { path: '/app/about', icon: 'info', label: 'About' },
 ];
 
-export const AppFooter: React.FC<AppFooterProps> = ({
-  bookmarkTitle,
-  bookmarkDescription,
-}) => {
+export const AppFooter: React.FC<AppFooterProps> = ({ bookmarkSlot }) => {
   const { theme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -78,13 +73,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({
             </div>
           );
         })}
-        {bookmarkTitle && (
-          <BookmarkToggle
-            pagePath={location.pathname}
-            pageTitle={bookmarkTitle}
-            pageDescription={bookmarkDescription ?? null}
-          />
-        )}
+        {bookmarkSlot}
       </div>
       <ZoomControl />
     </footer>

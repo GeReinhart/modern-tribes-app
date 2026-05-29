@@ -79,7 +79,7 @@ function ProfilePageContent() {
   });
 
   return (
-    <AppLayout breadcrumbs={breadcrumbs} bookmarkTitle={t('profile.title')}>
+    <AppLayout breadcrumbs={breadcrumbs}>
       <div
         style={{
           maxWidth: '600px',

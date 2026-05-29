@@ -23,7 +23,7 @@ import AboutPage from '@/platform/core/AboutPage.tsx';
 import { CreateProjectPage } from '@/features/tribes-projects/projects/CreateProjectPage.tsx';
 import CreateTribeForm from '@/features/tribes-projects/tribes/CreateTribePage.tsx';
 import DashboardPage from '@/features/dashboard/DashboardPage.tsx';
-import { DocumentPageFormPage } from '@/platform/functions/documents/DocumentPageFormPage.tsx';
+import { DocumentPageFormPage } from '@/features/tribes-projects/projects/DocumentPageFormPage.tsx';
 import { EditProjectDocumentPage } from '@/features/tribes-projects/projects/EditProjectDocumentPage.tsx';
 import { EditProjectPage } from '@/features/tribes-projects/projects/EditProjectPage.tsx';
 import ProfilePage from '@/platform/functions/people/ProfilePage.tsx';

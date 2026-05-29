@@ -4,6 +4,11 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 
+class LabelInfo(BaseModel):
+    id: str
+    name: str
+
+
 class LabelBase(BaseModel):
     name: str
 

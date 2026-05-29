@@ -1,7 +1,7 @@
 import { PublicLayout } from '@/platform/core/layout/PublicLayout.tsx';
 import { ThemeProvider, useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 import { usePublicationLabels, usePublications } from '@/platform/functions/publications/usePublications.ts';
-import { LabelInfo } from '@/features/tribes-projects/projects/project-document.types.ts';
+import { LabelInfo } from '@/platform/functions/labels/label.types.ts';
 import { PublicationSummary } from '@/platform/functions/publications/publication.types.ts';
 
 import React, { useEffect, useState } from 'react';

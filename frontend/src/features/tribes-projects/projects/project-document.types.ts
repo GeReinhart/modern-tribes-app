@@ -1,9 +1,7 @@
 import { AttachmentFile } from '../../../platform/functions/documents/document.types.ts';
+import { LabelInfo } from '../../../platform/functions/labels/label.types.ts';
 
-export interface LabelInfo {
-  id: string;
-  name: string;
-}
+export type { LabelInfo };
 
 export interface ProjectDocumentLabel {
   id: string;

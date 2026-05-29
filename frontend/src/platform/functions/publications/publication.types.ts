@@ -1,6 +1,6 @@
 import { DocumentPage } from '../documents/document-page.types.ts';
 import { AttachmentFile } from '../documents/document.types.ts';
-import { LabelInfo } from '../../../features/tribes-projects/projects/project-document.types.ts';
+import { LabelInfo } from '../labels/label.types.ts';
 
 export interface PublicationSummary {
   id: string;

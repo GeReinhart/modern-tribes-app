@@ -31,9 +31,11 @@ import { AttachmentFile } from '@/platform/functions/documents/document.types.ts
 import { MenuAction } from '@/platform/core/layout/menu.types.ts';
 import { ProjectEntry } from '@/features/tribes-projects/projects/projects.query.types.ts';
 
+import { BookmarkToggle } from '@/features/bookmarks/BookmarkToggle.tsx';
+
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import {
   Download,
@@ -183,6 +185,7 @@ const AddFeatureModal: React.FC<{
 const ShowProjectPageContent: React.FC = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const location = useLocation();
   const navigate = useNavigate();
   const { tribeId, projectId } = useParams<{
     tribeId: string;
@@ -395,7 +398,7 @@ const ShowProjectPageContent: React.FC = () => {
       breadcrumbs={breadcrumbs}
       breadcrumbTabs={breadcrumbTabs}
       menuActions={menuActions}
-      bookmarkTitle={project?.name ?? null}
+      bookmarkSlot={project?.name ? <BookmarkToggle pagePath={location.pathname} pageTitle={project.name} /> : null}
     >
       {showTabConfig && (
         <TabConfigPopup

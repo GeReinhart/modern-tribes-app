@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi import HTTPException, status
 
-from app.features.tribes_projects.projects.document_models import LabelInfo
+from app.platform.functions.labels.models import LabelInfo
 from app.platform.functions.publications.models import (
     PublicationAdminItem,
     PublicationDetail,

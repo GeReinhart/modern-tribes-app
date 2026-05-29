@@ -22,9 +22,11 @@ import { AttachmentFile } from '@/platform/functions/documents/document.types.ts
 import { MenuAction } from '@/platform/core/layout/menu.types.ts';
 import { ProjectEntry } from '@/features/tribes-projects/projects/projects.query.types.ts';
 
+import { BookmarkToggle } from '@/features/bookmarks/BookmarkToggle.tsx';
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import {
   Download,
@@ -39,6 +41,7 @@ import {
 const ShowTribePageContent: React.FC = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const location = useLocation();
   const navigate = useNavigate();
   const { tribeId } = useParams<{ tribeId: string }>();
   const {
@@ -302,7 +305,7 @@ const ShowTribePageContent: React.FC = () => {
       menuActions={menuActions}
       breadcrumbs={breadcrumbs}
       breadcrumbTabs={breadcrumbTabs}
-      bookmarkTitle={tribe?.name ?? null}
+      bookmarkSlot={tribe?.name ? <BookmarkToggle pagePath={location.pathname} pageTitle={tribe.name} /> : null}
     >
       {showTabConfig && (
         <TabConfigPopup

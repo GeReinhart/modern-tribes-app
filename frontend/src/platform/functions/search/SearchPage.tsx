@@ -114,7 +114,7 @@ const SearchPageContent: React.FC = () => {
   const showResults = query.trim().length >= 2;
 
   return (
-    <AppLayout breadcrumbs={breadcrumbs} bookmarkTitle={t('search.title')}>
+    <AppLayout breadcrumbs={breadcrumbs}>
       <div style={{ marginBottom: 'var(--space-xl)' }}>
         <input
           type="search"

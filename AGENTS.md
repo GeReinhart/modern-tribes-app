@@ -4,10 +4,13 @@
 
 - 1 - **Check** the project is a good status first. Green light. Otherwise, you do not start anything.
    - ./scripts/check-area.sh
+   - ./scripts/check-application.json.sh
    - ./scripts/check-backend.sh
    - ./scripts/check-frontend.sh
+   - read ./application.json it will give you a great idea of the project structure
 - 2 - **Apply changes** to the project.
 - 3 - **Check** the produced code is still a good status.
+  - ./scripts/check-application.json.sh
   - ./scripts/check-backend.sh
   - ./scripts/check-frontend.sh
 

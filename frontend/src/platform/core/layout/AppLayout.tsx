@@ -14,7 +14,7 @@ interface AppLayoutProps {
   menuActions?: MenuAction[];
   breadcrumbs?: BreadcrumbItem[];
   breadcrumbTabs?: BreadcrumbTab[];
-  bookmarkTitle?: string | null;
+  bookmarkSlot?: React.ReactNode;
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({
@@ -24,7 +24,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   menuActions,
   breadcrumbs,
   breadcrumbTabs,
-  bookmarkTitle,
+  bookmarkSlot,
 }) => {
   const { theme } = useTheme();
 
@@ -50,11 +50,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     gap: '12px',
   };
 
-  const bookmarkDescription =
-    breadcrumbs && breadcrumbs.length > 0
-      ? breadcrumbs.map((b) => b.label).join(' / ')
-      : null;
-
   return (
     <div style={layoutStyle}>
       <AppHeader
@@ -67,10 +62,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
       <main style={mainStyle}>
         <div style={contentStyle}>{children}</div>
       </main>
-      <AppFooter
-        bookmarkTitle={bookmarkTitle}
-        bookmarkDescription={bookmarkDescription}
-      />
+      <AppFooter bookmarkSlot={bookmarkSlot} />
     </div>
   );
 };

@@ -11,12 +11,15 @@ import { errorStyle } from '@/platform/core/layout/themes/theme.styles.tsx';
 import { MenuAction } from '@/platform/core/layout/menu.types.ts';
 import { TribeEntry } from '@/features/tribes-projects/tribes/tribes.query.types.ts';
 
+import { BookmarkToggle } from '@/features/bookmarks/BookmarkToggle.tsx';
+
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const TribesPageContent: React.FC = () => {
   const { t } = useTranslation();
+  const location = useLocation();
   const navigate = useNavigate();
   const { user, isLoading: currentUserLoading } = useCurrentUserProfile();
   const { tribes, loading: tribesLoading } = useUserTribes(user?.id || '', {
@@ -112,7 +115,7 @@ const TribesPageContent: React.FC = () => {
     <AppLayout
       menuActions={menuActions}
       breadcrumbs={breadcrumbs}
-      bookmarkTitle={t('tribes.title')}
+      bookmarkSlot={<BookmarkToggle pagePath={location.pathname} pageTitle={t('tribes.title')} />}
     >
       {authorizationError && (
         <ThemedCard>

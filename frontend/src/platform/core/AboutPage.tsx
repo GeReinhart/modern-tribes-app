@@ -90,7 +90,7 @@ const AboutPageContent: React.FC = () => {
   };
 
   return (
-    <AppLayout breadcrumbs={breadcrumbs} bookmarkTitle={t('about.title')}>
+    <AppLayout breadcrumbs={breadcrumbs}>
       <ThemedSection themeId="main_1">
         {/* Header */}
         <div

@@ -1,5 +1,5 @@
 import { publicationService } from '@/platform/functions/publications/publication.service.ts';
-import { LabelInfo } from '@/features/tribes-projects/projects/project-document.types.ts';
+import { LabelInfo } from '@/platform/functions/labels/label.types.ts';
 import { PublicationSummary } from '@/platform/functions/publications/publication.types.ts';
 
 import { useEffect, useState } from 'react';

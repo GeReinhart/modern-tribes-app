@@ -1,3 +1,8 @@
+export interface LabelInfo {
+  id: string;
+  name: string;
+}
+
 export interface LabelBase {
   name: string;
 }
