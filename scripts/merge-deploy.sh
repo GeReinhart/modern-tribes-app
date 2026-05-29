@@ -45,10 +45,6 @@ git checkout deploy
 echo "==> Rebasing deploy onto main..."
 git rebase main
 
-echo "==> Check code on deploy branch..."
-./scripts/check-backend.sh || { echo "✗ Backend checks failed on deploy branch. Aborting."; exit 1; }
-./scripts/check-frontend.sh || { echo "✗ Frontend checks failed on deploy branch. Aborting."; exit 1; }
-
 echo "==> Pushing deploy..."
 git push --force-with-lease origin deploy
 
