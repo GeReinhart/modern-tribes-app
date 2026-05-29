@@ -2,12 +2,12 @@
   "name": "Modern Tribes",
   "description": [
     "a backend and a frontend",
-    "a platform with all the common tools needed for most application",
-    "a feature set that make this application special",
+    "a platform with all the common tools needed for most applications",
+    "a feature set that makes this application special",
     "the platform and the features have code in both backend and frontend",
-    "the platform depends on external services and tird party libraries",
-    "the features depends on external services and tird party libraries and the platform",
-    "the platform do not depends on features"
+    "the platform depends on external services and third-party libraries",
+    "the features depend on external services, third-party libraries and the platform",
+    "the platform does not depend on features"
   ],
   "backend": {
     "stack": [
@@ -17,17 +17,18 @@
   },
   "frontend": {
     "stack": [
-      "typed script",
+      "typescript",
       "react"
     ]
   },
   "platform": {
-    "functionalities": [
+    "core": [
       {
         "package": "authentication",
         "description": [
           "authentication of the user",
-          "magic link send by email with a token"
+          "magic link sent by email with a token",
+          "token refresh and session management"
         ],
         "backend": {
           "schema": [
@@ -35,21 +36,21 @@
             "users_sessions"
           ],
           "path": [
-            "backend/app/platform/authentication/**"
+            "backend/app/platform/core/authentication/**"
           ]
         },
         "frontend": {
           "path": [
-            "frontend/src/platform/authentication/**"
+            "frontend/src/platform/core/authentication/**"
           ]
         }
       },
       {
         "package": "authorization",
         "description": [
-          "authorization of the user",
-          "access control base on permissions",
-          "user -> roles -> permissions"
+          "role-based access control",
+          "user -> roles -> permissions",
+          "ownership and project-level access checks"
         ],
         "backend": {
           "schema": [
@@ -58,122 +59,435 @@
             "roles_permissions"
           ],
           "path": [
-            "backend/app/platform/authorization/**"
+            "backend/app/platform/core/authorization/**"
           ]
         },
         "frontend": {
           "path": [
-            "frontend/src/platform/authorization/**"
+            "frontend/src/platform/core/authorization/**"
+          ]
+        }
+      },
+      {
+        "package": "api",
+        "description": [
+          "HTTP client abstraction for all backend communication",
+          "handles authentication headers, token refresh, and error handling"
+        ],
+        "frontend": {
+          "path": [
+            "frontend/src/platform/core/api/**"
+          ]
+        }
+      },
+      {
+        "package": "browser",
+        "description": [
+          "browser API utilities and local storage management",
+          "token storage helpers"
+        ],
+        "frontend": {
+          "path": [
+            "frontend/src/platform/core/browser/**"
+          ]
+        }
+      },
+      {
+        "package": "layout",
+        "description": [
+          "main UI layout components: header, footer, navigation, breadcrumbs",
+          "themed component library: buttons, inputs, modals, tables, icons"
+        ],
+        "frontend": {
+          "path": [
+            "frontend/src/platform/core/layout/**"
+          ]
+        }
+      },
+      {
+        "package": "app-config",
+        "description": [
+          "global application configuration management",
+          "stores and retrieves app-wide settings such as branding and feature flags"
+        ],
+        "backend": {
+          "schema": [
+            "app_config"
+          ],
+          "path": [
+            "backend/app/platform/core/app_config/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/platform/core/app-config/**"
+          ]
+        }
+      },
+      {
+        "package": "responsive",
+        "description": [
+          "responsive design utilities",
+          "device detection (phone vs desktop) and zoom level management"
+        ],
+        "frontend": {
+          "path": [
+            "frontend/src/platform/core/responsive/**"
           ]
         }
       },
       {
         "package": "i18n",
         "description": [
-          "translate the messages to the user on its language",
-          "the language is set by the user and stored in the user table"
+          "internationalization using react-i18next",
+          "supports English and French",
+          "language preference persisted on the user record"
         ],
         "backend": {
           "schema": [
             "users.language"
-          ],
-          "path": [
-
           ]
         },
         "frontend": {
           "path": [
-            "frontend/src/platform/i18n/**"
+            "frontend/src/platform/core/i18n/**"
+          ]
+        }
+      }
+    ],
+    "functions": [
+      {
+        "package": "labels",
+        "description": [
+          "system-wide label management",
+          "labels can be applied to any entity (documents, tasks, etc.)"
+        ],
+        "backend": {
+          "schema": [
+            "labels"
+          ],
+          "path": [
+            "backend/app/platform/functions/labels/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/platform/functions/labels/**"
           ]
         }
       },
       {
-        "package": "i18n",
+        "package": "monitoring",
         "description": [
-          "full text search",
-          "can target any element in the database"
+          "tracks recent changes and document revisions across the system",
+          "provides audit and history views"
+        ],
+        "backend": {
+          "path": [
+            "backend/app/platform/functions/monitoring/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/platform/functions/monitoring/**"
+          ]
+        }
+      },
+      {
+        "package": "publications",
+        "description": [
+          "document publishing workflow",
+          "allows authenticated users to publish or unpublish project documents",
+          "provides public access to published documents"
+        ],
+        "backend": {
+          "schema": [
+            "publications"
+          ],
+          "path": [
+            "backend/app/platform/functions/publications/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/platform/functions/publications/**"
+          ]
+        }
+      },
+      {
+        "package": "search",
+        "description": [
+          "global full-text search across documents, publications and other entities",
+          "indexed search targeting any element in the database"
         ],
         "backend": {
           "schema": [
             "search_index"
           ],
           "path": [
-            "backend/app/platform/search/**"
+            "backend/app/platform/functions/search/**"
           ]
         },
         "frontend": {
           "path": [
-            "frontend/src/platform/search/**"
+            "frontend/src/platform/functions/search/**"
+          ]
+        }
+      },
+      {
+        "package": "people",
+        "description": [
+          "manages users, persons and their relationships",
+          "users: authentication accounts with roles and permissions",
+          "persons: physical person records associated with tribes",
+          "represents: links between users and persons"
+        ],
+        "backend": {
+          "schema": [
+            "users",
+            "persons",
+            "represents"
+          ],
+          "path": [
+            "backend/app/platform/functions/people/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/platform/functions/people/**"
+          ]
+        }
+      },
+      {
+        "package": "documents",
+        "description": [
+          "rich document management with pages, content editing, attachments and revisions",
+          "supports WYSIWYG editing"
+        ],
+        "backend": {
+          "schema": [
+            "documents",
+            "document_pages",
+            "document_attachments"
+          ],
+          "path": [
+            "backend/app/platform/functions/documents/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/platform/functions/documents/**"
+          ]
+        }
+      }
+    ],
+    "tools": [
+      {
+        "package": "notifications",
+        "description": [
+          "in-app notification system",
+          "sending, status tracking and polling for new notifications",
+          "admin interface for manual notification creation"
+        ],
+        "backend": {
+          "schema": [
+            "notifications"
+          ],
+          "path": [
+            "backend/app/platform/tools/notifications/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/platform/tools/notifications/**"
+          ]
+        }
+      },
+      {
+        "package": "pwa",
+        "description": [
+          "Progressive Web App support",
+          "handles installation prompts, standalone mode detection and iOS-specific behavior"
+        ],
+        "frontend": {
+          "path": [
+            "frontend/src/platform/tools/pwa/**"
+          ]
+        }
+      },
+      {
+        "package": "revisions",
+        "description": [
+          "document revision history viewer with timeline interface",
+          "browse historical versions of documents with date-based navigation"
+        ],
+        "frontend": {
+          "path": [
+            "frontend/src/platform/tools/revisions/**"
+          ]
+        }
+      },
+      {
+        "package": "mail",
+        "description": [
+          "email queuing, scheduling and management",
+          "admin interface to view and filter sent or queued emails"
+        ],
+        "backend": {
+          "schema": [
+            "mails",
+            "mail_recipients"
+          ],
+          "path": [
+            "backend/app/platform/tools/mail/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/platform/tools/mail/**"
           ]
         }
       }
     ]
   },
   "features": {
+    "description": [
+      "each feature is a self-contained package under features/ on both backend and frontend",
+      "features follow hexagonal architecture: they depend on the platform, not the reverse",
+      "a project can have multiple instances of the same feature, each accessible via a tab"
+    ],
     "features": [
       {
-        "package": "todo_list",
+        "package": "bookmarks",
         "description": [
-          "todo list",
-          "task with due date, assigned to a user and labels"
+          "user bookmarks for frequently accessed pages",
+          "supports colors, ordering and editing"
         ],
         "backend": {
           "schema": [
-            "todo_items"
+            "user_bookmarks"
           ],
           "path": [
-            "backend/app/features/todo_list/**"
+            "backend/app/features/bookmarks/**"
           ]
         },
         "frontend": {
           "path": [
-            "frontend/src/features/todo_list/**"
-          ]
-        }
-      },
-      {
-        "package": "kanban",
-        "description": [
-          "kanban board",
-          "task with due date, assigned to a user, labels and a column"
-        ],
-        "backend": {
-          "schema": [
-            "kanban_columns",
-            "kanban_cards"
-          ],
-          "path": [
-            "backend/app/features/kanban/**"
-          ]
-        },
-        "frontend": {
-          "path": [
-            "frontend/src/features/kanban/**"
+            "frontend/src/features/bookmarks/**"
           ]
         }
       },
       {
         "package": "tasks",
         "description": [
-          "common elements from todo, dashboard and kanban"
+          "task management system with two presentation modes: todo list and kanban",
+          "supports labels, person assignments, sizing, due dates and rich document content",
+          "common types and components shared between todo_list and kanban sub-packages"
         ],
+        "backend": {
+          "path": [
+            "backend/app/features/tasks/**"
+          ]
+        },
         "frontend": {
           "path": [
             "frontend/src/features/tasks/**"
+          ]
+        },
+        "sub_packages": [
+          {
+            "package": "todo_list",
+            "description": [
+              "linear task list interface with filtering"
+            ],
+            "backend": {
+              "schema": [
+                "todo_items",
+                "todo_labels"
+              ],
+              "path": [
+                "backend/app/features/tasks/todo_list/**"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/features/tasks/todo_list/**"
+              ]
+            }
+          },
+          {
+            "package": "kanban",
+            "description": [
+              "kanban board with drag-and-drop columns and cards",
+              "supports card movement, reordering and column management"
+            ],
+            "backend": {
+              "schema": [
+                "kanban_columns",
+                "kanban_cards",
+                "kanban_labels"
+              ],
+              "path": [
+                "backend/app/features/tasks/kanban/**"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/features/tasks/kanban/**"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "package": "tribes-projects",
+        "description": [
+          "core organizational structure of the application",
+          "tribes: top-level groups with members and positions",
+          "projects: belong to a tribe, host feature instances and documents",
+          "positions: named roles within a tribe",
+          "feature instances: pluggable features attached to a project, each rendered as a tab"
+        ],
+        "backend": {
+          "schema": [
+            "tribes",
+            "projects",
+            "positions",
+            "feature_instances",
+            "project_documents"
+          ],
+          "path": [
+            "backend/app/features/tribes_projects/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/features/tribes-projects/**"
           ]
         }
       },
       {
         "package": "dashboard",
         "description": [
-          "show elements from todo, kanban as task, the favorites"
+          "personalized user dashboard",
+          "aggregates tasks from todo list and kanban",
+          "filterable by tribe, project, person and label",
+          "shows tribes membership and bookmarks"
         ],
+        "backend": {
+          "path": [
+            "backend/app/features/dashboard/**"
+          ]
+        },
         "frontend": {
           "path": [
-            "frontend/src/features/dasboard/**"
+            "frontend/src/features/dashboard/**"
           ]
         }
       }
     ]
+  },
+  "dependencies": {
+    "forbidden": "platform -> features"
   }
 }
