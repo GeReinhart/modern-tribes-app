@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { StatusBadge } from '@/platform/core/layout/themes/components/StatusBadge.tsx';
@@ -196,14 +197,18 @@ const TribesTab: React.FC = () => {
             <ThemedButton
               variant="secondary"
               onClick={() => navigate(`/admin/tribes/${tr.url_param_id}/edit`)}
+              title={t('common.edit')}
+              style={{ padding: 'var(--btn-pad-v)' }}
             >
-              {t('common.edit')}
+              <ThemedSvgIcon name="pencil" color="currentColor" size={16} />
             </ThemedButton>
             <ThemedButton
               variant="danger"
               onClick={() => crud.openDeleteSingle(tr)}
+              title={t('common.delete')}
+              style={{ padding: 'var(--btn-pad-v)' }}
             >
-              {t('common.delete')}
+              <ThemedSvgIcon name="trash" color="currentColor" size={16} />
             </ThemedButton>
           </div>
         ),
@@ -240,11 +245,20 @@ const TribesTab: React.FC = () => {
         <ThemedButton
           variant="secondary"
           onClick={() => navigate('/admin/tribes/new')}
+          leftIcon={
+            <ThemedSvgIcon name="plus" color="currentColor" size={16} />
+          }
         >
           {t('admin.addTribe')}
         </ThemedButton>
         {crud.selectedRows.size > 0 && (
-          <ThemedButton variant="danger" onClick={crud.handleDeleteSelected}>
+          <ThemedButton
+            variant="danger"
+            onClick={crud.handleDeleteSelected}
+            leftIcon={
+              <ThemedSvgIcon name="trash" color="currentColor" size={16} />
+            }
+          >
             {t('admin.deleteSelected', { count: crud.selectedRows.size })}
           </ThemedButton>
         )}
@@ -422,14 +436,21 @@ const ProjectsTab: React.FC = () => {
             style={{ display: 'flex', gap: '8px' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <ThemedButton variant="secondary" onClick={() => crud.openEdit(p)}>
-              {t('common.edit')}
+            <ThemedButton
+              variant="secondary"
+              onClick={() => crud.openEdit(p)}
+              title={t('common.edit')}
+              style={{ padding: 'var(--btn-pad-v)' }}
+            >
+              <ThemedSvgIcon name="pencil" color="currentColor" size={16} />
             </ThemedButton>
             <ThemedButton
               variant="danger"
               onClick={() => crud.openDeleteSingle(p)}
+              title={t('common.delete')}
+              style={{ padding: 'var(--btn-pad-v)' }}
             >
-              {t('common.delete')}
+              <ThemedSvgIcon name="trash" color="currentColor" size={16} />
             </ThemedButton>
           </div>
         ),
@@ -455,11 +476,23 @@ const ProjectsTab: React.FC = () => {
         </ThemedCard>
       )}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-        <ThemedButton variant="secondary" onClick={crud.openCreate}>
+        <ThemedButton
+          variant="secondary"
+          onClick={crud.openCreate}
+          leftIcon={
+            <ThemedSvgIcon name="plus" color="currentColor" size={16} />
+          }
+        >
           {t('admin.addProject')}
         </ThemedButton>
         {crud.selectedRows.size > 0 && (
-          <ThemedButton variant="danger" onClick={crud.handleDeleteSelected}>
+          <ThemedButton
+            variant="danger"
+            onClick={crud.handleDeleteSelected}
+            leftIcon={
+              <ThemedSvgIcon name="trash" color="currentColor" size={16} />
+            }
+          >
             {t('admin.deleteSelected', { count: crud.selectedRows.size })}
           </ThemedButton>
         )}

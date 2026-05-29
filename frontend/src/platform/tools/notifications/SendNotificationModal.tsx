@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedTextarea } from '@/platform/core/layout/themes/components/ThemedTextarea.tsx';
 import {
   ModalBody,
@@ -73,12 +74,14 @@ export const SendNotificationModal: React.FC<SendNotificationModalProps> = ({
           variant="secondary"
           onClick={handleClose}
           disabled={submitting}
+          leftIcon={<ThemedSvgIcon name="x" color="currentColor" size={16} />}
         >
           {t('common.cancel')}
         </ThemedButton>
         <ThemedButton
           onClick={handleSubmit}
           disabled={!message.trim() || submitting}
+          leftIcon={<ThemedSvgIcon name="bell" color="currentColor" size={16} />}
         >
           {t('admin.notifications.send')}
         </ThemedButton>

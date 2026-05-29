@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';
@@ -137,13 +138,22 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
             marginTop: 'var(--space-sm)',
           }}
         >
-          <ThemedButton variant="ghost" onClick={onClose}>
+          <ThemedButton
+            variant="ghost"
+            onClick={onClose}
+            leftIcon={
+              <ThemedSvgIcon name="x" color="currentColor" size={16} />
+            }
+          >
             {t('common.cancel')}
           </ThemedButton>
           <ThemedButton
             variant="primary"
             onClick={handleSave}
             disabled={saving}
+            leftIcon={
+              <ThemedSvgIcon name="save" color="currentColor" size={16} />
+            }
           >
             {saving ? t('common.saving') : t('common.save')}
           </ThemedButton>

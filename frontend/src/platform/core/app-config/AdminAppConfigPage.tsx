@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedText } from '@/platform/core/layout/themes/components/ThemedText.tsx';
@@ -154,6 +155,9 @@ const ConfigRow: React.FC<{
               variant="secondary"
               onClick={handleSave}
               disabled={state.saving}
+              leftIcon={
+                <ThemedSvgIcon name="save" color="currentColor" size={16} />
+              }
             >
               {t('common.save')}
             </ThemedButton>
@@ -161,17 +165,30 @@ const ConfigRow: React.FC<{
               variant="ghost"
               onClick={handleCancel}
               disabled={state.saving}
+              leftIcon={
+                <ThemedSvgIcon name="x" color="currentColor" size={16} />
+              }
             >
               {t('common.cancel')}
             </ThemedButton>
           </div>
         ) : (
           <div style={{ display: 'flex', gap: 'var(--space-xs)' }}>
-            <ThemedButton variant="ghost" onClick={() => setEditing(true)}>
-              {t('common.edit')}
+            <ThemedButton
+              variant="ghost"
+              onClick={() => setEditing(true)}
+              title={t('common.edit')}
+              style={{ padding: 'var(--btn-pad-v)' }}
+            >
+              <ThemedSvgIcon name="pencil" color="currentColor" size={16} />
             </ThemedButton>
-            <ThemedButton variant="ghost" onClick={handleDelete}>
-              {t('common.delete')}
+            <ThemedButton
+              variant="ghost"
+              onClick={handleDelete}
+              title={t('common.delete')}
+              style={{ padding: 'var(--btn-pad-v)' }}
+            >
+              <ThemedSvgIcon name="trash" color="currentColor" size={16} />
             </ThemedButton>
           </div>
         )}
@@ -291,7 +308,14 @@ const AddConfigForm: React.FC<{
         <div
           style={{ display: 'flex', gap: 'var(--space-xs)', paddingBottom: 0 }}
         >
-          <ThemedButton variant="secondary" type="submit" disabled={saving}>
+          <ThemedButton
+            variant="secondary"
+            type="submit"
+            disabled={saving}
+            leftIcon={
+              <ThemedSvgIcon name="plus" color="currentColor" size={16} />
+            }
+          >
             {t('common.create')}
           </ThemedButton>
           <ThemedButton
@@ -299,6 +323,9 @@ const AddConfigForm: React.FC<{
             type="button"
             onClick={onCancel}
             disabled={saving}
+            leftIcon={
+              <ThemedSvgIcon name="x" color="currentColor" size={16} />
+            }
           >
             {t('common.cancel')}
           </ThemedButton>
@@ -398,6 +425,9 @@ const AppConfigPageContent: React.FC = () => {
             <ThemedButton
               variant="secondary"
               onClick={() => setShowAddForm(true)}
+              leftIcon={
+                <ThemedSvgIcon name="plus" color="currentColor" size={16} />
+              }
             >
               {t('admin.config.addEntry')}
             </ThemedButton>

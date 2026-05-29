@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/platform/core/layout/themes/ThemeContext.tsx';
 
 import React from 'react';
@@ -78,10 +79,20 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             marginTop: 'var(--space-sm)',
           }}
         >
-          <ThemedButton variant="ghost" onClick={onCancel}>
+          <ThemedButton
+            variant="ghost"
+            onClick={onCancel}
+            leftIcon={<ThemedSvgIcon name="x" color="currentColor" size={16} />}
+          >
             {t('common.cancel')}
           </ThemedButton>
-          <ThemedButton variant={confirmVariant} onClick={onConfirm}>
+          <ThemedButton
+            variant={confirmVariant}
+            onClick={onConfirm}
+            leftIcon={
+              <ThemedSvgIcon name="check" color="currentColor" size={16} />
+            }
+          >
             {confirmLabel ?? t('common.confirm')}
           </ThemedButton>
         </div>

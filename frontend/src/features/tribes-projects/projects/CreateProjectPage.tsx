@@ -1,6 +1,7 @@
 import EditorFileUploader from '@/platform/functions/documents/editor/EditorFileUploader.tsx';
 import EditorJoditComponent from '@/platform/functions/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay.tsx';
 import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection.tsx';
@@ -232,6 +233,9 @@ const CreateProjectPageContent: React.FC = () => {
               variant="secondary"
               onClick={() => navigate(`/app/tribes/${tribeId}`)}
               disabled={submitting}
+              leftIcon={
+                <ThemedSvgIcon name="x" color="currentColor" size={16} />
+              }
             >
               {t('common.cancel')}
             </ThemedButton>
@@ -240,6 +244,9 @@ const CreateProjectPageContent: React.FC = () => {
               variant="primary"
               isLoading={submitting || loading}
               disabled={submitting || loading}
+              leftIcon={
+                <ThemedSvgIcon name="plus" color="currentColor" size={16} />
+              }
             >
               {t('common.create')}
             </ThemedButton>

@@ -300,6 +300,9 @@ const TodoListTab: React.FC<Props> = ({
             variant="primary"
             type="submit"
             disabled={adding || !newTitle.trim()}
+            leftIcon={
+              <ThemedSvgIcon name="plus" color="currentColor" size={16} />
+            }
           >
             {t('features.todo.add')}
           </ThemedButton>

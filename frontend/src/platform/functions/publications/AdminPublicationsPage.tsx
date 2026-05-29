@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedConfirmDialog } from '@/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
 import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection.tsx';
@@ -192,7 +193,13 @@ function PublicationAdminRow({
             <ExternalLink size={14} />
             {t('publications.view')}
           </ThemedButton>
-          <ThemedButton variant="ghost" onClick={onUnpublish}>
+          <ThemedButton
+            variant="ghost"
+            onClick={onUnpublish}
+            leftIcon={
+              <ThemedSvgIcon name="eye-off" color="currentColor" size={16} />
+            }
+          >
             {t('publications.unpublish')}
           </ThemedButton>
         </div>

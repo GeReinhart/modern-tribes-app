@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInput.tsx';
 import { StatusBadge } from '@/platform/core/layout/themes/components/StatusBadge.tsx';
 import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
@@ -114,14 +115,21 @@ const DocumentsCrudPageContent: React.FC = () => {
             style={{ display: 'flex', gap: '8px' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <ThemedButton variant="secondary" onClick={() => crud.openEdit(d)}>
-              {t('common.edit')}
+            <ThemedButton
+              variant="secondary"
+              onClick={() => crud.openEdit(d)}
+              title={t('common.edit')}
+              style={{ padding: 'var(--btn-pad-v)' }}
+            >
+              <ThemedSvgIcon name="pencil" color="currentColor" size={16} />
             </ThemedButton>
             <ThemedButton
               variant="danger"
               onClick={() => crud.openDeleteSingle(d)}
+              title={t('common.delete')}
+              style={{ padding: 'var(--btn-pad-v)' }}
             >
-              {t('common.delete')}
+              <ThemedSvgIcon name="trash" color="currentColor" size={16} />
             </ThemedButton>
           </div>
         ),
@@ -132,11 +140,21 @@ const DocumentsCrudPageContent: React.FC = () => {
 
   const secondaryActions = (
     <>
-      <ThemedButton variant="secondary" onClick={crud.openCreate}>
+      <ThemedButton
+        variant="secondary"
+        onClick={crud.openCreate}
+        leftIcon={<ThemedSvgIcon name="plus" color="currentColor" size={16} />}
+      >
         {t('admin.addDocument')}
       </ThemedButton>
       {crud.selectedRows.size > 0 && (
-        <ThemedButton variant="danger" onClick={crud.handleDeleteSelected}>
+        <ThemedButton
+          variant="danger"
+          onClick={crud.handleDeleteSelected}
+          leftIcon={
+            <ThemedSvgIcon name="trash" color="currentColor" size={16} />
+          }
+        >
           {t('admin.deleteSelected', { count: crud.selectedRows.size })}
         </ThemedButton>
       )}

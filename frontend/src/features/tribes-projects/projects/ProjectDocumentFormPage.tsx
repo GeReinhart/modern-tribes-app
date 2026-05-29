@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { DocumentFormPagesEditor } from '@/platform/functions/documents/DocumentFormPagesEditor.tsx';
 import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay.tsx';
@@ -232,6 +233,9 @@ const ProjectDocumentFormPageContent: React.FC = () => {
               variant="secondary"
               onClick={() => navigate(cancelPath)}
               disabled={submitting}
+              leftIcon={
+                <ThemedSvgIcon name="x" color="currentColor" size={16} />
+              }
             >
               {t('common.cancel')}
             </ThemedButton>
@@ -240,6 +244,9 @@ const ProjectDocumentFormPageContent: React.FC = () => {
               variant="primary"
               isLoading={submitting}
               disabled={submitting || !title.trim()}
+              leftIcon={
+                <ThemedSvgIcon name="save" color="currentColor" size={16} />
+              }
             >
               {isEdit ? t('common.update') : t('common.create')}
             </ThemedButton>

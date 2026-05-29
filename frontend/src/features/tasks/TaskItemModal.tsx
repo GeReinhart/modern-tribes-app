@@ -311,7 +311,12 @@ const TaskItemModal: React.FC<TaskItemModalProps> = ({
             gap: '8px',
           }}
         >
-          <ThemedButton variant="ghost" onClick={onClose} disabled={saving}>
+          <ThemedButton
+            variant="ghost"
+            onClick={onClose}
+            disabled={saving}
+            leftIcon={<ThemedSvgIcon name="x" color="currentColor" size={16} />}
+          >
             {t('common.cancel')}
           </ThemedButton>
           {canEdit && (
@@ -319,6 +324,9 @@ const TaskItemModal: React.FC<TaskItemModalProps> = ({
               variant="primary"
               onClick={handleSave}
               disabled={saving || !title.trim()}
+              leftIcon={
+                <ThemedSvgIcon name="save" color="currentColor" size={16} />
+              }
             >
               {saving ? t('common.saving') : t('common.save')}
             </ThemedButton>

@@ -165,6 +165,9 @@ const AddFeatureModal: React.FC<{
               type="button"
               onClick={onClose}
               disabled={saving}
+              leftIcon={
+                <ThemedSvgIcon name="x" color="currentColor" size={16} />
+              }
             >
               {t('common.cancel')}
             </ThemedButton>
@@ -172,6 +175,9 @@ const AddFeatureModal: React.FC<{
               variant="primary"
               type="submit"
               disabled={saving || !featureType || !name.trim()}
+              leftIcon={
+                <ThemedSvgIcon name="plus" color="currentColor" size={16} />
+              }
             >
               {t('common.create')}
             </ThemedButton>
@@ -748,6 +754,9 @@ const ShowProjectPageContent: React.FC = () => {
                   variant="ghost"
                   type="button"
                   onClick={() => setRenameTarget(null)}
+                  leftIcon={
+                    <ThemedSvgIcon name="x" color="currentColor" size={16} />
+                  }
                 >
                   {t('common.cancel')}
                 </ThemedButton>
@@ -755,6 +764,9 @@ const ShowProjectPageContent: React.FC = () => {
                   variant="primary"
                   type="submit"
                   disabled={!renameValue.trim()}
+                  leftIcon={
+                    <ThemedSvgIcon name="save" color="currentColor" size={16} />
+                  }
                 >
                   {t('common.save')}
                 </ThemedButton>

@@ -1,5 +1,6 @@
 import { DocumentPagesSection } from '@/platform/functions/documents/DocumentPagesSection.tsx';
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection.tsx';
 import { DocumentPage } from '@/platform/functions/documents/document-page.types.ts';
 
@@ -39,6 +40,9 @@ export const DocumentFormPagesEditor: React.FC<
         <ThemedButton
           variant="secondary"
           onClick={() => navigate(addPagePath)}
+          leftIcon={
+            <ThemedSvgIcon name="plus" color="currentColor" size={16} />
+          }
         >
           {t('documentPages.addPage')}
         </ThemedButton>

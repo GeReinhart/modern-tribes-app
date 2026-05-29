@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
@@ -747,10 +748,20 @@ const TribeEditPageContent: React.FC = () => {
               type="button"
               variant="ghost"
               onClick={() => navigate('/admin/tribes')}
+              leftIcon={
+                <ThemedSvgIcon name="x" color="currentColor" size={16} />
+              }
             >
               {t('common.cancel')}
             </ThemedButton>
-            <ThemedButton type="submit" variant="primary" isLoading={saving}>
+            <ThemedButton
+              type="submit"
+              variant="primary"
+              isLoading={saving}
+              leftIcon={
+                <ThemedSvgIcon name="save" color="currentColor" size={16} />
+              }
+            >
               {isCreate ? t('admin.addTribe') : t('common.save')}
             </ThemedButton>
           </div>

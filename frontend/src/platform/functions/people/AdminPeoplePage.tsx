@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedInput } from '@/platform/core/layout/themes/components/ThemedInput.tsx';
 import { StatusBadge } from '@/platform/core/layout/themes/components/StatusBadge.tsx';
 import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
@@ -277,14 +278,18 @@ const UsersTab: React.FC = () => {
               <ThemedButton
                 variant="secondary"
                 onClick={() => navigate(`/admin/users/${u.url_param_id}/edit`)}
+                title={t('common.edit')}
+                style={{ padding: 'var(--btn-pad-v)' }}
               >
-                {t('common.edit')}
+                <ThemedSvgIcon name="pencil" color="currentColor" size={16} />
               </ThemedButton>
               <ThemedButton
                 variant="danger"
                 onClick={() => crud.openDeleteSingle(u)}
+                title={t('common.delete')}
+                style={{ padding: 'var(--btn-pad-v)' }}
               >
-                {t('common.delete')}
+                <ThemedSvgIcon name="trash" color="currentColor" size={16} />
               </ThemedButton>
               <ThemedButton
                 variant="accent"
@@ -351,11 +356,23 @@ const UsersTab: React.FC = () => {
         </ThemedCard>
       )}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-        <ThemedButton variant="secondary" onClick={crud.openCreate}>
+        <ThemedButton
+          variant="secondary"
+          onClick={crud.openCreate}
+          leftIcon={
+            <ThemedSvgIcon name="plus" color="currentColor" size={16} />
+          }
+        >
           {t('admin.addUser')}
         </ThemedButton>
         {crud.selectedRows.size > 0 && (
-          <ThemedButton variant="danger" onClick={crud.handleDeleteSelected}>
+          <ThemedButton
+            variant="danger"
+            onClick={crud.handleDeleteSelected}
+            leftIcon={
+              <ThemedSvgIcon name="trash" color="currentColor" size={16} />
+            }
+          >
             {t('admin.deleteSelected', { count: crud.selectedRows.size })}
           </ThemedButton>
         )}
@@ -465,7 +482,13 @@ const UsersTab: React.FC = () => {
           </div>
         </ThemedModalBody>
         <ThemedModalFooter>
-          <ThemedButton variant="secondary" onClick={closeMagicLinkModal}>
+          <ThemedButton
+            variant="secondary"
+            onClick={closeMagicLinkModal}
+            leftIcon={
+              <ThemedSvgIcon name="x" color="currentColor" size={16} />
+            }
+          >
             {t('common.close')}
           </ThemedButton>
           <ThemedButton variant="primary" onClick={handleCopy}>
@@ -561,14 +584,21 @@ const PersonsTab: React.FC = () => {
             style={{ display: 'flex', gap: '8px' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <ThemedButton variant="secondary" onClick={() => crud.openEdit(p)}>
-              {t('common.edit')}
+            <ThemedButton
+              variant="secondary"
+              onClick={() => crud.openEdit(p)}
+              title={t('common.edit')}
+              style={{ padding: 'var(--btn-pad-v)' }}
+            >
+              <ThemedSvgIcon name="pencil" color="currentColor" size={16} />
             </ThemedButton>
             <ThemedButton
               variant="danger"
               onClick={() => crud.openDeleteSingle(p)}
+              title={t('common.delete')}
+              style={{ padding: 'var(--btn-pad-v)' }}
             >
-              {t('common.delete')}
+              <ThemedSvgIcon name="trash" color="currentColor" size={16} />
             </ThemedButton>
           </div>
         ),
@@ -580,11 +610,23 @@ const PersonsTab: React.FC = () => {
   return (
     <>
       <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-        <ThemedButton variant="secondary" onClick={crud.openCreate}>
+        <ThemedButton
+          variant="secondary"
+          onClick={crud.openCreate}
+          leftIcon={
+            <ThemedSvgIcon name="plus" color="currentColor" size={16} />
+          }
+        >
           {t('admin.addPerson')}
         </ThemedButton>
         {crud.selectedRows.size > 0 && (
-          <ThemedButton variant="danger" onClick={crud.handleDeleteSelected}>
+          <ThemedButton
+            variant="danger"
+            onClick={crud.handleDeleteSelected}
+            leftIcon={
+              <ThemedSvgIcon name="trash" color="currentColor" size={16} />
+            }
+          >
             {t('admin.deleteSelected', { count: crud.selectedRows.size })}
           </ThemedButton>
         )}

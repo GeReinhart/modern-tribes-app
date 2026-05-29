@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedSelect } from '@/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { StatusBadge } from '@/platform/core/layout/themes/components/StatusBadge.tsx';
 import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
@@ -205,6 +206,13 @@ function FeaturesPageContent() {
                 nextStatus: f.status === 'active' ? 'archived' : 'active',
               })
             }
+            leftIcon={
+              f.status === 'active' ? (
+                <ThemedSvgIcon name="archive" color="currentColor" size={16} />
+              ) : (
+                <ThemedSvgIcon name="refresh" color="currentColor" size={16} />
+              )
+            }
           >
             {f.status === 'active'
               ? t('tribes.archive')
@@ -287,6 +295,9 @@ function FeaturesPageContent() {
             <ThemedButton
               variant="primary"
               onClick={() => setShowCreateForm((s) => !s)}
+              leftIcon={
+                <ThemedSvgIcon name="plus" color="currentColor" size={16} />
+              }
             >
               {t('features.addFeature')}
             </ThemedButton>

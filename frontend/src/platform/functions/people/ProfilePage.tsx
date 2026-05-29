@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedBadge } from '@/platform/core/layout/themes/components/ThemedBadge.tsx';
 import { ThemedCard } from '@/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedDivider } from '@/platform/core/layout/themes/components/ThemedDivider.tsx';
@@ -247,6 +248,9 @@ function ProfilePageContent() {
           variant="danger"
           fullWidth
           mobileIcon="logout"
+          leftIcon={
+            <ThemedSvgIcon name="logout" color="currentColor" size={16} />
+          }
         >
           {t('profile.logout')}
         </ThemedButton>

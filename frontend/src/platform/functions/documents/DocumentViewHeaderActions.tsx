@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -46,6 +47,9 @@ export const DocumentViewHeaderActions: React.FC<Props> = ({
         onClick={() =>
           navigate(`/app/tribes/${tribeId}/projects/${projectId}/documents`)
         }
+        leftIcon={
+          <ThemedSvgIcon name="arrow-left" color="currentColor" size={16} />
+        }
       >
         {t('projectDocuments.backToDocuments')}
       </ThemedButton>
@@ -57,6 +61,9 @@ export const DocumentViewHeaderActions: React.FC<Props> = ({
               `/app/tribes/${tribeId}/projects/${projectId}/documents/${projectDocumentId}/edit`,
             )
           }
+          leftIcon={
+            <ThemedSvgIcon name="pencil" color="currentColor" size={16} />
+          }
         >
           {t('common.edit')}
         </ThemedButton>
@@ -67,9 +74,8 @@ export const DocumentViewHeaderActions: React.FC<Props> = ({
           onClick={() =>
             navigate(`/public/publications/${effectivePublicationUrlParamId}`)
           }
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+          leftIcon={<Globe size={16} />}
         >
-          <Globe size={14} />
           {t('publications.view')}
         </ThemedButton>
       )}
@@ -78,6 +84,7 @@ export const DocumentViewHeaderActions: React.FC<Props> = ({
           variant="primary"
           onClick={onPublish}
           disabled={publishing}
+          leftIcon={<ThemedSvgIcon name="eye" color="currentColor" size={16} />}
         >
           {t('publications.publish')}
         </ThemedButton>
@@ -87,12 +94,22 @@ export const DocumentViewHeaderActions: React.FC<Props> = ({
           variant="ghost"
           onClick={onUnpublish}
           disabled={publishing}
+          leftIcon={
+            <ThemedSvgIcon name="eye-off" color="currentColor" size={16} />
+          }
         >
           {t('publications.unpublish')}
         </ThemedButton>
       )}
       {isManager && isActive && (
-        <ThemedButton variant="ghost" onClick={onArchive} disabled={archiving}>
+        <ThemedButton
+          variant="ghost"
+          onClick={onArchive}
+          disabled={archiving}
+          leftIcon={
+            <ThemedSvgIcon name="archive" color="currentColor" size={16} />
+          }
+        >
           {t('common.archive')}
         </ThemedButton>
       )}

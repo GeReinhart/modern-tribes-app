@@ -1,6 +1,7 @@
 import EditorFileUploader from '@/platform/functions/documents/editor/EditorFileUploader.tsx';
 import EditorJoditComponent from '@/platform/functions/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedSvgIcon } from '@/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedLoadingOverlay } from '@/platform/core/layout/themes/components/ThemedLoadingOverlay.tsx';
 import { ThemedLoadingSpinner } from '@/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedSection } from '@/platform/core/layout/themes/components/ThemedSection.tsx';
@@ -527,6 +528,9 @@ const CreateTribeFormContent: React.FC = () => {
               variant="secondary"
               onClick={handleCancel}
               disabled={isSubmitting}
+              leftIcon={
+                <ThemedSvgIcon name="x" color="currentColor" size={16} />
+              }
             >
               {t('common.cancel')}
             </ThemedButton>
