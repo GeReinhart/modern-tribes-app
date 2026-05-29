@@ -1,13 +1,13 @@
 import AuthBootstrapApp from '@/app/AuthBootstrapApp.tsx';
-import '@/features/glue';
+import '@/app/features/glue';
 // triggers feature self-registration
-import i18n from '@/platform/core/i18n/index';
+import i18n from '@/app/platform/core/i18n/index';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { I18nextProvider } from 'react-i18next';
 
-import './platform/core/index.css';
+import '@/app/platform/core/index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

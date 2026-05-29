@@ -9,6 +9,7 @@
    - ./scripts/check-frontend.sh
    - read ./application.json it will give you a great idea of the project structure
 - 2 - **Apply changes** to the project.
+   - Don't forget to change the application.json file if there some changes on the files structure, new features, new tools, new functions. 
 - 3 - **Check** the produced code is still a good status.
   - ./scripts/check-application.json.sh
   - ./scripts/check-backend.sh

@@ -1,0 +1,47 @@
+import { PersonWithPosition } from '@/app/features/tribes-projects/tribes/tribe_with_positions.types.ts';
+import { Position } from '@/app/features/tribes-projects/positions/position.types.ts';
+
+export type TribeProjectRelation = 'manager' | 'member' | 'guest';
+
+export interface TribeProjectInput {
+  project_id: string;
+  relation: TribeProjectRelation;
+}
+
+export interface TribeProject extends TribeProjectInput {
+  id: string;
+  tribe_id: string;
+  created_at: string;
+  project_name: string;
+}
+
+export interface TribeBase {
+  name: string;
+  document_id?: string | null;
+}
+
+export type TribeCreate = TribeBase;
+
+export interface TribeUpdate {
+  name?: string;
+  document_id?: string | null;
+  status?: string;
+}
+
+export interface Tribe extends TribeBase {
+  id: string;
+  url_param_id: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TribeWithPositions extends Tribe {
+  position_count: number;
+  positions?: Position[];
+}
+
+export interface TribeWithPersonsWithPosition extends Tribe {
+  person_count: number;
+  persons?: PersonWithPosition[];
+}

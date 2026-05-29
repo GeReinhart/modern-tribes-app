@@ -77,4 +77,5 @@ if [[ $ERRORS -gt 0 ]]; then
     echo "==> FAILED: $ERRORS violation(s) found." >&2
     exit 1
 fi
+cp application.json frontend/src/app
 echo "==> application.json check OK"
