@@ -633,6 +633,35 @@
         }
       },
       {
+        "package": "glue",
+        "description": {
+          "en": [
+            "wiring layer between the platform and features",
+            "feature-instances: manage feature instances attached to a project (projects_features table)",
+            "tab-config: per-user tab visibility and ordering configuration"
+          ],
+          "fr": [
+            "couche de câblage entre la plateforme et les fonctionnalités",
+            "feature-instances : gère les instances de fonctionnalités attachées à un projet (table projects_features)",
+            "tab-config : configuration de la visibilité et de l'ordre des onglets par utilisateur"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "projects_features",
+            "user_tab_configs"
+          ],
+          "path": [
+            "backend/app/features/glue/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/features/glue/**"
+          ]
+        }
+      },
+      {
         "package": "dashboard",
         "description": {
           "en": [

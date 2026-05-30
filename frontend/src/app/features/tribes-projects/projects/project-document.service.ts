@@ -9,7 +9,7 @@ import { apiService } from '@/app/platform/core/api/api.service.ts';
 
 class ProjectDocumentService {
   private base(projectId: string) {
-    return `/project-documents/projects/${projectId}`;
+    return `/features/tribes-projects/project-documents/projects/${projectId}`;
   }
 
   list(

@@ -10,7 +10,7 @@ export const authorizationService = {
   ): Promise<Authorization> => {
     const permissionsStr = permissions.join(',');
 
-    let url = `/auth/permissions/any/${permissionsStr}`;
+    let url = `/platform/core/authorization/permissions/any/${permissionsStr}`;
 
     if (tribe_id) {
       url += `/own/tribe/${tribe_id}`;

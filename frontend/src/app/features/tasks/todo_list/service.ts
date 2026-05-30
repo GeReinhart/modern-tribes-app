@@ -13,50 +13,50 @@ import {
 class TodoListService {
   async listByInstance(featureInstanceId: string): Promise<TodoItem[]> {
     return apiService.get<TodoItem[]>(
-      `/features/todo-items/by-instance/${featureInstanceId}`,
+      `/features/tasks/todo-items/by-instance/${featureInstanceId}`,
     );
   }
 
   async create(data: TodoItemCreate): Promise<TodoItem> {
-    return apiService.post<TodoItem>('/features/todo-items/', data);
+    return apiService.post<TodoItem>('/features/tasks/todo-items/', data);
   }
 
   async update(itemId: string, data: TodoItemUpdate): Promise<TodoItem> {
-    return apiService.patch<TodoItem>(`/features/todo-items/${itemId}`, data);
+    return apiService.patch<TodoItem>(`/features/tasks/todo-items/${itemId}`, data);
   }
 
   async delete(itemId: string): Promise<void> {
-    return apiService.delete<void>(`/features/todo-items/${itemId}`);
+    return apiService.delete<void>(`/features/tasks/todo-items/${itemId}`);
   }
 
   async listLabels(featureInstanceId: string): Promise<TodoLabel[]> {
     return apiService.get<TodoLabel[]>(
-      `/features/todo-labels/by-instance/${featureInstanceId}`,
+      `/features/tasks/todo-labels/by-instance/${featureInstanceId}`,
     );
   }
 
   async createLabel(data: TodoLabelCreate): Promise<TodoLabel> {
-    return apiService.post<TodoLabel>('/features/todo-labels/', data);
+    return apiService.post<TodoLabel>('/features/tasks/todo-labels/', data);
   }
 
   async updateLabel(labelId: string, data: TodoLabelUpdate): Promise<void> {
-    return apiService.patch<void>(`/features/todo-labels/${labelId}`, data);
+    return apiService.patch<void>(`/features/tasks/todo-labels/${labelId}`, data);
   }
 
   async deleteLabel(labelId: string): Promise<void> {
-    return apiService.delete<void>(`/features/todo-labels/${labelId}`);
+    return apiService.delete<void>(`/features/tasks/todo-labels/${labelId}`);
   }
 
   async toggleLabel(itemId: string, labelId: string): Promise<string[]> {
     return apiService.post<string[]>(
-      `/features/todo-items/${itemId}/labels/${labelId}`,
+      `/features/tasks/todo-items/${itemId}/labels/${labelId}`,
       {},
     );
   }
 
   async listPersons(featureInstanceId: string): Promise<PersonOption[]> {
     return apiService.get<PersonOption[]>(
-      `/features/todo-items/persons/${featureInstanceId}`,
+      `/features/tasks/todo-items/persons/${featureInstanceId}`,
     );
   }
 }

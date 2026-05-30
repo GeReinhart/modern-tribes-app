@@ -2,7 +2,7 @@ import { Person, PersonCreate, PersonUpdate } from '@/app/platform/functions/peo
 import { apiService } from '@/app/platform/core/api/api.service.ts';
 
 class PersonService {
-  private endpoint = '/crud/persons';
+  private endpoint = '/platform/functions/people/persons';
 
   async getAll(): Promise<Person[]> {
     return apiService.get<Person[]>(this.endpoint);

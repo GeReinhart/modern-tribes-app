@@ -11,12 +11,12 @@ export const monitoringService = {
     if (userEmail) params.set('user_email', userEmail);
     if (status) params.set('status', status);
     return apiService.get<RecentChange[]>(
-      `/query/monitoring/recent-changes?${params}`,
+      `/platform/functions/monitoring/recent-changes?${params}`,
     );
   },
 
   getDocumentRevisions: (documentId: string): Promise<DocumentRevision[]> =>
     apiService.get<DocumentRevision[]>(
-      `/query/monitoring/documents/${documentId}/revisions`,
+      `/platform/functions/monitoring/documents/${documentId}/revisions`,
     ),
 };

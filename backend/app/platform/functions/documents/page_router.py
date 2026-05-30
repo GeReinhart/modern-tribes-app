@@ -16,7 +16,7 @@ from app.platform.functions.documents import page_service as document_page_servi
 from app.platform.core.utils.db_helpers import resolve_url_param_id
 from app.platform.core.authorization.project_access import check_project_access_or_admin
 
-router = APIRouter(prefix="/project-documents", tags=["app_document_pages"])
+router = APIRouter(prefix="/pages", tags=["app_document_pages"])
 
 
 @router.get(

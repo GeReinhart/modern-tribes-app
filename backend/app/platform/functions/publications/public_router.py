@@ -8,7 +8,7 @@ from app.platform.functions.publications.models import PublicationDetail, Public
 from app.platform.functions.publications import service as publication_service
 from app.platform.core.utils.db_helpers import resolve_url_param_id
 
-router = APIRouter(prefix="/public/publications", tags=["public_publications"])
+router = APIRouter(prefix="/publications/public", tags=["public_publications"])
 
 
 @router.get("/labels", response_model=List[LabelInfo])

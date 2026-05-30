@@ -9,16 +9,16 @@ import {
 class NotificationService {
   async searchUsers(q: string): Promise<UserSearchResult[]> {
     return apiService.get<UserSearchResult[]>(
-      `/query/users/search?q=${encodeURIComponent(q)}`,
+      `/platform/functions/people/users/search?q=${encodeURIComponent(q)}`,
     );
   }
 
   async createForUser(payload: NotificationCreate): Promise<AppNotification> {
-    return apiService.post<AppNotification>('/notifications/admin', payload);
+    return apiService.post<AppNotification>('/platform/tools/notifications/admin', payload);
   }
 
   async listPending(): Promise<AppNotification[]> {
-    return apiService.get<AppNotification[]>('/notifications/pending');
+    return apiService.get<AppNotification[]>('/platform/tools/notifications/pending');
   }
 
   async reportStatus(
@@ -26,7 +26,7 @@ class NotificationService {
     notificationStatus: NotificationStatus.sent | NotificationStatus.failed,
   ): Promise<AppNotification> {
     return apiService.patch<AppNotification>(
-      `/notifications/${notificationId}/status`,
+      `/platform/tools/notifications/${notificationId}/status`,
       {
         notification_status: notificationStatus,
       },

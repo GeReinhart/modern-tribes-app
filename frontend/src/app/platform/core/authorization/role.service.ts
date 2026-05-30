@@ -8,7 +8,7 @@ import {
 } from './role.types.ts';
 
 class RoleService {
-  private endpoint = '/crud/roles';
+  private endpoint = '/platform/core/authorization/roles';
 
   async getAll(): Promise<Role[]> {
     return apiService.get<Role[]>(this.endpoint);

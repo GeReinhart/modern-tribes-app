@@ -17,7 +17,7 @@ from app.platform.core.utils.db_helpers import (
     update_document,
 )
 
-router = APIRouter(prefix="/mails", tags=["crud_mails"])
+router = APIRouter(prefix="/mail", tags=["tools_mail"])
 
 MAIL_TABLE = "mails"
 MAIL_TO_TABLE = "mails_to"

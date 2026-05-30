@@ -10,7 +10,7 @@ from app.features.dashboard import repository as repo
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 
-router = APIRouter(prefix="/my-tasks", tags=["query_my_tasks"])
+router = APIRouter(prefix="/dashboard", tags=["features_dashboard"])
 
 
 class MyTaskLabel(BaseModel):

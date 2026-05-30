@@ -12,8 +12,8 @@ import {
 import { apiService } from '@/app/platform/core/api/api.service.ts';
 
 class TribeService {
-  private endpoint = '/crud/tribes';
-  private queryEndpoint = '/query/tribes';
+  private endpoint = '/features/tribes-projects/tribes';
+  private queryEndpoint = '/features/tribes-projects/tribes';
 
   async getAll(): Promise<Tribe[]> {
     return apiService.get<Tribe[]>(this.endpoint);

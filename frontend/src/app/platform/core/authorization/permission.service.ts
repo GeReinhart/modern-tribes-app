@@ -8,7 +8,7 @@ import {
 } from './permission.types.ts';
 
 class PermissionService {
-  private endpoint = '/crud/permissions';
+  private endpoint = '/platform/core/authorization/permissions';
 
   async getAll(): Promise<Permission[]> {
     return apiService.get<Permission[]>(this.endpoint);

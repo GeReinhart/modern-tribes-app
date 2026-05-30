@@ -3,7 +3,7 @@ import { apiService } from '@/app/platform/core/api/api.service.ts';
 
 export const authService = {
   sendMagicLink: async (email: string): Promise<void> => {
-    const response = await fetch(`${getAPIBaseUrl()}/auth/magic-link`, {
+    const response = await fetch(`${getAPIBaseUrl()}/platform/core/authentication/magic-link`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ export const authService = {
     token: string,
   ): Promise<{ access_token: string; refresh_token: string }> => {
     const response = await fetch(
-      `${getAPIBaseUrl()}/auth/verify?token=${token}`,
+      `${getAPIBaseUrl()}/platform/core/authentication/verify?token=${token}`,
       { method: 'POST' },
     );
 
@@ -40,7 +40,7 @@ export const authService = {
   refreshToken: async (
     refreshToken: string,
   ): Promise<{ access_token: string; refresh_token: string }> => {
-    const response = await fetch(`${getAPIBaseUrl()}/auth/refresh`, {
+    const response = await fetch(`${getAPIBaseUrl()}/platform/core/authentication/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh_token: refreshToken }),
@@ -59,6 +59,6 @@ export const authService = {
   },
 
   updateLanguage: async (language: string): Promise<void> => {
-    await apiService.patch('/auth/me/language', { language });
+    await apiService.patch('/platform/core/authentication/me/language', { language });
   },
 };

@@ -6,7 +6,7 @@ import {
 import { apiService } from '@/app/platform/core/api/api.service.ts';
 
 class PositionService {
-  private endpoint = '/crud/positions';
+  private endpoint = '/features/tribes-projects/positions';
 
   async getAll(): Promise<Position[]> {
     return apiService.get<Position[]>(this.endpoint);

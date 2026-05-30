@@ -23,7 +23,7 @@ from app.platform.core.authentication.security import create_magic_token
 from app.platform.core.authorization.permissions import get_user_permissions
 from app.platform.core.utils.db_helpers import create_document
 
-router = APIRouter()
+router = APIRouter(prefix="/authentication", tags=["authentication"])
 security = HTTPBearer()
 
 
@@ -34,7 +34,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     return await auth_service.validate_session(credentials.credentials, pool)
 
 
-@router.post("/auth/magic-link", response_model=MagicLinkResponse)
+@router.post("/magic-link", response_model=MagicLinkResponse)
 async def request_magic_link(request: MagicLinkRequest):
     magic_token = create_magic_token(request.email)
     magic_link = f"{settings.FRONTEND_URL}/auth/verify?token={magic_token}"
@@ -95,7 +95,7 @@ async def request_magic_link(request: MagicLinkRequest):
     return MagicLinkResponse(message="Magic link sent to your email", email=request.email)
 
 
-@router.post("/auth/verify", response_model=TokenResponse)
+@router.post("/verify", response_model=TokenResponse)
 async def verify_magic_link(token: str, request: Request, response: Response):
     pool = get_database()
     forwarded_for = request.headers.get("X-Forwarded-For")
@@ -109,7 +109,7 @@ async def verify_magic_link(token: str, request: Request, response: Response):
     )
 
 
-@router.get("/auth/me", response_model=UserResponse)
+@router.get("/me", response_model=UserResponse)
 async def get_me(current_user: dict = Depends(get_current_user)):
     pool = get_database()
     user_id = str(current_user["id"])
@@ -132,7 +132,7 @@ class UpdateLanguageRequest(BaseModel):
     language: str
 
 
-@router.patch("/auth/me/language")
+@router.patch("/me/language")
 async def update_my_language(body: UpdateLanguageRequest, current_user: dict = Depends(get_current_user)):
     if body.language not in _SUPPORTED_LANGUAGES:
         raise HTTPException(
@@ -149,13 +149,13 @@ async def update_my_language(body: UpdateLanguageRequest, current_user: dict = D
     return {"language": body.language}
 
 
-@router.post("/auth/refresh", response_model=RefreshResponse)
+@router.post("/refresh", response_model=RefreshResponse)
 async def refresh_token(body: RefreshRequest):
     pool = get_database()
     return await auth_service.refresh_access_token(body.refresh_token, pool)
 
 
-@router.post("/auth/logout")
+@router.post("/logout")
 async def logout(credentials: HTTPAuthorizationCredentials = Depends(security)):
     from app.platform.core.authentication.security import verify_access_token
 
@@ -166,7 +166,7 @@ async def logout(credentials: HTTPAuthorizationCredentials = Depends(security)):
     return {"message": "Logged out successfully"}
 
 
-@router.get("/auth/sessions", response_model=list[SessionResponse])
+@router.get("/sessions", response_model=list[SessionResponse])
 async def get_sessions(current_user: dict = Depends(get_current_user)):
     pool = get_database()
     sessions = await auth_repo.get_active_sessions(pool, str(current_user["id"]))
@@ -183,7 +183,7 @@ async def get_sessions(current_user: dict = Depends(get_current_user)):
     ]
 
 
-@router.delete("/auth/sessions/{session_id}")
+@router.delete("/sessions/{session_id}")
 async def revoke_session(session_id: str, current_user: dict = Depends(get_current_user)):
     pool = get_database()
     await auth_repo.delete_session(pool, str(current_user["id"]), session_id)

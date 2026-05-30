@@ -13,7 +13,7 @@ from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 from app.features.bookmarks import service as user_bookmarks_service
 
-router = APIRouter(prefix="/user-bookmarks", tags=["app_user_bookmarks"])
+router = APIRouter(prefix="/bookmarks", tags=["app_bookmarks"])
 
 
 @router.get("", response_model=UserBookmarksResponse)

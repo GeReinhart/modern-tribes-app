@@ -8,23 +8,23 @@ import { apiService } from '@/app/platform/core/api/api.service.ts';
 
 class AppConfigService {
   async getPublic(): Promise<AppConfigPublic[]> {
-    return apiService.get<AppConfigPublic[]>('/query/app-config/');
+    return apiService.get<AppConfigPublic[]>('/platform/core/app-config/');
   }
 
   async getAll(): Promise<AppConfigEntry[]> {
-    return apiService.get<AppConfigEntry[]>('/crud/app-config/');
+    return apiService.get<AppConfigEntry[]>('/platform/core/app-config/');
   }
 
   async create(data: AppConfigCreate): Promise<AppConfigEntry> {
-    return apiService.post<AppConfigEntry>('/crud/app-config/', data);
+    return apiService.post<AppConfigEntry>('/platform/core/app-config/', data);
   }
 
   async update(id: string, data: AppConfigUpdate): Promise<AppConfigEntry> {
-    return apiService.put<AppConfigEntry>(`/crud/app-config/${id}`, data);
+    return apiService.put<AppConfigEntry>(`/platform/core/app-config/${id}`, data);
   }
 
   async delete(id: string): Promise<void> {
-    return apiService.delete<void>(`/crud/app-config/${id}`);
+    return apiService.delete<void>(`/platform/core/app-config/${id}`);
   }
 }
 

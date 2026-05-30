@@ -2,7 +2,7 @@ import { Label, LabelCreate, LabelUpdate } from '@/app/platform/functions/labels
 import { apiService } from '@/app/platform/core/api/api.service.ts';
 
 class LabelService {
-  private endpoint = '/crud/labels';
+  private endpoint = '/platform/functions/labels';
 
   async getAll(): Promise<Label[]> {
     return apiService.get<Label[]>(this.endpoint);
@@ -33,7 +33,7 @@ class LabelService {
     }>
   > {
     return apiService.get(
-      `/query/labels/search?name=${encodeURIComponent(name)}`,
+      `/platform/functions/labels/search?name=${encodeURIComponent(name)}`,
     );
   }
 }

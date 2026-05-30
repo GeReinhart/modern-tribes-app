@@ -10,7 +10,7 @@ interface TabConfigResponse {
 export const tabConfigService = {
   get: (contextKey: string): Promise<TabConfigResponse> =>
     apiService.get<TabConfigResponse>(
-      `/user-tab-configs/${encodeURIComponent(contextKey)}`,
+      `/features/glue/tab-configs/${encodeURIComponent(contextKey)}`,
     ),
 
   save: (
@@ -26,7 +26,7 @@ export const tabConfigService = {
       }),
     );
     return apiService.put<TabConfigResponse>(
-      `/user-tab-configs/${encodeURIComponent(contextKey)}`,
+      `/features/glue/tab-configs/${encodeURIComponent(contextKey)}`,
       { tab_configs: payload },
     );
   },

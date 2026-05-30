@@ -7,7 +7,7 @@ import {
 import { apiService } from '@/app/platform/core/api/api.service.ts';
 
 class UserService {
-  private endpoint = '/crud/users';
+  private endpoint = '/platform/functions/people/users';
 
   async getAll(): Promise<User[]> {
     return apiService.get<User[]>(this.endpoint);

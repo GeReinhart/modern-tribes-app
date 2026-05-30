@@ -21,7 +21,7 @@ from app.platform.core.utils.db_helpers import (
 )
 from app.platform.core.utils.validators import EntityValidator
 
-router = APIRouter(prefix="/document-entities", tags=["crud_document_entities"])
+router = APIRouter(prefix="/entities", tags=["documents_entities"])
 
 TABLE = "document_entities"
 ENTITY_NAME = "DocumentEntity"

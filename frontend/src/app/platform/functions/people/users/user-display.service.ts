@@ -3,7 +3,7 @@ import { apiService } from '@/app/platform/core/api/api.service.ts';
 
 class UserDisplayService {
   async getDisplayInfo(userId: string): Promise<UserDisplayInfo> {
-    return apiService.get<UserDisplayInfo>(`/query/users/${userId}/display`);
+    return apiService.get<UserDisplayInfo>(`/platform/functions/people/users/${userId}/display`);
   }
 }
 

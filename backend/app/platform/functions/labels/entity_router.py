@@ -21,7 +21,7 @@ from app.platform.core.utils.db_helpers import (
 )
 from app.platform.core.utils.validators import EntityValidator
 
-router = APIRouter(prefix="/label-entities", tags=["crud_label_entities"])
+router = APIRouter(prefix="/entities", tags=["labels_entities"])
 
 TABLE = "label_entities"
 ENTITY_NAME = "LabelEntity"

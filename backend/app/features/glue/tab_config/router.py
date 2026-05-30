@@ -7,7 +7,7 @@ from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 from app.features.glue.tab_config import service as user_tab_config_service
 
-router = APIRouter(prefix="/user-tab-configs", tags=["app_user_tab_configs"])
+router = APIRouter(prefix="/tab-configs", tags=["glue_tab_configs"])
 
 
 @router.get("/{context_key}", response_model=UserTabConfigResponse)

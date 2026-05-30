@@ -17,15 +17,15 @@ class PublicationService {
     if (q) params.set('q', q);
     if (labelId) params.set('label_id', labelId);
     const qs = params.toString() ? `?${params.toString()}` : '';
-    return apiService.get<PublicationSummary[]>(`/public/publications/${qs}`);
+    return apiService.get<PublicationSummary[]>(`/platform/functions/publications/public/${qs}`);
   }
 
   getPublication(id: string): Promise<PublicationDetail> {
-    return apiService.get<PublicationDetail>(`/public/publications/${id}`);
+    return apiService.get<PublicationDetail>(`/platform/functions/publications/public/${id}`);
   }
 
   listPublicationLabels(): Promise<LabelInfo[]> {
-    return apiService.get<LabelInfo[]>('/public/publications/labels');
+    return apiService.get<LabelInfo[]>('/platform/functions/publications/public/labels');
   }
 
   // Authenticated endpoints (manager actions on project documents)
@@ -35,13 +35,13 @@ class PublicationService {
     projectDocumentId: string,
   ): Promise<{ publication_url_param_id: string }> {
     return apiService.patch<{ publication_url_param_id: string }>(
-      `/project-documents/projects/${projectId}/documents/${projectDocumentId}/publish`,
+      `/features/tribes-projects/project-documents/projects/${projectId}/documents/${projectDocumentId}/publish`,
     );
   }
 
   unpublish(projectId: string, projectDocumentId: string): Promise<void> {
     return apiService.patch<void>(
-      `/project-documents/projects/${projectId}/documents/${projectDocumentId}/unpublish`,
+      `/features/tribes-projects/project-documents/projects/${projectId}/documents/${projectDocumentId}/unpublish`,
     );
   }
 
@@ -57,11 +57,11 @@ class PublicationService {
     if (tribeId) params.set('tribe_id', tribeId);
     if (projectId) params.set('project_id', projectId);
     const qs = params.toString() ? `?${params.toString()}` : '';
-    return apiService.get<PublicationAdminItem[]>(`/publications/${qs}`);
+    return apiService.get<PublicationAdminItem[]>(`/platform/functions/publications/${qs}`);
   }
 
   adminUnpublish(publicationId: string): Promise<void> {
-    return apiService.delete<void>(`/publications/${publicationId}`);
+    return apiService.delete<void>(`/platform/functions/publications/${publicationId}`);
   }
 }
 

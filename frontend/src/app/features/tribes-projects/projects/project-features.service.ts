@@ -8,7 +8,7 @@ import { apiService } from '@/app/platform/core/api/api.service.ts';
 
 class ProjectFeaturesService {
   async getFeatureTypes(): Promise<FeatureTypeInfo[]> {
-    return apiService.get<FeatureTypeInfo[]>('/project-features/feature-types');
+    return apiService.get<FeatureTypeInfo[]>('/features/glue/feature-instances/feature-types');
   }
 
   async listByProject(
@@ -17,7 +17,7 @@ class ProjectFeaturesService {
   ): Promise<ProjectFeatureInstance[]> {
     const qs = status ? `?status=${encodeURIComponent(status)}` : '';
     return apiService.get<ProjectFeatureInstance[]>(
-      `/project-features/projects/${projectId}/features${qs}`,
+      `/features/glue/feature-instances/projects/${projectId}/features${qs}`,
     );
   }
 
@@ -26,7 +26,7 @@ class ProjectFeaturesService {
     data: ProjectFeatureInstanceCreate,
   ): Promise<ProjectFeatureInstance> {
     return apiService.post<ProjectFeatureInstance>(
-      `/project-features/projects/${projectId}/features`,
+      `/features/glue/feature-instances/projects/${projectId}/features`,
       data,
     );
   }
@@ -37,7 +37,7 @@ class ProjectFeaturesService {
     data: ProjectFeatureInstanceUpdate,
   ): Promise<ProjectFeatureInstance> {
     return apiService.patch<ProjectFeatureInstance>(
-      `/project-features/projects/${projectId}/features/${featureId}`,
+      `/features/glue/feature-instances/projects/${projectId}/features/${featureId}`,
       data,
     );
   }

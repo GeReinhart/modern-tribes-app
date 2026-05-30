@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchUser = useCallback(
     async (accessToken: string, allowRefresh = true) => {
       try {
-        const response = await fetch(`${getAPIBaseUrl()}/auth/me`, {
+        const response = await fetch(`${getAPIBaseUrl()}/platform/core/authentication/me`, {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         if (response.ok) {
@@ -147,7 +147,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const currentToken = tokenManager.getAccessToken();
     if (currentToken) {
       try {
-        await fetch(`${getAPIBaseUrl()}/auth/logout`, {
+        await fetch(`${getAPIBaseUrl()}/platform/core/authentication/logout`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${currentToken}` },
         });

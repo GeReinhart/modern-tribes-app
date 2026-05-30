@@ -9,7 +9,7 @@ from app.platform.core.authorization.models import Authorization, PermissionEnum
 from app.platform.core.authorization.ownership import check_own_tribe_position_or_admin
 from app.platform.core.authorization.permissions import get_user_permissions
 
-router = APIRouter()
+router = APIRouter(prefix="/authorization", tags=["authorization"])
 
 
 # ============ HELPER FUNCTION ============
@@ -23,7 +23,7 @@ async def _get_user_permissions_or_raise(current_user: dict) -> list[str]:
 
 
 # ============ ENDPOINT ============
-@router.get("/auth/permissions/any/{permissions}", response_model=Authorization)
+@router.get("/permissions/any/{permissions}", response_model=Authorization)
 async def current_user_has_at_least_one_permission(
     permissions: str, current_user: dict = Depends(get_current_user)
 ):
@@ -61,7 +61,7 @@ async def _authorize_tribe_access(
         return Authorization(authorized=False, message=e.detail)
 
 
-@router.get("/auth/permissions/any/{permissions}/own/tribe/{tribe_id}", response_model=Authorization)
+@router.get("/permissions/any/{permissions}/own/tribe/{tribe_id}", response_model=Authorization)
 async def check_permission_and_tribe(
     permissions: str, tribe_id: str, current_user: dict = Depends(get_current_user)
 ):
@@ -74,7 +74,7 @@ async def check_permission_and_tribe(
 
 
 @router.get(
-    "/auth/permissions/any/{permissions}/own/tribe/{tribe_id}/position/{position}",
+    "/permissions/any/{permissions}/own/tribe/{tribe_id}/position/{position}",
     response_model=Authorization,
 )
 async def check_permission_and_tribe_and_position(

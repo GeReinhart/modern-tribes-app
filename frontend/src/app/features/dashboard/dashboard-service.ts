@@ -16,6 +16,6 @@ export async function getMyTasks(
   filters: MyTasksFilters = {},
 ): Promise<MyTasksResponse> {
   return apiService.get<MyTasksResponse>(
-    `/query/my-tasks${buildQuery(filters)}`,
+    `/features/dashboard${buildQuery(filters)}`,
   );
 }

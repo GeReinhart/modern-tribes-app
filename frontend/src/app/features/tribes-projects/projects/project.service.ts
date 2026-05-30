@@ -11,7 +11,7 @@ import {
 import { apiService } from '@/app/platform/core/api/api.service.ts';
 
 class ProjectService {
-  private endpoint = '/crud/projects';
+  private endpoint = '/features/tribes-projects/projects';
 
   async getAll(): Promise<Project[]> {
     return apiService.get<Project[]>(this.endpoint);
@@ -35,7 +35,7 @@ class ProjectService {
 
   async getByUser(userId: string): Promise<UserProjectEntry[]> {
     return apiService.get<UserProjectEntry[]>(
-      `/query/projects/by/user/${userId}`,
+      `/features/tribes-projects/projects/by/user/${userId}`,
     );
   }
 
@@ -44,7 +44,7 @@ class ProjectService {
     userId: string,
   ): Promise<UserProjectEntry[]> {
     return apiService.get<UserProjectEntry[]>(
-      `/query/projects/by/tribe/${tribeId}/for/user/${userId}`,
+      `/features/tribes-projects/projects/by/tribe/${tribeId}/for/user/${userId}`,
     );
   }
 
@@ -52,7 +52,7 @@ class ProjectService {
     data: ProjectWithDocumentCreate,
   ): Promise<ProjectWithDocumentResponse> {
     return apiService.post<ProjectWithDocumentResponse>(
-      '/projects/with-document',
+      '/features/tribes-projects/projects/with-document',
       data,
     );
   }
@@ -61,7 +61,7 @@ class ProjectService {
     projectId: string,
   ): Promise<ProjectWithDocumentResponse> {
     return apiService.get<ProjectWithDocumentResponse>(
-      `/projects/${projectId}/with-document`,
+      `/features/tribes-projects/projects/${projectId}/with-document`,
     );
   }
 
@@ -70,7 +70,7 @@ class ProjectService {
     data: ProjectWithDocumentUpdate,
   ): Promise<ProjectWithDocumentResponse> {
     return apiService.put<ProjectWithDocumentResponse>(
-      `/projects/${projectId}/with-document`,
+      `/features/tribes-projects/projects/${projectId}/with-document`,
       data,
     );
   }
@@ -79,7 +79,7 @@ class ProjectService {
     projectId: string,
   ): Promise<ProjectTribeWithMembers[]> {
     return apiService.get<ProjectTribeWithMembers[]>(
-      `/projects/${projectId}/tribes-with-members`,
+      `/features/tribes-projects/projects/${projectId}/tribes-with-members`,
     );
   }
 }

@@ -9,7 +9,7 @@ class MailService {
     if (filters.user_id) params.set('user_id', filters.user_id);
     const qs = params.toString();
     return apiService.get<MailWithRecipients[]>(
-      `/query/mails${qs ? `?${qs}` : ''}`,
+      `/platform/tools/mail${qs ? `?${qs}` : ''}`,
     );
   }
 }

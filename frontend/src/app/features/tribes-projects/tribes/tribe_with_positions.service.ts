@@ -11,7 +11,7 @@ export const tribeWithPositionService = {
     data: TribeWithPositionsCreate,
   ): Promise<TribeWithPositionsResponse> {
     const response = await apiService.post<TribeWithPositionsResponse>(
-      '/tribes/with-positions',
+      '/features/tribes-projects/tribes/with-positions',
       data,
     );
     return response;
@@ -19,7 +19,7 @@ export const tribeWithPositionService = {
 
   async getWithPositions(id: string): Promise<TribeWithPositionsResponse> {
     const response = await apiService.get<TribeWithPositionsResponse>(
-      `/tribes/${id}/with-positions`,
+      `/features/tribes-projects/tribes/${id}/with-positions`,
     );
     return response;
   },
@@ -29,13 +29,13 @@ export const tribeWithPositionService = {
     data: TribeWithPositionsUpdate,
   ): Promise<TribeWithPositionsResponse> {
     const response = await apiService.put<TribeWithPositionsResponse>(
-      `/tribes/${id}/with-positions`,
+      `/features/tribes-projects/tribes/${id}/with-positions`,
       data,
     );
     return response;
   },
 
   async archiveTribe(id: string): Promise<void> {
-    await apiService.patch<void>(`/tribes/${id}/archive`);
+    await apiService.patch<void>(`/features/tribes-projects/tribes/${id}/archive`);
   },
 };
