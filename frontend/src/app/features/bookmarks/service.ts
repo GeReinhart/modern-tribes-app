@@ -8,7 +8,7 @@ import {
 
 export const userBookmarksService = {
   getBookmarks: (): Promise<UserBookmarksResponse> =>
-    apiService.get<UserBookmarksResponse>('/bookmarks'),
+    apiService.get<UserBookmarksResponse>('/features/bookmarks'),
 
   addBookmark: (
     pagePath: string,
@@ -17,7 +17,7 @@ export const userBookmarksService = {
     colorText: string | null,
     colorBackground: string | null,
   ): Promise<UserBookmark> =>
-    apiService.post<UserBookmark>('/bookmarks', {
+    apiService.post<UserBookmark>('/features/bookmarks', {
       page_path: pagePath,
       page_title: pageTitle,
       description,
@@ -29,7 +29,7 @@ export const userBookmarksService = {
     bookmarkId: string,
     data: UserBookmarkUpdate,
   ): Promise<UserBookmark> =>
-    apiService.put<UserBookmark>(`/bookmarks/${bookmarkId}`, {
+    apiService.put<UserBookmark>(`/features/bookmarks/${bookmarkId}`, {
       page_title: data.page_title,
       description: data.description,
       color_text: data.color_text,
@@ -37,10 +37,10 @@ export const userBookmarksService = {
     }),
 
   removeBookmark: (bookmarkId: string): Promise<void> =>
-    apiService.delete<void>(`/bookmarks/${bookmarkId}`),
+    apiService.delete<void>(`/features/bookmarks/${bookmarkId}`),
 
   reorderBookmarks: (orderedIds: string[]): Promise<UserBookmarksResponse> =>
-    apiService.put<UserBookmarksResponse>('/bookmarks/order', {
+    apiService.put<UserBookmarksResponse>('/features/bookmarks/order', {
       ordered_ids: orderedIds,
     }),
 };
