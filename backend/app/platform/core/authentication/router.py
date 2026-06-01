@@ -15,7 +15,6 @@ from app.platform.core.authentication.models import (
     MagicLinkResponse,
     RefreshRequest,
     RefreshResponse,
-    SessionResponse,
     TokenResponse,
     UserResponse,
 )
@@ -153,38 +152,3 @@ async def update_my_language(body: UpdateLanguageRequest, current_user: dict = D
 async def refresh_token(body: RefreshRequest):
     pool = get_database()
     return await auth_service.refresh_access_token(body.refresh_token, pool)
-
-
-@router.post("/logout")
-async def logout(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    from app.platform.core.authentication.security import verify_access_token
-
-    payload = verify_access_token(credentials.credentials)
-    if payload:
-        pool = get_database()
-        await auth_repo.delete_session(pool, payload.get("sub"), payload.get("session_id"))
-    return {"message": "Logged out successfully"}
-
-
-@router.get("/sessions", response_model=list[SessionResponse])
-async def get_sessions(current_user: dict = Depends(get_current_user)):
-    pool = get_database()
-    sessions = await auth_repo.get_active_sessions(pool, str(current_user["id"]))
-    return [
-        SessionResponse(
-            session_id=s["session_id"],
-            user_agent=s["user_agent"],
-            ip_address=s["ip_address"],
-            expires_at=s["expires_at"],
-            last_activity=s["last_activity"],
-            created_at=s["created_at"],
-        )
-        for s in sessions
-    ]
-
-
-@router.delete("/sessions/{session_id}")
-async def revoke_session(session_id: str, current_user: dict = Depends(get_current_user)):
-    pool = get_database()
-    await auth_repo.delete_session(pool, str(current_user["id"]), session_id)
-    return {"message": "Session revoked"}

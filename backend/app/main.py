@@ -19,10 +19,8 @@ from app.platform.core.app_config import router as app_config
 from app.platform.core.app_config import query_router as query_app_config
 from app.platform.core.uploads import router as uploads
 from app.platform.functions.documents import router as documents
-from app.platform.functions.documents import entity_router as document_entities
 from app.platform.functions.documents import page_router as document_pages
 from app.platform.functions.labels import router as labels
-from app.platform.functions.labels import entity_router as label_entities
 from app.platform.functions.labels import query_router as query_labels
 from app.platform.functions.monitoring import router as query_monitoring
 from app.platform.functions.people.persons import router as persons
@@ -32,14 +30,12 @@ from app.platform.functions.people.represents import router as represents
 from app.platform.functions.publications import router as app_publications
 from app.platform.functions.publications import public_router as public_publications
 from app.platform.functions.search import router as search_platform_router
-from app.platform.tools.mail import router as mails
-from app.platform.tools.mail import query_router as query_mails
+from app.platform.tools.mail import query_router as mail_router
 from app.platform.tools.mail.scheduler import mail_scheduler
 from app.platform.tools.notifications import router as app_notifications
 from app.features.bookmarks import router as user_bookmarks
 from app.features.dashboard import router as query_my_tasks
 from app.features.glue.features import router as project_features
-from app.features.glue.features import query_router as query_features
 from app.features.glue.tab_config import router as user_tab_configs
 from app.features.tribes_projects.positions import router as positions
 from app.features.tribes_projects.projects import router as projects
@@ -134,10 +130,8 @@ app.include_router(query_users.router, prefix="/api/platform/functions/people")
 app.include_router(persons.router, prefix="/api/platform/functions/people")
 app.include_router(represents.router, prefix="/api/platform/functions/people")
 app.include_router(labels.router, prefix="/api/platform/functions")
-app.include_router(label_entities.router, prefix="/api/platform/functions/labels")
 app.include_router(query_labels.router, prefix="/api/platform/functions")
 app.include_router(documents.router, prefix="/api/platform/functions")
-app.include_router(document_entities.router, prefix="/api/platform/functions/documents")
 app.include_router(document_pages.router, prefix="/api/platform/functions/documents")
 app.include_router(query_monitoring.router, prefix="/api/platform/functions")
 app.include_router(app_publications.router, prefix="/api/platform/functions")
@@ -145,8 +139,7 @@ app.include_router(public_publications.router, prefix="/api/platform/functions")
 app.include_router(search_platform_router.router, prefix="/api/platform/functions")
 
 # Platform — Tools
-app.include_router(mails.router, prefix="/api/platform/tools")
-app.include_router(query_mails.router, prefix="/api/platform/tools")
+app.include_router(mail_router.router, prefix="/api/platform/tools")
 app.include_router(app_notifications.router, prefix="/api/platform/tools")
 
 # Features — Bookmarks
@@ -157,7 +150,6 @@ app.include_router(query_my_tasks.router, prefix="/api/features")
 
 # Features — Glue
 app.include_router(project_features.router, prefix="/api/features/glue")
-app.include_router(query_features.router, prefix="/api/features/glue")
 app.include_router(user_tab_configs.router, prefix="/api/features/glue")
 
 # Features — Tribes-Projects
