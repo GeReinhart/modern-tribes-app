@@ -28,6 +28,9 @@ Feature: Update a bookmark
 
   Scenario: PUT /bookmarks/0010 with valid body as viewer — the bookmark is updated
     Given I am authenticated as a regular user: user.id 0002
+    And the user_bookmarks table contains:
+      | id   | user_id | page_path   | page_title | display_order | status |
+      | 0010 | 0002    | /tribes/abc | Eng        | 1             | active |
     When I PUT /api/features/bookmarks/0010 with body:
       """
       {"page_title": "Updated Title"}

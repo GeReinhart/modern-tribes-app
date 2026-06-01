@@ -5,57 +5,97 @@ Create a BDD test for a backend use case using pytest-bdd and Gherkin.
 - Feature files: `backend/tests/features/<package-path>/<use-case>.feature`
 - Step definitions: `backend/tests/bdd/<package-path>/test_<use-case>.py`
 - `<package-path>` mirrors the app package, dropping `functions/` and `features/` segments
-  - e.g. `app/platform/functions/people/persons/router.py` → `platform/people/persons`
-- Shared fixtures: `backend/tests/conftest.py`
+  - `app/platform/functions/people/persons/router.py` → `platform/people/persons`
+  - `app/features/bookmarks/router.py` → `features/bookmarks`
+- Shared step definitions: `backend/tests/bdd/conftest.py`
+- Auth fixtures + DB setup: `backend/tests/conftest.py`
+- DB infrastructure: `backend/tests/db_helpers.py`
+- ID/assertion helpers: `backend/tests/helpers.py`
 - Run all: `./scripts/run-backend-tests.sh`
 - Run by tag: `./scripts/run-backend-tests.sh @wip`
 
+## Architecture: real-DB integration tests
+
+**All tests run against a real PostgreSQL database** (`modern_tribes_test`).
+No mocks except `get_current_user` (auth identity only).
+
+Each test file creates a **mini FastAPI app** containing only the router under test, with
+`lifespan=db_lifespan`. This wires `db.pool` to the test pool inside TestClient's event loop.
+Tables are **truncated before every test** via the `clean_test_db` autouse fixture in
+`tests/conftest.py`. Schema is applied once per session via `pytest_configure`.
+
+Given steps insert data via `asyncio.run()` + a direct `asyncpg.connect()` (no pool).
+
 ## pytest-bdd API facts (8.x)
 
-- `datatable` parameter in a step function receives `step.datatable.raw()` — a `list[list[str]]`.
-  First row = headers, subsequent rows = data. An empty table (header row only) represents zero records.
-- `docstring` parameter receives the raw triple-quoted text as a plain string.
-- Neither needs any import; they are injected by name automatically when present in the function signature.
-- Tags on a `Feature:` apply to every scenario in the file. Tags on a `Scenario:` apply only to that one.
-  Scenario-level tags are placed on the line immediately before `Scenario:`.
-- Every marker used in a `.feature` file must be registered in `backend/pyproject.toml` under
-  `[tool.pytest.ini_options] markers = [...]` to avoid "unknown mark" warnings.
+- `datatable` receives `step.datatable.raw()` — `list[list[str]]`. First row = headers.
+  A header-only table represents zero records (empty state).
+- `docstring` receives the raw triple-quoted block as a plain string.
+- Neither needs an import; injected by name automatically.
+- Tags on `Feature:` apply to every scenario. Tags on `Scenario:` apply to that one only.
+- Every marker used in a `.feature` file must be registered in `backend/pyproject.toml`.
+
+## Short IDs
+
+Use 1–4 digit numeric short IDs in feature files: `0001`, `1001`, `6001`.
+`expand_id("0001")` → `"00000000-0000-0000-0000-000000000001"`.
+`expand_json_ids()` and `expand_path_ids()` expand short IDs recursively in JSON and URL paths.
+
+## Fixed auth identities
+
+The three auth constants in `tests/conftest.py` have fixed IDs. You must use these exact IDs
+in `Background:` and `Given` steps, and always seed them in the `users` table:
+
+| Step suffix | Constant | id | email |
+|---|---|---|---|
+| `user.id 0001` | `_ADMIN_USER` | `0001` | `admin@test.com` |
+| `user.id 0002` | `_REGULAR_USER` | `0002` | `user@test.com` |
+| `user.id 0003` | `_PROFILE_USER` | `0003` | `profile_user@test.com` |
+
+The `user.id N` in auth step names is **descriptive only** — the fixture always returns the
+pre-defined constant. No dynamic lookup is performed.
 
 ## Steps
 
 ### 1 — Understand the target
 
-Ask (or infer from context):
+Read or infer:
 - Which router file is being tested
-- Which use cases to cover (always include at least: happy path, validation error, and auth/permission error)
+- Which DB tables the endpoint reads/writes (check repository and router files)
+- Which permission is required (for the `@error_case` scenario)
+- Which use cases to cover: happy path, validation error, permission error
 
-### 2 — Read the router
+### 2 — Read the router and repository
 
 For the target endpoint:
 - HTTP method and exact URL path (as registered in `app/main.py`)
 - Required / optional Pydantic fields (read the `Create` schema)
-- Which helpers are called: `get_database`, `create_document`, `get_user_permissions`, permission decorators
+- All tables read (list in `Given` steps) and written (assert in `Then` steps)
 
 ### 3 — Create directories and `__init__.py`
 
 ```
 backend/tests/features/<package-path>/
-backend/tests/bdd/<package-path>/          ← add __init__.py at every level
+backend/tests/bdd/<package-path>/     ← add __init__.py at every level if missing
 ```
 
 ### 4 — Write the Gherkin feature file
 
 **Tag rules:**
 - `@wip` on the `Feature:` line — applies to all scenarios by default
-- Additional tags (e.g. `@error_case`) on individual `Scenario:` lines for cross-cutting concerns
+- `@error_case` on individual `Scenario:` lines for permission/validation errors
 
-**No `Background:` for authentication.** Put the auth `Given` step in each scenario explicitly so
-the role is visible at a glance.
+**`Background:`** for shared auth data: users, roles, role_permissions, user_roles.
+Always seed the auth users that will be used in scenarios (0001, 0002, 0003 as needed).
 
-**Before/after DB state** uses a DataTable on the same step name `the <table> table contains:`.
-An empty state is represented by a header-only table (no data rows).
+**Domain `Given` tables** go inside each `Scenario:`, covering every table the endpoint
+reads. List them in FK-dependency order (parents before children — see section 9).
 
-**JSON body** uses a Gherkin docstring (triple-quoted block) under the `When` step.
+**`Given the managed_<table> table contains:`** for mutation tests:
+- Before `When`: header-only table = take a baseline snapshot of current IDs
+- After `When` (Then): list only the new rows expected after the action
+
+**`Then the response body is:`** uses a Gherkin docstring with JSON. Short IDs are expanded.
 
 ```gherkin
 @wip
@@ -64,181 +104,258 @@ Feature: <Domain action>
   I want to <action>
   So that <benefit>
 
-  Scenario: <METHOD> /<path> with a valid body — the new record appears in the database
-    Given I am authenticated as an administrator
-    And the <table> table contains:
+  Background:
+    Given the users table contains:
+      | id   | email          | status |
+      | 0001 | admin@test.com | active |
+      | 0002 | user@test.com  | active |
+    And the roles table contains:
+      | name          | status |
+      | administrator | active |
+      | viewer        | active |
+    And the role_permissions table contains:
+      | role          | permission                 |
+      | administrator | admin                      |
+      | viewer        | can_access_attached_tribes |
+    And the user_roles table contains:
+      | user           | role          |
+      | admin@test.com | administrator |
+      | user@test.com  | viewer        |
+
+  Scenario: POST /<path> with a valid body — the new record appears in the database
+    Given I am authenticated as an administrator: user.id 0001
+    And the projects table contains:
+      | id   | name    | status |
+      | 2001 | My Proj | active |
+    And the managed_<target-table> table contains:
       | field_a | field_b | status |
-    When I <METHOD> /api/<path>/ with body:
+    When I POST /api/<path>/ with body:
       """
-      {
-        "field_a": "value_a",
-        "field_b": "value_b"
-      }
+      { "field_a": "value_a", "field_b": "value_b" }
       """
-    Then the response status code is <2xx>
-    And the <table> table contains:
+    Then the response status code is 201
+    And the managed_<target-table> table contains:
       | field_a  | field_b  | status |
       | value_a  | value_b  | active |
 
-  Scenario: <METHOD> /<path> with a missing required field — <4xx> and the database is not modified
-    Given I am authenticated as an administrator
-    And the <table> table contains:
+  Scenario: POST /<path> with a missing required field — 422 and the database is not modified
+    Given I am authenticated as an administrator: user.id 0001
+    And the managed_<target-table> table contains:
       | field_a | field_b | status |
-    When I <METHOD> /api/<path>/ with body:
+    When I POST /api/<path>/ with body:
       """
-      {
-        "field_a": "value_a"
-      }
+      { "field_a": "value_a" }
       """
     Then the response status code is 422
-    And the <table> table contains:
+    And the managed_<target-table> table contains:
       | field_a | field_b | status |
 
   @error_case
-  Scenario: <METHOD> /<path> as a non-admin user — 403 and the database is not modified
-    Given I am authenticated as a regular user
-    And the <table> table contains:
+  Scenario: POST /<path> as a non-admin user — 403 and the database is not modified
+    Given I am authenticated as a regular user: user.id 0002
+    And the managed_<target-table> table contains:
       | field_a | field_b | status |
-    When I <METHOD> /api/<path>/ with body:
+    When I POST /api/<path>/ with body:
       """
-      {
-        "field_a": "value_a",
-        "field_b": "value_b"
-      }
+      { "field_a": "value_a", "field_b": "value_b" }
       """
     Then the response status code is 403
-    And the <table> table contains:
+    And the managed_<target-table> table contains:
       | field_a | field_b | status |
 ```
 
-### 5 — Update `backend/tests/conftest.py`
+For GET endpoints, use `Then the response body is:` with a docstring JSON instead of
+managed table assertions.
 
-**`Fake<Entity>Store`** — one per domain entity being tested:
+### 5 — Write the step definitions file
 
-```python
-class Fake<Entity>Store:
-    def __init__(self):
-        self._records: list[dict] = []
+Each test file contains only:
+1. A module-level mini FastAPI app with `lifespan=db_lifespan` and the target router
+2. Auth fixture(s): at least the roles needed by the scenarios in this file
+3. `@scenario(FEATURE, "...")` declarations
 
-    def count(self) -> int:
-        return len(self._records)
-
-    def insert(self, record: dict) -> dict:
-        self._records.append(record)
-        return record
-
-    def all(self) -> list[dict]:
-        return list(self._records)
-
-    def last(self) -> dict | None:
-        return self._records[-1] if self._records else None
-```
-
-**`_make_fake_create_document`** — shared factory used by all client fixtures:
+**No other mocks.** DB wiring is handled by `db_lifespan`. All step logic lives in
+`tests/bdd/conftest.py`.
 
 ```python
-def _make_fake_create_document(store: Fake<Entity>Store):
-    async def fake_create_document(pool, table, data):
-        from datetime import datetime
-        from uuid import UUID, uuid4
-        now = datetime(2024, 1, 1, 0, 0, 0)
-        record = {k: str(v) if isinstance(v, UUID) else v for k, v in data.items()}
-        record["id"] = str(uuid4())
-        record["created_at"] = now
-        record["updated_at"] = now
-        if table == "<target_table>":
-            store.insert(record)
-        return record
-    return fake_create_document
-```
+import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+from pytest_bdd import scenario
 
-**Client fixtures** — one per role. Patch at the **import site** (where the function name is bound),
-not at the definition site:
+from app.platform.core.authentication.router import get_current_user
+from app.<package>.router import router
+from tests.conftest import _ADMIN_USER, _REGULAR_USER, _PROFILE_USER
+from tests.db_helpers import db_lifespan
 
-```python
+_test_app = FastAPI(lifespan=db_lifespan)
+_test_app.include_router(router, prefix="/api/<mount-prefix>")
+
+FEATURE = "../../../../features/<package-path>/<use-case>.feature"
+
+
 @pytest.fixture
-def admin_client(<entity>_store):
+def admin_client():
     _test_app.dependency_overrides[get_current_user] = lambda: _ADMIN_USER
-    with (
-        patch("app.platform.core.authorization.router.get_database", return_value=MagicMock()),
-        patch("app.platform.core.authorization.router.get_user_permissions",
-              new=AsyncMock(return_value=["admin"])),
-        patch("app.<router-module>.get_database", return_value=MagicMock()),
-        patch("app.<router-module>.create_document",
-              new=AsyncMock(side_effect=_make_fake_create_document(<entity>_store))),
-    ):
-        with TestClient(_test_app) as client:
-            yield client
+    with TestClient(_test_app) as client:
+        yield client
     _test_app.dependency_overrides.clear()
+
 
 @pytest.fixture
-def non_admin_client(<entity>_store):
+def non_admin_client():
     _test_app.dependency_overrides[get_current_user] = lambda: _REGULAR_USER
-    with (
-        patch("app.platform.core.authorization.router.get_database", return_value=MagicMock()),
-        patch("app.platform.core.authorization.router.get_user_permissions",
-              new=AsyncMock(return_value=["can_access_own_tribes"])),  # no admin
-        patch("app.<router-module>.get_database", return_value=MagicMock()),
-        patch("app.<router-module>.create_document",
-              new=AsyncMock(side_effect=_make_fake_create_document(<entity>_store))),
-    ):
-        with TestClient(_test_app) as client:
-            yield client
+    with TestClient(_test_app) as client:
+        yield client
     _test_app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def profile_owner_client():
+    _test_app.dependency_overrides[get_current_user] = lambda: _PROFILE_USER
+    with TestClient(_test_app) as client:
+        yield client
+    _test_app.dependency_overrides.clear()
+
+
+@scenario(FEATURE, "POST /<path> with a valid body — the new record appears in the database")
+def test_create_success():
+    pass
+
+
+@scenario(FEATURE, "POST /<path> with a missing required field — 422 and the database is not modified")
+def test_create_missing_field():
+    pass
+
+
+@scenario(FEATURE, "POST /<path> as a non-admin user — 403 and the database is not modified")
+def test_create_forbidden():
+    pass
 ```
 
-The four patch targets for every client fixture:
-1. `app.platform.core.authorization.router.get_database` — used by the permission decorator
-2. `app.platform.core.authorization.router.get_user_permissions` — used by the permission decorator
-3. `app.<router-module>.get_database` — used by the route handler
-4. `app.<router-module>.create_document` — (or whatever db helper is called) — records DB state
+Only include the fixtures required by the scenarios in that file. `profile_owner_client` is
+only needed if a scenario uses `"I am authenticated as the person's owner: user.id 0003"`.
 
-### 6 — Write the step definitions
+### 6 — Shared steps already in `tests/bdd/conftest.py`
 
-**Key design:** auth `Given` steps store the client in `context["client"]`.
-The `When` step reads from `context["client"]` — it never depends on `admin_client` or
-`non_admin_client` directly. This makes all `When` and `Then` steps role-agnostic.
+No re-declaration needed for these:
 
-```python
-@given("I am authenticated as an administrator")
-def authenticated_admin(admin_client, context):
-    context["client"] = admin_client
+**Auth (Given):**
 
-@given("I am authenticated as a regular user")
-def authenticated_regular_user(non_admin_client, context):
-    context["client"] = non_admin_client
+| Step | Fixture used |
+|---|---|
+| `I am authenticated as an administrator: user.id {N}` | `admin_client` |
+| `I am authenticated as a regular user: user.id {N}` | `non_admin_client` |
+| `I am authenticated as the person's owner: user.id {N}` | `profile_owner_client` |
 
-def _assert_table(store, datatable):
-    headers = datatable[0]
-    expected_rows = datatable[1:]           # empty list = expected empty table
-    actual = store.all()
-    assert len(actual) == len(expected_rows), (
-        f"Expected {len(expected_rows)} record(s), got {len(actual)}"
-    )
-    for expected, record in zip(expected_rows, actual):
-        for i, field in enumerate(headers):
-            assert str(record[field]) == expected[i], (
-                f"{field}: expected {expected[i]!r}, got {record[field]!r}"
-            )
+**DB seed (Given):**
 
-@given("the <table> table contains:")
-def given_table_state(<entity>_store, datatable):
-    _assert_table(<entity>_store, datatable)
+| Step | Notes |
+|---|---|
+| `the users table contains:` | auto-fills `url_param_id` and `login` from email |
+| `the roles table contains:` | |
+| `the role_permissions table contains:` | columns: `role` (name), `permission` (name) — upserts permission if absent |
+| `the user_roles table contains:` | columns: `user` (email), `role` (name) |
+| `the persons table contains:` | |
+| `the represents table contains:` | |
+| `the documents table contains:` | |
+| `the labels table contains:` | |
+| `the projects table contains:` | auto-fills `url_param_id` |
+| `the tribes table contains:` | auto-fills `url_param_id` |
+| `the tribes_projects table contains:` | columns: `tribe_id`, `project_id`, `relation` |
+| `the positions table contains:` | columns: `tribe_id`, `person_id`, `position`, `status` |
+| `the projects_features table contains:` | columns: `id`, `project_id`, `feature_type`, `name`, `status`, `position` |
+| `the kanban_columns table contains:` | |
+| `the kanban_cards table contains:` | |
+| `the todo_items table contains:` | |
+| `the user_bookmarks table contains:` | alias: `the user_bookmark table contains:` |
+| `the notifications table contains:` | |
+| `the projects_documents table contains:` | |
+| `the publications table contains:` | |
+| `the app_config table contains:` | |
+| `the managed_roles table contains:` | snapshots baseline + seeds initial rows |
+| `the managed_users table contains:` | snapshots baseline + seeds initial rows |
+| `the created_users table contains:` | alias for `managed_users` mechanism |
 
-@when(parsers.re(r"I POST (?P<path>\S+) with body:"))
-def post_with_body(context, path, docstring):
-    context["response"] = context["client"].post(path, json=json.loads(docstring))
+**HTTP (When):**
 
-@then(parsers.parse("the response status code is {status_code:d}"))
-def check_status_code(context, status_code):
-    assert context["response"].status_code == status_code
+| Step | Notes |
+|---|---|
+| `I POST <path> with body:` | docstring = JSON body; short IDs expanded in path and body |
+| `I PUT <path> with body:` | |
+| `I PATCH <path> with body:` | |
+| `I POST <path>` | no body |
+| `I GET <path>` | |
+| `I DELETE <path>` | |
 
-@then("the <table> table contains:")
-def then_table_state(<entity>_store, datatable):
-    _assert_table(<entity>_store, datatable)
-```
+**Assertions (Then):**
 
-### 7 — Register markers in `pyproject.toml`
+| Step | Notes |
+|---|---|
+| `the response status code is {N}` | |
+| `the response body is:` | docstring = JSON; short IDs expanded |
+| `the persons table contains:` | full table assertion |
+| `the represents table contains:` | |
+| `the documents table contains:` | |
+| `the labels table contains:` | |
+| `the app_config table contains:` | |
+| `the projects table contains:` | |
+| `the tribes table contains:` | |
+| `the positions table contains:` | |
+| `the managed_roles table contains:` | delta from baseline taken in Given |
+| `the managed_users table contains:` | delta from baseline taken in Given |
+| `the created_users table contains:` | delta from baseline taken in Given |
+
+### 7 — DB helpers reference
+
+**`tests/db_helpers.py`:**
+- `TEST_DB_DSN` — `postgresql://admin:password123@localhost:5432/modern_tribes_test`
+- `db_lifespan` — FastAPI lifespan; creates asyncpg pool, sets `db.pool`, cleans up
+- `setup_test_database()` — creates DB + runs `alembic upgrade head` (called once via `pytest_configure`)
+- `truncate_all_tables()` — truncates all public tables except `alembic_version` (called before each test)
+- `coerce(col, val)` — converts strings to UUID / date / int based on column name and value pattern
+- `url_param_id_from_uuid(uuid_str)` — last 6 hex chars of the UUID (deterministic short ID)
+
+**`tests/helpers.py`:**
+- `expand_id(value)` — `"0001"` → full UUID string
+- `expand_path_ids(path)` — expands short IDs in URL path segments
+- `expand_json_ids(data)` — recursively expands short IDs in parsed JSON
+- `assert_table(actual, datatable, label)` — asserts list of dicts matches a Gherkin datatable
+- `assert_table_contains(actual, datatable, label)` — subset check (any-order)
+
+### 8 — Auto-filled columns
+
+| Table | Column | Auto value |
+|---|---|---|
+| `users` | `url_param_id` | `url_param_id_from_uuid(id)` |
+| `users` | `login` | same as `email` |
+| `projects` | `url_param_id` | `url_param_id_from_uuid(id)` |
+| `tribes` | `url_param_id` | `url_param_id_from_uuid(id)` |
+| `permissions` | auto-upserted by name | no explicit `id` needed |
+
+### 9 — FK insert order
+
+Always declare `Given` tables in dependency order (parent before child):
+
+1. `roles`, `permissions`
+2. `persons`
+3. `users` (→ persons)
+4. `role_permissions` (→ roles, permissions)
+5. `user_roles` (→ users, roles)
+6. `tribes`, `projects`
+7. `represents` (→ users, persons)
+8. `positions` (→ tribes, persons)
+9. `tribes_projects` (→ tribes, projects)
+10. `projects_features` (→ projects)
+11. `kanban_columns` (→ projects_features)
+12. `kanban_cards` (→ kanban_columns, projects_features)
+13. `todo_items` (→ projects_features)
+14. `documents`
+15. `labels` (→ projects_features)
+16. `projects_documents` (→ projects, documents)
+17. `publications` (→ documents, projects_documents)
+
+### 10 — Register markers in `pyproject.toml`
 
 ```toml
 [tool.pytest.ini_options]
@@ -250,14 +367,14 @@ markers = [
 
 Add any new tag used in a `.feature` file here.
 
-### 8 — Verify
+### 11 — Verify
 
 ```bash
-python3 -m py_compile backend/tests/conftest.py
 python3 -m py_compile backend/tests/bdd/<package-path>/test_<use-case>.py
+./scripts/check-backend.sh
 ```
 
-### 9 — Hand off to the user
+### 12 — Hand off to the user
 
 Tell the user to run:
 ```bash

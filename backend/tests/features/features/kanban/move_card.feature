@@ -21,6 +21,19 @@ Feature: Move a kanban card
       | user           | role          |
       | admin@test.com | administrator |
       | user@test.com  | viewer        |
+    And the projects table contains:
+      | id   | name    | status |
+      | 0100 | Project | active |
+    And the projects_features table contains:
+      | id   | project_id | name  | feature_type | status |
+      | 0100 | 0100       | Board | kanban       | active |
+    And the kanban_columns table contains:
+      | id   | feature_instance_id | name  | position | status |
+      | 0200 | 0100                | To Do | 1        | active |
+      | 0201 | 0100                | Done  | 2        | active |
+    And the kanban_cards table contains:
+      | id   | feature_instance_id | column_id | title | position | status |
+      | 0010 | 0100                | 0200      | Task  | 1        | active |
 
   Scenario: POST /kanban/cards/0010/move as admin — card is moved
     Given I am authenticated as an administrator: user.id 0001

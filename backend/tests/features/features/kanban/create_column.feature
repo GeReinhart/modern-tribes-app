@@ -21,6 +21,12 @@ Feature: Create a kanban column
       | user           | role          |
       | admin@test.com | administrator |
       | user@test.com  | viewer        |
+    And the projects table contains:
+      | id   | name    | status |
+      | 0100 | Project | active |
+    And the projects_features table contains:
+      | id   | project_id | name  | feature_type | status |
+      | 0100 | 0100       | Board | kanban       | active |
 
   Scenario: POST /kanban/columns as admin — the column is created
     Given I am authenticated as an administrator: user.id 0001

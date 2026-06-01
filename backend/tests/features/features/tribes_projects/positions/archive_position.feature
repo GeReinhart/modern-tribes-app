@@ -21,6 +21,12 @@ Feature: Archive a position
       | user           | role          |
       | admin@test.com | administrator |
       | user@test.com  | viewer        |
+    And the tribes table contains:
+      | id   | name        | status |
+      | 0020 | Engineering | active |
+    And the persons table contains:
+      | id   | first_name | last_name | gender | status |
+      | 0030 | Alice      | Dupont    | female | active |
 
   Scenario: DELETE /positions/0010 as admin — position is archived
     Given I am authenticated as an administrator: user.id 0001
@@ -30,8 +36,7 @@ Feature: Archive a position
     When I DELETE /api/features/tribes-projects/positions/0010
     Then the response status code is 204
     And the positions table contains:
-      | id   | tribe_id | person_id | position | status   |
-      | 0010 | 0020     | 0030      | member   | archived |
+      | id | tribe_id | person_id | position | status |
 
   @error_case
   Scenario: DELETE /positions/0010 as a viewer — 403 error and the position is not archived

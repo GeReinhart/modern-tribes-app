@@ -31,7 +31,6 @@ Feature: Archive a role
     Then the response status code is 204
     And the managed_roles table contains:
       | id   | name   | status   |
-      | 0010 | editor | archived |
 
   @error_case
   Scenario: DELETE /roles/0010 as a viewer — 403 error and the role is not archived

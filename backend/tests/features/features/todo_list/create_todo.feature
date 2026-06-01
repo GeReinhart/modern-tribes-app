@@ -21,6 +21,12 @@ Feature: Create a todo item
       | user           | role          |
       | admin@test.com | administrator |
       | user@test.com  | viewer        |
+    And the projects table contains:
+      | id   | name    | status |
+      | 0100 | Project | active |
+    And the projects_features table contains:
+      | id   | project_id | name  | feature_type | status |
+      | 0100 | 0100       | Todos | todo         | active |
 
   Scenario: POST /todo-items/ as admin — the item is created
     Given I am authenticated as an administrator: user.id 0001

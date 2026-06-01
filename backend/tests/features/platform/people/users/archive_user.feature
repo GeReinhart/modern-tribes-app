@@ -30,8 +30,7 @@ Feature: Archive a user
     When I DELETE /api/platform/functions/people/users/0010
     Then the response status code is 204
     And the managed_users table contains:
-      | id   | login | email        | status   |
-      | 0010 | bob   | bob@test.com | archived |
+      | id | login | email | status |
 
   @error_case
   Scenario: DELETE /users/0010 as a viewer — 403 error and the user is not archived

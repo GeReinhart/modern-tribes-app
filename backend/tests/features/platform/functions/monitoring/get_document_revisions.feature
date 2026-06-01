@@ -24,6 +24,9 @@ Feature: Get document revisions
 
   Scenario: GET /monitoring/documents/0010/revisions as admin — revisions are returned
     Given I am authenticated as an administrator: user.id 0001
+    And the documents table contains:
+      | id   | content_html   | status |
+      | 0010 | <p>Content</p> | active |
     When I GET /api/platform/functions/monitoring/documents/0010/revisions
     Then the response status code is 200
 

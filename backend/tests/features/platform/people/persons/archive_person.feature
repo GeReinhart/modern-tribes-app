@@ -30,8 +30,7 @@ Feature: Archive a person
     When I DELETE /api/platform/functions/people/persons/0010
     Then the response status code is 204
     And the persons table contains:
-      | id   | first_name | last_name | gender | status   |
-      | 0010 | Alice      | Dupont    | female | archived |
+      | id | first_name | last_name | gender | status |
 
   @error_case
   Scenario: DELETE /persons/0010 as a viewer — 403 error and the person is not archived

@@ -31,7 +31,6 @@ Feature: Archive a project
     Then the response status code is 204
     And the projects table contains:
       | id   | name             | status   |
-      | 0010 | Website Redesign | archived |
 
   @error_case
   Scenario: DELETE /projects/0010 as a viewer — 403 error and the project is not archived

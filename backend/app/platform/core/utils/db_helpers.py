@@ -11,6 +11,10 @@ TABLES_WITH_STATUS = frozenset(
     {"permissions", "roles", "documents", "persons", "users", "projects", "tribes", "positions", "labels"}
 )
 
+TABLES_WITHOUT_CREATED_AT = frozenset(
+    {"user_roles", "role_permissions", "tribes_projects", "label_entities"}
+)
+
 URL_PARAM_ID_TABLES = frozenset(
     {"users", "tribes", "projects", "projects_documents", "publications", "document_pages"}
 )
@@ -163,7 +167,8 @@ async def get_all_documents(
     else:
         query = f"SELECT * FROM {table}"
 
-    query += " ORDER BY created_at DESC"
+    if table not in TABLES_WITHOUT_CREATED_AT:
+        query += " ORDER BY created_at DESC"
 
     async with pool.acquire() as conn:
         rows = await conn.fetch(query, *(params or []))

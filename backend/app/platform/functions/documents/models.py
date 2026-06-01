@@ -1,14 +1,11 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel, Field
-
-from app.platform.core.uploads.files import AttachmentFile
 
 
 class DocumentBase(BaseModel):
     content_html: str = Field(..., min_length=1, description="Post content in HTML")
-    attachments: List[AttachmentFile] = Field(default=[], description="File attachments")
 
 
 class DocumentCreate(DocumentBase):
@@ -17,7 +14,6 @@ class DocumentCreate(DocumentBase):
 
 class DocumentUpdate(BaseModel):
     content_html: Optional[str] = Field(None, min_length=1, description="Post content in HTML")
-    attachments: Optional[List[AttachmentFile]] = Field(None, description="File attachments")
     status: Optional[str] = None
 
 

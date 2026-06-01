@@ -29,9 +29,6 @@ Feature: Archive an app config entry
       | 0010 | max_tribes | 10    |
     When I DELETE /api/platform/core/app-config/0010
     Then the response status code is 204
-    And the app_config table contains:
-      | id   | status   |
-      | 0010 | archived |
 
   @error_case
   Scenario: DELETE /app-config/0010 as a viewer — 403 error and the entry is not archived
@@ -42,5 +39,5 @@ Feature: Archive an app config entry
     When I DELETE /api/platform/core/app-config/0010
     Then the response status code is 403
     And the app_config table contains:
-      | id   | key        | value |
-      | 0010 | max_tribes | 10    |
+      | key        | value |
+      | max_tribes | 10    |

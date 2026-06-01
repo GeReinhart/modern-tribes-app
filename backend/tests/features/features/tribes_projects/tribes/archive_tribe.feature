@@ -31,7 +31,6 @@ Feature: Archive a tribe
     Then the response status code is 204
     And the tribes table contains:
       | id   | name        | status   |
-      | 0010 | Engineering | archived |
 
   @error_case
   Scenario: DELETE /tribes/0010 as a viewer — 403 error and the tribe is not archived

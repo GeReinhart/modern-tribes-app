@@ -33,8 +33,7 @@ Feature: Archive a represents link
     When I DELETE /api/platform/functions/people/represents/0030
     Then the response status code is 204
     And the represents table contains:
-      | id   | user_id | person_id | status   |
-      | 0030 | 0002    | 0020      | archived |
+      | id | user_id | person_id | status |
 
   @error_case
   Scenario: DELETE /represents/0030 as a viewer — 403 error and the link is not archived

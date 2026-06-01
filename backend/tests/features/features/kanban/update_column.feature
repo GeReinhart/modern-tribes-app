@@ -21,6 +21,16 @@ Feature: Update a kanban column
       | user           | role          |
       | admin@test.com | administrator |
       | user@test.com  | viewer        |
+    And the projects table contains:
+      | id   | name    | status |
+      | 0100 | Project | active |
+    And the projects_features table contains:
+      | id   | project_id | name  | feature_type | status |
+      | 0100 | 0100       | Board | kanban       | active |
+    And the kanban_columns table contains:
+      | id   | feature_instance_id | name  | position | status |
+      | 0010 | 0100                | To Do | 1        | active |
+      | 0011 | 0100                | Done  | 2        | active |
 
   Scenario: PATCH /kanban/columns/0010 as admin — the column is updated
     Given I am authenticated as an administrator: user.id 0001

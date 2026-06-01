@@ -21,6 +21,18 @@ Feature: Archive a publication
       | user           | role          |
       | admin@test.com | administrator |
       | user@test.com  | viewer        |
+    And the projects table contains:
+      | id   | name    | status |
+      | 0100 | Project | active |
+    And the documents table contains:
+      | id   | content_html   | status |
+      | 0010 | <p>Content</p> | active |
+    And the projects_documents table contains:
+      | id   | project_id | document_id | title    | status |
+      | 0010 | 0100       | 0010        | My Doc   | active |
+    And the publications table contains:
+      | id   | document_id | project_document_id | status |
+      | 0010 | 0010        | 0010                | active |
 
   Scenario: DELETE /publications/0010 as admin — publication is archived
     Given I am authenticated as an administrator: user.id 0001

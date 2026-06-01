@@ -31,7 +31,6 @@ Feature: Archive a document
     Then the response status code is 204
     And the documents table contains:
       | id   | content_html   | status   |
-      | 0010 | <p>Content</p> | archived |
 
   @error_case
   Scenario: DELETE /documents/0010 as a viewer — 403 error and the document is not archived

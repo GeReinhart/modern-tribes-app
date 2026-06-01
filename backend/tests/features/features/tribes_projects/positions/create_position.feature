@@ -21,6 +21,12 @@ Feature: Create a position
       | user           | role          |
       | admin@test.com | administrator |
       | user@test.com  | viewer        |
+    And the tribes table contains:
+      | id   | name        | status |
+      | 0020 | Engineering | active |
+    And the persons table contains:
+      | id   | first_name | last_name | gender | status |
+      | 0030 | Alice      | Dupont    | female | active |
 
   Scenario: POST /positions/ with valid body as admin — the position is created
     Given I am authenticated as an administrator: user.id 0001

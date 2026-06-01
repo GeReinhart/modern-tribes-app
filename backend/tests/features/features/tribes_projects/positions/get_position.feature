@@ -21,12 +21,18 @@ Feature: Get a position
       | user           | role          |
       | admin@test.com | administrator |
       | user@test.com  | viewer        |
+    And the tribes table contains:
+      | id   | name        | status |
+      | 0020 | Engineering | active |
+    And the persons table contains:
+      | id   | first_name | last_name | gender | status |
+      | 0030 | Alice      | Dupont    | female | active |
 
   Scenario: GET /positions/0010 as admin — position is returned
     Given I am authenticated as an administrator: user.id 0001
     And the positions table contains:
       | id   | tribe_id | person_id | position    | status |
-      | 0010 | 0020     | 0030      | Tech Lead   | active |
+      | 0010 | 0020     | 0030      | member      | active |
     When I GET /api/features/tribes-projects/positions/0010
     Then the response status code is 200
 
@@ -35,6 +41,6 @@ Feature: Get a position
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:
       | id   | tribe_id | person_id | position    | status |
-      | 0010 | 0020     | 0030      | Tech Lead   | active |
+      | 0010 | 0020     | 0030      | member      | active |
     When I GET /api/features/tribes-projects/positions/0010
     Then the response status code is 403

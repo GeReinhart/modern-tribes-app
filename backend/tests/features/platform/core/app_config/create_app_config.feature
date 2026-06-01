@@ -25,7 +25,7 @@ Feature: Create an app config entry
   Scenario: POST /app-config/ with valid body as admin — the entry is created
     Given I am authenticated as an administrator: user.id 0001
     And the app_config table contains:
-      | id | key | value | status |
+      | id | key | value |
     When I POST /api/platform/core/app-config/ with body:
       """
       {"key": "max_tribes", "value": "10"}
@@ -38,24 +38,24 @@ Feature: Create an app config entry
   Scenario: POST /app-config/ with missing key — 422 error and the database is not modified
     Given I am authenticated as an administrator: user.id 0001
     And the app_config table contains:
-      | id | key | value | status |
+      | id | key | value |
     When I POST /api/platform/core/app-config/ with body:
       """
       {"value": "10"}
       """
     Then the response status code is 422
     And the app_config table contains:
-      | id | key | value | status |
+      | id | key | value |
 
   @error_case
   Scenario: POST /app-config/ as a viewer — 403 error and the database is not modified
     Given I am authenticated as a regular user: user.id 0002
     And the app_config table contains:
-      | id | key | value | status |
+      | id | key | value |
     When I POST /api/platform/core/app-config/ with body:
       """
       {"key": "max_tribes", "value": "10"}
       """
     Then the response status code is 403
     And the app_config table contains:
-      | id | key | value | status |
+      | id | key | value |

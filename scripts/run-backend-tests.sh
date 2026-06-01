@@ -4,6 +4,15 @@ set -euo pipefail
 BACKEND_DIR="$(cd "$(dirname "$0")/../backend" && pwd)"
 COVERAGE_THRESHOLD=80
 
+ROOT_DIR="$(cd "$BACKEND_DIR/.." && pwd)"
+COMPOSE_FILE="$ROOT_DIR/docker-compose.bdd-test.yml"
+
+echo "Starting BDD test database (port 5433)..."
+# On Fedora/Podman systems the user socket must be active for docker-compose to work
+systemctl --user start podman.socket 2>/dev/null || true
+docker compose -f "$COMPOSE_FILE" up -d --wait postgres-test
+echo ""
+
 cd "$BACKEND_DIR"
 
 if ! venv/bin/python -m pytest --version &>/dev/null; then
@@ -34,25 +43,22 @@ fi
 echo "Running all backend BDD tests"
 echo ""
 
-if ! venv/bin/python -m pytest "${PYTEST_ARGS[@]}"; then
+PYTEST_ARGS+=(
+    "--cov=app"
+    "--cov-report=term-missing"
+    "--cov-config=pyproject.toml"
+)
+
+TMP_OUT=$(mktemp)
+venv/bin/python -m pytest "${PYTEST_ARGS[@]}" 2>&1 | tee "$TMP_OUT"
+EXIT_CODE=${PIPESTATUS[0]}
+
+if [[ $EXIT_CODE -ne 0 ]]; then
+    rm -f "$TMP_OUT"
     echo ""
-    echo "Tests FAILED — skipping coverage report."
-    exit 1
+    echo "Tests FAILED — skipping coverage summary."
+    exit $EXIT_CODE
 fi
-
-echo ""
-echo "All tests passed — generating coverage report..."
-echo ""
-
-COVERAGE_OUTPUT=$(venv/bin/python -m pytest \
-    tests/bdd \
-    --no-header -q \
-    --cov=app \
-    --cov-report=term-missing \
-    --cov-config=pyproject.toml \
-    2>&1)
-
-echo "$COVERAGE_OUTPUT" | grep -E "^(app/|Name|------|----|TOTAL)"
 
 echo ""
 echo "--- Coverage warnings (< ${COVERAGE_THRESHOLD}%) ---"
@@ -66,7 +72,8 @@ while IFS= read -r line; do
             WARNINGS+=("$(printf "%03d %s" "$pct" "$module")")
         fi
     fi
-done <<< "$COVERAGE_OUTPUT"
+done < "$TMP_OUT"
+rm -f "$TMP_OUT"
 
 if [[ "${#WARNINGS[@]}" -eq 0 ]]; then
     echo "  All modules are above ${COVERAGE_THRESHOLD}% line coverage."

@@ -21,6 +21,9 @@ Feature: Create a feature instance on a project
       | user           | role          |
       | admin@test.com | administrator |
       | user@test.com  | viewer        |
+    And the projects table contains:
+      | id   | name    | status |
+      | 0100 | Project | active |
 
   Scenario: POST /feature-instances/projects/0100/features as admin — the instance is created
     Given I am authenticated as an administrator: user.id 0001

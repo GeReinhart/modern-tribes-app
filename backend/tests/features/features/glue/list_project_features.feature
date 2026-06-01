@@ -21,6 +21,12 @@ Feature: List project feature instances
       | user           | role          |
       | admin@test.com | administrator |
       | user@test.com  | viewer        |
+    And the projects table contains:
+      | id   | name    | status |
+      | 0100 | Project | active |
+    And the projects_features table contains:
+      | id   | project_id | name  | feature_type | status |
+      | 0010 | 0100       | Board | kanban       | active |
 
   Scenario: GET /feature-instances/projects/0100/features as admin — feature instances are returned
     Given I am authenticated as an administrator: user.id 0001

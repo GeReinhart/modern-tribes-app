@@ -28,6 +28,9 @@ Feature: Remove a bookmark
 
   Scenario: DELETE /bookmarks/0010 as viewer — bookmark is removed
     Given I am authenticated as a regular user: user.id 0002
+    And the user_bookmarks table contains:
+      | id   | user_id | page_path   | page_title | display_order | status |
+      | 0010 | 0002    | /tribes/abc | Eng        | 1             | active |
     When I DELETE /api/features/bookmarks/0010
     Then the response status code is 204
 

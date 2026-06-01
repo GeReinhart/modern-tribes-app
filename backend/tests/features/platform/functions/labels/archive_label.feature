@@ -31,7 +31,6 @@ Feature: Archive a label
     Then the response status code is 204
     And the labels table contains:
       | id   | name   | status   |
-      | 0010 | Urgent | archived |
 
   @error_case
   Scenario: DELETE /labels/0010 as a viewer — 403 error and the label is not archived

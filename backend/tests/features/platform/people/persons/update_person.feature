@@ -49,6 +49,9 @@ Feature: Update a person
     And the persons table contains:
       | id   | first_name | last_name | gender | status |
       | 0010 | Alice      | Dupont    | female | active |
+    And the represents table contains:
+      | user_id | person_id | status |
+      | 0003    | 0010      | active |
     When I PUT /api/platform/functions/people/persons/0010 with body:
       """
       {
