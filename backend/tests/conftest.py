@@ -90,6 +90,59 @@ class FakeRepresentsStore(FakeStore):
     pass
 
 
+class FakeDocumentsStore(FakeStore):
+    pass
+
+
+class FakeLabelsStore(FakeStore):
+    pass
+
+
+class FakeRolesStore(FakeStore):
+    pass
+
+
+class FakeAppConfigStore(FakeStore):
+    pass
+
+
+class FakeMailsStore(FakeStore):
+    pass
+
+
+class FakeTribesStore(FakeStore):
+    pass
+
+
+class FakeProjectsStore(FakeStore):
+    pass
+
+
+class FakePositionsStore(FakeStore):
+    pass
+
+
+def _make_mock_pool(*fetchrow_values, fetch_return=None):
+    """Return a pool mock supporting `async with pool.acquire() as conn:`."""
+    call_count = [0]
+    values = list(fetchrow_values)
+
+    async def _fake_fetchrow(*args, **kwargs):
+        idx = call_count[0]
+        call_count[0] += 1
+        return values[idx] if idx < len(values) else None
+
+    mock_conn = AsyncMock()
+    mock_conn.fetchrow.side_effect = _fake_fetchrow
+    mock_conn.fetch.return_value = fetch_return if fetch_return is not None else []
+    mock_conn.execute.return_value = None
+    mock_conn.fetchval.return_value = None
+    mock_pool = MagicMock()
+    mock_pool.acquire.return_value.__aenter__ = AsyncMock(return_value=mock_conn)
+    mock_pool.acquire.return_value.__aexit__ = AsyncMock(return_value=None)
+    return mock_pool
+
+
 def _make_fake_create_document(store: FakeStore, table_name: str):
     async def fake_create_document(pool, table, data):
         now = datetime(2024, 1, 1, 0, 0, 0)
@@ -149,6 +202,46 @@ def created_users_store() -> FakeUsersStore:
 @pytest.fixture
 def represents_store() -> FakeRepresentsStore:
     return FakeRepresentsStore()
+
+
+@pytest.fixture
+def documents_store() -> FakeDocumentsStore:
+    return FakeDocumentsStore()
+
+
+@pytest.fixture
+def labels_store() -> FakeLabelsStore:
+    return FakeLabelsStore()
+
+
+@pytest.fixture
+def managed_roles_store() -> FakeRolesStore:
+    return FakeRolesStore()
+
+
+@pytest.fixture
+def app_config_store() -> FakeAppConfigStore:
+    return FakeAppConfigStore()
+
+
+@pytest.fixture
+def mails_store() -> FakeMailsStore:
+    return FakeMailsStore()
+
+
+@pytest.fixture
+def tribes_store() -> FakeTribesStore:
+    return FakeTribesStore()
+
+
+@pytest.fixture
+def projects_store() -> FakeProjectsStore:
+    return FakeProjectsStore()
+
+
+@pytest.fixture
+def positions_store() -> FakePositionsStore:
+    return FakePositionsStore()
 
 
 @pytest.fixture

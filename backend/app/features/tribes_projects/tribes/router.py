@@ -47,9 +47,8 @@ async def get_tribe(tribe_id: str, current_user: dict = Depends(get_current_user
     return await get_document_by_id(pool, TABLE, tribe_id, ENTITY_NAME)
 
 
-# @require_all_permissions_decorator(PermissionEnum.ADMIN, "specific_permission")
-@require_permission_decorator(PermissionEnum.ADMIN)
 @router.post("/", response_model=Tribe, status_code=status.HTTP_201_CREATED)
+@require_permission_decorator(PermissionEnum.ADMIN)
 async def create_tribe(tribe: TribeCreate, current_user: dict = Depends(get_current_user)):
     """Create a new tribe"""
     pool = get_database()
