@@ -217,3 +217,38 @@ def given_positions_table(positions_store: FakePositionsStore, datatable):
 @then("the positions table contains:")
 def then_positions_table(positions_store: FakePositionsStore, datatable):
     assert_table(positions_store.all(), datatable, "positions")
+
+
+@given("the tribes_projects table contains:")
+def given_tribes_projects_table(datatable):
+    pass
+
+
+@given("the projects_features table contains:")
+def given_projects_features_table(datatable):
+    pass
+
+
+@given("the kanban_columns table contains:")
+def given_kanban_columns_table(datatable):
+    pass
+
+
+@given("the kanban_cards table contains:")
+def given_kanban_cards_table(datatable):
+    pass
+
+
+@given("the todo_items table contains:")
+def given_todo_items_table(datatable):
+    pass
+
+
+@then("the response body is:")
+def check_response_body(context, docstring):
+    import json
+    expected = expand_json_ids(json.loads(docstring))
+    actual = context["response"].json()
+    assert actual == expected, (
+        f"Expected:\n{json.dumps(expected, indent=2)}\nActual:\n{json.dumps(actual, indent=2)}"
+    )
