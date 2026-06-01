@@ -7,7 +7,7 @@ from app.platform.core.app_config.models import AppConfigPublic
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.utils.db_helpers import get_all_documents
 
-router = APIRouter(prefix="/app-config", tags=["query_app_config"])
+router = APIRouter(prefix="/app-config", tags=["platform_core_query_app_config"])
 
 
 @router.get("/", response_model=List[AppConfigPublic])

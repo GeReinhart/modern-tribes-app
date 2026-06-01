@@ -18,7 +18,7 @@ from app.platform.core.utils.db_helpers import resolve_url_param_id
 from app.platform.core.authorization.ownership import check_own_tribe_position_or_admin
 from app.platform.core.authorization.project_access import check_project_access_or_admin
 
-router = APIRouter(prefix="/projects", tags=["app_projects"])
+router = APIRouter(prefix="/projects", tags=["features_tribes_projects"])
 
 
 @router.post(

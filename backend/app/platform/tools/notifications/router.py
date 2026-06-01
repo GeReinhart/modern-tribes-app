@@ -13,7 +13,7 @@ from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_permission_decorator
 from app.platform.tools.notifications import service as notification_service
 
-router = APIRouter(prefix="/notifications", tags=["app_notifications"])
+router = APIRouter(prefix="/notifications", tags=["platform_tools"])
 
 
 @router.post("/admin", response_model=NotificationResponse, status_code=status.HTTP_201_CREATED)

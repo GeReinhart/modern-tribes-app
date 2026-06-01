@@ -9,7 +9,7 @@ from app.platform.core.authorization.models import Authorization, PermissionEnum
 from app.platform.core.authorization.ownership import check_own_tribe_position_or_admin
 from app.platform.core.authorization.permissions import get_user_permissions
 
-router = APIRouter(prefix="/authorization", tags=["authorization"])
+router = APIRouter(prefix="/authorization", tags=["platform_core"])
 
 
 # ============ HELPER FUNCTION ============

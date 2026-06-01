@@ -18,7 +18,7 @@ from app.platform.functions.publications import service as publication_service
 from app.platform.core.utils.db_helpers import resolve_url_param_id
 from app.platform.core.authorization.project_access import check_project_access_or_admin
 
-router = APIRouter(prefix="/project-documents", tags=["app_project_documents"])
+router = APIRouter(prefix="/project-documents", tags=["features_tribes_projects"])
 
 
 @router.get("/projects/{project_id}/documents", response_model=List[ProjectDocumentSummary])

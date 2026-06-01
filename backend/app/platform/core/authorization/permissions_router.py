@@ -19,7 +19,7 @@ from app.platform.core.utils.db_helpers import (
     update_document,
 )
 
-router = APIRouter(prefix="/permissions", tags=["crud_permissions"])
+router = APIRouter(prefix="/permissions", tags=["platform_core"])
 
 TABLE = "permissions"
 ENTITY_NAME = "Permission"

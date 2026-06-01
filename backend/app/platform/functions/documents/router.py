@@ -19,7 +19,7 @@ from app.platform.core.utils.db_helpers import (
 )
 from app.platform.core.utils.document_helpers import extract_content_summary, strip_html
 
-router = APIRouter(prefix="/documents", tags=["crud_documents"])
+router = APIRouter(prefix="/documents", tags=["platform_documents"])
 
 TABLE = "documents"
 ENTITY_NAME = "Document"

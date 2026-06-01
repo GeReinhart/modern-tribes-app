@@ -8,7 +8,7 @@ from app.platform.core.uploads.files import UploadFileResponse
 from app.platform.core.uploads.file_handler import file_handler
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/uploads", tags=["upload"])
+router = APIRouter(prefix="/uploads", tags=["platform_core"])
 
 
 @router.post("/image")

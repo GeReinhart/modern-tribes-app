@@ -10,7 +10,7 @@ from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 
-router = APIRouter(prefix="/feature-instances", tags=["query_feature_instances"])
+router = APIRouter(prefix="/feature-instances", tags=["features_glue"])
 
 
 class AdminFeatureEntry(BaseModel):

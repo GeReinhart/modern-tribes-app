@@ -17,7 +17,7 @@ from app.features.tasks.kanban.models import (
     LabelCreate, LabelUpdate,
 )
 
-router = APIRouter(prefix="/kanban", tags=["feature_kanban"])
+router = APIRouter(prefix="/kanban", tags=["features_tasks_kanban"])
 
 
 def _column(row: dict) -> KanbanColumnResponse:

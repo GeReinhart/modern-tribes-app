@@ -12,7 +12,7 @@ from app.platform.core.authorization.router import require_any_permission_decora
 from app.platform.core.utils.db_helpers import resolve_url_param_id
 from app.platform.core.authorization.ownership import check_own_user_or_admin
 
-router = APIRouter(prefix="/tribes", tags=["query_tribes"])
+router = APIRouter(prefix="/tribes", tags=["features_tribes_projects"])
 
 _QUERY = """
     SELECT

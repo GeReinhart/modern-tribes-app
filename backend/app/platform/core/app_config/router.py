@@ -17,7 +17,7 @@ from app.platform.core.utils.db_helpers import (
     update_document,
 )
 
-router = APIRouter(prefix="/app-config", tags=["crud_app_config"])
+router = APIRouter(prefix="/app-config", tags=["platform_core"])
 
 TABLE = "app_config"
 ENTITY_NAME = "AppConfig"

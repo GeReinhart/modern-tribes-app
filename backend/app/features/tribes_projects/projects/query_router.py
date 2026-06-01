@@ -12,7 +12,7 @@ from app.platform.core.authorization.router import require_any_permission_decora
 from app.platform.core.utils.db_helpers import resolve_url_param_id
 from app.platform.core.authorization.ownership import check_own_user_or_admin
 
-router = APIRouter(prefix="/projects", tags=["query_projects"])
+router = APIRouter(prefix="/projects", tags=["features_tribes_projects"])
 
 _POSITION_RANK = {"guest": 0, "member": 1, "manager": 2}
 

@@ -10,7 +10,7 @@ from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_permission_decorator
 
-router = APIRouter(prefix="/monitoring", tags=["query_monitoring"])
+router = APIRouter(prefix="/monitoring", tags=["platform_monitoring"])
 
 
 class RecentChange(BaseModel):

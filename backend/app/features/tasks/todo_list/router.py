@@ -15,8 +15,8 @@ from app.features.tasks.todo_list.models import (
     TodoLabel, TodoLabelCreate, TodoLabelUpdate, PersonOption,
 )
 
-router = APIRouter(prefix="/todo-items", tags=["feature_todo_list"])
-label_router = APIRouter(prefix="/todo-labels", tags=["feature_todo_list"])
+router = APIRouter(prefix="/todo-items", tags=["features_tasks_todo_list"])
+label_router = APIRouter(prefix="/todo-labels", tags=["features_tasks_todo_list"])
 
 
 async def _get_project_id(conn, feature_instance_id: str) -> str:

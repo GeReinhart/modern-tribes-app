@@ -20,7 +20,7 @@ from app.platform.core.utils.db_helpers import (
     update_document,
 )
 
-router = APIRouter(prefix="/roles", tags=["crud_roles"])
+router = APIRouter(prefix="/roles", tags=["platform_core"])
 
 TABLE = "roles"
 ENTITY_NAME = "Role"

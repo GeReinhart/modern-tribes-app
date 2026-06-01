@@ -18,7 +18,7 @@ from app.platform.core.utils.db_helpers import (
     update_document,
 )
 
-router = APIRouter(prefix="/labels", tags=["crud_labels"])
+router = APIRouter(prefix="/labels", tags=["platform_labels"])
 
 TABLE = "labels"
 ENTITY_NAME = "Label"

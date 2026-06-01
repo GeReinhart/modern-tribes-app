@@ -9,7 +9,7 @@ from app.platform.functions.people.users import repository as user_repo
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_permission_decorator
 
-router = APIRouter(prefix="/users", tags=["query_users"])
+router = APIRouter(prefix="/users", tags=["platform_people"])
 
 ENTITY_NAME = "User"
 

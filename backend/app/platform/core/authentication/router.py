@@ -23,7 +23,7 @@ from app.platform.core.authentication.security import create_magic_token
 from app.platform.core.authorization.permissions import get_user_permissions
 from app.platform.core.utils.db_helpers import create_document
 
-router = APIRouter(prefix="/authentication", tags=["authentication"])
+router = APIRouter(prefix="/authentication", tags=["platform_core"])
 security = HTTPBearer()
 
 

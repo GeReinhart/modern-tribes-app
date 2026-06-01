@@ -13,7 +13,7 @@ from app.features.tribes_projects.tribes import service as tribe_service
 from app.platform.core.utils.db_helpers import resolve_url_param_id
 from app.platform.core.authorization.ownership import check_own_tribe_position_or_admin
 
-router = APIRouter(prefix="/tribes", tags=["app_tribes"])
+router = APIRouter(prefix="/tribes", tags=["features_tribes_projects"])
 
 
 @router.post(

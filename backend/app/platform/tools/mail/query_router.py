@@ -8,7 +8,7 @@ from app.platform.tools.mail.models import MailWithRecipients
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_permission_decorator
 
-router = APIRouter(prefix="/mail", tags=["tools_mail"])
+router = APIRouter(prefix="/mail", tags=["platform_tools"])
 
 _QUERY = """
 SELECT

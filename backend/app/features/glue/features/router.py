@@ -16,7 +16,7 @@ from app.platform.core.authorization.router import require_any_permission_decora
 from app.platform.core.utils.db_helpers import resolve_url_param_id
 from app.platform.core.authorization.project_access import check_project_access_or_admin
 
-router = APIRouter(prefix="/feature-instances", tags=["app_feature_instances"])
+router = APIRouter(prefix="/feature-instances", tags=["features_glue"])
 
 
 @router.get("/feature-types", response_model=list[FeatureTypeInfo])

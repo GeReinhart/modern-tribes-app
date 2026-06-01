@@ -10,7 +10,7 @@ from app.platform.core.authorization.router import require_any_permission_decora
 from app.platform.core.authorization.permissions import get_user_permissions
 from app.platform.functions.search import repository as search_repository
 
-router = APIRouter(prefix="/search", tags=["query_search"])
+router = APIRouter(prefix="/search", tags=["platform_search"])
 
 
 class SearchResult(BaseModel):

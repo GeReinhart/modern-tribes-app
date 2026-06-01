@@ -7,7 +7,7 @@ from app.platform.functions.labels import repository as repo
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 
-router = APIRouter(prefix="/labels", tags=["query_labels"])
+router = APIRouter(prefix="/labels", tags=["platform_labels"])
 
 
 class LabelSuggestion(BaseModel):

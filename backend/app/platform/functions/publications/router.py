@@ -10,7 +10,7 @@ from app.platform.core.authorization.router import require_any_permission_decora
 from app.platform.functions.publications import service as publication_service
 from app.platform.core.utils.db_helpers import resolve_url_param_id
 
-router = APIRouter(prefix="/publications", tags=["app_publications"])
+router = APIRouter(prefix="/publications", tags=["platform_publications"])
 
 
 @router.get("/", response_model=List[PublicationAdminItem])

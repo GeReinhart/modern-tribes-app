@@ -22,7 +22,7 @@ from app.platform.core.utils.db_helpers import (
 )
 from app.platform.core.utils.validators import EntityValidator
 
-router = APIRouter(prefix="/tribes", tags=["crud_tribes"])
+router = APIRouter(prefix="/tribes", tags=["features_tribes_projects"])
 
 TABLE = "tribes"
 ENTITY_NAME = "Tribe"

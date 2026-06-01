@@ -28,7 +28,7 @@ from app.platform.core.utils.db_helpers import (
 from app.platform.core.authorization.ownership import check_own_user_or_admin
 from app.platform.core.utils.validators import EntityValidator
 
-router = APIRouter(prefix="/users", tags=["crud_users"])
+router = APIRouter(prefix="/users", tags=["platform_people"])
 
 TABLE = "users"
 ENTITY_NAME = "User"
