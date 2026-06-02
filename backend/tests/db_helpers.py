@@ -60,15 +60,34 @@ async def _create_db_if_needed():
         await conn.close()
 
 
-def _run_alembic():
-    env = {**os.environ, "POSTGRES_DB": TEST_DB_NAME, "POSTGRES_PORT": str(TEST_DB_PORT)}
-    result = subprocess.run(
+def _alembic_upgrade(env: dict) -> subprocess.CompletedProcess:
+    return subprocess.run(
         ["./venv/bin/python", "-m", "alembic", "upgrade", "head"],
         cwd=_BACKEND_DIR,
         env=env,
         capture_output=True,
         text=True,
     )
+
+
+async def _reset_schema():
+    conn = await asyncpg.connect(
+        f"postgresql://admin:password123@localhost:{TEST_DB_PORT}/{TEST_DB_NAME}",
+        timeout=_CONNECT_TIMEOUT,
+    )
+    try:
+        await conn.execute("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
+    finally:
+        await conn.close()
+
+
+def _run_alembic():
+    env = {**os.environ, "POSTGRES_DB": TEST_DB_NAME, "POSTGRES_PORT": str(TEST_DB_PORT)}
+    result = _alembic_upgrade(env)
+    if result.returncode != 0:
+        print("\n[test-db] Migration conflict detected; resetting schema...", flush=True)
+        asyncio.run(_reset_schema())
+        result = _alembic_upgrade(env)
     if result.returncode != 0:
         raise RuntimeError(f"Alembic upgrade failed:\n{result.stderr}")
 
