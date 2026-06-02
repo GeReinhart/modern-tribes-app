@@ -199,7 +199,10 @@ ORDER BY updated_at DESC
 @router.get("/documents/{document_id}/revisions", response_model=List[DocumentRevision])
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_document_revisions(document_id: str, current_user: dict = Depends(get_current_user)):
-    """Get all revision snapshots for a document, current version first"""
+    """Get all revision snapshots for a document, current version first.
+
+    **Permissions:** admin
+    """
     try:
         uid = UUID(document_id)
     except (ValueError, AttributeError):
@@ -228,7 +231,10 @@ async def get_recent_changes(
     status: Optional[str] = Query(default=None),
     current_user: dict = Depends(get_current_user),
 ):
-    """Get recent changes across all entities within the last N hours"""
+    """Get recent changes across all entities within the last N hours.
+
+    **Permissions:** admin
+    """
     pool = get_database()
     async with pool.acquire() as conn:
         rows = await conn.fetch(_QUERY, hours, user_email or None, status or None)

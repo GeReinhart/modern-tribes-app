@@ -21,6 +21,10 @@ async def list_publications_admin(
     project_id: Optional[str] = Query(None),
     current_user: dict = Depends(get_current_user),
 ):
+    """List all publications (admin view).
+
+    **Permissions:** admin
+    """
     pool = get_database()
     return await publication_service.list_publications_admin(pool, q, tribe_id, project_id)
 
@@ -31,6 +35,10 @@ async def delete_publication(
     publication_id: str,
     current_user: dict = Depends(get_current_user),
 ):
+    """Unpublish and delete a publication.
+
+    **Permissions:** admin
+    """
     pool = get_database()
     publication_id = await resolve_url_param_id(pool, "publications", publication_id)
     await publication_service.admin_unpublish(publication_id, pool)

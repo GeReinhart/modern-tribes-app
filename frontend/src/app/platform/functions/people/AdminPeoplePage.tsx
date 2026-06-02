@@ -702,6 +702,7 @@ const PeopleManagementPageContent: React.FC = () => {
   const { t } = useTranslation();
   const { user, isLoading } = useCurrentUserProfile();
   const [activeTab, setActiveTab] = useState<TabKey>('users');
+  const canManagePeople = user?.permissions?.includes('can_manage_people') ?? false;
 
   const breadcrumbs = useMemo(
     () => [
@@ -722,7 +723,7 @@ const PeopleManagementPageContent: React.FC = () => {
 
   const headerActions = <AdminNavigation currentPage="people" />;
 
-  if (!isLoading && !user?.permissions?.includes('admin')) {
+  if (!isLoading && !user?.permissions?.includes('admin') && !canManagePeople) {
     return <Navigate to="/app" replace />;
   }
 

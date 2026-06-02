@@ -156,7 +156,10 @@ def _deduplicate(rows, user_id: str) -> List[UserProjectEntry]:
 @router.get("/by/user/{user_id}", response_model=List[UserProjectEntry])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_projects_by_user(user_id: str, current_user: dict = Depends(get_current_user)):
-    """Get all active projects accessible to a user, with effective position per path."""
+    """Get all active projects accessible to a user, with effective position per path.
+
+    **Permissions:** admin | can_access_attached_tribes (own user only)
+    """
     pool = get_database()
     user_id = await resolve_url_param_id(pool, "users", user_id)
     await check_own_user_or_admin(user_id, current_user, pool)
@@ -178,6 +181,10 @@ async def get_tribes_for_project(
     project_id: str,
     current_user: dict = Depends(get_current_user),
 ):
+    """Get all tribes linked to a project.
+
+    **Permissions:** admin
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     async with pool.acquire() as conn:
@@ -201,7 +208,10 @@ async def get_projects_by_tribe_for_user(
     user_id: str,
     current_user: dict = Depends(get_current_user),
 ):
-    """Get all active projects in a tribe accessible to a user, with effective position per path."""
+    """Get all active projects in a tribe accessible to a user, with effective position per path.
+
+    **Permissions:** admin | can_access_attached_tribes (own user only)
+    """
     pool = get_database()
     user_id = await resolve_url_param_id(pool, "users", user_id)
     tribe_id = await resolve_url_param_id(pool, "tribes", tribe_id)

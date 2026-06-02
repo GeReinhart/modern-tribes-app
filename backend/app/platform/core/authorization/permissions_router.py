@@ -28,7 +28,10 @@ ENTITY_NAME = "Permission"
 @router.get("/", response_model=List[Permission])
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_permissions(current_user: dict = Depends(get_current_user)):
-    """Get all permissions"""
+    """Get all permissions
+
+    **Permissions:** admin
+    """
     pool = get_database()
     return await get_all_documents(pool, TABLE, any_status=True)
 
@@ -36,7 +39,10 @@ async def get_permissions(current_user: dict = Depends(get_current_user)):
 @router.get("/{permission_id}", response_model=Permission)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_permission(permission_id: str, current_user: dict = Depends(get_current_user)):
-    """Get a specific permission by ID"""
+    """Get a specific permission by ID
+
+    **Permissions:** admin
+    """
     pool = get_database()
     return await get_document_by_id(pool, TABLE, permission_id, ENTITY_NAME)
 
@@ -44,7 +50,10 @@ async def get_permission(permission_id: str, current_user: dict = Depends(get_cu
 @router.post("/", response_model=Permission, status_code=status.HTTP_201_CREATED)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def create_permission(permission: PermissionCreate, current_user: dict = Depends(get_current_user)):
-    """Create a new permission"""
+    """Create a new permission
+
+    **Permissions:** admin
+    """
     pool = get_database()
 
     # Check if permission name already exists
@@ -64,7 +73,10 @@ async def create_permission(permission: PermissionCreate, current_user: dict = D
 async def update_permission(
     permission_id: str, permission: PermissionUpdate, current_user: dict = Depends(get_current_user)
 ):
-    """Update an existing permission"""
+    """Update an existing permission
+
+    **Permissions:** admin
+    """
     pool = get_database()
 
     # Check if permission exists
@@ -90,7 +102,10 @@ async def update_permission(
 @router.delete("/{permission_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def delete_permission(permission_id: str, current_user: dict = Depends(get_current_user)):
-    """Delete a permission"""
+    """Delete a permission
+
+    **Permissions:** admin
+    """
     pool = get_database()
 
     # Check referential integrity
@@ -110,7 +125,10 @@ async def delete_permission(permission_id: str, current_user: dict = Depends(get
 @router.get("/{permission_id}/roles")
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_permission_roles(permission_id: str, current_user: dict = Depends(get_current_user)):
-    """Get all members in a permission"""
+    """Get all roles assigned to a permission
+
+    **Permissions:** admin
+    """
     pool = get_database()
 
     # Check if permission exists and get it

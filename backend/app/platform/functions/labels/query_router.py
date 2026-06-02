@@ -20,6 +20,10 @@ class LabelSuggestion(BaseModel):
 @router.get("/search", response_model=list[LabelSuggestion])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def search_labels(name: str = "", current_user: dict = Depends(get_current_user)):
+    """Search labels by name prefix.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     if not name.strip():
         return []
     pool = get_database()

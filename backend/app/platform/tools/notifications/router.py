@@ -22,6 +22,10 @@ async def admin_create_notification(
     payload: NotificationCreate,
     current_user: dict = Depends(get_current_user),
 ):
+    """Create a notification for a specific user (admin only).
+
+    **Permissions:** admin
+    """
     pool = get_database()
     return await notification_service.create_for_user(
         pool,
@@ -33,6 +37,10 @@ async def admin_create_notification(
 
 @router.get("/pending", response_model=List[NotificationResponse])
 async def get_pending_notifications(current_user: dict = Depends(get_current_user)):
+    """Get all pending notifications for the current user.
+
+    **Permissions:** authentication required — no specific permission
+    """
     pool = get_database()
     return await notification_service.list_pending(pool, current_user["id"])
 
@@ -43,6 +51,10 @@ async def report_notification_status(
     payload: NotificationStatusUpdate,
     current_user: dict = Depends(get_current_user),
 ):
+    """Update the status of a notification.
+
+    **Permissions:** authentication required — no specific permission
+    """
     pool = get_database()
     return await notification_service.report_status(
         pool,

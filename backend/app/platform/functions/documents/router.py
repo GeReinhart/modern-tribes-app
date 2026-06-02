@@ -28,7 +28,10 @@ ENTITY_NAME = "Document"
 @router.get("/", response_model=List[Document])
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_documents(current_user: dict = Depends(get_current_user)):
-    """Get all documents"""
+    """Get all documents
+
+    **Permissions:** admin
+    """
     pool = get_database()
     return await get_all_documents(pool, TABLE, any_status=True)
 
@@ -36,7 +39,10 @@ async def get_documents(current_user: dict = Depends(get_current_user)):
 @router.get("/{document_id}", response_model=Document)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_document(document_id: str, current_user: dict = Depends(get_current_user)):
-    """Get a specific document by ID"""
+    """Get a specific document by ID
+
+    **Permissions:** admin
+    """
     pool = get_database()
     return await get_document_by_id(pool, TABLE, document_id, ENTITY_NAME)
 
@@ -44,7 +50,10 @@ async def get_document(document_id: str, current_user: dict = Depends(get_curren
 @router.post("/", response_model=Document, status_code=status.HTTP_201_CREATED)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def create_document_endpoint(document: DocumentCreate, current_user: dict = Depends(get_current_user)):
-    """Create a new document"""
+    """Create a new document
+
+    **Permissions:** admin
+    """
     pool = get_database()
 
     # Create document
@@ -61,7 +70,10 @@ async def create_document_endpoint(document: DocumentCreate, current_user: dict 
 async def update_document_endpoint(
     document_id: str, document: DocumentUpdate, current_user: dict = Depends(get_current_user)
 ):
-    """Update an existing document"""
+    """Update an existing document
+
+    **Permissions:** admin
+    """
     pool = get_database()
 
     current_doc = await check_document_exists(pool, TABLE, document_id, ENTITY_NAME)
@@ -90,7 +102,10 @@ async def update_document_endpoint(
 @router.delete("/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def delete_document_endpoint(document_id: str, current_user: dict = Depends(get_current_user)):
-    """Delete a document"""
+    """Delete a document
+
+    **Permissions:** admin
+    """
     pool = get_database()
     await delete_document(pool, TABLE, document_id, ENTITY_NAME)
     return None

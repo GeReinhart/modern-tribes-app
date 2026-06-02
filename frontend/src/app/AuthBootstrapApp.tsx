@@ -1,4 +1,5 @@
 import ProtectedRoute from '@/app/platform/core/authentication/ProtectedRoute.tsx';
+import { useAdminAccess } from '@/app/platform/core/authorization/useAdminAccess.ts';
 import { ErrorBoundary } from '@/app/platform/core/layout/ErrorBoundary.tsx';
 import { NotificationsPoller } from '@/app/platform/tools/notifications/NotificationsPoller.tsx';
 import { AppConfigProvider } from '@/app/platform/core/app-config/AppConfigContext.tsx';
@@ -40,7 +41,16 @@ import Verify from '@/app/platform/core/authentication/VerifyPage.tsx';
 import { PublicationDetailPage } from '@/app/platform/functions/publications/PublicationDetailPage.tsx';
 import { PublicationsPage } from '@/app/platform/functions/publications/PublicationsPage.tsx';
 
+import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+
+const AdminLandingRedirect: React.FC = () => {
+  const { isAdmin, canManagePeople, isLoading } = useAdminAccess();
+  if (isLoading) return null;
+  if (isAdmin) return <Navigate to="/admin/monitoring" replace />;
+  if (canManagePeople) return <Navigate to="/admin/people" replace />;
+  return <Navigate to="/app" replace />;
+};
 
 function AuthBootstrapApp() {
   return (
@@ -71,7 +81,7 @@ function AuthBootstrapApp() {
                     <Route element={<ProtectedRoute />}>
                       <Route
                         path="/admin"
-                        element={<Navigate to="/admin/monitoring" replace />}
+                        element={<AdminLandingRedirect />}
                       />
                       <Route
                         path="/admin/people"

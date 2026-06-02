@@ -9,7 +9,10 @@ from app.features.tribes_projects.models import TribeProject, TribeProjectInput
 from app.features.tribes_projects.tribes.models import Tribe, TribeCreate, TribeUpdate
 from app.features.tribes_projects.tribes import repository as tribe_repo
 from app.platform.core.authentication.router import get_current_user
-from app.platform.core.authorization.router import require_permission_decorator
+from app.platform.core.authorization.router import (
+    require_any_permission_decorator,
+    require_permission_decorator,
+)
 from app.platform.core.utils.db_helpers import (
     check_document_exists,
     check_unique_field,
@@ -29,19 +32,23 @@ ENTITY_NAME = "Tribe"
 
 
 @router.get("/", response_model=List[Tribe])
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def get_tribes(current_user: dict = Depends(get_current_user)):
-    """Get all tribes"""
+    """Get all tribes
 
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     return await get_all_documents(pool, TABLE, any_status=True)
 
 
 @router.get("/{tribe_id}", response_model=Tribe)
-@require_permission_decorator(PermissionEnum.ADMIN)
-# @require_any_permission_decorator(PermissionEnum.ADMIN, Permission.CAN_CRUD_OWN_TRIBES)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def get_tribe(tribe_id: str, current_user: dict = Depends(get_current_user)):
-    """Get a specific tribe by ID"""
+    """Get a specific tribe by ID
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
     return await get_document_by_id(pool, TABLE, tribe_id, ENTITY_NAME)
@@ -50,7 +57,10 @@ async def get_tribe(tribe_id: str, current_user: dict = Depends(get_current_user
 @router.post("/", response_model=Tribe, status_code=status.HTTP_201_CREATED)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def create_tribe(tribe: TribeCreate, current_user: dict = Depends(get_current_user)):
-    """Create a new tribe"""
+    """Create a new tribe
+
+    **Permissions:** admin
+    """
     pool = get_database()
     validator = EntityValidator(pool)
 
@@ -74,7 +84,10 @@ async def create_tribe(tribe: TribeCreate, current_user: dict = Depends(get_curr
 @router.put("/{tribe_id}", response_model=Tribe)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def update_tribe(tribe_id: str, tribe: TribeUpdate, current_user: dict = Depends(get_current_user)):
-    """Update an existing tribe"""
+    """Update an existing tribe
+
+    **Permissions:** admin
+    """
     pool = get_database()
     tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
     validator = EntityValidator(pool)
@@ -104,7 +117,10 @@ async def update_tribe(tribe_id: str, tribe: TribeUpdate, current_user: dict = D
 @router.delete("/{tribe_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def delete_tribe(tribe_id: str, current_user: dict = Depends(get_current_user)):
-    """Delete a tribe"""
+    """Delete a tribe
+
+    **Permissions:** admin
+    """
     pool = get_database()
     tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
     await delete_document(pool, TABLE, tribe_id, ENTITY_NAME)
@@ -114,7 +130,10 @@ async def delete_tribe(tribe_id: str, current_user: dict = Depends(get_current_u
 @router.get("/{tribe_id}/positions")
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_tribe_positions(tribe_id: str, current_user: dict = Depends(get_current_user)):
-    """Get all positions in a tribe"""
+    """Get all positions in a tribe
+
+    **Permissions:** admin
+    """
     pool = get_database()
     tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
 
@@ -135,9 +154,12 @@ async def get_tribe_positions(tribe_id: str, current_user: dict = Depends(get_cu
 
 
 @router.get("/{tribe_id}/projects", response_model=List[TribeProject])
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def get_tribe_projects(tribe_id: str, current_user: dict = Depends(get_current_user)):
-    """Get all project relations for a tribe"""
+    """Get all project relations for a tribe
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
     await check_document_exists(pool, TABLE, tribe_id, ENTITY_NAME)
@@ -145,11 +167,14 @@ async def get_tribe_projects(tribe_id: str, current_user: dict = Depends(get_cur
 
 
 @router.put("/{tribe_id}/projects", response_model=List[TribeProject])
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def sync_tribe_projects(
     tribe_id: str, projects: List[TribeProjectInput], current_user: dict = Depends(get_current_user)
 ):
-    """Replace all project relations for a tribe"""
+    """Replace all project relations for a tribe
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
     await check_document_exists(pool, TABLE, tribe_id, ENTITY_NAME)
@@ -164,7 +189,10 @@ async def sync_tribe_projects(
 @router.get("/{tribe_id}/persons")
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_tribe_persons(tribe_id: str, current_user: dict = Depends(get_current_user)):
-    """Get all persons and their positions in a tribe"""
+    """Get all persons and their positions in a tribe
+
+    **Permissions:** admin
+    """
     pool = get_database()
     tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
 

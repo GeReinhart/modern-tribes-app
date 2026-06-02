@@ -30,24 +30,41 @@ ENTITY_NAME = "Person"
 
 @router.get("/", response_model=List[Person])
 @require_any_permission_decorator(
-    PermissionEnum.ADMIN, PermissionEnum.CAN_CREATE_OWN_TRIBES, PermissionEnum.CAN_ACCESS_OWN_TRIBES
+    PermissionEnum.ADMIN,
+    PermissionEnum.CAN_CREATE_OWN_TRIBES,
+    PermissionEnum.CAN_ACCESS_OWN_TRIBES,
+    PermissionEnum.CAN_MANAGE_PEOPLE,
 )
 async def get_persons(current_user: dict = Depends(get_current_user)):
+    """Get all persons.
+
+    **Permissions:** admin | can_create_own_tribes | can_access_attached_tribes | can_manage_people
+    """
     pool = get_database()
     return await get_all_documents(pool, TABLE, any_status=True)
 
 
 @router.get("/{person_id}", response_model=Person)
-@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_OWN_PROFILE)
+@require_any_permission_decorator(
+    PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_OWN_PROFILE, PermissionEnum.CAN_MANAGE_PEOPLE
+)
 async def get_person(person_id: str, current_user: dict = Depends(get_current_user)):
+    """Get a specific person by ID.
+
+    **Permissions:** admin | can_manage_own_profile (own) | can_manage_people (any)
+    """
     pool = get_database()
     await check_own_person_or_admin(person_id, current_user, pool)
     return await get_document_by_id(pool, TABLE, person_id, ENTITY_NAME)
 
 
 @router.post("/", response_model=Person, status_code=status.HTTP_201_CREATED)
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def create_person(person: PersonCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new person.
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     validator = EntityValidator(pool)
     references = (
@@ -61,8 +78,14 @@ async def create_person(person: PersonCreate, current_user: dict = Depends(get_c
 
 
 @router.put("/{person_id}", response_model=Person)
-@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_OWN_PROFILE)
+@require_any_permission_decorator(
+    PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_OWN_PROFILE, PermissionEnum.CAN_MANAGE_PEOPLE
+)
 async def update_person(person_id: str, person: PersonUpdate, current_user: dict = Depends(get_current_user)):
+    """Update a person's profile.
+
+    **Permissions:** admin | can_manage_own_profile (own) | can_manage_people (any)
+    """
     pool = get_database()
     await check_own_person_or_admin(person_id, current_user, pool)
     validator = EntityValidator(pool)
@@ -77,8 +100,12 @@ async def update_person(person_id: str, person: PersonUpdate, current_user: dict
 
 
 @router.delete("/{person_id}", status_code=status.HTTP_204_NO_CONTENT)
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def delete_person(person_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a person.
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     await delete_document(pool, TABLE, person_id, ENTITY_NAME)
     return None

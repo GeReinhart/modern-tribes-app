@@ -28,6 +28,11 @@ router = APIRouter(prefix="/projects", tags=["features_tribes_projects"])
 async def create_project_with_document(
     data: ProjectWithDocumentCreate, current_user: dict = Depends(get_current_user)
 ):
+    """Create a new project with its associated document.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Tribe access:** manager position required on the target tribe
+    """
     pool = get_database()
     await check_own_tribe_position_or_admin(data.tribe_id, current_user, pool, required_position="manager")
     resolved_tribe_id = await resolve_url_param_id(pool, "tribes", data.tribe_id)
@@ -38,6 +43,10 @@ async def create_project_with_document(
 @router.get("/{project_id}/with-document", response_model=ProjectWithDocumentResponse)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_project_with_document(project_id: str, current_user: dict = Depends(get_current_user)):
+    """Get a project with its associated document.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     return await project_service.get_project_with_document(project_id, pool)
@@ -48,6 +57,11 @@ async def get_project_with_document(project_id: str, current_user: dict = Depend
 async def update_project_with_document(
     project_id: str, data: ProjectWithDocumentUpdate, current_user: dict = Depends(get_current_user)
 ):
+    """Update a project and its associated document.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Tribe access:** manager position required on the linked tribe
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     # Verify the user is a manager of at least one tribe linked to this project
@@ -65,6 +79,11 @@ async def update_project_with_document(
 @router.get("/{project_id}/tribes-with-members", response_model=List[ProjectTribeWithMembersResponse])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_project_tribes_with_members(project_id: str, current_user: dict = Depends(get_current_user)):
+    """Get all tribes linked to a project along with their members.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** any position required
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     await check_project_access_or_admin(project_id, current_user, pool)

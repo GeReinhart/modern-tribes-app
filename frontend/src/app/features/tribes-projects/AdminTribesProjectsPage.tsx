@@ -20,6 +20,7 @@ import {
 } from '@/app/platform/core/layout/AdminNavigation.tsx';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { useAdminAccess } from '@/app/platform/core/authorization/useAdminAccess.ts';
 import { useCrudPage } from '@/app/platform/functions/documents/useCrudPage.ts';
 import { usePersons } from '@/app/platform/functions/people/persons/usePersons.ts';
 import { usePositions } from '@/app/features/tribes-projects/positions/usePositions.ts';
@@ -30,7 +31,7 @@ import { Tribe, TribeCreate, TribeUpdate } from '@/app/features/tribes-projects/
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const POSITION_COLORS: Record<string, string> = {
   manager: '#d97706',
@@ -42,7 +43,11 @@ const POSITION_COLORS: Record<string, string> = {
 
 type TribePersonEntry = { personId: string; position: string };
 
-const TribesTab: React.FC = () => {
+interface TribesTabProps {
+  canWrite: boolean;
+}
+
+const TribesTab: React.FC<TribesTabProps> = ({ canWrite }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const navigate = useNavigate();
@@ -58,7 +63,6 @@ const TribesTab: React.FC = () => {
   const { positions } = usePositions();
   const { persons } = usePersons();
 
-  // Map tribe_id -> active member entries
   const tribePositions = useMemo(() => {
     const map = new Map<string, TribePersonEntry[]>();
     for (const pos of positions) {
@@ -202,14 +206,16 @@ const TribesTab: React.FC = () => {
             >
               <ThemedSvgIcon name="pencil" color="currentColor" size={16} />
             </ThemedButton>
-            <ThemedButton
-              variant="danger"
-              onClick={() => crud.openDeleteSingle(tr)}
-              title={t('common.delete')}
-              style={{ padding: 'var(--btn-pad-v)' }}
-            >
-              <ThemedSvgIcon name="trash" color="currentColor" size={16} />
-            </ThemedButton>
+            {canWrite && (
+              <ThemedButton
+                variant="danger"
+                onClick={() => crud.openDeleteSingle(tr)}
+                title={t('common.delete')}
+                style={{ padding: 'var(--btn-pad-v)' }}
+              >
+                <ThemedSvgIcon name="trash" color="currentColor" size={16} />
+              </ThemedButton>
+            )}
           </div>
         ),
       },
@@ -222,6 +228,7 @@ const TribesTab: React.FC = () => {
       crud,
       navigate,
       tribePositions,
+      canWrite,
     ],
   );
 
@@ -242,16 +249,18 @@ const TribesTab: React.FC = () => {
         </ThemedCard>
       )}
       <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-        <ThemedButton
-          variant="secondary"
-          onClick={() => navigate('/admin/tribes/new')}
-          leftIcon={
-            <ThemedSvgIcon name="plus" color="currentColor" size={16} />
-          }
-        >
-          {t('admin.addTribe')}
-        </ThemedButton>
-        {crud.selectedRows.size > 0 && (
+        {canWrite && (
+          <ThemedButton
+            variant="secondary"
+            onClick={() => navigate('/admin/tribes/new')}
+            leftIcon={
+              <ThemedSvgIcon name="plus" color="currentColor" size={16} />
+            }
+          >
+            {t('admin.addTribe')}
+          </ThemedButton>
+        )}
+        {canWrite && crud.selectedRows.size > 0 && (
           <ThemedButton
             variant="danger"
             onClick={crud.handleDeleteSelected}
@@ -289,32 +298,34 @@ const TribesTab: React.FC = () => {
           columns={columns}
           getRowId={(tr) => tr.id}
           onRowClick={(tr) => navigate(`/admin/tribes/${tr.url_param_id}/edit`)}
-          selectedRows={crud.selectedRows}
-          onRowSelect={crud.handleRowSelect}
+          selectedRows={canWrite ? crud.selectedRows : undefined}
+          onRowSelect={canWrite ? crud.handleRowSelect : undefined}
         />
       </div>
-      <ThemedConfirmDialog
-        isOpen={crud.deleteDialog.isOpen}
-        onClose={crud.closeDeleteDialog}
-        onConfirm={crud.confirmDelete}
-        title={
-          crud.deleteDialog.isMultiple
-            ? t('admin.deleteSelectedTribes')
-            : t('admin.deleteTribe')
-        }
-        message={
-          crud.deleteDialog.isMultiple
-            ? t('admin.confirmDeleteSelected', {
-                count: crud.selectedRows.size,
-              })
-            : t('admin.confirmDeleteNamed', {
-                name: crud.deleteDialog.entity?.name,
-              })
-        }
-        confirmText={t('common.delete')}
-        variant="danger"
-        isLoading={mutationLoading}
-      />
+      {canWrite && (
+        <ThemedConfirmDialog
+          isOpen={crud.deleteDialog.isOpen}
+          onClose={crud.closeDeleteDialog}
+          onConfirm={crud.confirmDelete}
+          title={
+            crud.deleteDialog.isMultiple
+              ? t('admin.deleteSelectedTribes')
+              : t('admin.deleteTribe')
+          }
+          message={
+            crud.deleteDialog.isMultiple
+              ? t('admin.confirmDeleteSelected', {
+                  count: crud.selectedRows.size,
+                })
+              : t('admin.confirmDeleteNamed', {
+                  name: crud.deleteDialog.entity?.name,
+                })
+          }
+          confirmText={t('common.delete')}
+          variant="danger"
+          isLoading={mutationLoading}
+        />
+      )}
       <ThemedModal
         isOpen={!!membersPopupTribeId}
         onClose={() => setMembersPopupTribeId(null)}
@@ -553,6 +564,7 @@ type TabKey = 'tribes' | 'projects';
 
 const TribesProjectsPageContent: React.FC = () => {
   const { t } = useTranslation();
+  const { isAdmin, hasAdminAccess, isLoading } = useAdminAccess();
   const [activeTab, setActiveTab] = useState<TabKey>('tribes');
 
   const breadcrumbs = useMemo(
@@ -564,15 +576,17 @@ const TribesProjectsPageContent: React.FC = () => {
     [t],
   );
 
-  const tabs = useMemo(
-    () => [
-      { key: 'tribes', label: t('admin.tribes') },
-      { key: 'projects', label: t('admin.projects') },
-    ],
-    [t],
-  );
+  const tabs = useMemo(() => {
+    const result = [{ key: 'tribes', label: t('admin.tribes') }];
+    if (isAdmin) result.push({ key: 'projects', label: t('admin.projects') });
+    return result;
+  }, [t, isAdmin]);
 
   const headerActions = <AdminNavigation currentPage="tribes" />;
+
+  if (!isLoading && !hasAdminAccess) {
+    return <Navigate to="/app" replace />;
+  }
 
   return (
     <AppLayout breadcrumbs={breadcrumbs} headerActions={headerActions}>
@@ -584,11 +598,13 @@ const TribesProjectsPageContent: React.FC = () => {
         />
         <div style={{ marginTop: '16px' }}>
           <div style={{ display: activeTab === 'tribes' ? 'block' : 'none' }}>
-            <TribesTab />
+            <TribesTab canWrite={isAdmin} />
           </div>
-          <div style={{ display: activeTab === 'projects' ? 'block' : 'none' }}>
-            <ProjectsTab />
-          </div>
+          {isAdmin && (
+            <div style={{ display: activeTab === 'projects' ? 'block' : 'none' }}>
+              <ProjectsTab />
+            </div>
+          )}
         </div>
       </ThemedCard>
     </AppLayout>

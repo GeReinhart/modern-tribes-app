@@ -29,6 +29,11 @@ async def list_project_documents(
     label_id: Optional[str] = Query(None),
     current_user: dict = Depends(get_current_user),
 ):
+    """List all documents for a project.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ guest
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position="guest")
@@ -48,6 +53,11 @@ async def create_project_document(
     data: ProjectDocumentCreate,
     current_user: dict = Depends(get_current_user),
 ):
+    """Create a new document in a project.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ member
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position="member")
@@ -61,6 +71,11 @@ async def get_project_document(
     project_document_id: str,
     current_user: dict = Depends(get_current_user),
 ):
+    """Get a specific document from a project.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ guest
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
@@ -76,6 +91,11 @@ async def update_project_document(
     data: ProjectDocumentUpdate,
     current_user: dict = Depends(get_current_user),
 ):
+    """Update a project document.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ member
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
@@ -95,6 +115,11 @@ async def archive_project_document(
     project_document_id: str,
     current_user: dict = Depends(get_current_user),
 ):
+    """Archive a project document.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ manager
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
@@ -115,6 +140,11 @@ async def publish_project_document(
     project_document_id: str,
     current_user: dict = Depends(get_current_user),
 ):
+    """Publish a project document publicly.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ manager
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
@@ -132,6 +162,11 @@ async def unpublish_project_document(
     project_document_id: str,
     current_user: dict = Depends(get_current_user),
 ):
+    """Unpublish a project document.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ manager
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
@@ -146,6 +181,11 @@ async def get_project_document_labels(
     project_id: str,
     current_user: dict = Depends(get_current_user),
 ):
+    """Get all labels used in a project's documents.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ guest
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position="guest")

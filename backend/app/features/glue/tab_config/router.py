@@ -16,6 +16,10 @@ async def get_tab_config(
     context_key: str,
     current_user: dict = Depends(get_current_user),
 ):
+    """Get the current user's tab configuration for a given context.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     pool = get_database()
     return await user_tab_config_service.get_tab_config(current_user["id"], context_key, pool)
 
@@ -27,6 +31,10 @@ async def save_tab_config(
     data: UserTabConfigRequest,
     current_user: dict = Depends(get_current_user),
 ):
+    """Save the current user's tab configuration for a given context.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     pool = get_database()
     return await user_tab_config_service.save_tab_config(
         current_user["id"], context_key, data, pool, current_user

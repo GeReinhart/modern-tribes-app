@@ -23,6 +23,10 @@ router = APIRouter(prefix="/tribes", tags=["features_tribes_projects"])
 async def create_tribe_with_positions(
     data: TribeWithPositionsCreate, current_user: dict = Depends(get_current_user)
 ):
+    """Create a new tribe with initial positions.
+
+    **Permissions:** admin | can_create_own_tribes
+    """
     pool = get_database()
     return await tribe_service.create_tribe_with_positions(data, pool, current_user)
 
@@ -30,6 +34,10 @@ async def create_tribe_with_positions(
 @router.get("/{tribe_id}/with-positions", response_model=TribeWithPositionsResponse)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_tribe_with_positions(tribe_id: str, current_user: dict = Depends(get_current_user)):
+    """Get a tribe with all its positions.
+
+    **Permissions:** admin | can_access_attached_tribes (own tribe only)
+    """
     pool = get_database()
     tribe_id = await resolve_url_param_id(pool, "tribes", tribe_id)
     await check_own_tribe_position_or_admin(tribe_id, current_user, pool)
@@ -41,6 +49,11 @@ async def get_tribe_with_positions(tribe_id: str, current_user: dict = Depends(g
 async def update_tribe_with_positions(
     tribe_id: str, data: TribeWithPositionsUpdate, current_user: dict = Depends(get_current_user)
 ):
+    """Update a tribe and its positions.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Tribe access:** manager position required
+    """
     pool = get_database()
     tribe_id = await resolve_url_param_id(pool, "tribes", tribe_id)
     await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position="manager")
@@ -50,6 +63,11 @@ async def update_tribe_with_positions(
 @router.patch("/{tribe_id}/archive", status_code=status.HTTP_204_NO_CONTENT)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def archive_tribe(tribe_id: str, current_user: dict = Depends(get_current_user)):
+    """Archive a tribe.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Tribe access:** manager position required
+    """
     pool = get_database()
     tribe_id = await resolve_url_param_id(pool, "tribes", tribe_id)
     await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position="manager")

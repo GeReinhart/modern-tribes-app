@@ -27,7 +27,10 @@ ENTITY_NAME = "Position"
 @router.get("/", response_model=List[Position])
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_positions(current_user: dict = Depends(get_current_user)):
-    """Get all positions"""
+    """Get all positions
+
+    **Permissions:** admin
+    """
     pool = get_database()
     return await get_all_documents(pool, TABLE, any_status=True)
 
@@ -35,7 +38,10 @@ async def get_positions(current_user: dict = Depends(get_current_user)):
 @router.get("/{position_id}", response_model=Position)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_position(position_id: str, current_user: dict = Depends(get_current_user)):
-    """Get a specific position by ID"""
+    """Get a specific position by ID
+
+    **Permissions:** admin
+    """
     pool = get_database()
     return await get_document_by_id(pool, TABLE, position_id, ENTITY_NAME)
 
@@ -43,7 +49,10 @@ async def get_position(position_id: str, current_user: dict = Depends(get_curren
 @router.get("/by/tribe/{tribe_id}", response_model=List[Position])
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_positions_by_tribe(tribe_id: str, current_user: dict = Depends(get_current_user)):
-    """Get all positions associated with a tribe"""
+    """Get all positions associated with a tribe
+
+    **Permissions:** admin
+    """
     pool = get_database()
 
     return await get_all_documents(pool, "positions", filter_query="tribe_id = $1", params=[UUID(tribe_id)])
@@ -52,7 +61,10 @@ async def get_positions_by_tribe(tribe_id: str, current_user: dict = Depends(get
 @router.post("/", response_model=Position, status_code=status.HTTP_201_CREATED)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def create_position(position: PositionCreate, current_user: dict = Depends(get_current_user)):
-    """Create a new position"""
+    """Create a new position
+
+    **Permissions:** admin
+    """
     pool = get_database()
     validator = EntityValidator(pool)
 
@@ -77,7 +89,10 @@ async def create_position(position: PositionCreate, current_user: dict = Depends
 async def update_position(
     position_id: str, position: PositionUpdate, current_user: dict = Depends(get_current_user)
 ):
-    """Update an existing position"""
+    """Update an existing position
+
+    **Permissions:** admin
+    """
     pool = get_database()
     validator = EntityValidator(pool)
 
@@ -102,7 +117,10 @@ async def update_position(
 @router.delete("/{position_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def delete_position(position_id: str, current_user: dict = Depends(get_current_user)):
-    """Delete a position"""
+    """Delete a position
+
+    **Permissions:** admin
+    """
     pool = get_database()
     await delete_document(pool, TABLE, position_id, ENTITY_NAME)
     return None

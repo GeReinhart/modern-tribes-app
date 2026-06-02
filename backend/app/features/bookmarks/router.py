@@ -19,6 +19,10 @@ router = APIRouter(prefix="/bookmarks", tags=["features_bookmarks"])
 @router.get("", response_model=UserBookmarksResponse)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_bookmarks(current_user: dict = Depends(get_current_user)):
+    """Get all bookmarks for the current user.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     pool = get_database()
     return await user_bookmarks_service.get_bookmarks(current_user["id"], pool)
 
@@ -29,6 +33,10 @@ async def add_bookmark(
     data: UserBookmarkCreate,
     current_user: dict = Depends(get_current_user),
 ):
+    """Add a new bookmark for the current user.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     pool = get_database()
     return await user_bookmarks_service.add_bookmark(current_user["id"], data, pool, current_user)
 
@@ -39,6 +47,10 @@ async def reorder_bookmarks(
     data: UserBookmarksReorderRequest,
     current_user: dict = Depends(get_current_user),
 ):
+    """Reorder the current user's bookmarks.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     pool = get_database()
     return await user_bookmarks_service.reorder_bookmarks(current_user["id"], data, pool, current_user)
 
@@ -50,6 +62,10 @@ async def update_bookmark(
     data: UserBookmarkUpdate,
     current_user: dict = Depends(get_current_user),
 ):
+    """Update a bookmark for the current user.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     pool = get_database()
     return await user_bookmarks_service.update_bookmark(
         current_user["id"], bookmark_id, data, pool, current_user
@@ -62,5 +78,9 @@ async def remove_bookmark(
     bookmark_id: str,
     current_user: dict = Depends(get_current_user),
 ):
+    """Remove a bookmark for the current user.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     pool = get_database()
     await user_bookmarks_service.remove_bookmark(current_user["id"], bookmark_id, pool)

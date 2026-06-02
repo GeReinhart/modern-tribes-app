@@ -29,6 +29,11 @@ async def list_pages(
     project_document_id: str,
     current_user: dict = Depends(get_current_user),
 ):
+    """List all pages for a project document.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ guest
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
@@ -48,6 +53,11 @@ async def create_page(
     data: DocumentPageCreate,
     current_user: dict = Depends(get_current_user),
 ):
+    """Create a new page in a project document.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ member
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
@@ -66,6 +76,11 @@ async def reorder_pages(
     data: PageReorderRequest,
     current_user: dict = Depends(get_current_user),
 ):
+    """Reorder pages within a project document.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ member
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
@@ -85,6 +100,11 @@ async def get_page(
     page_id: str,
     current_user: dict = Depends(get_current_user),
 ):
+    """Get a specific page from a project document.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ guest
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
@@ -105,6 +125,11 @@ async def update_page(
     data: DocumentPageUpdate,
     current_user: dict = Depends(get_current_user),
 ):
+    """Update a page in a project document.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ member
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
@@ -126,6 +151,11 @@ async def archive_page(
     page_id: str,
     current_user: dict = Depends(get_current_user),
 ):
+    """Archive a page in a project document.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ manager
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)

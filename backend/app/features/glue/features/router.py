@@ -22,6 +22,10 @@ router = APIRouter(prefix="/feature-instances", tags=["features_glue"])
 @router.get("/feature-types", response_model=list[FeatureTypeInfo])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_feature_types(current_user: dict = Depends(get_current_user)):
+    """List all available feature types that can be added to a project.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     from app.features.registry import get_available_feature_types
 
     return [FeatureTypeInfo(**ft) for ft in get_available_feature_types()]
@@ -34,6 +38,11 @@ async def list_project_features(
     status_filter: Optional[str] = Query(None, alias="status"),
     current_user: dict = Depends(get_current_user),
 ):
+    """List all feature instances for a project.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ guest
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position="guest")
@@ -71,6 +80,11 @@ async def list_project_features(
 async def create_project_feature(
     project_id: str, data: ProjectFeatureInstanceCreate, current_user: dict = Depends(get_current_user)
 ):
+    """Add a new feature instance to a project.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ manager
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position="manager")
@@ -110,6 +124,11 @@ async def update_project_feature(
     data: ProjectFeatureInstanceUpdate,
     current_user: dict = Depends(get_current_user),
 ):
+    """Update a feature instance (name, status, position).
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ manager
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position="manager")

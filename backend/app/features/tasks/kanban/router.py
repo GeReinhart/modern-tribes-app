@@ -45,6 +45,11 @@ def _card(row: dict) -> KanbanCardResponse:
 @router.get("/board/{feature_instance_id}", response_model=KanbanBoard)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_board(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
+    """Get the full kanban board (columns, cards, labels) for a feature instance.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ guest
+    """
     pool = get_database()
     await label_service.require_feature_access(pool, feature_instance_id, current_user, "guest")
     data = await repo.fetch_board(pool, feature_instance_id)
@@ -58,12 +63,21 @@ async def get_board(feature_instance_id: str, current_user: dict = Depends(get_c
 @router.get("/persons/{feature_instance_id}", response_model=list[PersonOption])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def list_persons(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
+    """List persons available for assignment in a kanban feature instance.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     return await label_service.list_persons_for_feature(get_database(), feature_instance_id, current_user)
 
 
 @router.post("/columns", response_model=KanbanColumnResponse, status_code=status.HTTP_201_CREATED)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def create_column(data: ColumnCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new column in a kanban board (max 4 columns).
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ manager
+    """
     pool = get_database()
     await label_service.require_feature_access(pool, data.feature_instance_id, current_user, "manager")
     cols = await repo.fetch_columns_sorted(pool, data.feature_instance_id)
@@ -77,6 +91,11 @@ async def create_column(data: ColumnCreate, current_user: dict = Depends(get_cur
 @router.patch("/columns/{column_id}", response_model=KanbanColumnResponse)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def rename_column(column_id: str, data: ColumnUpdate, current_user: dict = Depends(get_current_user)):
+    """Rename a kanban column.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ manager
+    """
     pool = get_database()
     col = await repo.fetch_column(pool, column_id)
     if not col:
@@ -89,6 +108,11 @@ async def rename_column(column_id: str, data: ColumnUpdate, current_user: dict =
 @router.post("/columns/{column_id}/move", response_model=list[KanbanColumnResponse])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def move_column(column_id: str, data: MoveCard, current_user: dict = Depends(get_current_user)):
+    """Move a kanban column left or right.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ manager
+    """
     pool = get_database()
     col = await repo.fetch_column(pool, column_id)
     if not col:
@@ -112,6 +136,11 @@ async def move_column(column_id: str, data: MoveCard, current_user: dict = Depen
 @router.delete("/columns/{column_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def delete_column(column_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a kanban column (must not be first or last; board must keep ≥ 2 columns).
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ manager
+    """
     pool = get_database()
     col = await repo.fetch_column(pool, column_id)
     if not col:
@@ -129,6 +158,11 @@ async def delete_column(column_id: str, current_user: dict = Depends(get_current
 @router.post("/cards", response_model=KanbanCardResponse, status_code=status.HTTP_201_CREATED)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def create_card(data: CardCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new kanban card.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
     pool = get_database()
     await label_service.require_feature_access(pool, data.feature_instance_id, current_user, "member")
     row = await repo.insert_card(
@@ -141,6 +175,11 @@ async def create_card(data: CardCreate, current_user: dict = Depends(get_current
 @router.patch("/cards/{card_id}", response_model=KanbanCardResponse)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def update_card(card_id: str, data: CardUpdate, current_user: dict = Depends(get_current_user)):
+    """Update a kanban card's fields.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
     pool = get_database()
     card = await repo.fetch_card(pool, card_id)
     if not card:
@@ -174,6 +213,11 @@ async def _upsert_card_document(pool, card: dict, html: str, uid: str) -> None:
 @router.delete("/cards/{card_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def archive_card(card_id: str, current_user: dict = Depends(get_current_user)):
+    """Archive (soft-delete) a kanban card.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
     pool = get_database()
     card = await repo.fetch_card(pool, card_id)
     if not card:
@@ -185,6 +229,11 @@ async def archive_card(card_id: str, current_user: dict = Depends(get_current_us
 @router.post("/cards/{card_id}/restore", response_model=KanbanCardResponse)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def restore_card(card_id: str, current_user: dict = Depends(get_current_user)):
+    """Restore an archived kanban card.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
     pool = get_database()
     card = await repo.fetch_card(pool, card_id)
     if not card:
@@ -197,6 +246,11 @@ async def restore_card(card_id: str, current_user: dict = Depends(get_current_us
 @router.post("/cards/{card_id}/move", response_model=list[KanbanCardResponse])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def move_card(card_id: str, data: MoveCard, current_user: dict = Depends(get_current_user)):
+    """Move a kanban card to the previous or next column.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
     pool = get_database()
     card = await repo.fetch_card(pool, card_id)
     if not card:
@@ -220,6 +274,11 @@ async def move_card(card_id: str, data: MoveCard, current_user: dict = Depends(g
 @router.post("/cards/{card_id}/reorder", response_model=list[KanbanCardResponse])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def reorder_card(card_id: str, data: ReorderCard, current_user: dict = Depends(get_current_user)):
+    """Reorder a kanban card within its column.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
     pool = get_database()
     card = await repo.fetch_card(pool, card_id)
     if not card:
@@ -234,30 +293,51 @@ async def reorder_card(card_id: str, data: ReorderCard, current_user: dict = Dep
 @router.get("/labels/{feature_instance_id}", response_model=list[FeatureLabel])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def list_labels(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
+    """List all labels for a kanban feature instance.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     return await label_service.list_feature_labels(get_database(), feature_instance_id, current_user)
 
 
 @router.post("/labels", response_model=FeatureLabel, status_code=status.HTTP_201_CREATED)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def create_label(data: FeatureLabelCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new label for a kanban feature instance.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     return await label_service.create_feature_label(get_database(), data, current_user)
 
 
 @router.patch("/labels/{label_id}", response_model=FeatureLabel)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def update_label(label_id: str, data: FeatureLabelUpdate, current_user: dict = Depends(get_current_user)):
+    """Update a kanban label.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     return await label_service.update_feature_label(get_database(), label_id, data, current_user)
 
 
 @router.delete("/labels/{label_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def delete_label(label_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a kanban label.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     await label_service.delete_feature_label(get_database(), label_id, current_user)
 
 
 @router.post("/cards/{card_id}/labels/{label_id}", response_model=KanbanCardResponse)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def add_card_label(card_id: str, label_id: str, current_user: dict = Depends(get_current_user)):
+    """Add a label to a kanban card.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
     pool = get_database()
     card = await repo.fetch_card(pool, card_id)
     if not card:
@@ -270,6 +350,11 @@ async def add_card_label(card_id: str, label_id: str, current_user: dict = Depen
 @router.delete("/cards/{card_id}/labels/{label_id}", response_model=KanbanCardResponse)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def remove_card_label(card_id: str, label_id: str, current_user: dict = Depends(get_current_user)):
+    """Remove a label from a kanban card.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
     pool = get_database()
     card = await repo.fetch_card(pool, card_id)
     if not card:

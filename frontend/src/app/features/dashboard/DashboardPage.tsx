@@ -8,9 +8,9 @@ import DashboardTribesTab from '@/app/features/dashboard/tabs/DashboardTribesTab
 import { TabConfigButton } from '@/app/features/glue/tab-config/TabConfigButton.tsx';
 import { TabConfigPopup } from '@/app/features/glue/tab-config/TabConfigPopup.tsx';
 import { useTabConfig } from '@/app/features/glue/tab-config/useTabConfig.ts';
-import { useCurrentUserProfile } from '@/app/platform/functions/people/users/useCurrentUserProfile.ts';
 import { useUrlTab } from '@/app/features/glue/url-tab/useUrlTab.ts';
 import { authorizationHooks } from '@/app/platform/core/authorization/authorization-hooks.ts';
+import { useAdminAccess } from '@/app/platform/core/authorization/useAdminAccess.ts';
 import { errorStyle } from '@/app/platform/core/layout/themes/theme.styles.tsx';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 
@@ -47,7 +47,7 @@ const DashboardPageContent: React.FC = () => {
     error: authorizationError,
     verifyAuthorization,
   } = authorizationHooks();
-  const { user } = useCurrentUserProfile();
+  const { hasAdminAccess } = useAdminAccess();
   const [showTabConfig, setShowTabConfig] = useState(false);
 
   const allTabs = useMemo(
@@ -79,7 +79,6 @@ const DashboardPageContent: React.FC = () => {
     });
   }, [verifyAuthorization]);
 
-  const isAdmin = user?.permissions?.includes('admin') ?? false;
   const menuActions = useMemo(
     (): MenuAction[] => [
       ...(authorization?.authorized
@@ -91,7 +90,7 @@ const DashboardPageContent: React.FC = () => {
             },
           ]
         : []),
-      ...(isAdmin
+      ...(hasAdminAccess
         ? [
             {
               icon: 'settings' as const,
@@ -101,7 +100,7 @@ const DashboardPageContent: React.FC = () => {
           ]
         : []),
     ],
-    [authorization?.authorized, isAdmin, t, navigate],
+    [authorization?.authorized, hasAdminAccess, t, navigate],
   );
 
   return (

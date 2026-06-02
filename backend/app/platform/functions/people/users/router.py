@@ -35,22 +35,36 @@ ENTITY_NAME = "User"
 
 
 @router.get("/", response_model=List[User])
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def get_users(current_user: dict = Depends(get_current_user)):
+    """Get all users.
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     return await get_all_documents(pool, TABLE, any_status=True)
 
 
 @router.get("/with/roles/permissions", response_model=List[UserWithRoles])
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def get_userswith_roles_permissions(current_user: dict = Depends(get_current_user)):
+    """Get all users with their roles and permissions.
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     return await user_repo.get_users_with_roles_and_permissions(pool)
 
 
 @router.get("/{user_id}", response_model=User)
-@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_OWN_PROFILE)
+@require_any_permission_decorator(
+    PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_OWN_PROFILE, PermissionEnum.CAN_MANAGE_PEOPLE
+)
 async def get_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Get a specific user by ID.
+
+    **Permissions:** admin | can_manage_own_profile (own) | can_manage_people (any)
+    """
     pool = get_database()
     user_id = await resolve_url_param_id(pool, TABLE, user_id)
     await check_own_user_or_admin(user_id, current_user, pool)
@@ -61,8 +75,14 @@ async def get_user(user_id: str, current_user: dict = Depends(get_current_user))
 
 
 @router.get("/{user_id}/with/roles/permissions", response_model=UserWithRoles)
-@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_OWN_PROFILE)
+@require_any_permission_decorator(
+    PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_OWN_PROFILE, PermissionEnum.CAN_MANAGE_PEOPLE
+)
 async def get_user_with_roles_and_permissions(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Get a user with their roles and permissions.
+
+    **Permissions:** admin | can_manage_own_profile (own) | can_manage_people (any)
+    """
     pool = get_database()
     user_id = await resolve_url_param_id(pool, TABLE, user_id)
     await check_own_user_or_admin(user_id, current_user, pool)
@@ -73,8 +93,12 @@ async def get_user_with_roles_and_permissions(user_id: str, current_user: dict =
 
 
 @router.post("/", response_model=User, status_code=status.HTTP_201_CREATED)
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def create_user(user: UserCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new user.
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     validator = EntityValidator(pool)
     await check_unique_field(pool, TABLE, "email", user.email, error_message="Email already registered")
@@ -95,8 +119,12 @@ async def create_user(user: UserCreate, current_user: dict = Depends(get_current
 
 
 @router.put("/{user_id}", response_model=User)
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def update_user(user_id: str, user: UserUpdate, current_user: dict = Depends(get_current_user)):
+    """Update an existing user.
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     user_id = await resolve_url_param_id(pool, TABLE, user_id)
     await check_own_user_or_admin(user_id, current_user, pool)
@@ -122,8 +150,12 @@ async def update_user(user_id: str, user: UserUpdate, current_user: dict = Depen
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def delete_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a user.
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     user_id = await resolve_url_param_id(pool, TABLE, user_id)
     await delete_document(pool, TABLE, user_id, ENTITY_NAME)
@@ -131,8 +163,12 @@ async def delete_user(user_id: str, current_user: dict = Depends(get_current_use
 
 
 @router.post("/{user_id}/magic-link/send")
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def admin_send_magic_link(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Send a magic-link sign-in email to a user.
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     user_id = await resolve_url_param_id(pool, TABLE, user_id)
     user = await check_document_exists(pool, TABLE, user_id, ENTITY_NAME)
@@ -186,8 +222,12 @@ async def admin_send_magic_link(user_id: str, current_user: dict = Depends(get_c
 
 
 @router.get("/{user_id}/magic-link/generate")
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def admin_generate_magic_link(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Generate a magic-link for a user without sending it.
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     user_id = await resolve_url_param_id(pool, TABLE, user_id)
     user = await check_document_exists(pool, TABLE, user_id, ENTITY_NAME)

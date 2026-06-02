@@ -52,6 +52,10 @@ async def get_mails(
     user_id: Optional[str] = Query(default=None),
     current_user: dict = Depends(get_current_user),
 ):
+    """List all mails with their recipients.
+
+    **Permissions:** admin
+    """
     pool = get_database()
     async with pool.acquire() as conn:
         rows = await conn.fetch(_QUERY, status or None, mail_status or None, user_id or None)

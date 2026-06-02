@@ -4,7 +4,9 @@ export type PermissionEnum =
   | 'admin'
   | 'can_create_own_tribes'
   | 'can_access_attached_tribes'
-  | 'can_manage_own_profile';
+  | 'can_manage_own_profile'
+  | 'can_manage_people'
+  | 'can_assign_projects';
 
 export interface Authorization extends BaseEntity {
   authorized: boolean;

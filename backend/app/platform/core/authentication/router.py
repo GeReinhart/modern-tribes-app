@@ -35,6 +35,10 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 
 @router.post("/magic-link", response_model=MagicLinkResponse)
 async def request_magic_link(request: MagicLinkRequest):
+    """Request a magic-link sign-in email.
+
+    **Public** — no authentication required
+    """
     magic_token = create_magic_token(request.email)
     magic_link = f"{settings.FRONTEND_URL}/auth/verify?token={magic_token}"
     pool = get_database()
@@ -96,6 +100,10 @@ async def request_magic_link(request: MagicLinkRequest):
 
 @router.post("/verify", response_model=TokenResponse)
 async def verify_magic_link(token: str, request: Request, response: Response):
+    """Verify a magic-link token and create a session.
+
+    **Public** — no authentication required
+    """
     pool = get_database()
     forwarded_for = request.headers.get("X-Forwarded-For")
     ip_address = (
@@ -110,6 +118,10 @@ async def verify_magic_link(token: str, request: Request, response: Response):
 
 @router.get("/me", response_model=UserResponse)
 async def get_me(current_user: dict = Depends(get_current_user)):
+    """Get the current authenticated user's profile, roles, and permissions.
+
+    **Permissions:** authentication required — no specific permission
+    """
     pool = get_database()
     user_id = str(current_user["id"])
     permissions = await get_user_permissions(pool, user_id)
@@ -133,6 +145,10 @@ class UpdateLanguageRequest(BaseModel):
 
 @router.patch("/me/language")
 async def update_my_language(body: UpdateLanguageRequest, current_user: dict = Depends(get_current_user)):
+    """Update the current user's preferred language.
+
+    **Permissions:** authentication required — no specific permission
+    """
     if body.language not in _SUPPORTED_LANGUAGES:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -150,5 +166,9 @@ async def update_my_language(body: UpdateLanguageRequest, current_user: dict = D
 
 @router.post("/refresh", response_model=RefreshResponse)
 async def refresh_token(body: RefreshRequest):
+    """Refresh an access token using a refresh token.
+
+    **Public** — no authentication required
+    """
     pool = get_database()
     return await auth_service.refresh_access_token(body.refresh_token, pool)

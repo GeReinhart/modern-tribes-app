@@ -11,6 +11,7 @@ import {
 } from '@/app/platform/core/layout/AdminNavigation.tsx';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { useAdminAccess } from '@/app/platform/core/authorization/useAdminAccess.ts';
 import { useDocuments } from '@/app/platform/functions/documents/useDocuments.ts';
 import { usePersons } from '@/app/platform/functions/people/persons/usePersons.ts';
 import { usePositionsByTribe } from '@/app/features/tribes-projects/positions/usePositions.ts';
@@ -38,7 +39,7 @@ import React, {
   useState,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -491,6 +492,7 @@ const TribeEditPageContent: React.FC = () => {
   const { tribeId } = useParams<{ tribeId?: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { isAdmin, canManagePeople, hasAdminAccess, isLoading: accessLoading } = useAdminAccess();
   const isCreate = !tribeId;
 
   const { tribe, loading: tribeLoading } = useTribe(tribeId ?? null);
@@ -526,9 +528,6 @@ const TribeEditPageContent: React.FC = () => {
     }
   }, [tribe]);
 
-  // hasFetched is false until the API responds (or immediately true for create mode).
-  // This avoids the useApi loading=false initial-state race where the effect fires
-  // before any fetch has started and locks the ref with empty data.
   useEffect(() => {
     if (!projectsInitialized.current && projectsFetched) {
       setProjectRows(
@@ -546,7 +545,6 @@ const TribeEditPageContent: React.FC = () => {
       setPersonPositions(
         existingPositions.map((p) => ({
           person_id: p.person_id!,
-          // Normalize legacy 'chief' value (pre-migration compat)
           position: (p.position as string) === 'chief' ? 'manager' : p.position,
         })),
       );
@@ -554,7 +552,6 @@ const TribeEditPageContent: React.FC = () => {
     }
   }, [existingPositions, positionsFetched]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Call positionService directly — avoids shared-execute stale issues from hooks
   const syncPositions = useCallback(
     async (savedTribeId: string) => {
       if (isCreate) {
@@ -600,7 +597,12 @@ const TribeEditPageContent: React.FC = () => {
     setError(null);
     try {
       let savedId: string;
-      if (isCreate) {
+
+      if (canManagePeople && !isAdmin) {
+        // People managers can only sync project relations on existing tribes
+        if (!tribeId) throw new Error('Tribe ID is required');
+        savedId = tribeId;
+      } else if (isCreate) {
         const created = await createTribe(formData as TribeCreate);
         if (!created) throw new Error('Failed to create tribe');
         savedId = created.id;
@@ -612,8 +614,13 @@ const TribeEditPageContent: React.FC = () => {
         if (!updated) throw new Error('Failed to update tribe');
         savedId = updated.id;
       }
+
       await tribeService.syncTribeProjects(savedId, projectRows);
-      await syncPositions(savedId);
+
+      if (isAdmin) {
+        await syncPositions(savedId);
+      }
+
       navigate('/admin/tribes');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -634,8 +641,15 @@ const TribeEditPageContent: React.FC = () => {
 
   const headerActions = <AdminNavigation currentPage="tribes" />;
 
-  // !projectsFetched and !positionsFetched catch the window where loading=false
-  // but the fetch hasn't started yet (useApi initializes loading=false).
+  if (!accessLoading && !hasAdminAccess) {
+    return <Navigate to="/app" replace />;
+  }
+
+  // People managers cannot create tribes
+  if (!accessLoading && canManagePeople && !isAdmin && isCreate) {
+    return <Navigate to="/admin/tribes" replace />;
+  }
+
   const isLoading =
     !isCreate && (tribeLoading || !projectsFetched || !positionsFetched);
 
@@ -685,45 +699,47 @@ const TribeEditPageContent: React.FC = () => {
             </ThemedCard>
           )}
 
-          <ThemedCard>
-            <ThemedText
-              variant="primary"
-              size="medium"
-              as="h3"
-              style={{ marginBottom: '16px' }}
-            >
-              {t('admin.tribeInfo')}
-            </ThemedText>
-            <div
-              style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
-            >
-              <ThemedInput
-                label="Name"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData((p) => ({ ...p, name: e.target.value }))
-                }
-                required
-              />
-              <ThemedSelect
-                label="Document"
-                value={formData.document_id || ''}
-                onChange={(v) =>
-                  setFormData((p) => ({ ...p, document_id: v || null }))
-                }
-                options={documentOptions}
-              />
-              {!isCreate && (
-                <ThemedSelect
-                  label="Status"
-                  value={status}
-                  onChange={setStatus}
-                  options={statusOptions}
-                  allowEmpty={false}
+          {isAdmin && (
+            <ThemedCard>
+              <ThemedText
+                variant="primary"
+                size="medium"
+                as="h3"
+                style={{ marginBottom: '16px' }}
+              >
+                {t('admin.tribeInfo')}
+              </ThemedText>
+              <div
+                style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+              >
+                <ThemedInput
+                  label="Name"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData((p) => ({ ...p, name: e.target.value }))
+                  }
+                  required
                 />
-              )}
-            </div>
-          </ThemedCard>
+                <ThemedSelect
+                  label="Document"
+                  value={formData.document_id || ''}
+                  onChange={(v) =>
+                    setFormData((p) => ({ ...p, document_id: v || null }))
+                  }
+                  options={documentOptions}
+                />
+                {!isCreate && (
+                  <ThemedSelect
+                    label="Status"
+                    value={status}
+                    onChange={setStatus}
+                    options={statusOptions}
+                    allowEmpty={false}
+                  />
+                )}
+              </div>
+            </ThemedCard>
+          )}
 
           <ThemedCard>
             <ProjectRelationsSection
@@ -733,13 +749,15 @@ const TribeEditPageContent: React.FC = () => {
             />
           </ThemedCard>
 
-          <ThemedCard>
-            <PersonPositionsSection
-              persons={persons}
-              personPositions={personPositions}
-              onChange={setPersonPositions}
-            />
-          </ThemedCard>
+          {isAdmin && (
+            <ThemedCard>
+              <PersonPositionsSection
+                persons={persons}
+                personPositions={personPositions}
+                onChange={setPersonPositions}
+              />
+            </ThemedCard>
+          )}
 
           <div
             style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}

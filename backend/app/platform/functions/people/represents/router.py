@@ -29,15 +29,25 @@ ENTITY_NAME = "Represents"
 
 
 @router.get("/", response_model=List[Represents])
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def get_all_represents(current_user: dict = Depends(get_current_user)):
+    """Get all representation links between users and persons.
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     return await get_all_documents(pool, TABLE, any_status=True)
 
 
 @router.get("/by/user/{user_id}", response_model=List[Represents])
-@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_OWN_PROFILE)
+@require_any_permission_decorator(
+    PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_OWN_PROFILE, PermissionEnum.CAN_MANAGE_PEOPLE
+)
 async def get_represents_by_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Get all representation links for a specific user.
+
+    **Permissions:** admin | can_manage_own_profile (own) | can_manage_people (any)
+    """
     pool = get_database()
     await check_own_user_or_admin(user_id, current_user, pool)
     return await get_all_documents(
@@ -46,15 +56,23 @@ async def get_represents_by_user(user_id: str, current_user: dict = Depends(get_
 
 
 @router.get("/{represents_id}", response_model=Represents)
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def get_represents(represents_id: str, current_user: dict = Depends(get_current_user)):
+    """Get a specific representation link by ID.
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     return await get_document_by_id(pool, TABLE, represents_id, ENTITY_NAME)
 
 
 @router.post("/", response_model=Represents, status_code=status.HTTP_201_CREATED)
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def create_represents(represents: RepresentsCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new representation link between a user and a person.
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     validator = EntityValidator(pool)
 
@@ -72,10 +90,14 @@ async def create_represents(represents: RepresentsCreate, current_user: dict = D
 
 
 @router.put("/{represents_id}", response_model=Represents)
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def update_represents(
     represents_id: str, represents: RepresentsUpdate, current_user: dict = Depends(get_current_user)
 ):
+    """Update an existing representation link.
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     validator = EntityValidator(pool)
 
@@ -95,8 +117,12 @@ async def update_represents(
 
 
 @router.delete("/{represents_id}", status_code=status.HTTP_204_NO_CONTENT)
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def delete_represents(represents_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a representation link.
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     await delete_document(pool, TABLE, represents_id, ENTITY_NAME)
     return None

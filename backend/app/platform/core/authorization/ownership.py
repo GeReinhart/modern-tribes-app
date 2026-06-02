@@ -13,15 +13,16 @@ async def check_own_user_or_admin(user_id: str, current_user: dict, pool) -> Non
     if str(current_user.get("id")) == user_id:
         return
     permissions = await get_user_permissions(pool, str(current_user.get("id")))
-    if PermissionEnum.ADMIN not in permissions:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="We do not allow access to other users' data."
-        )
+    if PermissionEnum.ADMIN in permissions or PermissionEnum.CAN_MANAGE_PEOPLE in permissions:
+        return
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN, detail="We do not allow access to other users' data."
+    )
 
 
 async def check_own_person_or_admin(person_id: str, current_user: dict, pool) -> None:
     permissions = await get_user_permissions(pool, str(current_user.get("id")))
-    if PermissionEnum.ADMIN in permissions:
+    if PermissionEnum.ADMIN in permissions or PermissionEnum.CAN_MANAGE_PEOPLE in permissions:
         return
     async with pool.acquire() as conn:
         row = await conn.fetchrow("SELECT id FROM users WHERE person_id = $1", UUID(person_id))

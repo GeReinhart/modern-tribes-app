@@ -29,6 +29,10 @@ async def search(
     q: str = Query(..., min_length=2, description="Full-text search query"),
     current_user: dict = Depends(get_current_user),
 ):
+    """Full-text search across accessible entities.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     if not q.strip():
         return []
 

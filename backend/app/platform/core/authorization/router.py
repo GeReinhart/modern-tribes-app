@@ -27,7 +27,10 @@ async def _get_user_permissions_or_raise(current_user: dict) -> list[str]:
 async def current_user_has_at_least_one_permission(
     permissions: str, current_user: dict = Depends(get_current_user)
 ):
-    """Check if current user has at least one of the specified permissions"""
+    """Check if the current user has at least one of the specified permissions.
+
+    **Permissions:** authentication required — no specific permission
+    """
     user_permissions = await _get_user_permissions_or_raise(current_user)
     required_permissions = [p.strip() for p in permissions.split(",")]
 
@@ -65,7 +68,10 @@ async def _authorize_tribe_access(
 async def check_permission_and_tribe(
     permissions: str, tribe_id: str, current_user: dict = Depends(get_current_user)
 ):
-    """Check if user has permission and owns tribe"""
+    """Check if the current user has the given permission and owns the specified tribe.
+
+    **Permissions:** authentication required — no specific permission
+    """
     authorized, message = await _check_permissions(permissions, current_user)
     if not authorized:
         return Authorization(authorized=False, message=message)
@@ -80,7 +86,10 @@ async def check_permission_and_tribe(
 async def check_permission_and_tribe_and_position(
     permissions: str, tribe_id: str, position: str, current_user: dict = Depends(get_current_user)
 ):
-    """Check if user has permission, owns tribe, and has position"""
+    """Check if the current user has the given permission, owns the tribe, and holds the specified position.
+
+    **Permissions:** authentication required — no specific permission
+    """
     authorized, message = await _check_permissions(permissions, current_user)
     if not authorized:
         return Authorization(authorized=False, message=message)

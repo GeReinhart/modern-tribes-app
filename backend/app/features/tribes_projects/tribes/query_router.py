@@ -73,7 +73,10 @@ class UserPersonPositionTribe(BaseModel):
 @router.get("/by/user/{user_id}", response_model=List[UserPersonPositionTribe])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_tribes_by_user(user_id: str, current_user: dict = Depends(get_current_user)):
-    """Get all active tribes associated with a user via their active positions."""
+    """Get all active tribes associated with a user via their active positions.
+
+    **Permissions:** admin | can_access_attached_tribes (own user only)
+    """
     pool = get_database()
     user_id = await resolve_url_param_id(pool, "users", user_id)
     await check_own_user_or_admin(user_id, current_user, pool)

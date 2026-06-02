@@ -13,10 +13,9 @@ router = APIRouter(prefix="/uploads", tags=["platform_core"])
 
 @router.post("/image")
 async def upload_image(request: Request):
-    """
-    Upload image for Jodit editor - accepts any field name
+    """Upload image for Jodit editor — accepts any field name, returns URL in Jodit-compatible format.
 
-    Returns URL in Jodit-compatible format
+    **Public** — no authentication required
     """
     try:
         form = await request.form()
@@ -49,10 +48,9 @@ async def upload_image(request: Request):
 
 @router.post("/file", response_model=UploadFileResponse)
 async def upload_file(file: UploadFile = File(...)):
-    """
-    Upload file attachment
+    """Upload a file attachment, returns file information including URL.
 
-    Returns file information including URL
+    **Public** — no authentication required
     """
     try:
         # Save file

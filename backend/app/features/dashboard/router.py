@@ -77,6 +77,10 @@ async def get_my_tasks(
     label_id: Optional[str] = None,
     current_user: dict = Depends(get_current_user),
 ):
+    """Get tasks assigned to the current user across all accessible projects.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     pool = get_database()
     user_id = current_user["id"]
     filters = {

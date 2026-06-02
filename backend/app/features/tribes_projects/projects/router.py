@@ -7,7 +7,10 @@ from app.platform.core.database import get_database
 from app.platform.core.authorization.models import PermissionEnum
 from app.features.tribes_projects.projects.models import Project, ProjectCreate, ProjectUpdate
 from app.platform.core.authentication.router import get_current_user
-from app.platform.core.authorization.router import require_permission_decorator
+from app.platform.core.authorization.router import (
+    require_any_permission_decorator,
+    require_permission_decorator,
+)
 from app.platform.core.utils.db_helpers import (
     check_document_exists,
     create_document,
@@ -26,17 +29,23 @@ ENTITY_NAME = "Project"
 
 
 @router.get("/", response_model=List[Project])
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def get_projects(current_user: dict = Depends(get_current_user)):
-    """Get all projects"""
+    """Get all projects
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     return await get_all_documents(pool, TABLE, any_status=True)
 
 
 @router.get("/{project_id}", response_model=Project)
-@require_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
 async def get_project(project_id: str, current_user: dict = Depends(get_current_user)):
-    """Get a specific project by ID"""
+    """Get a specific project by ID
+
+    **Permissions:** admin | can_manage_people
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, TABLE, project_id)
     return await get_document_by_id(pool, TABLE, project_id, ENTITY_NAME)
@@ -45,7 +54,10 @@ async def get_project(project_id: str, current_user: dict = Depends(get_current_
 @router.post("/", response_model=Project, status_code=status.HTTP_201_CREATED)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def create_project(project: ProjectCreate, current_user: dict = Depends(get_current_user)):
-    """Create a new project"""
+    """Create a new project
+
+    **Permissions:** admin
+    """
     pool = get_database()
     validator = EntityValidator(pool)
 
@@ -64,7 +76,10 @@ async def create_project(project: ProjectCreate, current_user: dict = Depends(ge
 async def update_project(
     project_id: str, project: ProjectUpdate, current_user: dict = Depends(get_current_user)
 ):
-    """Update an existing project"""
+    """Update an existing project
+
+    **Permissions:** admin
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, TABLE, project_id)
     validator = EntityValidator(pool)
@@ -87,7 +102,10 @@ async def update_project(
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def delete_project(project_id: str, current_user: dict = Depends(get_current_user)):
-    """Delete a project"""
+    """Delete a project
+
+    **Permissions:** admin
+    """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, TABLE, project_id)
     await delete_document(pool, TABLE, project_id, ENTITY_NAME)

@@ -43,6 +43,11 @@ def _row_to_todo(row: dict) -> TodoItemResponse:
 @router.get("/by-instance/{feature_instance_id}", response_model=list[TodoItemResponse])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def list_todo_items(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
+    """List all todo items for a feature instance.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ guest
+    """
     pool = get_database()
     await label_service.require_feature_access(pool, feature_instance_id, current_user, "guest")
     rows = await todo_repository.fetch_todo_items(pool, feature_instance_id)
@@ -52,12 +57,21 @@ async def list_todo_items(feature_instance_id: str, current_user: dict = Depends
 @router.get("/persons/{feature_instance_id}", response_model=list[PersonOption])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def list_persons(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
+    """List persons available for assignment in a todo feature instance.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     return await label_service.list_persons_for_feature(get_database(), feature_instance_id, current_user)
 
 
 @router.post("/", response_model=TodoItemResponse, status_code=status.HTTP_201_CREATED)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def create_todo_item(data: TodoItemCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new todo item.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
     pool = get_database()
     user_id = str(current_user["id"])
     await label_service.require_feature_access(pool, data.feature_instance_id, current_user, "member")
@@ -68,6 +82,11 @@ async def create_todo_item(data: TodoItemCreate, current_user: dict = Depends(ge
 @router.patch("/{item_id}", response_model=TodoItemResponse)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def update_todo_item(item_id: str, data: TodoItemUpdate, current_user: dict = Depends(get_current_user)):
+    """Update a todo item's fields.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
     pool = get_database()
     user_id = str(current_user["id"])
     async with pool.acquire() as conn:
@@ -108,6 +127,11 @@ async def update_todo_item(item_id: str, data: TodoItemUpdate, current_user: dic
 @router.post("/{item_id}/labels/{label_id}", response_model=list[str])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def toggle_todo_label(item_id: str, label_id: str, current_user: dict = Depends(get_current_user)):
+    """Toggle a label on a todo item (add if absent, remove if present).
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
     pool = get_database()
     async with pool.acquire() as conn:
         item_row = await conn.fetchrow("SELECT feature_instance_id FROM todo_items WHERE id = $1", UUID(item_id))
@@ -120,6 +144,11 @@ async def toggle_todo_label(item_id: str, label_id: str, current_user: dict = De
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def delete_todo_item(item_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a todo item.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
     pool = get_database()
     async with pool.acquire() as conn:
         item_row = await conn.fetchrow("SELECT feature_instance_id FROM todo_items WHERE id = $1", UUID(item_id))
@@ -135,22 +164,38 @@ async def delete_todo_item(item_id: str, current_user: dict = Depends(get_curren
 @label_router.get("/by-instance/{feature_instance_id}", response_model=list[FeatureLabel])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def list_labels(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
+    """List all labels for a todo feature instance.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     return await label_service.list_feature_labels(get_database(), feature_instance_id, current_user)
 
 
 @label_router.post("/", response_model=FeatureLabel, status_code=status.HTTP_201_CREATED)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def create_label(data: FeatureLabelCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new label for a todo feature instance.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     return await label_service.create_feature_label(get_database(), data, current_user)
 
 
 @label_router.patch("/{label_id}", response_model=FeatureLabel)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def update_label(label_id: str, data: FeatureLabelUpdate, current_user: dict = Depends(get_current_user)):
+    """Update a todo label.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     return await label_service.update_feature_label(get_database(), label_id, data, current_user)
 
 
 @label_router.delete("/{label_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def delete_label(label_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a todo label.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
     await label_service.delete_feature_label(get_database(), label_id, current_user)

@@ -27,7 +27,10 @@ ENTITY_NAME = "Label"
 @router.get("/", response_model=List[Label])
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_labels(current_user: dict = Depends(get_current_user)):
-    """Get all labels"""
+    """Get all labels
+
+    **Permissions:** admin
+    """
     pool = get_database()
     return await get_all_documents(pool, TABLE)
 
@@ -35,7 +38,10 @@ async def get_labels(current_user: dict = Depends(get_current_user)):
 @router.get("/{label_id}", response_model=Label)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_label(label_id: str, current_user: dict = Depends(get_current_user)):
-    """Get a specific label by ID"""
+    """Get a specific label by ID
+
+    **Permissions:** admin
+    """
     pool = get_database()
     return await get_document_by_id(pool, TABLE, label_id, ENTITY_NAME)
 
@@ -43,7 +49,10 @@ async def get_label(label_id: str, current_user: dict = Depends(get_current_user
 @router.post("/", response_model=Label, status_code=status.HTTP_201_CREATED)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def create_label(label: LabelCreate, current_user: dict = Depends(get_current_user)):
-    """Create a new label"""
+    """Create a new label
+
+    **Permissions:** admin
+    """
     pool = get_database()
 
     # Check unique name
@@ -59,7 +68,10 @@ async def create_label(label: LabelCreate, current_user: dict = Depends(get_curr
 @router.put("/{label_id}", response_model=Label)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def update_label(label_id: str, label: LabelUpdate, current_user: dict = Depends(get_current_user)):
-    """Update an existing label"""
+    """Update an existing label
+
+    **Permissions:** admin
+    """
     pool = get_database()
 
     # Check if label exists
@@ -80,7 +92,10 @@ async def update_label(label_id: str, label: LabelUpdate, current_user: dict = D
 @router.delete("/{label_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def delete_label(label_id: str, current_user: dict = Depends(get_current_user)):
-    """Delete a label"""
+    """Delete a label
+
+    **Permissions:** admin
+    """
     pool = get_database()
     await delete_document(pool, TABLE, label_id, ENTITY_NAME)
     return None

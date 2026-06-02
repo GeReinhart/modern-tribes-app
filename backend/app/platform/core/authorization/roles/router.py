@@ -29,7 +29,10 @@ ENTITY_NAME = "Role"
 @router.get("/", response_model=List[Role])
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_roles(current_user: dict = Depends(get_current_user)):
-    """Get all roles"""
+    """Get all roles
+
+    **Permissions:** admin
+    """
     pool = get_database()
     return await get_all_documents(pool, TABLE, any_status=True)
 
@@ -37,6 +40,10 @@ async def get_roles(current_user: dict = Depends(get_current_user)):
 @router.get("/with/permissions", response_model=List[RoleWithPermissions])
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_roles_with_permissions(current_user: dict = Depends(get_current_user)):
+    """Get all roles with their associated permissions.
+
+    **Permissions:** admin
+    """
     pool = get_database()
     return await role_repo.get_roles_with_permissions(pool)
 
@@ -44,7 +51,10 @@ async def get_roles_with_permissions(current_user: dict = Depends(get_current_us
 @router.get("/{role_id}", response_model=Role)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_role(role_id: str, current_user: dict = Depends(get_current_user)):
-    """Get a specific role by ID"""
+    """Get a specific role by ID
+
+    **Permissions:** admin
+    """
     pool = get_database()
     return await get_document_by_id(pool, TABLE, role_id, ENTITY_NAME)
 
@@ -52,7 +62,10 @@ async def get_role(role_id: str, current_user: dict = Depends(get_current_user))
 @router.post("/", response_model=Role, status_code=status.HTTP_201_CREATED)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def create_role(role: RoleCreate, current_user: dict = Depends(get_current_user)):
-    """Create a new role"""
+    """Create a new role
+
+    **Permissions:** admin
+    """
     pool = get_database()
 
     # Check if role name already exists
@@ -72,7 +85,10 @@ async def create_role(role: RoleCreate, current_user: dict = Depends(get_current
 @router.put("/{role_id}", response_model=Role)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def update_role(role_id: str, role: RoleUpdate, current_user: dict = Depends(get_current_user)):
-    """Update an existing role"""
+    """Update an existing role
+
+    **Permissions:** admin
+    """
     pool = get_database()
 
     # Check if role exists
@@ -97,7 +113,10 @@ async def update_role(role_id: str, role: RoleUpdate, current_user: dict = Depen
 @router.delete("/{role_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def delete_role(role_id: str, current_user: dict = Depends(get_current_user)):
-    """Delete a role"""
+    """Delete a role
+
+    **Permissions:** admin
+    """
     pool = get_database()
 
     # Check referential integrity
@@ -112,7 +131,10 @@ async def delete_role(role_id: str, current_user: dict = Depends(get_current_use
 @router.get("/{role_id}/users")
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_role_users(role_id: str, current_user: dict = Depends(get_current_user)):
-    """Get all members in a role"""
+    """Get all users assigned to a role
+
+    **Permissions:** admin
+    """
     pool = get_database()
 
     # Check if role exists and get it

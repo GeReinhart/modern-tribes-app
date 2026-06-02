@@ -3,8 +3,9 @@ import {
   ThemedSvgIcon,
 } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { useAdminAccess } from '@/app/platform/core/authorization/useAdminAccess.ts';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,72 +27,86 @@ interface AdminNavigationProps {
 
 export const adminMainThemeId: string = 'alt_05';
 
-const items: Array<{
+type NavItem = {
   page: AdminPage | 'app';
   icon: IconName;
   labelKey: string;
   path: string;
-}> = [
+  adminOnly?: boolean;
+  peopleManagerVisible?: boolean;
+};
+
+const ALL_ITEMS: NavItem[] = [
   { page: 'app', icon: 'arrow-left', labelKey: 'admin.app', path: '/app' },
   {
     page: 'monitoring',
     icon: 'eye',
     labelKey: 'admin.monitoring',
     path: '/admin/monitoring',
+    adminOnly: true,
   },
   {
     page: 'mails',
     icon: 'archive',
     labelKey: 'admin.mails.nav',
     path: '/admin/mails',
+    adminOnly: true,
   },
   {
     page: 'people',
     icon: 'user',
     labelKey: 'admin.people',
     path: '/admin/people',
+    peopleManagerVisible: true,
   },
   {
     page: 'authorization',
     icon: 'hash',
     labelKey: 'admin.authorization',
     path: '/admin/authorization',
+    adminOnly: true,
   },
   {
     page: 'tribes',
     icon: 'external-link',
     labelKey: 'admin.tribes',
     path: '/admin/tribes',
+    peopleManagerVisible: true,
   },
   {
     page: 'documents',
     icon: 'file-text',
     labelKey: 'admin.documents',
     path: '/admin/documents',
+    adminOnly: true,
   },
   {
     page: 'config',
     icon: 'settings',
     labelKey: 'admin.config',
     path: '/admin/config',
+    adminOnly: true,
   },
   {
     page: 'features',
     icon: 'plus',
     labelKey: 'admin.features',
     path: '/admin/features',
+    adminOnly: true,
   },
   {
     page: 'publications',
     icon: 'upload',
     labelKey: 'publications.title',
     path: '/admin/publications',
+    adminOnly: true,
   },
   {
     page: 'notifications',
     icon: 'bell',
     labelKey: 'admin.notifications',
     path: '/admin/notifications',
+    adminOnly: true,
   },
 ];
 
@@ -101,10 +116,23 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const { isAdmin, canManagePeople } = useAdminAccess();
+
+  const visibleItems = useMemo(
+    () =>
+      ALL_ITEMS.filter(({ page, adminOnly, peopleManagerVisible }) => {
+        if (page === 'app') return true;
+        if (isAdmin) return true;
+        if (canManagePeople && peopleManagerVisible) return true;
+        if (!adminOnly) return true;
+        return false;
+      }),
+    [isAdmin, canManagePeople],
+  );
 
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)' }}>
-      {items.map(({ page, icon, labelKey, path }) => {
+      {visibleItems.map(({ page, icon, labelKey, path }) => {
         const isActive = page === currentPage;
         const color = isActive ? theme.colors.primary : theme.colors.text;
         return (
