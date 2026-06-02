@@ -33,7 +33,7 @@ async def fetch_board(pool, feature_instance_id: str) -> dict:
             UUID(feature_instance_id),
         )
         labels = await conn.fetch(
-            """SELECT id, name, color, position FROM labels
+            """SELECT id::text, name, color, position FROM labels
                WHERE feature_instance_id = $1 AND status = 'active'
                ORDER BY position ASC""",
             UUID(feature_instance_id),
