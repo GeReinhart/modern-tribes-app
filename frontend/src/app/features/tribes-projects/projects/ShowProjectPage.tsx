@@ -328,7 +328,7 @@ const ShowProjectPageContent: React.FC = () => {
         ? [
             {
               icon: 'plus' as const,
-              label: t('features.addFeature'),
+              label: t('features.feature'),
               onClick: () => setShowAddFeature(true),
             },
             {
@@ -341,7 +341,7 @@ const ShowProjectPageContent: React.FC = () => {
             },
             {
               icon: 'pencil' as const,
-              label: t('projects.editProject'),
+              label: t('common.project'),
               onClick: () =>
                 navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit`),
             },
@@ -357,7 +357,7 @@ const ShowProjectPageContent: React.FC = () => {
         ? [
             {
               icon: 'pencil' as const,
-              label: t('features.rename'),
+              label: t('features.feature'),
               onClick: () => {
                 setRenameValue(activeFeature.name);
                 setRenameTarget({
@@ -368,7 +368,7 @@ const ShowProjectPageContent: React.FC = () => {
             },
             {
               icon: 'archive' as const,
-              label: t('features.archive'),
+              label: t('features.feature'),
               onClick: () =>
                 setArchiveTarget({
                   id: activeFeature.id,

@@ -55,7 +55,7 @@ const AddColumnForm: React.FC<AddColumnFormProps> = ({ onAdd }) => {
         }}
       >
         <ThemedSvgIcon name="plus" color={theme.colors.secondary} size={14} />
-        {t('features.kanban.addColumn')}
+        {t('features.kanban.column')}
       </button>
     );
 

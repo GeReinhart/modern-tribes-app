@@ -257,7 +257,7 @@ const TribesTab: React.FC<TribesTabProps> = ({ canWrite }) => {
               <ThemedSvgIcon name="plus" color="currentColor" size={16} />
             }
           >
-            {t('admin.addTribe')}
+            {t('admin.tribe')}
           </ThemedButton>
         )}
         {canWrite && crud.selectedRows.size > 0 && (
@@ -494,7 +494,7 @@ const ProjectsTab: React.FC = () => {
             <ThemedSvgIcon name="plus" color="currentColor" size={16} />
           }
         >
-          {t('admin.addProject')}
+          {t('common.project')}
         </ThemedButton>
         {crud.selectedRows.size > 0 && (
           <ThemedButton

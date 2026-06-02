@@ -179,7 +179,7 @@ const ShowTribePageContent: React.FC = () => {
         ? [
             {
               icon: 'plus' as const,
-              label: t('projects.addProject'),
+              label: t('common.project'),
               onClick: () => navigate(`/app/tribes/${tribeId}/projects/new`),
             },
           ]

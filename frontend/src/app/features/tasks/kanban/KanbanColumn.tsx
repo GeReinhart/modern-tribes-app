@@ -238,7 +238,7 @@ const KanbanColumn: React.FC<Props> = ({
         {canEdit && configuring && canDelete && (
           <button
             onClick={() => setConfirmDelete(true)}
-            title={t('features.kanban.deleteColumn')}
+            title={t('features.kanban.column')}
             style={{
               background: 'none',
               border: 'none',

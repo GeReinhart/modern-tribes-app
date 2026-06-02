@@ -299,7 +299,7 @@ function FeaturesPageContent() {
                 <ThemedSvgIcon name="plus" color="currentColor" size={16} />
               }
             >
-              {t('features.addFeature')}
+              {t('features.feature')}
             </ThemedButton>
           )}
         </div>

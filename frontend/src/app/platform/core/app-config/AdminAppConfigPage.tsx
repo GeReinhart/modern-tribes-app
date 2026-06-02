@@ -429,7 +429,7 @@ const AppConfigPageContent: React.FC = () => {
                 <ThemedSvgIcon name="plus" color="currentColor" size={16} />
               }
             >
-              {t('admin.config.addEntry')}
+              {t('admin.config.entry')}
             </ThemedButton>
           )}
         </div>
