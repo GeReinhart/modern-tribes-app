@@ -769,9 +769,10 @@ def _assert_db(table: str, datatable: list):
     )
     for i, (exp, act) in enumerate(zip(expected_rows, actual_rows)):
         for j, col in enumerate(headers):
-            exp_val = expand_id(exp[j])
             act_val = act[col]
             act_str = str(act_val) if act_val is not None else ""
+            # Integer columns must not be UUID-expanded; compare raw strings
+            exp_val = exp[j] if isinstance(act_val, int) else expand_id(exp[j])
             assert act_str == exp_val, f"{table}[{i}].{col}: expected {exp_val!r}, got {act_str!r}"
 
 

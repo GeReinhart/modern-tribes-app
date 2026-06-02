@@ -39,8 +39,8 @@ class TodoListService {
     return apiService.post<TodoLabel>('/features/tasks/todo-labels/', data);
   }
 
-  async updateLabel(labelId: string, data: TodoLabelUpdate): Promise<void> {
-    return apiService.patch<void>(`/features/tasks/todo-labels/${labelId}`, data);
+  async updateLabel(labelId: string, data: TodoLabelUpdate): Promise<TodoLabel> {
+    return apiService.patch<TodoLabel>(`/features/tasks/todo-labels/${labelId}`, data);
   }
 
   async deleteLabel(labelId: string): Promise<void> {

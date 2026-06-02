@@ -27,6 +27,24 @@ export function urgencyColor(dueDate: string | null, size: number | null): strin
   return URGENCY_COLORS[4];
 }
 
+export interface FeatureLabel {
+  id: string;
+  name: string;
+  color: string;
+  position: number;
+}
+
+export interface FeatureLabelCreate {
+  feature_instance_id: string;
+  name: string;
+  color: string;
+}
+
+export interface FeatureLabelUpdate {
+  name?: string;
+  color?: string;
+}
+
 export interface TaskLabelInfo {
   id: string;
   feature_instance_id: string;

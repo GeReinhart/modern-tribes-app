@@ -5,27 +5,17 @@ from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.database import get_database
-from app.platform.core.authorization.project_access import check_project_access_or_admin
 from app.platform.core.utils.document_helpers import strip_html, extract_content_summary
+from app.features.tasks import label_service
 from app.features.tasks.todo_list import repository as todo_repository
-from app.platform.functions.people.persons import repository as persons_repository
 from app.platform.functions.labels import repository as labels_repo
+from app.features.tasks.models import PersonOption, FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate
 from app.features.tasks.todo_list.models import (
     TodoItemCreate, TodoItemUpdate, TodoItemResponse,
-    TodoLabel, TodoLabelCreate, TodoLabelUpdate, PersonOption,
 )
 
 router = APIRouter(prefix="/todo-items", tags=["features_tasks_todo_list"])
 label_router = APIRouter(prefix="/todo-labels", tags=["features_tasks_todo_list"])
-
-
-async def _get_project_id(conn, feature_instance_id: str) -> str:
-    row = await conn.fetchrow(
-        "SELECT project_id FROM projects_features WHERE id = $1", UUID(feature_instance_id)
-    )
-    if not row:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Feature instance not found.")
-    return str(row["project_id"])
 
 
 def _row_to_todo(row: dict) -> TodoItemResponse:
@@ -54,9 +44,7 @@ def _row_to_todo(row: dict) -> TodoItemResponse:
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def list_todo_items(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
     pool = get_database()
-    async with pool.acquire() as conn:
-        project_id = await _get_project_id(conn, feature_instance_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
+    await label_service.require_feature_access(pool, feature_instance_id, current_user, "guest")
     rows = await todo_repository.fetch_todo_items(pool, feature_instance_id)
     return [_row_to_todo(r) for r in rows]
 
@@ -64,12 +52,7 @@ async def list_todo_items(feature_instance_id: str, current_user: dict = Depends
 @router.get("/persons/{feature_instance_id}", response_model=list[PersonOption])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def list_persons(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
-    pool = get_database()
-    async with pool.acquire() as conn:
-        project_id = await _get_project_id(conn, feature_instance_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
-    rows = await persons_repository.fetch_persons_for_feature(pool, feature_instance_id, str(current_user["id"]))
-    return [PersonOption(**r) for r in rows]
+    return await label_service.list_persons_for_feature(get_database(), feature_instance_id, current_user)
 
 
 @router.post("/", response_model=TodoItemResponse, status_code=status.HTTP_201_CREATED)
@@ -77,9 +60,7 @@ async def list_persons(feature_instance_id: str, current_user: dict = Depends(ge
 async def create_todo_item(data: TodoItemCreate, current_user: dict = Depends(get_current_user)):
     pool = get_database()
     user_id = str(current_user["id"])
-    async with pool.acquire() as conn:
-        project_id = await _get_project_id(conn, data.feature_instance_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='member')
+    await label_service.require_feature_access(pool, data.feature_instance_id, current_user, "member")
     row = await todo_repository.insert_todo_item(pool, data.feature_instance_id, data.title, data.position, user_id)
     return _row_to_todo(row)
 
@@ -91,10 +72,9 @@ async def update_todo_item(item_id: str, data: TodoItemUpdate, current_user: dic
     user_id = str(current_user["id"])
     async with pool.acquire() as conn:
         item_row = await conn.fetchrow("SELECT feature_instance_id FROM todo_items WHERE id = $1", UUID(item_id))
-        if not item_row:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo item not found.")
-        project_id = await _get_project_id(conn, str(item_row["feature_instance_id"]))
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='member')
+    if not item_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo item not found.")
+    await label_service.require_feature_access(pool, str(item_row["feature_instance_id"]), current_user, "member")
 
     basic: dict = {}
     if data.title is not None:
@@ -131,10 +111,9 @@ async def toggle_todo_label(item_id: str, label_id: str, current_user: dict = De
     pool = get_database()
     async with pool.acquire() as conn:
         item_row = await conn.fetchrow("SELECT feature_instance_id FROM todo_items WHERE id = $1", UUID(item_id))
-        if not item_row:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo item not found.")
-        project_id = await _get_project_id(conn, str(item_row["feature_instance_id"]))
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='member')
+    if not item_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo item not found.")
+    await label_service.require_feature_access(pool, str(item_row["feature_instance_id"]), current_user, "member")
     return await labels_repo.toggle_entity_label(pool, item_id, 'todo_item', label_id)
 
 
@@ -144,61 +123,34 @@ async def delete_todo_item(item_id: str, current_user: dict = Depends(get_curren
     pool = get_database()
     async with pool.acquire() as conn:
         item_row = await conn.fetchrow("SELECT feature_instance_id FROM todo_items WHERE id = $1", UUID(item_id))
-        if not item_row:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo item not found.")
-        project_id = await _get_project_id(conn, str(item_row["feature_instance_id"]))
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='member')
+    if not item_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo item not found.")
+    await label_service.require_feature_access(pool, str(item_row["feature_instance_id"]), current_user, "member")
     async with pool.acquire() as conn:
         await conn.execute("DELETE FROM todo_items WHERE id = $1", UUID(item_id))
 
 
 # --- Label endpoints ---
 
-@label_router.get("/by-instance/{feature_instance_id}", response_model=list[TodoLabel])
+@label_router.get("/by-instance/{feature_instance_id}", response_model=list[FeatureLabel])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def list_labels(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
-    pool = get_database()
-    async with pool.acquire() as conn:
-        project_id = await _get_project_id(conn, feature_instance_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='guest')
-    rows = await labels_repo.fetch_labels_for_feature(pool, feature_instance_id)
-    return [TodoLabel(**r) for r in rows]
+    return await label_service.list_feature_labels(get_database(), feature_instance_id, current_user)
 
 
-@label_router.post("/", response_model=TodoLabel, status_code=status.HTTP_201_CREATED)
+@label_router.post("/", response_model=FeatureLabel, status_code=status.HTTP_201_CREATED)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
-async def create_label(data: TodoLabelCreate, current_user: dict = Depends(get_current_user)):
-    pool = get_database()
-    user_id = str(current_user["id"])
-    async with pool.acquire() as conn:
-        project_id = await _get_project_id(conn, data.feature_instance_id)
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
-    row = await labels_repo.insert_feature_label(pool, data.feature_instance_id, data.name, data.color, user_id)
-    return TodoLabel(**row)
+async def create_label(data: FeatureLabelCreate, current_user: dict = Depends(get_current_user)):
+    return await label_service.create_feature_label(get_database(), data, current_user)
 
 
-@label_router.patch("/{label_id}", status_code=status.HTTP_204_NO_CONTENT)
+@label_router.patch("/{label_id}", response_model=FeatureLabel)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
-async def update_label(label_id: str, data: TodoLabelUpdate, current_user: dict = Depends(get_current_user)):
-    pool = get_database()
-    user_id = str(current_user["id"])
-    lb = await labels_repo.fetch_label_by_id(pool, label_id)
-    if not lb:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Label not found.")
-    async with pool.acquire() as conn:
-        project_id = await _get_project_id(conn, str(lb["feature_instance_id"]))
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
-    await labels_repo.update_feature_label(pool, label_id, data.name, data.color, user_id)
+async def update_label(label_id: str, data: FeatureLabelUpdate, current_user: dict = Depends(get_current_user)):
+    return await label_service.update_feature_label(get_database(), label_id, data, current_user)
 
 
 @label_router.delete("/{label_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def delete_label(label_id: str, current_user: dict = Depends(get_current_user)):
-    pool = get_database()
-    lb = await labels_repo.fetch_label_by_id(pool, label_id)
-    if not lb:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Label not found.")
-    async with pool.acquire() as conn:
-        project_id = await _get_project_id(conn, str(lb["feature_instance_id"]))
-    await check_project_access_or_admin(project_id, current_user, pool, min_position='manager')
-    await labels_repo.delete_feature_label(pool, label_id)
+    await label_service.delete_feature_label(get_database(), label_id, current_user)

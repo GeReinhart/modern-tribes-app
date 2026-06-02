@@ -1,9 +1,5 @@
-export interface KanbanLabel {
-  id: string;
-  name: string;
-  color: string;
-  position: number;
-}
+import type { FeatureLabel } from '@/app/features/tasks/types.ts';
+export type { FeatureLabel as KanbanLabel } from '@/app/features/tasks/types.ts';
 
 export interface KanbanColumn {
   id: string;
@@ -34,7 +30,7 @@ export interface KanbanCard {
 export interface KanbanBoard {
   columns: KanbanColumn[];
   cards: KanbanCard[];
-  labels: KanbanLabel[];
+  labels: FeatureLabel[];
 }
 
 export type { PersonOption } from '@/app/features/tasks/types.ts';
@@ -63,16 +59,7 @@ export interface ColumnCreate {
   name: string;
 }
 
-export interface LabelCreate {
-  feature_instance_id: string;
-  name: string;
-  color: string;
-}
-
-export interface LabelUpdate {
-  name?: string;
-  color?: string;
-}
+export type { FeatureLabelCreate as LabelCreate, FeatureLabelUpdate as LabelUpdate } from '@/app/features/tasks/types.ts';
 
 export type MoveDirection = 'prev' | 'next';
 export type ReorderDirection = 'up' | 'down' | 'top' | 'bottom';

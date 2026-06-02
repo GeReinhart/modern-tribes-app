@@ -1,23 +1,7 @@
 export type { PersonOption } from '@/app/features/tasks/types.ts';
 export { FIBONACCI, fibColor, urgencyColor } from '@/app/features/tasks/types.ts';
 
-export interface TodoLabel {
-  id: string;
-  name: string;
-  color: string;
-  position: number;
-}
-
-export interface TodoLabelCreate {
-  feature_instance_id: string;
-  name: string;
-  color: string;
-}
-
-export interface TodoLabelUpdate {
-  name?: string;
-  color?: string;
-}
+export type { FeatureLabel as TodoLabel, FeatureLabelCreate as TodoLabelCreate, FeatureLabelUpdate as TodoLabelUpdate } from '@/app/features/tasks/types.ts';
 
 export interface TodoItem {
   id: string;

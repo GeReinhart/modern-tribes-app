@@ -6,15 +6,14 @@ from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.database import get_database
-from app.platform.core.authorization.project_access import check_project_access_or_admin
 from app.platform.core.utils.document_helpers import strip_html, extract_content_summary
+from app.features.tasks import label_service
 from app.features.tasks.kanban import repository as repo
-from app.platform.functions.people.persons import repository as persons_repository
 from app.platform.functions.labels import repository as labels_repo
+from app.features.tasks.models import PersonOption, FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate
 from app.features.tasks.kanban.models import (
-    KanbanBoard, KanbanColumnResponse, KanbanCardResponse, KanbanLabel, PersonOption,
+    KanbanBoard, KanbanColumnResponse, KanbanCardResponse,
     ColumnCreate, ColumnUpdate, CardCreate, CardUpdate, MoveCard, ReorderCard,
-    LabelCreate, LabelUpdate,
 )
 
 router = APIRouter(prefix="/kanban", tags=["features_tasks_kanban"])
@@ -22,10 +21,6 @@ router = APIRouter(prefix="/kanban", tags=["features_tasks_kanban"])
 
 def _column(row: dict) -> KanbanColumnResponse:
     return KanbanColumnResponse(id=str(row["id"]), name=row["name"], position=row["position"])
-
-
-def _label(row: dict) -> KanbanLabel:
-    return KanbanLabel(id=str(row["id"]), name=row["name"], color=row["color"], position=row["position"])
 
 
 def _card(row: dict) -> KanbanCardResponse:
@@ -47,47 +42,30 @@ def _card(row: dict) -> KanbanCardResponse:
     )
 
 
-async def _feature_project(conn, feature_instance_id: str) -> str:
-    row = await conn.fetchrow("SELECT project_id FROM projects_features WHERE id = $1", UUID(feature_instance_id))
-    if not row:
-        raise HTTPException(status_code=404, detail="Feature not found.")
-    return str(row["project_id"])
-
-
-async def _require_feature_access(feature_instance_id: str, user: dict, pool, min_position: str = "guest"):
-    async with pool.acquire() as conn:
-        project_id = await _feature_project(conn, feature_instance_id)
-    await check_project_access_or_admin(project_id, user, pool, min_position=min_position)
-    return project_id
-
-
 @router.get("/board/{feature_instance_id}", response_model=KanbanBoard)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_board(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
     pool = get_database()
-    await _require_feature_access(feature_instance_id, current_user, pool, "guest")
+    await label_service.require_feature_access(pool, feature_instance_id, current_user, "guest")
     data = await repo.fetch_board(pool, feature_instance_id)
     return KanbanBoard(
         columns=[_column(c) for c in data["columns"]],
         cards=[_card(c) for c in data["cards"]],
-        labels=[_label(lb) for lb in data["labels"]],
+        labels=[FeatureLabel(**lb) for lb in data["labels"]],
     )
 
 
 @router.get("/persons/{feature_instance_id}", response_model=list[PersonOption])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def list_persons(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
-    pool = get_database()
-    await _require_feature_access(feature_instance_id, current_user, pool, "guest")
-    rows = await persons_repository.fetch_persons_for_feature(pool, feature_instance_id, str(current_user["id"]))
-    return [PersonOption(id=str(r["id"]), name=r["name"]) for r in rows]
+    return await label_service.list_persons_for_feature(get_database(), feature_instance_id, current_user)
 
 
 @router.post("/columns", response_model=KanbanColumnResponse, status_code=status.HTTP_201_CREATED)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def create_column(data: ColumnCreate, current_user: dict = Depends(get_current_user)):
     pool = get_database()
-    await _require_feature_access(data.feature_instance_id, current_user, pool, "manager")
+    await label_service.require_feature_access(pool, data.feature_instance_id, current_user, "manager")
     cols = await repo.fetch_columns_sorted(pool, data.feature_instance_id)
     if len(cols) >= 4:
         raise HTTPException(status_code=400, detail="Maximum 4 columns allowed.")
@@ -103,7 +81,7 @@ async def rename_column(column_id: str, data: ColumnUpdate, current_user: dict =
     col = await repo.fetch_column(pool, column_id)
     if not col:
         raise HTTPException(status_code=404, detail="Column not found.")
-    await _require_feature_access(str(col["feature_instance_id"]), current_user, pool, "manager")
+    await label_service.require_feature_access(pool, str(col["feature_instance_id"]), current_user, "manager")
     updated = await repo.update_column(pool, column_id, data.name, str(current_user["id"]))
     return _column(updated)
 
@@ -116,7 +94,7 @@ async def move_column(column_id: str, data: MoveCard, current_user: dict = Depen
     if not col:
         raise HTTPException(status_code=404, detail="Column not found.")
     fid = str(col["feature_instance_id"])
-    await _require_feature_access(fid, current_user, pool, "manager")
+    await label_service.require_feature_access(pool, fid, current_user, "manager")
     cols = await repo.fetch_columns_sorted(pool, fid)
     idx = next((i for i, c in enumerate(cols) if str(c["id"]) == column_id), None)
     if idx is None:
@@ -139,7 +117,7 @@ async def delete_column(column_id: str, current_user: dict = Depends(get_current
     if not col:
         raise HTTPException(status_code=404, detail="Column not found.")
     fid = str(col["feature_instance_id"])
-    await _require_feature_access(fid, current_user, pool, "manager")
+    await label_service.require_feature_access(pool, fid, current_user, "manager")
     cols = await repo.fetch_columns_sorted(pool, fid)
     if len(cols) <= 2:
         raise HTTPException(status_code=400, detail="Cannot delete: at least 2 columns required.")
@@ -152,7 +130,7 @@ async def delete_column(column_id: str, current_user: dict = Depends(get_current
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def create_card(data: CardCreate, current_user: dict = Depends(get_current_user)):
     pool = get_database()
-    await _require_feature_access(data.feature_instance_id, current_user, pool, "member")
+    await label_service.require_feature_access(pool, data.feature_instance_id, current_user, "member")
     row = await repo.insert_card(
         pool, data.feature_instance_id, data.column_id,
         data.title, data.assigned_person_id, data.position, str(current_user["id"]),
@@ -167,7 +145,7 @@ async def update_card(card_id: str, data: CardUpdate, current_user: dict = Depen
     card = await repo.fetch_card(pool, card_id)
     if not card:
         raise HTTPException(status_code=404, detail="Card not found.")
-    await _require_feature_access(str(card["feature_instance_id"]), current_user, pool, "member")
+    await label_service.require_feature_access(pool, str(card["feature_instance_id"]), current_user, "member")
     uid = str(current_user["id"])
     await repo.update_card_fields(pool, card_id, data.title, data.assigned_person_id, data.clear_assignee, data.size, data.clear_size, data.due_date, data.clear_due_date, uid)
     if data.document_content_html is not None:
@@ -200,7 +178,7 @@ async def archive_card(card_id: str, current_user: dict = Depends(get_current_us
     card = await repo.fetch_card(pool, card_id)
     if not card:
         raise HTTPException(status_code=404, detail="Card not found.")
-    await _require_feature_access(str(card["feature_instance_id"]), current_user, pool, "member")
+    await label_service.require_feature_access(pool, str(card["feature_instance_id"]), current_user, "member")
     await repo.archive_card(pool, card_id, str(current_user["id"]))
 
 
@@ -211,7 +189,7 @@ async def restore_card(card_id: str, current_user: dict = Depends(get_current_us
     card = await repo.fetch_card(pool, card_id)
     if not card:
         raise HTTPException(status_code=404, detail="Card not found.")
-    await _require_feature_access(str(card["feature_instance_id"]), current_user, pool, "member")
+    await label_service.require_feature_access(pool, str(card["feature_instance_id"]), current_user, "member")
     await repo.restore_card(pool, card_id, str(current_user["id"]))
     return _card(await repo.fetch_card(pool, card_id))
 
@@ -224,7 +202,7 @@ async def move_card(card_id: str, data: MoveCard, current_user: dict = Depends(g
     if not card:
         raise HTTPException(status_code=404, detail="Card not found.")
     fid = str(card["feature_instance_id"])
-    await _require_feature_access(fid, current_user, pool, "member")
+    await label_service.require_feature_access(pool, fid, current_user, "member")
     cols = await repo.fetch_columns_sorted(pool, fid)
     col_ids = [str(c["id"]) for c in cols]
     current_idx = next((i for i, c in enumerate(cols) if str(c["id"]) == str(card["column_id"])), None)
@@ -246,52 +224,35 @@ async def reorder_card(card_id: str, data: ReorderCard, current_user: dict = Dep
     card = await repo.fetch_card(pool, card_id)
     if not card:
         raise HTTPException(status_code=404, detail="Card not found.")
-    await _require_feature_access(str(card["feature_instance_id"]), current_user, pool, "member")
+    await label_service.require_feature_access(pool, str(card["feature_instance_id"]), current_user, "member")
     updated = await repo.reorder_card_in_column(pool, card_id, data.direction, str(current_user["id"]))
     return [_card(c) for c in updated]
 
 
 # --- Labels ---
 
-@router.get("/labels/{feature_instance_id}", response_model=list[KanbanLabel])
+@router.get("/labels/{feature_instance_id}", response_model=list[FeatureLabel])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def list_labels(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
-    pool = get_database()
-    await _require_feature_access(feature_instance_id, current_user, pool, "guest")
-    rows = await labels_repo.fetch_labels_for_feature(pool, feature_instance_id)
-    return [_label(r) for r in rows]
+    return await label_service.list_feature_labels(get_database(), feature_instance_id, current_user)
 
 
-@router.post("/labels", response_model=KanbanLabel, status_code=status.HTTP_201_CREATED)
+@router.post("/labels", response_model=FeatureLabel, status_code=status.HTTP_201_CREATED)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
-async def create_label(data: LabelCreate, current_user: dict = Depends(get_current_user)):
-    pool = get_database()
-    await _require_feature_access(data.feature_instance_id, current_user, pool, "manager")
-    row = await labels_repo.insert_feature_label(pool, data.feature_instance_id, data.name, data.color, str(current_user["id"]))
-    return _label(row)
+async def create_label(data: FeatureLabelCreate, current_user: dict = Depends(get_current_user)):
+    return await label_service.create_feature_label(get_database(), data, current_user)
 
 
-@router.patch("/labels/{label_id}", response_model=KanbanLabel)
+@router.patch("/labels/{label_id}", response_model=FeatureLabel)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
-async def update_label(label_id: str, data: LabelUpdate, current_user: dict = Depends(get_current_user)):
-    pool = get_database()
-    lb = await labels_repo.fetch_label_by_id(pool, label_id)
-    if not lb:
-        raise HTTPException(status_code=404, detail="Label not found.")
-    await _require_feature_access(str(lb["feature_instance_id"]), current_user, pool, "manager")
-    updated = await labels_repo.update_feature_label(pool, label_id, data.name, data.color, str(current_user["id"]))
-    return _label(updated)
+async def update_label(label_id: str, data: FeatureLabelUpdate, current_user: dict = Depends(get_current_user)):
+    return await label_service.update_feature_label(get_database(), label_id, data, current_user)
 
 
 @router.delete("/labels/{label_id}", status_code=status.HTTP_204_NO_CONTENT)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def delete_label(label_id: str, current_user: dict = Depends(get_current_user)):
-    pool = get_database()
-    lb = await labels_repo.fetch_label_by_id(pool, label_id)
-    if not lb:
-        raise HTTPException(status_code=404, detail="Label not found.")
-    await _require_feature_access(str(lb["feature_instance_id"]), current_user, pool, "manager")
-    await labels_repo.delete_feature_label(pool, label_id)
+    await label_service.delete_feature_label(get_database(), label_id, current_user)
 
 
 @router.post("/cards/{card_id}/labels/{label_id}", response_model=KanbanCardResponse)
@@ -301,7 +262,7 @@ async def add_card_label(card_id: str, label_id: str, current_user: dict = Depen
     card = await repo.fetch_card(pool, card_id)
     if not card:
         raise HTTPException(status_code=404, detail="Card not found.")
-    await _require_feature_access(str(card["feature_instance_id"]), current_user, pool, "member")
+    await label_service.require_feature_access(pool, str(card["feature_instance_id"]), current_user, "member")
     await labels_repo.add_entity_label(pool, card_id, 'kanban_card', label_id)
     return _card(await repo.fetch_card(pool, card_id))
 
@@ -313,6 +274,6 @@ async def remove_card_label(card_id: str, label_id: str, current_user: dict = De
     card = await repo.fetch_card(pool, card_id)
     if not card:
         raise HTTPException(status_code=404, detail="Card not found.")
-    await _require_feature_access(str(card["feature_instance_id"]), current_user, pool, "member")
+    await label_service.require_feature_access(pool, str(card["feature_instance_id"]), current_user, "member")
     await labels_repo.remove_entity_label(pool, card_id, 'kanban_card', label_id)
     return _card(await repo.fetch_card(pool, card_id))

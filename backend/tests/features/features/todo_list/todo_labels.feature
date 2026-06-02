@@ -65,7 +65,11 @@ Feature: Manage todo labels
       """
       {"name": "Feature"}
       """
-    Then the response status code is 204
+    Then the response status code is 200
+    And the response body is:
+      """
+      {"id": "0010", "name": "Feature", "color": "#ff0000", "position": 0}
+      """
     And the labels table contains:
       | id   | name    | color   | status | feature_instance_id |
       | 0010 | Feature | #ff0000 | active | 0100                |

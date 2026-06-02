@@ -41,26 +41,3 @@ class TodoItemResponse(BaseModel):
     updated_at: datetime
     created_by: Optional[str] = None
     updated_by: Optional[str] = None
-
-
-class TodoLabel(BaseModel):
-    id: str
-    name: str
-    color: str
-    position: int
-
-
-class TodoLabelCreate(BaseModel):
-    feature_instance_id: str
-    name: str
-    color: str = '#6b7280'
-
-
-class TodoLabelUpdate(BaseModel):
-    name: Optional[str] = None
-    color: Optional[str] = None
-
-
-class PersonOption(BaseModel):
-    id: str
-    name: str
