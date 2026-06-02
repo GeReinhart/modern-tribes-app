@@ -33,9 +33,16 @@ Feature: Remove a bookmark
       | 0010 | 0002    | /tribes/abc | Eng        | 1             | active |
     When I DELETE /api/features/bookmarks/0010
     Then the response status code is 204
+    And the user_bookmarks table contains:
+      | id   | page_path   | page_title | status   |
+      | 0010 | /tribes/abc | Eng        | archived |
 
   @error_case
   Scenario: DELETE /bookmarks/0010 as a user with no app access — 403 error
     Given I am authenticated as the person's owner: user.id 0003
+    And the user_bookmarks table contains:
+      | id | user_id | page_path | page_title | display_order | status |
     When I DELETE /api/features/bookmarks/0010
     Then the response status code is 403
+    And the user_bookmarks table contains:
+      | id | user_id | page_path | page_title | display_order | status |

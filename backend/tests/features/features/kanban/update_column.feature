@@ -27,13 +27,13 @@ Feature: Update a kanban column
     And the projects_features table contains:
       | id   | project_id | name  | feature_type | status |
       | 0100 | 0100       | Board | kanban       | active |
+
+  Scenario: PATCH /kanban/columns/0010 as admin — the column is updated
+    Given I am authenticated as an administrator: user.id 0001
     And the kanban_columns table contains:
       | id   | feature_instance_id | name  | position | status |
       | 0010 | 0100                | To Do | 1        | active |
       | 0011 | 0100                | Done  | 2        | active |
-
-  Scenario: PATCH /kanban/columns/0010 as admin — the column is updated
-    Given I am authenticated as an administrator: user.id 0001
     When I PATCH /api/features/tasks/kanban/columns/0010 with body:
       """
       {"name": "In Progress"}
@@ -43,12 +43,24 @@ Feature: Update a kanban column
       """
       {"id": "0010", "name": "In Progress", "position": 1}
       """
+    And the kanban_columns table contains:
+      | id   | feature_instance_id | name        | position | status |
+      | 0010 | 0100                | In Progress | 1        | active |
+      | 0011 | 0100                | Done        | 2        | active |
 
   @error_case
   Scenario: PATCH /kanban/columns/0010 as a viewer without project access — 403 error
     Given I am authenticated as a regular user: user.id 0002
+    And the kanban_columns table contains:
+      | id   | feature_instance_id | name  | position | status |
+      | 0010 | 0100                | To Do | 1        | active |
+      | 0011 | 0100                | Done  | 2        | active |
     When I PATCH /api/features/tasks/kanban/columns/0010 with body:
       """
       {"name": "In Progress"}
       """
     Then the response status code is 403
+    And the kanban_columns table contains:
+      | id   | feature_instance_id | name  | position | status |
+      | 0010 | 0100                | To Do | 1        | active |
+      | 0011 | 0100                | Done  | 2        | active |

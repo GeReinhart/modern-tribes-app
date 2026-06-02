@@ -886,3 +886,92 @@ def _then_delta_users(context, datatable, label):
             exp_val = expand_id(exp[j])
             act_str = str(act[col]) if act[col] is not None else ""
             assert act_str == exp_val, f"{label}[{i}].{col}: expected {exp_val!r}, got {act_str!r}"
+
+
+@then("the users table contains:")
+def then_users_table(datatable):
+    _assert_db("users", datatable)
+
+
+@then("the notifications table contains:")
+def then_notifications_table(datatable):
+    _assert_db("notifications", datatable)
+
+
+@then("the publications table contains:")
+def then_publications_table(datatable):
+    _assert_db("publications", datatable)
+
+
+@then("the kanban_columns table contains:")
+def then_kanban_columns_table(datatable):
+    _assert_db("kanban_columns", datatable)
+
+
+@then("the kanban_cards table contains:")
+def then_kanban_cards_table(datatable):
+    _assert_db("kanban_cards", datatable)
+
+
+@then("the todo_items table contains:")
+def then_todo_items_table(datatable):
+    _assert_db("todo_items", datatable)
+
+
+@then("the user_bookmarks table contains:")
+def then_user_bookmarks_table(datatable):
+    _assert_db("user_bookmarks", datatable)
+
+
+@then("the projects_features table contains:")
+def then_projects_features_table(datatable):
+    _assert_db("projects_features", datatable)
+
+
+@given("the label_entities table contains:")
+def given_label_entities_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            for row in datatable[1:]:
+                rec = {datatable[0][i]: expand_id(row[i]) for i in range(len(datatable[0]))}
+                await conn.execute(
+                    """INSERT INTO label_entities(label_id, entity_type, entity_id)
+                       VALUES($1, $2, $3) ON CONFLICT DO NOTHING""",
+                    UUID(rec["label_id"]),
+                    rec["entity_type"],
+                    UUID(rec["entity_id"]),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the label_entities table contains:")
+def then_label_entities_table(datatable):
+    _assert_db("label_entities", datatable)
+
+
+@given("the user_tab_configs table contains:")
+def given_user_tab_configs_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            for row in datatable[1:]:
+                rec = {datatable[0][i]: expand_id(row[i]) for i in range(len(datatable[0]))}
+                await conn.execute(
+                    """INSERT INTO user_tab_configs(id, user_id, context_key, tab_configs)
+                       VALUES($1, $2, $3, $4::jsonb) ON CONFLICT (id) DO NOTHING""",
+                    UUID(rec["id"]),
+                    UUID(rec["user_id"]),
+                    rec["context_key"],
+                    rec.get("tab_configs", "[]"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the user_tab_configs table contains:")
+def then_user_tab_configs_table(datatable):
+    _assert_db("user_tab_configs", datatable)

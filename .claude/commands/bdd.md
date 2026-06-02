@@ -91,6 +91,13 @@ Always seed the auth users that will be used in scenarios (0001, 0002, 0003 as n
 **Domain `Given` tables** go inside each `Scenario:`, covering every table the endpoint
 reads. List them in FK-dependency order (parents before children — see section 9).
 
+**Table state rule (applies to every table the endpoint writes):**
+- **Before `When` (Given):** always show the initial state of the table — the rows that
+  exist before the action. An empty table = header-only. This documents the starting point.
+- **After `When` (Then):** always show the expected state of the table after the action.
+  For insert scenarios: all rows that should now exist. For no-op scenarios (error cases):
+  same rows as in Given (table unchanged).
+
 **`Given the managed_<table> table contains:`** for mutation tests:
 - Before `When`: header-only table = take a baseline snapshot of current IDs
 - After `When` (Then): list only the new rows expected after the action
@@ -276,6 +283,8 @@ No re-declaration needed for these:
 | `the managed_roles table contains:` | snapshots baseline + seeds initial rows |
 | `the managed_users table contains:` | snapshots baseline + seeds initial rows |
 | `the created_users table contains:` | alias for `managed_users` mechanism |
+| `the label_entities table contains:` | columns: `label_id`, `entity_type`, `entity_id` |
+| `the user_tab_configs table contains:` | columns: `id`, `user_id`, `context_key`, `tab_configs` |
 
 **HTTP (When):**
 
@@ -305,6 +314,16 @@ No re-declaration needed for these:
 | `the managed_roles table contains:` | delta from baseline taken in Given |
 | `the managed_users table contains:` | delta from baseline taken in Given |
 | `the created_users table contains:` | delta from baseline taken in Given |
+| `the users table contains:` | full table assertion |
+| `the notifications table contains:` | full table assertion |
+| `the publications table contains:` | full table assertion |
+| `the kanban_columns table contains:` | full table assertion |
+| `the kanban_cards table contains:` | full table assertion |
+| `the todo_items table contains:` | full table assertion |
+| `the user_bookmarks table contains:` | full table assertion |
+| `the projects_features table contains:` | full table assertion |
+| `the label_entities table contains:` | full table assertion; columns: `label_id`, `entity_type`, `entity_id` |
+| `the user_tab_configs table contains:` | full table assertion; columns: `user_id`, `context_key`, `tab_configs` |
 
 ### 7 — DB helpers reference
 

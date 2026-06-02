@@ -36,15 +36,24 @@ Feature: Toggle a label on a todo item
 
   Scenario: POST /todo-items/0010/labels/0020 as admin — label is toggled on todo item
     Given I am authenticated as an administrator: user.id 0001
+    And the label_entities table contains:
+      | label_id | entity_type | entity_id |
     When I POST /api/features/tasks/todo-items/0010/labels/0020
     Then the response status code is 200
     And the response body is:
       """
       ["0020"]
       """
+    And the label_entities table contains:
+      | label_id | entity_type | entity_id |
+      | 0020     | todo_item   | 0010      |
 
   @error_case
   Scenario: POST /todo-items/0010/labels/0020 as a viewer without project access — 403 error
     Given I am authenticated as a regular user: user.id 0002
+    And the label_entities table contains:
+      | label_id | entity_type | entity_id |
     When I POST /api/features/tasks/todo-items/0010/labels/0020
     Then the response status code is 403
+    And the label_entities table contains:
+      | label_id | entity_type | entity_id |

@@ -28,6 +28,8 @@ Feature: Add a bookmark
 
   Scenario: POST /bookmarks with valid body as viewer — the bookmark is created
     Given I am authenticated as a regular user: user.id 0002
+    And the user_bookmarks table contains:
+      | id | user_id | page_path | page_title | display_order | status |
     When I POST /api/features/bookmarks with body:
       """
       {"page_path": "/tribes/abc", "page_title": "Engineering tribe"}
@@ -44,12 +46,19 @@ Feature: Add a bookmark
         "color_background": null
       }
       """
+    And the user_bookmarks table contains:
+      | user_id | page_path   | page_title        | display_order | status |
+      | 0002    | /tribes/abc | Engineering tribe | 0             | active |
 
   @error_case
   Scenario: POST /bookmarks as a user with no app access — 403 error
     Given I am authenticated as the person's owner: user.id 0003
+    And the user_bookmarks table contains:
+      | id | user_id | page_path | page_title | display_order | status |
     When I POST /api/features/bookmarks with body:
       """
       {"page_path": "/tribes/abc", "page_title": "Engineering tribe"}
       """
     Then the response status code is 403
+    And the user_bookmarks table contains:
+      | id | user_id | page_path | page_title | display_order | status |

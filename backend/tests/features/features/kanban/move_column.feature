@@ -27,13 +27,13 @@ Feature: Move a kanban column
     And the projects_features table contains:
       | id   | project_id | name  | feature_type | status |
       | 0100 | 0100       | Board | kanban       | active |
+
+  Scenario: POST /kanban/columns/0010/move as admin — column is moved
+    Given I am authenticated as an administrator: user.id 0001
     And the kanban_columns table contains:
       | id   | feature_instance_id | name  | position | status |
       | 0010 | 0100                | To Do | 1        | active |
       | 0011 | 0100                | Done  | 2        | active |
-
-  Scenario: POST /kanban/columns/0010/move as admin — column is moved
-    Given I am authenticated as an administrator: user.id 0001
     When I POST /api/features/tasks/kanban/columns/0010/move with body:
       """
       {"direction": "next"}
@@ -46,12 +46,24 @@ Feature: Move a kanban column
         {"id": "0010", "name": "To Do", "position": 2}
       ]
       """
+    And the kanban_columns table contains:
+      | id   | feature_instance_id | name  | position | status |
+      | 0010 | 0100                | To Do | 2        | active |
+      | 0011 | 0100                | Done  | 1        | active |
 
   @error_case
   Scenario: POST /kanban/columns/0010/move as a viewer without project access — 403 error
     Given I am authenticated as a regular user: user.id 0002
+    And the kanban_columns table contains:
+      | id   | feature_instance_id | name  | position | status |
+      | 0010 | 0100                | To Do | 1        | active |
+      | 0011 | 0100                | Done  | 2        | active |
     When I POST /api/features/tasks/kanban/columns/0010/move with body:
       """
       {"direction": "next"}
       """
     Then the response status code is 403
+    And the kanban_columns table contains:
+      | id   | feature_instance_id | name  | position | status |
+      | 0010 | 0100                | To Do | 1        | active |
+      | 0011 | 0100                | Done  | 2        | active |

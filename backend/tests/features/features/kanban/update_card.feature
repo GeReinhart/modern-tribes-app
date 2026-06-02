@@ -30,12 +30,12 @@ Feature: Update a kanban card
     And the kanban_columns table contains:
       | id   | feature_instance_id | name  | position | status |
       | 0200 | 0100                | To Do | 1        | active |
-    And the kanban_cards table contains:
-      | id   | feature_instance_id | column_id | title | position | status |
-      | 0010 | 0100                | 0200      | Task  | 1        | active |
 
   Scenario: PATCH /kanban/cards/0010 as admin — the card is updated
     Given I am authenticated as an administrator: user.id 0001
+    And the kanban_cards table contains:
+      | id   | feature_instance_id | column_id | title | position | status |
+      | 0010 | 0100                | 0200      | Task  | 1        | active |
     When I PATCH /api/features/tasks/kanban/cards/0010 with body:
       """
       {"title": "Fix login bug — updated"}
@@ -63,12 +63,21 @@ Feature: Update a kanban card
         "updated_by": null
       }
       """
+    And the kanban_cards table contains:
+      | id   | feature_instance_id | column_id | title                   | position | status |
+      | 0010 | 0100                | 0200      | Fix login bug — updated | 1        | active |
 
   @error_case
   Scenario: PATCH /kanban/cards/0010 as a viewer without project access — 403 error
     Given I am authenticated as a regular user: user.id 0002
+    And the kanban_cards table contains:
+      | id   | feature_instance_id | column_id | title | position | status |
+      | 0010 | 0100                | 0200      | Task  | 1        | active |
     When I PATCH /api/features/tasks/kanban/cards/0010 with body:
       """
       {"title": "Fix login bug — updated"}
       """
     Then the response status code is 403
+    And the kanban_cards table contains:
+      | id   | feature_instance_id | column_id | title | position | status |
+      | 0010 | 0100                | 0200      | Task  | 1        | active |

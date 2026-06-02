@@ -39,6 +39,8 @@ Feature: Manage card labels
 
   Scenario: POST /kanban/cards/0010/labels/0020 as admin — label is toggled on card
     Given I am authenticated as an administrator: user.id 0001
+    And the label_entities table contains:
+      | label_id | entity_type | entity_id |
     When I POST /api/features/tasks/kanban/cards/0010/labels/0020
     Then the response status code is 200
     And the response body is:
@@ -63,9 +65,16 @@ Feature: Manage card labels
         "updated_by": null
       }
       """
+    And the label_entities table contains:
+      | label_id | entity_type | entity_id |
+      | 0020     | kanban_card | 0010      |
 
   @error_case
   Scenario: POST /kanban/cards/0010/labels/0020 as a viewer without project access — 403 error
     Given I am authenticated as a regular user: user.id 0002
+    And the label_entities table contains:
+      | label_id | entity_type | entity_id |
     When I POST /api/features/tasks/kanban/cards/0010/labels/0020
     Then the response status code is 403
+    And the label_entities table contains:
+      | label_id | entity_type | entity_id |

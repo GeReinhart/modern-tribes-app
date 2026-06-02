@@ -28,6 +28,8 @@ Feature: Update tab configuration
 
   Scenario: PUT /tab-configs/my-context as viewer — tab config is updated
     Given I am authenticated as a regular user: user.id 0002
+    And the user_tab_configs table contains:
+      | id | user_id | context_key | tab_configs |
     When I PUT /api/features/glue/tab-configs/my-context with body:
       """
       {"tab_configs": []}
@@ -40,12 +42,19 @@ Feature: Update tab configuration
         "tab_configs": []
       }
       """
+    And the user_tab_configs table contains:
+      | user_id | context_key | tab_configs |
+      | 0002    | my-context  | []          |
 
   @error_case
   Scenario: PUT /tab-configs/my-context as a user with no app access — 403 error
     Given I am authenticated as the person's owner: user.id 0003
+    And the user_tab_configs table contains:
+      | id | user_id | context_key | tab_configs |
     When I PUT /api/features/glue/tab-configs/my-context with body:
       """
       {"tab_configs": []}
       """
     Then the response status code is 403
+    And the user_tab_configs table contains:
+      | id | user_id | context_key | tab_configs |

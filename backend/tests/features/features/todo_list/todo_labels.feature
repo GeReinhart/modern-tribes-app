@@ -54,6 +54,10 @@ Feature: Manage todo labels
       """
       {"name": "Feature", "color": "#0000ff", "position": 1}
       """
+    And the labels table contains:
+      | name    | color   | status |
+      | Bug     | #ff0000 | active |
+      | Feature | #0000ff | active |
 
   Scenario: PATCH /todo-labels/0010 as admin — label is updated
     Given I am authenticated as an administrator: user.id 0001
@@ -62,6 +66,9 @@ Feature: Manage todo labels
       {"name": "Feature"}
       """
     Then the response status code is 204
+    And the labels table contains:
+      | id   | name    | color   | status | feature_instance_id |
+      | 0010 | Feature | #ff0000 | active | 0100                |
 
   @error_case
   Scenario: POST /todo-labels/ as a viewer without project access — 403 error
@@ -71,3 +78,6 @@ Feature: Manage todo labels
       {"feature_instance_id": "0100", "name": "Bug", "color": "#ff0000"}
       """
     Then the response status code is 403
+    And the labels table contains:
+      | id   | name | color   | status | feature_instance_id |
+      | 0010 | Bug  | #ff0000 | active | 0100                |

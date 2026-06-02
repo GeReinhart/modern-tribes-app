@@ -33,6 +33,8 @@ Feature: Create a kanban card
 
   Scenario: POST /kanban/cards as admin — the card is created
     Given I am authenticated as an administrator: user.id 0001
+    And the kanban_cards table contains:
+      | id | feature_instance_id | column_id | title | position | status |
     When I POST /api/features/tasks/kanban/cards with body:
       """
       {
@@ -57,10 +59,15 @@ Feature: Create a kanban card
         "label_ids": []
       }
       """
+    And the kanban_cards table contains:
+      | feature_instance_id | column_id | title         | status |
+      | 0100                | 0200      | Fix login bug | active |
 
   @error_case
   Scenario: POST /kanban/cards as a viewer without project access — 403 error
     Given I am authenticated as a regular user: user.id 0002
+    And the kanban_cards table contains:
+      | id | feature_instance_id | column_id | title | position | status |
     When I POST /api/features/tasks/kanban/cards with body:
       """
       {
@@ -70,3 +77,5 @@ Feature: Create a kanban card
       }
       """
     Then the response status code is 403
+    And the kanban_cards table contains:
+      | id | feature_instance_id | column_id | title | position | status |

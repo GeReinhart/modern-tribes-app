@@ -48,12 +48,19 @@ Feature: Update a bookmark
         "color_background": null
       }
       """
+    And the user_bookmarks table contains:
+      | id   | page_path   | page_title    | display_order | status |
+      | 0010 | /tribes/abc | Updated Title | 1             | active |
 
   @error_case
   Scenario: PUT /bookmarks/0010 as a user with no app access — 403 error
     Given I am authenticated as the person's owner: user.id 0003
+    And the user_bookmarks table contains:
+      | id | user_id | page_path | page_title | display_order | status |
     When I PUT /api/features/bookmarks/0010 with body:
       """
       {"page_title": "Updated Title"}
       """
     Then the response status code is 403
+    And the user_bookmarks table contains:
+      | id | user_id | page_path | page_title | display_order | status |

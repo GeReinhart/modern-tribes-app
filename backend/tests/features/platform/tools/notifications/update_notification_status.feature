@@ -25,21 +25,27 @@ Feature: Update notification status
   Scenario: PATCH /notifications/0010/status as admin — notification status is updated
     Given I am authenticated as an administrator: user.id 0001
     And the notifications table contains:
-      | id   | target_user_id | message         | notification_status |
-      | 0010 | 0001           | Test notification | planned           |
+      | id   | target_user_id | message           | notification_status |
+      | 0010 | 0001           | Test notification | planned             |
     When I PATCH /api/platform/tools/notifications/0010/status with body:
       """
       {"notification_status": "sent"}
       """
     Then the response status code is 200
+    And the notifications table contains:
+      | id   | target_user_id | notification_status |
+      | 0010 | 0001           | sent                |
 
   Scenario: PATCH /notifications/0010/status as a regular user — notification status is updated
     Given I am authenticated as a regular user: user.id 0002
     And the notifications table contains:
-      | id   | target_user_id | message         | notification_status |
-      | 0010 | 0002           | Test notification | planned           |
+      | id   | target_user_id | message           | notification_status |
+      | 0010 | 0002           | Test notification | planned             |
     When I PATCH /api/platform/tools/notifications/0010/status with body:
       """
       {"notification_status": "sent"}
       """
     Then the response status code is 200
+    And the notifications table contains:
+      | id   | target_user_id | notification_status |
+      | 0010 | 0002           | sent                |

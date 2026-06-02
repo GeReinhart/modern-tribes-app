@@ -28,19 +28,27 @@ Feature: Archive a publication
       | id   | content_html   | status |
       | 0010 | <p>Content</p> | active |
     And the projects_documents table contains:
-      | id   | project_id | document_id | title    | status |
-      | 0010 | 0100       | 0010        | My Doc   | active |
-    And the publications table contains:
-      | id   | document_id | project_document_id | status |
-      | 0010 | 0010        | 0010                | active |
+      | id   | project_id | document_id | title  | status |
+      | 0010 | 0100       | 0010        | My Doc | active |
 
   Scenario: DELETE /publications/0010 as admin — publication is archived
     Given I am authenticated as an administrator: user.id 0001
+    And the publications table contains:
+      | id   | document_id | project_document_id | status |
+      | 0010 | 0010        | 0010                | active |
     When I DELETE /api/platform/functions/publications/0010
     Then the response status code is 204
+    And the publications table contains:
+      | id | document_id | project_document_id | status |
 
   @error_case
   Scenario: DELETE /publications/0010 as a viewer — 403 error
     Given I am authenticated as a regular user: user.id 0002
+    And the publications table contains:
+      | id   | document_id | project_document_id | status |
+      | 0010 | 0010        | 0010                | active |
     When I DELETE /api/platform/functions/publications/0010
     Then the response status code is 403
+    And the publications table contains:
+      | id   | document_id | project_document_id | status |
+      | 0010 | 0010        | 0010                | active |

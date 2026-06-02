@@ -24,12 +24,12 @@ Feature: Update a feature instance on a project
     And the projects table contains:
       | id   | name    | status |
       | 0100 | Project | active |
-    And the projects_features table contains:
-      | id   | project_id | name  | feature_type | status |
-      | 0010 | 0100       | Board | kanban       | active |
 
   Scenario: PATCH /feature-instances/projects/0100/features/0010 as admin — the instance is updated
     Given I am authenticated as an administrator: user.id 0001
+    And the projects_features table contains:
+      | id   | project_id | name  | feature_type | status |
+      | 0010 | 0100       | Board | kanban       | active |
     When I PATCH /api/features/glue/feature-instances/projects/0100/features/0010 with body:
       """
       {"name": "Sprint Board"}
@@ -45,12 +45,21 @@ Feature: Update a feature instance on a project
         "status": "active"
       }
       """
+    And the projects_features table contains:
+      | id   | project_id | name         | feature_type | status |
+      | 0010 | 0100       | Sprint Board | kanban       | active |
 
   @error_case
   Scenario: PATCH /feature-instances/projects/0100/features/0010 as a viewer without project access — 403 error
     Given I am authenticated as a regular user: user.id 0002
+    And the projects_features table contains:
+      | id   | project_id | name  | feature_type | status |
+      | 0010 | 0100       | Board | kanban       | active |
     When I PATCH /api/features/glue/feature-instances/projects/0100/features/0010 with body:
       """
       {"name": "Sprint Board"}
       """
     Then the response status code is 403
+    And the projects_features table contains:
+      | id   | project_id | name  | feature_type | status |
+      | 0010 | 0100       | Board | kanban       | active |

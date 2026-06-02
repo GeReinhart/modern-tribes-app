@@ -30,6 +30,8 @@ Feature: Create a todo item
 
   Scenario: POST /todo-items/ as admin — the item is created
     Given I am authenticated as an administrator: user.id 0001
+    And the todo_items table contains:
+      | id | feature_instance_id | title | todo_status | position | status |
     When I POST /api/features/tasks/todo-items/ with body:
       """
       {"feature_instance_id": "0100", "title": "Write tests"}
@@ -46,12 +48,19 @@ Feature: Create a todo item
         "label_ids": []
       }
       """
+    And the todo_items table contains:
+      | feature_instance_id | title       | todo_status | status |
+      | 0100                | Write tests | todo        | active |
 
   @error_case
   Scenario: POST /todo-items/ as a viewer without project access — 403 error
     Given I am authenticated as a regular user: user.id 0002
+    And the todo_items table contains:
+      | id | feature_instance_id | title | todo_status | position | status |
     When I POST /api/features/tasks/todo-items/ with body:
       """
       {"feature_instance_id": "0100", "title": "Write tests"}
       """
     Then the response status code is 403
+    And the todo_items table contains:
+      | id | feature_instance_id | title | todo_status | position | status |

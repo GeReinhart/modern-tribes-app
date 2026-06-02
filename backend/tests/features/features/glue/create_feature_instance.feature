@@ -27,6 +27,8 @@ Feature: Create a feature instance on a project
 
   Scenario: POST /feature-instances/projects/0100/features as admin — the instance is created
     Given I am authenticated as an administrator: user.id 0001
+    And the projects_features table contains:
+      | id | project_id | name | feature_type | status |
     When I POST /api/features/glue/feature-instances/projects/0100/features with body:
       """
       {"name": "Team Board", "feature_type": "kanban"}
@@ -42,12 +44,19 @@ Feature: Create a feature instance on a project
         "position": 0
       }
       """
+    And the projects_features table contains:
+      | project_id | name       | feature_type | status |
+      | 0100       | Team Board | kanban       | active |
 
   @error_case
   Scenario: POST /feature-instances/projects/0100/features as a viewer without project access — 403 error
     Given I am authenticated as a regular user: user.id 0002
+    And the projects_features table contains:
+      | id | project_id | name | feature_type | status |
     When I POST /api/features/glue/feature-instances/projects/0100/features with body:
       """
       {"name": "Team Board", "feature_type": "kanban"}
       """
     Then the response status code is 403
+    And the projects_features table contains:
+      | id | project_id | name | feature_type | status |

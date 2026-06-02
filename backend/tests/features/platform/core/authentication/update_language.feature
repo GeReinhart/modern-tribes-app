@@ -29,6 +29,10 @@ Feature: Update user language preference
       {"language": "fr"}
       """
     Then the response status code is 200
+    And the users table contains:
+      | id   | language | status |
+      | 0001 | fr       | active |
+      | 0002 | en       | active |
 
   Scenario: PATCH /authentication/me/language as a regular user — language is updated
     Given I am authenticated as a regular user: user.id 0002
@@ -37,3 +41,7 @@ Feature: Update user language preference
       {"language": "fr"}
       """
     Then the response status code is 200
+    And the users table contains:
+      | id   | language | status |
+      | 0001 | en       | active |
+      | 0002 | fr       | active |

@@ -62,12 +62,20 @@ Feature: Reorder bookmarks
         ]
       }
       """
+    And the user_bookmarks table contains:
+      | id   | page_path   | page_title  | display_order | status |
+      | 0010 | /tribes/abc | Engineering | 1             | active |
+      | 0011 | /projects   | My Project  | 0             | active |
 
   @error_case
   Scenario: PUT /bookmarks/order as a user with no app access — 403 error
     Given I am authenticated as the person's owner: user.id 0003
+    And the user_bookmarks table contains:
+      | id | user_id | page_path | page_title | display_order | status |
     When I PUT /api/features/bookmarks/order with body:
       """
       {"ordered_ids": []}
       """
     Then the response status code is 403
+    And the user_bookmarks table contains:
+      | id | user_id | page_path | page_title | display_order | status |
