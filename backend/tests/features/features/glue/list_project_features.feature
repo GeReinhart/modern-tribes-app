@@ -32,6 +32,19 @@ Feature: List project feature instances
     Given I am authenticated as an administrator: user.id 0001
     When I GET /api/features/glue/feature-instances/projects/0100/features
     Then the response status code is 200
+    And the response body includes:
+      """
+      [
+        {
+          "id": "0010",
+          "project_id": "0100",
+          "feature_type": "kanban",
+          "name": "Board",
+          "status": "active",
+          "position": 0
+        }
+      ]
+      """
 
   @error_case
   Scenario: GET /feature-instances/projects/0100/features as a viewer without project access — 403 error

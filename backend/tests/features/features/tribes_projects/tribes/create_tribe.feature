@@ -31,6 +31,13 @@ Feature: Create a tribe
       {"name": "Engineering"}
       """
     Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "name": "Engineering",
+        "status": "active"
+      }
+      """
     And the tribes table contains:
       | name        | status |
       | Engineering | active |

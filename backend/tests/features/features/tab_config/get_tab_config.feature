@@ -30,6 +30,13 @@ Feature: Get tab configuration
     Given I am authenticated as a regular user: user.id 0002
     When I GET /api/features/glue/tab-configs/my-context
     Then the response status code is 200
+    And the response body is:
+      """
+      {
+        "context_key": "my-context",
+        "tab_configs": []
+      }
+      """
 
   @error_case
   Scenario: GET /tab-configs/my-context as a user with no app access — 403 error

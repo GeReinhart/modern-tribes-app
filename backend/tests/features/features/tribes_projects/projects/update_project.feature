@@ -32,6 +32,14 @@ Feature: Update a project
       {"name": "Mobile App"}
       """
     Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "0010",
+        "name": "Mobile App",
+        "status": "active"
+      }
+      """
     And the projects table contains:
       | id   | name       | status |
       | 0010 | Mobile App | active |

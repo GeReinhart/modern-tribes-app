@@ -35,6 +35,17 @@ Feature: Create a todo item
       {"feature_instance_id": "0100", "title": "Write tests"}
       """
     Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "feature_instance_id": "0100",
+        "title": "Write tests",
+        "status": "active",
+        "todo_status": "todo",
+        "position": 0,
+        "label_ids": []
+      }
+      """
 
   @error_case
   Scenario: POST /todo-items/ as a viewer without project access — 403 error

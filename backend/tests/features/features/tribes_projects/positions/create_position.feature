@@ -41,6 +41,15 @@ Feature: Create a position
       }
       """
     Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "tribe_id": "0020",
+        "person_id": "0030",
+        "position": "member",
+        "status": "active"
+      }
+      """
     And the positions table contains:
       | tribe_id | person_id | position | status |
       | 0020     | 0030      | member   | active |

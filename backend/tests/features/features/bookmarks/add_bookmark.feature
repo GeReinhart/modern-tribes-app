@@ -33,6 +33,17 @@ Feature: Add a bookmark
       {"page_path": "/tribes/abc", "page_title": "Engineering tribe"}
       """
     Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "page_path": "/tribes/abc",
+        "page_title": "Engineering tribe",
+        "display_order": 0,
+        "description": null,
+        "color_text": null,
+        "color_background": null
+      }
+      """
 
   @error_case
   Scenario: POST /bookmarks as a user with no app access — 403 error

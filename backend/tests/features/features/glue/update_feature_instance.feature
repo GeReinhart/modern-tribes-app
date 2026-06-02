@@ -35,6 +35,16 @@ Feature: Update a feature instance on a project
       {"name": "Sprint Board"}
       """
     Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "0010",
+        "project_id": "0100",
+        "feature_type": "kanban",
+        "name": "Sprint Board",
+        "status": "active"
+      }
+      """
 
   @error_case
   Scenario: PATCH /feature-instances/projects/0100/features/0010 as a viewer without project access — 403 error

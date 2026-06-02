@@ -726,6 +726,28 @@ def check_response_body(context, docstring):
     )
 
 
+def _check_includes(actual, expected, path="root"):
+    if isinstance(expected, dict):
+        assert isinstance(actual, dict), f"{path}: expected dict, got {type(actual).__name__}"
+        for key, exp_val in expected.items():
+            assert key in actual, f"{path}.{key}: key not found in response"
+            _check_includes(actual[key], exp_val, f"{path}.{key}")
+    elif isinstance(expected, list):
+        assert isinstance(actual, list), f"{path}: expected list, got {type(actual).__name__}"
+        assert len(actual) == len(expected), f"{path}: expected {len(expected)} item(s), got {len(actual)}"
+        for i, (act_item, exp_item) in enumerate(zip(actual, expected)):
+            _check_includes(act_item, exp_item, f"{path}[{i}]")
+    else:
+        assert actual == expected, f"{path}: expected {expected!r}, got {actual!r}"
+
+
+@then("the response body includes:")
+def check_response_body_includes(context, docstring):
+    expected = expand_json_ids(json.loads(docstring))
+    actual = context["response"].json()
+    _check_includes(actual, expected)
+
+
 # ── Then: DB-state assertions ─────────────────────────────────────────────────
 
 async def _query_table(table: str, headers: list) -> list[dict]:

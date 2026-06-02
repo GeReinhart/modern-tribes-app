@@ -29,6 +29,14 @@ Feature: Get a tribe
       | 0010 | Engineering | active |
     When I GET /api/features/tribes-projects/tribes/0010
     Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "0010",
+        "name": "Engineering",
+        "status": "active"
+      }
+      """
 
   @error_case
   Scenario: GET /tribes/0010 as a viewer — 403 error

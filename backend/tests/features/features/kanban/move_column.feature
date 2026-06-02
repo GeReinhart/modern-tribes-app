@@ -39,6 +39,13 @@ Feature: Move a kanban column
       {"direction": "next"}
       """
     Then the response status code is 200
+    And the response body is:
+      """
+      [
+        {"id": "0011", "name": "Done", "position": 1},
+        {"id": "0010", "name": "To Do", "position": 2}
+      ]
+      """
 
   @error_case
   Scenario: POST /kanban/columns/0010/move as a viewer without project access — 403 error

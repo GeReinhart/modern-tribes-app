@@ -42,6 +42,30 @@ Feature: Move a kanban card
       {"direction": "next"}
       """
     Then the response status code is 200
+    And the response body is:
+      """
+      [
+        {
+          "id": "0010",
+          "feature_instance_id": "0100",
+          "column_id": "0201",
+          "title": "Task",
+          "assigned_person_id": null,
+          "assigned_person_name": null,
+          "document_id": null,
+          "document_content_html": null,
+          "position": 1,
+          "status": "active",
+          "size": null,
+          "due_date": null,
+          "label_ids": [],
+          "created_at": null,
+          "updated_at": null,
+          "created_by": null,
+          "updated_by": null
+        }
+      ]
+      """
 
   @error_case
   Scenario: POST /kanban/cards/0010/move as a viewer without project access — 403 error

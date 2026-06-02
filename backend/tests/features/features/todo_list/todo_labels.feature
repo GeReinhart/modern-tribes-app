@@ -38,6 +38,10 @@ Feature: Manage todo labels
     Given I am authenticated as an administrator: user.id 0001
     When I GET /api/features/tasks/todo-labels/by-instance/0100
     Then the response status code is 200
+    And the response body is:
+      """
+      [{"id": "0010", "name": "Bug", "color": "#ff0000", "position": 0}]
+      """
 
   Scenario: POST /todo-labels/ as admin — label is created
     Given I am authenticated as an administrator: user.id 0001
@@ -46,6 +50,10 @@ Feature: Manage todo labels
       {"feature_instance_id": "0100", "name": "Feature", "color": "#0000ff"}
       """
     Then the response status code is 201
+    And the response body includes:
+      """
+      {"name": "Feature", "color": "#0000ff", "position": 1}
+      """
 
   Scenario: PATCH /todo-labels/0010 as admin — label is updated
     Given I am authenticated as an administrator: user.id 0001

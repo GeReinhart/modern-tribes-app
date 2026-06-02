@@ -35,6 +35,10 @@ Feature: Create a kanban column
       {"feature_instance_id": "0100", "name": "To Do"}
       """
     Then the response status code is 201
+    And the response body includes:
+      """
+      {"name": "To Do", "position": 1}
+      """
 
   @error_case
   Scenario: POST /kanban/columns as a viewer without project access — 403 error

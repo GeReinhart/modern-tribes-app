@@ -36,6 +36,18 @@ Feature: Update a bookmark
       {"page_title": "Updated Title"}
       """
     Then the response status code is 200
+    And the response body is:
+      """
+      {
+        "id": "0010",
+        "page_path": "/tribes/abc",
+        "page_title": "Updated Title",
+        "display_order": 1,
+        "description": null,
+        "color_text": null,
+        "color_background": null
+      }
+      """
 
   @error_case
   Scenario: PUT /bookmarks/0010 as a user with no app access — 403 error

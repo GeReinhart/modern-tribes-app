@@ -32,6 +32,10 @@ Feature: Sync tribe projects
       []
       """
     Then the response status code is 200
+    And the response body is:
+      """
+      []
+      """
 
   @error_case
   Scenario: PUT /tribes/0010/projects as a viewer — 403 error

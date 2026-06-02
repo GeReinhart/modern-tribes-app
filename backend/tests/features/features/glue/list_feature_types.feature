@@ -30,6 +30,13 @@ Feature: List feature types
     Given I am authenticated as a regular user: user.id 0002
     When I GET /api/features/glue/feature-instances/feature-types
     Then the response status code is 200
+    And the response body is:
+      """
+      [
+        {"feature_type": "kanban", "label": "Kanban"},
+        {"feature_type": "todo_list", "label": "Todo List"}
+      ]
+      """
 
   @error_case
   Scenario: GET /feature-instances/feature-types as a user with no app access — 403 error

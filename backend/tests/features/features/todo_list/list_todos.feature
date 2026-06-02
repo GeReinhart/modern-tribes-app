@@ -30,8 +30,24 @@ Feature: List todo items
 
   Scenario: GET /todo-items/by-instance/0100 as admin — todo items are returned
     Given I am authenticated as an administrator: user.id 0001
+    And the todo_items table contains:
+      | id   | feature_instance_id | title    | todo_status | position | status |
+      | 1001 | 0100                | Buy milk | todo        | 1        | active |
     When I GET /api/features/tasks/todo-items/by-instance/0100
     Then the response status code is 200
+    And the response body includes:
+      """
+      [
+        {
+          "id": "1001",
+          "feature_instance_id": "0100",
+          "title": "Buy milk",
+          "status": "active",
+          "todo_status": "todo",
+          "position": 1
+        }
+      ]
+      """
 
   @error_case
   Scenario: GET /todo-items/by-instance/0100 as a viewer without project access — 403 error

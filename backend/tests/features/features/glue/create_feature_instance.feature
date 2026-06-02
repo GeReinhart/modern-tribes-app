@@ -32,6 +32,16 @@ Feature: Create a feature instance on a project
       {"name": "Team Board", "feature_type": "kanban"}
       """
     Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "project_id": "0100",
+        "feature_type": "kanban",
+        "name": "Team Board",
+        "status": "active",
+        "position": 0
+      }
+      """
 
   @error_case
   Scenario: POST /feature-instances/projects/0100/features as a viewer without project access — 403 error

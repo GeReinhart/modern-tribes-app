@@ -38,6 +38,10 @@ Feature: Toggle a label on a todo item
     Given I am authenticated as an administrator: user.id 0001
     When I POST /api/features/tasks/todo-items/0010/labels/0020
     Then the response status code is 200
+    And the response body is:
+      """
+      ["0020"]
+      """
 
   @error_case
   Scenario: POST /todo-items/0010/labels/0020 as a viewer without project access — 403 error

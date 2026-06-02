@@ -30,8 +30,23 @@ Feature: List positions
 
   Scenario: GET /positions/ as admin — positions are returned
     Given I am authenticated as an administrator: user.id 0001
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0020     | 0030      | member   | active |
     When I GET /api/features/tribes-projects/positions/
     Then the response status code is 200
+    And the response body includes:
+      """
+      [
+        {
+          "id": "1001",
+          "tribe_id": "0020",
+          "person_id": "0030",
+          "position": "member",
+          "status": "active"
+        }
+      ]
+      """
 
   @error_case
   Scenario: GET /positions/ as a viewer — 403 error

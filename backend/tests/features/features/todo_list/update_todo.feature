@@ -38,6 +38,17 @@ Feature: Update a todo item
       {"title": "Write tests — updated"}
       """
     Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "0010",
+        "feature_instance_id": "0100",
+        "title": "Write tests — updated",
+        "status": "active",
+        "todo_status": "todo",
+        "position": 1
+      }
+      """
 
   @error_case
   Scenario: PATCH /todo-items/0010 as a viewer without project access — 403 error

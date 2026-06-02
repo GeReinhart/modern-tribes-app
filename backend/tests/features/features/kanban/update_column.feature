@@ -39,6 +39,10 @@ Feature: Update a kanban column
       {"name": "In Progress"}
       """
     Then the response status code is 200
+    And the response body is:
+      """
+      {"id": "0010", "name": "In Progress", "position": 1}
+      """
 
   @error_case
   Scenario: PATCH /kanban/columns/0010 as a viewer without project access — 403 error

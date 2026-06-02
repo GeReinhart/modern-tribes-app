@@ -29,6 +29,14 @@ Feature: Get a project
       | 0010 | Hermes | active |
     When I GET /api/features/tribes-projects/projects/0010
     Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "0010",
+        "name": "Hermes",
+        "status": "active"
+      }
+      """
 
   @error_case
   Scenario: GET /projects/0010 as a viewer — 403 error

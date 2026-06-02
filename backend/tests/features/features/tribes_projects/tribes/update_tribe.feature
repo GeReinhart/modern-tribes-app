@@ -32,6 +32,14 @@ Feature: Update a tribe
       {"name": "Platform"}
       """
     Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "0010",
+        "name": "Platform",
+        "status": "active"
+      }
+      """
     And the tribes table contains:
       | id   | name     | status |
       | 0010 | Platform | active |

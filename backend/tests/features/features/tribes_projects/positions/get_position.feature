@@ -31,10 +31,20 @@ Feature: Get a position
   Scenario: GET /positions/0010 as admin — position is returned
     Given I am authenticated as an administrator: user.id 0001
     And the positions table contains:
-      | id   | tribe_id | person_id | position    | status |
-      | 0010 | 0020     | 0030      | member      | active |
+      | id   | tribe_id | person_id | position | status |
+      | 0010 | 0020     | 0030      | member   | active |
     When I GET /api/features/tribes-projects/positions/0010
     Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "0010",
+        "tribe_id": "0020",
+        "person_id": "0030",
+        "position": "member",
+        "status": "active"
+      }
+      """
 
   @error_case
   Scenario: GET /positions/0010 as a viewer — 403 error

@@ -24,8 +24,21 @@ Feature: List projects
 
   Scenario: GET /projects/ as admin — projects are returned
     Given I am authenticated as an administrator: user.id 0001
+    And the projects table contains:
+      | id   | name   | status |
+      | 1001 | Hermes | active |
     When I GET /api/features/tribes-projects/projects/
     Then the response status code is 200
+    And the response body includes:
+      """
+      [
+        {
+          "id": "1001",
+          "name": "Hermes",
+          "status": "active"
+        }
+      ]
+      """
 
   @error_case
   Scenario: GET /projects/ as a viewer — 403 error

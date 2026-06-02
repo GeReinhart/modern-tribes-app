@@ -31,6 +31,13 @@ Feature: Create a project
       {"name": "Website Redesign"}
       """
     Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "name": "Website Redesign",
+        "status": "active"
+      }
+      """
     And the projects table contains:
       | name             | status |
       | Website Redesign | active |

@@ -24,8 +24,21 @@ Feature: List tribes
 
   Scenario: GET /tribes/ as admin — tribes are returned
     Given I am authenticated as an administrator: user.id 0001
+    And the tribes table contains:
+      | id   | name        | status |
+      | 1001 | Engineering | active |
     When I GET /api/features/tribes-projects/tribes/
     Then the response status code is 200
+    And the response body includes:
+      """
+      [
+        {
+          "id": "1001",
+          "name": "Engineering",
+          "status": "active"
+        }
+      ]
+      """
 
   @error_case
   Scenario: GET /tribes/ as a viewer — 403 error

@@ -33,6 +33,13 @@ Feature: Update tab configuration
       {"tab_configs": []}
       """
     Then the response status code is 200
+    And the response body is:
+      """
+      {
+        "context_key": "my-context",
+        "tab_configs": []
+      }
+      """
 
   @error_case
   Scenario: PUT /tab-configs/my-context as a user with no app access — 403 error

@@ -38,6 +38,16 @@ Feature: Update a position
       {"position": "manager"}
       """
     Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "0010",
+        "tribe_id": "0020",
+        "person_id": "0030",
+        "position": "manager",
+        "status": "active"
+      }
+      """
     And the positions table contains:
       | id   | tribe_id | person_id | position | status |
       | 0010 | 0020     | 0030      | manager  | active |

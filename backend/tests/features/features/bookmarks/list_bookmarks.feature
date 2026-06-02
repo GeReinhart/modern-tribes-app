@@ -28,8 +28,27 @@ Feature: List bookmarks
 
   Scenario: GET /bookmarks as viewer — bookmarks are returned
     Given I am authenticated as a regular user: user.id 0002
+    And the user_bookmarks table contains:
+      | id   | user_id | page_path  | page_title | display_order | status |
+      | 1001 | 0002    | /dashboard | Dashboard  | 0             | active |
     When I GET /api/features/bookmarks
     Then the response status code is 200
+    And the response body is:
+      """
+      {
+        "bookmarks": [
+          {
+            "id": "1001",
+            "page_path": "/dashboard",
+            "page_title": "Dashboard",
+            "display_order": 0,
+            "description": null,
+            "color_text": null,
+            "color_background": null
+          }
+        ]
+      }
+      """
 
   @error_case
   Scenario: GET /bookmarks as a user with no app access — 403 error

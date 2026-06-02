@@ -42,6 +42,21 @@ Feature: Create a kanban card
       }
       """
     Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "feature_instance_id": "0100",
+        "column_id": "0200",
+        "title": "Fix login bug",
+        "position": 0,
+        "status": "active",
+        "assigned_person_id": null,
+        "document_content_html": null,
+        "size": null,
+        "due_date": null,
+        "label_ids": []
+      }
+      """
 
   @error_case
   Scenario: POST /kanban/cards as a viewer without project access — 403 error
