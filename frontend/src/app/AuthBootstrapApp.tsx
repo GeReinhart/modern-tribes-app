@@ -45,10 +45,11 @@ import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
 const AdminLandingRedirect: React.FC = () => {
-  const { isAdmin, canManagePeople, isLoading } = useAdminAccess();
+  const { isAdmin, canManagePeople, canAssignProjects, isLoading } = useAdminAccess();
   if (isLoading) return null;
   if (isAdmin) return <Navigate to="/admin/monitoring" replace />;
   if (canManagePeople) return <Navigate to="/admin/people" replace />;
+  if (canAssignProjects) return <Navigate to="/admin/tribes" replace />;
   return <Navigate to="/app" replace />;
 };
 

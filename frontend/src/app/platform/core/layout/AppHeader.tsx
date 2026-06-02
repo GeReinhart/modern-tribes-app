@@ -7,19 +7,29 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb.tsx';
+import {predefinedThemes} from "@/app/platform/core/layout/themes/themes.ts";
 
 interface AppHeaderProps {
   actions?: React.ReactNode;
   secondaryActions?: React.ReactNode;
   menuActions?: MenuAction[];
+  tabActions?: MenuAction[];
   breadcrumbs?: BreadcrumbItem[];
   breadcrumbTabs?: BreadcrumbTab[];
 }
+
+const AREA_COLORS = {
+  breadcrumbs: predefinedThemes.default.colors.surface,
+  tabs: predefinedThemes.main_1.colors.surface,
+  pageActions: predefinedThemes.main_2.colors.surface,
+  tabActions: predefinedThemes.main_1.colors.surface,
+};
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
   actions,
   secondaryActions,
   menuActions,
+  tabActions,
   breadcrumbs,
   breadcrumbTabs,
 }) => {
@@ -104,7 +114,49 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     margin: '6px 0',
   };
 
-  const menuActionsStyle: React.CSSProperties = {};
+  const hasPageActions = (menuActions?.length ?? 0) > 0;
+  const hasTabActions = (tabActions?.length ?? 0) > 0;
+  const hasActionsRow = hasPageActions || hasTabActions;
+
+  const renderActionItem = (action: MenuAction, index: number) => {
+    const color =
+      action.variant === 'danger' ? theme.colors.danger : theme.colors.text;
+    return (
+      <div
+        key={index}
+        role="menuitem"
+        style={{
+          padding: '12px 24px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          color,
+          fontSize: 'calc(var(--btn-font) * 1.2)',
+          fontWeight: 600,
+          opacity: action.disabled ? 0.5 : 1,
+          cursor: action.disabled ? 'not-allowed' : 'pointer',
+          transition: 'background-color 0.15s ease',
+        }}
+        onClick={() => {
+          if (!action.disabled) {
+            action.onClick();
+            setIsMenuOpen(false);
+          }
+        }}
+        onMouseEnter={(e) => {
+          if (!action.disabled)
+            e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
+        }}
+        onMouseLeave={(e) => {
+          if (!action.disabled)
+            e.currentTarget.style.backgroundColor = 'transparent';
+        }}
+      >
+        <ThemedSvgIcon name={action.icon} color={color} size={16} />
+        {action.label}
+      </div>
+    );
+  };
 
   const menuSecondaryActionsStyle: React.CSSProperties = {
     display: 'grid',
@@ -141,19 +193,19 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
           {isMenuOpen && hasMenuContent && (
             <div style={menuStyle} role="menu">
-              {/* Breadcrumb navigation — single or two-column layout */}
+              {/* Row 1: breadcrumbs (left) | tabs (right) */}
               {breadcrumbs && breadcrumbs.length > 0 && (
                 <div
                   style={{
                     display: 'grid',
                     gridTemplateColumns: breadcrumbTabs ? '1fr 1fr' : '1fr',
                     borderBottom:
-                      secondaryActions || actions
+                      secondaryActions || actions || hasActionsRow
                         ? `1px solid ${theme.colors.border}`
                         : undefined,
                   }}
                 >
-                  <div>
+                  <div style={{ backgroundColor: AREA_COLORS.breadcrumbs }}>
                     {breadcrumbs.map((item, index) => {
                       const isLast = index === breadcrumbs.length - 1;
                       const clickable = !isLast && !!item.path;
@@ -180,7 +232,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                   </div>
                   {breadcrumbTabs && (
                     <div
-                      style={{ borderLeft: `1px solid ${theme.colors.border}` }}
+                      style={{
+                        borderLeft: `1px solid ${theme.colors.border}`,
+                        backgroundColor: AREA_COLORS.tabs,
+                      }}
                     >
                       {breadcrumbTabs.map((tab) => (
                         <div
@@ -223,59 +278,32 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
               {/* Admin navigation */}
               {actions && (
-                <div
-                  style={menuActionsStyle}
-                  onClick={() => setIsMenuOpen(false)}
-                >
+                <div onClick={() => setIsMenuOpen(false)}>
                   {actions}
                 </div>
               )}
 
-              {/* Page-specific menu actions (icon + text) */}
-              {menuActions &&
-                menuActions.length > 0 &&
-                menuActions.map((action, index) => {
-                  const color =
-                    action.variant === 'danger'
-                      ? theme.colors.danger
-                      : theme.colors.text;
-                  return (
-                    <div
-                      key={index}
-                      role="menuitem"
-                      style={{
-                        ...menuNavItemStyle(true, false),
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        color,
-                        opacity: action.disabled ? 0.5 : 1,
-                        cursor: action.disabled ? 'not-allowed' : 'pointer',
-                      }}
-                      onClick={() => {
-                        if (!action.disabled) {
-                          action.onClick();
-                          setIsMenuOpen(false);
-                        }
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!action.disabled)
-                          e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!action.disabled)
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                      }}
-                    >
-                      <ThemedSvgIcon
-                        name={action.icon}
-                        color={color}
-                        size={16}
-                      />
-                      {action.label}
-                    </div>
-                  );
-                })}
+              {/* Row 2: page actions (left) | tab actions (right) */}
+              {hasActionsRow && (
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                  }}
+                >
+                  <div style={{ backgroundColor: AREA_COLORS.pageActions }}>
+                    {menuActions?.map(renderActionItem)}
+                  </div>
+                  <div
+                    style={{
+                      backgroundColor: AREA_COLORS.tabActions,
+                      borderLeft: `1px solid ${theme.colors.border}`,
+                    }}
+                  >
+                    {tabActions?.map(renderActionItem)}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

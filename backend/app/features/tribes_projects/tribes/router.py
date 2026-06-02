@@ -32,22 +32,22 @@ ENTITY_NAME = "Tribe"
 
 
 @router.get("/", response_model=List[Tribe])
-@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ASSIGN_PROJECTS)
 async def get_tribes(current_user: dict = Depends(get_current_user)):
     """Get all tribes
 
-    **Permissions:** admin | can_manage_people
+    **Permissions:** admin | can_assign_projects
     """
     pool = get_database()
     return await get_all_documents(pool, TABLE, any_status=True)
 
 
 @router.get("/{tribe_id}", response_model=Tribe)
-@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ASSIGN_PROJECTS)
 async def get_tribe(tribe_id: str, current_user: dict = Depends(get_current_user)):
     """Get a specific tribe by ID
 
-    **Permissions:** admin | can_manage_people
+    **Permissions:** admin | can_assign_projects
     """
     pool = get_database()
     tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
@@ -154,11 +154,11 @@ async def get_tribe_positions(tribe_id: str, current_user: dict = Depends(get_cu
 
 
 @router.get("/{tribe_id}/projects", response_model=List[TribeProject])
-@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ASSIGN_PROJECTS)
 async def get_tribe_projects(tribe_id: str, current_user: dict = Depends(get_current_user)):
     """Get all project relations for a tribe
 
-    **Permissions:** admin | can_manage_people
+    **Permissions:** admin | can_assign_projects
     """
     pool = get_database()
     tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)
@@ -167,13 +167,13 @@ async def get_tribe_projects(tribe_id: str, current_user: dict = Depends(get_cur
 
 
 @router.put("/{tribe_id}/projects", response_model=List[TribeProject])
-@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ASSIGN_PROJECTS)
 async def sync_tribe_projects(
     tribe_id: str, projects: List[TribeProjectInput], current_user: dict = Depends(get_current_user)
 ):
     """Replace all project relations for a tribe
 
-    **Permissions:** admin | can_manage_people
+    **Permissions:** admin | can_assign_projects
     """
     pool = get_database()
     tribe_id = await resolve_url_param_id(pool, TABLE, tribe_id)

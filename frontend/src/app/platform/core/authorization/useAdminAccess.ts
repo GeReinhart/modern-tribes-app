@@ -3,6 +3,7 @@ import { useCurrentUserProfile } from '@/app/platform/functions/people/UserProfi
 export interface AdminAccess {
   isAdmin: boolean;
   canManagePeople: boolean;
+  canAssignProjects: boolean;
   hasAdminAccess: boolean;
   isLoading: boolean;
 }
@@ -13,7 +14,8 @@ export function useAdminAccess(): AdminAccess {
 
   const isAdmin = permissions.includes('admin');
   const canManagePeople = permissions.includes('can_manage_people');
-  const hasAdminAccess = isAdmin || canManagePeople;
+  const canAssignProjects = permissions.includes('can_assign_projects');
+  const hasAdminAccess = isAdmin || canManagePeople || canAssignProjects;
 
-  return { isAdmin, canManagePeople, hasAdminAccess, isLoading };
+  return { isAdmin, canManagePeople, canAssignProjects, hasAdminAccess, isLoading };
 }

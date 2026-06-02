@@ -4,7 +4,6 @@ export interface FeatureTabProps {
   featureInstanceId: string;
   canEdit: boolean;
   isManager: boolean;
-  actions?: React.ReactNode;
 }
 
 export interface FeatureDefinition {

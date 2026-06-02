@@ -11,14 +11,12 @@ interface ThemedTabsProps {
   tabs: Tab[];
   activeTab: string;
   onTabChange: (key: string) => void;
-  configButton?: React.ReactNode;
 }
 
 export const ThemedTabs: React.FC<ThemedTabsProps> = ({
   tabs,
   activeTab,
   onTabChange,
-  configButton,
 }) => {
   const { theme } = useTheme();
 
@@ -61,11 +59,6 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({
           </button>
         );
       })}
-      {configButton && (
-        <div style={{ marginLeft: 'auto', paddingBottom: 'var(--space-xs)' }}>
-          {configButton}
-        </div>
-      )}
     </div>
   );
 };

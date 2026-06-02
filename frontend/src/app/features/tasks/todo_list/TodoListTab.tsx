@@ -15,14 +15,12 @@ interface Props {
   featureInstanceId: string;
   canEdit: boolean;
   isManager: boolean;
-  actions?: React.ReactNode;
 }
 
 const TodoListTab: React.FC<Props> = ({
   featureInstanceId,
   canEdit,
   isManager,
-  actions,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -204,8 +202,8 @@ const TodoListTab: React.FC<Props> = ({
               </button>
             </div>
           )}
-          {/* Row 2 (with persons): archive toggle + external actions */}
-          {(assignedPersons.length > 0 || actions || archivedCount > 0) && (
+          {/* Row 2 (with persons): archive toggle */}
+          {(assignedPersons.length > 0 || archivedCount > 0) && (
             <div style={{ display: 'flex', gap: '8px' }}>
               {archivedCount > 0 && (
                 <button
@@ -238,7 +236,6 @@ const TodoListTab: React.FC<Props> = ({
                   />
                 </button>
               )}
-              {actions}
             </div>
           )}
         </div>

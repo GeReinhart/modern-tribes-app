@@ -34,6 +34,7 @@ type NavItem = {
   path: string;
   adminOnly?: boolean;
   peopleManagerVisible?: boolean;
+  projectsAssignerVisible?: boolean;
 };
 
 const ALL_ITEMS: NavItem[] = [
@@ -71,7 +72,7 @@ const ALL_ITEMS: NavItem[] = [
     icon: 'external-link',
     labelKey: 'admin.tribes',
     path: '/admin/tribes',
-    peopleManagerVisible: true,
+    projectsAssignerVisible: true,
   },
   {
     page: 'documents',
@@ -116,18 +117,19 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const { isAdmin, canManagePeople } = useAdminAccess();
+  const { isAdmin, canManagePeople, canAssignProjects } = useAdminAccess();
 
   const visibleItems = useMemo(
     () =>
-      ALL_ITEMS.filter(({ page, adminOnly, peopleManagerVisible }) => {
+      ALL_ITEMS.filter(({ page, adminOnly, peopleManagerVisible, projectsAssignerVisible }) => {
         if (page === 'app') return true;
         if (isAdmin) return true;
         if (canManagePeople && peopleManagerVisible) return true;
+        if (canAssignProjects && projectsAssignerVisible) return true;
         if (!adminOnly) return true;
         return false;
       }),
-    [isAdmin, canManagePeople],
+    [isAdmin, canManagePeople, canAssignProjects],
   );
 
   return (

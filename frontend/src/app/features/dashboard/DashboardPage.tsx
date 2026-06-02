@@ -5,7 +5,6 @@ import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.ts
 import DashboardBookmarksTab from '@/app/features/bookmarks/DashboardBookmarksTab.tsx';
 import DashboardTasksTab from '@/app/features/dashboard/tabs/DashboardTasksTab.tsx';
 import DashboardTribesTab from '@/app/features/dashboard/tabs/DashboardTribesTab.tsx';
-import { TabConfigButton } from '@/app/features/glue/tab-config/TabConfigButton.tsx';
 import { TabConfigPopup } from '@/app/features/glue/tab-config/TabConfigPopup.tsx';
 import { useTabConfig } from '@/app/features/glue/tab-config/useTabConfig.ts';
 import { useUrlTab } from '@/app/features/glue/url-tab/useUrlTab.ts';
@@ -81,6 +80,11 @@ const DashboardPageContent: React.FC = () => {
 
   const menuActions = useMemo(
     (): MenuAction[] => [
+      {
+        icon: 'settings' as const,
+        label: t('tabConfig.configure'),
+        onClick: () => setShowTabConfig(true),
+      },
       ...(authorization?.authorized
         ? [
             {
@@ -100,7 +104,7 @@ const DashboardPageContent: React.FC = () => {
           ]
         : []),
     ],
-    [authorization?.authorized, hasAdminAccess, t, navigate],
+    [authorization?.authorized, hasAdminAccess, t, navigate, setShowTabConfig],
   );
 
   return (
@@ -131,9 +135,6 @@ const DashboardPageContent: React.FC = () => {
         tabs={visibleTabs}
         activeTab={activeTab}
         onTabChange={handleTabChange}
-        configButton={
-          <TabConfigButton onClick={() => setShowTabConfig(true)} />
-        }
       />
       <ActiveComponent />
     </AppLayout>

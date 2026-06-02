@@ -12,6 +12,7 @@ interface AppLayoutProps {
   headerActions?: React.ReactNode;
   secondaryActions?: React.ReactNode;
   menuActions?: MenuAction[];
+  tabActions?: MenuAction[];
   breadcrumbs?: BreadcrumbItem[];
   breadcrumbTabs?: BreadcrumbTab[];
   bookmarkSlot?: React.ReactNode;
@@ -22,6 +23,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   headerActions,
   secondaryActions,
   menuActions,
+  tabActions,
   breadcrumbs,
   breadcrumbTabs,
   bookmarkSlot,
@@ -56,6 +58,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         actions={headerActions}
         secondaryActions={secondaryActions}
         menuActions={menuActions}
+        tabActions={tabActions}
         breadcrumbs={breadcrumbs}
         breadcrumbTabs={breadcrumbTabs}
       />

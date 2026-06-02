@@ -15,14 +15,12 @@ interface Props {
   featureInstanceId: string;
   canEdit: boolean;
   isManager: boolean;
-  actions?: React.ReactNode;
 }
 
 const KanbanTab: React.FC<Props> = ({
   featureInstanceId,
   canEdit,
   isManager,
-  actions,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -210,10 +208,8 @@ const KanbanTab: React.FC<Props> = ({
               </button>
             </div>
           )}
-          {/* Row 2 (with persons): archive toggle + external actions */}
-          {(assignedPersons.length > 0 ||
-            actions ||
-            (canEdit && hasArchived)) && (
+          {/* Row 2 (with persons): archive toggle */}
+          {(assignedPersons.length > 0 || (canEdit && hasArchived)) && (
             <div style={{ display: 'flex', gap: '8px' }}>
               {canEdit && hasArchived && (
                 <button
@@ -244,7 +240,6 @@ const KanbanTab: React.FC<Props> = ({
                   />
                 </button>
               )}
-              {actions}
             </div>
           )}
         </div>

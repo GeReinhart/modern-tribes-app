@@ -29,22 +29,22 @@ ENTITY_NAME = "Project"
 
 
 @router.get("/", response_model=List[Project])
-@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ASSIGN_PROJECTS)
 async def get_projects(current_user: dict = Depends(get_current_user)):
     """Get all projects
 
-    **Permissions:** admin | can_manage_people
+    **Permissions:** admin | can_assign_projects
     """
     pool = get_database()
     return await get_all_documents(pool, TABLE, any_status=True)
 
 
 @router.get("/{project_id}", response_model=Project)
-@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ASSIGN_PROJECTS)
 async def get_project(project_id: str, current_user: dict = Depends(get_current_user)):
     """Get a specific project by ID
 
-    **Permissions:** admin | can_manage_people
+    **Permissions:** admin | can_assign_projects
     """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, TABLE, project_id)

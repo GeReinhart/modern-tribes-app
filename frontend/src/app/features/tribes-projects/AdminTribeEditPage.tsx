@@ -492,7 +492,7 @@ const TribeEditPageContent: React.FC = () => {
   const { tribeId } = useParams<{ tribeId?: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { isAdmin, canManagePeople, hasAdminAccess, isLoading: accessLoading } = useAdminAccess();
+  const { isAdmin, canAssignProjects, hasAdminAccess, isLoading: accessLoading } = useAdminAccess();
   const isCreate = !tribeId;
 
   const { tribe, loading: tribeLoading } = useTribe(tribeId ?? null);
@@ -598,8 +598,8 @@ const TribeEditPageContent: React.FC = () => {
     try {
       let savedId: string;
 
-      if (canManagePeople && !isAdmin) {
-        // People managers can only sync project relations on existing tribes
+      if (canAssignProjects && !isAdmin) {
+        // Project assigners can only sync project relations on existing tribes
         if (!tribeId) throw new Error('Tribe ID is required');
         savedId = tribeId;
       } else if (isCreate) {
@@ -645,8 +645,8 @@ const TribeEditPageContent: React.FC = () => {
     return <Navigate to="/app" replace />;
   }
 
-  // People managers cannot create tribes
-  if (!accessLoading && canManagePeople && !isAdmin && isCreate) {
+  // Project assigners cannot create tribes
+  if (!accessLoading && canAssignProjects && !isAdmin && isCreate) {
     return <Navigate to="/admin/tribes" replace />;
   }
 

@@ -11,7 +11,6 @@ import { ProjectTribesTab } from '@/app/features/tribes-projects/projects/Projec
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { getFeatureComponent } from '@/app/features/glue/registry.ts';
-import { TabConfigButton } from '@/app/features/glue/tab-config/TabConfigButton.tsx';
 import { TabConfigPopup } from '@/app/features/glue/tab-config/TabConfigPopup.tsx';
 import { useTabConfig } from '@/app/features/glue/tab-config/useTabConfig.ts';
 import { useCurrentUserProfile } from '@/app/platform/functions/people/users/useCurrentUserProfile.ts';
@@ -310,17 +309,30 @@ const ShowProjectPageContent: React.FC = () => {
     [tribe?.name, project?.name, tribeId, t],
   );
 
+  const activeFeature = useMemo(
+    () => features.find((f) => f.id === activeTab) ?? null,
+    [features, activeTab],
+  );
+  const FeatureComponent = activeFeature
+    ? getFeatureComponent(activeFeature.feature_type)
+    : null;
+
   const menuActions = useMemo(
-    (): MenuAction[] =>
-      isManager
+    (): MenuAction[] => [
+      {
+        icon: 'settings',
+        label: t('tabConfig.configure'),
+        onClick: () => setShowTabConfig(true),
+      },
+      ...(isManager
         ? [
             {
-              icon: 'plus',
+              icon: 'plus' as const,
               label: t('features.addFeature'),
               onClick: () => setShowAddFeature(true),
             },
             {
-              icon: 'file-text',
+              icon: 'file-text' as const,
               label: t('projects.editDocument'),
               onClick: () =>
                 navigate(
@@ -328,14 +340,44 @@ const ShowProjectPageContent: React.FC = () => {
                 ),
             },
             {
-              icon: 'pencil',
+              icon: 'pencil' as const,
               label: t('projects.editProject'),
               onClick: () =>
                 navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit`),
             },
           ]
-        : [],
+        : []),
+    ],
     [isManager, tribeId, projectId, t, navigate],
+  );
+
+  const tabActions = useMemo(
+    (): MenuAction[] =>
+      isManager && activeFeature
+        ? [
+            {
+              icon: 'pencil' as const,
+              label: t('features.rename'),
+              onClick: () => {
+                setRenameValue(activeFeature.name);
+                setRenameTarget({
+                  id: activeFeature.id,
+                  name: activeFeature.name,
+                });
+              },
+            },
+            {
+              icon: 'archive' as const,
+              label: t('features.archive'),
+              onClick: () =>
+                setArchiveTarget({
+                  id: activeFeature.id,
+                  name: activeFeature.name,
+                }),
+            },
+          ]
+        : [],
+    [isManager, activeFeature, t],
   );
 
   const attachmentCardStyle: React.CSSProperties = {
@@ -394,16 +436,12 @@ const ShowProjectPageContent: React.FC = () => {
     );
   }
 
-  const activeFeature = features.find((f) => f.id === activeTab);
-  const FeatureComponent = activeFeature
-    ? getFeatureComponent(activeFeature.feature_type)
-    : null;
-
   return (
     <AppLayout
       breadcrumbs={breadcrumbs}
       breadcrumbTabs={breadcrumbTabs}
       menuActions={menuActions}
+      tabActions={tabActions}
       bookmarkSlot={project?.name ? <BookmarkToggle pagePath={location.pathname} pageTitle={project.name} /> : null}
     >
       {showTabConfig && (
@@ -420,9 +458,6 @@ const ShowProjectPageContent: React.FC = () => {
           tabs={visibleTabs}
           activeTab={activeTab}
           onTabChange={handleTabChange}
-          configButton={
-            <TabConfigButton onClick={() => setShowTabConfig(true)} />
-          }
         />
 
         <div style={{ paddingTop: '16px' }}>
@@ -590,61 +625,6 @@ const ShowProjectPageContent: React.FC = () => {
               featureInstanceId={activeFeature.id}
               canEdit={canEdit}
               isManager={isManager}
-              actions={
-                isManager ? (
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    <button
-                      onClick={() => {
-                        setRenameValue(activeFeature.name);
-                        setRenameTarget({
-                          id: activeFeature.id,
-                          name: activeFeature.name,
-                        });
-                      }}
-                      title={t('features.rename')}
-                      style={{
-                        background: 'none',
-                        border: `1px solid ${theme.colors.border}`,
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '6px 10px',
-                      }}
-                    >
-                      <ThemedSvgIcon
-                        name="pencil"
-                        color={theme.colors.secondary}
-                        size={16}
-                      />
-                    </button>
-                    <button
-                      onClick={() =>
-                        setArchiveTarget({
-                          id: activeFeature.id,
-                          name: activeFeature.name,
-                        })
-                      }
-                      title={t('features.archive')}
-                      style={{
-                        background: 'none',
-                        border: `1px solid ${theme.colors.border}`,
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '6px 10px',
-                      }}
-                    >
-                      <ThemedSvgIcon
-                        name="archive"
-                        color={theme.colors.secondary}
-                        size={16}
-                      />
-                    </button>
-                  </div>
-                ) : undefined
-              }
             />
           )}
 

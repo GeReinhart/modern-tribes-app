@@ -38,15 +38,19 @@ _MAGIC_LINK_STRINGS = {
 
 def magic_link_html(magic_link: str, language: str = "en") -> str:
     s = _MAGIC_LINK_STRINGS.get(language, _MAGIC_LINK_STRINGS["en"])
+    logo_url = f"{settings.FRONTEND_URL}/modern-tribes.h-logo.svg"
     return f"""
     <!DOCTYPE html>
     <html>
     <head>
         <style>
-            body {{ font-family: Arial, sans-serif; line-height: 1.6; }}
-            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; background-color: #f4f4f4; margin: 0; padding: 0; }}
+            .container {{ max-width: 600px; margin: 0 auto; background-color: #ffffff; }}
+            .header {{ text-align: center; padding: 30px 20px; border-bottom: 2px solid #f0f0f0; }}
+            .logo {{ max-width: 240px; height: auto; }}
+            .content {{ padding: 30px 20px; }}
             .button {{
-                background-color: #4F46E5;
+                background-color: #FF7F50;
                 color: white;
                 padding: 12px 24px;
                 text-decoration: none;
@@ -54,19 +58,24 @@ def magic_link_html(magic_link: str, language: str = "en") -> str:
                 display: inline-block;
                 margin: 20px 0;
             }}
-            .footer {{ color: #666; font-size: 12px; margin-top: 30px; }}
+            .footer {{ color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #f0f0f0; }}
         </style>
     </head>
     <body>
         <div class="container">
-            <h2>{s["title"].format(app_name=settings.APP_NAME)}</h2>
-            <p>{s["intro"]}</p>
-            <a href="{magic_link}" class="button">{s["button"]}</a>
-            <p>{s["fallback"]}</p>
-            <p style="color: #666; word-break: break-all;">{magic_link}</p>
-            <p class="footer">
-                {s["footer"].format(minutes=settings.MAGIC_LINK_EXPIRE_MINUTES)}
-            </p>
+            <div class="header">
+                <img src="{logo_url}" alt="{settings.APP_NAME}" class="logo">
+            </div>
+            <div class="content">
+                <h2>{s["title"].format(app_name=settings.APP_NAME)}</h2>
+                <p>{s["intro"]}</p>
+                <a href="{magic_link}" class="button">{s["button"]}</a>
+                <p>{s["fallback"]}</p>
+                <p style="color: #666; word-break: break-all;">{magic_link}</p>
+                <p class="footer">
+                    {s["footer"].format(minutes=settings.MAGIC_LINK_EXPIRE_MINUTES)}
+                </p>
+            </div>
         </div>
     </body>
     </html>

@@ -7,7 +7,6 @@ import { ThemedTabs } from '@/app/platform/core/layout/themes/components/ThemedT
 import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
-import { TabConfigButton } from '@/app/features/glue/tab-config/TabConfigButton.tsx';
 import { TabConfigPopup } from '@/app/features/glue/tab-config/TabConfigPopup.tsx';
 import { useTabConfig } from '@/app/features/glue/tab-config/useTabConfig.ts';
 import { useCurrentUserProfile } from '@/app/platform/functions/people/users/useCurrentUserProfile.ts';
@@ -171,6 +170,11 @@ const ShowTribePageContent: React.FC = () => {
 
   const menuActions = useMemo(
     (): MenuAction[] => [
+      {
+        icon: 'settings' as const,
+        label: t('tabConfig.configure'),
+        onClick: () => setShowTabConfig(true),
+      },
       ...(isManager
         ? [
             {
@@ -197,7 +201,7 @@ const ShowTribePageContent: React.FC = () => {
           ]
         : []),
     ],
-    [isManager, authorization?.authorized, archiving, tribeId, t, navigate],
+    [isManager, authorization?.authorized, archiving, tribeId, t, navigate, setShowTabConfig],
   );
 
   const breadcrumbs = React.useMemo(
@@ -329,9 +333,6 @@ const ShowTribePageContent: React.FC = () => {
         tabs={visibleTabs}
         activeTab={activeTab}
         onTabChange={handleTabChange}
-        configButton={
-          <TabConfigButton onClick={() => setShowTabConfig(true)} />
-        }
       />
 
       <div style={{ marginTop: '16px' }}>
