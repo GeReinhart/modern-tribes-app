@@ -9,10 +9,10 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import type { DashboardTask } from '../dashboard-types.ts';
+import type { MyTask } from './types.ts';
 
 interface Props {
-  task: DashboardTask;
+  task: MyTask;
   persons: PersonOption[];
   canEdit: boolean;
   onUpdate: (patch: TaskPatch) => Promise<void>;
@@ -24,12 +24,12 @@ interface Props {
   }) => Promise<TaskLabelInfo | null>;
 }
 
-function buildSourcePath(task: DashboardTask): string {
+function buildSourcePath(task: MyTask): string {
   if (!task.tribe_id) return `/app/tribes`;
   return `/app/tribes/${task.tribe_id}/projects/${task.project_id}/${task.feature_instance_id}`;
 }
 
-const DashboardTaskCard: React.FC<Props> = ({
+const MyTasksCard: React.FC<Props> = ({
   task,
   persons,
   canEdit,
@@ -249,4 +249,4 @@ const DashboardTaskCard: React.FC<Props> = ({
   );
 };
 
-export default DashboardTaskCard;
+export default MyTasksCard;

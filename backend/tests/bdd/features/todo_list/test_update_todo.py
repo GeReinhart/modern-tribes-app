@@ -11,7 +11,7 @@ from tests.db_helpers import db_lifespan
 _test_app = FastAPI(lifespan=db_lifespan)
 _test_app.include_router(router, prefix="/api/features/tasks")
 
-FEATURE = "../../../features/features/todo_list/update_todo.feature"
+FEATURE = "../../../features/features/tasks/todo_list/update_todo.feature"
 
 @scenario(FEATURE, "PATCH /todo-items/0010 as admin — the item is updated")
 def test_update_todo_admin():

@@ -11,7 +11,7 @@ from tests.db_helpers import db_lifespan
 _test_app = FastAPI(lifespan=db_lifespan)
 _test_app.include_router(router, prefix="/api/features/tasks")
 
-FEATURE = "../../../features/features/todo_list/archive_todo.feature"
+FEATURE = "../../../features/features/tasks/todo_list/archive_todo.feature"
 
 @scenario(FEATURE, "DELETE /todo-items/0010 as admin — the item is archived")
 def test_archive_todo_admin():

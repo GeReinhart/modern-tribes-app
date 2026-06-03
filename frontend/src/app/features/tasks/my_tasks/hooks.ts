@@ -7,12 +7,8 @@ import { apiHooks } from '@/app/platform/core/api/api-hooks.ts';
 
 import { useCallback, useEffect } from 'react';
 
-import { getMyTasks } from './dashboard-service.ts';
-import type {
-  DashboardTask,
-  MyTasksFilters,
-  MyTasksResponse,
-} from './dashboard-types.ts';
+import { getMyTasks } from './service.ts';
+import type { MyTask, MyTasksFilters, MyTasksResponse } from './types.ts';
 
 export function useMyTasks(filters: MyTasksFilters) {
   const { data, loading, error, execute } = apiHooks<MyTasksResponse>();
@@ -32,7 +28,7 @@ export function useMyTasks(filters: MyTasksFilters) {
 
 export function useMyTaskMutations() {
   const updateTask = useCallback(
-    async (task: DashboardTask, patch: TaskPatch): Promise<void> => {
+    async (task: MyTask, patch: TaskPatch): Promise<void> => {
       if (task.source === 'kanban') {
         await kanbanService.updateCard(task.id, patch as CardUpdate);
       } else {
@@ -43,7 +39,7 @@ export function useMyTaskMutations() {
   );
 
   const toggleLabel = useCallback(
-    async (task: DashboardTask, labelId: string): Promise<void> => {
+    async (task: MyTask, labelId: string): Promise<void> => {
       const ids = task.label_ids;
       if (task.source === 'kanban') {
         if (ids.includes(labelId))
@@ -58,7 +54,7 @@ export function useMyTaskMutations() {
 
   const createLabel = useCallback(
     async (
-      task: DashboardTask,
+      task: MyTask,
       data: { feature_instance_id: string; name: string; color: string },
     ) => {
       if (task.source === 'kanban') return kanbanService.createLabel(data);

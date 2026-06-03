@@ -10,7 +10,7 @@ from tests.db_helpers import db_lifespan
 _test_app = FastAPI(lifespan=db_lifespan)
 _test_app.include_router(router, prefix="/api/features/tasks")
 
-FEATURE = "../../../features/features/kanban/kanban_labels.feature"
+FEATURE = "../../../features/features/tasks/kanban/kanban_labels.feature"
 
 @scenario(FEATURE, "GET /kanban/labels/0100 as admin — labels are returned")
 def test_list_kanban_labels_admin():

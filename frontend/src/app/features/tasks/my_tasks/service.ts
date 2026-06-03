@@ -1,6 +1,6 @@
 import { apiService } from '@/app/platform/core/api/api.service.ts';
 
-import type { MyTasksFilters, MyTasksResponse } from './dashboard-types.ts';
+import type { MyTasksFilters, MyTasksResponse } from './types.ts';
 
 function buildQuery(filters: MyTasksFilters): string {
   const params = new URLSearchParams();
@@ -16,6 +16,6 @@ export async function getMyTasks(
   filters: MyTasksFilters = {},
 ): Promise<MyTasksResponse> {
   return apiService.get<MyTasksResponse>(
-    `/features/dashboard${buildQuery(filters)}`,
+    `/features/my-tasks${buildQuery(filters)}`,
   );
 }

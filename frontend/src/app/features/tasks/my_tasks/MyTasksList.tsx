@@ -5,22 +5,22 @@ import type { PersonOption } from '@/app/features/tasks/types.ts';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { DashboardTask, MyTasksResponse } from '../dashboard-types.ts';
-import DashboardTaskCard from './DashboardTaskCard.tsx';
+import MyTasksCard from './MyTasksCard.tsx';
+import type { MyTask, MyTasksResponse } from './types.ts';
 
 interface Props {
   data: MyTasksResponse;
   persons: PersonOption[];
   canEdit: boolean;
-  onUpdate: (task: DashboardTask, patch: TaskPatch) => Promise<void>;
-  onToggleLabel: (task: DashboardTask, labelId: string) => Promise<void>;
+  onUpdate: (task: MyTask, patch: TaskPatch) => Promise<void>;
+  onToggleLabel: (task: MyTask, labelId: string) => Promise<void>;
   onCreateLabel: (
-    task: DashboardTask,
+    task: MyTask,
     data: { feature_instance_id: string; name: string; color: string },
   ) => Promise<TaskLabelInfo | null>;
 }
 
-function sortTasks(tasks: DashboardTask[]): DashboardTask[] {
+function sortTasks(tasks: MyTask[]): MyTask[] {
   return [...tasks].sort((a, b) => {
     if (a.due_date < b.due_date) return -1;
     if (a.due_date > b.due_date) return 1;
@@ -28,7 +28,7 @@ function sortTasks(tasks: DashboardTask[]): DashboardTask[] {
   });
 }
 
-const DashboardTasksList: React.FC<Props> = ({
+const MyTasksList: React.FC<Props> = ({
   data,
   persons,
   canEdit,
@@ -39,7 +39,7 @@ const DashboardTasksList: React.FC<Props> = ({
   const { t } = useTranslation();
   const { theme } = useTheme();
 
-  const allTasks: DashboardTask[] = sortTasks([
+  const allTasks: MyTask[] = sortTasks([
     ...data.kanban.map((k) => ({ ...k, source: 'kanban' as const })),
     ...data.todo.map((td) => ({ ...td, source: 'todo' as const })),
   ]);
@@ -62,7 +62,7 @@ const DashboardTasksList: React.FC<Props> = ({
   return (
     <div style={{ maxWidth: '680px' }}>
       {allTasks.map((task) => (
-        <DashboardTaskCard
+        <MyTasksCard
           key={`${task.source}-${task.id}`}
           task={task}
           persons={persons}
@@ -76,4 +76,4 @@ const DashboardTasksList: React.FC<Props> = ({
   );
 };
 
-export default DashboardTasksList;
+export default MyTasksList;

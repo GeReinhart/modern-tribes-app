@@ -5,14 +5,10 @@ import type { PersonOption } from '@/app/features/tasks/types.ts';
 
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { useMyTaskMutations, useMyTasks } from '../dashboard-hooks.ts';
-import type {
-  DashboardTask,
-  MyTasksFilters,
-  MyTasksResponse,
-} from '../dashboard-types.ts';
-import DashboardTasksFilters from './DashboardTasksFilters.tsx';
-import DashboardTasksList from './DashboardTasksList.tsx';
+import { useMyTaskMutations, useMyTasks } from './hooks.ts';
+import type { MyTask, MyTasksFilters, MyTasksResponse } from './types.ts';
+import MyTasksFiltersPanel from './MyTasksFilters.tsx';
+import MyTasksList from './MyTasksList.tsx';
 
 function uniquePersons(data: MyTasksResponse): PersonOption[] {
   const seen = new Set<string>();
@@ -33,7 +29,7 @@ function uniquePersons(data: MyTasksResponse): PersonOption[] {
 
 const empty: MyTasksResponse = { kanban: [], todo: [] };
 
-const DashboardTasksTab: React.FC = () => {
+const MyTasksTab: React.FC = () => {
   const { theme } = useTheme();
   const [filters, setFilters] = useState<MyTasksFilters>({});
 
@@ -41,14 +37,14 @@ const DashboardTasksTab: React.FC = () => {
   const { updateTask, toggleLabel, createLabel } = useMyTaskMutations();
 
   const tasks: MyTasksResponse = data ?? empty;
-  const allDashTasks: DashboardTask[] = useMemo(
+  const allTasks: MyTask[] = useMemo(
     () => [...tasks.kanban, ...tasks.todo],
     [tasks],
   );
   const effectivePersons = useMemo(() => uniquePersons(tasks), [tasks]);
 
   const handleUpdate = useCallback(
-    async (task: DashboardTask, patch: TaskPatch) => {
+    async (task: MyTask, patch: TaskPatch) => {
       await updateTask(task, patch);
       await refetch();
     },
@@ -56,7 +52,7 @@ const DashboardTasksTab: React.FC = () => {
   );
 
   const handleToggleLabel = useCallback(
-    async (task: DashboardTask, labelId: string) => {
+    async (task: MyTask, labelId: string) => {
       await toggleLabel(task, labelId);
       await refetch();
     },
@@ -65,7 +61,7 @@ const DashboardTasksTab: React.FC = () => {
 
   const handleCreateLabel = useCallback(
     async (
-      task: DashboardTask,
+      task: MyTask,
       data: { feature_instance_id: string; name: string; color: string },
     ): Promise<TaskLabelInfo | null> => {
       const created = await createLabel(task, data);
@@ -102,13 +98,13 @@ const DashboardTasksTab: React.FC = () => {
 
   return (
     <div>
-      <DashboardTasksFilters
-        tasks={allDashTasks}
+      <MyTasksFiltersPanel
+        tasks={allTasks}
         filters={filters}
         effectivePersons={effectivePersons}
         onChange={setFilters}
       />
-      <DashboardTasksList
+      <MyTasksList
         data={tasks}
         persons={effectivePersons}
         canEdit={true}
@@ -120,4 +116,4 @@ const DashboardTasksTab: React.FC = () => {
   );
 };
 
-export default DashboardTasksTab;
+export default MyTasksTab;

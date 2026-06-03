@@ -6,10 +6,10 @@ import { useTranslation } from 'react-i18next';
 
 import { FolderOpen, Layers, Tag, User } from 'lucide-react';
 
-import type { DashboardTask, MyTasksFilters } from '../dashboard-types.ts';
+import type { MyTask, MyTasksFilters } from './types.ts';
 
 interface Props {
-  tasks: DashboardTask[];
+  tasks: MyTask[];
   filters: MyTasksFilters;
   effectivePersons: PersonOption[];
   onChange: (f: MyTasksFilters) => void;
@@ -40,7 +40,7 @@ function pillStyle(active: boolean, color: string): React.CSSProperties {
   };
 }
 
-const DashboardTasksFilters: React.FC<Props> = ({
+const MyTasksFilters: React.FC<Props> = ({
   tasks,
   filters,
   effectivePersons,
@@ -201,4 +201,4 @@ const DashboardTasksFilters: React.FC<Props> = ({
   );
 };
 
-export default DashboardTasksFilters;
+export default MyTasksFilters;

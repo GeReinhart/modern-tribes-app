@@ -11,7 +11,7 @@ from tests.db_helpers import db_lifespan
 _test_app = FastAPI(lifespan=db_lifespan)
 _test_app.include_router(router, prefix="/api/features/tasks")
 
-FEATURE = "../../../features/features/todo_list/toggle_todo_label.feature"
+FEATURE = "../../../features/features/tasks/todo_list/toggle_todo_label.feature"
 
 @scenario(FEATURE, "POST /todo-items/0010/labels/0020 as admin — label is toggled on todo item")
 def test_toggle_todo_label_admin():

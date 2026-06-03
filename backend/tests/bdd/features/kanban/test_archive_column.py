@@ -10,7 +10,7 @@ from tests.db_helpers import db_lifespan
 _test_app = FastAPI(lifespan=db_lifespan)
 _test_app.include_router(router, prefix="/api/features/tasks")
 
-FEATURE = "../../../features/features/kanban/archive_column.feature"
+FEATURE = "../../../features/features/tasks/kanban/archive_column.feature"
 
 @scenario(FEATURE, "DELETE /kanban/columns/0010 as admin — the column is deleted")
 def test_archive_column_admin():

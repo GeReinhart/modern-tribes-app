@@ -23,7 +23,7 @@ import { AdminNotificationsPage } from '@/app/platform/tools/notifications/Admin
 import AboutPage from '@/app/platform/core/about/AboutPage.tsx';
 import { CreateProjectPage } from '@/app/features/tribes-projects/projects/CreateProjectPage.tsx';
 import CreateTribeForm from '@/app/features/tribes-projects/tribes/CreateTribePage.tsx';
-import DashboardPage from '@/app/features/dashboard/DashboardPage.tsx';
+import DashboardPage from '@/app/features/glue/dashboard/DashboardPage.tsx';
 import { DocumentPageFormPage } from '@/app/features/tribes-projects/projects/DocumentPageFormPage.tsx';
 import { EditProjectPage } from '@/app/features/tribes-projects/projects/EditProjectPage.tsx';
 import ProfilePage from '@/app/platform/functions/people/ProfilePage.tsx';

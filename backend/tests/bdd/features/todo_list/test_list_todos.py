@@ -11,7 +11,7 @@ from tests.db_helpers import db_lifespan
 _test_app = FastAPI(lifespan=db_lifespan)
 _test_app.include_router(router, prefix="/api/features/tasks")
 
-FEATURE = "../../../features/features/todo_list/list_todos.feature"
+FEATURE = "../../../features/features/tasks/todo_list/list_todos.feature"
 
 @scenario(FEATURE, "GET /todo-items/by-instance/0100 as admin — todo items are returned")
 def test_list_todos_admin():

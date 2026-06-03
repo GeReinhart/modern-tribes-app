@@ -10,7 +10,7 @@ from tests.db_helpers import db_lifespan
 _test_app = FastAPI(lifespan=db_lifespan)
 _test_app.include_router(router, prefix="/api/features/tasks")
 
-FEATURE = "../../../features/features/kanban/create_column.feature"
+FEATURE = "../../../features/features/tasks/kanban/create_column.feature"
 
 @scenario(FEATURE, "POST /kanban/columns as admin — the column is created")
 def test_create_column_admin():

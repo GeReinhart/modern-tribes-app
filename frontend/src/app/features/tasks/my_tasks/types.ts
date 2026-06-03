@@ -1,10 +1,10 @@
-export interface DashboardTaskLabel {
+export interface MyTaskLabel {
   id: string;
   name: string;
   color: string;
 }
 
-export interface DashboardTaskBase {
+export interface MyTaskBase {
   id: string;
   title: string;
   size: number | null;
@@ -18,26 +18,26 @@ export interface DashboardTaskBase {
   tribe_id: string | null;
   tribe_name: string | null;
   label_ids: string[];
-  labels: DashboardTaskLabel[];
+  labels: MyTaskLabel[];
   document_content_html: string | null;
 }
 
-export interface DashboardKanbanTask extends DashboardTaskBase {
+export interface MyKanbanTask extends MyTaskBase {
   source: 'kanban';
   column_id: string;
   column_name: string;
 }
 
-export interface DashboardTodoTask extends DashboardTaskBase {
+export interface MyTodoTask extends MyTaskBase {
   source: 'todo';
   todo_status: string;
 }
 
-export type DashboardTask = DashboardKanbanTask | DashboardTodoTask;
+export type MyTask = MyKanbanTask | MyTodoTask;
 
 export interface MyTasksResponse {
-  kanban: DashboardKanbanTask[];
-  todo: DashboardTodoTask[];
+  kanban: MyKanbanTask[];
+  todo: MyTodoTask[];
 }
 
 export interface MyTasksFilters {

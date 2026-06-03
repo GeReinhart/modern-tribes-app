@@ -34,7 +34,7 @@ from app.platform.tools.mail import query_router as mail_router
 from app.platform.tools.mail.scheduler import mail_scheduler
 from app.platform.tools.notifications import router as app_notifications
 from app.features.bookmarks import router as user_bookmarks
-from app.features.dashboard import router as query_my_tasks
+from app.features.tasks.my_tasks import router as my_tasks_router
 from app.features.glue.features import router as project_features
 from app.features.glue.tab_config import router as user_tab_configs
 from app.features.tribes_projects.positions import router as positions
@@ -145,8 +145,8 @@ app.include_router(app_notifications.router, prefix="/api/platform/tools")
 # Features — Bookmarks
 app.include_router(user_bookmarks.router, prefix="/api/features")
 
-# Features — Dashboard
-app.include_router(query_my_tasks.router, prefix="/api/features")
+# Features — My Tasks
+app.include_router(my_tasks_router.router, prefix="/api/features")
 
 # Features — Glue
 app.include_router(project_features.router, prefix="/api/features/glue")

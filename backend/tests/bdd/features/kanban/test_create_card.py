@@ -10,7 +10,7 @@ from tests.db_helpers import db_lifespan
 _test_app = FastAPI(lifespan=db_lifespan)
 _test_app.include_router(router, prefix="/api/features/tasks")
 
-FEATURE = "../../../features/features/kanban/create_card.feature"
+FEATURE = "../../../features/features/tasks/kanban/create_card.feature"
 
 @scenario(FEATURE, "POST /kanban/cards as admin — the card is created")
 def test_create_card_admin():

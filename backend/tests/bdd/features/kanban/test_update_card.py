@@ -10,7 +10,7 @@ from tests.db_helpers import db_lifespan
 _test_app = FastAPI(lifespan=db_lifespan)
 _test_app.include_router(router, prefix="/api/features/tasks")
 
-FEATURE = "../../../features/features/kanban/update_card.feature"
+FEATURE = "../../../features/features/tasks/kanban/update_card.feature"
 
 @scenario(FEATURE, "PATCH /kanban/cards/0010 as admin — the card is updated")
 def test_update_card_admin():

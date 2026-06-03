@@ -593,6 +593,33 @@
                 "frontend/src/app/features/tasks/kanban/**"
               ]
             }
+          },
+          {
+            "package": "my_tasks",
+            "description": {
+              "en": [
+                "aggregates tasks assigned to the current user across all projects",
+                "cross-project view combining kanban cards and todo items",
+                "filterable by tribe, project, person and label",
+                "exposed at GET /features/my-tasks"
+              ],
+              "fr": [
+                "agrège les tâches assignées à l'utilisateur courant sur tous les projets",
+                "vue transversale combinant les cartes kanban et les éléments todo",
+                "filtrable par tribu, projet, personne et étiquette",
+                "exposé sur GET /features/my-tasks"
+              ]
+            },
+            "backend": {
+              "path": [
+                "backend/app/features/tasks/my_tasks/**"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/tasks/my_tasks/**"
+              ]
+            }
           }
         ]
       },
@@ -668,14 +695,12 @@
         "description": {
           "en": [
             "personalized user dashboard",
-            "aggregates tasks from todo list and kanban",
-            "filterable by tribe, project, person and label",
+            "composes my_tasks, tribes and bookmarks tabs",
             "shows tribes membership and bookmarks"
           ],
           "fr": [
             "tableau de bord personnalisé",
-            "agrège les tâches de la liste de tâches et du kanban",
-            "filtrable par tribu, projet, personne et étiquette",
+            "compose les onglets my_tasks, tribus et signets",
             "affiche l'appartenance aux tribus et les signets"
           ]
         },

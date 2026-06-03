@@ -1,7 +1,7 @@
-Feature: Get dashboard
+Feature: Get my tasks
   As a user with platform access
-  I want to retrieve the dashboard data
-  So that I can see an overview of my activity
+  I want to retrieve my tasks across all projects
+  So that I can see all tasks assigned to me
 
   Background:
     Given the users table contains:
@@ -25,7 +25,7 @@ Feature: Get dashboard
       | user@test.com         | viewer        |
       | profile_user@test.com | profile-owner |
 
-  Scenario: GET /dashboard as viewer — dashboard is returned
+  Scenario: GET /my-tasks as viewer — kanban and todo tasks are returned
     Given I am authenticated as a regular user: user.id 0002
     And the persons table contains:
       | id   | first_name | last_name | gender | status |
@@ -56,7 +56,7 @@ Feature: Get dashboard
     And the todo_items table contains:
       | id   | feature_instance_id | title      | assigned_person_id | due_date   | todo_status | status |
       | 7001 | 4002                | Write docs | 1001               | 2026-07-01 | todo        | active |
-    When I GET /api/features/dashboard
+    When I GET /api/features/my-tasks
     Then the response status code is 200
     And the response body is:
       """
@@ -108,7 +108,7 @@ Feature: Get dashboard
       """
 
   @error_case
-  Scenario: GET /dashboard as a user with no app access — 403 error
+  Scenario: GET /my-tasks as a user with no app access — 403 error
     Given I am authenticated as the person's owner: user.id 0003
-    When I GET /api/features/dashboard
+    When I GET /api/features/my-tasks
     Then the response status code is 403
