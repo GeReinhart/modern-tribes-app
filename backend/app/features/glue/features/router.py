@@ -60,6 +60,7 @@ async def list_project_features(
             project_id=str(r["project_id"]),
             feature_type=r["feature_type"],
             name=r["name"],
+            theme_code=r["theme_code"],
             status=r["status"],
             position=r["position"],
             created_at=r["created_at"],
@@ -92,13 +93,14 @@ async def create_project_feature(
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """
-            INSERT INTO projects_features (project_id, feature_type, name, position, created_by, updated_by)
-            VALUES ($1, $2, $3, $4, $5, $5)
+            INSERT INTO projects_features (project_id, feature_type, name, theme_code, position, created_by, updated_by)
+            VALUES ($1, $2, $3, $4, $5, $6, $6)
             RETURNING *
             """,
             UUID(project_id),
             data.feature_type,
             data.name,
+            data.theme_code,
             data.position,
             user_id,
         )
@@ -107,6 +109,7 @@ async def create_project_feature(
         project_id=str(row["project_id"]),
         feature_type=row["feature_type"],
         name=row["name"],
+        theme_code=row["theme_code"],
         status=row["status"],
         position=row["position"],
         created_at=row["created_at"],
@@ -140,6 +143,8 @@ async def update_project_feature(
         updates["status"] = data.status
     if data.position is not None:
         updates["position"] = data.position
+    if "theme_code" in data.model_fields_set:
+        updates["theme_code"] = data.theme_code
 
     set_clauses = ", ".join(f"{k} = ${i+2}" for i, k in enumerate(updates.keys()))
     values = list(updates.values())
@@ -158,6 +163,7 @@ async def update_project_feature(
         project_id=str(row["project_id"]),
         feature_type=row["feature_type"],
         name=row["name"],
+        theme_code=row["theme_code"],
         status=row["status"],
         position=row["position"],
         created_at=row["created_at"],

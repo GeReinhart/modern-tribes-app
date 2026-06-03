@@ -32,6 +32,7 @@ class TribeWithPositionsUpdate(BaseModel):
     document_content_html: Optional[str] = None
     document_attachments: Optional[List[AttachmentFile]] = None
     positions: Optional[List[PositionData]] = None
+    theme_code: Optional[str] = None
 
 
 class PersonWithPosition(BaseModel):
@@ -55,6 +56,7 @@ class TribeWithPositionsResponse(BaseModel):
     document_id: str
     document_content_html: str
     document_attachments: List[AttachmentFile] = []
+    theme_code: Optional[str] = None
     projects: List[TribeProjectResponse] = []
     persons: List[PersonWithPosition]
     created_at: datetime

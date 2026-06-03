@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict
 class TribeBase(BaseModel):
     name: str
     document_id: Optional[str] = None
+    theme_code: Optional[str] = None
 
 
 class TribeCreate(TribeBase):
@@ -17,6 +18,7 @@ class TribeUpdate(BaseModel):
     name: Optional[str] = None
     document_id: Optional[str] = None
     status: Optional[str] = None
+    theme_code: Optional[str] = None
 
 
 class Tribe(TribeBase):

@@ -546,6 +546,8 @@ const fr: Record<string, string> = {
   'admin.notifications.error': "Échec de l'envoi de la notification",
   'admin.notifications.noResults':
     'Aucun utilisateur trouvé. Tapez pour rechercher.',
+
+  'theme.selectTheme': 'Thème',
 };
 
 export default fr;

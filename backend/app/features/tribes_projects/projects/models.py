@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict
 class ProjectBase(BaseModel):
     name: str
     document_id: Optional[str] = None
+    theme_code: Optional[str] = None
 
 
 class ProjectCreate(ProjectBase):
@@ -17,6 +18,7 @@ class ProjectUpdate(BaseModel):
     name: Optional[str] = None
     document_id: Optional[str] = None
     status: Optional[str] = None
+    theme_code: Optional[str] = None
 
 
 class Project(ProjectBase):

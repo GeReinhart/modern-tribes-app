@@ -97,6 +97,17 @@ async def update_tribe_name(pool, tribe_id: str, name: str, user_id: str) -> Non
         )
 
 
+async def update_tribe_theme_code(pool, tribe_id: str, theme_code, user_id: str) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE tribes SET theme_code = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
+            theme_code,
+            datetime.now(timezone.utc),
+            UUID(user_id),
+            UUID(tribe_id),
+        )
+
+
 async def update_tribe_document_id(pool, tribe_id: str, document_id: str, user_id: str) -> None:
     async with pool.acquire() as conn:
         await conn.execute(

@@ -123,6 +123,9 @@ async def _apply_tribe_updates(
     if data.name:
         await tribe_repo.update_tribe_name(pool, tribe_id, data.name, user_id)
 
+    if "theme_code" in data.model_fields_set:
+        await tribe_repo.update_tribe_theme_code(pool, tribe_id, data.theme_code, user_id)
+
     document_id = tribe.get("document_id")
     has_document_changes = data.document_content_html is not None or data.document_attachments is not None
 
@@ -161,6 +164,7 @@ def _build_response(
         document_id=str(document["id"]) if document else "",
         document_content_html=document.get("content_html", "") if document else "",
         document_attachments=attachments,
+        theme_code=tribe.get("theme_code"),
         projects=projects,
         persons=persons,
         created_at=tribe["created_at"],

@@ -2,7 +2,7 @@ import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.ts
 
 import React, { ReactNode } from 'react';
 
-import { themesById } from '@/app/platform/core/layout/themes/themes.ts';
+import { predefinedThemes, themesById } from '@/app/platform/core/layout/themes/themes.ts';
 
 interface ThemedSectionProps {
   children: ReactNode;
@@ -17,10 +17,14 @@ export const ThemedSection: React.FC<ThemedSectionProps> = ({
   style,
   className,
 }) => {
-  const effectiveTheme = themesById[themeId ? themeId : 'default'];
+  if (!themeId) {
+    return <div className={className} style={style}>{children}</div>;
+  }
+
+  const effectiveTheme = themesById[themeId] ?? predefinedThemes.default;
 
   return (
-    <ThemeProvider defaultTheme={effectiveTheme}>
+    <ThemeProvider key={themeId} defaultTheme={effectiveTheme}>
       <div className={className} style={style}>
         {children}
       </div>

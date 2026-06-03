@@ -6,6 +6,7 @@ import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedC
 import { ThemedLoadingOverlay } from '@/app/platform/core/layout/themes/components/ThemedLoadingOverlay.tsx';
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedSection } from '@/app/platform/core/layout/themes/components/ThemedSection.tsx';
+import { ThemeCodeSelect } from '@/app/platform/core/layout/themes/components/ThemeCodeSelect.tsx';
 import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
@@ -46,6 +47,7 @@ const EditProjectPageContent: React.FC = () => {
   const [name, setName] = useState('');
   const [documentContent, setDocumentContent] = useState('');
   const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
+  const [themeCode, setThemeCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [initialized, setInitialized] = useState(false);
@@ -57,6 +59,7 @@ const EditProjectPageContent: React.FC = () => {
       setName(project.name);
       setDocumentContent(project.document_content_html);
       setAttachments(project.document_attachments);
+      setThemeCode(project.theme_code ?? null);
       setInitialized(true);
     }
   }, [project, initialized]);
@@ -89,6 +92,7 @@ const EditProjectPageContent: React.FC = () => {
         name: name.trim(),
         document_content_html: documentContent,
         document_attachments: attachments,
+        theme_code: themeCode,
       });
       if (!result) throw new Error('Failed to update project');
       navigate(`/app/tribes/${tribeId}/projects/${projectId}`);
@@ -170,6 +174,16 @@ const EditProjectPageContent: React.FC = () => {
               <EditorFileUploader
                 attachments={attachments}
                 onAttachmentsChange={setAttachments}
+              />
+            </div>
+          </ThemedSection>
+
+          <ThemedSection>
+            <div style={{ padding: '0 0 16px 0' }}>
+              <ThemeCodeSelect
+                label={t('theme.selectTheme')}
+                value={themeCode}
+                onChange={setThemeCode}
               />
             </div>
           </ThemedSection>

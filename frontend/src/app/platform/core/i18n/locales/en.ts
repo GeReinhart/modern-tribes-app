@@ -529,6 +529,8 @@ const en: Record<string, string> = {
   'admin.notifications.success': 'Notification queued for {{name}}',
   'admin.notifications.error': 'Failed to send notification',
   'admin.notifications.noResults': 'No users found. Type to search.',
+
+  'theme.selectTheme': 'Theme',
 };
 
 export default en;

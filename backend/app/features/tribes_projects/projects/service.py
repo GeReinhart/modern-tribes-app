@@ -94,6 +94,16 @@ async def update_project_with_document(
                 UUID(project_id),
             )
 
+    if "theme_code" in data.model_fields_set:
+        async with pool.acquire() as conn:
+            await conn.execute(
+                "UPDATE projects SET theme_code = $1, updated_at = $2, updated_by = $3 WHERE id = $4",
+                data.theme_code,
+                now,
+                uid,
+                UUID(project_id),
+            )
+
     document_id = project.get("document_id")
     has_document_changes = data.document_content_html is not None or data.document_attachments is not None
 
@@ -149,6 +159,7 @@ async def _build_response(project: dict, pool) -> ProjectWithDocumentResponse:
         document_id=str(document_id) if document_id else None,
         document_content_html=document.get("content_html", "") if document else "",
         document_attachments=attachments,
+        theme_code=project.get("theme_code"),
         status=project.get("status", "active"),
         created_at=project["created_at"],
         updated_at=project["updated_at"],

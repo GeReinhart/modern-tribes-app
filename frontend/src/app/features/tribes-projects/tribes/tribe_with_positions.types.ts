@@ -31,6 +31,7 @@ export interface TribeWithPositionsUpdate {
   document_content_html?: string;
   document_attachments?: AttachmentFile[];
   positions?: PositionData[];
+  theme_code?: string | null;
 }
 
 export interface TribeWithPositionsResponse {
@@ -40,6 +41,7 @@ export interface TribeWithPositionsResponse {
   document_id: string;
   document_content_html: string;
   document_attachments: AttachmentFile[];
+  theme_code?: string | null;
   projects: TribeProject[];
   persons: PersonWithPosition[];
   created_at: string;

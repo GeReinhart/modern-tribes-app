@@ -6,6 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 export interface TabDefinition {
   key: string;
   label: string;
+  color?: string;
 }
 
 interface UseUrlTabResult {

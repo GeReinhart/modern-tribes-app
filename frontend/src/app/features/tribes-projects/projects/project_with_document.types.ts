@@ -11,6 +11,7 @@ export interface ProjectWithDocumentUpdate {
   name?: string;
   document_content_html?: string;
   document_attachments?: AttachmentFile[];
+  theme_code?: string | null;
 }
 
 export interface ProjectWithDocumentResponse {
@@ -20,6 +21,7 @@ export interface ProjectWithDocumentResponse {
   document_id: string | null;
   document_content_html: string;
   document_attachments: AttachmentFile[];
+  theme_code?: string | null;
   status: string;
   created_at: string;
   updated_at: string;

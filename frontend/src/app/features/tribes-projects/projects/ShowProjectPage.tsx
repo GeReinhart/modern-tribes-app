@@ -4,6 +4,9 @@ import { ThemedBadge } from '@/app/platform/core/layout/themes/components/Themed
 import { ThemedConfirmDialog } from '@/app/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedSection } from '@/app/platform/core/layout/themes/components/ThemedSection.tsx';
+import { ThemeCodeSelect } from '@/app/platform/core/layout/themes/components/ThemeCodeSelect.tsx';
+import { ThemePickerModal } from '@/app/platform/core/layout/themes/components/ThemePickerModal.tsx';
+import { predefinedThemes } from '@/app/platform/core/layout/themes/themes.ts';
 import { ThemedTabs } from '@/app/platform/core/layout/themes/components/ThemedTabs.tsx';
 import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 import { ProjectDocumentsTab } from '@/app/features/tribes-projects/projects/ProjectDocumentsTab.tsx';
@@ -22,6 +25,7 @@ import {
 import {
   useProjectTribesWithMembers,
   useProjectWithDocument,
+  useProjectWithDocumentMutations,
   useUserProjectsByTribe,
 } from '@/app/features/tribes-projects/projects/useProjects.ts';
 import { useTribeWithPositions } from '@/app/features/tribes-projects/tribes/useTribesWithPositions.ts';
@@ -33,7 +37,7 @@ import { ProjectEntry } from '@/app/features/tribes-projects/projects/projects.q
 
 import { BookmarkToggle } from '@/app/features/bookmarks/BookmarkToggle.tsx';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
@@ -190,7 +194,7 @@ const AddFeatureModal: React.FC<{
 
 const ShowProjectPageContent: React.FC = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const { tribeId, projectId } = useParams<{
@@ -201,13 +205,23 @@ const ShowProjectPageContent: React.FC = () => {
 
   const { user } = useCurrentUserProfile();
   const { tribe } = useTribeWithPositions(tribeId || null);
-  const { project, loading, error } = useProjectWithDocument(projectId || null);
+  const { project, loading, error, refetch: refetchProject } = useProjectWithDocument(projectId || null);
+  const { updateProjectWithDocument } = useProjectWithDocumentMutations();
+
+  const [pageThemeCode, setPageThemeCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    const code = project?.theme_code ?? null;
+    setPageThemeCode(code);
+    setTheme(code || 'default');
+  }, [project?.theme_code, setTheme]);
+
   const { projects: tribeProjects } = useUserProjectsByTribe(
     tribeId || '',
     user?.id || '',
     { enabled: !!tribeId && !!user?.id },
   );
-  const { features, createFeature, renameFeature, archiveFeature } =
+  const { features, createFeature, updateFeature, archiveFeature } =
     useProjectFeatures(projectId || null);
   const { tribes: projectTribes } = useProjectTribesWithMembers(
     projectId || null,
@@ -216,6 +230,8 @@ const ShowProjectPageContent: React.FC = () => {
   const initialLabelId = searchParams.get('labelId') || null;
   const [showAddFeature, setShowAddFeature] = useState(false);
   const [showTabConfig, setShowTabConfig] = useState(false);
+  const [showProjectThemePicker, setShowProjectThemePicker] = useState(false);
+  const [showFeatureThemePicker, setShowFeatureThemePicker] = useState(false);
   const [archiveTarget, setArchiveTarget] = useState<{
     id: string;
     name: string;
@@ -223,8 +239,10 @@ const ShowProjectPageContent: React.FC = () => {
   const [renameTarget, setRenameTarget] = useState<{
     id: string;
     name: string;
+    theme_code?: string | null;
   } | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const [renameThemeCode, setRenameThemeCode] = useState<string | null>(null);
 
   const myProjectPosition = useMemo((): ProjectEntry | null => {
     if (!projectId) return null;
@@ -282,7 +300,11 @@ const ShowProjectPageContent: React.FC = () => {
       projectTribes.length > 1
         ? [{ key: 'tribes', label: t('projects.tabTribes') }]
         : [];
-    const featureTabs = features.map((f) => ({ key: f.id, label: f.name }));
+    const featureTabs = features.map((f) => ({
+      key: f.id,
+      label: f.name,
+      color: f.theme_code ? predefinedThemes[f.theme_code]?.colors.primary : undefined,
+    }));
     return [...base, ...tribeTab, ...featureTabs];
   }, [features, projectTribes.length, t]);
 
@@ -333,6 +355,11 @@ const ShowProjectPageContent: React.FC = () => {
               onClick: () => setShowAddFeature(true),
             },
             {
+              icon: 'palette' as const,
+              label: t('common.project'),
+              onClick: () => setShowProjectThemePicker(true),
+            },
+            {
               icon: 'pencil' as const,
               label: t('common.project'),
               onClick: () =>
@@ -353,11 +380,18 @@ const ShowProjectPageContent: React.FC = () => {
               label: t('features.feature'),
               onClick: () => {
                 setRenameValue(activeFeature.name);
+                setRenameThemeCode(activeFeature.theme_code ?? null);
                 setRenameTarget({
                   id: activeFeature.id,
                   name: activeFeature.name,
+                  theme_code: activeFeature.theme_code,
                 });
               },
+            },
+            {
+              icon: 'palette' as const,
+              label: t('features.feature'),
+              onClick: () => setShowFeatureThemePicker(true),
             },
             {
               icon: 'archive' as const,
@@ -447,8 +481,33 @@ const ShowProjectPageContent: React.FC = () => {
         />
       )}
 
+      {showProjectThemePicker && projectId && (
+        <ThemePickerModal
+          title={t('theme.selectTheme')}
+          currentThemeCode={project?.theme_code}
+          onSave={async (themeCode) => {
+            await updateProjectWithDocument(projectId, { theme_code: themeCode });
+            setPageThemeCode(themeCode);
+            setTheme(themeCode || 'default');
+            refetchProject();
+          }}
+          onClose={() => setShowProjectThemePicker(false)}
+        />
+      )}
+
+      {showFeatureThemePicker && activeFeature && (
+        <ThemePickerModal
+          title={t('theme.selectTheme')}
+          currentThemeCode={activeFeature.theme_code}
+          onSave={async (themeCode) => {
+            await updateFeature(activeFeature.id, { theme_code: themeCode });
+          }}
+          onClose={() => setShowFeatureThemePicker(false)}
+        />
+      )}
+
       {/* Tabs */}
-      <ThemedSection themeId="main_1">
+      <ThemedSection themeId={pageThemeCode ?? 'main_1'}>
         <ThemedTabs
           tabs={visibleTabs}
           activeTab={activeTab}
@@ -466,14 +525,12 @@ const ShowProjectPageContent: React.FC = () => {
           )}
 
           {activeTab === 'tribes' && (
-              <ThemedSection themeId="default">
-                 <ProjectTribesTab tribes={projectTribes} />
-              </ThemedSection>
+              <ProjectTribesTab tribes={projectTribes} />
           )}
 
           {activeTab === 'description' && (
             <>
-              <ThemedSection themeId="default">
+              <ThemedSection>
                 {/* User position on this project */}
                 {myProjectPosition &&
                   (myProjectPosition.direct_position ||
@@ -616,11 +673,21 @@ const ShowProjectPageContent: React.FC = () => {
           )}
 
           {activeFeature && FeatureComponent && (
-            <FeatureComponent
-              featureInstanceId={activeFeature.id}
-              canEdit={canEdit}
-              isManager={isManager}
-            />
+            activeFeature.theme_code ? (
+              <ThemedSection themeId={activeFeature.theme_code}>
+                <FeatureComponent
+                  featureInstanceId={activeFeature.id}
+                  canEdit={canEdit}
+                  isManager={isManager}
+                />
+              </ThemedSection>
+            ) : (
+              <FeatureComponent
+                featureInstanceId={activeFeature.id}
+                canEdit={canEdit}
+                isManager={isManager}
+              />
+            )
           )}
 
           {activeFeature && !FeatureComponent && (
@@ -694,8 +761,11 @@ const ShowProjectPageContent: React.FC = () => {
               onSubmit={async (e) => {
                 e.preventDefault();
                 const trimmed = renameValue.trim();
-                if (trimmed && trimmed !== renameTarget.name)
-                  await renameFeature(renameTarget.id, trimmed);
+                const updates: { name?: string; theme_code?: string | null } = {};
+                if (trimmed && trimmed !== renameTarget.name) updates.name = trimmed;
+                if (renameThemeCode !== (renameTarget.theme_code ?? null)) updates.theme_code = renameThemeCode;
+                if (Object.keys(updates).length > 0)
+                  await updateFeature(renameTarget.id, updates);
                 setRenameTarget(null);
               }}
             >
@@ -718,6 +788,13 @@ const ShowProjectPageContent: React.FC = () => {
                   marginBottom: '16px',
                 }}
               />
+              <div style={{ marginBottom: '16px' }}>
+                <ThemeCodeSelect
+                  label={t('theme.selectTheme')}
+                  value={renameThemeCode}
+                  onChange={setRenameThemeCode}
+                />
+              </div>
               <div
                 style={{
                   display: 'flex',

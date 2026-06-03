@@ -12,7 +12,8 @@ import { useTabConfig } from '@/app/features/glue/tab-config/useTabConfig.ts';
 import { useCurrentUserProfile } from '@/app/platform/functions/people/users/useCurrentUserProfile.ts';
 import { useUserProjectsByTribe } from '@/app/features/tribes-projects/projects/useProjects.ts';
 import { useUserTribes } from '@/app/features/tribes-projects/tribes/useTribes.ts';
-import { useTribeWithPositions } from '@/app/features/tribes-projects/tribes/useTribesWithPositions.ts';
+import { useTribeWithPositions, useTribeWithPositionsMutations } from '@/app/features/tribes-projects/tribes/useTribesWithPositions.ts';
+import { ThemePickerModal } from '@/app/platform/core/layout/themes/components/ThemePickerModal.tsx';
 import { useUrlTab } from '@/app/features/glue/url-tab/useUrlTab.ts';
 import { authorizationHooks } from '@/app/platform/core/authorization/authorization-hooks.ts';
 import { tribeWithPositionService } from '@/app/features/tribes-projects/tribes/tribe_with_positions.service.ts';
@@ -39,7 +40,7 @@ import {
 
 const ShowTribePageContent: React.FC = () => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const { tribeId } = useParams<{ tribeId: string }>();
@@ -51,9 +52,19 @@ const ShowTribePageContent: React.FC = () => {
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [archiving, setArchiving] = useState(false);
   const [showTabConfig, setShowTabConfig] = useState(false);
+  const [showThemePicker, setShowThemePicker] = useState(false);
 
   // Single hook call to get all data
-  const { tribe, loading, error } = useTribeWithPositions(tribeId || null);
+  const { tribe, loading, error, refetch: refetchTribe } = useTribeWithPositions(tribeId || null);
+  const { updateTribeWithPositions } = useTribeWithPositionsMutations();
+
+  const [pageThemeCode, setPageThemeCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    const code = tribe?.theme_code ?? null;
+    setPageThemeCode(code);
+    setTheme(code || 'default');
+  }, [tribe?.theme_code, setTheme]);
 
   const { user } = useCurrentUserProfile();
   const { tribes: userTribes } = useUserTribes(user?.id || '', {
@@ -187,6 +198,11 @@ const ShowTribePageContent: React.FC = () => {
       ...(authorization?.authorized
         ? [
             {
+              icon: 'palette' as const,
+              label: t('tribes.title'),
+              onClick: () => setShowThemePicker(true),
+            },
+            {
               icon: 'pencil' as const,
               label: t('common.edit'),
               onClick: () => navigate(`/app/tribes/${tribeId}/update`),
@@ -201,7 +217,7 @@ const ShowTribePageContent: React.FC = () => {
           ]
         : []),
     ],
-    [isManager, authorization?.authorized, archiving, tribeId, t, navigate, setShowTabConfig],
+    [isManager, authorization?.authorized, archiving, tribeId, t, navigate, setShowTabConfig, setShowThemePicker],
   );
 
   const breadcrumbs = React.useMemo(
@@ -319,6 +335,20 @@ const ShowTribePageContent: React.FC = () => {
         />
       )}
 
+      {showThemePicker && tribeId && (
+        <ThemePickerModal
+          title={t('theme.selectTheme')}
+          currentThemeCode={tribe?.theme_code}
+          onSave={async (themeCode) => {
+            await updateTribeWithPositions(tribeId, { theme_code: themeCode });
+            setPageThemeCode(themeCode);
+            setTheme(themeCode || 'default');
+            refetchTribe();
+          }}
+          onClose={() => setShowThemePicker(false)}
+        />
+      )}
+
       {/* Authorization Error Message */}
       {authorizationError && (
         <ThemedCard>
@@ -340,7 +370,7 @@ const ShowTribePageContent: React.FC = () => {
         {activeTab === 'description' && (
           <>
             {tribe.document_content_html ? (
-              <ThemedSection themeId="main_1">
+              <ThemedSection themeId={pageThemeCode ?? 'main_1'}>
                 <div
                   className="prose max-w-none"
                   style={{
@@ -362,7 +392,7 @@ const ShowTribePageContent: React.FC = () => {
 
             {tribe.document_attachments &&
               tribe.document_attachments.length > 0 && (
-                <ThemedSection themeId="main_1">
+                <ThemedSection themeId={pageThemeCode ?? 'main_1'}>
                   <div
                     style={{
                       display: 'flex',
@@ -452,7 +482,7 @@ const ShowTribePageContent: React.FC = () => {
 
         {/* Projects tab */}
         {activeTab === 'projects' && (
-          <ThemedSection themeId="main_1">
+          <ThemedSection themeId={pageThemeCode ?? 'main_1'}>
             {dedupedProjects.length === 0 ? (
               <ThemedText variant="secondary" size="small">
                 {t('projects.noProjects')}
@@ -503,7 +533,7 @@ const ShowTribePageContent: React.FC = () => {
         {/* Members tab */}
         {activeTab === 'members' && (
           <>
-            <ThemedSection themeId="default">
+            <ThemedSection>
               {/* User position in this tribe */}
               {myPosition &&
                 (myPosition.direct_position ||
@@ -547,7 +577,7 @@ const ShowTribePageContent: React.FC = () => {
                   </div>
                 )}
             </ThemedSection>
-            <ThemedSection themeId="main_2">
+            <ThemedSection themeId={pageThemeCode ?? 'main_2'}>
               {managers.length > 0 && (
                 <div style={{ marginBottom: '24px' }}>
                   {managers.map((person) => (

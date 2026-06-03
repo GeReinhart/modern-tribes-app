@@ -604,14 +604,16 @@
             "tribes: top-level groups with members and positions",
             "projects: belong to a tribe, host feature instances and documents",
             "positions: named roles within a tribe",
-            "feature instances: pluggable features attached to a project, each rendered as a tab"
+            "feature instances: pluggable features attached to a project, each rendered as a tab",
+            "theme_code: optional theme override on tribes, projects, and feature instances"
           ],
           "fr": [
             "structure organisationnelle principale de l'application",
             "tribus : groupes de premier niveau avec membres et postes",
             "projets : appartiennent à une tribu, hébergent des instances de fonctionnalités et des documents",
             "postes : rôles nommés au sein d'une tribu",
-            "instances de fonctionnalités : fonctionnalités modulaires attachées à un projet, chacune affichée sous forme d'onglet"
+            "instances de fonctionnalités : fonctionnalités modulaires attachées à un projet, chacune affichée sous forme d'onglet",
+            "theme_code : thème optionnel sur les tribus, projets et instances de fonctionnalités"
           ]
         },
         "backend": {

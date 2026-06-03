@@ -5,6 +5,7 @@ import React from 'react';
 interface Tab {
   key: string;
   label: string;
+  color?: string;
 }
 
 interface ThemedTabsProps {
@@ -33,6 +34,7 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({
     >
       {tabs.map((tab) => {
         const isActive = activeTab === tab.key;
+        const tabColor = tab.color ?? theme.colors.primary;
         return (
           <button
             key={tab.key}
@@ -41,13 +43,13 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({
               padding: 'var(--space-sm) var(--space-lg)',
               border: 'none',
               borderBottom: isActive
-                ? `3px solid ${theme.colors.primary}`
+                ? `3px solid ${tabColor}`
                 : '3px solid transparent',
               marginBottom: '-2px',
               background: isActive
-                ? `${theme.colors.primary}15`
+                ? `${tabColor}15`
                 : 'transparent',
-              color: isActive ? theme.colors.primary : theme.colors.text,
+              color: isActive ? tabColor : theme.colors.text,
               fontWeight: isActive ? 600 : 400,
               cursor: 'pointer',
               borderRadius: 'var(--radius-sm) var(--radius-sm) 0 0',

@@ -18,6 +18,7 @@ export interface TribeProject extends TribeProjectInput {
 export interface TribeBase {
   name: string;
   document_id?: string | null;
+  theme_code?: string | null;
 }
 
 export type TribeCreate = TribeBase;
@@ -26,12 +27,14 @@ export interface TribeUpdate {
   name?: string;
   document_id?: string | null;
   status?: string;
+  theme_code?: string | null;
 }
 
 export interface Tribe extends TribeBase {
   id: string;
   url_param_id: string;
   status: string;
+  theme_code?: string | null;
   created_at: string;
   updated_at: string;
 }

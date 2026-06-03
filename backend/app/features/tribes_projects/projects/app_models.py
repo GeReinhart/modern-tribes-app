@@ -18,6 +18,7 @@ class ProjectWithDocumentUpdate(BaseModel):
     name: Optional[str] = None
     document_content_html: Optional[str] = None
     document_attachments: Optional[List[AttachmentFile]] = None
+    theme_code: Optional[str] = None
 
 
 class ProjectWithDocumentResponse(BaseModel):
@@ -27,6 +28,7 @@ class ProjectWithDocumentResponse(BaseModel):
     document_id: Optional[str] = None
     document_content_html: str
     document_attachments: List[AttachmentFile] = []
+    theme_code: Optional[str] = None
     status: str
     created_at: datetime
     updated_at: datetime

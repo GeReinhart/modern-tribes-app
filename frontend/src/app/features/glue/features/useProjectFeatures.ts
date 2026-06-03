@@ -5,6 +5,7 @@ import {
   FeatureTypeInfo,
   ProjectFeatureInstance,
   ProjectFeatureInstanceCreate,
+  ProjectFeatureInstanceUpdate,
 } from '@/app/features/tribes-projects/projects/project-features.types.ts';
 
 export function useProjectFeatures(projectId: string | null) {
@@ -65,6 +66,19 @@ export function useProjectFeatures(projectId: string | null) {
     [projectId],
   );
 
+  const updateFeature = useCallback(
+    async (featureId: string, data: ProjectFeatureInstanceUpdate): Promise<void> => {
+      if (!projectId) return;
+      try {
+        const updated = await projectFeaturesService.update(projectId, featureId, data);
+        setFeatures((prev) => prev.map((f) => (f.id === featureId ? updated : f)));
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'An error occurred');
+      }
+    },
+    [projectId],
+  );
+
   const archiveFeature = useCallback(
     async (featureId: string): Promise<void> => {
       if (!projectId) return;
@@ -87,6 +101,7 @@ export function useProjectFeatures(projectId: string | null) {
     refetch: fetch,
     createFeature,
     renameFeature,
+    updateFeature,
     archiveFeature,
   };
 }
