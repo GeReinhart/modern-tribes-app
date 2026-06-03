@@ -14,6 +14,7 @@ from app.platform.core.utils.db_helpers import (
     delete_document,
     get_all_documents,
     get_document_by_id,
+    resolve_url_param_id,
     update_document,
 )
 from app.platform.core.utils.validators import EntityValidator
@@ -54,8 +55,8 @@ async def get_positions_by_tribe(tribe_id: str, current_user: dict = Depends(get
     **Permissions:** admin
     """
     pool = get_database()
-
-    return await get_all_documents(pool, "positions", filter_query="tribe_id = $1", params=[UUID(tribe_id)])
+    tribe_uuid = await resolve_url_param_id(pool, "tribes", tribe_id)
+    return await get_all_documents(pool, "positions", filter_query="tribe_id = $1", params=[UUID(tribe_uuid)])
 
 
 @router.post("/", response_model=Position, status_code=status.HTTP_201_CREATED)

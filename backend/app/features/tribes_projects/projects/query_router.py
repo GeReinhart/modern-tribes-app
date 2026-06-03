@@ -175,6 +175,35 @@ class ProjectTribeEntry(BaseModel):
     tribe_name: str
 
 
+class ProjectTribesSummaryEntry(BaseModel):
+    project_id: str
+    tribe_names: List[str]
+
+
+@router.get("/by/all/tribes-summary", response_model=List[ProjectTribesSummaryEntry])
+@require_any_permission_decorator(PermissionEnum.ADMIN)
+async def get_tribes_summary_for_projects(current_user: dict = Depends(get_current_user)):
+    """Get tribe names grouped by project for all active projects.
+
+    **Permissions:** admin
+    """
+    pool = get_database()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT tp.project_id, array_agg(t.name ORDER BY t.name) AS tribe_names
+            FROM tribes_projects tp
+            JOIN tribes t ON t.id = tp.tribe_id AND t.status = 'active'
+            JOIN projects p ON p.id = tp.project_id AND p.status = 'active'
+            GROUP BY tp.project_id
+            """,
+        )
+    return [
+        ProjectTribesSummaryEntry(project_id=str(r["project_id"]), tribe_names=list(r["tribe_names"]))
+        for r in rows
+    ]
+
+
 @router.get("/{project_id}/tribes", response_model=List[ProjectTribeEntry])
 @require_any_permission_decorator(PermissionEnum.ADMIN)
 async def get_tribes_for_project(

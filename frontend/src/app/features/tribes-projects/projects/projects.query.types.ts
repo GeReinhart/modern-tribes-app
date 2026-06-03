@@ -31,6 +31,11 @@ export interface ProjectTribeMember {
   position: PositionEnum;
 }
 
+export interface ProjectTribesSummary {
+  project_id: string;
+  tribe_names: string[];
+}
+
 export interface ProjectTribeWithMembers {
   tribe_id: string;
   tribe_url_param_id: string;

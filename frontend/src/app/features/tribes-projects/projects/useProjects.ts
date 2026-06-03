@@ -7,8 +7,11 @@ import {
   ProjectWithDocumentUpdate,
 } from '@/app/features/tribes-projects/projects/project_with_document.types.ts';
 import { Project, ProjectCreate, ProjectUpdate } from '@/app/features/tribes-projects/projects/project.types.ts';
-import { UserProjectEntry } from '@/app/features/tribes-projects/projects/projects.query.types.ts';
-import { ProjectTribeWithMembers } from '@/app/features/tribes-projects/projects/projects.query.types.ts';
+import {
+  ProjectTribesSummary,
+  ProjectTribeWithMembers,
+  UserProjectEntry,
+} from '@/app/features/tribes-projects/projects/projects.query.types.ts';
 import { apiHooks } from '@/app/platform/core/api/api-hooks.ts';
 import { createEntityHooks } from '@/app/platform/core/api/useEntityCrud.ts';
 
@@ -170,4 +173,28 @@ export function useProjectTribesWithMembers(projectId: string | null) {
   }, [fetch]);
 
   return { tribes, loading, error, refetch: fetch };
+}
+
+export function useProjectTribes() {
+  const [projectTribes, setProjectTribes] = useState<Record<string, string[]>>({});
+  const { loading, error, execute } = apiHooks<ProjectTribesSummary[]>();
+
+  const fetch = useCallback(async () => {
+    try {
+      const data = await execute(() => projectService.getTribesPerProject());
+      if (data) {
+        const map: Record<string, string[]> = {};
+        for (const entry of data) map[entry.project_id] = entry.tribe_names;
+        setProjectTribes(map);
+      }
+    } catch {
+      console.error('Error fetching project tribes');
+    }
+  }, [execute]);
+
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
+
+  return { projectTribes, loading, error };
 }

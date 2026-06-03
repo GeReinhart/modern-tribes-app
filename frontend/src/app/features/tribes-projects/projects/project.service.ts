@@ -5,6 +5,7 @@ import {
 } from '@/app/features/tribes-projects/projects/project_with_document.types.ts';
 import { Project, ProjectCreate, ProjectUpdate } from '@/app/features/tribes-projects/projects/project.types.ts';
 import {
+  ProjectTribesSummary,
   ProjectTribeWithMembers,
   UserProjectEntry,
 } from '@/app/features/tribes-projects/projects/projects.query.types.ts';
@@ -80,6 +81,12 @@ class ProjectService {
   ): Promise<ProjectTribeWithMembers[]> {
     return apiService.get<ProjectTribeWithMembers[]>(
       `/features/tribes-projects/projects/${projectId}/tribes-with-members`,
+    );
+  }
+
+  async getTribesPerProject(): Promise<ProjectTribesSummary[]> {
+    return apiService.get<ProjectTribesSummary[]>(
+      `${this.endpoint}/by/all/tribes-summary`,
     );
   }
 }

@@ -15,7 +15,10 @@ import { useAdminAccess } from '@/app/platform/core/authorization/useAdminAccess
 import { useDocuments } from '@/app/platform/functions/documents/useDocuments.ts';
 import { usePersons } from '@/app/platform/functions/people/persons/usePersons.ts';
 import { usePositionsByTribe } from '@/app/features/tribes-projects/positions/usePositions.ts';
-import { useProjects } from '@/app/features/tribes-projects/projects/useProjects.ts';
+import {
+  useProjectTribes,
+  useProjects,
+} from '@/app/features/tribes-projects/projects/useProjects.ts';
 import {
   useTribe,
   useTribeMutations,
@@ -77,12 +80,14 @@ const POSITION_COLORS: Record<PositionEnum, string> = {
 interface ProjectSectionProps {
   projects: Array<{ id: string; name: string }>;
   projectRows: TribeProjectInput[];
+  projectTribes: Record<string, string[]>;
   onChange: (rows: TribeProjectInput[]) => void;
 }
 
 const ProjectRelationsSection: React.FC<ProjectSectionProps> = ({
   projects,
   projectRows,
+  projectTribes,
   onChange,
 }) => {
   const { theme } = useTheme();
@@ -95,10 +100,15 @@ const ProjectRelationsSection: React.FC<ProjectSectionProps> = ({
       list = list.filter((p) => projectRows.some((r) => r.project_id === p.id));
     if (filter.trim()) {
       const term = filter.toLowerCase();
-      list = list.filter((p) => p.name.toLowerCase().includes(term));
+      list = list.filter((p) => {
+        if (p.name.toLowerCase().includes(term)) return true;
+        return (projectTribes[p.id] ?? []).some((t) =>
+          t.toLowerCase().includes(term),
+        );
+      });
     }
     return list;
-  }, [projects, filter, showOnlySelected, projectRows]);
+  }, [projects, filter, showOnlySelected, projectRows, projectTribes]);
 
   const toggle = useCallback(
     (projectId: string) => {
@@ -243,6 +253,11 @@ const ProjectRelationsSection: React.FC<ProjectSectionProps> = ({
                 style={{ fontSize: '13px', color: theme.colors.text, flex: 1 }}
               >
                 {project.name}
+                {(projectTribes[project.id] ?? []).length > 0 && (
+                  <span style={{ color: theme.colors.secondary, marginLeft: '6px' }}>
+                    ({(projectTribes[project.id] ?? []).join(', ')})
+                  </span>
+                )}
               </span>
               {isSelected && (
                 <div onClick={(e) => e.stopPropagation()}>
@@ -502,6 +517,7 @@ const TribeEditPageContent: React.FC = () => {
   const { positions: existingPositions, hasFetched: positionsFetched } =
     usePositionsByTribe(tribeId ?? null);
   const { projects } = useProjects();
+  const { projectTribes } = useProjectTribes();
   const { persons } = usePersons();
   const { documents } = useDocuments();
   const { createTribe, updateTribe } = useTribeMutations();
@@ -745,6 +761,7 @@ const TribeEditPageContent: React.FC = () => {
             <ProjectRelationsSection
               projects={projects}
               projectRows={projectRows}
+              projectTribes={projectTribes}
               onChange={setProjectRows}
             />
           </ThemedCard>
