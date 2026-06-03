@@ -89,7 +89,7 @@ export function RowActionsMenu({
                 border: 'none',
                 cursor: action.disabled ? 'not-allowed' : 'pointer',
                 color:
-                  action.variant === 'danger' ? '#ef4444' : theme.colors.text,
+                  action.variant === 'danger' ? 'theme.colors.danger' : theme.colors.text,
                 opacity: action.disabled ? 0.5 : 1,
                 fontSize: 'var(--font-sm)',
                 textAlign: 'left',
@@ -98,7 +98,7 @@ export function RowActionsMenu({
               <ThemedSvgIcon
                 name={action.icon}
                 color={
-                  action.variant === 'danger' ? '#ef4444' : theme.colors.text
+                  action.variant === 'danger' ? 'theme.colors.danger' : theme.colors.text
                 }
                 size={14}
               />

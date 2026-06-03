@@ -25,7 +25,6 @@ import { CreateProjectPage } from '@/app/features/tribes-projects/projects/Creat
 import CreateTribeForm from '@/app/features/tribes-projects/tribes/CreateTribePage.tsx';
 import DashboardPage from '@/app/features/dashboard/DashboardPage.tsx';
 import { DocumentPageFormPage } from '@/app/features/tribes-projects/projects/DocumentPageFormPage.tsx';
-import { EditProjectDocumentPage } from '@/app/features/tribes-projects/projects/EditProjectDocumentPage.tsx';
 import { EditProjectPage } from '@/app/features/tribes-projects/projects/EditProjectPage.tsx';
 import ProfilePage from '@/app/platform/functions/people/ProfilePage.tsx';
 import { ProjectDocumentFormPage } from '@/app/features/tribes-projects/projects/ProjectDocumentFormPage.tsx';
@@ -199,10 +198,6 @@ function AuthBootstrapApp() {
                       <Route
                         path="/app/tribes/:tribeId/projects/:projectId/edit"
                         element={<EditProjectPage />}
-                      />
-                      <Route
-                        path="/app/tribes/:tribeId/projects/:projectId/edit-document"
-                        element={<EditProjectDocumentPage />}
                       />
                       <Route
                         path="/app/tribes/:tribeId/projects/:projectId/documents/new"

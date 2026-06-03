@@ -42,8 +42,6 @@ const en: Record<string, string> = {
   'projects.empty': 'No projects yet.',
   'projects.addProject': 'Add Project',
   'projects.editProject': 'Edit Project',
-  'projects.editDocument': 'Edit Document',
-  'projects.updatingDocument': 'Updating document...',
   'projects.name': 'Name *',
   'projects.description': 'Description *',
   'projects.creating': 'Creating project...',
@@ -60,7 +58,7 @@ const en: Record<string, string> = {
 
   'tribes.title': 'Tribes',
   'tribes.subtitle': "The tribes I'm involved with.",
-  'tribes.createTribe': 'Create Tribe',
+  'tribes.createTribe': 'Tribe',
   'tribes.empty': 'No tribes yet. Create your first tribe!',
   'tribes.createTitle': 'Create a new tribe',
   'tribes.createSubtitle': 'Fill in the form below to create a new tribe',

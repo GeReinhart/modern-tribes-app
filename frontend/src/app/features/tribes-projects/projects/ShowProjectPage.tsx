@@ -9,6 +9,7 @@ import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedT
 import { ProjectDocumentsTab } from '@/app/features/tribes-projects/projects/ProjectDocumentsTab.tsx';
 import { ProjectTribesTab } from '@/app/features/tribes-projects/projects/ProjectTribesTab.tsx';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
+import { TabActionsProvider } from '@/app/platform/core/layout/TabActionsContext.tsx';
 import { ThemeProvider, useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { getFeatureComponent } from '@/app/features/glue/registry.ts';
 import { TabConfigPopup } from '@/app/features/glue/tab-config/TabConfigPopup.tsx';
@@ -332,14 +333,6 @@ const ShowProjectPageContent: React.FC = () => {
               onClick: () => setShowAddFeature(true),
             },
             {
-              icon: 'file-text' as const,
-              label: t('projects.editDocument'),
-              onClick: () =>
-                navigate(
-                  `/app/tribes/${tribeId}/projects/${projectId}/edit-document`,
-                ),
-            },
-            {
               icon: 'pencil' as const,
               label: t('common.project'),
               onClick: () =>
@@ -374,6 +367,7 @@ const ShowProjectPageContent: React.FC = () => {
                   id: activeFeature.id,
                   name: activeFeature.name,
                 }),
+              variant: 'danger' as const,
             },
           ]
         : [],
@@ -437,6 +431,7 @@ const ShowProjectPageContent: React.FC = () => {
   }
 
   return (
+    <TabActionsProvider>
     <AppLayout
       breadcrumbs={breadcrumbs}
       breadcrumbTabs={breadcrumbTabs}
@@ -756,6 +751,7 @@ const ShowProjectPageContent: React.FC = () => {
         </div>
       )}
     </AppLayout>
+    </TabActionsProvider>
   );
 };
 

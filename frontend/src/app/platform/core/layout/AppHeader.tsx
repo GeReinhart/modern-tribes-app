@@ -100,7 +100,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     padding: '12px 24px',
     cursor: clickable ? 'pointer' : 'default',
     color: isLast ? theme.colors.primary : theme.colors.text,
-    fontSize: 'calc(var(--btn-font) * 1.2)',
+    fontSize: 'var(--btn-font)',
     fontWeight: isLast ? 700 : 600,
     borderLeft: isLast
       ? `3px solid ${theme.colors.primary}`
@@ -131,7 +131,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           alignItems: 'center',
           gap: '10px',
           color,
-          fontSize: 'calc(var(--btn-font) * 1.2)',
+          fontSize: 'var(--btn-font)',
           fontWeight: 600,
           opacity: action.disabled ? 0.5 : 1,
           cursor: action.disabled ? 'not-allowed' : 'pointer',

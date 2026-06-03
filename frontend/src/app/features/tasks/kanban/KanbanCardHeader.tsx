@@ -100,7 +100,7 @@ const KanbanCardHeader: React.FC<Props> = ({
         >
           <ThemedSvgIcon
             name="archive"
-            color={theme.colors.secondary}
+            color={theme.colors.danger}
             size={12}
           />
         </span>

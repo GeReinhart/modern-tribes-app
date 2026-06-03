@@ -2,8 +2,9 @@ import { LabelBar } from '@/app/platform/core/layout/themes/components/LabelBar.
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { User } from 'lucide-react';
@@ -49,6 +50,37 @@ const TodoListTab: React.FC<Props> = ({
 
   const activeItems = items.filter((i) => i.status !== 'archived');
   const archivedCount = items.filter((i) => i.status === 'archived').length;
+
+  const tabActions = useMemo(
+    () => [
+      ...(isManager
+        ? [
+            {
+              icon: 'settings' as const,
+              label: configuring
+                ? t('features.todo.doneConfiguring')
+                : t('features.todo.configure'),
+              onClick: () => setConfiguring((v) => !v),
+            },
+          ]
+        : []),
+      ...(archivedCount > 0
+        ? [
+            {
+              icon: (showArchived ? 'eye-off' as const : 'eye' as const),
+              label: showArchived
+                ? t('features.todo.hideArchived')
+                : t('features.todo.showArchived', { count: archivedCount }),
+              onClick: () => setShowArchived((s) => !s),
+              variant: 'danger' as const,
+            },
+          ]
+        : []),
+    ],
+    [isManager, archivedCount, configuring, showArchived, t],
+  );
+
+  useRegisterTabActions(tabActions);
 
   const activeItemLabelIds = new Set(activeItems.flatMap((i) => i.label_ids));
   const assignedPersons = persons.filter((p) =>
@@ -96,149 +128,62 @@ const TodoListTab: React.FC<Props> = ({
         </div>
       )}
 
-      {/* Top bar: 2-row layout — filters left, actions right */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-        {/* Left: label row + person row */}
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
-          }}
-        >
-          <LabelBar
-            labels={labels}
-            activeLabelIds={activeItemLabelIds}
-            filterLabelId={filterLabelId}
-            onFilter={setFilterLabelId}
-            canEditLabels={isConfiguring}
-            onUpdate={updateLabel}
-            onDelete={deleteLabel}
-          />
-          {assignedPersons.length > 0 && (
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '8px',
-                alignItems: 'center',
-              }}
-            >
-              <User size={14} color={theme.colors.primary} />
-              {assignedPersons.map((person) => {
-                const active = filterPersonId === person.id;
-                return (
-                  <button
-                    key={person.id}
-                    type="button"
-                    onClick={() =>
-                      setFilterPersonId((prev) =>
-                        prev === person.id ? null : person.id,
-                      )
-                    }
-                    style={{
-                      padding: '4px 12px',
-                      borderRadius: '16px',
-                      fontSize: 'var(--font-xs)',
-                      fontWeight: active ? 700 : 500,
-                      cursor: 'pointer',
-                      border: `1px solid ${theme.colors.primary}`,
-                      backgroundColor: active
-                        ? theme.colors.primary
-                        : 'transparent',
-                      color: active
-                        ? theme.colors.surface
-                        : theme.colors.primary,
-                      transition: 'all 0.15s',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {person.name}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Right: actions aligned with each filter row */}
-        <div
-          style={{
-            flexShrink: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '8px',
-            alignItems: 'flex-end',
-          }}
-        >
-          {/* Row 1 (with labels): configure */}
-          {isManager && (
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                onClick={() => setConfiguring((v) => !v)}
-                title={
-                  configuring
-                    ? t('features.todo.doneConfiguring')
-                    : t('features.todo.configure')
-                }
-                style={{
-                  background: configuring ? theme.colors.primary : 'none',
-                  border: `1px solid ${configuring ? theme.colors.primary : theme.colors.border}`,
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '6px 10px',
-                }}
-              >
-                <ThemedSvgIcon
-                  name="settings"
-                  color={
-                    configuring ? theme.colors.surface : theme.colors.secondary
-                  }
-                  size={16}
-                />
-              </button>
-            </div>
-          )}
-          {/* Row 2 (with persons): archive toggle */}
-          {(assignedPersons.length > 0 || archivedCount > 0) && (
-            <div style={{ display: 'flex', gap: '8px' }}>
-              {archivedCount > 0 && (
+      {/* Filters bar */}
+      <div style={{ marginBottom: '10px' }}>
+        <LabelBar
+          labels={labels}
+          activeLabelIds={activeItemLabelIds}
+          filterLabelId={filterLabelId}
+          onFilter={setFilterLabelId}
+          canEditLabels={isConfiguring}
+          onUpdate={updateLabel}
+          onDelete={deleteLabel}
+        />
+        {assignedPersons.length > 0 && (
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '8px',
+              alignItems: 'center',
+              marginTop: '8px',
+            }}
+          >
+            <User size={14} color={theme.colors.primary} />
+            {assignedPersons.map((person) => {
+              const active = filterPersonId === person.id;
+              return (
                 <button
-                  onClick={() => setShowArchived((s) => !s)}
-                  title={
-                    showArchived
-                      ? t('features.todo.hideArchived')
-                      : t('features.todo.showArchived', {
-                          count: archivedCount,
-                        })
+                  key={person.id}
+                  type="button"
+                  onClick={() =>
+                    setFilterPersonId((prev) =>
+                      prev === person.id ? null : person.id,
+                    )
                   }
                   style={{
-                    background: showArchived ? theme.colors.secondary : 'none',
-                    border: `1px solid ${showArchived ? theme.colors.secondary : theme.colors.border}`,
-                    borderRadius: '6px',
+                    padding: '4px 12px',
+                    borderRadius: '16px',
+                    fontSize: 'var(--font-xs)',
+                    fontWeight: active ? 700 : 500,
                     cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '6px 10px',
+                    border: `1px solid ${theme.colors.primary}`,
+                    backgroundColor: active
+                      ? theme.colors.primary
+                      : 'transparent',
+                    color: active
+                      ? theme.colors.surface
+                      : theme.colors.primary,
+                    transition: 'all 0.15s',
+                    whiteSpace: 'nowrap',
                   }}
                 >
-                  <ThemedSvgIcon
-                    name={showArchived ? 'eye-off' : 'eye'}
-                    color={
-                      showArchived
-                        ? theme.colors.surface
-                        : theme.colors.secondary
-                    }
-                    size={16}
-                  />
+                  {person.name}
                 </button>
-              )}
-            </div>
-          )}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div style={{ marginBottom: '16px' }}>

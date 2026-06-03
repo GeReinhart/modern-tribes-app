@@ -1,5 +1,6 @@
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
+import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,6 +39,7 @@ export const DocumentViewHeaderActions: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const isActive = docStatus === 'active';
 
   return (
@@ -107,7 +109,7 @@ export const DocumentViewHeaderActions: React.FC<Props> = ({
           onClick={onArchive}
           disabled={archiving}
           leftIcon={
-            <ThemedSvgIcon name="archive" color="currentColor" size={16} />
+            <ThemedSvgIcon name="archive" color={theme.colors.danger} size={16} />
           }
         >
           {t('common.archive')}

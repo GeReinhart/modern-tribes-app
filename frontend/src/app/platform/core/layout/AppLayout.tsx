@@ -1,11 +1,12 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { AppFooter } from './AppFooter.tsx';
 import { AppHeader } from './AppHeader.tsx';
 import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb.tsx';
+import { useTabActionsContext } from './TabActionsContext.tsx';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -29,6 +30,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
   bookmarkSlot,
 }) => {
   const { theme } = useTheme();
+  const { tabActionsFromTab } = useTabActionsContext();
+  const mergedTabActions = useMemo(
+    () => [...(tabActions ?? []), ...tabActionsFromTab],
+    [tabActions, tabActionsFromTab],
+  );
 
   const layoutStyle: React.CSSProperties = {
     minHeight: '100vh',
@@ -58,7 +64,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
         actions={headerActions}
         secondaryActions={secondaryActions}
         menuActions={menuActions}
-        tabActions={tabActions}
+        tabActions={mergedTabActions}
         breadcrumbs={breadcrumbs}
         breadcrumbTabs={breadcrumbTabs}
       />

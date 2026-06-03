@@ -208,7 +208,7 @@ function FeaturesPageContent() {
             }
             leftIcon={
               f.status === 'active' ? (
-                <ThemedSvgIcon name="archive" color="currentColor" size={16} />
+                <ThemedSvgIcon name="archive" color={theme.colors.danger} size={16} />
               ) : (
                 <ThemedSvgIcon name="refresh" color="currentColor" size={16} />
               )
