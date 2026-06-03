@@ -6,7 +6,7 @@ import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedC
 import { ThemedLoadingOverlay } from '@/app/platform/core/layout/themes/components/ThemedLoadingOverlay.tsx';
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedSection } from '@/app/platform/core/layout/themes/components/ThemedSection.tsx';
-import { ThemeCodeSelect } from '@/app/platform/core/layout/themes/components/ThemeCodeSelect.tsx';
+
 import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
@@ -90,7 +90,6 @@ const UpdateTribePageContent: React.FC = () => {
   const [originalPersons, setOriginalPersons] = useState<SelectedPerson[]>([]);
 
   // Filter state
-  const [themeCode, setThemeCode] = useState<string | null>(null);
   const [personFilter, setPersonFilter] = useState('');
   const [showOnlySelected, setShowOnlySelected] = useState(false);
 
@@ -105,7 +104,6 @@ const UpdateTribePageContent: React.FC = () => {
 
       setAttachments(tribe.document_attachments || []);
       setOriginalAttachments(tribe.document_attachments || []);
-      setThemeCode(tribe.theme_code ?? null);
 
       const persons = tribe.persons.map((p) => ({
         person_id: p.id,
@@ -263,7 +261,6 @@ const UpdateTribePageContent: React.FC = () => {
       // Build update data - only include what changed
       const updateData: TribeWithPositionsUpdate = {
         positions: selectedPersons,
-        theme_code: themeCode,
       };
 
       // Only add name if changed
@@ -471,15 +468,6 @@ const UpdateTribePageContent: React.FC = () => {
               </div>
             </ThemedSection>
 
-            <ThemedSection>
-              <div style={{ padding: '4px 0 8px 0' }}>
-                <ThemeCodeSelect
-                  label={t('theme.selectTheme')}
-                  value={themeCode}
-                  onChange={setThemeCode}
-                />
-              </div>
-            </ThemedSection>
 
             {/* Members Section */}
             <ThemedSection themeId="main_2">
