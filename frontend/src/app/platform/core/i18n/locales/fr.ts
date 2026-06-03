@@ -402,8 +402,8 @@ const fr: Record<string, string> = {
   'features.kanban.dueDate': "Date d'échéance",
 
   'projectDocuments.tab': 'Documents',
-  'projectDocuments.addDocument': 'Ajouter un document',
-  'projectDocuments.newDocument': 'Nouveau document',
+  'projectDocuments.addDocument': 'Document',
+  'projectDocuments.newDocument': 'Document',
   'projectDocuments.searchPlaceholder': 'Rechercher des documents...',
   'projectDocuments.allLabels': 'Tous',
   'projectDocuments.noDocuments': "Aucun document pour l'instant.",

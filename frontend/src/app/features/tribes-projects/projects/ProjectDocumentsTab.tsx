@@ -1,4 +1,3 @@
-import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
@@ -8,8 +7,9 @@ import {
   useProjectDocuments,
 } from '@/app/features/tribes-projects/projects/useProjectDocuments.ts';
 import { ProjectDocumentSummary } from '@/app/features/tribes-projects/projects/project-document.types.ts';
+import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -49,6 +49,25 @@ export const ProjectDocumentsTab: React.FC<ProjectDocumentsTabProps> = ({
     selectedLabelId || undefined,
   );
   const { labels } = useProjectDocumentLabels(projectId);
+
+  const tabActions = useMemo(
+    () =>
+      canEdit
+        ? [
+            {
+              icon: 'plus' as const,
+              label: t('projectDocuments.addDocument'),
+              onClick: () =>
+                navigate(
+                  `/app/tribes/${tribeId}/projects/${projectId}/documents/new`,
+                ),
+            },
+          ]
+        : [],
+    [canEdit, t, navigate, tribeId, projectId],
+  );
+
+  useRegisterTabActions(tabActions);
 
   const inputStyle: React.CSSProperties = {
     flex: 1,
@@ -116,18 +135,6 @@ export const ProjectDocumentsTab: React.FC<ProjectDocumentsTabProps> = ({
             style={inputStyle}
           />
         </div>
-        {canEdit && (
-          <ThemedButton
-            variant="primary"
-            onClick={() =>
-              navigate(
-                `/app/tribes/${tribeId}/projects/${projectId}/documents/new`,
-              )
-            }
-          >
-            {t('projectDocuments.addDocument')}
-          </ThemedButton>
-        )}
       </div>
 
       {/* Label filters */}

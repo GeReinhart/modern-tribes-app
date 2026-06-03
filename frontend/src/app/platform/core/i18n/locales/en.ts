@@ -389,8 +389,8 @@ const en: Record<string, string> = {
   'features.kanban.dueDate': 'Due date',
 
   'projectDocuments.tab': 'Documents',
-  'projectDocuments.addDocument': 'Add Document',
-  'projectDocuments.newDocument': 'New Document',
+  'projectDocuments.addDocument': 'Document',
+  'projectDocuments.newDocument': 'Document',
   'projectDocuments.searchPlaceholder': 'Search documents...',
   'projectDocuments.allLabels': 'All',
   'projectDocuments.noDocuments': 'No documents yet.',
