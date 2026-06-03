@@ -1,4 +1,3 @@
-@wip
 Feature: Archive a project
   As an administrator
   I want to archive a project

@@ -1,4 +1,3 @@
-@wip
 Feature: Get users assigned to a role
   As an administrator
   I want to retrieve the list of users assigned to a role

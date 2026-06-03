@@ -1,4 +1,3 @@
-@wip
 Feature: Update a feature instance on a project
   As a project manager
   I want to rename a feature instance

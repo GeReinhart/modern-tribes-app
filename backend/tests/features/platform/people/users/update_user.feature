@@ -1,4 +1,3 @@
-@wip
 Feature: Update a user
   As an administrator
   I want to update a user account

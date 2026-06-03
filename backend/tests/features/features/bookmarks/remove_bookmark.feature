@@ -1,4 +1,3 @@
-@wip
 Feature: Remove a bookmark
   As a user with platform access
   I want to remove a bookmark

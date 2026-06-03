@@ -1,4 +1,3 @@
-@wip
 Feature: Move a kanban card
   As an administrator
   I want to move a kanban card within or between columns

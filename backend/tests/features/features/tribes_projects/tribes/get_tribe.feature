@@ -1,4 +1,3 @@
-@wip
 Feature: Get a tribe
   As an administrator
   I want to retrieve a tribe by its ID

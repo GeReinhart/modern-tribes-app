@@ -14,6 +14,7 @@ import { errorStyle } from '@/app/platform/core/layout/themes/theme.styles.tsx';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 
 import { BookmarkToggle } from '@/app/features/bookmarks/BookmarkToggle.tsx';
+import { TabActionsProvider } from '@/app/platform/core/layout/TabActionsContext.tsx';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -143,7 +144,9 @@ const DashboardPageContent: React.FC = () => {
 
 const DashboardPage: React.FC = () => (
   <ThemeProvider defaultTheme="default">
-    <DashboardPageContent />
+    <TabActionsProvider>
+      <DashboardPageContent />
+    </TabActionsProvider>
   </ThemeProvider>
 );
 

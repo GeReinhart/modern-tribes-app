@@ -1,4 +1,3 @@
-@wip
 Feature: Update notification status
   As an authenticated user
   I want to update the status of a notification

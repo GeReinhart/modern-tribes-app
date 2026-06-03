@@ -1,7 +1,8 @@
 import { ThemedSection } from '@/app/platform/core/layout/themes/components/ThemedSection.tsx';
 import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
+import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,6 +20,21 @@ const DashboardBookmarksTab: React.FC = () => {
     updateBookmark,
     isLoading,
   } = useBookmarks();
+
+  const [configuring, setConfiguring] = useState(false);
+
+  const tabActions = useMemo(
+    () => [
+      {
+        icon: 'settings' as const,
+        label: configuring ? t('bookmarks.configuring') : t('bookmarks.configure'),
+        onClick: () => setConfiguring((v) => !v),
+      },
+    ],
+    [configuring, t],
+  );
+
+  useRegisterTabActions(tabActions);
 
   const handleMove = async (index: number, dir: 'up' | 'down') => {
     const target = dir === 'up' ? index - 1 : index + 1;
@@ -61,6 +77,7 @@ const DashboardBookmarksTab: React.FC = () => {
             bookmark={bookmark}
             index={index}
             total={bookmarks.length}
+            configuring={configuring}
             onMove={handleMove}
             onRemove={handleRemove}
             onNavigate={(path) => navigate(path)}

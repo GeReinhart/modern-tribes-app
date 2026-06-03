@@ -1,4 +1,3 @@
-@wip
 Feature: List projects
   As an administrator
   I want to list all projects

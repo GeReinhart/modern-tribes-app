@@ -1,4 +1,3 @@
-@wip
 Feature: Get a project
   As an administrator
   I want to retrieve a project by its ID

@@ -1,4 +1,3 @@
-@wip
 Feature: Update a tribe
   As an administrator
   I want to update a tribe's name

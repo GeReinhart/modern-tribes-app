@@ -1,4 +1,3 @@
-@wip
 Feature: Update an app config entry
   As an administrator
   I want to update a configuration value

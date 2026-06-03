@@ -1,4 +1,3 @@
-@wip
 Feature: List project feature instances
   As an administrator
   I want to list the feature instances attached to a project

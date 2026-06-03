@@ -1,4 +1,3 @@
-@wip
 Feature: Toggle a label on a todo item
   As an administrator
   I want to toggle a label on a todo item

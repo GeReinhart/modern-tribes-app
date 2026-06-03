@@ -1,4 +1,3 @@
-@wip
 Feature: Update a bookmark
   As a user with platform access
   I want to update a bookmark's title

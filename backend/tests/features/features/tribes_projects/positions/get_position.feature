@@ -1,4 +1,3 @@
-@wip
 Feature: Get a position
   As an administrator
   I want to retrieve a position by its ID

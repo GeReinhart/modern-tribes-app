@@ -1,4 +1,3 @@
-@wip
 Feature: Archive a kanban column
   As a project manager
   I want to delete a kanban column

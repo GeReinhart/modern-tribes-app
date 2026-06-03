@@ -1,4 +1,3 @@
-@wip
 Feature: Update a label
   As an administrator
   I want to update a label's name

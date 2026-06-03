@@ -1,4 +1,3 @@
-@wip
 Feature: List labels
   As an administrator
   I want to list all labels

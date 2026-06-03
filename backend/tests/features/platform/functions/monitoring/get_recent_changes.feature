@@ -1,4 +1,3 @@
-@wip
 Feature: Get recent changes
   As an administrator
   I want to retrieve a feed of recent changes across the platform

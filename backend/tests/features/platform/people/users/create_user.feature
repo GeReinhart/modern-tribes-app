@@ -1,4 +1,3 @@
-@wip
 Feature: Create a user
   As an administrator
   I want to create a user account

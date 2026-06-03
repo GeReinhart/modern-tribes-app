@@ -1,4 +1,3 @@
-@wip
 Feature: Manage todo labels
   As an administrator
   I want to manage labels for a todo list instance

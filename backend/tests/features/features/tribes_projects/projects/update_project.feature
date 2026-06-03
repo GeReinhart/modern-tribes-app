@@ -1,4 +1,3 @@
-@wip
 Feature: Update a project
   As an administrator
   I want to update a project's name

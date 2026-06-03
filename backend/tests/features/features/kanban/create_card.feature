@@ -1,4 +1,3 @@
-@wip
 Feature: Create a kanban card
   As a project member
   I want to create a card in the kanban board

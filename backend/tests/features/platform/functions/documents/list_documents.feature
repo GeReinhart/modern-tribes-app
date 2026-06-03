@@ -1,4 +1,3 @@
-@wip
 Feature: List documents
   As an administrator
   I want to list all documents

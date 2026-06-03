@@ -1,4 +1,3 @@
-@wip
 Feature: Update a todo item
   As a project member
   I want to update a todo item's title or status

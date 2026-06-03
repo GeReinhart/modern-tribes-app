@@ -1,4 +1,3 @@
-@wip
 Feature: Get dashboard
   As a user with platform access
   I want to retrieve the dashboard data

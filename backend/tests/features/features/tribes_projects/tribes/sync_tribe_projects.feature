@@ -1,4 +1,3 @@
-@wip
 Feature: Sync tribe projects
   As an administrator
   I want to sync the projects linked to a tribe

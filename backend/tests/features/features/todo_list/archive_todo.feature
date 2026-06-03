@@ -1,4 +1,3 @@
-@wip
 Feature: Archive a todo item
   As a project member
   I want to archive a todo item

@@ -1,4 +1,3 @@
-@wip
 Feature: Manage kanban labels
   As an administrator
   I want to manage labels for a kanban board

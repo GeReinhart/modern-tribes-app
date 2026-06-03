@@ -1,4 +1,3 @@
-@wip
 Feature: Update a person
   As an administrator or a user managing their own profile
   I want to update a person record

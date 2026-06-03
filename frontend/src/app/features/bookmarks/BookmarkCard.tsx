@@ -3,7 +3,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ChevronDown, ChevronUp, Pencil, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Pencil, Archive } from 'lucide-react';
 
 import { BookmarkEditModal } from './BookmarkEditModal.tsx';
 import {
@@ -16,6 +16,7 @@ interface BookmarkCardProps {
   bookmark: UserBookmark;
   index: number;
   total: number;
+  configuring: boolean;
   onMove: (index: number, dir: 'up' | 'down') => void;
   onRemove: (bookmark: UserBookmark) => void;
   onNavigate: (pagePath: string) => void;
@@ -26,6 +27,7 @@ export const BookmarkCard: React.FC<BookmarkCardProps> = ({
   bookmark,
   index,
   total,
+  configuring,
   onMove,
   onRemove,
   onNavigate,
@@ -104,45 +106,47 @@ export const BookmarkCard: React.FC<BookmarkCardProps> = ({
           )}
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            gap: 'var(--space-xs)',
-            alignItems: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <button
-            style={iconBtnStyle(index === 0)}
-            onClick={() => onMove(index, 'up')}
-            disabled={index === 0}
-            title={t('bookmarks.moveUp')}
+        {configuring && (
+          <div
+            style={{
+              display: 'flex',
+              gap: 'var(--space-xs)',
+              alignItems: 'center',
+              flexShrink: 0,
+            }}
           >
-            <ChevronUp size={16} />
-          </button>
-          <button
-            style={iconBtnStyle(index === total - 1)}
-            onClick={() => onMove(index, 'down')}
-            disabled={index === total - 1}
-            title={t('bookmarks.moveDown')}
-          >
-            <ChevronDown size={16} />
-          </button>
-          <button
-            style={iconBtnStyle()}
-            onClick={() => setEditing(true)}
-            title={t('bookmarks.edit.open')}
-          >
-            <Pencil size={16} />
-          </button>
-          <button
-            style={{ ...iconBtnStyle(), color: theme.colors.danger }}
-            onClick={() => onRemove(bookmark)}
-            title={t('bookmarks.remove')}
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
+            <button
+              style={iconBtnStyle(index === 0)}
+              onClick={() => onMove(index, 'up')}
+              disabled={index === 0}
+              title={t('bookmarks.moveUp')}
+            >
+              <ChevronUp size={16} />
+            </button>
+            <button
+              style={iconBtnStyle(index === total - 1)}
+              onClick={() => onMove(index, 'down')}
+              disabled={index === total - 1}
+              title={t('bookmarks.moveDown')}
+            >
+              <ChevronDown size={16} />
+            </button>
+            <button
+              style={iconBtnStyle()}
+              onClick={() => setEditing(true)}
+              title={t('bookmarks.edit.open')}
+            >
+              <Pencil size={16} />
+            </button>
+            <button
+              style={{ ...iconBtnStyle(), color: theme.colors.danger }}
+              onClick={() => onRemove(bookmark)}
+              title={t('bookmarks.archive')}
+            >
+              <Archive size={16} />
+            </button>
+          </div>
+        )}
       </div>
 
       {editing && (

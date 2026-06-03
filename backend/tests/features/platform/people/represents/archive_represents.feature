@@ -1,4 +1,3 @@
-@wip
 Feature: Archive a represents link
   As an administrator
   I want to archive a user–person link

@@ -1,4 +1,3 @@
-@wip
 Feature: Get a label
   As an administrator
   I want to retrieve a label by its ID

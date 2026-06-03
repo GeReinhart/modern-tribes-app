@@ -1,4 +1,3 @@
-@wip
 Feature: Get current user profile
   As an authenticated user
   I want to retrieve my own profile

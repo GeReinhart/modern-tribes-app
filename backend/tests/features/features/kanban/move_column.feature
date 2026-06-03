@@ -1,4 +1,3 @@
-@wip
 Feature: Move a kanban column
   As an administrator
   I want to move a kanban column left or right

@@ -1,4 +1,3 @@
-@wip
 Feature: Archive a kanban card
   As a project member
   I want to archive a card

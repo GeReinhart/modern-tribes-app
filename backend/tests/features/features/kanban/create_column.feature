@@ -1,4 +1,3 @@
-@wip
 Feature: Create a kanban column
   As a project manager
   I want to create a column in the kanban board

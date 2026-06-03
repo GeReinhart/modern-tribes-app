@@ -1,4 +1,3 @@
-@wip
 Feature: Get tribe relations
   As an administrator
   I want to retrieve the positions, projects, and persons linked to a tribe

@@ -1,4 +1,3 @@
-@wip
 Feature: Create a tribe
   As an administrator
   I want to create a tribe

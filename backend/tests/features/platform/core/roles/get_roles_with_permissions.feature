@@ -1,4 +1,3 @@
-@wip
 Feature: Get roles with permissions
   As an administrator
   I want to retrieve all roles together with their permissions

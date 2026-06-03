@@ -1,4 +1,3 @@
-@wip
 Feature: Get kanban board
   As an administrator
   I want to retrieve a kanban board

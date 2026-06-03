@@ -1,4 +1,3 @@
-@wip
 Feature: Update tab configuration
   As a user with platform access
   I want to update the tab configuration for a context

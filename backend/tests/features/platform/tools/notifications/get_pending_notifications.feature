@@ -1,4 +1,3 @@
-@wip
 Feature: Get pending notifications
   As an authenticated user
   I want to retrieve my pending notifications

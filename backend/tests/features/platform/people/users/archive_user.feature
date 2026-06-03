@@ -1,4 +1,3 @@
-@wip
 Feature: Archive a user
   As an administrator
   I want to archive a user account

@@ -1,4 +1,3 @@
-@wip
 Feature: Archive a label
   As an administrator
   I want to archive a label

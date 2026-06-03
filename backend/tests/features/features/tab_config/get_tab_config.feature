@@ -1,4 +1,3 @@
-@wip
 Feature: Get tab configuration
   As a user with platform access
   I want to retrieve the tab configuration for a context

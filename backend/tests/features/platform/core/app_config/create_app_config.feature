@@ -1,4 +1,3 @@
-@wip
 Feature: Create an app config entry
   As an administrator
   I want to create a configuration key-value pair

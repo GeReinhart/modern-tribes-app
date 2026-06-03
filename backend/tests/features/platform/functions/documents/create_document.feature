@@ -1,4 +1,3 @@
-@wip
 Feature: Create a document
   As an administrator
   I want to create a document

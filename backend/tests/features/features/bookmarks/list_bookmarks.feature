@@ -1,4 +1,3 @@
-@wip
 Feature: List bookmarks
   As a user with platform access
   I want to list my bookmarks

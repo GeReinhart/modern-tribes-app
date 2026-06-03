@@ -1,4 +1,3 @@
-@wip
 Feature: Manage card labels
   As an administrator
   I want to toggle labels on a kanban card

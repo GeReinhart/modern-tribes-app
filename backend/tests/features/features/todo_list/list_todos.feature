@@ -1,4 +1,3 @@
-@wip
 Feature: List todo items
   As an administrator
   I want to list the todo items for a feature instance

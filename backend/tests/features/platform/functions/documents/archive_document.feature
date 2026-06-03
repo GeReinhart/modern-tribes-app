@@ -1,4 +1,3 @@
-@wip
 Feature: Archive a document
   As an administrator
   I want to archive a document

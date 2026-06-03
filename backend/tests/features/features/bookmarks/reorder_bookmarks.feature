@@ -1,4 +1,3 @@
-@wip
 Feature: Reorder bookmarks
   As a user with platform access
   I want to reorder my bookmarks

@@ -1,4 +1,3 @@
-@wip
 Feature: List positions
   As an administrator
   I want to list all positions

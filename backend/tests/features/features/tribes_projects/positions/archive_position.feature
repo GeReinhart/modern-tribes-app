@@ -1,4 +1,3 @@
-@wip
 Feature: Archive a position
   As an administrator
   I want to archive a position

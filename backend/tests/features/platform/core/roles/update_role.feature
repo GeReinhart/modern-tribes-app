@@ -1,4 +1,3 @@
-@wip
 Feature: Update a role
   As an administrator
   I want to update a role's name

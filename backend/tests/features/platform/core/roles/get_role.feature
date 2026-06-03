@@ -1,4 +1,3 @@
-@wip
 Feature: Get a role
   As an administrator
   I want to retrieve a role by its ID

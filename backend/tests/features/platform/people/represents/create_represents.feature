@@ -1,4 +1,3 @@
-@wip
 Feature: Create a represents link
   As an administrator
   I want to link a user to a person record

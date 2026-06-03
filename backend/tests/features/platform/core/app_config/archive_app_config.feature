@@ -1,4 +1,3 @@
-@wip
 Feature: Archive an app config entry
   As an administrator
   I want to archive a configuration entry

@@ -1,4 +1,3 @@
-@wip
 Feature: Restore a kanban card
   As an administrator
   I want to restore an archived kanban card

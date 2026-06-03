@@ -1,4 +1,3 @@
-@wip
 Feature: Update user language preference
   As an authenticated user
   I want to update my language preference

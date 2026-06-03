@@ -1,4 +1,3 @@
-@wip
 Feature: Create a project
   As an administrator
   I want to create a project

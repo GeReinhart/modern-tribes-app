@@ -1,4 +1,3 @@
-@wip
 Feature: List app configuration
   As an administrator
   I want to list all application configuration entries

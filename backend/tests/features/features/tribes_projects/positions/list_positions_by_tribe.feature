@@ -1,4 +1,3 @@
-@wip
 Feature: List positions by tribe
   As an administrator
   I want to list all positions for a given tribe

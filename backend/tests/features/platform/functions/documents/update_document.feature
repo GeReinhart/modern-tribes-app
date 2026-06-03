@@ -1,4 +1,3 @@
-@wip
 Feature: Update a document
   As an administrator
   I want to update a document's content

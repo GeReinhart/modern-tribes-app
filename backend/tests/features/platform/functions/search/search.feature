@@ -1,4 +1,3 @@
-@wip
 Feature: Search
   As a user with platform access
   I want to search for content across the platform

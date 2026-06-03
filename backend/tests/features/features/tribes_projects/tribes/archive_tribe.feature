@@ -1,4 +1,3 @@
-@wip
 Feature: Archive a tribe
   As an administrator
   I want to archive a tribe

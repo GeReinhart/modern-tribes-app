@@ -1,4 +1,3 @@
-@wip
 Feature: Update a position
   As an administrator
   I want to change a person's position in a tribe

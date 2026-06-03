@@ -1,4 +1,3 @@
-@wip
 Feature: List publications
   As an administrator
   I want to list all publications

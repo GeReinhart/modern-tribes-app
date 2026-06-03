@@ -1,4 +1,3 @@
-@wip
 Feature: List mails
   As an administrator
   I want to list all mails

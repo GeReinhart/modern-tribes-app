@@ -1,4 +1,3 @@
-@wip
 Feature: Archive a person
   As an administrator
   I want to archive a person record

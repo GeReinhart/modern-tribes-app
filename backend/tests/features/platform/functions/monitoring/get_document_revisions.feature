@@ -1,4 +1,3 @@
-@wip
 Feature: Get document revisions
   As an administrator
   I want to retrieve the revision history of a document

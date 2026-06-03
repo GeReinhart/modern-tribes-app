@@ -1,4 +1,3 @@
-@wip
 Feature: Create a feature instance on a project
   As a project manager
   I want to attach a feature to a project

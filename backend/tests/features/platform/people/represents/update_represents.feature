@@ -1,4 +1,3 @@
-@wip
 Feature: Update a represents link
   As an administrator
   I want to update a user–person link

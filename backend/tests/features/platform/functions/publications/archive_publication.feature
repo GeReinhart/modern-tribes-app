@@ -1,4 +1,3 @@
-@wip
 Feature: Archive a publication
   As an administrator
   I want to archive a publication

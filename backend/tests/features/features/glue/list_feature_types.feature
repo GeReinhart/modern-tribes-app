@@ -1,4 +1,3 @@
-@wip
 Feature: List feature types
   As a user with platform access
   I want to list all available feature types

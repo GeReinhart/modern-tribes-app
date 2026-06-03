@@ -1,4 +1,3 @@
-@wip
 Feature: Add a person
   As an administrator
   I want to add a person to the platform

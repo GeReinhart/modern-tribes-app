@@ -1,4 +1,3 @@
-@wip
 Feature: Update a kanban column
   As a project manager
   I want to rename a kanban column

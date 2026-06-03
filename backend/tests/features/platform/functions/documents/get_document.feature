@@ -1,4 +1,3 @@
-@wip
 Feature: Get a document by ID
   As an administrator
   I want to retrieve a specific document

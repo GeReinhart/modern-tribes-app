@@ -1,4 +1,3 @@
-@wip
 Feature: Update a kanban card
   As a project member
   I want to update a card's title or assignment

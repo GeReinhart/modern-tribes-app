@@ -1,4 +1,3 @@
-@wip
 Feature: Archive a role
   As an administrator
   I want to archive a role

@@ -1,4 +1,3 @@
-@wip
 Feature: Create a position
   As an administrator
   I want to assign a person a position in a tribe

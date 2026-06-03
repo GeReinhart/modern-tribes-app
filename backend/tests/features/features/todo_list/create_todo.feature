@@ -1,4 +1,3 @@
-@wip
 Feature: Create a todo item
   As a project member
   I want to create a todo item

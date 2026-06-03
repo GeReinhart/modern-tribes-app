@@ -1,4 +1,3 @@
-@wip
 Feature: Create a role
   As an administrator
   I want to create a role

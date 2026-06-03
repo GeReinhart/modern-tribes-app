@@ -1,4 +1,3 @@
-@wip
 Feature: List roles
   As an administrator
   I want to list all roles
