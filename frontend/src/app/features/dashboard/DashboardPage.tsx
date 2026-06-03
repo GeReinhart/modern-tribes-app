@@ -66,7 +66,6 @@ const DashboardPageContent: React.FC = () => {
 
   const breadcrumbs = useMemo(
     () => [
-      { label: t('common.home'), path: '/app' },
       { label: t('dashboard.title') },
     ],
     [t],

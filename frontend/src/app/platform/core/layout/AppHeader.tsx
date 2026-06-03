@@ -21,8 +21,9 @@ interface AppHeaderProps {
 const AREA_COLORS = {
   breadcrumbs: predefinedThemes.default.colors.surface,
   tabs: predefinedThemes.main_1.colors.surface,
+  tabActiveBorder: predefinedThemes.main_3.colors.primary,
   pageActions: predefinedThemes.main_2.colors.surface,
-  tabActions: predefinedThemes.main_1.colors.surface,
+  tabActions: predefinedThemes.main_3.colors.surface,
 };
 
 export const AppHeader: React.FC<AppHeaderProps> = ({
@@ -96,6 +97,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const menuNavItemStyle = (
     clickable: boolean,
     isLast: boolean,
+    activeBorderColor?: string,
   ): React.CSSProperties => ({
     padding: '12px 24px',
     cursor: clickable ? 'pointer' : 'default',
@@ -103,7 +105,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     fontSize: 'var(--btn-font)',
     fontWeight: isLast ? 700 : 600,
     borderLeft: isLast
-      ? `3px solid ${theme.colors.primary}`
+      ? `3px solid ${activeBorderColor ?? theme.colors.primary}`
       : '3px solid transparent',
     transition: 'background-color 0.15s ease',
   });
@@ -241,7 +243,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                         <div
                           key={tab.key}
                           role="menuitem"
-                          style={menuNavItemStyle(true, tab.isActive)}
+                          style={menuNavItemStyle(true, tab.isActive, AREA_COLORS.tabActiveBorder)}
                           onClick={() => handleNavItem(tab.path)}
                           onMouseEnter={(e) => {
                             if (!tab.isActive)

@@ -78,7 +78,7 @@ export const predefinedThemes: Record<string, Theme> = {
       success: '#FF7F50',
       ghost: '#a9c3da',
       text: '#77422f',
-      surface: '#ffffff',
+      surface: '#fff6f2',
       border: '#708090',
     },
   },
