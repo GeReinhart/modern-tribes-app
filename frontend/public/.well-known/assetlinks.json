@@ -4,7 +4,7 @@
     "target": {
       "namespace": "android_app",
       "package_name": "com.moderntribes.app",
-      "sha256_cert_fingerprints": ["REPLACE_WITH_SHA256_FROM_BUILD_SCRIPT"]
+      "sha256_cert_fingerprints": ["06:30:CD:CD:3C:60:53:A0:81:66:20:3D:0E:AE:AD:FF:0C:73:75:BA:71:02:20:76:95:D3:CC:74:2F:EF:36:39"]
     }
   }
 ]

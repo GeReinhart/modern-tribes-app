@@ -63,9 +63,15 @@ echo "==> APK ready: $APK"
 echo "==> Copied to: $DOWNLOADS_DIR/modern-tribes.apk (served at /downloads/modern-tribes.apk)"
 echo ""
 
-# Extract and display fingerprint
-FINGERPRINT=$(keytool -list -v -keystore "$KEYSTORE" -alias modern-tribes 2>/dev/null \
+# Extract fingerprint — prompt for keystore password so keytool doesn't fail silently
+echo "==> Enter the keystore password to extract the SHA-256 fingerprint:"
+read -rs KEYSTORE_PASS
+FINGERPRINT=$(keytool -list -v \
+  -keystore "$KEYSTORE" \
+  -alias modern-tribes \
+  -storepass "$KEYSTORE_PASS" 2>/dev/null \
   | grep "SHA256:" | head -1 | awk '{print $2}')
+unset KEYSTORE_PASS
 
 if [ -n "$FINGERPRINT" ]; then
   echo "==> SHA-256 fingerprint: $FINGERPRINT"
@@ -88,6 +94,5 @@ fi
 
 echo ""
 echo "==> Next steps:"
-echo "    1. Host the APK and note its public URL."
-echo "    2. Set VITE_APK_DOWNLOAD_URL=<url> in your frontend environment."
-echo "    3. Deploy the updated assetlinks.json (already written above)."
+echo "    1. Commit frontend/public/.well-known/assetlinks.json and frontend/public/downloads/modern-tribes.apk"
+echo "    2. Deploy — the updated assetlinks.json must be live before Android will open links in the app."
