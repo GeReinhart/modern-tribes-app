@@ -1,0 +1,24 @@
+{
+  "packageId": "com.moderntribes.app",
+  "host": "www.reinhart.online",
+  "name": "Modern Tribes",
+  "launcherName": "Modern Tribes",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#4f46e5",
+  "backgroundColor": "#ffffff",
+  "startUrl": "/",
+  "iconUrl": "https://www.reinhart.online/icon-512x512.png",
+  "maskableIconUrl": "https://www.reinhart.online/icon-512x512.png",
+  "appVersion": "0.0.1",
+  "appVersionCode": 1,
+  "signingKey": {
+    "path": "./android-keystore.jks",
+    "alias": "modern-tribes"
+  },
+  "splashScreenFadeOutDuration": 300,
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://www.reinhart.online/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "minSdkVersion": 19
+}

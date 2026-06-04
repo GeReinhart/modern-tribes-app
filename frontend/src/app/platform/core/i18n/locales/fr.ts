@@ -548,6 +548,39 @@ const fr: Record<string, string> = {
     'Aucun utilisateur trouvé. Tapez pour rechercher.',
 
   'theme.selectTheme': 'Thème',
+
+  'install.title': 'Installer Modern Tribes',
+  'install.subtitle': "Ajoutez l'application à votre écran d'accueil pour la meilleure expérience",
+
+  'install.ios.title': 'Installer sur iPhone / iPad',
+  'install.ios.safariRequired': "Ouvrir dans Safari d'abord",
+  'install.ios.safariRequiredDesc':
+    "Cette page doit être ouverte dans Safari pour installer l'application. Appuyez sur l'icône de partage dans votre navigateur et choisissez « Ouvrir dans Safari ».",
+  'install.ios.step1': 'Appuyez sur le bouton Partager',
+  'install.ios.step1desc': "L'icône de partage se trouve en bas de la barre Safari (flèche vers le haut)",
+  'install.ios.step2': "Appuyez sur « Sur l’écran d’accueil »",
+  'install.ios.step2desc': 'Faites défiler le menu de partage pour trouver cette option',
+  'install.ios.step3': 'Appuyez sur « Ajouter »',
+  'install.ios.step3desc': "Confirmez en appuyant sur Ajouter en haut à droite",
+
+  'install.android.title': 'Installer sur Android',
+  'install.android.installButton': "Installer l'application",
+  'install.android.installing': 'Installation…',
+  'install.android.manualTitle': 'Ou installez manuellement via Chrome :',
+  'install.android.manual1': 'Ouvrez le menu Chrome',
+  'install.android.manual1desc': 'Appuyez sur le menu à trois points (⋮) en haut à droite',
+  'install.android.manual2': "Appuyez sur « Installer l'application »",
+  'install.android.manual2desc': "Ou « Ajouter à l'écran d'accueil » sur les anciennes versions de Chrome",
+  'install.android.manual3': "Confirmez l'installation",
+  'install.android.manual3desc': "Appuyez sur « Installer » pour ajouter l'application à votre écran d'accueil",
+
+  'install.android.apkTitle': "Télécharger l'application directement",
+  'install.android.apkDesc': "Pas besoin de Chrome — téléchargez l'APK et installez-le directement.",
+  'install.android.apkButton': "Télécharger l'APK",
+  'install.android.apkWarning': "Vous devrez peut-être autoriser l'installation depuis des sources inconnues dans Paramètres Android → Applications → Accès spécial.",
+
+  'install.desktop.title': 'Ouvrir sur votre téléphone',
+  'install.desktop.desc': "Visitez cette adresse sur votre Android ou iPhone pour installer l'application :",
 };
 
 export default fr;

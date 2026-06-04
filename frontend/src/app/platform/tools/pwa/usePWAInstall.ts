@@ -8,6 +8,8 @@ interface BeforeInstallPromptEvent extends Event {
 export interface PWAInstallState {
   isStandalone: boolean;
   isIOS: boolean;
+  isInSafari: boolean;
+  isAndroid: boolean;
   canPrompt: boolean;
   install: () => Promise<void>;
 }
@@ -26,9 +28,21 @@ function detectIOS(): boolean {
   );
 }
 
+function detectInSafari(isIOS: boolean): boolean {
+  if (!isIOS) return false;
+  const ua = navigator.userAgent;
+  return /safari/i.test(ua) && !/crios|fxios|opios|mercury/i.test(ua);
+}
+
+function detectAndroid(): boolean {
+  return /android/i.test(navigator.userAgent);
+}
+
 export function usePWAInstall(): PWAInstallState {
   const [isStandalone] = useState(detectStandalone);
   const [isIOS] = useState(detectIOS);
+  const [isInSafari] = useState(() => detectInSafari(detectIOS()));
+  const [isAndroid] = useState(detectAndroid);
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
 
@@ -56,6 +70,8 @@ export function usePWAInstall(): PWAInstallState {
   return {
     isStandalone,
     isIOS,
+    isInSafari,
+    isAndroid,
     canPrompt: !!deferredPrompt,
     install,
   };

@@ -531,6 +531,39 @@ const en: Record<string, string> = {
   'admin.notifications.noResults': 'No users found. Type to search.',
 
   'theme.selectTheme': 'Theme',
+
+  'install.title': 'Install Modern Tribes',
+  'install.subtitle': 'Add the app to your home screen for the best experience',
+
+  'install.ios.title': 'Install on iPhone / iPad',
+  'install.ios.safariRequired': 'Open in Safari first',
+  'install.ios.safariRequiredDesc':
+    'This page must be opened in Safari to install the app. Tap the sharing icon in your browser and choose "Open in Safari".',
+  'install.ios.step1': 'Tap the Share button',
+  'install.ios.step1desc': 'The share icon is at the bottom of the Safari toolbar (arrow pointing up)',
+  'install.ios.step2': 'Tap "Add to Home Screen"',
+  'install.ios.step2desc': 'Scroll down in the share sheet to find this option',
+  'install.ios.step3': 'Tap "Add"',
+  'install.ios.step3desc': 'Confirm by tapping Add in the top right corner',
+
+  'install.android.title': 'Install on Android',
+  'install.android.installButton': 'Install the app',
+  'install.android.installing': 'Installing…',
+  'install.android.manualTitle': 'Or install manually via Chrome:',
+  'install.android.manual1': 'Open the Chrome menu',
+  'install.android.manual1desc': 'Tap the three-dot menu (⋮) in the top right corner',
+  'install.android.manual2': 'Tap "Install app"',
+  'install.android.manual2desc': 'Or "Add to Home screen" on older versions of Chrome',
+  'install.android.manual3': 'Confirm installation',
+  'install.android.manual3desc': 'Tap "Install" to add the app to your home screen',
+
+  'install.android.apkTitle': 'Download the app directly',
+  'install.android.apkDesc': 'No Chrome required — download the APK and install it directly.',
+  'install.android.apkButton': 'Download APK',
+  'install.android.apkWarning': 'You may need to allow installation from unknown sources in Android Settings → Apps → Special app access.',
+
+  'install.desktop.title': 'Open on your phone',
+  'install.desktop.desc': 'Visit this address on your Android or iPhone to install the app:',
 };
 
 export default en;

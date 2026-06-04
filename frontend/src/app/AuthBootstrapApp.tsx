@@ -35,6 +35,7 @@ import ShowProjectPage from '@/app/features/tribes-projects/projects/ShowProject
 import ShowTribePage from '@/app/features/tribes-projects/tribes/ShowTribePage.tsx';
 import { TribesPage } from '@/app/features/tribes-projects/tribes/TribesPage.tsx';
 import UpdateTribePage from '@/app/features/tribes-projects/tribes/UpdateTribePage.tsx';
+import { InstallPage } from '@/app/platform/tools/pwa/InstallPage.tsx';
 import Login from '@/app/platform/core/authentication/LoginPage.tsx';
 import Verify from '@/app/platform/core/authentication/VerifyPage.tsx';
 import { PublicationDetailPage } from '@/app/platform/functions/publications/PublicationDetailPage.tsx';
@@ -69,6 +70,7 @@ function AuthBootstrapApp() {
                   <Routes>
                     <Route path="/auth/login" element={<Login />} />
                     <Route path="/auth/verify" element={<Verify />} />
+                    <Route path="/install" element={<InstallPage />} />
                     <Route
                       path="/public/publications"
                       element={<PublicationsPage />}

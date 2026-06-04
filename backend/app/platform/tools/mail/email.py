@@ -25,6 +25,9 @@ _MAGIC_LINK_STRINGS = {
         "button": "Sign In",
         "fallback": "Or copy and paste this link into your browser:",
         "footer": "This link will expire in {minutes} minutes.<br>If you didn't request this email, you can safely ignore it.",
+        "install_title": "📱 Install the app on your phone",
+        "install_desc": "Add Modern Tribes to your home screen for instant access.",
+        "install_button": "Install the app",
     },
     "fr": {
         "title": "Connexion à {app_name}",
@@ -32,6 +35,9 @@ _MAGIC_LINK_STRINGS = {
         "button": "Se connecter",
         "fallback": "Ou copiez et collez ce lien dans votre navigateur :",
         "footer": "Ce lien expirera dans {minutes} minutes.<br>Si vous n'avez pas demandé cet e-mail, vous pouvez l'ignorer.",
+        "install_title": "📱 Installez l'application sur votre téléphone",
+        "install_desc": "Ajoutez Modern Tribes à votre écran d'accueil pour un accès instantané.",
+        "install_button": "Installer l'application",
     },
 }
 
@@ -39,6 +45,7 @@ _MAGIC_LINK_STRINGS = {
 def magic_link_html(magic_link: str, language: str = "en") -> str:
     s = _MAGIC_LINK_STRINGS.get(language, _MAGIC_LINK_STRINGS["en"])
     logo_url = f"{settings.FRONTEND_URL}/modern-tribes.h-logo.svg"
+    install_url = f"{settings.FRONTEND_URL}/install"
     return f"""
     <!DOCTYPE html>
     <html>
@@ -58,6 +65,21 @@ def magic_link_html(magic_link: str, language: str = "en") -> str:
                 display: inline-block;
                 margin: 20px 0;
             }}
+            .install-section {{
+                margin-top: 24px;
+                padding-top: 20px;
+                border-top: 1px solid #f0f0f0;
+            }}
+            .install-button {{
+                background-color: #4f46e5;
+                color: white;
+                padding: 10px 20px;
+                text-decoration: none;
+                border-radius: 6px;
+                display: inline-block;
+                margin-top: 10px;
+                font-size: 14px;
+            }}
             .footer {{ color: #666; font-size: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #f0f0f0; }}
         </style>
     </head>
@@ -72,6 +94,11 @@ def magic_link_html(magic_link: str, language: str = "en") -> str:
                 <a href="{magic_link}" class="button">{s["button"]}</a>
                 <p>{s["fallback"]}</p>
                 <p style="color: #666; word-break: break-all;">{magic_link}</p>
+                <div class="install-section">
+                    <strong>{s["install_title"]}</strong>
+                    <p style="color: #555; font-size: 14px; margin: 6px 0 0;">{s["install_desc"]}</p>
+                    <a href="{install_url}" class="install-button">{s["install_button"]}</a>
+                </div>
                 <p class="footer">
                     {s["footer"].format(minutes=settings.MAGIC_LINK_EXPIRE_MINUTES)}
                 </p>
