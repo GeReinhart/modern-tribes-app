@@ -49,6 +49,31 @@ Feature: Add a bookmark
       | user_id | page_path   | page_title        | display_order | status |
       | 0002    | /tribes/abc | Engineering tribe | 0             | active |
 
+  Scenario: POST /bookmarks with description as viewer — the description is saved
+    Given I am authenticated as a regular user: user.id 0002
+    And the user_bookmarks table contains:
+      | id | user_id | page_path | page_title | display_order | status |
+    When I POST /api/features/bookmarks with body:
+      """
+      {
+        "page_path": "/tribes/abc/projects/xyz/documents/doc1",
+        "page_title": "Design Guidelines",
+        "description": "Home / Tribes / Engineering / Alpha"
+      }
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "page_path": "/tribes/abc/projects/xyz/documents/doc1",
+        "page_title": "Design Guidelines",
+        "description": "Home / Tribes / Engineering / Alpha"
+      }
+      """
+    And the user_bookmarks table contains:
+      | user_id | page_path                                   | page_title        | description                          | status |
+      | 0002    | /tribes/abc/projects/xyz/documents/doc1     | Design Guidelines | Home / Tribes / Engineering / Alpha  | active |
+
   @error_case
   Scenario: POST /bookmarks as a user with no app access — 403 error
     Given I am authenticated as the person's owner: user.id 0003

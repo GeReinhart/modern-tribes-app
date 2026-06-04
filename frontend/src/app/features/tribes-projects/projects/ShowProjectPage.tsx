@@ -36,6 +36,7 @@ import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 import { ProjectEntry } from '@/app/features/tribes-projects/projects/projects.query.types.ts';
 
 import { BookmarkToggle } from '@/app/features/bookmarks/BookmarkToggle.tsx';
+import { buildBookmarkDescription } from '@/app/features/bookmarks/types.ts';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -471,7 +472,7 @@ const ShowProjectPageContent: React.FC = () => {
       breadcrumbTabs={breadcrumbTabs}
       menuActions={menuActions}
       tabActions={tabActions}
-      bookmarkSlot={project?.name ? <BookmarkToggle pagePath={location.pathname} pageTitle={project.name} /> : null}
+      bookmarkSlot={project?.name ? <BookmarkToggle pagePath={location.pathname} pageTitle={project.name} pageDescription={buildBookmarkDescription(breadcrumbs)} /> : null}
     >
       {showTabConfig && (
         <TabConfigPopup

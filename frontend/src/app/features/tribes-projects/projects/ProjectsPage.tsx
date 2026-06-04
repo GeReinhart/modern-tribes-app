@@ -10,6 +10,7 @@ import { useUserProjects } from '@/app/features/tribes-projects/projects/useProj
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 import { ProjectEntry } from '@/app/features/tribes-projects/projects/projects.query.types.ts';
 import { BookmarkToggle } from '@/app/features/bookmarks/BookmarkToggle.tsx';
+import { buildBookmarkDescription } from '@/app/features/bookmarks/types.ts';
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -92,7 +93,7 @@ const ProjectsPageContent: React.FC = () => {
     <AppLayout
       breadcrumbs={breadcrumbs}
       menuActions={menuActions}
-      bookmarkSlot={<BookmarkToggle pagePath={location.pathname} pageTitle={t('projects.title')} />}
+      bookmarkSlot={<BookmarkToggle pagePath={location.pathname} pageTitle={t('projects.title')} pageDescription={buildBookmarkDescription(breadcrumbs)} />}
     >
       <ThemedText variant="primary" size="small">
         {t('projects.subtitle')}

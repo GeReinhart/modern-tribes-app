@@ -68,6 +68,8 @@ export const DocumentPagesSection: React.FC<DocumentPagesSectionProps> = ({
   }
 
   const hasPages = pages.length > 0;
+
+  if (!hasPages) return null;
   const cardStyle: React.CSSProperties = {
     padding: '16px',
     backgroundColor: theme.colors.surface,

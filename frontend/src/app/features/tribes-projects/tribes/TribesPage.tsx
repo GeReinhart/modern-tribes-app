@@ -12,6 +12,7 @@ import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 import { TribeEntry } from '@/app/features/tribes-projects/tribes/tribes.query.types.ts';
 
 import { BookmarkToggle } from '@/app/features/bookmarks/BookmarkToggle.tsx';
+import { buildBookmarkDescription } from '@/app/features/bookmarks/types.ts';
 
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -115,7 +116,7 @@ const TribesPageContent: React.FC = () => {
     <AppLayout
       menuActions={menuActions}
       breadcrumbs={breadcrumbs}
-      bookmarkSlot={<BookmarkToggle pagePath={location.pathname} pageTitle={t('tribes.title')} />}
+      bookmarkSlot={<BookmarkToggle pagePath={location.pathname} pageTitle={t('tribes.title')} pageDescription={buildBookmarkDescription(breadcrumbs)} />}
     >
       {authorizationError && (
         <ThemedCard>

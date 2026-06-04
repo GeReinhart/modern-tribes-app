@@ -14,6 +14,7 @@ import { errorStyle } from '@/app/platform/core/layout/themes/theme.styles.tsx';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 
 import { BookmarkToggle } from '@/app/features/bookmarks/BookmarkToggle.tsx';
+import { buildBookmarkDescription } from '@/app/features/bookmarks/types.ts';
 import { TabActionsProvider } from '@/app/platform/core/layout/TabActionsContext.tsx';
 
 import React, { useEffect, useMemo, useState } from 'react';
@@ -112,7 +113,7 @@ const DashboardPageContent: React.FC = () => {
       breadcrumbs={breadcrumbs}
       breadcrumbTabs={breadcrumbTabs}
       menuActions={menuActions}
-      bookmarkSlot={<BookmarkToggle pagePath={location.pathname} pageTitle={t('dashboard.title')} />}
+      bookmarkSlot={<BookmarkToggle pagePath={location.pathname} pageTitle={t('dashboard.title')} pageDescription={buildBookmarkDescription(breadcrumbs)} />}
     >
       {showTabConfig && (
         <TabConfigPopup

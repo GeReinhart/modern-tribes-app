@@ -24,7 +24,10 @@ import { ProjectEntry } from '@/app/features/tribes-projects/projects/projects.q
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+
+import { BookmarkToggle } from '@/app/features/bookmarks/BookmarkToggle.tsx';
+import { buildBookmarkDescription } from '@/app/features/bookmarks/types.ts';
 
 import { Globe, Tag } from 'lucide-react';
 
@@ -32,6 +35,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const { tribeId, projectId, projectDocumentId } = useParams<{
     tribeId: string;
     projectId: string;
@@ -131,6 +135,14 @@ const ProjectDocumentViewPageContent: React.FC = () => {
     [tribe?.name, project?.name, doc?.title, tribeId, projectId, t],
   );
 
+  const bookmarkSlot = doc?.title ? (
+    <BookmarkToggle
+      pagePath={location.pathname}
+      pageTitle={doc.title}
+      pageDescription={buildBookmarkDescription(breadcrumbs)}
+    />
+  ) : null;
+
   const effectivePublicationUrlParamId =
     publicationUrlParamId !== undefined
       ? publicationUrlParamId
@@ -206,7 +218,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
 
   if (loading)
     return (
-      <AppLayout breadcrumbs={breadcrumbs}>
+      <AppLayout breadcrumbs={breadcrumbs} bookmarkSlot={bookmarkSlot}>
         <div
           style={{
             display: 'flex',
@@ -221,7 +233,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
     );
   if (error || !doc)
     return (
-      <AppLayout breadcrumbs={breadcrumbs}>
+      <AppLayout breadcrumbs={breadcrumbs} bookmarkSlot={bookmarkSlot}>
         <div style={errorStyle}>
           <strong>{t('common.error')}</strong>{' '}
           {error || t('projectDocuments.notFound')}
@@ -231,7 +243,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
 
   if (readerMode) {
     return (
-      <AppLayout breadcrumbs={breadcrumbs}>
+      <AppLayout breadcrumbs={breadcrumbs} bookmarkSlot={bookmarkSlot}>
         <DocumentReader
           title={doc.title}
           contentHtml={doc.content_html}
@@ -245,7 +257,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
   }
 
   return (
-    <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions}>
+    <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions} bookmarkSlot={bookmarkSlot}>
       <ThemedSection themeId="main_1">
         <div
           style={{

@@ -86,3 +86,11 @@ export const BOOKMARK_COLOR_PRESETS: BookmarkColorPreset[] = [
 ];
 
 export const DEFAULT_BOOKMARK_COLOR = BOOKMARK_COLOR_PRESETS[0];
+
+export function buildBookmarkDescription(
+  breadcrumbs: { label: string }[],
+): string | null {
+  const parents = breadcrumbs.slice(0, -1);
+  if (parents.length === 0) return null;
+  return parents.map((b) => b.label).join(' / ');
+}
