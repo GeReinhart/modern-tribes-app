@@ -121,12 +121,11 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({
 
   const visibleItems = useMemo(
     () =>
-      ALL_ITEMS.filter(({ page, adminOnly, peopleManagerVisible, projectsAssignerVisible }) => {
+      ALL_ITEMS.filter(({ page, peopleManagerVisible, projectsAssignerVisible }) => {
         if (page === 'app') return true;
         if (isAdmin) return true;
         if (canManagePeople && peopleManagerVisible) return true;
         if (canAssignProjects && projectsAssignerVisible) return true;
-        if (!adminOnly) return true;
         return false;
       }),
     [isAdmin, canManagePeople, canAssignProjects],

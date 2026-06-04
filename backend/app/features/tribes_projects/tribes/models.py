@@ -29,6 +29,7 @@ class Tribe(TribeBase):
     updated_at: datetime
     created_by: Optional[str] = None
     updated_by: Optional[str] = None
+    member_count: int = 0
 
     model_config = ConfigDict(
         populate_by_name=True,

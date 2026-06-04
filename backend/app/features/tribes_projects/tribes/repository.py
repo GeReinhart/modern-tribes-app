@@ -7,6 +7,18 @@ from app.platform.core.utils.db_helpers import generate_url_param_id, row_to_dic
 from app.platform.core.utils.document_helpers import update_document_content_with_revision
 
 
+async def get_all_tribes_with_member_count(pool) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch("""
+            SELECT t.*,
+                   (SELECT COUNT(*) FROM positions p
+                    WHERE p.tribe_id = t.id AND p.status = 'active') AS member_count
+            FROM tribes t
+            ORDER BY t.name
+        """)
+    return [row_to_dict(row) for row in rows]
+
+
 async def get_tribe_by_id(pool, tribe_id: str) -> dict | None:
     async with pool.acquire() as conn:
         row = await conn.fetchrow("SELECT * FROM tribes WHERE id = $1 AND status = 'active'", UUID(tribe_id))

@@ -39,7 +39,7 @@ async def get_tribes(current_user: dict = Depends(get_current_user)):
     **Permissions:** admin | can_assign_projects
     """
     pool = get_database()
-    return await get_all_documents(pool, TABLE, any_status=True)
+    return await tribe_repo.get_all_tribes_with_member_count(pool)
 
 
 @router.get("/{tribe_id}", response_model=Tribe)

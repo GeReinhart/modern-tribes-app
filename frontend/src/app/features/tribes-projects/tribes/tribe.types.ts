@@ -37,6 +37,7 @@ export interface Tribe extends TribeBase {
   theme_code?: string | null;
   created_at: string;
   updated_at: string;
+  member_count: number;
 }
 
 export interface TribeWithPositions extends Tribe {

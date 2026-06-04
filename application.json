@@ -418,21 +418,13 @@
             "- Progressive Web App + TWA (Trusted Web Activity) support",
             "- usePWAInstall hook: standalone detection, iOS/Android/Safari detection, beforeinstallprompt capture",
             "- /install public page: device-aware guided installation (iOS Safari steps, Android install button + APK download, desktop fallback)",
-            "- install link injected into magic link emails",
-            "- android/twa-manifest.json: Bubblewrap config for building the Android TWA APK",
-            "- scripts/build-android-apk.sh: builds the APK, extracts SHA-256 fingerprint, updates assetlinks.json",
-            "- frontend/public/.well-known/assetlinks.json: Digital Asset Links for chrome-free TWA verification",
-            "- VITE_APK_DOWNLOAD_URL env var: when set, shows APK download button on the install page"
+            "- install link injected into magic link emails"
           ],
           "fr": [
             "- support Progressive Web App + TWA (Trusted Web Activity)",
             "- hook usePWAInstall : détection standalone, iOS/Android/Safari, capture beforeinstallprompt",
             "- page publique /install : guide d'installation selon l'appareil (iOS Safari, bouton Android + téléchargement APK, message bureau)",
-            "- lien d'installation injecté dans les e-mails de lien magique",
-            "- android/twa-manifest.json : config Bubblewrap pour compiler l'APK Android TWA",
-            "- scripts/build-android-apk.sh : compile l'APK, extrait l'empreinte SHA-256, met à jour assetlinks.json",
-            "- frontend/public/.well-known/assetlinks.json : Digital Asset Links pour la vérification TWA sans Chrome",
-            "- variable VITE_APK_DOWNLOAD_URL : affiche le bouton de téléchargement APK si définie"
+            "- lien d'installation injecté dans les e-mails de lien magique"
           ]
         },
         "frontend": {

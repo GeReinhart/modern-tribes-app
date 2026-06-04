@@ -181,11 +181,11 @@ class ProjectTribesSummaryEntry(BaseModel):
 
 
 @router.get("/by/all/tribes-summary", response_model=List[ProjectTribesSummaryEntry])
-@require_any_permission_decorator(PermissionEnum.ADMIN)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ASSIGN_PROJECTS)
 async def get_tribes_summary_for_projects(current_user: dict = Depends(get_current_user)):
     """Get tribe names grouped by project for all active projects.
 
-    **Permissions:** admin
+    **Permissions:** admin | can_assign_projects
     """
     pool = get_database()
     async with pool.acquire() as conn:

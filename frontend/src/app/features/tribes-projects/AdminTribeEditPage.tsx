@@ -650,9 +650,9 @@ const TribeEditPageContent: React.FC = () => {
       { label: t('common.home'), path: '/app' },
       { label: t('common.admin'), path: '/admin' },
       { label: t('admin.tribes'), path: '/admin/tribes' },
-      { label: isCreate ? t('admin.addTribe') : t('admin.editTribe') },
+      { label: isCreate ? t('admin.addTribe') : tribe?.name ?? t('admin.editTribe') },
     ],
-    [t, isCreate],
+    [t, isCreate, tribe?.name],
   );
 
   const headerActions = <AdminNavigation currentPage="tribes" />;

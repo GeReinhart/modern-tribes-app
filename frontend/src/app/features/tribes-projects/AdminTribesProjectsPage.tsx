@@ -140,7 +140,7 @@ const TribesTab: React.FC<TribesTabProps> = ({ canWrite }) => {
         key: 'persons',
         header: t('admin.columnPersons'),
         render: (tr: Tribe) => {
-          const count = tribePositions.get(tr.id)?.length ?? 0;
+          const count = tr.member_count;
           return (
             <button
               onClick={(e) => {
