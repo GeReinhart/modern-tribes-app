@@ -4,7 +4,7 @@ export const uploadImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append('files', file);
 
-  const response = await fetch(`${getAPIBaseUrl()}/uploads/image`, {
+  const response = await fetch(`${getAPIBaseUrl()}/platform/core/uploads/image`, {
     method: 'POST',
     body: formData,
   });
@@ -27,7 +27,7 @@ export const uploadFile = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetch(`${getAPIBaseUrl()}/uploads/file`, {
+  const response = await fetch(`${getAPIBaseUrl()}/platform/core/uploads/file`, {
     method: 'POST',
     body: formData,
   });

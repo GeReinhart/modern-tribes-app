@@ -7,6 +7,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/app /code/app
 
+ENV UPLOAD_DIR=./data/uploads
+
+VOLUME /code/data/uploads
+
 EXPOSE 8080
 
 # CleverCloud injects PORT=8080; fall back to 8000 for local use

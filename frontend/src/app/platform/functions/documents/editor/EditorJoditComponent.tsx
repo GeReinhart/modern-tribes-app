@@ -61,7 +61,7 @@ const EditorJoditComponent = ({
       uploader: {
         insertImageAsBase64URI: false,
         imagesExtensions: appConfig.editorImageExtensions,
-        url: `${getAPIBaseUrl()}/uploads/image`,
+        url: `${getAPIBaseUrl()}/platform/core/uploads/image`,
         format: 'json',
         prepareData: function (formData: FormData) {
           return formData;
