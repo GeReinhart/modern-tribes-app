@@ -1,4 +1,4 @@
-import { EntityAuditBadge } from '@/app/platform/core/layout/themes/components/EntityAuditBadge.tsx';
+import { EntityAuditUserBadge } from '@/app/platform/functions/people/users/EntityAuditUserBadge.tsx';
 import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import ThemedDateSelection from '@/app/platform/core/layout/themes/components/ThemedDateSelection.tsx';
@@ -293,7 +293,7 @@ const TaskItemModal: React.FC<TaskItemModalProps> = ({
             )}
           </div>
           {value.created_by && value.created_at && value.updated_at && (
-            <EntityAuditBadge
+            <EntityAuditUserBadge
               createdBy={value.created_by}
               updatedBy={value.updated_by ?? null}
               createdAt={value.created_at}

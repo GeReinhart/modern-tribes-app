@@ -8,7 +8,7 @@ import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/componen
 import { ThemedSection } from '@/app/platform/core/layout/themes/components/ThemedSection.tsx';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
-import { EntityAuditBadge } from '@/app/platform/core/layout/themes/components/EntityAuditBadge.tsx';
+import { EntityAuditUserBadge } from '@/app/platform/functions/people/users/EntityAuditUserBadge.tsx';
 import { useCurrentUserProfile } from '@/app/platform/functions/people/users/useCurrentUserProfile.ts';
 import { useDocumentPages } from '@/app/platform/functions/documents/useDocumentPages.ts';
 import { useProjectDocument } from '@/app/features/tribes-projects/projects/useProjectDocuments.ts';
@@ -353,7 +353,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
           onReordered={refetchPages}
         />
         {doc.created_by && (
-          <EntityAuditBadge
+          <EntityAuditUserBadge
             createdBy={doc.created_by}
             updatedBy={doc.updated_by}
             createdAt={doc.created_at}

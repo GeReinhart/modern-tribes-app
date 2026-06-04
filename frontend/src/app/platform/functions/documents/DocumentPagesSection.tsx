@@ -2,7 +2,7 @@ import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/componen
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { documentPageService } from '@/app/platform/functions/documents/document-page.service.ts';
 import { DocumentPage } from '@/app/platform/functions/documents/document-page.types.ts';
-import { EntityAuditBadge } from '@/app/platform/core/layout/themes/components/EntityAuditBadge.tsx';
+import { EntityAuditUserBadge } from '@/app/platform/functions/people/users/EntityAuditUserBadge.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -177,7 +177,7 @@ export const DocumentPagesSection: React.FC<DocumentPagesSectionProps> = ({
               </div>
             )}
             {page.created_by && (
-              <EntityAuditBadge
+              <EntityAuditUserBadge
                 createdBy={page.created_by}
                 updatedBy={page.updated_by}
                 createdAt={page.created_at}

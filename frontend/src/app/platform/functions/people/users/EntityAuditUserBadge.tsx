@@ -75,11 +75,11 @@ const UserAvatar: React.FC<AvatarProps> = ({
       <title>{tooltipText}</title>
       <defs>
         <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={theme.colors.secondary} stopOpacity="0.7" />
-          <stop offset="100%" stopColor={theme.colors.secondary} stopOpacity="0.4" />
+          <stop offset="0%" stopColor={theme.colors.primary} stopOpacity="1" />
+          <stop offset="100%" stopColor={theme.colors.secondary} stopOpacity="0.85" />
         </linearGradient>
       </defs>
-      <circle cx="18" cy="18" r="18" fill={`url(#${gradientId})`} />
+      <circle cx="18" cy="18" r="18" fill={`url(#${gradientId})`} filter="drop-shadow(0 1px 3px rgba(0,0,0,0.25))" />
       <text
         x="18"
         y="18"
@@ -95,7 +95,7 @@ const UserAvatar: React.FC<AvatarProps> = ({
   );
 };
 
-export const EntityAuditBadge: React.FC<EntityAuditBadgeProps> = ({
+export const EntityAuditUserBadge: React.FC<EntityAuditBadgeProps> = ({
   createdBy,
   updatedBy,
   createdAt,
@@ -138,14 +138,14 @@ export const EntityAuditBadge: React.FC<EntityAuditBadgeProps> = ({
       <UserAvatar
         userId={createdBy}
         buildTooltip={buildCreatorTooltip}
-        size={20}
+        size={28}
         gradientId={`audit-creator-${createdBy}`}
       />
       {showUpdater && updatedBy && (
         <UserAvatar
           userId={updatedBy}
           buildTooltip={buildUpdaterTooltip}
-          size={20}
+          size={28}
           gradientId={`audit-updater-${updatedBy}`}
         />
       )}

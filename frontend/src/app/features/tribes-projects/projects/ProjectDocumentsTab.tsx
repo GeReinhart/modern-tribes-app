@@ -1,7 +1,7 @@
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
-import { EntityAuditBadge } from '@/app/platform/core/layout/themes/components/EntityAuditBadge.tsx';
+import { EntityAuditUserBadge } from '@/app/platform/functions/people/users/EntityAuditUserBadge.tsx';
 import {
   useProjectDocumentLabels,
   useProjectDocuments,
@@ -301,7 +301,7 @@ export const ProjectDocumentsTab: React.FC<ProjectDocumentsTabProps> = ({
               </div>
             )}
             {doc.created_by && (
-              <EntityAuditBadge
+              <EntityAuditUserBadge
                 createdBy={doc.created_by}
                 updatedBy={doc.updated_by}
                 createdAt={doc.created_at}
