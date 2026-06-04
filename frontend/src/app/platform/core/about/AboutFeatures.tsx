@@ -2,10 +2,8 @@ import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedT
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedBadge } from '@/app/platform/core/layout/themes/components/ThemedBadge.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
-import {
-  LocalizedText,
-  useLocalizedText,
-} from '@/app/platform/core/about/localized-text.ts';
+import { LocalizedText, useLocalizedText } from '@/app/platform/core/about/localized-text.ts';
+import { MarkdownContent } from '@/app/platform/core/about/MarkdownContent.tsx';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -52,13 +50,9 @@ const SubPackageList: React.FC<{ subPackages: SubPackageDef[] }> = ({ subPackage
       {subPackages.map((sub) => (
         <div key={sub.package} style={{ marginBottom: '8px' }}>
           <ThemedBadge variant="secondary">{sub.package}</ThemedBadge>
-          <ul style={{ margin: '4px 0 0', paddingLeft: '16px' }}>
-            {localize(sub.description).map((desc, i) => (
-              <li key={i} style={{ fontSize: 'var(--font-xs)', color: theme.colors.text }}>
-                {desc}
-              </li>
-            ))}
-          </ul>
+          <div style={{ marginTop: '4px' }}>
+            <MarkdownContent content={localize(sub.description)} />
+          </div>
         </div>
       ))}
     </div>
@@ -66,7 +60,6 @@ const SubPackageList: React.FC<{ subPackages: SubPackageDef[] }> = ({ subPackage
 };
 
 const FeatureCard: React.FC<{ feature: FeatureDef }> = ({ feature }) => {
-  const { theme } = useTheme();
   const localize = useLocalizedText();
 
   return (
@@ -74,16 +67,7 @@ const FeatureCard: React.FC<{ feature: FeatureDef }> = ({ feature }) => {
       <div style={{ marginBottom: '6px' }}>
         <ThemedBadge variant="accent">{feature.package}</ThemedBadge>
       </div>
-      <ul style={{ margin: 0, paddingLeft: '16px' }}>
-        {localize(feature.description).map((desc, i) => (
-          <li
-            key={i}
-            style={{ fontSize: 'var(--font-xs)', color: theme.colors.text, marginBottom: '2px' }}
-          >
-            {desc}
-          </li>
-        ))}
-      </ul>
+      <MarkdownContent content={localize(feature.description)} />
       {feature.sub_packages && feature.sub_packages.length > 0 && (
         <SubPackageList subPackages={feature.sub_packages} />
       )}

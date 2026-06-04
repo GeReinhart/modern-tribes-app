@@ -8,6 +8,7 @@ import { AboutStack } from '@/app/platform/core/about/AboutStack.tsx';
 import { AboutPackages } from '@/app/platform/core/about/AboutPackages.tsx';
 import { AboutFeatures } from '@/app/platform/core/about/AboutFeatures.tsx';
 import { useLocalizedText } from '@/app/platform/core/about/localized-text.ts';
+import { MarkdownContent } from '@/app/platform/core/about/MarkdownContent.tsx';
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -80,16 +81,9 @@ const AboutPageContent: React.FC = () => {
           </a>
         </div>
 
-        <ul style={{ marginBottom: '28px', paddingLeft: '20px' }}>
-          {localize(appConfig.description).map((desc, i) => (
-            <li
-              key={i}
-              style={{ fontSize: 'var(--font-sm)', color: theme.colors.text, marginBottom: '4px' }}
-            >
-              {desc}
-            </li>
-          ))}
-        </ul>
+        <div style={{ marginBottom: '28px' }}>
+          <MarkdownContent content={localize(appConfig.description)} fontSize="var(--font-sm)" />
+        </div>
 
         <AboutStack
           backendStack={appConfig.backend.stack}

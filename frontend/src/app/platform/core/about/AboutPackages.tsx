@@ -2,10 +2,8 @@ import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedT
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedBadge } from '@/app/platform/core/layout/themes/components/ThemedBadge.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
-import {
-  LocalizedText,
-  useLocalizedText,
-} from '@/app/platform/core/about/localized-text.ts';
+import { LocalizedText, useLocalizedText } from '@/app/platform/core/about/localized-text.ts';
+import { MarkdownContent } from '@/app/platform/core/about/MarkdownContent.tsx';
 
 import React from 'react';
 
@@ -23,7 +21,6 @@ interface Props {
 }
 
 const PackageCard: React.FC<{ pkg: PackageDef; variant: Variant }> = ({ pkg, variant }) => {
-  const { theme } = useTheme();
   const localize = useLocalizedText();
 
   return (
@@ -31,16 +28,7 @@ const PackageCard: React.FC<{ pkg: PackageDef; variant: Variant }> = ({ pkg, var
       <div style={{ marginBottom: '6px' }}>
         <ThemedBadge variant={variant}>{pkg.package}</ThemedBadge>
       </div>
-      <ul style={{ margin: 0, paddingLeft: '16px' }}>
-        {localize(pkg.description).map((desc, i) => (
-          <li
-            key={i}
-            style={{ fontSize: 'var(--font-xs)', color: theme.colors.text, marginBottom: '2px' }}
-          >
-            {desc}
-          </li>
-        ))}
-      </ul>
+      <MarkdownContent content={localize(pkg.description)} />
     </ThemedCard>
   );
 };
