@@ -54,8 +54,13 @@ if [ ! -f "$APK" ]; then
   exit 1
 fi
 
+DOWNLOADS_DIR="$ROOT_DIR/frontend/public/downloads"
+mkdir -p "$DOWNLOADS_DIR"
+cp "$APK" "$DOWNLOADS_DIR/modern-tribes.apk"
+
 echo ""
 echo "==> APK ready: $APK"
+echo "==> Copied to: $DOWNLOADS_DIR/modern-tribes.apk (served at /downloads/modern-tribes.apk)"
 echo ""
 
 # Extract and display fingerprint

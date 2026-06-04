@@ -36,21 +36,14 @@ const Step: React.FC<StepProps> = ({ number, title, desc }) => (
   </div>
 );
 
-interface ApkSectionProps {
+interface ApkDownloadButtonProps {
   apkUrl: string;
 }
 
-const ApkSection: React.FC<ApkSectionProps> = ({ apkUrl }) => {
+const ApkDownloadButton: React.FC<ApkDownloadButtonProps> = ({ apkUrl }) => {
   const { t } = useTranslation();
   return (
     <>
-      <div style={divider} />
-      <ThemedText size="small" style={{ marginBottom: '6px' }}>
-        {t('install.android.apkTitle')}
-      </ThemedText>
-      <ThemedText variant="secondary" size="small" style={{ marginBottom: '12px' }}>
-        {t('install.android.apkDesc')}
-      </ThemedText>
       <a
         href={apkUrl}
         download
@@ -59,7 +52,7 @@ const ApkSection: React.FC<ApkSectionProps> = ({ apkUrl }) => {
           textAlign: 'center',
           backgroundColor: '#111827',
           color: 'white',
-          padding: '12px 20px',
+          padding: '14px 20px',
           borderRadius: '8px',
           textDecoration: 'none',
           fontWeight: '600',
@@ -79,7 +72,7 @@ const ApkSection: React.FC<ApkSectionProps> = ({ apkUrl }) => {
 interface InstallInstructionsAndroidProps {
   canPrompt: boolean;
   install: () => Promise<void>;
-  apkUrl: string | null;
+  apkUrl: string;
   isInAppBrowser: boolean;
 }
 
@@ -128,60 +121,57 @@ export const InstallInstructionsAndroid: React.FC<InstallInstructionsAndroidProp
 
       {isInAppBrowser && (
         <>
-          <Step
-            number={1}
-            title={t('install.android.openInChrome1')}
-            desc={t('install.android.openInChrome1desc')}
-          />
-          <Step
-            number={2}
-            title={t('install.android.openInChrome2')}
-            desc={t('install.android.openInChrome2desc')}
-          />
-          <Step
-            number={3}
-            title={t('install.android.openInChrome3')}
-            desc={t('install.android.openInChrome3desc')}
-          />
+          <Step number={1} title={t('install.android.openInChrome1')} desc={t('install.android.openInChrome1desc')} />
+          <Step number={2} title={t('install.android.openInChrome2')} desc={t('install.android.openInChrome2desc')} />
+          <Step number={3} title={t('install.android.openInChrome3')} desc={t('install.android.openInChrome3desc')} />
+          <div style={divider} />
+          <ThemedText size="small" style={{ marginBottom: '8px' }}>
+            {t('install.android.apkTitle')}
+          </ThemedText>
+          <ThemedText variant="secondary" size="small" style={{ marginBottom: '12px' }}>
+            {t('install.android.apkDesc')}
+          </ThemedText>
+          <ApkDownloadButton apkUrl={apkUrl} />
         </>
       )}
 
       {!isInAppBrowser && canPrompt && (
-        <ThemedSubmitButton
-          variant="secondary"
-          isLoading={isInstalling}
-          loadingText={t('install.android.installing')}
-          onClick={handleInstall}
-          style={{ marginBottom: '20px' }}
-        >
-          {t('install.android.installButton')}
-        </ThemedSubmitButton>
+        <>
+          <ThemedSubmitButton
+            variant="secondary"
+            isLoading={isInstalling}
+            loadingText={t('install.android.installing')}
+            onClick={handleInstall}
+            style={{ marginBottom: '20px' }}
+          >
+            {t('install.android.installButton')}
+          </ThemedSubmitButton>
+          <div style={divider} />
+          <ThemedText size="small" style={{ marginBottom: '8px' }}>
+            {t('install.android.apkTitle')}
+          </ThemedText>
+          <ApkDownloadButton apkUrl={apkUrl} />
+        </>
       )}
 
       {!isInAppBrowser && !canPrompt && (
         <>
+          <ThemedText size="small" style={{ marginBottom: '8px' }}>
+            {t('install.android.apkTitle')}
+          </ThemedText>
+          <ThemedText variant="secondary" size="small" style={{ marginBottom: '12px' }}>
+            {t('install.android.apkDesc')}
+          </ThemedText>
+          <ApkDownloadButton apkUrl={apkUrl} />
+          <div style={divider} />
           <ThemedText variant="secondary" size="small" style={{ marginBottom: '12px' }}>
             {t('install.android.manualTitle')}
           </ThemedText>
-          <Step
-            number={1}
-            title={t('install.android.manual1')}
-            desc={t('install.android.manual1desc')}
-          />
-          <Step
-            number={2}
-            title={t('install.android.manual2')}
-            desc={t('install.android.manual2desc')}
-          />
-          <Step
-            number={3}
-            title={t('install.android.manual3')}
-            desc={t('install.android.manual3desc')}
-          />
+          <Step number={1} title={t('install.android.manual1')} desc={t('install.android.manual1desc')} />
+          <Step number={2} title={t('install.android.manual2')} desc={t('install.android.manual2desc')} />
+          <Step number={3} title={t('install.android.manual3')} desc={t('install.android.manual3desc')} />
         </>
       )}
-
-      {apkUrl && <ApkSection apkUrl={apkUrl} />}
     </div>
   );
 };

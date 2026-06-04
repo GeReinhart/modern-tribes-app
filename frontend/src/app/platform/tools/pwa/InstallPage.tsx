@@ -47,7 +47,7 @@ const DesktopMessage: React.FC = () => {
 export const InstallPage: React.FC = () => {
   const { t } = useTranslation();
   const { isStandalone, isIOS, isInSafari, isAndroid, isAndroidInAppBrowser, canPrompt, install } = usePWAInstall();
-  const apkUrl: string | null = (import.meta.env.VITE_APK_DOWNLOAD_URL as string | undefined) ?? null;
+  const apkUrl: string = (import.meta.env.VITE_APK_DOWNLOAD_URL as string | undefined) ?? '/downloads/modern-tribes.apk';
 
   if (isStandalone) {
     return <Navigate to="/app" replace />;
