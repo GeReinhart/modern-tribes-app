@@ -547,6 +547,15 @@ const en: Record<string, string> = {
   'install.ios.step3desc': 'Confirm by tapping Add in the top right corner',
 
   'install.android.title': 'Install on Android',
+  'install.android.inAppBrowserTitle': 'Open in Chrome first',
+  'install.android.inAppBrowserDesc':
+    "You're in an app browser (e.g. Gmail). Tap the menu and choose \"Open in Chrome\" to install.",
+  'install.android.openInChrome1': 'Tap the menu in your browser',
+  'install.android.openInChrome1desc': 'Look for ⋮ or a share icon in the top-right corner',
+  'install.android.openInChrome2': 'Tap "Open in Chrome"',
+  'install.android.openInChrome2desc': 'Or "Open in browser" — choose Chrome',
+  'install.android.openInChrome3': 'Install from Chrome',
+  'install.android.openInChrome3desc': 'Once in Chrome, tap the Install button that appears here',
   'install.android.installButton': 'Install the app',
   'install.android.installing': 'Installing…',
   'install.android.manualTitle': 'Or install manually via Chrome:',

@@ -564,6 +564,15 @@ const fr: Record<string, string> = {
   'install.ios.step3desc': "Confirmez en appuyant sur Ajouter en haut à droite",
 
   'install.android.title': 'Installer sur Android',
+  'install.android.inAppBrowserTitle': 'Ouvrir dans Chrome d\'abord',
+  'install.android.inAppBrowserDesc':
+    "Vous êtes dans un navigateur intégré (ex. Gmail). Appuyez sur le menu et choisissez « Ouvrir dans Chrome » pour installer.",
+  'install.android.openInChrome1': 'Appuyez sur le menu de votre navigateur',
+  'install.android.openInChrome1desc': 'Cherchez ⋮ ou une icône de partage en haut à droite',
+  'install.android.openInChrome2': 'Appuyez sur « Ouvrir dans Chrome »',
+  'install.android.openInChrome2desc': "Ou « Ouvrir dans le navigateur » — choisissez Chrome",
+  'install.android.openInChrome3': 'Installer depuis Chrome',
+  'install.android.openInChrome3desc': "Une fois dans Chrome, appuyez sur le bouton Installer qui apparaît ici",
   'install.android.installButton': "Installer l'application",
   'install.android.installing': 'Installation…',
   'install.android.manualTitle': 'Ou installez manuellement via Chrome :',

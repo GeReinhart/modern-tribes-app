@@ -10,6 +10,7 @@ export interface PWAInstallState {
   isIOS: boolean;
   isInSafari: boolean;
   isAndroid: boolean;
+  isAndroidInAppBrowser: boolean;
   canPrompt: boolean;
   install: () => Promise<void>;
 }
@@ -38,11 +39,21 @@ function detectAndroid(): boolean {
   return /android/i.test(navigator.userAgent);
 }
 
+// Android in-app browsers (Gmail, Outlook, FB, etc.) use a WebView and never fire
+// beforeinstallprompt. Chrome on Android includes "Chrome/" but not "wv".
+function detectAndroidInAppBrowser(): boolean {
+  const ua = navigator.userAgent;
+  if (!/android/i.test(ua)) return false;
+  return /wv|FBAN|FBAV|Instagram|Snapchat|Twitter|Line|MicroMessenger/i.test(ua) ||
+    (!/chrome/i.test(ua) && !/firefox/i.test(ua) && !/samsungbrowser/i.test(ua));
+}
+
 export function usePWAInstall(): PWAInstallState {
   const [isStandalone] = useState(detectStandalone);
   const [isIOS] = useState(detectIOS);
   const [isInSafari] = useState(() => detectInSafari(detectIOS()));
   const [isAndroid] = useState(detectAndroid);
+  const [isAndroidInAppBrowser] = useState(detectAndroidInAppBrowser);
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
 
@@ -72,6 +83,7 @@ export function usePWAInstall(): PWAInstallState {
     isIOS,
     isInSafari,
     isAndroid,
+    isAndroidInAppBrowser,
     canPrompt: !!deferredPrompt,
     install,
   };

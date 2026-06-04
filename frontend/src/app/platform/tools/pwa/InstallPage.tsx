@@ -46,7 +46,7 @@ const DesktopMessage: React.FC = () => {
 
 export const InstallPage: React.FC = () => {
   const { t } = useTranslation();
-  const { isStandalone, isIOS, isInSafari, isAndroid, canPrompt, install } = usePWAInstall();
+  const { isStandalone, isIOS, isInSafari, isAndroid, isAndroidInAppBrowser, canPrompt, install } = usePWAInstall();
   const apkUrl: string | null = (import.meta.env.VITE_APK_DOWNLOAD_URL as string | undefined) ?? null;
 
   if (isStandalone) {
@@ -76,6 +76,7 @@ export const InstallPage: React.FC = () => {
                 canPrompt={canPrompt}
                 install={install}
                 apkUrl={apkUrl}
+                isInAppBrowser={isAndroidInAppBrowser}
               />
             )}
             {!isIOS && !isAndroid && <DesktopMessage />}
