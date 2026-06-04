@@ -9,10 +9,15 @@ export interface TabDefinition {
   color?: string;
 }
 
+export interface NavTab extends TabDefinition {
+  href: string;
+}
+
 interface UseUrlTabResult {
   activeTab: string;
   handleTabChange: (key: string) => void;
   breadcrumbTabs: BreadcrumbTab[];
+  navTabs: NavTab[];
 }
 
 export function useUrlTab(
@@ -43,7 +48,12 @@ export function useUrlTab(
     [tabs, basePath, activeTab],
   );
 
+  const navTabs = useMemo(
+    () => tabs.map((t) => ({ ...t, href: `${basePath}/${t.key}` })),
+    [tabs, basePath],
+  );
+
   const handleTabChange = (key: string) => navigate(`${basePath}/${key}`);
 
-  return { activeTab, breadcrumbTabs, handleTabChange };
+  return { activeTab, breadcrumbTabs, handleTabChange, navTabs };
 }

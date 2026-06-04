@@ -56,7 +56,7 @@ const DashboardPageContent: React.FC = () => {
   );
   const { visibleTabs, defaultTabKey, tabsWithConfig, saveConfig } =
     useTabConfig('dashboard', allTabs);
-  const { activeTab, breadcrumbTabs, handleTabChange } = useUrlTab(
+  const { activeTab, breadcrumbTabs, handleTabChange, navTabs } = useUrlTab(
     visibleTabs,
     '/app/dashboard',
     defaultTabKey,
@@ -132,7 +132,7 @@ const DashboardPageContent: React.FC = () => {
       )}
 
       <ThemedTabs
-        tabs={visibleTabs}
+        tabs={navTabs}
         activeTab={activeTab}
         onTabChange={handleTabChange}
       />

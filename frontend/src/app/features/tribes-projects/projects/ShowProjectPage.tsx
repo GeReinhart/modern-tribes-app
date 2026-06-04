@@ -313,7 +313,7 @@ const ShowProjectPageContent: React.FC = () => {
     useTabConfig(contextKey, allTabs);
 
   const basePath = `/app/tribes/${tribeId ?? ''}/projects/${projectId ?? ''}`;
-  const { activeTab, breadcrumbTabs, handleTabChange } = useUrlTab(
+  const { activeTab, breadcrumbTabs, handleTabChange, navTabs } = useUrlTab(
     visibleTabs,
     basePath,
     defaultTabKey,
@@ -509,7 +509,7 @@ const ShowProjectPageContent: React.FC = () => {
       {/* Tabs */}
       <ThemedSection themeId={pageThemeCode ?? 'main_1'}>
         <ThemedTabs
-          tabs={visibleTabs}
+          tabs={navTabs}
           activeTab={activeTab}
           onTabChange={handleTabChange}
         />

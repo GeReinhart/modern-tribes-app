@@ -148,7 +148,7 @@ const ShowTribePageContent: React.FC = () => {
   const { visibleTabs, defaultTabKey, tabsWithConfig, saveConfig } =
     useTabConfig(contextKey, allTabs);
 
-  const { activeTab, breadcrumbTabs, handleTabChange } = useUrlTab(
+  const { activeTab, breadcrumbTabs, handleTabChange, navTabs } = useUrlTab(
     visibleTabs,
     `/app/tribes/${tribeId ?? ''}`,
     defaultTabKey,
@@ -360,7 +360,7 @@ const ShowTribePageContent: React.FC = () => {
 
       {/* Tabs */}
       <ThemedTabs
-        tabs={visibleTabs}
+        tabs={navTabs}
         activeTab={activeTab}
         onTabChange={handleTabChange}
       />
