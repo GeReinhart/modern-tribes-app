@@ -57,6 +57,9 @@ const fr: Record<string, string> = {
   'projects.descriptionOptional': 'Description',
   'projects.features': 'Fonctionnalités',
   'projects.tabsConfig': 'Onglets',
+  'projects.archiveTitle': 'Archiver ce projet ?',
+  'projects.archiveMessage':
+    'Cela va archiver "{{name}}". Il ne sera plus actif.',
 
   'tribes.title': 'Tribus',
   'tribes.subtitle': 'Les tribus auxquelles je participe.',

@@ -14,7 +14,7 @@ class MyTaskBase(BaseModel):
     id: str
     title: str
     size: Optional[int] = None
-    due_date: date
+    due_date: Optional[date] = None
     assigned_person_id: Optional[str] = None
     assigned_person_name: Optional[str] = None
     feature_instance_id: str

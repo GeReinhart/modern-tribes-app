@@ -55,6 +55,9 @@ const en: Record<string, string> = {
   'projects.descriptionOptional': 'Description',
   'projects.features': 'Features',
   'projects.tabsConfig': 'Tabs',
+  'projects.archiveTitle': 'Archive this project?',
+  'projects.archiveMessage':
+    'This will archive "{{name}}". It will no longer be active.',
 
   'tribes.title': 'Tribes',
   'tribes.subtitle': "The tribes I'm involved with.",

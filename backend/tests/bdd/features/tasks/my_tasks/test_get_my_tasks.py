@@ -13,8 +13,33 @@ _test_app.include_router(router, prefix="/api/features")
 FEATURE = "../../../../features/features/tasks/my_tasks/get_my_tasks.feature"
 
 
-@scenario(FEATURE, "GET /my-tasks as viewer — kanban and todo tasks are returned")
-def test_get_my_tasks_viewer():
+@scenario(FEATURE, "GET /my-tasks — included: task assigned to me with a due date")
+def test_included_assigned_with_due_date():
+    pass
+
+
+@scenario(FEATURE, "GET /my-tasks — included: unassigned task with a due date")
+def test_included_unassigned_with_due_date():
+    pass
+
+
+@scenario(FEATURE, "GET /my-tasks — included: task assigned to me, no due date, created more than 100 days ago")
+def test_included_assigned_old():
+    pass
+
+
+@scenario(FEATURE, "GET /my-tasks — included: unassigned task, no due date, created more than 100 days ago")
+def test_included_unassigned_old():
+    pass
+
+
+@scenario(FEATURE, "GET /my-tasks — excluded: task assigned to another person")
+def test_excluded_other_person():
+    pass
+
+
+@scenario(FEATURE, "GET /my-tasks — excluded: task assigned to me, no due date, created less than 100 days ago")
+def test_excluded_assigned_recent():
     pass
 
 

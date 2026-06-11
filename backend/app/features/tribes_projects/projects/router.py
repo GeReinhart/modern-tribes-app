@@ -11,6 +11,7 @@ from app.platform.core.authorization.router import (
     require_any_permission_decorator,
     require_permission_decorator,
 )
+from app.platform.core.authorization.project_access import check_project_access_or_admin
 from app.platform.core.utils.db_helpers import (
     check_document_exists,
     create_document,
@@ -100,13 +101,15 @@ async def update_project(
 
 
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
-@require_permission_decorator(PermissionEnum.ADMIN)
-async def delete_project(project_id: str, current_user: dict = Depends(get_current_user)):
-    """Delete a project
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def archive_project(project_id: str, current_user: dict = Depends(get_current_user)):
+    """Archive a project (soft-delete by setting status to archived).
 
-    **Permissions:** admin
+    **Permissions:** admin | can_access_attached_tribes (manager position required)
     """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, TABLE, project_id)
-    await delete_document(pool, TABLE, project_id, ENTITY_NAME)
+    await check_project_access_or_admin(project_id, current_user, pool, min_position="manager")
+    archive_data = {"status": "archived", "updated_by": UUID(current_user["id"])}
+    await update_document(pool, TABLE, project_id, archive_data, ENTITY_NAME)
     return None

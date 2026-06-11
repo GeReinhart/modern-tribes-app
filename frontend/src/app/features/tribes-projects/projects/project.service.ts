@@ -34,6 +34,10 @@ class ProjectService {
     return apiService.delete<void>(`${this.endpoint}/${id}`);
   }
 
+  async archive(id: string): Promise<void> {
+    return this.delete(id);
+  }
+
   async getByUser(userId: string): Promise<UserProjectEntry[]> {
     return apiService.get<UserProjectEntry[]>(
       `/features/tribes-projects/projects/by/user/${userId}`,

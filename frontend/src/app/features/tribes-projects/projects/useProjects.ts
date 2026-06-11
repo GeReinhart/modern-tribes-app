@@ -175,6 +175,27 @@ export function useProjectTribesWithMembers(projectId: string | null) {
   return { tribes, loading, error, refetch: fetch };
 }
 
+export function useArchiveProject() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const archiveProject = useCallback(async (projectId: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+    try {
+      await projectService.archive(projectId);
+      return true;
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { archiveProject, loading, error };
+}
+
 export function useProjectTribes() {
   const [projectTribes, setProjectTribes] = useState<Record<string, string[]>>({});
   const { loading, error, execute } = apiHooks<ProjectTribesSummary[]>();

@@ -1,6 +1,7 @@
 import asyncio
 import json
 import re
+from datetime import datetime, timezone
 from uuid import UUID
 
 import asyncpg
@@ -9,6 +10,12 @@ from pytest_bdd import given, parsers, then, when
 
 from tests.db_helpers import TEST_DB_DSN, coerce, url_param_id_from_uuid
 from tests.helpers import assert_table, expand_id, expand_json_ids, expand_path_ids
+
+
+def _parse_created_at(value: str | None) -> datetime | None:
+    if not value:
+        return None
+    return datetime.fromisoformat(value).replace(tzinfo=timezone.utc)
 
 
 def _run(coro):
@@ -535,11 +542,12 @@ def given_kanban_cards_table(datatable):
                 uid = rec["id"]
                 assigned = rec.get("assigned_person_id")
                 due = rec.get("due_date")
-                await conn.execute(
-                    """INSERT INTO kanban_cards(id, feature_instance_id, column_id, title,
-                       assigned_person_id, due_date, status, position)
-                       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
-                       ON CONFLICT (id) DO NOTHING""",
+                created_at = _parse_created_at(rec.get("created_at"))
+                fields = [
+                    "id", "feature_instance_id", "column_id", "title",
+                    "assigned_person_id", "due_date", "status", "position",
+                ]
+                values = [
                     UUID(uid),
                     UUID(rec["feature_instance_id"]),
                     UUID(rec["column_id"]),
@@ -548,7 +556,16 @@ def given_kanban_cards_table(datatable):
                     coerce("due_date", due) if due else None,
                     rec.get("status", "active"),
                     coerce("position", rec.get("position", "0")),
+                ]
+                if created_at is not None:
+                    fields.append("created_at")
+                    values.append(created_at)
+                placeholders = ", ".join(f"${i + 1}" for i in range(len(fields)))
+                query = (
+                    f"INSERT INTO kanban_cards({', '.join(fields)}) "
+                    f"VALUES({placeholders}) ON CONFLICT (id) DO NOTHING"
                 )
+                await conn.execute(query, *values)
         finally:
             await conn.close()
     _run(_insert())
@@ -565,11 +582,12 @@ def given_todo_items_table(datatable):
                 uid = rec["id"]
                 assigned = rec.get("assigned_person_id")
                 due = rec.get("due_date")
-                await conn.execute(
-                    """INSERT INTO todo_items(id, feature_instance_id, title, todo_status,
-                       assigned_person_id, due_date, status, position)
-                       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
-                       ON CONFLICT (id) DO NOTHING""",
+                created_at = _parse_created_at(rec.get("created_at"))
+                fields = [
+                    "id", "feature_instance_id", "title", "todo_status",
+                    "assigned_person_id", "due_date", "status", "position",
+                ]
+                values = [
                     UUID(uid),
                     UUID(rec["feature_instance_id"]),
                     rec.get("title", "Todo"),
@@ -578,7 +596,16 @@ def given_todo_items_table(datatable):
                     coerce("due_date", due) if due else None,
                     rec.get("status", "active"),
                     coerce("position", rec.get("position", "0")),
+                ]
+                if created_at is not None:
+                    fields.append("created_at")
+                    values.append(created_at)
+                placeholders = ", ".join(f"${i + 1}" for i in range(len(fields)))
+                query = (
+                    f"INSERT INTO todo_items({', '.join(fields)}) "
+                    f"VALUES({placeholders}) ON CONFLICT (id) DO NOTHING"
                 )
+                await conn.execute(query, *values)
         finally:
             await conn.close()
     _run(_insert())

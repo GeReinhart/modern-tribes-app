@@ -23,6 +23,7 @@ import {
   useProjectFeatures,
 } from '@/app/features/glue/features/useProjectFeatures.ts';
 import {
+  useArchiveProject,
   useProjectTribesWithMembers,
   useProjectWithDocument,
   useProjectWithDocumentMutations,
@@ -208,6 +209,7 @@ const ShowProjectPageContent: React.FC = () => {
   const { tribe } = useTribeWithPositions(tribeId || null);
   const { project, loading, error, refetch: refetchProject } = useProjectWithDocument(projectId || null);
   const { updateProjectWithDocument } = useProjectWithDocumentMutations();
+  const { archiveProject } = useArchiveProject();
 
   const [pageThemeCode, setPageThemeCode] = useState<string | null>(null);
 
@@ -233,6 +235,7 @@ const ShowProjectPageContent: React.FC = () => {
   const [showTabConfig, setShowTabConfig] = useState(false);
   const [showProjectThemePicker, setShowProjectThemePicker] = useState(false);
   const [showFeatureThemePicker, setShowFeatureThemePicker] = useState(false);
+  const [archiveProjectOpen, setArchiveProjectOpen] = useState(false);
   const [archiveTarget, setArchiveTarget] = useState<{
     id: string;
     name: string;
@@ -365,6 +368,12 @@ const ShowProjectPageContent: React.FC = () => {
               label: t('common.project'),
               onClick: () =>
                 navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit`),
+            },
+            {
+              icon: 'archive' as const,
+              label: t('common.project'),
+              onClick: () => setArchiveProjectOpen(true),
+              variant: 'danger' as const,
             },
           ]
         : []),
@@ -698,6 +707,21 @@ const ShowProjectPageContent: React.FC = () => {
           )}
         </div>
       </ThemedSection>
+
+      <ThemedConfirmDialog
+        isOpen={archiveProjectOpen}
+        onClose={() => setArchiveProjectOpen(false)}
+        onConfirm={async () => {
+          if (!projectId) return;
+          await archiveProject(projectId);
+          setArchiveProjectOpen(false);
+          navigate(`/app/tribes/${tribeId}`);
+        }}
+        title={t('projects.archiveTitle')}
+        message={t('projects.archiveMessage', { name: project?.name ?? '' })}
+        confirmText={t('common.archive')}
+        variant="warning"
+      />
 
       <ThemedConfirmDialog
         isOpen={!!archiveTarget}

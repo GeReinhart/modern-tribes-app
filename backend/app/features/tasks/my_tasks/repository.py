@@ -27,12 +27,15 @@ _KANBAN_BASE = """
     LEFT JOIN documents d ON d.id = c.document_id
     LEFT JOIN persons pe ON pe.id = c.assigned_person_id
     WHERE c.status = 'active'
-    AND c.due_date IS NOT NULL
-    AND c.assigned_person_id IN (
-        SELECT u.person_id FROM users u WHERE u.id = $1 AND u.person_id IS NOT NULL
-        UNION
-        SELECT r.person_id FROM represents r WHERE r.user_id = $1 AND r.status = 'active'
+    AND (
+        c.assigned_person_id IN (
+            SELECT u.person_id FROM users u WHERE u.id = $1 AND u.person_id IS NOT NULL
+            UNION
+            SELECT r.person_id FROM represents r WHERE r.user_id = $1 AND r.status = 'active'
+        )
+        OR c.assigned_person_id IS NULL
     )
+    AND (c.due_date IS NOT NULL OR c.created_at < NOW() - INTERVAL '100 days')
     AND col.position < (
         SELECT MAX(kc2.position) FROM kanban_columns kc2
         WHERE kc2.feature_instance_id = c.feature_instance_id AND kc2.status = 'active'
@@ -65,12 +68,15 @@ _TODO_BASE = """
     LEFT JOIN persons pe ON pe.id = i.assigned_person_id
     WHERE i.status = 'active'
     AND i.todo_status = 'todo'
-    AND i.due_date IS NOT NULL
-    AND i.assigned_person_id IN (
-        SELECT u.person_id FROM users u WHERE u.id = $1 AND u.person_id IS NOT NULL
-        UNION
-        SELECT r.person_id FROM represents r WHERE r.user_id = $1 AND r.status = 'active'
+    AND (
+        i.assigned_person_id IN (
+            SELECT u.person_id FROM users u WHERE u.id = $1 AND u.person_id IS NOT NULL
+            UNION
+            SELECT r.person_id FROM represents r WHERE r.user_id = $1 AND r.status = 'active'
+        )
+        OR i.assigned_person_id IS NULL
     )
+    AND (i.due_date IS NOT NULL OR i.created_at < NOW() - INTERVAL '100 days')
 """
 
 _KANBAN_LABEL_EXISTS = (

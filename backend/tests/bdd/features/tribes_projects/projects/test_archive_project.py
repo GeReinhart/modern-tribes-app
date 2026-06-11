@@ -16,7 +16,11 @@ FEATURE = "../../../../features/features/tribes_projects/projects/archive_projec
 def test_archive_admin():
     pass
 
-@scenario(FEATURE, "DELETE /projects/0010 as a viewer — 403 error and the project is not archived")
+@scenario(FEATURE, "DELETE /projects/0010 as project manager — project is archived")
+def test_archive_manager():
+    pass
+
+@scenario(FEATURE, "DELETE /projects/0010 as a viewer without project access — 403 error and the project is not archived")
 def test_archive_forbidden():
     pass
 
