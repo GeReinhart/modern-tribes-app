@@ -17,6 +17,7 @@ interface Props {
   persons: PersonOption[];
   canEdit: boolean;
   featureInstanceId: string;
+  highlightToken?: string;
   onClose: () => void;
   onUpdate: (itemId: string, data: TodoItemUpdate) => Promise<void>;
   onToggleLabel: (itemId: string, labelId: string) => Promise<void>;
@@ -29,6 +30,7 @@ const TodoItemModal: React.FC<Props> = ({
   persons,
   canEdit,
   featureInstanceId,
+  highlightToken,
   onClose,
   onUpdate,
   onToggleLabel,
@@ -60,6 +62,7 @@ const TodoItemModal: React.FC<Props> = ({
 
   return (
     <TaskItemModal
+      highlightToken={highlightToken}
       value={{
         id: item.id,
         feature_instance_id: featureInstanceId,

@@ -9,6 +9,7 @@ from app.platform.core.utils.document_helpers import strip_html, extract_content
 from app.features.tasks import label_service
 from app.features.tasks.todo_list import repository as todo_repository
 from app.platform.functions.labels import repository as labels_repo
+from app.platform.functions.search import index_repository as search_index
 from app.features.tasks.models import PersonOption, FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate
 from app.features.tasks.todo_list.models import (
     TodoItemCreate, TodoItemUpdate, TodoItemResponse,
@@ -76,6 +77,7 @@ async def create_todo_item(data: TodoItemCreate, current_user: dict = Depends(ge
     user_id = str(current_user["id"])
     await label_service.require_feature_access(pool, data.feature_instance_id, current_user, "member")
     row = await todo_repository.insert_todo_item(pool, data.feature_instance_id, data.title, data.position, user_id)
+    await search_index.index_todo_item(pool, str(row["id"]), user_id)
     return _row_to_todo(row)
 
 
@@ -121,6 +123,10 @@ async def update_todo_item(item_id: str, data: TodoItemUpdate, current_user: dic
         )
 
     row = await todo_repository.fetch_todo_item(pool, item_id)
+    if row["status"] != "archived":
+        await search_index.index_todo_item(pool, item_id, user_id)
+    else:
+        await search_index.archive_entity(pool, "todo_item", item_id, user_id)
     return _row_to_todo(row)
 
 
@@ -138,7 +144,9 @@ async def toggle_todo_label(item_id: str, label_id: str, current_user: dict = De
     if not item_row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo item not found.")
     await label_service.require_feature_access(pool, str(item_row["feature_instance_id"]), current_user, "member")
-    return await labels_repo.toggle_entity_label(pool, item_id, 'todo_item', label_id)
+    result = await labels_repo.toggle_entity_label(pool, item_id, 'todo_item', label_id)
+    await search_index.index_todo_item(pool, item_id, str(current_user["id"]))
+    return result
 
 
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)

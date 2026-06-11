@@ -344,6 +344,7 @@ const fr: Record<string, string> = {
   'search.subtitle': 'Recherchez dans les documents auxquels vous avez accès.',
   'search.placeholder': 'Rechercher...',
   'search.empty': 'Aucun résultat trouvé pour votre recherche.',
+  'search.highlightBanner': 'Résultat pour : {{token}}',
 
   'features.addFeature': 'Ajouter une fonctionnalité',
   'features.feature': 'Fonctionnalité',

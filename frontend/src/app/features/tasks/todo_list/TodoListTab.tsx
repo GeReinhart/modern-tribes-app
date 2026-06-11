@@ -6,9 +6,11 @@ import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTab
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { User } from 'lucide-react';
 
+import TodoItemModal from './TodoItemModal.tsx';
 import TodoRow from './TodoRow.tsx';
 import { useTodoList } from './hooks.ts';
 
@@ -37,6 +39,19 @@ const TodoListTab: React.FC<Props> = ({
     deleteLabel,
     toggleLabel,
   } = useTodoList(featureInstanceId);
+
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const urlTaskId = searchParams.get('taskId');
+  const urlHighlight = searchParams.get('q') ?? undefined;
+
+  const deepLinkedItem = urlTaskId ? items.find((i) => i.id === urlTaskId) ?? null : null;
+
+  const closeDeepLinked = () => {
+    searchParams.delete('taskId');
+    searchParams.delete('q');
+    navigate({ search: searchParams.toString() }, { replace: true });
+  };
 
   const [newTitle, setNewTitle] = useState('');
   const [adding, setAdding] = useState(false);
@@ -249,6 +264,21 @@ const TodoListTab: React.FC<Props> = ({
             {t('features.todo.add')}
           </ThemedButton>
         </form>
+      )}
+
+      {deepLinkedItem && (
+        <TodoItemModal
+          item={deepLinkedItem}
+          labels={labels}
+          persons={persons}
+          canEdit={false}
+          featureInstanceId={featureInstanceId}
+          highlightToken={urlHighlight}
+          onClose={closeDeepLinked}
+          onUpdate={updateItem}
+          onToggleLabel={toggleLabel}
+          onCreateLabel={createLabel}
+        />
       )}
     </div>
   );

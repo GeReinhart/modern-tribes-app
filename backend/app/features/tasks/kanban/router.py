@@ -10,6 +10,7 @@ from app.platform.core.utils.document_helpers import strip_html, extract_content
 from app.features.tasks import label_service
 from app.features.tasks.kanban import repository as repo
 from app.platform.functions.labels import repository as labels_repo
+from app.platform.functions.search import index_repository as search_index
 from app.features.tasks.models import PersonOption, FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate
 from app.features.tasks.kanban.models import (
     KanbanBoard, KanbanColumnResponse, KanbanCardResponse,
@@ -164,11 +165,13 @@ async def create_card(data: CardCreate, current_user: dict = Depends(get_current
     **Feature access:** minimum position ≥ member
     """
     pool = get_database()
+    uid = str(current_user["id"])
     await label_service.require_feature_access(pool, data.feature_instance_id, current_user, "member")
     row = await repo.insert_card(
         pool, data.feature_instance_id, data.column_id,
-        data.title, data.assigned_person_id, data.position, str(current_user["id"]),
+        data.title, data.assigned_person_id, data.position, uid,
     )
+    await search_index.index_kanban_card(pool, str(row["id"]), uid)
     return _card(row)
 
 
@@ -189,7 +192,12 @@ async def update_card(card_id: str, data: CardUpdate, current_user: dict = Depen
     await repo.update_card_fields(pool, card_id, data.title, data.assigned_person_id, data.clear_assignee, data.size, data.clear_size, data.due_date, data.clear_due_date, uid)
     if data.document_content_html is not None:
         await _upsert_card_document(pool, card, data.document_content_html, uid)
-    return _card(await repo.fetch_card(pool, card_id))
+    updated = await repo.fetch_card(pool, card_id)
+    if updated["status"] != "archived":
+        await search_index.index_kanban_card(pool, card_id, uid)
+    else:
+        await search_index.archive_entity(pool, "kanban_card", card_id, uid)
+    return _card(updated)
 
 
 async def _upsert_card_document(pool, card: dict, html: str, uid: str) -> None:
@@ -222,8 +230,10 @@ async def archive_card(card_id: str, current_user: dict = Depends(get_current_us
     card = await repo.fetch_card(pool, card_id)
     if not card:
         raise HTTPException(status_code=404, detail="Card not found.")
+    uid = str(current_user["id"])
     await label_service.require_feature_access(pool, str(card["feature_instance_id"]), current_user, "member")
-    await repo.archive_card(pool, card_id, str(current_user["id"]))
+    await repo.archive_card(pool, card_id, uid)
+    await search_index.archive_entity(pool, "kanban_card", card_id, uid)
 
 
 @router.post("/cards/{card_id}/restore", response_model=KanbanCardResponse)
@@ -238,8 +248,10 @@ async def restore_card(card_id: str, current_user: dict = Depends(get_current_us
     card = await repo.fetch_card(pool, card_id)
     if not card:
         raise HTTPException(status_code=404, detail="Card not found.")
+    uid = str(current_user["id"])
     await label_service.require_feature_access(pool, str(card["feature_instance_id"]), current_user, "member")
-    await repo.restore_card(pool, card_id, str(current_user["id"]))
+    await repo.restore_card(pool, card_id, uid)
+    await search_index.index_kanban_card(pool, card_id, uid)
     return _card(await repo.fetch_card(pool, card_id))
 
 
@@ -342,8 +354,10 @@ async def add_card_label(card_id: str, label_id: str, current_user: dict = Depen
     card = await repo.fetch_card(pool, card_id)
     if not card:
         raise HTTPException(status_code=404, detail="Card not found.")
+    uid = str(current_user["id"])
     await label_service.require_feature_access(pool, str(card["feature_instance_id"]), current_user, "member")
     await labels_repo.add_entity_label(pool, card_id, 'kanban_card', label_id)
+    await search_index.index_kanban_card(pool, card_id, uid)
     return _card(await repo.fetch_card(pool, card_id))
 
 
@@ -359,6 +373,8 @@ async def remove_card_label(card_id: str, label_id: str, current_user: dict = De
     card = await repo.fetch_card(pool, card_id)
     if not card:
         raise HTTPException(status_code=404, detail="Card not found.")
+    uid = str(current_user["id"])
     await label_service.require_feature_access(pool, str(card["feature_instance_id"]), current_user, "member")
     await labels_repo.remove_entity_label(pool, card_id, 'kanban_card', label_id)
+    await search_index.index_kanban_card(pool, card_id, uid)
     return _card(await repo.fetch_card(pool, card_id))

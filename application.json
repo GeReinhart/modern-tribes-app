@@ -299,12 +299,16 @@
         "package": "search",
         "description": {
           "en": [
-            "- global full-text search across documents, publications and other entities",
-            "- indexed search targeting any element in the database"
+            "- global full-text search across documents, publications, todo items and kanban cards",
+            "- indexed search targeting any element in the database",
+            "- labels applied to tasks are included in the indexed content",
+            "- navigating to a task result auto-opens the task modal with the search token highlighted"
           ],
           "fr": [
-            "- recherche plein texte globale sur les documents, publications et autres entités",
-            "- recherche indexée ciblant n'importe quel élément de la base de données"
+            "- recherche plein texte globale sur les documents, publications, tâches todo et cartes kanban",
+            "- recherche indexée ciblant n'importe quel élément de la base de données",
+            "- les étiquettes appliquées aux tâches sont incluses dans le contenu indexé",
+            "- naviguer vers un résultat de tâche ouvre automatiquement la modale avec le token de recherche surligné"
           ]
         },
         "backend": {

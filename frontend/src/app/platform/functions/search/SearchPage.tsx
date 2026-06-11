@@ -12,14 +12,25 @@ import { useNavigate } from 'react-router-dom';
 import { useSearch } from './useSearch.ts';
 import { SearchResult } from './search.types.ts';
 
-const SearchResultCard: React.FC<{ result: SearchResult }> = ({ result }) => {
+const TASK_ENTITY_TYPES = new Set(['todo_item', 'kanban_card']);
+
+const SearchResultCard: React.FC<{ result: SearchResult; query: string }> = ({ result, query }) => {
   const { theme } = useTheme();
   const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (TASK_ENTITY_TYPES.has(result.entity_type) && query) {
+      const sep = result.routing_path.includes('?') ? '&' : '?';
+      navigate(`${result.routing_path}${sep}q=${encodeURIComponent(query)}`);
+    } else {
+      navigate(result.routing_path);
+    }
+  };
 
   return (
     <ThemedCard variant="primary">
       <div
-        onClick={() => navigate(result.routing_path)}
+        onClick={handleClick}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -169,7 +180,7 @@ const SearchPageContent: React.FC = () => {
           }}
         >
           {results.map((result) => (
-            <SearchResultCard key={result.entity_id} result={result} />
+            <SearchResultCard key={result.entity_id} result={result} query={query} />
           ))}
         </div>
       )}

@@ -16,6 +16,7 @@ interface Props {
   boardLabels: KanbanLabel[];
   persons: PersonOption[];
   canEdit: boolean;
+  highlightToken?: string;
   onClose: () => void;
   onUpdate: (cardId: string, data: CardUpdate) => Promise<void>;
   onToggleLabel: (
@@ -31,6 +32,7 @@ const KanbanCardModal: React.FC<Props> = ({
   boardLabels,
   persons,
   canEdit,
+  highlightToken,
   onClose,
   onUpdate,
   onToggleLabel,
@@ -56,6 +58,7 @@ const KanbanCardModal: React.FC<Props> = ({
 
   return (
     <TaskItemModal
+      highlightToken={highlightToken}
       value={{
         id: card.id,
         feature_instance_id: card.feature_instance_id,

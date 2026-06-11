@@ -1003,3 +1003,37 @@ def given_user_tab_configs_table(datatable):
 @then("the user_tab_configs table contains:")
 def then_user_tab_configs_table(datatable):
     _assert_db("user_tab_configs", datatable)
+
+
+@given("the search_index table contains:")
+def given_search_index_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                entity_id = rec.get("entity_id")
+                entity_type = rec.get("entity_type")
+                if not entity_id or not entity_type:
+                    continue
+                await conn.execute(
+                    """INSERT INTO search_index
+                           (entity_type, entity_id, content_text, content_summary, routing_path, status)
+                       VALUES($1, $2, $3, $4, $5, $6)
+                       ON CONFLICT (entity_type, entity_id) DO NOTHING""",
+                    entity_type,
+                    UUID(entity_id),
+                    rec.get("content_text", ""),
+                    rec.get("content_summary"),
+                    rec.get("routing_path", "/app"),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the search_index table contains:")
+def then_search_index_table(datatable):
+    _assert_db("search_index", datatable)

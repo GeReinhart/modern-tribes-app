@@ -4,10 +4,12 @@ import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTab
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { User } from 'lucide-react';
 
 import AddColumnForm from './AddColumnForm.tsx';
+import KanbanCardModal from './KanbanCardModal.tsx';
 import KanbanColumnComponent from './KanbanColumn.tsx';
 import { useKanban } from './hooks.ts';
 
@@ -45,10 +47,23 @@ const KanbanTab: React.FC<Props> = ({
     toggleCardLabel,
   } = useKanban(featureInstanceId);
 
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const urlTaskId = searchParams.get('taskId');
+  const urlHighlight = searchParams.get('q') ?? undefined;
+
   const [configuring, setConfiguring] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
   const [filterLabelId, setFilterLabelId] = useState<string | null>(null);
   const [filterPersonId, setFilterPersonId] = useState<string | null>(null);
+
+  const deepLinkedCard = urlTaskId ? board.cards.find((c) => c.id === urlTaskId) ?? null : null;
+
+  const closeDeepLinked = () => {
+    searchParams.delete('taskId');
+    searchParams.delete('q');
+    navigate({ search: searchParams.toString() }, { replace: true });
+  };
 
   const hasArchived = board.cards.some((c) => c.status === 'archived');
 
@@ -240,6 +255,20 @@ const KanbanTab: React.FC<Props> = ({
           </div>
         )}
       </div>
+
+      {deepLinkedCard && (
+        <KanbanCardModal
+          card={deepLinkedCard}
+          boardLabels={board.labels}
+          persons={persons}
+          canEdit={false}
+          highlightToken={urlHighlight}
+          onClose={closeDeepLinked}
+          onUpdate={updateCard}
+          onToggleLabel={toggleCardLabel}
+          onCreateLabel={createLabel}
+        />
+      )}
     </div>
   );
 };
