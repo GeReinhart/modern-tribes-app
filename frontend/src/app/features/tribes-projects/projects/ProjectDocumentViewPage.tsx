@@ -39,7 +39,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const searchHighlight = searchParams.get('q') ?? null;
   const { tribeId, projectId, projectDocumentId } = useParams<{
     tribeId: string;
@@ -217,8 +217,21 @@ const ProjectDocumentViewPageContent: React.FC = () => {
         label: t('documentPages.read'),
         onClick: () => setReaderMode(true),
       },
+      ...(searchHighlight
+        ? [
+            {
+              icon: 'x' as const,
+              label: t('search.removeHighlight'),
+              onClick: () => {
+                const next = new URLSearchParams(searchParams);
+                next.delete('q');
+                setSearchParams(next);
+              },
+            },
+          ]
+        : []),
     ],
-    [docMenuActions, t],
+    [docMenuActions, t, searchHighlight, searchParams, setSearchParams],
   );
 
   if (loading)

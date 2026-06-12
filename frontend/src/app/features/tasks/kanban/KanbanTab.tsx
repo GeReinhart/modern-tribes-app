@@ -92,8 +92,21 @@ const KanbanTab: React.FC<Props> = ({
             },
           ]
         : []),
+      ...(urlHighlight
+        ? [
+            {
+              icon: 'x' as const,
+              label: t('search.removeHighlight'),
+              onClick: () => {
+                const next = new URLSearchParams(searchParams);
+                next.delete('q');
+                navigate({ search: next.toString() }, { replace: true });
+              },
+            },
+          ]
+        : []),
     ],
-    [isManager, canEdit, hasArchived, configuring, showArchived, t],
+    [isManager, canEdit, hasArchived, configuring, showArchived, t, urlHighlight, searchParams, navigate],
   );
 
   useRegisterTabActions(tabActions);
