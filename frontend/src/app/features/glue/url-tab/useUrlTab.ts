@@ -24,6 +24,7 @@ export function useUrlTab(
   tabs: TabDefinition[],
   basePath: string,
   defaultTabKey?: string,
+  tabsReady?: boolean,
 ): UseUrlTabResult {
   const { tab } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
@@ -32,10 +33,11 @@ export function useUrlTab(
 
   useEffect(() => {
     if (!tab || tabs.length === 0 || !defaultTabKey) return;
+    if (tabsReady === false) return;
     if (!tabs.some((t) => t.key === tab)) {
       navigate(`${basePath}/${defaultTabKey}`, { replace: true });
     }
-  }, [tab, tabs, defaultTabKey, basePath, navigate]);
+  }, [tab, tabs, defaultTabKey, basePath, navigate, tabsReady]);
 
   const breadcrumbTabs = useMemo(
     () =>

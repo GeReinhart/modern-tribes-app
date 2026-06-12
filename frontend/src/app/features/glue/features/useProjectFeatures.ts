@@ -11,6 +11,7 @@ import {
 export function useProjectFeatures(projectId: string | null) {
   const [features, setFeatures] = useState<ProjectFeatureInstance[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetch = useCallback(() => {
@@ -21,7 +22,7 @@ export function useProjectFeatures(projectId: string | null) {
       .listByProject(projectId, 'active')
       .then((data) => setFeatures(data))
       .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
+      .finally(() => { setLoading(false); setLoaded(true); });
   }, [projectId]);
 
   useEffect(() => {
@@ -97,6 +98,7 @@ export function useProjectFeatures(projectId: string | null) {
   return {
     features,
     loading,
+    loaded,
     error,
     refetch: fetch,
     createFeature,

@@ -226,7 +226,7 @@ const ShowProjectPageContent: React.FC = () => {
     user?.id || '',
     { enabled: !!tribeId && !!user?.id },
   );
-  const { features, createFeature, updateFeature, archiveFeature } =
+  const { features, loaded: featuresLoaded, createFeature, updateFeature, archiveFeature } =
     useProjectFeatures(projectId || null);
   const { tribes: projectTribes } = useProjectTribesWithMembers(
     projectId || null,
@@ -324,6 +324,7 @@ const ShowProjectPageContent: React.FC = () => {
     visibleTabs,
     basePath,
     defaultTabKey,
+    featuresLoaded,
   );
 
   const breadcrumbs = useMemo(
