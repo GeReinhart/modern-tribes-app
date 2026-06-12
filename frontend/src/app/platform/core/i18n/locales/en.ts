@@ -1,4 +1,5 @@
 const en: Record<string, string> = {
+  'common.return': 'Return',
   'common.cancel': 'Cancel',
   'common.save': 'Save',
   'common.create': 'Create',

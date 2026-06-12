@@ -12,6 +12,7 @@ import { MarkdownContent } from '@/app/platform/core/about/MarkdownContent.tsx';
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const GITHUB_URL = 'https://github.com/GeReinhart/modern-tribes-app';
 
@@ -19,6 +20,7 @@ const AboutPageContent: React.FC = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const localize = useLocalizedText();
+  const navigate = useNavigate();
 
   const breadcrumbs = useMemo(
     () => [
@@ -26,6 +28,17 @@ const AboutPageContent: React.FC = () => {
       { label: t('about.title') },
     ],
     [t],
+  );
+
+  const menuActions = useMemo(
+    () => [
+      {
+        icon: 'arrow-left' as const,
+        label: t('common.return'),
+        onClick: () => navigate(-1),
+      },
+    ],
+    [t, navigate],
   );
 
   const githubLinkStyle: React.CSSProperties = {
@@ -44,7 +57,7 @@ const AboutPageContent: React.FC = () => {
   };
 
   return (
-    <AppLayout breadcrumbs={breadcrumbs}>
+    <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions}>
       <ThemedSection themeId="main_1">
         <div
           style={{

@@ -1,4 +1,5 @@
 const fr: Record<string, string> = {
+  'common.return': 'Retour',
   'common.cancel': 'Annuler',
   'common.save': 'Enregistrer',
   'common.create': 'Créer',

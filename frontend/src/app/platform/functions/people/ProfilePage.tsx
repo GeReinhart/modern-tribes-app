@@ -45,6 +45,14 @@ function ProfilePageContent() {
     { label: t('profile.title') },
   ];
 
+  const menuActions = [
+    {
+      icon: 'arrow-left' as const,
+      label: t('common.return'),
+      onClick: () => navigate(-1),
+    },
+  ];
+
   const handleLogout = async () => {
     await logout();
     navigate('/auth/login');
@@ -80,7 +88,7 @@ function ProfilePageContent() {
   });
 
   return (
-    <AppLayout breadcrumbs={breadcrumbs}>
+    <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions}>
       <div
         style={{
           maxWidth: '600px',
