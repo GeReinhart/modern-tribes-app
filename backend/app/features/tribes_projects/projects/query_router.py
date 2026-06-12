@@ -141,7 +141,7 @@ _QUERY_BY_TRIBE = """
     JOIN tribes_projects tp ON tp.tribe_id = t.id
     JOIN projects       proj ON proj.id = tp.project_id AND proj.status = 'active'
     WHERE u.id = $1 AND t.id = $2
-    ORDER BY tp.display_order ASC
+    ORDER BY display_order ASC
 """
 
 
