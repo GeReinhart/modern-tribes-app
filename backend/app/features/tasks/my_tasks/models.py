@@ -20,8 +20,10 @@ class MyTaskBase(BaseModel):
     feature_instance_id: str
     feature_instance_name: str
     project_id: str
+    project_url_param_id: Optional[str] = None
     project_name: str
     tribe_id: Optional[str] = None
+    tribe_url_param_id: Optional[str] = None
     tribe_name: Optional[str] = None
     label_ids: list[str] = []
     labels: list[MyTaskLabel] = []

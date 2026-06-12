@@ -25,8 +25,8 @@ interface Props {
 }
 
 function buildSourcePath(task: MyTask): string {
-  if (!task.tribe_id) return `/app/tribes`;
-  return `/app/tribes/${task.tribe_id}/projects/${task.project_id}/${task.feature_instance_id}`;
+  if (!task.tribe_url_param_id || !task.project_url_param_id) return `/app/tribes`;
+  return `/app/tribes/${task.tribe_url_param_id}/projects/${task.project_url_param_id}/${task.feature_instance_id}?taskId=${task.id}`;
 }
 
 const MyTasksCard: React.FC<Props> = ({

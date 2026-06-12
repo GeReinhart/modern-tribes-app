@@ -14,8 +14,10 @@ export interface MyTaskBase {
   feature_instance_id: string;
   feature_instance_name: string;
   project_id: string;
+  project_url_param_id: string | null;
   project_name: string;
   tribe_id: string | null;
+  tribe_url_param_id: string | null;
   tribe_name: string | null;
   label_ids: string[];
   labels: MyTaskLabel[];

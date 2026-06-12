@@ -8,7 +8,7 @@ import { apiService } from '@/app/platform/core/api/api.service.ts';
 
 class DocumentPageService {
   private base(projectId: string, projectDocumentId: string) {
-    return `/document-pages/projects/${projectId}/documents/${projectDocumentId}/pages`;
+    return `/platform/functions/documents/projects/${projectId}/documents/${projectDocumentId}/pages`;
   }
 
   list(projectId: string, projectDocumentId: string): Promise<DocumentPage[]> {
