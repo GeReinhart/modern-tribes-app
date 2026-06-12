@@ -62,12 +62,16 @@ done < <(grep -rn --include="*.py" \
     "$ROOT_DIR/backend/app/platform/" 2>/dev/null || true)
 
 # Frontend TypeScript: any import whose path contains /features/
+# Exception: platform/core/i18n/index.ts is the intentional aggregation point
+# that merges all feature locale files into the single i18n resource bundle.
 while IFS= read -r line; do
     echo "  FAIL [frontend] ${line#"$ROOT_DIR"/}"
     ERRORS=$((ERRORS + 1))
 done < <(grep -rn --include="*.ts" --include="*.tsx" \
     -E "from ['\"][^'\"]*features/" \
-    "$ROOT_DIR/frontend/src/platform/" 2>/dev/null || true)
+    "$ROOT_DIR/frontend/src/app/platform/" 2>/dev/null \
+    | grep -v "platform/core/i18n/index.ts" \
+    || true)
 
 # ────────────────────────────────────────────────────────────
 # RESULT
