@@ -46,7 +46,7 @@ const ShowTribePageContent: React.FC = () => {
   const { theme, setTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const searchHighlight = searchParams.get('q') ?? null;
   const { tribeId } = useParams<{ tribeId: string }>();
   const {
@@ -191,6 +191,19 @@ const ShowTribePageContent: React.FC = () => {
         label: t('tabConfig.configure'),
         onClick: () => setShowTabConfig(true),
       },
+      ...(searchHighlight
+        ? [
+            {
+              icon: 'x' as const,
+              label: t('search.removeHighlight'),
+              onClick: () => {
+                const next = new URLSearchParams(searchParams);
+                next.delete('q');
+                setSearchParams(next);
+              },
+            },
+          ]
+        : []),
       ...(isManager
         ? [
             {
@@ -222,7 +235,7 @@ const ShowTribePageContent: React.FC = () => {
           ]
         : []),
     ],
-    [isManager, authorization?.authorized, archiving, tribeId, t, navigate, setShowTabConfig, setShowThemePicker],
+    [isManager, authorization?.authorized, archiving, tribeId, t, navigate, setShowTabConfig, setShowThemePicker, searchHighlight, searchParams, setSearchParams],
   );
 
   const breadcrumbs = React.useMemo(

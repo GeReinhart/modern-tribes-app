@@ -76,13 +76,26 @@
     }
 }
 
-/* Restore heading and list styles inside the Jodit editor (Tailwind preflight resets them) */
+/* Restore browser defaults inside the Jodit editor (Tailwind preflight resets them) */
 .jodit-wysiwyg h1 { font-size: 2em; font-weight: 700; margin: 0.67em 0; }
 .jodit-wysiwyg h2 { font-size: 1.5em; font-weight: 700; margin: 0.83em 0; }
 .jodit-wysiwyg h3 { font-size: 1.17em; font-weight: 700; margin: 1em 0; }
 .jodit-wysiwyg h4 { font-size: 1em; font-weight: 700; margin: 1.33em 0; }
+.jodit-wysiwyg h5 { font-size: 0.83em; font-weight: 700; margin: 1.67em 0; }
+.jodit-wysiwyg h6 { font-size: 0.67em; font-weight: 700; margin: 2.33em 0; }
 .jodit-wysiwyg ul { list-style-type: disc; padding-left: 2em; margin: 1em 0; }
 .jodit-wysiwyg ol { list-style-type: decimal; padding-left: 2em; margin: 1em 0; }
+.jodit-wysiwyg a { color: #2563eb; text-decoration: underline; }
+.jodit-wysiwyg blockquote { border-left: 4px solid #d1d5db; padding-left: 1em; margin: 1em 0; color: #6b7280; font-style: italic; }
+.jodit-wysiwyg table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+.jodit-wysiwyg th, .jodit-wysiwyg td { border: 1px solid #d1d5db; padding: 0.5em 0.75em; }
+.jodit-wysiwyg th { background-color: #f9fafb; font-weight: 700; }
+.jodit-wysiwyg pre { background-color: #f3f4f6; border-radius: 4px; padding: 1em; margin: 1em 0; overflow-x: auto; }
+.jodit-wysiwyg code { background-color: #f3f4f6; border-radius: 3px; padding: 0.1em 0.3em; font-family: ui-monospace, monospace; font-size: 0.9em; }
+.jodit-wysiwyg pre code { background: none; padding: 0; }
+.jodit-wysiwyg hr { border: none; border-top: 1px solid #d1d5db; margin: 1.5em 0; }
+.jodit-wysiwyg sub { vertical-align: sub; font-size: 75%; }
+.jodit-wysiwyg sup { vertical-align: super; font-size: 75%; }
 
 /* Custom animations */
 @layer utilities {

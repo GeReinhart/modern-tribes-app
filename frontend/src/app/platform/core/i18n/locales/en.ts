@@ -333,6 +333,7 @@ const en: Record<string, string> = {
   'search.placeholder': 'Search...',
   'search.empty': 'No results found for your query.',
   'search.highlightBanner': 'Showing result for: {{token}}',
+  'search.removeHighlight': 'Highlight',
 
   'features.addFeature': 'Add Feature',
   'features.feature': 'Feature',

@@ -345,6 +345,7 @@ const fr: Record<string, string> = {
   'search.placeholder': 'Rechercher...',
   'search.empty': 'Aucun résultat trouvé pour votre recherche.',
   'search.highlightBanner': 'Résultat pour : {{token}}',
+  'search.removeHighlight': 'Surimpression',
 
   'features.addFeature': 'Ajouter une fonctionnalité',
   'features.feature': 'Fonctionnalité',

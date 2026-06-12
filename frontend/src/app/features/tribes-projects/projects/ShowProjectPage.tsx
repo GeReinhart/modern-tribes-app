@@ -205,7 +205,7 @@ const ShowProjectPageContent: React.FC = () => {
     tribeId: string;
     projectId: string;
   }>();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const { user } = useCurrentUserProfile();
   const { tribe } = useTribeWithPositions(tribeId || null);
@@ -354,6 +354,19 @@ const ShowProjectPageContent: React.FC = () => {
         label: t('tabConfig.configure'),
         onClick: () => setShowTabConfig(true),
       },
+      ...(searchHighlight
+        ? [
+            {
+              icon: 'x' as const,
+              label: t('search.removeHighlight'),
+              onClick: () => {
+                const next = new URLSearchParams(searchParams);
+                next.delete('q');
+                setSearchParams(next);
+              },
+            },
+          ]
+        : []),
       ...(isManager
         ? [
             {
@@ -381,7 +394,7 @@ const ShowProjectPageContent: React.FC = () => {
           ]
         : []),
     ],
-    [isManager, tribeId, projectId, t, navigate],
+    [isManager, tribeId, projectId, t, navigate, searchHighlight, searchParams, setSearchParams],
   );
 
   const tabActions = useMemo(
