@@ -38,6 +38,8 @@ import { ProjectEntry } from '@/app/features/tribes-projects/projects/projects.q
 
 import { BookmarkToggle } from '@/app/features/bookmarks/BookmarkToggle.tsx';
 import { buildBookmarkDescription } from '@/app/features/bookmarks/types.ts';
+import { InvertedMarkStyle } from '@/app/platform/functions/search/InvertedMarkStyle.tsx';
+import { highlightHtml } from '@/app/platform/functions/search/highlight.utils.ts';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -231,6 +233,7 @@ const ShowProjectPageContent: React.FC = () => {
   );
 
   const initialLabelId = searchParams.get('labelId') || null;
+  const searchHighlight = searchParams.get('q') ?? null;
   const [showAddFeature, setShowAddFeature] = useState(false);
   const [showTabConfig, setShowTabConfig] = useState(false);
   const [showProjectThemePicker, setShowProjectThemePicker] = useState(false);
@@ -587,10 +590,11 @@ const ShowProjectPageContent: React.FC = () => {
                     marginBottom: '16px',
                   }}
                   dangerouslySetInnerHTML={{
-                    __html: project.document_content_html,
+                    __html: searchHighlight ? highlightHtml(project.document_content_html, searchHighlight) : project.document_content_html,
                   }}
                 />
               )}
+              {searchHighlight && <InvertedMarkStyle />}
 
               {/* Attachments */}
               {project.document_attachments &&

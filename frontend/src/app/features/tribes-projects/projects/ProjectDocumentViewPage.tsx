@@ -22,9 +22,12 @@ import { publicationService } from '@/app/platform/functions/publications/public
 import { errorStyle } from '@/app/platform/core/layout/themes/theme.styles.tsx';
 import { ProjectEntry } from '@/app/features/tribes-projects/projects/projects.query.types.ts';
 
+import { InvertedMarkStyle } from '@/app/platform/functions/search/InvertedMarkStyle.tsx';
+import { highlightHtml } from '@/app/platform/functions/search/highlight.utils.ts';
+
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { BookmarkToggle } from '@/app/features/bookmarks/BookmarkToggle.tsx';
 import { buildBookmarkDescription } from '@/app/features/bookmarks/types.ts';
@@ -36,6 +39,8 @@ const ProjectDocumentViewPageContent: React.FC = () => {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const searchHighlight = searchParams.get('q') ?? null;
   const { tribeId, projectId, projectDocumentId } = useParams<{
     tribeId: string;
     projectId: string;
@@ -350,9 +355,10 @@ const ProjectDocumentViewPageContent: React.FC = () => {
               border: `1px solid ${theme.colors.border}`,
               marginBottom: '16px',
             }}
-            dangerouslySetInnerHTML={{ __html: doc.content_html }}
+            dangerouslySetInnerHTML={{ __html: searchHighlight ? highlightHtml(doc.content_html, searchHighlight) : doc.content_html }}
           />
         )}
+        {searchHighlight && <InvertedMarkStyle />}
         <DocumentAttachments attachments={doc.attachments ?? []} />
         <DocumentPagesSection
           tribeId={tribeId!}

@@ -24,10 +24,12 @@ import { ProjectEntry } from '@/app/features/tribes-projects/projects/projects.q
 
 import { BookmarkToggle } from '@/app/features/bookmarks/BookmarkToggle.tsx';
 import { buildBookmarkDescription } from '@/app/features/bookmarks/types.ts';
+import { InvertedMarkStyle } from '@/app/platform/functions/search/InvertedMarkStyle.tsx';
+import { highlightHtml } from '@/app/platform/functions/search/highlight.utils.ts';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import {
   Download,
@@ -44,6 +46,8 @@ const ShowTribePageContent: React.FC = () => {
   const { theme, setTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const searchHighlight = searchParams.get('q') ?? null;
   const { tribeId } = useParams<{ tribeId: string }>();
   const {
     data: authorization,
@@ -381,7 +385,7 @@ const ShowTribePageContent: React.FC = () => {
                     border: `1px solid ${theme.colors.border}`,
                   }}
                   dangerouslySetInnerHTML={{
-                    __html: tribe.document_content_html,
+                    __html: searchHighlight ? highlightHtml(tribe.document_content_html, searchHighlight) : tribe.document_content_html,
                   }}
                 />
               </ThemedSection>
@@ -390,6 +394,7 @@ const ShowTribePageContent: React.FC = () => {
                 {t('tribes.descriptionSection')}
               </ThemedText>
             )}
+            {searchHighlight && <InvertedMarkStyle />}
 
             {tribe.document_attachments &&
               tribe.document_attachments.length > 0 && (

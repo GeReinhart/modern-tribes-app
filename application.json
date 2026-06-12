@@ -302,13 +302,19 @@
             "- global full-text search across documents, publications, todo items and kanban cards",
             "- indexed search targeting any element in the database",
             "- labels applied to tasks are included in the indexed content",
-            "- navigating to a task result auto-opens the task modal with the search token highlighted"
+            "- navigating to any search result passes the query via ?q= in the URL",
+            "- on the target page, matched search terms are highlighted with inverted colors (text/background swapped)",
+            "- highlight.utils.ts: shared utility for tokenizing a query and injecting <mark> tags into HTML",
+            "- InvertedMarkStyle.tsx: shared component rendering inverted-color <mark> CSS using the current theme"
           ],
           "fr": [
             "- recherche plein texte globale sur les documents, publications, tâches todo et cartes kanban",
             "- recherche indexée ciblant n'importe quel élément de la base de données",
             "- les étiquettes appliquées aux tâches sont incluses dans le contenu indexé",
-            "- naviguer vers un résultat de tâche ouvre automatiquement la modale avec le token de recherche surligné"
+            "- naviguer vers n'importe quel résultat de recherche transmet la requête via ?q= dans l'URL",
+            "- sur la page cible, les termes recherchés sont mis en évidence avec des couleurs inversées (texte/fond inversés)",
+            "- highlight.utils.ts : utilitaire partagé pour tokeniser une requête et injecter des balises <mark> dans le HTML",
+            "- InvertedMarkStyle.tsx : composant partagé rendant le CSS <mark> en couleurs inversées avec le thème courant"
           ]
         },
         "backend": {
