@@ -9,6 +9,7 @@ export interface UserProjectEntry {
   via_represents: boolean;
   person_first_name: string | null;
   person_last_name: string | null;
+  display_order: number;
 }
 
 export interface ProjectEntry {

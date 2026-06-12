@@ -10,7 +10,7 @@ import { ThemeProvider, useTheme } from '@/app/platform/core/layout/themes/Theme
 import { TabConfigPopup } from '@/app/features/glue/tab-config/TabConfigPopup.tsx';
 import { useTabConfig } from '@/app/features/glue/tab-config/useTabConfig.ts';
 import { useCurrentUserProfile } from '@/app/platform/functions/people/users/useCurrentUserProfile.ts';
-import { useUserProjectsByTribe } from '@/app/features/tribes-projects/projects/useProjects.ts';
+import { useReorderProjectsInTribe, useUserProjectsByTribe } from '@/app/features/tribes-projects/projects/useProjects.ts';
 import { useUserTribes } from '@/app/features/tribes-projects/tribes/useTribes.ts';
 import { useTribeWithPositions, useTribeWithPositionsMutations } from '@/app/features/tribes-projects/tribes/useTribesWithPositions.ts';
 import { ThemePickerModal } from '@/app/platform/core/layout/themes/components/ThemePickerModal.tsx';
@@ -32,6 +32,8 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import {
+  ChevronDown,
+  ChevronUp,
   Download,
   File,
   FileText,
@@ -58,6 +60,7 @@ const ShowTribePageContent: React.FC = () => {
   const [archiving, setArchiving] = useState(false);
   const [showTabConfig, setShowTabConfig] = useState(false);
   const [showThemePicker, setShowThemePicker] = useState(false);
+  const [reorderingProjects, setReorderingProjects] = useState(false);
 
   // Single hook call to get all data
   const { tribe, loading, error, refetch: refetchTribe } = useTribeWithPositions(tribeId || null);
@@ -75,11 +78,12 @@ const ShowTribePageContent: React.FC = () => {
   const { tribes: userTribes } = useUserTribes(user?.id || '', {
     enabled: !!user?.id,
   });
-  const { projects: tribeProjects } = useUserProjectsByTribe(
+  const { projects: tribeProjects, refetch: refetchProjects } = useUserProjectsByTribe(
     tribeId || '',
     user?.id || '',
     { enabled: !!tribeId && !!user?.id },
   );
+  const { reorderProjects } = useReorderProjectsInTribe();
 
   const myPosition = useMemo(() => {
     if (!tribeId) return null;
@@ -184,6 +188,14 @@ const ShowTribePageContent: React.FC = () => {
     }
   };
 
+  const handleProjectMove = async (index: number, dir: 'up' | 'down') => {
+    const target = dir === 'up' ? index - 1 : index + 1;
+    const reordered = [...dedupedProjects];
+    [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
+    await reorderProjects(tribeId!, reordered.map((p) => p.project_id));
+    refetchProjects();
+  };
+
   const menuActions = useMemo(
     (): MenuAction[] => [
       {
@@ -213,6 +225,15 @@ const ShowTribePageContent: React.FC = () => {
             },
           ]
         : []),
+      ...(isManager && activeTab === 'projects'
+        ? [
+            {
+              icon: 'chevrons-up' as const,
+              label: t('projects.reorderProjects'),
+              onClick: () => setReorderingProjects((v) => !v),
+            },
+          ]
+        : []),
       ...(authorization?.authorized
         ? [
             {
@@ -235,7 +256,7 @@ const ShowTribePageContent: React.FC = () => {
           ]
         : []),
     ],
-    [isManager, authorization?.authorized, archiving, tribeId, t, navigate, setShowTabConfig, setShowThemePicker, searchHighlight, searchParams, setSearchParams],
+    [isManager, activeTab, authorization?.authorized, archiving, tribeId, t, navigate, setShowTabConfig, setShowThemePicker, searchHighlight, searchParams, setSearchParams],
   );
 
   const breadcrumbs = React.useMemo(
@@ -510,7 +531,7 @@ const ShowTribePageContent: React.FC = () => {
               <div
                 style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
               >
-                {dedupedProjects.map((project) => (
+                {dedupedProjects.map((project, index) => (
                   <div
                     key={project.project_id}
                     style={{
@@ -521,27 +542,66 @@ const ShowTribePageContent: React.FC = () => {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      cursor: 'pointer',
+                      cursor: reorderingProjects ? 'default' : 'pointer',
                       transition: 'all 0.2s ease',
                     }}
-                    onClick={() =>
-                      navigate(
-                        `/app/tribes/${tribeId}/projects/${project.project_url_param_id}`,
-                      )
-                    }
+                    onClick={() => {
+                      if (!reorderingProjects) {
+                        navigate(`/app/tribes/${tribeId}/projects/${project.project_url_param_id}`);
+                      }
+                    }}
                     onMouseEnter={(e) => {
+                      if (reorderingProjects) return;
                       e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
                       e.currentTarget.style.borderColor = theme.colors.primary;
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor =
-                        theme.colors.surface;
+                      if (reorderingProjects) return;
+                      e.currentTarget.style.backgroundColor = theme.colors.surface;
                       e.currentTarget.style.borderColor = theme.colors.border;
                     }}
                   >
                     <ThemedText variant="primary" size="small">
                       {project.project_name}
                     </ThemedText>
+                    {reorderingProjects && (
+                      <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
+                        <button
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: index === 0 ? 'default' : 'pointer',
+                            color: index === 0 ? theme.colors.border : theme.colors.secondary,
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '4px',
+                            opacity: index === 0 ? 0.4 : 1,
+                          }}
+                          disabled={index === 0}
+                          onClick={(e) => { e.stopPropagation(); handleProjectMove(index, 'up'); }}
+                          title={t('projects.moveUp')}
+                        >
+                          <ChevronUp size={16} />
+                        </button>
+                        <button
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: index === dedupedProjects.length - 1 ? 'default' : 'pointer',
+                            color: index === dedupedProjects.length - 1 ? theme.colors.border : theme.colors.secondary,
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '4px',
+                            opacity: index === dedupedProjects.length - 1 ? 0.4 : 1,
+                          }}
+                          disabled={index === dedupedProjects.length - 1}
+                          onClick={(e) => { e.stopPropagation(); handleProjectMove(index, 'down'); }}
+                          title={t('projects.moveDown')}
+                        >
+                          <ChevronDown size={16} />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

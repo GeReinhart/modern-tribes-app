@@ -55,16 +55,25 @@ def given_users_table(datatable):
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
                 uid = rec["id"]
                 email = rec.get("email", f"user_{uid[:8]}@test.com")
+                person_id = rec.get("person_id")
                 await conn.execute(
                     """INSERT INTO users(id, url_param_id, login, email, status)
                        VALUES($1, $2, $3, $4, $5)
-                       ON CONFLICT (id) DO NOTHING""",
+                       ON CONFLICT (id) DO UPDATE SET
+                           email = EXCLUDED.email,
+                           status = EXCLUDED.status""",
                     UUID(uid),
                     url_param_id_from_uuid(uid),
                     email,
                     email,
                     rec.get("status", "active"),
                 )
+                if person_id:
+                    await conn.execute(
+                        "UPDATE users SET person_id = $1::uuid WHERE id = $2::uuid",
+                        UUID(person_id),
+                        UUID(uid),
+                    )
         finally:
             await conn.close()
     _run(_insert())
@@ -446,12 +455,17 @@ def given_tribes_projects_table(datatable):
             headers = datatable[0]
             for row in datatable[1:]:
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                display_order = coerce("display_order", rec.get("display_order", "0"))
                 await conn.execute(
-                    """INSERT INTO tribes_projects(tribe_id, project_id, relation)
-                       VALUES($1, $2, $3) ON CONFLICT DO NOTHING""",
+                    """INSERT INTO tribes_projects(tribe_id, project_id, relation, display_order)
+                       VALUES($1, $2, $3, $4)
+                       ON CONFLICT (tribe_id, project_id) DO UPDATE SET
+                           relation = EXCLUDED.relation,
+                           display_order = EXCLUDED.display_order""",
                     UUID(rec["tribe_id"]),
                     UUID(rec["project_id"]),
                     rec.get("relation", "member"),
+                    display_order,
                 )
         finally:
             await conn.close()
@@ -954,6 +968,34 @@ def then_user_bookmarks_table(datatable):
 @then("the projects_features table contains:")
 def then_projects_features_table(datatable):
     _assert_db("projects_features", datatable)
+
+
+@then("the tribes_projects table contains:")
+def then_tribes_projects_table(datatable):
+    headers = datatable[0]
+    expected_rows = datatable[1:]
+
+    async def _query():
+        conn = await _conn()
+        try:
+            cols = ", ".join(f'"{h}"' for h in headers)
+            rows = await conn.fetch(
+                f"SELECT {cols} FROM tribes_projects ORDER BY tribe_id, project_id"
+            )
+            return [dict(r) for r in rows]
+        finally:
+            await conn.close()
+
+    actual_rows = _run(_query())
+    assert len(actual_rows) == len(expected_rows), (
+        f"tribes_projects: expected {len(expected_rows)} rows, got {len(actual_rows)}"
+    )
+    for i, (exp, act) in enumerate(zip(expected_rows, actual_rows)):
+        for j, col in enumerate(headers):
+            act_val = act[col]
+            act_str = str(act_val) if act_val is not None else ""
+            exp_val = exp[j] if isinstance(act_val, int) else expand_id(exp[j])
+            assert act_str == exp_val, f"tribes_projects[{i}].{col}: expected {exp_val!r}, got {act_str!r}"
 
 
 @given("the label_entities table contains:")

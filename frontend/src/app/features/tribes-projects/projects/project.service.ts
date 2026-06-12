@@ -93,6 +93,13 @@ class ProjectService {
       `${this.endpoint}/by/all/tribes-summary`,
     );
   }
+
+  async reorderProjectsInTribe(tribeId: string, orderedIds: string[]): Promise<void> {
+    return apiService.put<void>(
+      `${this.endpoint}/by/tribe/${tribeId}/order`,
+      { ordered_ids: orderedIds },
+    );
+  }
 }
 
 export const projectService = new ProjectService();

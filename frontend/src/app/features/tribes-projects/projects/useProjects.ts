@@ -86,6 +86,30 @@ export function useUserProjectsByTribe(
   return { projects, loading, error, refetch: fetch };
 }
 
+export function useReorderProjectsInTribe() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const reorderProjects = useCallback(
+    async (tribeId: string, orderedIds: string[]): Promise<boolean> => {
+      setLoading(true);
+      setError(null);
+      try {
+        await projectService.reorderProjectsInTribe(tribeId, orderedIds);
+        return true;
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Error');
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  return { reorderProjects, loading, error };
+}
+
 export function useProjectWithDocument(projectId: string | null) {
   const [project, setProject] = useState<ProjectWithDocumentResponse | null>(
     null,

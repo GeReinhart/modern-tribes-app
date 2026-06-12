@@ -203,6 +203,7 @@ CREATE TABLE IF NOT EXISTS tribes_projects (
     tribe_id UUID REFERENCES tribes(id) ON DELETE CASCADE NOT NULL,
     project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
     relation VARCHAR(20) NOT NULL CHECK (relation IN ('manager', 'member', 'guest')),
+    display_order INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (tribe_id, project_id)
 );
