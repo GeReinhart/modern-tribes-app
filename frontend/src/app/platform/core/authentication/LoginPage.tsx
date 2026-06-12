@@ -5,17 +5,24 @@ import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedT
 import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
+import { useAuth } from './AuthContext.tsx';
 import { authService } from './authentication-service.ts';
 
 export default function LoginPage() {
   const { t } = useTranslation();
+  const { isAuthenticated, isLoading } = useAuth();
   const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [sentEmail, setSentEmail] = useState('');
   const [error, setError] = useState('');
+
+  if (!isLoading && isAuthenticated) {
+    return <Navigate to="/app" replace />;
+  }
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -24,7 +31,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsSubmitting(true);
     setError('');
 
     try {
@@ -40,7 +47,7 @@ export default function LoginPage() {
         setError(t('validation.errorOccurred'));
       }
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -84,7 +91,7 @@ export default function LoginPage() {
             {!success && (
               <ThemedSubmitButton
                 variant="secondary"
-                isLoading={isLoading}
+                isLoading={isSubmitting}
                 loadingText={t('auth.sending')}
                 type="submit"
               >
