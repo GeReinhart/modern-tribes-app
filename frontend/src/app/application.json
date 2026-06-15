@@ -1,0 +1,723 @@
+{
+  "name": "Modern Tribes",
+  "description": {
+    "en": [
+      "- a backend and a frontend",
+      "- a platform with all the common tools needed for most applications",
+      "- a feature set that makes this application special",
+      "- the platform and the features have code in both backend and frontend",
+      "- the platform depends on external services and third-party libraries",
+      "- the features depend on external services, third-party libraries and the platform",
+      "- the platform does not depend on features"
+    ],
+    "fr": [
+      "- un backend et un frontend",
+      "- une plateforme avec tous les outils communs nécessaires à la plupart des applications",
+      "- un ensemble de fonctionnalités qui rend cette application unique",
+      "- la plateforme et les fonctionnalités ont du code dans le backend et le frontend",
+      "- la plateforme dépend de services externes et de bibliothèques tierces",
+      "- les fonctionnalités dépendent de services externes, de bibliothèques tierces et de la plateforme",
+      "- la plateforme ne dépend pas des fonctionnalités"
+    ]
+  },
+  "backend": {
+    "stack": [
+      "postgres for the database",
+      "python fastapi for the backend"
+    ]
+  },
+  "frontend": {
+    "stack": [
+      "typescript",
+      "react"
+    ]
+  },
+  "platform": {
+    "core": [
+      {
+        "package": "authentication",
+        "description": {
+          "en": [
+            "- authentication of the user",
+            "- magic link sent by email with a token",
+            "- token refresh and session management"
+          ],
+          "fr": [
+            "- authentification de l'utilisateur",
+            "- lien magique envoyé par email avec un token",
+            "- rafraîchissement du token et gestion des sessions"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "users",
+            "users_sessions"
+          ],
+          "path": [
+            "backend/app/platform/core/authentication/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/core/authentication/**"
+          ]
+        }
+      },
+      {
+        "package": "authorization",
+        "description": {
+          "en": [
+            "- role-based access control",
+            "- user -> roles -> permissions",
+            "- ownership and project-level access checks"
+          ],
+          "fr": [
+            "- contrôle d'accès basé sur les rôles",
+            "- utilisateur -> rôles -> permissions",
+            "- vérifications de propriété et d'accès au niveau du projet"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "users_roles",
+            "roles",
+            "roles_permissions"
+          ],
+          "path": [
+            "backend/app/platform/core/authorization/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/core/authorization/**"
+          ]
+        }
+      },
+      {
+        "package": "api",
+        "description": {
+          "en": [
+            "- HTTP client abstraction for all backend communication",
+            "- handles authentication headers, token refresh, and error handling"
+          ],
+          "fr": [
+            "- abstraction du client HTTP pour toutes les communications avec le backend",
+            "- gère les en-têtes d'authentification, le rafraîchissement des tokens et la gestion des erreurs"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/core/api/**"
+          ]
+        }
+      },
+      {
+        "package": "browser",
+        "description": {
+          "en": [
+            "- browser API utilities and local storage management",
+            "- token storage helpers"
+          ],
+          "fr": [
+            "- utilitaires d'API navigateur et gestion du stockage local",
+            "- helpers de stockage des tokens"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/core/browser/**"
+          ]
+        }
+      },
+      {
+        "package": "layout",
+        "description": {
+          "en": [
+            "- main UI layout components: header, footer, navigation, breadcrumbs",
+            "- themed component library: buttons, inputs, modals, tables, icons"
+          ],
+          "fr": [
+            "- composants principaux d'interface : en-tête, pied de page, navigation, fil d'Ariane",
+            "- bibliothèque de composants thémés : boutons, champs, modales, tableaux, icônes"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/core/layout/**"
+          ]
+        }
+      },
+      {
+        "package": "app-config",
+        "description": {
+          "en": [
+            "- global application configuration management",
+            "- stores and retrieves app-wide settings such as branding and feature flags"
+          ],
+          "fr": [
+            "- gestion de la configuration globale de l'application",
+            "- stocke et récupère les paramètres globaux comme l'identité visuelle et les flags de fonctionnalités"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "app_config"
+          ],
+          "path": [
+            "backend/app/platform/core/app_config/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/core/app-config/**"
+          ]
+        }
+      },
+      {
+        "package": "responsive",
+        "description": {
+          "en": [
+            "- responsive design utilities",
+            "- device detection (phone vs desktop) and zoom level management"
+          ],
+          "fr": [
+            "- utilitaires de design adaptatif",
+            "- détection de l'appareil (téléphone vs ordinateur) et gestion du niveau de zoom"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/core/responsive/**"
+          ]
+        }
+      },
+      {
+        "package": "i18n",
+        "description": {
+          "en": [
+            "- internationalization using react-i18next",
+            "- supports English and French",
+            "- language preference persisted on the user record"
+          ],
+          "fr": [
+            "- internationalisation avec react-i18next",
+            "- supporte l'anglais et le français",
+            "- préférence de langue persistée sur le profil utilisateur"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "users.language"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/core/i18n/**"
+          ]
+        }
+      }
+    ],
+    "functions": [
+      {
+        "package": "labels",
+        "description": {
+          "en": [
+            "- system-wide label management",
+            "- labels can be applied to any entity (documents, tasks, etc.)"
+          ],
+          "fr": [
+            "- gestion des étiquettes à l'échelle du système",
+            "- les étiquettes peuvent être appliquées à n'importe quelle entité (documents, tâches, etc.)"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "labels"
+          ],
+          "path": [
+            "backend/app/platform/functions/labels/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/functions/labels/**"
+          ]
+        }
+      },
+      {
+        "package": "monitoring",
+        "description": {
+          "en": [
+            "- tracks recent changes and document revisions across the system",
+            "- provides audit and history views"
+          ],
+          "fr": [
+            "- suit les modifications récentes et les révisions de documents dans le système",
+            "- fournit des vues d'audit et d'historique"
+          ]
+        },
+        "backend": {
+          "path": [
+            "backend/app/platform/functions/monitoring/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/functions/monitoring/**"
+          ]
+        }
+      },
+      {
+        "package": "publications",
+        "description": {
+          "en": [
+            "- document publishing workflow",
+            "- allows authenticated users to publish or unpublish project documents",
+            "- provides public access to published documents"
+          ],
+          "fr": [
+            "- flux de publication de documents",
+            "- permet aux utilisateurs authentifiés de publier ou dépublier des documents de projet",
+            "- fournit un accès public aux documents publiés"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "publications"
+          ],
+          "path": [
+            "backend/app/platform/functions/publications/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/functions/publications/**"
+          ]
+        }
+      },
+      {
+        "package": "search",
+        "description": {
+          "en": [
+            "- global full-text search across documents, publications and other entities",
+            "- indexed search targeting any element in the database"
+          ],
+          "fr": [
+            "- recherche plein texte globale sur les documents, publications et autres entités",
+            "- recherche indexée ciblant n'importe quel élément de la base de données"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "search_index"
+          ],
+          "path": [
+            "backend/app/platform/functions/search/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/functions/search/**"
+          ]
+        }
+      },
+      {
+        "package": "people",
+        "description": {
+          "en": [
+            "- manages users, persons and their relationships",
+            "- users: authentication accounts with roles and permissions",
+            "- persons: physical person records associated with tribes",
+            "- represents: links between users and persons"
+          ],
+          "fr": [
+            "- gère les utilisateurs, les personnes et leurs relations",
+            "- utilisateurs : comptes d'authentification avec rôles et permissions",
+            "- personnes : enregistrements de personnes physiques associés aux tribus",
+            "- représente : liens entre utilisateurs et personnes"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "users",
+            "persons",
+            "represents"
+          ],
+          "path": [
+            "backend/app/platform/functions/people/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/functions/people/**"
+          ]
+        }
+      },
+      {
+        "package": "documents",
+        "description": {
+          "en": [
+            "- rich document management with pages, content editing, attachments and revisions",
+            "- supports WYSIWYG editing"
+          ],
+          "fr": [
+            "- gestion de documents enrichis avec pages, édition de contenu, pièces jointes et révisions",
+            "- supporte l'édition WYSIWYG"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "documents",
+            "document_pages",
+            "document_attachments"
+          ],
+          "path": [
+            "backend/app/platform/functions/documents/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/functions/documents/**"
+          ]
+        }
+      }
+    ],
+    "tools": [
+      {
+        "package": "notifications",
+        "description": {
+          "en": [
+            "- in-app notification system",
+            "- sending, status tracking and polling for new notifications",
+            "- admin interface for manual notification creation"
+          ],
+          "fr": [
+            "- système de notifications dans l'application",
+            "- envoi, suivi du statut et interrogation pour les nouvelles notifications",
+            "- interface d'administration pour la création manuelle de notifications"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "notifications"
+          ],
+          "path": [
+            "backend/app/platform/tools/notifications/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/tools/notifications/**"
+          ]
+        }
+      },
+      {
+        "package": "pwa",
+        "description": {
+          "en": [
+            "- Progressive Web App support",
+            "- handles installation prompts, standalone mode detection and iOS-specific behavior"
+          ],
+          "fr": [
+            "- support des Progressive Web Apps",
+            "- gère les invitations d'installation, la détection du mode autonome et les comportements spécifiques iOS"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/tools/pwa/**"
+          ]
+        }
+      },
+      {
+        "package": "revisions",
+        "description": {
+          "en": [
+            "- document revision history viewer with timeline interface",
+            "- browse historical versions of documents with date-based navigation"
+          ],
+          "fr": [
+            "- visualiseur d'historique des révisions de documents avec interface chronologique",
+            "- parcourir les versions historiques des documents avec une navigation par date"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/tools/revisions/**"
+          ]
+        }
+      },
+      {
+        "package": "mail",
+        "description": {
+          "en": [
+            "- email queuing, scheduling and management",
+            "- admin interface to view and filter sent or queued emails"
+          ],
+          "fr": [
+            "- mise en file d'attente, planification et gestion des emails",
+            "- interface d'administration pour visualiser et filtrer les emails envoyés ou en attente"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "mails",
+            "mail_recipients"
+          ],
+          "path": [
+            "backend/app/platform/tools/mail/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/platform/tools/mail/**"
+          ]
+        }
+      }
+    ]
+  },
+  "features": {
+    "description": {
+      "en": [
+        "- each feature is a self-contained package under features/ on both backend and frontend",
+        "- features follow hexagonal architecture: they depend on the platform, not the reverse",
+        "- a project can have multiple instances of the same feature, each accessible via a tab"
+      ],
+      "fr": [
+        "- chaque fonctionnalité est un package autonome sous features/ sur le backend et le frontend",
+        "- les fonctionnalités suivent l'architecture hexagonale : elles dépendent de la plateforme, pas l'inverse",
+        "- un projet peut avoir plusieurs instances de la même fonctionnalité, chacune accessible via un onglet"
+      ]
+    },
+    "features": [
+      {
+        "package": "bookmarks",
+        "description": {
+          "en": [
+            "- user bookmarks for frequently accessed pages",
+            "- supports colors, ordering and editing"
+          ],
+          "fr": [
+            "- signets utilisateur pour les pages fréquemment consultées",
+            "- supporte les couleurs, le tri et l'édition"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "user_bookmarks"
+          ],
+          "path": [
+            "backend/app/features/bookmarks/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/features/bookmarks/**"
+          ]
+        }
+      },
+      {
+        "package": "tasks",
+        "description": {
+          "en": [
+            "- task management system with two presentation modes: todo list and kanban",
+            "- supports labels, person assignments, sizing, due dates and rich document content",
+            "- common types and components shared between todo_list and kanban sub-packages"
+          ],
+          "fr": [
+            "- système de gestion des tâches avec deux modes : liste de tâches et kanban",
+            "- supporte les étiquettes, les assignations, la taille, les échéances et le contenu de documents riches",
+            "- types et composants communs partagés entre les sous-packages todo_list et kanban"
+          ]
+        },
+        "backend": {
+          "path": [
+            "backend/app/features/tasks/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/features/tasks/**"
+          ]
+        },
+        "sub_packages": [
+          {
+            "package": "todo_list",
+            "description": {
+              "en": [
+                "- linear task list interface with filtering"
+              ],
+              "fr": [
+                "- interface de liste de tâches linéaire avec filtrage"
+              ]
+            },
+            "backend": {
+              "schema": [
+                "todo_items",
+                "todo_labels"
+              ],
+              "path": [
+                "backend/app/features/tasks/todo_list/**"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/tasks/todo_list/**"
+              ]
+            }
+          },
+          {
+            "package": "kanban",
+            "description": {
+              "en": [
+                "- kanban board with drag-and-drop columns and cards",
+                "- supports card movement, reordering and column management"
+              ],
+              "fr": [
+                "- tableau kanban avec colonnes et cartes déplaçables par glisser-déposer",
+                "- supporte le déplacement de cartes, le réordonnancement et la gestion des colonnes"
+              ]
+            },
+            "backend": {
+              "schema": [
+                "kanban_columns",
+                "kanban_cards",
+                "kanban_labels"
+              ],
+              "path": [
+                "backend/app/features/tasks/kanban/**"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/tasks/kanban/**"
+              ]
+            }
+          },
+          {
+            "package": "my_tasks",
+            "description": {
+              "en": [
+                "- aggregates tasks assigned to the current user across all projects",
+                "- cross-project view combining kanban cards and todo items",
+                "- filterable by tribe, project, person and label",
+                "- exposed at GET /features/my-tasks"
+              ],
+              "fr": [
+                "- agrège les tâches assignées à l'utilisateur courant sur tous les projets",
+                "- vue transversale combinant les cartes kanban et les éléments todo",
+                "- filtrable par tribu, projet, personne et étiquette",
+                "- exposé sur GET /features/my-tasks"
+              ]
+            },
+            "backend": {
+              "path": [
+                "backend/app/features/tasks/my_tasks/**"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/tasks/my_tasks/**"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "package": "tribes-projects",
+        "description": {
+          "en": [
+            "- core organizational structure of the application",
+            "- tribes: top-level groups with members and positions",
+            "- projects: belong to a tribe, host feature instances and documents",
+            "- positions: named roles within a tribe",
+            "- feature instances: pluggable features attached to a project, each rendered as a tab",
+            "- theme_code: optional theme override on tribes, projects, and feature instances"
+          ],
+          "fr": [
+            "- structure organisationnelle principale de l'application",
+            "- tribus : groupes de premier niveau avec membres et postes",
+            "- projets : appartiennent à une tribu, hébergent des instances de fonctionnalités et des documents",
+            "- postes : rôles nommés au sein d'une tribu",
+            "- instances de fonctionnalités : fonctionnalités modulaires attachées à un projet, chacune affichée sous forme d'onglet",
+            "- theme_code : thème optionnel sur les tribus, projets et instances de fonctionnalités"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "tribes",
+            "projects",
+            "positions",
+            "feature_instances",
+            "project_documents"
+          ],
+          "path": [
+            "backend/app/features/tribes_projects/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/features/tribes-projects/**"
+          ]
+        }
+      },
+      {
+        "package": "glue",
+        "description": {
+          "en": [
+            "- wiring layer between the platform and features",
+            "- feature-instances: manage feature instances attached to a project (projects_features table)",
+            "- tab-config: per-user tab visibility and ordering configuration"
+          ],
+          "fr": [
+            "- couche de câblage entre la plateforme et les fonctionnalités",
+            "- feature-instances : gère les instances de fonctionnalités attachées à un projet (table projects_features)",
+            "- tab-config : configuration de la visibilité et de l'ordre des onglets par utilisateur"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "projects_features",
+            "user_tab_configs"
+          ],
+          "path": [
+            "backend/app/features/glue/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/features/glue/**"
+          ]
+        }
+      },
+      {
+        "package": "dashboard",
+        "description": {
+          "en": [
+            "- personalized user dashboard",
+            "- composes my_tasks, tribes and bookmarks tabs",
+            "- shows tribes membership and bookmarks"
+          ],
+          "fr": [
+            "- tableau de bord personnalisé",
+            "- compose les onglets my_tasks, tribus et signets",
+            "- affiche l'appartenance aux tribus et les signets"
+          ]
+        },
+        "backend": {
+          "path": [
+            "backend/app/features/dashboard/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/features/dashboard/**"
+          ]
+        }
+      }
+    ]
+  },
+  "dependencies": {
+    "forbidden": "platform -> features"
+  }
+}

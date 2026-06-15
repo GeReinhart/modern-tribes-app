@@ -8,47 +8,43 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-import features  # noqa: F401 — triggers feature self-registration
-from app.core.config import settings
-from app.core.database import close_postgres_connection, connect_to_postgres
-from app.routers.app import document_pages
-from app.routers.app import notifications as app_notifications
-from app.routers.app import project_documents, project_features, project_with_document
-from app.routers.app import publications as app_publications
-from app.routers.app import tribes_with_positions, user_bookmarks, user_tab_configs
-from app.platform.authentication.router import router as authentification_router
-from app.platform.authorization.router import router as authorization_router
-from app.routers.crud import (
-    app_config,
-    document_entities,
-    documents,
-    label_entities,
-    labels,
-    mails,
-    permissions,
-    persons,
-    positions,
-    projects,
-    represents,
-    roles,
-)
-from app.routers.crud import tribes as crud_tribes
-from app.routers.crud import (
-    users,
-)
-from app.routers.public import publications as public_publications
-from app.routers.query import app_config as query_app_config
-from app.routers.query import features as query_features
-from app.routers.query import labels as query_labels
-from app.routers.query import mails as query_mails
-from app.routers.query import monitoring as query_monitoring
-from app.routers.query import my_tasks as query_my_tasks
-from app.routers.query import projects as query_projects
-from app.platform.search import router as search_platform_router
-from app.routers.query import tribes as query_tribes
-from app.routers.query import users as query_users
-from app.routers.uploads import uploads
-from app.services.mail_scheduler import mail_scheduler
+import app.features  # noqa: F401 — triggers feature self-registration
+from app.platform.core.config import settings
+from app.platform.core.database import close_postgres_connection, connect_to_postgres
+from app.platform.core.authentication.router import router as authentification_router
+from app.platform.core.authorization.router import router as authorization_router
+from app.platform.core.authorization.roles import router as roles
+from app.platform.core.authorization import permissions_router as permissions
+from app.platform.core.app_config import router as app_config
+from app.platform.core.app_config import query_router as query_app_config
+from app.platform.core.uploads import router as uploads
+from app.platform.functions.documents import router as documents
+from app.platform.functions.documents import page_router as document_pages
+from app.platform.functions.labels import router as labels
+from app.platform.functions.labels import query_router as query_labels
+from app.platform.functions.monitoring import router as query_monitoring
+from app.platform.functions.people.persons import router as persons
+from app.platform.functions.people.users import router as users
+from app.platform.functions.people.users import query_router as query_users
+from app.platform.functions.people.represents import router as represents
+from app.platform.functions.publications import router as app_publications
+from app.platform.functions.publications import public_router as public_publications
+from app.platform.functions.search import router as search_platform_router
+from app.platform.tools.mail import query_router as mail_router
+from app.platform.tools.mail.scheduler import mail_scheduler
+from app.platform.tools.notifications import router as app_notifications
+from app.features.bookmarks import router as user_bookmarks
+from app.features.tasks.my_tasks import router as my_tasks_router
+from app.features.glue.features import router as project_features
+from app.features.glue.tab_config import router as user_tab_configs
+from app.features.tribes_projects.positions import router as positions
+from app.features.tribes_projects.projects import router as projects
+from app.features.tribes_projects.projects import app_router as project_with_document
+from app.features.tribes_projects.projects import document_router as project_documents
+from app.features.tribes_projects.projects import query_router as query_projects
+from app.features.tribes_projects.tribes import router as crud_tribes
+from app.features.tribes_projects.tribes import app_router as tribes_with_positions
+from app.features.tribes_projects.tribes import query_router as query_tribes
 
 # Configure logging
 logging.basicConfig(
@@ -118,53 +114,59 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 
 
 # Include routers
-app.include_router(users.router, prefix="/api/crud")
-app.include_router(roles.router, prefix="/api/crud")
-app.include_router(permissions.router, prefix="/api/crud")
-app.include_router(persons.router, prefix="/api/crud")
-app.include_router(crud_tribes.router, prefix="/api/crud")
-app.include_router(positions.router, prefix="/api/crud")
-app.include_router(represents.router, prefix="/api/crud")
-app.include_router(mails.router, prefix="/api/crud")
-app.include_router(labels.router, prefix="/api/crud")
-app.include_router(label_entities.router, prefix="/api/crud")
-app.include_router(projects.router, prefix="/api/crud")
-app.include_router(documents.router, prefix="/api/crud")
-app.include_router(document_entities.router, prefix="/api/crud")
-app.include_router(app_config.router, prefix="/api/crud")
-app.include_router(uploads.router)
 
-app.include_router(authentification_router, prefix="/api", tags=["auth"])
-app.include_router(authorization_router, prefix="/api", tags=["auth"])
+# Platform — Core
+app.include_router(authentification_router, prefix="/api/platform/core")
+app.include_router(authorization_router, prefix="/api/platform/core")
+app.include_router(roles.router, prefix="/api/platform/core/authorization")
+app.include_router(permissions.router, prefix="/api/platform/core/authorization")
+app.include_router(app_config.router, prefix="/api/platform/core")
+app.include_router(query_app_config.router, prefix="/api/platform/core")
+app.include_router(uploads.router, prefix="/api/platform/core")
 
-app.include_router(tribes_with_positions.router, prefix="/api")
-app.include_router(project_with_document.router, prefix="/api")
-app.include_router(project_features.router, prefix="/api")
-app.include_router(project_documents.router, prefix="/api")
-app.include_router(document_pages.router, prefix="/api")
-app.include_router(app_publications.router, prefix="/api")
-app.include_router(user_tab_configs.router, prefix="/api")
-app.include_router(user_bookmarks.router, prefix="/api")
-app.include_router(app_notifications.router, prefix="/api")
-app.include_router(public_publications.router, prefix="/api")
+# Platform — Functions
+app.include_router(users.router, prefix="/api/platform/functions/people")
+app.include_router(query_users.router, prefix="/api/platform/functions/people")
+app.include_router(persons.router, prefix="/api/platform/functions/people")
+app.include_router(represents.router, prefix="/api/platform/functions/people")
+app.include_router(labels.router, prefix="/api/platform/functions")
+app.include_router(query_labels.router, prefix="/api/platform/functions")
+app.include_router(documents.router, prefix="/api/platform/functions")
+app.include_router(document_pages.router, prefix="/api/platform/functions/documents")
+app.include_router(query_monitoring.router, prefix="/api/platform/functions")
+app.include_router(app_publications.router, prefix="/api/platform/functions")
+app.include_router(public_publications.router, prefix="/api/platform/functions")
+app.include_router(search_platform_router.router, prefix="/api/platform/functions")
 
+# Platform — Tools
+app.include_router(mail_router.router, prefix="/api/platform/tools")
+app.include_router(app_notifications.router, prefix="/api/platform/tools")
 
-app.include_router(query_tribes.router, prefix="/api/query")
-app.include_router(query_users.router, prefix="/api/query")
-app.include_router(query_monitoring.router, prefix="/api/query")
-app.include_router(query_mails.router, prefix="/api/query")
-app.include_router(query_projects.router, prefix="/api/query")
-app.include_router(search_platform_router.router, prefix="/api/query")
-app.include_router(query_app_config.router, prefix="/api/query")
-app.include_router(query_features.router, prefix="/api/query")
-app.include_router(query_my_tasks.router, prefix="/api/query")
-app.include_router(query_labels.router, prefix="/api/query")
+# Features — Bookmarks
+app.include_router(user_bookmarks.router, prefix="/api/features")
 
-# Feature routers (registered via features package self-registration)
-from features.registry import get_all_routers as _get_feature_routers
+# Features — My Tasks
+app.include_router(my_tasks_router.router, prefix="/api/features")
+
+# Features — Glue
+app.include_router(project_features.router, prefix="/api/features/glue")
+app.include_router(user_tab_configs.router, prefix="/api/features/glue")
+
+# Features — Tribes-Projects
+app.include_router(crud_tribes.router, prefix="/api/features/tribes-projects")
+app.include_router(tribes_with_positions.router, prefix="/api/features/tribes-projects")
+app.include_router(query_tribes.router, prefix="/api/features/tribes-projects")
+app.include_router(positions.router, prefix="/api/features/tribes-projects")
+app.include_router(projects.router, prefix="/api/features/tribes-projects")
+app.include_router(project_with_document.router, prefix="/api/features/tribes-projects")
+app.include_router(project_documents.router, prefix="/api/features/tribes-projects")
+app.include_router(query_projects.router, prefix="/api/features/tribes-projects")
+
+# Features — Tasks (registered via self-registration)
+from app.features.registry import get_all_routers as _get_feature_routers
 
 for _feature_router in _get_feature_routers():
-    app.include_router(_feature_router, prefix="/api/features")
+    app.include_router(_feature_router, prefix="/api/features/tasks")
 
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")

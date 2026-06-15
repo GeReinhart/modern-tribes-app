@@ -284,12 +284,13 @@ class DatabaseInitializer:
         return ids
 
     async def create_project_documents(
-        self, project_ids: Dict[str, str], label_ids: Dict[str, str]
+        self, project_ids: Dict[str, str], label_ids: Dict[str, str], user_ids: Dict[str, str]
     ) -> Tuple[Dict[str, str], Dict[str, str]]:
         rows = self.load_csv("project_documents.csv")
         pd_ids: Dict[str, str] = {}
         doc_ids: Dict[str, str] = {}
         label_count = 0
+        admin_id = user_ids.get("admin")
         async with self.pool.acquire() as conn:
             for row in rows:
                 project = row["project"]
@@ -307,8 +308,8 @@ class DatabaseInitializer:
                 )
                 doc_id = str(doc_r["id"])
                 pd_r = await conn.fetchrow(
-                    "INSERT INTO projects_documents (url_param_id, project_id, document_id, title) VALUES ($1, $2, $3, $4) RETURNING id",
-                    _generate_url_param_id(), project_ids[project], doc_id, title,
+                    "INSERT INTO projects_documents (url_param_id, project_id, document_id, title, created_by, updated_by) VALUES ($1, $2, $3, $4, $5, $5) RETURNING id",
+                    _generate_url_param_id(), project_ids[project], doc_id, title, admin_id,
                 )
                 pd_id = str(pd_r["id"])
                 key = f"{project}|{title}"
@@ -345,9 +346,10 @@ class DatabaseInitializer:
         print(f"✓ Created {count} publications")
         return count
 
-    async def create_document_pages(self, pd_ids: Dict[str, str]) -> int:
+    async def create_document_pages(self, pd_ids: Dict[str, str], user_ids: Dict[str, str]) -> int:
         rows = self.load_csv("document_pages.csv")
         count = 0
+        admin_id = user_ids.get("admin")
         async with self.pool.acquire() as conn:
             for row in rows:
                 key = f"{row['project']}|{row['document_title']}"
@@ -360,11 +362,11 @@ class DatabaseInitializer:
                 await conn.execute(
                     """INSERT INTO document_pages
                        (url_param_id, project_document_id, title, content_html,
-                        content_summary, content_text, order_index)
-                       VALUES ($1, $2, $3, $4, $5, $6, $7)""",
+                        content_summary, content_text, order_index, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8)""",
                     _generate_url_param_id(), pd_ids[key],
                     row["title"], content_html, summary, content_text,
-                    int(row.get("order_index") or 0),
+                    int(row.get("order_index") or 0), admin_id,
                 )
                 count += 1
         print(f"✓ Created {count} document pages")
@@ -390,9 +392,10 @@ class DatabaseInitializer:
         print(f"✓ Created {len(ids)} project features")
         return ids
 
-    async def create_todo_items(self, feature_ids: Dict[str, str]) -> int:
+    async def create_todo_items(self, feature_ids: Dict[str, str], user_ids: Dict[str, str]) -> int:
         rows = self.load_csv("todo_items.csv")
         count = 0
+        admin_id = user_ids.get("admin")
         async with self.pool.acquire() as conn:
             for row in rows:
                 key = f"{row['project']}|{row['feature_name']}"
@@ -400,10 +403,10 @@ class DatabaseInitializer:
                     print(f"✗ Unknown feature '{key}' in todo_items.csv")
                     sys.exit(1)
                 await conn.execute(
-                    """INSERT INTO todo_items (feature_instance_id, title, todo_status, position)
-                       VALUES ($1, $2, $3, $4)""",
+                    """INSERT INTO todo_items (feature_instance_id, title, todo_status, position, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $5, $5)""",
                     feature_ids[key], row["title"],
-                    row.get("todo_status") or "todo", int(row.get("position") or 0),
+                    row.get("todo_status") or "todo", int(row.get("position") or 0), admin_id,
                 )
                 count += 1
         print(f"✓ Created {count} todo items")
@@ -524,11 +527,11 @@ class DatabaseInitializer:
             await self.create_positions(tribe_ids, person_ids)
             tribes_projects_count = await self.create_tribes_projects(tribe_ids, project_ids)
             label_ids = await self.create_labels()
-            pd_ids, doc_ids = await self.create_project_documents(project_ids, label_ids)
+            pd_ids, doc_ids = await self.create_project_documents(project_ids, label_ids, user_ids)
             publications_count = await self.create_publications(pd_ids, doc_ids)
-            pages_count = await self.create_document_pages(pd_ids)
+            pages_count = await self.create_document_pages(pd_ids, user_ids)
             feature_ids = await self.create_projects_features(project_ids)
-            todo_count = await self.create_todo_items(feature_ids)
+            todo_count = await self.create_todo_items(feature_ids, user_ids)
             mail_ids = await self.create_mails()
             mails_to_count = await self.create_mails_to(mail_ids, user_ids)
             represents_count = await self.create_represents(person_ids, user_ids)

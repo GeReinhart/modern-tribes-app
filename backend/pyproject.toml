@@ -21,3 +21,17 @@ skip = ["venv", ".venv", "__pycache__"]
 
 [tool.autoflake]
 exclude = ["venv", ".venv"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore::pydantic.warnings.PydanticDeprecatedSince212",
+    "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning",
+    "ignore:'maxsplit' is passed as positional argument:DeprecationWarning",
+    "ignore:'asyncio.get_event_loop_policy' is deprecated:DeprecationWarning",
+]
+markers = [
+    "wip: work in progress — scenarios actively being developed",
+    "error_case: scenarios that verify error and rejection behaviour",
+]

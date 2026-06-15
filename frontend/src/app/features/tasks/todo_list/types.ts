@@ -1,0 +1,44 @@
+export type { PersonOption } from '@/app/features/tasks/types.ts';
+export { FIBONACCI, fibColor, urgencyColor } from '@/app/features/tasks/types.ts';
+
+export type { FeatureLabel as TodoLabel, FeatureLabelCreate as TodoLabelCreate, FeatureLabelUpdate as TodoLabelUpdate } from '@/app/features/tasks/types.ts';
+
+export interface TodoItem {
+  id: string;
+  feature_instance_id: string;
+  title: string;
+  status: 'pending' | 'active' | 'archived';
+  todo_status: 'todo' | 'done';
+  document_id: string | null;
+  document_content_html: string | null;
+  position: number;
+  size: number | null;
+  due_date: string | null;
+  assigned_person_id: string | null;
+  assigned_person_name: string | null;
+  label_ids: string[];
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+  updated_by: string | null;
+}
+
+export interface TodoItemCreate {
+  feature_instance_id: string;
+  title: string;
+  position?: number;
+}
+
+export interface TodoItemUpdate {
+  title?: string;
+  status?: string;
+  todo_status?: string;
+  position?: number;
+  document_content_html?: string;
+  size?: number | null;
+  clear_size?: boolean;
+  assigned_person_id?: string | null;
+  clear_assignee?: boolean;
+  due_date?: string | null;
+  clear_due_date?: boolean;
+}

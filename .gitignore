@@ -48,3 +48,5 @@ build/
 /backend/.env.prod
 /.env.prod
 /target/
+/.claude/worktrees/agent-*/
+/backend/.coverage*

@@ -1,0 +1,80 @@
+Feature: Create a kanban card
+  As a project member
+  I want to create a card in the kanban board
+  So that a task is tracked
+
+  Background:
+    Given the users table contains:
+      | id   | email          | status |
+      | 0001 | admin@test.com | active |
+      | 0002 | user@test.com  | active |
+    And the roles table contains:
+      | name          | status |
+      | administrator | active |
+      | viewer        | active |
+    And the role_permissions table contains:
+      | role          | permission                 |
+      | administrator | admin                      |
+      | viewer        | can_access_attached_tribes |
+    And the user_roles table contains:
+      | user           | role          |
+      | admin@test.com | administrator |
+      | user@test.com  | viewer        |
+    And the projects table contains:
+      | id   | name    | status |
+      | 0100 | Project | active |
+    And the projects_features table contains:
+      | id   | project_id | name  | feature_type | status |
+      | 0100 | 0100       | Board | kanban       | active |
+    And the kanban_columns table contains:
+      | id   | feature_instance_id | name  | position | status |
+      | 0200 | 0100                | To Do | 1        | active |
+
+  Scenario: POST /kanban/cards as admin — the card is created
+    Given I am authenticated as an administrator: user.id 0001
+    And the kanban_cards table contains:
+      | id | feature_instance_id | column_id | title | position | status |
+    When I POST /api/features/tasks/kanban/cards with body:
+      """
+      {
+        "feature_instance_id": "0100",
+        "column_id": "0200",
+        "title": "Fix login bug"
+      }
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "feature_instance_id": "0100",
+        "column_id": "0200",
+        "title": "Fix login bug",
+        "position": 0,
+        "status": "active",
+        "assigned_person_id": null,
+        "document_content_html": null,
+        "size": null,
+        "due_date": null,
+        "label_ids": []
+      }
+      """
+    And the kanban_cards table contains:
+      | feature_instance_id | column_id | title         | status |
+      | 0100                | 0200      | Fix login bug | active |
+
+  @error_case
+  Scenario: POST /kanban/cards as a viewer without project access — 403 error
+    Given I am authenticated as a regular user: user.id 0002
+    And the kanban_cards table contains:
+      | id | feature_instance_id | column_id | title | position | status |
+    When I POST /api/features/tasks/kanban/cards with body:
+      """
+      {
+        "feature_instance_id": "0100",
+        "column_id": "0200",
+        "title": "Fix login bug"
+      }
+      """
+    Then the response status code is 403
+    And the kanban_cards table contains:
+      | id | feature_instance_id | column_id | title | position | status |

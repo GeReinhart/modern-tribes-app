@@ -1,0 +1,332 @@
+from typing import List, Optional
+from uuid import UUID
+
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel
+
+from app.platform.core.database import get_database
+from app.platform.core.authorization.models import PermissionEnum
+from app.features.tribes_projects.positions.models import PositionEnum
+from app.platform.core.authentication.router import get_current_user
+from app.platform.core.authorization.router import require_any_permission_decorator
+from app.platform.core.utils.db_helpers import resolve_url_param_id
+from app.platform.core.authorization.ownership import check_own_user_or_admin, check_own_tribe_position_or_admin
+from app.platform.core.authorization.project_access import check_project_access_or_admin
+
+router = APIRouter(prefix="/projects", tags=["features_tribes_projects"])
+
+_POSITION_RANK = {"guest": 0, "member": 1, "manager": 2}
+
+_QUERY = """
+    SELECT
+        u.id        AS user_id,
+        proj.id     AS project_id,
+        proj.url_param_id AS project_url_param_id,
+        proj.name   AS project_name,
+        CASE LEAST(
+            CASE pos.position WHEN 'guest' THEN 0 WHEN 'member' THEN 1 ELSE 2 END,
+            CASE tp.relation  WHEN 'guest' THEN 0 WHEN 'member' THEN 1 ELSE 2 END
+        )
+        WHEN 0 THEN 'guest'
+        WHEN 1 THEN 'member'
+        ELSE 'manager'
+        END         AS effective_position,
+        FALSE       AS via_represents,
+        NULL::text  AS person_first_name,
+        NULL::text  AS person_last_name,
+        0           AS display_order
+    FROM users u
+    JOIN persons        p   ON p.id  = u.person_id   AND p.status   = 'active'
+    JOIN positions      pos ON pos.person_id = p.id   AND pos.status = 'active'
+    JOIN tribes         t   ON t.id  = pos.tribe_id   AND t.status   = 'active'
+    JOIN tribes_projects tp ON tp.tribe_id = t.id
+    JOIN projects       proj ON proj.id = tp.project_id AND proj.status = 'active'
+    WHERE u.id = $1
+
+    UNION ALL
+
+    SELECT
+        u.id        AS user_id,
+        proj.id     AS project_id,
+        proj.url_param_id AS project_url_param_id,
+        proj.name   AS project_name,
+        CASE LEAST(
+            CASE pos.position WHEN 'guest' THEN 0 WHEN 'member' THEN 1 ELSE 2 END,
+            CASE tp.relation  WHEN 'guest' THEN 0 WHEN 'member' THEN 1 ELSE 2 END
+        )
+        WHEN 0 THEN 'guest'
+        WHEN 1 THEN 'member'
+        ELSE 'manager'
+        END         AS effective_position,
+        TRUE        AS via_represents,
+        p.first_name AS person_first_name,
+        p.last_name  AS person_last_name,
+        0           AS display_order
+    FROM users u
+    JOIN represents     r   ON r.user_id = u.id       AND r.status   = 'active'
+    JOIN persons        p   ON p.id = r.person_id      AND p.status   = 'active'
+    JOIN positions      pos ON pos.person_id = p.id    AND pos.status = 'active'
+    JOIN tribes         t   ON t.id = pos.tribe_id     AND t.status   = 'active'
+    JOIN tribes_projects tp ON tp.tribe_id = t.id
+    JOIN projects       proj ON proj.id = tp.project_id AND proj.status = 'active'
+    WHERE u.id = $1
+"""
+
+
+class UserProjectEntry(BaseModel):
+    user_id: str
+    project_id: str
+    project_url_param_id: str
+    project_name: str
+    effective_position: PositionEnum
+    via_represents: bool
+    person_first_name: Optional[str] = None
+    person_last_name: Optional[str] = None
+    display_order: int = 0
+
+
+class ProjectsReorderRequest(BaseModel):
+    ordered_ids: List[str]
+
+
+_QUERY_BY_TRIBE = """
+    SELECT
+        u.id        AS user_id,
+        proj.id     AS project_id,
+        proj.url_param_id AS project_url_param_id,
+        proj.name   AS project_name,
+        CASE LEAST(
+            CASE pos.position WHEN 'guest' THEN 0 WHEN 'member' THEN 1 ELSE 2 END,
+            CASE tp.relation  WHEN 'guest' THEN 0 WHEN 'member' THEN 1 ELSE 2 END
+        )
+        WHEN 0 THEN 'guest'
+        WHEN 1 THEN 'member'
+        ELSE 'manager'
+        END         AS effective_position,
+        FALSE       AS via_represents,
+        NULL::text  AS person_first_name,
+        NULL::text  AS person_last_name,
+        tp.display_order AS display_order
+    FROM users u
+    JOIN persons        p   ON p.id  = u.person_id   AND p.status   = 'active'
+    JOIN positions      pos ON pos.person_id = p.id   AND pos.status = 'active'
+    JOIN tribes         t   ON t.id  = pos.tribe_id   AND t.status   = 'active'
+    JOIN tribes_projects tp ON tp.tribe_id = t.id
+    JOIN projects       proj ON proj.id = tp.project_id AND proj.status = 'active'
+    WHERE u.id = $1 AND t.id = $2
+
+    UNION ALL
+
+    SELECT
+        u.id        AS user_id,
+        proj.id     AS project_id,
+        proj.url_param_id AS project_url_param_id,
+        proj.name   AS project_name,
+        CASE LEAST(
+            CASE pos.position WHEN 'guest' THEN 0 WHEN 'member' THEN 1 ELSE 2 END,
+            CASE tp.relation  WHEN 'guest' THEN 0 WHEN 'member' THEN 1 ELSE 2 END
+        )
+        WHEN 0 THEN 'guest'
+        WHEN 1 THEN 'member'
+        ELSE 'manager'
+        END         AS effective_position,
+        TRUE        AS via_represents,
+        p.first_name AS person_first_name,
+        p.last_name  AS person_last_name,
+        tp.display_order AS display_order
+    FROM users u
+    JOIN represents     r   ON r.user_id = u.id       AND r.status   = 'active'
+    JOIN persons        p   ON p.id = r.person_id      AND p.status   = 'active'
+    JOIN positions      pos ON pos.person_id = p.id    AND pos.status = 'active'
+    JOIN tribes         t   ON t.id = pos.tribe_id     AND t.status   = 'active'
+    JOIN tribes_projects tp ON tp.tribe_id = t.id
+    JOIN projects       proj ON proj.id = tp.project_id AND proj.status = 'active'
+    WHERE u.id = $1 AND t.id = $2
+    ORDER BY display_order ASC
+"""
+
+
+def _deduplicate(rows, user_id: str) -> List[UserProjectEntry]:
+    best: dict = {}
+    for r in rows:
+        key = (str(r["project_id"]), r["via_represents"], r["person_first_name"], r["person_last_name"])
+        ep = r["effective_position"]
+        if key not in best or _POSITION_RANK[ep] > _POSITION_RANK[best[key]["effective_position"]]:
+            best[key] = {
+                "project_id": str(r["project_id"]),
+                "project_url_param_id": r["project_url_param_id"],
+                "project_name": r["project_name"],
+                "effective_position": ep,
+                "via_represents": r["via_represents"],
+                "person_first_name": r["person_first_name"],
+                "person_last_name": r["person_last_name"],
+                "display_order": r["display_order"],
+            }
+    entries = sorted(best.values(), key=lambda e: e["display_order"])
+    return [UserProjectEntry(user_id=user_id, **entry) for entry in entries]
+
+
+@router.get("/by/user/{user_id}", response_model=List[UserProjectEntry])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_projects_by_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Get all active projects accessible to a user, with effective position per path.
+
+    **Permissions:** admin | can_access_attached_tribes (own user only)
+    """
+    pool = get_database()
+    user_id = await resolve_url_param_id(pool, "users", user_id)
+    await check_own_user_or_admin(user_id, current_user, pool)
+
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(_QUERY, UUID(user_id))
+
+    return _deduplicate(rows, user_id)
+
+
+class ProjectTribeEntry(BaseModel):
+    tribe_id: str
+    tribe_name: str
+
+
+class ProjectTribesSummaryEntry(BaseModel):
+    project_id: str
+    tribe_names: List[str]
+
+
+@router.get("/by/all/tribes-summary", response_model=List[ProjectTribesSummaryEntry])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ASSIGN_PROJECTS)
+async def get_tribes_summary_for_projects(current_user: dict = Depends(get_current_user)):
+    """Get tribe names grouped by project for all active projects.
+
+    **Permissions:** admin | can_assign_projects
+    """
+    pool = get_database()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT tp.project_id, array_agg(t.name ORDER BY t.name) AS tribe_names
+            FROM tribes_projects tp
+            JOIN tribes t ON t.id = tp.tribe_id AND t.status = 'active'
+            JOIN projects p ON p.id = tp.project_id AND p.status = 'active'
+            GROUP BY tp.project_id
+            """,
+        )
+    return [
+        ProjectTribesSummaryEntry(project_id=str(r["project_id"]), tribe_names=list(r["tribe_names"]))
+        for r in rows
+    ]
+
+
+@router.get("/{project_id}/tribes", response_model=List[ProjectTribeEntry])
+@require_any_permission_decorator(PermissionEnum.ADMIN)
+async def get_tribes_for_project(
+    project_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """Get all tribes linked to a project.
+
+    **Permissions:** admin
+    """
+    pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT t.id AS tribe_id, t.name AS tribe_name
+            FROM tribes t
+            JOIN tribes_projects tp ON tp.tribe_id = t.id
+            WHERE tp.project_id = $1
+            ORDER BY t.name ASC
+            """,
+            UUID(project_id),
+        )
+    return [ProjectTribeEntry(tribe_id=str(r["tribe_id"]), tribe_name=r["tribe_name"]) for r in rows]
+
+
+@router.get("/by/tribe/{tribe_id}/for/user/{user_id}", response_model=List[UserProjectEntry])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_projects_by_tribe_for_user(
+    tribe_id: str,
+    user_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """Get all active projects in a tribe accessible to a user, with effective position per path.
+
+    **Permissions:** admin | can_access_attached_tribes (own user only)
+    """
+    pool = get_database()
+    user_id = await resolve_url_param_id(pool, "users", user_id)
+    tribe_id = await resolve_url_param_id(pool, "tribes", tribe_id)
+    await check_own_user_or_admin(user_id, current_user, pool)
+
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(_QUERY_BY_TRIBE, UUID(user_id), UUID(tribe_id))
+
+    return _deduplicate(rows, user_id)
+
+
+class ArchivedProjectEntry(BaseModel):
+    project_id: str
+    project_url_param_id: str
+    project_name: str
+
+
+@router.get("/by/tribe/{tribe_id}/archived", response_model=List[ArchivedProjectEntry])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_archived_projects_by_tribe(
+    tribe_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """Get archived projects in a tribe. Requires manager position.
+
+    **Permissions:** admin | can_access_attached_tribes (manager position required)
+    """
+    pool = get_database()
+    tribe_id = await resolve_url_param_id(pool, "tribes", tribe_id)
+    await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position="manager")
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT proj.id AS project_id, proj.url_param_id AS project_url_param_id, proj.name AS project_name
+            FROM projects proj
+            JOIN tribes_projects tp ON tp.project_id = proj.id
+            WHERE tp.tribe_id = $1 AND proj.status = 'archived'
+            ORDER BY proj.name ASC
+            """,
+            UUID(tribe_id),
+        )
+    return [
+        ArchivedProjectEntry(
+            project_id=str(r["project_id"]),
+            project_url_param_id=r["project_url_param_id"],
+            project_name=r["project_name"],
+        )
+        for r in rows
+    ]
+
+
+@router.put("/by/tribe/{tribe_id}/order", status_code=200)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def reorder_projects_in_tribe(
+    tribe_id: str,
+    data: ProjectsReorderRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    """Reorder projects within a tribe. Requires manager position.
+
+    **Permissions:** admin | can_access_attached_tribes (manager position required)
+    """
+    pool = get_database()
+    tribe_id = await resolve_url_param_id(pool, "tribes", tribe_id)
+    await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position="manager")
+    async with pool.acquire() as conn:
+        for order, project_id in enumerate(data.ordered_ids):
+            resolved_project_id = await resolve_url_param_id(pool, "projects", project_id)
+            await conn.execute(
+                "UPDATE tribes_projects SET display_order = $1 "
+                "WHERE tribe_id = $2::uuid AND project_id = $3::uuid",
+                order,
+                UUID(tribe_id),
+                UUID(resolved_project_id),
+            )
+    return {"ok": True}

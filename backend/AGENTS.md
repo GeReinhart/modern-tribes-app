@@ -18,7 +18,7 @@
 - **Pydantic schemas are not business objects.** Keep them in `schemas/`; keep domain logic in services.
 
 
-- **MUST**: all SQL queries must be under `backend/app/repositories`
+- **MUST**: when adding an entpoint, add a related BDD test
 
 ### Files and directories
 

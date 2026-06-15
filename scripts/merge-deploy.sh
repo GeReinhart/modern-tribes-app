@@ -24,6 +24,9 @@ fi
 echo "==> Check code..."
 ./scripts/check-backend.sh || { echo "✗ Backend checks failed. Aborting."; exit 1; }
 ./scripts/check-frontend.sh || { echo "✗ Frontend checks failed. Aborting."; exit 1; }
+echo "==> Test code..."
+./scripts/run-backend-tests.sh || { echo "✗ Backend checks failed. Aborting."; exit 1; }
+
 
 cd $ROOT_DIR
 if [ -n "$COMMIT_MSG" ]; then
@@ -44,10 +47,6 @@ git checkout deploy
 
 echo "==> Rebasing deploy onto main..."
 git rebase main
-
-echo "==> Check code on deploy branch..."
-./scripts/check-backend.sh || { echo "✗ Backend checks failed on deploy branch. Aborting."; exit 1; }
-./scripts/check-frontend.sh || { echo "✗ Frontend checks failed on deploy branch. Aborting."; exit 1; }
 
 echo "==> Pushing deploy..."
 git push --force-with-lease origin deploy

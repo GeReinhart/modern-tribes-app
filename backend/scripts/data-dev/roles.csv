@@ -2,3 +2,5 @@ name,description,permissions
 Admin,Administrator role with full access,admin
 Advanced user,Can create tribes and have access to all elements of its tribes given its position,can_create_own_tribes|can_access_attached_tribes|can_manage_own_profile
 User,Can access to all elements of its tribes given its position,can_access_attached_tribes|can_manage_own_profile
+People Manager,Can manage people and their profiles,can_manage_people|can_manage_own_profile|can_access_attached_tribes
+Project Assigner,Can assign projects to tribes,can_assign_projects|can_access_attached_tribes|can_manage_own_profile

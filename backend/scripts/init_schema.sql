@@ -175,6 +175,7 @@ CREATE TABLE IF NOT EXISTS projects (
     name VARCHAR(255) UNIQUE NOT NULL,
     description TEXT,
     document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
+    theme_code VARCHAR(50) NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
@@ -188,6 +189,7 @@ CREATE TABLE IF NOT EXISTS tribes (
     url_param_id VARCHAR(6) UNIQUE NOT NULL,
     name VARCHAR(255) UNIQUE NOT NULL,
     document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
+    theme_code VARCHAR(50) NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
@@ -201,6 +203,7 @@ CREATE TABLE IF NOT EXISTS tribes_projects (
     tribe_id UUID REFERENCES tribes(id) ON DELETE CASCADE NOT NULL,
     project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
     relation VARCHAR(20) NOT NULL CHECK (relation IN ('manager', 'member', 'guest')),
+    display_order INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (tribe_id, project_id)
 );
@@ -250,6 +253,7 @@ CREATE TABLE IF NOT EXISTS projects_features (
     project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
     feature_type VARCHAR(100) NOT NULL,
     name VARCHAR(255) NOT NULL,
+    theme_code VARCHAR(50) NULL,
     status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'archived')),
     position INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -558,3 +562,6 @@ CREATE INDEX IF NOT EXISTS idx_search_index_entity ON search_index(entity_type, 
 CREATE INDEX IF NOT EXISTS idx_search_index_routing_path ON search_index(routing_path);
 CREATE INDEX IF NOT EXISTS idx_search_index_content_fts ON search_index USING GIN(to_tsvector('french', COALESCE(content_text, '')));
 CREATE OR REPLACE TRIGGER update_search_index_updated_at BEFORE UPDATE ON search_index FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Schema evolution: add columns that may be missing on databases created before they were introduced
+ALTER TABLE tribes_projects ADD COLUMN IF NOT EXISTS display_order INTEGER NOT NULL DEFAULT 0;

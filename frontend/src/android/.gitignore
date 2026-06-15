@@ -1,0 +1,15 @@
+# Private signing key — never commit this
+android-keystore.jks
+
+# Build artifacts
+*.apk
+*.aab
+*.idsig
+
+# Gradle caches and build output
+.gradle/
+build/
+app/build/
+
+# Node (if bubblewrap installs anything locally)
+node_modules/

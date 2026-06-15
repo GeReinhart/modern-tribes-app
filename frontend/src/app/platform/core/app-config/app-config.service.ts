@@ -1,0 +1,31 @@
+import {
+  AppConfigCreate,
+  AppConfigEntry,
+  AppConfigPublic,
+  AppConfigUpdate,
+} from '@/app/platform/core/app-config/app-config.types.ts';
+import { apiService } from '@/app/platform/core/api/api.service.ts';
+
+class AppConfigService {
+  async getPublic(): Promise<AppConfigPublic[]> {
+    return apiService.get<AppConfigPublic[]>('/platform/core/app-config/');
+  }
+
+  async getAll(): Promise<AppConfigEntry[]> {
+    return apiService.get<AppConfigEntry[]>('/platform/core/app-config/');
+  }
+
+  async create(data: AppConfigCreate): Promise<AppConfigEntry> {
+    return apiService.post<AppConfigEntry>('/platform/core/app-config/', data);
+  }
+
+  async update(id: string, data: AppConfigUpdate): Promise<AppConfigEntry> {
+    return apiService.put<AppConfigEntry>(`/platform/core/app-config/${id}`, data);
+  }
+
+  async delete(id: string): Promise<void> {
+    return apiService.delete<void>(`/platform/core/app-config/${id}`);
+  }
+}
+
+export const appConfigService = new AppConfigService();

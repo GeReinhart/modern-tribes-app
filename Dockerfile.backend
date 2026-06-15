@@ -6,7 +6,10 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/app /code/app
-COPY backend/features /code/features
+
+ENV UPLOAD_DIR=./data/uploads
+
+VOLUME /code/data/uploads
 
 EXPOSE 8080
 
