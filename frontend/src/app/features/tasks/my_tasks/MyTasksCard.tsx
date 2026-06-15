@@ -1,6 +1,8 @@
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
+import TaskContentPopup from '@/app/features/tasks/TaskContentPopup.tsx';
 import TaskItemModal from '@/app/features/tasks/TaskItemModal.tsx';
 import type { TaskLabelInfo, TaskPatch } from '@/app/features/tasks/types.ts';
+import MyTasksCardContent from './MyTasksCardContent.tsx';
 import { fibColor, urgencyColor } from '@/app/features/tasks/types.ts';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import type { PersonOption } from '@/app/features/tasks/types.ts';
@@ -41,6 +43,8 @@ const MyTasksCard: React.FC<Props> = ({
   const { theme } = useTheme();
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const borderColor = task.size ? fibColor(task.size) : theme.colors.border;
   const uc = urgencyColor(task.due_date, task.size);
@@ -125,6 +129,13 @@ const MyTasksCard: React.FC<Props> = ({
                 />
               </button>
             )}
+            <button
+              onClick={() => setExpanded((v) => !v)}
+              title={expanded ? t('features.kanban.hideContent') : t('features.kanban.showContent')}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 2px', display: 'flex', alignItems: 'center', opacity: 0.75, flexShrink: 0 }}
+            >
+              <ThemedSvgIcon name={expanded ? 'chevron-up' : 'chevron-down'} color={theme.colors.text} size={13} />
+            </button>
             <button
               onClick={() => navigate(buildSourcePath(task))}
               title={t('dashboard.tasks.openSource')}
@@ -222,7 +233,31 @@ const MyTasksCard: React.FC<Props> = ({
             )}
           </div>
         </div>
+        {expanded && (
+          <MyTasksCardContent
+            documentContentHtml={task.document_content_html}
+            labels={labels}
+            onOpenPopup={() => setPopupOpen(true)}
+          />
+        )}
       </div>
+      {popupOpen && (
+        <TaskContentPopup
+          title={task.title}
+          documentContentHtml={task.document_content_html}
+          labels={labels}
+          size={task.size}
+          dueDate={task.due_date}
+          assignedPersonName={task.assigned_person_name}
+          canEdit={canEdit}
+          onClose={() => setPopupOpen(false)}
+          onEdit={() => {
+            setPopupOpen(false);
+            setModalOpen(true);
+          }}
+        />
+      )}
+
       {modalOpen && (
         <TaskItemModal
           value={{

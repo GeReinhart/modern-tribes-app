@@ -5,6 +5,7 @@ import { PersonOption, fibColor, urgencyColor } from './types.ts';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import TaskContentPopup from '@/app/features/tasks/TaskContentPopup.tsx';
 import TodoItemModal from './TodoItemModal.tsx';
 import { TodoItem, TodoItemUpdate, TodoLabel, TodoLabelCreate } from './types.ts';
 
@@ -37,6 +38,7 @@ const TodoRow: React.FC<Props> = ({
   const { theme } = useTheme();
   const [expanded, setExpanded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
 
   const isDone = item.todo_status === 'done';
   const isArchived = item.status === 'archived';
@@ -271,6 +273,28 @@ const TodoRow: React.FC<Props> = ({
             borderTop: `1px solid ${theme.colors.border}`,
           }}
         >
+          <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '8px', marginBottom: '4px' }}>
+            <button
+              onClick={() => setPopupOpen(true)}
+              title={t('features.tasks.openInPopup')}
+              style={{
+                background: 'none',
+                border: `1px solid ${theme.colors.primary}`,
+                borderRadius: '6px',
+                cursor: 'pointer',
+                padding: '4px 10px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                color: theme.colors.primary,
+                fontSize: 'var(--font-xs)',
+                fontWeight: 600,
+              }}
+            >
+              <ThemedSvgIcon name="external-link" color={theme.colors.primary} size={12} />
+              {t('features.tasks.openInPopup')}
+            </button>
+          </div>
           {cardLabels.length > 0 && (
             <div
               style={{
@@ -318,6 +342,23 @@ const TodoRow: React.FC<Props> = ({
             )}
           </div>
         </div>
+      )}
+
+      {popupOpen && (
+        <TaskContentPopup
+          title={item.title}
+          documentContentHtml={item.document_content_html}
+          labels={cardLabels}
+          size={item.size}
+          dueDate={item.due_date}
+          assignedPersonName={item.assigned_person_name}
+          canEdit={canEdit && !isArchived}
+          onClose={() => setPopupOpen(false)}
+          onEdit={() => {
+            setPopupOpen(false);
+            setModalOpen(true);
+          }}
+        />
       )}
 
       {modalOpen && (

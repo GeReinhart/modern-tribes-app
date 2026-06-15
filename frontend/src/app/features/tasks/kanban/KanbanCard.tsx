@@ -8,6 +8,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import TaskContentPopup from '@/app/features/tasks/TaskContentPopup.tsx';
 import KanbanCardBadges from './KanbanCardBadges.tsx';
 import KanbanCardBody from './KanbanCardBody.tsx';
 import KanbanCardHeader from './KanbanCardHeader.tsx';
@@ -102,6 +103,7 @@ const KanbanCard: React.FC<Props> = ({
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmArchive, setConfirmArchive] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
 
   const isArchived = card.status === 'archived';
   const borderColor = card.size ? fibColor(card.size) : accentColor;
@@ -183,7 +185,11 @@ const KanbanCard: React.FC<Props> = ({
               />
             </div>
             {expanded && (
-              <KanbanCardBody card={card} boardLabels={boardLabels} />
+              <KanbanCardBody
+                card={card}
+                boardLabels={boardLabels}
+                onOpenPopup={() => setPopupOpen(true)}
+              />
             )}
           </div>
           {showMoveControls && (
@@ -221,6 +227,23 @@ const KanbanCard: React.FC<Props> = ({
           </div>
         )}
       </div>
+
+      {popupOpen && (
+        <TaskContentPopup
+          title={card.title}
+          documentContentHtml={card.document_content_html}
+          labels={boardLabels.filter((l) => card.label_ids.includes(l.id))}
+          size={card.size}
+          dueDate={card.due_date}
+          assignedPersonName={card.assigned_person_name}
+          canEdit={!isArchived && canEdit}
+          onClose={() => setPopupOpen(false)}
+          onEdit={() => {
+            setPopupOpen(false);
+            setModalOpen(true);
+          }}
+        />
+      )}
 
       {modalOpen && (
         <KanbanCardModal

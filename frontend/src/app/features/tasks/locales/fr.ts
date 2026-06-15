@@ -46,6 +46,7 @@ const fr: Record<string, string> = {
   'features.kanban.dueDate': "Date d'échéance",
   'features.kanban.hideContent': 'Masquer le contenu',
   'features.kanban.showContent': 'Afficher le contenu',
+  'features.tasks.openInPopup': 'Ouvrir en vue complète',
 
   'dashboard.tasks.empty': 'Aucune tâche à venir qui vous est assignée.',
   'dashboard.tasks.openSource': 'Ouvrir dans le projet',
