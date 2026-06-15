@@ -12,6 +12,7 @@ from app.platform.core.authorization.router import (
     require_permission_decorator,
 )
 from app.platform.core.authorization.project_access import check_project_access_or_admin
+from app.platform.core.utils.validators import EntityValidator
 from app.platform.core.utils.db_helpers import (
     check_document_exists,
     create_document,
@@ -21,7 +22,6 @@ from app.platform.core.utils.db_helpers import (
     resolve_url_param_id,
     update_document,
 )
-from app.platform.core.utils.validators import EntityValidator
 
 router = APIRouter(prefix="/projects", tags=["features_tribes_projects"])
 
@@ -113,3 +113,17 @@ async def archive_project(project_id: str, current_user: dict = Depends(get_curr
     archive_data = {"status": "archived", "updated_by": UUID(current_user["id"])}
     await update_document(pool, TABLE, project_id, archive_data, ENTITY_NAME)
     return None
+
+
+@router.patch("/{project_id}/unarchive", response_model=Project)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def unarchive_project(project_id: str, current_user: dict = Depends(get_current_user)):
+    """Reactivate an archived project (set status back to active).
+
+    **Permissions:** admin | can_access_attached_tribes (manager position required)
+    """
+    pool = get_database()
+    project_id = await resolve_url_param_id(pool, TABLE, project_id)
+    await check_project_access_or_admin(project_id, current_user, pool, min_position="manager")
+    unarchive_data = {"status": "active", "updated_by": UUID(current_user["id"])}
+    return await update_document(pool, TABLE, project_id, unarchive_data, ENTITY_NAME)

@@ -734,6 +734,11 @@ def patch_with_json_body(context, path, docstring):
     context["response"] = context["client"].patch(expand_path_ids(path), json=body)
 
 
+@when(parsers.re(r"I PATCH (?P<path>\S+)$"))
+def patch_no_body(context, path):
+    context["response"] = context["client"].patch(expand_path_ids(path))
+
+
 @when(parsers.re(r"I POST (?P<path>\S+)$"))
 def post_no_body(context, path):
     context["response"] = context["client"].post(expand_path_ids(path))

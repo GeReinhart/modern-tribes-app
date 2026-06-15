@@ -11,6 +11,7 @@ from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 from app.platform.core.utils.db_helpers import resolve_url_param_id
 from app.platform.core.authorization.ownership import check_own_user_or_admin, check_own_tribe_position_or_admin
+from app.platform.core.authorization.project_access import check_project_access_or_admin
 
 router = APIRouter(prefix="/projects", tags=["features_tribes_projects"])
 
@@ -262,6 +263,46 @@ async def get_projects_by_tribe_for_user(
         rows = await conn.fetch(_QUERY_BY_TRIBE, UUID(user_id), UUID(tribe_id))
 
     return _deduplicate(rows, user_id)
+
+
+class ArchivedProjectEntry(BaseModel):
+    project_id: str
+    project_url_param_id: str
+    project_name: str
+
+
+@router.get("/by/tribe/{tribe_id}/archived", response_model=List[ArchivedProjectEntry])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_archived_projects_by_tribe(
+    tribe_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """Get archived projects in a tribe. Requires manager position.
+
+    **Permissions:** admin | can_access_attached_tribes (manager position required)
+    """
+    pool = get_database()
+    tribe_id = await resolve_url_param_id(pool, "tribes", tribe_id)
+    await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position="manager")
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT proj.id AS project_id, proj.url_param_id AS project_url_param_id, proj.name AS project_name
+            FROM projects proj
+            JOIN tribes_projects tp ON tp.project_id = proj.id
+            WHERE tp.tribe_id = $1 AND proj.status = 'archived'
+            ORDER BY proj.name ASC
+            """,
+            UUID(tribe_id),
+        )
+    return [
+        ArchivedProjectEntry(
+            project_id=str(r["project_id"]),
+            project_url_param_id=r["project_url_param_id"],
+            project_name=r["project_name"],
+        )
+        for r in rows
+    ]
 
 
 @router.put("/by/tribe/{tribe_id}/order", status_code=200)

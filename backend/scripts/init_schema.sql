@@ -562,3 +562,6 @@ CREATE INDEX IF NOT EXISTS idx_search_index_entity ON search_index(entity_type, 
 CREATE INDEX IF NOT EXISTS idx_search_index_routing_path ON search_index(routing_path);
 CREATE INDEX IF NOT EXISTS idx_search_index_content_fts ON search_index USING GIN(to_tsvector('french', COALESCE(content_text, '')));
 CREATE OR REPLACE TRIGGER update_search_index_updated_at BEFORE UPDATE ON search_index FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Schema evolution: add columns that may be missing on databases created before they were introduced
+ALTER TABLE tribes_projects ADD COLUMN IF NOT EXISTS display_order INTEGER NOT NULL DEFAULT 0;

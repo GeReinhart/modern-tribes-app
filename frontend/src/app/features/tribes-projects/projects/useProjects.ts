@@ -8,6 +8,7 @@ import {
 } from '@/app/features/tribes-projects/projects/project_with_document.types.ts';
 import { Project, ProjectCreate, ProjectUpdate } from '@/app/features/tribes-projects/projects/project.types.ts';
 import {
+  ArchivedProjectEntry,
   ProjectTribesSummary,
   ProjectTribeWithMembers,
   UserProjectEntry,
@@ -218,6 +219,48 @@ export function useArchiveProject() {
   }, []);
 
   return { archiveProject, loading, error };
+}
+
+export function useArchivedProjectsByTribe(
+  tribeId: string,
+  options: { enabled?: boolean } = {},
+) {
+  const [projects, setProjects] = useState<ArchivedProjectEntry[]>([]);
+  const { loading, error, execute } = apiHooks<ArchivedProjectEntry[]>();
+
+  const fetch = useCallback(() => {
+    if (!tribeId) return;
+    execute(() => projectService.getArchivedByTribe(tribeId)).then((data) => {
+      if (data) setProjects(data);
+    });
+  }, [tribeId, execute]);
+
+  useEffect(() => {
+    if (options.enabled !== false) fetch();
+  }, [fetch, options.enabled]);
+
+  return { projects, loading, error, refetch: fetch };
+}
+
+export function useUnarchiveProject() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const unarchiveProject = useCallback(async (projectId: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+    try {
+      await projectService.unarchive(projectId);
+      return true;
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { unarchiveProject, loading, error };
 }
 
 export function useProjectTribes() {

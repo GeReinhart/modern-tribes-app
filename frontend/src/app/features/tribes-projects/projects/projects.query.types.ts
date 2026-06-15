@@ -32,6 +32,12 @@ export interface ProjectTribeMember {
   position: PositionEnum;
 }
 
+export interface ArchivedProjectEntry {
+  project_id: string;
+  project_url_param_id: string;
+  project_name: string;
+}
+
 export interface ProjectTribesSummary {
   project_id: string;
   tribe_names: string[];

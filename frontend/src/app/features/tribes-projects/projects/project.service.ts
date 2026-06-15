@@ -5,6 +5,7 @@ import {
 } from '@/app/features/tribes-projects/projects/project_with_document.types.ts';
 import { Project, ProjectCreate, ProjectUpdate } from '@/app/features/tribes-projects/projects/project.types.ts';
 import {
+  ArchivedProjectEntry,
   ProjectTribesSummary,
   ProjectTribeWithMembers,
   UserProjectEntry,
@@ -99,6 +100,16 @@ class ProjectService {
       `${this.endpoint}/by/tribe/${tribeId}/order`,
       { ordered_ids: orderedIds },
     );
+  }
+
+  async getArchivedByTribe(tribeId: string): Promise<ArchivedProjectEntry[]> {
+    return apiService.get<ArchivedProjectEntry[]>(
+      `${this.endpoint}/by/tribe/${tribeId}/archived`,
+    );
+  }
+
+  async unarchive(projectId: string): Promise<Project> {
+    return apiService.patch<Project>(`${this.endpoint}/${projectId}/unarchive`);
   }
 }
 
