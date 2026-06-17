@@ -10,13 +10,26 @@ The list of features to remove is always derived from the current `application.j
 
 ## Step 0 — Read current state
 
-Before touching anything, read:
-- `application.json` → collect every feature package name and its backend/frontend paths
-- `frontend/src/app/features/` → list actual directories present
-- `backend/app/features/` → list actual directories present
+Before touching anything:
+1. Determine the branch name:
+   ```bash
+   git tag --list '0.*.0' --sort=-version:refname | head -1
+   ```
+   Take the last tag (e.g. `0.3.0`), increment the minor version by 1, and create the branch:
+   ```bash
+   git checkout -b keep-only-platform-0.<x+1>.0
+   ```
+   Example: last tag is `0.3.0` → branch is `keep-only-platform-0.4.0`.
+   If no tag exists yet, start at `keep-only-platform-0.1.0`.
+2. Run `./scripts/check-area.sh` to confirm the branch is valid before proceeding.
+3. Read:
+   - `application.json` → collect every feature package name and its backend/frontend paths
+   - `frontend/src/app/features/` → list actual directories present
+   - `backend/app/features/` → list actual directories present
 
 Cross-check: every directory present but not listed in `application.json` (or vice versa)
-is worth noting before deletion.
+is worth noting before deletion. (Common: a `dashboard` feature listed in `application.json`
+but never materialised on disk — safe to skip deletion, will vanish when the key is removed.)
 
 ## Step 1 — Delete feature code
 
@@ -43,6 +56,9 @@ rm -rf backend/tests/features/features/   # Gherkin .feature files for all featu
 ## Step 3 — Empty the feature self-registration triggers
 
 `backend/app/features/__init__.py` → empty file (removes all `import` lines that trigger self-registration)
+
+`backend/app/features/registry.py` → **delete this file** (it's the feature registry singleton;
+it's not in a feature sub-directory but lives directly under `backend/app/features/`).
 
 `frontend/src/main.tsx` → remove any `import '@/app/features/...'` lines (feature self-registration side-effects)
 
@@ -80,6 +96,8 @@ Keep only the platform locale imports (`en`, `fr`).
 ## Step 8 — `frontend/src/app/platform/core/about/AboutPage.tsx`
 
 - Remove the `AboutFeatures` import and the entire features section it renders
+- **Delete `frontend/src/app/platform/core/about/AboutFeatures.tsx`** — it becomes unreachable
+  and references `application.json` at the `features.features` path which is now gone.
 - Simplify breadcrumbs to a single entry `[{ label: t('about.title') }]`
   (this is now the home page — no back navigation needed)
 - Remove `menuActions` / `navigate` if the only action was "return"
@@ -107,7 +125,22 @@ even though no component called them — they were invisible to static checks.
 ## Step 9 — `application.json`
 
 - Remove the entire `"features"` top-level key
-- Update `"description"` to drop any mention of features
+- Update the top-level `"description"` to drop any mention of features
+- Scan **every platform package `description` field** for stale feature references and fix them.
+  After the last run, the following were found:
+
+  | Package | Field | Before | After |
+  |---|---|---|---|
+  | `search` | en[0] | "…todo items and kanban cards" | "…documents and publications" |
+  | `people` | en[2] | "persons associated with tribes" | "physical person records" |
+  | `authorization` | en[2] | "project-level access checks" | "access checks" |
+  | `app-config` | en[1] | "branding and feature flags" | "branding" |
+  | `labels` | en[1] | "(documents, tasks, etc.)" | "(documents, etc.)" |
+
+  (Apply the same fix in `fr` for each.)
+
+- Run `./scripts/check-application.json.sh` at the end — it copies `application.json` to
+  `frontend/src/app/application.json` on success, so no manual copy is needed.
 
 ## Step 10 — `scripts/check-application.json.sh`
 
@@ -192,6 +225,11 @@ Simplify any step that conditionally handles a feature-only field
 
 **Keep** any step whose table is still referenced by a remaining platform test.
 Check by grepping `backend/tests/features/platform/` for the table name before deleting.
+
+**Also check platform `.feature` files for Given steps that set up feature tables** — e.g.
+`archive_publication.feature` used `Given the projects table contains:` as an FK precondition
+for `projects_documents`. Since `projects_documents.project_id` becomes a plain nullable UUID
+after Step 12, the projects setup step is no longer needed. Remove it from the feature file.
 
 ## Verification
 
