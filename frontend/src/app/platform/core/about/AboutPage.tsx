@@ -6,13 +6,11 @@ import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { AboutStack } from '@/app/platform/core/about/AboutStack.tsx';
 import { AboutPackages } from '@/app/platform/core/about/AboutPackages.tsx';
-import { AboutFeatures } from '@/app/platform/core/about/AboutFeatures.tsx';
 import { useLocalizedText } from '@/app/platform/core/about/localized-text.ts';
 import { MarkdownContent } from '@/app/platform/core/about/MarkdownContent.tsx';
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 
 const GITHUB_URL = 'https://github.com/GeReinhart/modern-tribes-app';
 
@@ -20,25 +18,10 @@ const AboutPageContent: React.FC = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const localize = useLocalizedText();
-  const navigate = useNavigate();
 
   const breadcrumbs = useMemo(
-    () => [
-      { label: t('common.home'), path: '/app' },
-      { label: t('about.title') },
-    ],
+    () => [{ label: t('about.title') }],
     [t],
-  );
-
-  const menuActions = useMemo(
-    () => [
-      {
-        icon: 'arrow-left' as const,
-        label: t('common.return'),
-        onClick: () => navigate(-1),
-      },
-    ],
-    [t, navigate],
   );
 
   const githubLinkStyle: React.CSSProperties = {
@@ -57,7 +40,7 @@ const AboutPageContent: React.FC = () => {
   };
 
   return (
-    <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions}>
+    <AppLayout breadcrumbs={breadcrumbs}>
       <ThemedSection themeId="main_1">
         <div
           style={{
@@ -126,17 +109,6 @@ const AboutPageContent: React.FC = () => {
             packages={appConfig.platform.tools}
             variant="accent"
           />
-        </div>
-
-        <div>
-          <ThemedText
-            size="medium"
-            as="h2"
-            style={{ fontWeight: 700, marginBottom: '12px', color: theme.colors.primary }}
-          >
-            {t('about.features')}
-          </ThemedText>
-          <AboutFeatures features={appConfig.features.features} />
         </div>
       </ThemedSection>
     </AppLayout>

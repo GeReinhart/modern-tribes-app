@@ -4,20 +4,12 @@
     "en": [
       "- a backend and a frontend",
       "- a platform with all the common tools needed for most applications",
-      "- a feature set that makes this application special",
-      "- the platform and the features have code in both backend and frontend",
-      "- the platform depends on external services and third-party libraries",
-      "- the features depend on external services, third-party libraries and the platform",
-      "- the platform does not depend on features"
+      "- the platform depends on external services and third-party libraries"
     ],
     "fr": [
       "- un backend et un frontend",
       "- une plateforme avec tous les outils communs nécessaires à la plupart des applications",
-      "- un ensemble de fonctionnalités qui rend cette application unique",
-      "- la plateforme et les fonctionnalités ont du code dans le backend et le frontend",
-      "- la plateforme dépend de services externes et de bibliothèques tierces",
-      "- les fonctionnalités dépendent de services externes, de bibliothèques tierces et de la plateforme",
-      "- la plateforme ne dépend pas des fonctionnalités"
+      "- la plateforme dépend de services externes et de bibliothèques tierces"
     ]
   },
   "backend": {
@@ -69,12 +61,12 @@
           "en": [
             "- role-based access control",
             "- user -> roles -> permissions",
-            "- ownership and project-level access checks"
+            "- ownership and access checks"
           ],
           "fr": [
             "- contrôle d'accès basé sur les rôles",
             "- utilisateur -> rôles -> permissions",
-            "- vérifications de propriété et d'accès au niveau du projet"
+            "- vérifications de propriété et d'accès"
           ]
         },
         "backend": {
@@ -152,11 +144,11 @@
         "description": {
           "en": [
             "- global application configuration management",
-            "- stores and retrieves app-wide settings such as branding and feature flags"
+            "- stores and retrieves app-wide settings such as branding"
           ],
           "fr": [
             "- gestion de la configuration globale de l'application",
-            "- stocke et récupère les paramètres globaux comme l'identité visuelle et les flags de fonctionnalités"
+            "- stocke et récupère les paramètres globaux comme l'identité visuelle"
           ]
         },
         "backend": {
@@ -223,11 +215,11 @@
         "description": {
           "en": [
             "- system-wide label management",
-            "- labels can be applied to any entity (documents, tasks, etc.)"
+            "- labels can be applied to any entity (documents, etc.)"
           ],
           "fr": [
             "- gestion des étiquettes à l'échelle du système",
-            "- les étiquettes peuvent être appliquées à n'importe quelle entité (documents, tâches, etc.)"
+            "- les étiquettes peuvent être appliquées à n'importe quelle entité (documents, etc.)"
           ]
         },
         "backend": {
@@ -299,7 +291,7 @@
         "package": "search",
         "description": {
           "en": [
-            "- global full-text search across documents, publications, todo items and kanban cards",
+            "- global full-text search across documents and publications",
             "- indexed search targeting any element in the database",
             "- labels applied to tasks are included in the indexed content",
             "- navigating to any search result passes the query via ?q= in the URL",
@@ -308,7 +300,7 @@
             "- InvertedMarkStyle.tsx: shared component rendering inverted-color <mark> CSS using the current theme"
           ],
           "fr": [
-            "- recherche plein texte globale sur les documents, publications, tâches todo et cartes kanban",
+            "- recherche plein texte globale sur les documents et publications",
             "- recherche indexée ciblant n'importe quel élément de la base de données",
             "- les étiquettes appliquées aux tâches sont incluses dans le contenu indexé",
             "- naviguer vers n'importe quel résultat de recherche transmet la requête via ?q= dans l'URL",
@@ -337,13 +329,13 @@
           "en": [
             "- manages users, persons and their relationships",
             "- users: authentication accounts with roles and permissions",
-            "- persons: physical person records associated with tribes",
+            "- persons: physical person records",
             "- represents: links between users and persons"
           ],
           "fr": [
             "- gère les utilisateurs, les personnes et leurs relations",
             "- utilisateurs : comptes d'authentification avec rôles et permissions",
-            "- personnes : enregistrements de personnes physiques associés aux tribus",
+            "- personnes : enregistrements de personnes physiques",
             "- représente : liens entre utilisateurs et personnes"
           ]
         },
@@ -492,247 +484,6 @@
         "frontend": {
           "path": [
             "frontend/src/app/platform/tools/mail/**"
-          ]
-        }
-      }
-    ]
-  },
-  "features": {
-    "description": {
-      "en": [
-        "- each feature is a self-contained package under features/ on both backend and frontend",
-        "- features follow hexagonal architecture: they depend on the platform, not the reverse",
-        "- a project can have multiple instances of the same feature, each accessible via a tab"
-      ],
-      "fr": [
-        "- chaque fonctionnalité est un package autonome sous features/ sur le backend et le frontend",
-        "- les fonctionnalités suivent l'architecture hexagonale : elles dépendent de la plateforme, pas l'inverse",
-        "- un projet peut avoir plusieurs instances de la même fonctionnalité, chacune accessible via un onglet"
-      ]
-    },
-    "features": [
-      {
-        "package": "bookmarks",
-        "description": {
-          "en": [
-            "- user bookmarks for frequently accessed pages",
-            "- supports colors, ordering and editing"
-          ],
-          "fr": [
-            "- signets utilisateur pour les pages fréquemment consultées",
-            "- supporte les couleurs, le tri et l'édition"
-          ]
-        },
-        "backend": {
-          "schema": [
-            "user_bookmarks"
-          ],
-          "path": [
-            "backend/app/features/bookmarks/**"
-          ]
-        },
-        "frontend": {
-          "path": [
-            "frontend/src/app/features/bookmarks/**"
-          ]
-        }
-      },
-      {
-        "package": "tasks",
-        "description": {
-          "en": [
-            "- task management system with two presentation modes: todo list and kanban",
-            "- supports labels, person assignments, sizing, due dates and rich document content",
-            "- common types and components shared between todo_list and kanban sub-packages"
-          ],
-          "fr": [
-            "- système de gestion des tâches avec deux modes : liste de tâches et kanban",
-            "- supporte les étiquettes, les assignations, la taille, les échéances et le contenu de documents riches",
-            "- types et composants communs partagés entre les sous-packages todo_list et kanban"
-          ]
-        },
-        "backend": {
-          "path": [
-            "backend/app/features/tasks/**"
-          ]
-        },
-        "frontend": {
-          "path": [
-            "frontend/src/app/features/tasks/**"
-          ]
-        },
-        "sub_packages": [
-          {
-            "package": "todo_list",
-            "description": {
-              "en": [
-                "- linear task list interface with filtering"
-              ],
-              "fr": [
-                "- interface de liste de tâches linéaire avec filtrage"
-              ]
-            },
-            "backend": {
-              "schema": [
-                "todo_items",
-                "todo_labels"
-              ],
-              "path": [
-                "backend/app/features/tasks/todo_list/**"
-              ]
-            },
-            "frontend": {
-              "path": [
-                "frontend/src/app/features/tasks/todo_list/**"
-              ]
-            }
-          },
-          {
-            "package": "kanban",
-            "description": {
-              "en": [
-                "- kanban board with drag-and-drop columns and cards",
-                "- supports card movement, reordering and column management"
-              ],
-              "fr": [
-                "- tableau kanban avec colonnes et cartes déplaçables par glisser-déposer",
-                "- supporte le déplacement de cartes, le réordonnancement et la gestion des colonnes"
-              ]
-            },
-            "backend": {
-              "schema": [
-                "kanban_columns",
-                "kanban_cards",
-                "kanban_labels"
-              ],
-              "path": [
-                "backend/app/features/tasks/kanban/**"
-              ]
-            },
-            "frontend": {
-              "path": [
-                "frontend/src/app/features/tasks/kanban/**"
-              ]
-            }
-          },
-          {
-            "package": "my_tasks",
-            "description": {
-              "en": [
-                "- aggregates tasks assigned to the current user across all projects",
-                "- cross-project view combining kanban cards and todo items",
-                "- filterable by tribe, project, person and label",
-                "- exposed at GET /features/my-tasks"
-              ],
-              "fr": [
-                "- agrège les tâches assignées à l'utilisateur courant sur tous les projets",
-                "- vue transversale combinant les cartes kanban et les éléments todo",
-                "- filtrable par tribu, projet, personne et étiquette",
-                "- exposé sur GET /features/my-tasks"
-              ]
-            },
-            "backend": {
-              "path": [
-                "backend/app/features/tasks/my_tasks/**"
-              ]
-            },
-            "frontend": {
-              "path": [
-                "frontend/src/app/features/tasks/my_tasks/**"
-              ]
-            }
-          }
-        ]
-      },
-      {
-        "package": "tribes-projects",
-        "description": {
-          "en": [
-            "- core organizational structure of the application",
-            "- tribes: top-level groups with members and positions",
-            "- projects: belong to a tribe, host feature instances and documents",
-            "- positions: named roles within a tribe",
-            "- feature instances: pluggable features attached to a project, each rendered as a tab",
-            "- theme_code: optional theme override on tribes, projects, and feature instances"
-          ],
-          "fr": [
-            "- structure organisationnelle principale de l'application",
-            "- tribus : groupes de premier niveau avec membres et postes",
-            "- projets : appartiennent à une tribu, hébergent des instances de fonctionnalités et des documents",
-            "- postes : rôles nommés au sein d'une tribu",
-            "- instances de fonctionnalités : fonctionnalités modulaires attachées à un projet, chacune affichée sous forme d'onglet",
-            "- theme_code : thème optionnel sur les tribus, projets et instances de fonctionnalités"
-          ]
-        },
-        "backend": {
-          "schema": [
-            "tribes",
-            "projects",
-            "positions",
-            "feature_instances",
-            "project_documents"
-          ],
-          "path": [
-            "backend/app/features/tribes_projects/**"
-          ]
-        },
-        "frontend": {
-          "path": [
-            "frontend/src/app/features/tribes-projects/**"
-          ]
-        }
-      },
-      {
-        "package": "glue",
-        "description": {
-          "en": [
-            "- wiring layer between the platform and features",
-            "- feature-instances: manage feature instances attached to a project (projects_features table)",
-            "- tab-config: per-user tab visibility and ordering configuration"
-          ],
-          "fr": [
-            "- couche de câblage entre la plateforme et les fonctionnalités",
-            "- feature-instances : gère les instances de fonctionnalités attachées à un projet (table projects_features)",
-            "- tab-config : configuration de la visibilité et de l'ordre des onglets par utilisateur"
-          ]
-        },
-        "backend": {
-          "schema": [
-            "projects_features",
-            "user_tab_configs"
-          ],
-          "path": [
-            "backend/app/features/glue/**"
-          ]
-        },
-        "frontend": {
-          "path": [
-            "frontend/src/app/features/glue/**"
-          ]
-        }
-      },
-      {
-        "package": "dashboard",
-        "description": {
-          "en": [
-            "- personalized user dashboard",
-            "- composes my_tasks, tribes and bookmarks tabs",
-            "- shows tribes membership and bookmarks"
-          ],
-          "fr": [
-            "- tableau de bord personnalisé",
-            "- compose les onglets my_tasks, tribus et signets",
-            "- affiche l'appartenance aux tribus et les signets"
-          ]
-        },
-        "backend": {
-          "path": [
-            "backend/app/features/dashboard/**"
-          ]
-        },
-        "frontend": {
-          "path": [
-            "frontend/src/app/features/dashboard/**"
           ]
         }
       }

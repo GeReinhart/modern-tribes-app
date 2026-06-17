@@ -1,7 +1,5 @@
 import asyncio
 import json
-import re
-from datetime import datetime, timezone
 from uuid import UUID
 
 import asyncpg
@@ -10,12 +8,6 @@ from pytest_bdd import given, parsers, then, when
 
 from tests.db_helpers import TEST_DB_DSN, coerce, url_param_id_from_uuid
 from tests.helpers import assert_table, expand_id, expand_json_ids, expand_path_ids
-
-
-def _parse_created_at(value: str | None) -> datetime | None:
-    if not value:
-        return None
-    return datetime.fromisoformat(value).replace(tzinfo=timezone.utc)
 
 
 def _run(coro):
@@ -234,64 +226,18 @@ def given_labels_table(datatable):
             for row in datatable[1:]:
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
                 uid = rec["id"]
-                fi_id = rec.get("feature_instance_id")
-                if fi_id:
-                    await conn.execute(
-                        """INSERT INTO labels(id, name, color, status, feature_instance_id)
-                           VALUES($1, $2, $3, $4, $5)
-                           ON CONFLICT (id) DO NOTHING""",
-                        UUID(uid),
-                        rec.get("name", ""),
-                        rec.get("color", "#000000"),
-                        rec.get("status", "active"),
-                        UUID(fi_id),
-                    )
-                else:
-                    await conn.execute(
-                        """INSERT INTO labels(id, name, color, status)
-                           VALUES($1, $2, $3, $4)
-                           ON CONFLICT (id) DO NOTHING""",
-                        UUID(uid),
-                        rec.get("name", ""),
-                        rec.get("color", "#000000"),
-                        rec.get("status", "active"),
-                    )
-        finally:
-            await conn.close()
-    _run(_insert())
-
-
-@given("the user_bookmarks table contains:")
-def given_user_bookmarks_table(datatable):
-    async def _insert():
-        conn = await _conn()
-        try:
-            headers = datatable[0]
-            for row in datatable[1:]:
-                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
-                uid = rec.get("id")
-                user_id = rec.get("user_id")
-                if not uid or not user_id:
-                    continue
                 await conn.execute(
-                    """INSERT INTO user_bookmarks(id, user_id, page_path, page_title, display_order, status)
-                       VALUES($1, $2, $3, $4, $5, $6)
+                    """INSERT INTO labels(id, name, color, status)
+                       VALUES($1, $2, $3, $4)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(uid),
-                    UUID(user_id),
-                    rec.get("page_path", "/"),
-                    rec.get("page_title", "Page"),
-                    coerce("display_order", rec.get("display_order", "0")),
+                    rec.get("name", ""),
+                    rec.get("color", "#000000"),
                     rec.get("status", "active"),
                 )
         finally:
             await conn.close()
     _run(_insert())
-
-
-@given("the user_bookmark table contains:")
-def given_user_bookmark_table(datatable):
-    given_user_bookmarks_table(datatable)
 
 
 @given("the notifications table contains:")
@@ -333,13 +279,14 @@ def given_projects_documents_table(datatable):
                 uid = rec.get("id")
                 if not uid:
                     continue
+                project_id = rec.get("project_id")
                 await conn.execute(
                     """INSERT INTO projects_documents(id, url_param_id, project_id, document_id, title, status)
                        VALUES($1, $2, $3, $4, $5, $6)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(uid),
                     rec.get("url_param_id", url_param_id_from_uuid(uid)),
-                    UUID(rec["project_id"]),
+                    UUID(project_id) if project_id else None,
                     UUID(rec["document_id"]),
                     rec.get("title", "Document"),
                     rec.get("status", "active"),
@@ -360,6 +307,7 @@ def given_publications_table(datatable):
                 uid = rec.get("id")
                 if not uid:
                     continue
+                project_document_id = rec.get("project_document_id")
                 await conn.execute(
                     """INSERT INTO publications(id, url_param_id, document_id, project_document_id, status)
                        VALUES($1, $2, $3, $4, $5)
@@ -367,7 +315,7 @@ def given_publications_table(datatable):
                     UUID(uid),
                     rec.get("url_param_id", url_param_id_from_uuid(uid)),
                     UUID(rec["document_id"]),
-                    UUID(rec["project_document_id"]),
+                    UUID(project_document_id) if project_document_id else None,
                     rec.get("status", "active"),
                 )
         finally:
@@ -394,232 +342,6 @@ def given_app_config_table(datatable):
                     rec.get("key", ""),
                     rec.get("value", ""),
                 )
-        finally:
-            await conn.close()
-    _run(_insert())
-
-
-# ── Given: domain tables ───────────────────────────────────────────────────────
-
-@given("the projects table contains:")
-def given_projects_table(datatable):
-    async def _insert():
-        conn = await _conn()
-        try:
-            headers = datatable[0]
-            for row in datatable[1:]:
-                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
-                uid = rec["id"]
-                await conn.execute(
-                    """INSERT INTO projects(id, url_param_id, name, status)
-                       VALUES($1, $2, $3, $4)
-                       ON CONFLICT (id) DO NOTHING""",
-                    UUID(uid),
-                    rec.get("url_param_id", url_param_id_from_uuid(uid)),
-                    rec.get("name", "Project"),
-                    rec.get("status", "active"),
-                )
-        finally:
-            await conn.close()
-    _run(_insert())
-
-
-@given("the tribes table contains:")
-def given_tribes_table(datatable):
-    async def _insert():
-        conn = await _conn()
-        try:
-            headers = datatable[0]
-            for row in datatable[1:]:
-                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
-                uid = rec["id"]
-                await conn.execute(
-                    """INSERT INTO tribes(id, url_param_id, name, status)
-                       VALUES($1, $2, $3, $4)
-                       ON CONFLICT (id) DO NOTHING""",
-                    UUID(uid),
-                    rec.get("url_param_id", url_param_id_from_uuid(uid)),
-                    rec.get("name", "Tribe"),
-                    rec.get("status", "active"),
-                )
-        finally:
-            await conn.close()
-    _run(_insert())
-
-
-@given("the tribes_projects table contains:")
-def given_tribes_projects_table(datatable):
-    async def _insert():
-        conn = await _conn()
-        try:
-            headers = datatable[0]
-            for row in datatable[1:]:
-                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
-                display_order = coerce("display_order", rec.get("display_order", "0"))
-                await conn.execute(
-                    """INSERT INTO tribes_projects(tribe_id, project_id, relation, display_order)
-                       VALUES($1, $2, $3, $4)
-                       ON CONFLICT (tribe_id, project_id) DO UPDATE SET
-                           relation = EXCLUDED.relation,
-                           display_order = EXCLUDED.display_order""",
-                    UUID(rec["tribe_id"]),
-                    UUID(rec["project_id"]),
-                    rec.get("relation", "member"),
-                    display_order,
-                )
-        finally:
-            await conn.close()
-    _run(_insert())
-
-
-@given("the positions table contains:")
-def given_positions_table(datatable):
-    async def _insert():
-        conn = await _conn()
-        try:
-            headers = datatable[0]
-            for row in datatable[1:]:
-                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
-                uid = rec.get("id")
-                await conn.execute(
-                    """INSERT INTO positions(id, tribe_id, person_id, position, status)
-                       VALUES($1, $2, $3, $4, $5)
-                       ON CONFLICT (tribe_id, person_id) DO NOTHING""",
-                    UUID(uid) if uid else None,
-                    UUID(rec["tribe_id"]),
-                    UUID(rec["person_id"]),
-                    rec.get("position", "member"),
-                    rec.get("status", "active"),
-                )
-        finally:
-            await conn.close()
-    _run(_insert())
-
-
-@given("the projects_features table contains:")
-def given_projects_features_table(datatable):
-    async def _insert():
-        conn = await _conn()
-        try:
-            headers = datatable[0]
-            for row in datatable[1:]:
-                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
-                uid = rec["id"]
-                await conn.execute(
-                    """INSERT INTO projects_features(id, project_id, feature_type, name, status, position)
-                       VALUES($1, $2, $3, $4, $5, $6)
-                       ON CONFLICT (id) DO NOTHING""",
-                    UUID(uid),
-                    UUID(rec["project_id"]),
-                    rec.get("feature_type", "kanban"),
-                    rec.get("name", "Feature"),
-                    rec.get("status", "active"),
-                    coerce("position", rec.get("position", "0")),
-                )
-        finally:
-            await conn.close()
-    _run(_insert())
-
-
-@given("the kanban_columns table contains:")
-def given_kanban_columns_table(datatable):
-    async def _insert():
-        conn = await _conn()
-        try:
-            headers = datatable[0]
-            for row in datatable[1:]:
-                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
-                uid = rec["id"]
-                await conn.execute(
-                    """INSERT INTO kanban_columns(id, feature_instance_id, name, position, status)
-                       VALUES($1, $2, $3, $4, $5)
-                       ON CONFLICT (id) DO NOTHING""",
-                    UUID(uid),
-                    UUID(rec["feature_instance_id"]),
-                    rec.get("name", "Column"),
-                    coerce("position", rec.get("position", "0")),
-                    rec.get("status", "active"),
-                )
-        finally:
-            await conn.close()
-    _run(_insert())
-
-
-@given("the kanban_cards table contains:")
-def given_kanban_cards_table(datatable):
-    async def _insert():
-        conn = await _conn()
-        try:
-            headers = datatable[0]
-            for row in datatable[1:]:
-                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
-                uid = rec["id"]
-                assigned = rec.get("assigned_person_id")
-                due = rec.get("due_date")
-                created_at = _parse_created_at(rec.get("created_at"))
-                fields = [
-                    "id", "feature_instance_id", "column_id", "title",
-                    "assigned_person_id", "due_date", "status", "position",
-                ]
-                values = [
-                    UUID(uid),
-                    UUID(rec["feature_instance_id"]),
-                    UUID(rec["column_id"]),
-                    rec.get("title", "Card"),
-                    UUID(assigned) if assigned else None,
-                    coerce("due_date", due) if due else None,
-                    rec.get("status", "active"),
-                    coerce("position", rec.get("position", "0")),
-                ]
-                if created_at is not None:
-                    fields.append("created_at")
-                    values.append(created_at)
-                placeholders = ", ".join(f"${i + 1}" for i in range(len(fields)))
-                query = (
-                    f"INSERT INTO kanban_cards({', '.join(fields)}) "
-                    f"VALUES({placeholders}) ON CONFLICT (id) DO NOTHING"
-                )
-                await conn.execute(query, *values)
-        finally:
-            await conn.close()
-    _run(_insert())
-
-
-@given("the todo_items table contains:")
-def given_todo_items_table(datatable):
-    async def _insert():
-        conn = await _conn()
-        try:
-            headers = datatable[0]
-            for row in datatable[1:]:
-                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
-                uid = rec["id"]
-                assigned = rec.get("assigned_person_id")
-                due = rec.get("due_date")
-                created_at = _parse_created_at(rec.get("created_at"))
-                fields = [
-                    "id", "feature_instance_id", "title", "todo_status",
-                    "assigned_person_id", "due_date", "status", "position",
-                ]
-                values = [
-                    UUID(uid),
-                    UUID(rec["feature_instance_id"]),
-                    rec.get("title", "Todo"),
-                    rec.get("todo_status", "todo"),
-                    UUID(assigned) if assigned else None,
-                    coerce("due_date", due) if due else None,
-                    rec.get("status", "active"),
-                    coerce("position", rec.get("position", "0")),
-                ]
-                if created_at is not None:
-                    fields.append("created_at")
-                    values.append(created_at)
-                placeholders = ", ".join(f"${i + 1}" for i in range(len(fields)))
-                query = (
-                    f"INSERT INTO todo_items({', '.join(fields)}) "
-                    f"VALUES({placeholders}) ON CONFLICT (id) DO NOTHING"
-                )
-                await conn.execute(query, *values)
         finally:
             await conn.close()
     _run(_insert())
@@ -817,7 +539,6 @@ def _assert_db(table: str, datatable: list):
         for j, col in enumerate(headers):
             act_val = act[col]
             act_str = str(act_val) if act_val is not None else ""
-            # Integer columns must not be UUID-expanded; compare raw strings
             exp_val = exp[j] if isinstance(act_val, int) else expand_id(exp[j])
             assert act_str == exp_val, f"{table}[{i}].{col}: expected {exp_val!r}, got {act_str!r}"
 
@@ -845,21 +566,6 @@ def then_labels_table(datatable):
 @then("the app_config table contains:")
 def then_app_config_table(datatable):
     _assert_db("app_config", datatable)
-
-
-@then("the projects table contains:")
-def then_projects_table(datatable):
-    _assert_db("projects", datatable)
-
-
-@then("the tribes table contains:")
-def then_tribes_table(datatable):
-    _assert_db("tribes", datatable)
-
-
-@then("the positions table contains:")
-def then_positions_table(datatable):
-    _assert_db("positions", datatable)
 
 
 @then("the managed_roles table contains:")
@@ -950,59 +656,6 @@ def then_publications_table(datatable):
     _assert_db("publications", datatable)
 
 
-@then("the kanban_columns table contains:")
-def then_kanban_columns_table(datatable):
-    _assert_db("kanban_columns", datatable)
-
-
-@then("the kanban_cards table contains:")
-def then_kanban_cards_table(datatable):
-    _assert_db("kanban_cards", datatable)
-
-
-@then("the todo_items table contains:")
-def then_todo_items_table(datatable):
-    _assert_db("todo_items", datatable)
-
-
-@then("the user_bookmarks table contains:")
-def then_user_bookmarks_table(datatable):
-    _assert_db("user_bookmarks", datatable)
-
-
-@then("the projects_features table contains:")
-def then_projects_features_table(datatable):
-    _assert_db("projects_features", datatable)
-
-
-@then("the tribes_projects table contains:")
-def then_tribes_projects_table(datatable):
-    headers = datatable[0]
-    expected_rows = datatable[1:]
-
-    async def _query():
-        conn = await _conn()
-        try:
-            cols = ", ".join(f'"{h}"' for h in headers)
-            rows = await conn.fetch(
-                f"SELECT {cols} FROM tribes_projects ORDER BY tribe_id, project_id"
-            )
-            return [dict(r) for r in rows]
-        finally:
-            await conn.close()
-
-    actual_rows = _run(_query())
-    assert len(actual_rows) == len(expected_rows), (
-        f"tribes_projects: expected {len(expected_rows)} rows, got {len(actual_rows)}"
-    )
-    for i, (exp, act) in enumerate(zip(expected_rows, actual_rows)):
-        for j, col in enumerate(headers):
-            act_val = act[col]
-            act_str = str(act_val) if act_val is not None else ""
-            exp_val = exp[j] if isinstance(act_val, int) else expand_id(exp[j])
-            assert act_str == exp_val, f"tribes_projects[{i}].{col}: expected {exp_val!r}, got {act_str!r}"
-
-
 @given("the label_entities table contains:")
 def given_label_entities_table(datatable):
     async def _insert():
@@ -1025,31 +678,6 @@ def given_label_entities_table(datatable):
 @then("the label_entities table contains:")
 def then_label_entities_table(datatable):
     _assert_db("label_entities", datatable)
-
-
-@given("the user_tab_configs table contains:")
-def given_user_tab_configs_table(datatable):
-    async def _insert():
-        conn = await _conn()
-        try:
-            for row in datatable[1:]:
-                rec = {datatable[0][i]: expand_id(row[i]) for i in range(len(datatable[0]))}
-                await conn.execute(
-                    """INSERT INTO user_tab_configs(id, user_id, context_key, tab_configs)
-                       VALUES($1, $2, $3, $4::jsonb) ON CONFLICT (id) DO NOTHING""",
-                    UUID(rec["id"]),
-                    UUID(rec["user_id"]),
-                    rec["context_key"],
-                    rec.get("tab_configs", "[]"),
-                )
-        finally:
-            await conn.close()
-    _run(_insert())
-
-
-@then("the user_tab_configs table contains:")
-def then_user_tab_configs_table(datatable):
-    _assert_db("user_tab_configs", datatable)
 
 
 @given("the search_index table contains:")

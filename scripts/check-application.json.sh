@@ -35,7 +35,8 @@ def emit(packages, context):
 emit(app["platform"]["core"],      "platform.core")
 emit(app["platform"]["functions"], "platform.functions")
 emit(app["platform"]["tools"],     "platform.tools")
-emit(app["features"]["features"],  "features")
+if "features" in app:
+    emit(app["features"].get("features", []), "features")
 PYEOF
 )
 

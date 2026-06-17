@@ -1,12 +1,11 @@
 import os
-import re
 import asyncio
 import argparse
 import csv
 import random
 import string
 from datetime import datetime, timezone
-from typing import Dict, List, Tuple
+from typing import Dict, List
 from dotenv import load_dotenv
 import asyncpg
 import sys
@@ -19,7 +18,7 @@ POSTGRES_DB = os.getenv("POSTGRES_DB", "modern_tribes_db")
 POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
 POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", "5432"))
 
-ALEMBIC_REVISION = "001"
+ALEMBIC_REVISION = "002"
 
 
 _URL_PARAM_CHARS = string.ascii_letters + string.digits
@@ -27,10 +26,6 @@ _URL_PARAM_CHARS = string.ascii_letters + string.digits
 
 def _generate_url_param_id() -> str:
     return ''.join(random.choices(_URL_PARAM_CHARS, k=6))
-
-
-def _strip_html(html: str) -> str:
-    return re.sub(r'<[^>]+>', ' ', html or '').strip()
 
 
 class DatabaseInitializer:
@@ -95,23 +90,16 @@ class DatabaseInitializer:
             "notifications",
             "publications",
             "document_pages",
-            "projects_documents",
-            "todo_items",
-            "projects_features",
             "document_entities",
             "label_entities",
             "mails_to",
             "mails",
-            "tribes_projects",
-            "positions",
             "represents",
             "user_sessions",
             "user_roles",
             "role_permissions",
             "users",
             "persons",
-            "tribes",
-            "projects",
             "documents",
             "labels",
             "app_config",
@@ -176,19 +164,6 @@ class DatabaseInitializer:
         print(f"✓ Created {len(ids)} persons")
         return ids
 
-    async def create_tribes(self) -> Dict[str, str]:
-        rows = self.load_csv("tribes.csv")
-        ids: Dict[str, str] = {}
-        async with self.pool.acquire() as conn:
-            for row in rows:
-                r = await conn.fetchrow(
-                    "INSERT INTO tribes (url_param_id, name) VALUES ($1, $2) RETURNING id",
-                    _generate_url_param_id(), row["name"],
-                )
-                ids[row["name"]] = str(r["id"])
-        print(f"✓ Created {len(ids)} tribes")
-        return ids
-
     async def create_users(
         self, role_ids: Dict[str, str], person_ids: Dict[str, str]
     ) -> Dict[str, str]:
@@ -215,61 +190,6 @@ class DatabaseInitializer:
         print(f"✓ Created {len(ids)} users")
         return ids
 
-    async def create_projects(self) -> Dict[str, str]:
-        rows = self.load_csv("projects.csv")
-        ids: Dict[str, str] = {}
-        async with self.pool.acquire() as conn:
-            for row in rows:
-                r = await conn.fetchrow(
-                    "INSERT INTO projects (url_param_id, name, description) VALUES ($1, $2, $3) RETURNING id",
-                    _generate_url_param_id(), row["name"], row.get("description") or None,
-                )
-                ids[row["name"]] = str(r["id"])
-        print(f"✓ Created {len(ids)} projects")
-        return ids
-
-    async def create_tribes_projects(
-        self, tribe_ids: Dict[str, str], project_ids: Dict[str, str]
-    ) -> int:
-        rows = self.load_csv("tribes_projects.csv")
-        count = 0
-        async with self.pool.acquire() as conn:
-            for row in rows:
-                if row["tribe"] not in tribe_ids:
-                    print(f"✗ Unknown tribe '{row['tribe']}' in tribes_projects.csv")
-                    sys.exit(1)
-                if row["project"] not in project_ids:
-                    print(f"✗ Unknown project '{row['project']}' in tribes_projects.csv")
-                    sys.exit(1)
-                await conn.execute(
-                    "INSERT INTO tribes_projects (tribe_id, project_id, relation) VALUES ($1, $2, $3)",
-                    tribe_ids[row["tribe"]], project_ids[row["project"]], row["relation"],
-                )
-                count += 1
-        print(f"✓ Created {count} tribe-project relations")
-        return count
-
-    async def create_positions(
-        self, tribe_ids: Dict[str, str], person_ids: Dict[str, str]
-    ) -> int:
-        rows = self.load_csv("positions.csv")
-        count = 0
-        async with self.pool.acquire() as conn:
-            for row in rows:
-                if row["tribe"] not in tribe_ids:
-                    print(f"✗ Unknown tribe '{row['tribe']}' in positions.csv")
-                    sys.exit(1)
-                if row["person"] not in person_ids:
-                    print(f"✗ Unknown person '{row['person']}' in positions.csv")
-                    sys.exit(1)
-                await conn.fetchrow(
-                    "INSERT INTO positions (tribe_id, person_id, position) VALUES ($1, $2, $3) RETURNING id",
-                    tribe_ids[row["tribe"]], person_ids[row["person"]], row["position"],
-                )
-                count += 1
-        print(f"✓ Created {count} positions")
-        return count
-
     async def create_labels(self) -> Dict[str, str]:
         rows = self.load_csv("labels.csv")
         ids: Dict[str, str] = {}
@@ -282,135 +202,6 @@ class DatabaseInitializer:
                 ids[row["name"]] = str(r["id"])
         print(f"✓ Created {len(ids)} labels")
         return ids
-
-    async def create_project_documents(
-        self, project_ids: Dict[str, str], label_ids: Dict[str, str], user_ids: Dict[str, str]
-    ) -> Tuple[Dict[str, str], Dict[str, str]]:
-        rows = self.load_csv("project_documents.csv")
-        pd_ids: Dict[str, str] = {}
-        doc_ids: Dict[str, str] = {}
-        label_count = 0
-        admin_id = user_ids.get("admin")
-        async with self.pool.acquire() as conn:
-            for row in rows:
-                project = row["project"]
-                title = row["title"]
-                summary = row.get("content_summary") or None
-                labels_str = row.get("labels") or ""
-                if project not in project_ids:
-                    print(f"✗ Unknown project '{project}' in project_documents.csv")
-                    sys.exit(1)
-                content_html = f"<h2>{title}</h2><p>{summary}</p>" if summary else f"<h2>{title}</h2>"
-                content_text = _strip_html(content_html)
-                doc_r = await conn.fetchrow(
-                    "INSERT INTO documents (content_html, content_summary, content_text) VALUES ($1, $2, $3) RETURNING id",
-                    content_html, summary, content_text,
-                )
-                doc_id = str(doc_r["id"])
-                pd_r = await conn.fetchrow(
-                    "INSERT INTO projects_documents (url_param_id, project_id, document_id, title, created_by, updated_by) VALUES ($1, $2, $3, $4, $5, $5) RETURNING id",
-                    _generate_url_param_id(), project_ids[project], doc_id, title, admin_id,
-                )
-                pd_id = str(pd_r["id"])
-                key = f"{project}|{title}"
-                pd_ids[key] = pd_id
-                doc_ids[key] = doc_id
-                for label in (l.strip() for l in labels_str.split("|") if l.strip()):
-                    if label not in label_ids:
-                        print(f"✗ Unknown label '{label}' in project_documents.csv")
-                        sys.exit(1)
-                    await conn.execute(
-                        "INSERT INTO label_entities (label_id, entity_type, entity_id) VALUES ($1, $2, $3)",
-                        label_ids[label], "project_document", pd_id,
-                    )
-                    label_count += 1
-        print(f"✓ Created {len(pd_ids)} project documents with {label_count} label associations")
-        return pd_ids, doc_ids
-
-    async def create_publications(
-        self, pd_ids: Dict[str, str], doc_ids: Dict[str, str]
-    ) -> int:
-        rows = self.load_csv("publications.csv")
-        count = 0
-        async with self.pool.acquire() as conn:
-            for row in rows:
-                key = f"{row['project']}|{row['document_title']}"
-                if key not in pd_ids:
-                    print(f"✗ Unknown project document '{key}' in publications.csv")
-                    sys.exit(1)
-                await conn.execute(
-                    "INSERT INTO publications (url_param_id, document_id, project_document_id, status) VALUES ($1, $2, $3, 'active')",
-                    _generate_url_param_id(), doc_ids[key], pd_ids[key],
-                )
-                count += 1
-        print(f"✓ Created {count} publications")
-        return count
-
-    async def create_document_pages(self, pd_ids: Dict[str, str], user_ids: Dict[str, str]) -> int:
-        rows = self.load_csv("document_pages.csv")
-        count = 0
-        admin_id = user_ids.get("admin")
-        async with self.pool.acquire() as conn:
-            for row in rows:
-                key = f"{row['project']}|{row['document_title']}"
-                if key not in pd_ids:
-                    print(f"✗ Unknown project document '{key}' in document_pages.csv")
-                    sys.exit(1)
-                summary = row.get("content_summary") or None
-                content_html = f"<p>{summary}</p>" if summary else ""
-                content_text = summary or ""
-                await conn.execute(
-                    """INSERT INTO document_pages
-                       (url_param_id, project_document_id, title, content_html,
-                        content_summary, content_text, order_index, created_by, updated_by)
-                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8)""",
-                    _generate_url_param_id(), pd_ids[key],
-                    row["title"], content_html, summary, content_text,
-                    int(row.get("order_index") or 0), admin_id,
-                )
-                count += 1
-        print(f"✓ Created {count} document pages")
-        return count
-
-    async def create_projects_features(
-        self, project_ids: Dict[str, str]
-    ) -> Dict[str, str]:
-        rows = self.load_csv("projects_features.csv")
-        ids: Dict[str, str] = {}
-        async with self.pool.acquire() as conn:
-            for row in rows:
-                if row["project"] not in project_ids:
-                    print(f"✗ Unknown project '{row['project']}' in projects_features.csv")
-                    sys.exit(1)
-                r = await conn.fetchrow(
-                    """INSERT INTO projects_features (project_id, feature_type, name, position)
-                       VALUES ($1, $2, $3, $4) RETURNING id""",
-                    project_ids[row["project"]], row["feature_type"],
-                    row["name"], int(row.get("position") or 0),
-                )
-                ids[f"{row['project']}|{row['name']}"] = str(r["id"])
-        print(f"✓ Created {len(ids)} project features")
-        return ids
-
-    async def create_todo_items(self, feature_ids: Dict[str, str], user_ids: Dict[str, str]) -> int:
-        rows = self.load_csv("todo_items.csv")
-        count = 0
-        admin_id = user_ids.get("admin")
-        async with self.pool.acquire() as conn:
-            for row in rows:
-                key = f"{row['project']}|{row['feature_name']}"
-                if key not in feature_ids:
-                    print(f"✗ Unknown feature '{key}' in todo_items.csv")
-                    sys.exit(1)
-                await conn.execute(
-                    """INSERT INTO todo_items (feature_instance_id, title, todo_status, position, created_by, updated_by)
-                       VALUES ($1, $2, $3, $4, $5, $5)""",
-                    feature_ids[key], row["title"],
-                    row.get("todo_status") or "todo", int(row.get("position") or 0), admin_id,
-                )
-                count += 1
-        print(f"✓ Created {count} todo items")
-        return count
 
     async def create_mails(self) -> Dict[str, str]:
         rows = self.load_csv("mails.csv")
@@ -521,17 +312,8 @@ class DatabaseInitializer:
             permission_ids = await self.create_permissions()
             role_ids = await self.create_roles(permission_ids)
             person_ids = await self.create_persons()
-            tribe_ids = await self.create_tribes()
-            project_ids = await self.create_projects()
             user_ids = await self.create_users(role_ids, person_ids)
-            await self.create_positions(tribe_ids, person_ids)
-            tribes_projects_count = await self.create_tribes_projects(tribe_ids, project_ids)
             label_ids = await self.create_labels()
-            pd_ids, doc_ids = await self.create_project_documents(project_ids, label_ids, user_ids)
-            publications_count = await self.create_publications(pd_ids, doc_ids)
-            pages_count = await self.create_document_pages(pd_ids, user_ids)
-            feature_ids = await self.create_projects_features(project_ids)
-            todo_count = await self.create_todo_items(feature_ids, user_ids)
             mail_ids = await self.create_mails()
             mails_to_count = await self.create_mails_to(mail_ids, user_ids)
             represents_count = await self.create_represents(person_ids, user_ids)
@@ -543,16 +325,8 @@ class DatabaseInitializer:
             print(f"   • Permissions:              {len(permission_ids)}")
             print(f"   • Roles:                    {len(role_ids)}")
             print(f"   • Persons:                  {len(person_ids)}")
-            print(f"   • Tribes:                   {len(tribe_ids)}")
-            print(f"   • Projects:                 {len(project_ids)}")
             print(f"   • Users:                    {len(user_ids)}")
-            print(f"   • Tribe-project relations:  {tribes_projects_count}")
             print(f"   • Labels:                   {len(label_ids)}")
-            print(f"   • Project documents:        {len(pd_ids)}")
-            print(f"   • Publications:             {publications_count}")
-            print(f"   • Document pages:           {pages_count}")
-            print(f"   • Project features:         {len(feature_ids)}")
-            print(f"   • Todo items:               {todo_count}")
             print(f"   • Mails:                    {len(mail_ids)}")
             print(f"   • Mail recipients:          {mails_to_count}")
             print(f"   • Represents relations:     {represents_count}")

@@ -93,6 +93,14 @@ Keep only the platform locale imports (`en`, `fr`).
 - Remove any `NavItem` field and filter logic that was only needed for those items
   (e.g. `projectsAssignerVisible`, `canAssignProjects`)
 
+## Step 7b — `frontend/src/app/platform/core/authorization/useAdminAccess.ts`
+
+`canAssignProjects` (`can_assign_projects` permission) was feature-only (project assignment belonged to tribes-projects). Remove it:
+- Remove `canAssignProjects: boolean` from the `AdminAccess` interface
+- Remove the `const canAssignProjects = ...` line
+- Remove it from the `hasAdminAccess` expression
+- Remove it from the returned object
+
 ## Step 8 — `frontend/src/app/platform/core/about/AboutPage.tsx`
 
 - Remove the `AboutFeatures` import and the entire features section it renders
@@ -198,11 +206,17 @@ For each feature table:
 
 **Cross-table dependencies** — platform tables may hold FKs to feature tables. Before removing
 the referenced feature table, update the platform table:
-- If the FK column is needed by other platform tables (e.g. `project_id` in `projects_documents`
-  is referenced by `publications` and `document_pages`), **drop only the FK constraint** and make
-  the column a plain nullable UUID. Add a comment: "feature FK removed; features re-attach via migration".
+- If the FK column is needed by other platform tables (e.g. `project_document_id` in
+  `publications` and `document_pages` both reference `projects_documents(id)`, and
+  `projects_documents` is itself a feature table being removed), **drop only the FK constraint**
+  and make the column a plain nullable UUID. Add a comment: "feature FK removed; features re-attach via migration".
 - If the FK column is purely decorative (e.g. `feature_instance_id` on `labels`), drop the column
   entirely and remove any index or unique constraint that depended on it.
+
+**Concrete case from this run:**
+- `projects_documents` was the `tribes-projects` feature table — removed entirely
+- `publications.project_document_id` and `document_pages.project_document_id` both had FKs to it → made nullable
+- `labels.feature_instance_id` referenced `projects_features(id)` → column dropped, unique indexes `labels_name_feature_unique` and `idx_labels_feature_instance` dropped; `labels_name_global_unique` simplified from `WHERE feature_instance_id IS NULL` to unconditional
 
 After editing, verify the file creates cleanly with no FK violations by scanning for `REFERENCES`
 pointing to removed tables.
@@ -230,6 +244,84 @@ Check by grepping `backend/tests/features/platform/` for the table name before d
 `archive_publication.feature` used `Given the projects table contains:` as an FK precondition
 for `projects_documents`. Since `projects_documents.project_id` becomes a plain nullable UUID
 after Step 12, the projects setup step is no longer needed. Remove it from the feature file.
+
+**Also update `given_projects_documents_table`** in `conftest.py` — since `project_id` is now
+nullable (the FK was dropped), change `UUID(rec["project_id"])` to
+`UUID(project_id) if project_id else None`. Any test that omits `project_id` from the column
+list will work correctly.
+
+**Also update `given_publications_table`** for the same reason: `project_document_id` is now
+nullable, so handle it with `UUID(project_document_id) if project_document_id else None`.
+
+## Step 14 — Alembic migration to drop feature tables
+
+`reset-db.sh` runs `alembic upgrade head`, not `init_schema.sql`. This means the feature
+tables are still created by migration `001` after every DB reset unless you add a migration
+that explicitly drops them.
+
+Create `backend/alembic/versions/002_remove_features.py` (increment to the next available
+number if 002 already exists):
+
+```python
+"""Remove feature tables and decouple platform FKs
+
+Revision ID: 002
+Revises: 001
+Create Date: <today>
+"""
+from alembic import op
+
+revision = '002'
+down_revision = '001'
+branch_labels = None
+depends_on = None
+
+
+def upgrade() -> None:
+    # Make project_document_id nullable in platform tables before dropping projects_documents
+    op.execute("ALTER TABLE publications ALTER COLUMN project_document_id DROP NOT NULL")
+    op.execute("ALTER TABLE document_pages ALTER COLUMN project_document_id DROP NOT NULL")
+
+    # Drop feature_instance_id column from labels (purely decorative FK to projects_features)
+    op.execute("ALTER TABLE labels DROP COLUMN IF EXISTS feature_instance_id")
+
+    # Drop feature tables — CASCADE removes FK constraints in referencing tables
+    op.execute("DROP TABLE IF EXISTS kanban_cards CASCADE")
+    op.execute("DROP TABLE IF EXISTS kanban_columns CASCADE")
+    op.execute("DROP TABLE IF EXISTS todo_items CASCADE")
+    op.execute("DROP TABLE IF EXISTS user_tab_configs CASCADE")
+    op.execute("DROP TABLE IF EXISTS user_bookmarks CASCADE")
+    op.execute("DROP TABLE IF EXISTS projects_documents CASCADE")
+    op.execute("DROP TABLE IF EXISTS tribes_projects CASCADE")
+    op.execute("DROP TABLE IF EXISTS positions CASCADE")
+    op.execute("DROP TABLE IF EXISTS projects_features CASCADE")
+    op.execute("DROP TABLE IF EXISTS projects CASCADE")
+    op.execute("DROP TABLE IF EXISTS tribes CASCADE")
+
+    # Recreate labels unique index without the feature_instance_id partial condition
+    op.execute("DROP INDEX IF EXISTS labels_name_global_unique")
+    op.execute("DROP INDEX IF EXISTS labels_name_feature_unique")
+    op.execute("DROP INDEX IF EXISTS idx_labels_feature_instance")
+    op.execute("CREATE UNIQUE INDEX labels_name_global_unique ON labels (name)")
+
+
+def downgrade() -> None:
+    pass
+```
+
+**The table list must match the feature schema entries** collected in Step 0. Update it if
+features were added or renamed since this was written.
+
+Also update `backend/scripts/init_db.py`:
+- Change `ALEMBIC_REVISION = "001"` to match the new head revision (e.g. `"002"`)
+
+Also update `backend/scripts/init_schema.sql`:
+- Update the header comment `-- Reflects full schema (alembic revision NNN)` to the new revision
+
+Verify the migration chain parses cleanly:
+```bash
+source backend/venv/bin/activate && python -m alembic history
+```
 
 ## Verification
 

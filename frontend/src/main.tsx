@@ -1,6 +1,4 @@
 import AuthBootstrapApp from '@/app/AuthBootstrapApp.tsx';
-import '@/app/features/glue';
-// triggers feature self-registration
 import i18n from '@/app/platform/core/i18n/index';
 
 import React from 'react';
