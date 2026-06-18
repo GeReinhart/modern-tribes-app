@@ -46,6 +46,7 @@ build/
 /.claude/settings.local.json
 /frontend/.vite/
 /backend/.env.prod
+/backend/.env.db.prod
 /.env.prod
 /target/
 /.claude/worktrees/agent-*/
