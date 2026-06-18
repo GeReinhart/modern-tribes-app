@@ -1,8 +1,8 @@
-"""Full consolidated schema
+"""Full consolidated platform schema
 
 Revision ID: 001
 Revises: None
-Create Date: 2026-06-12
+Create Date: 2026-06-18
 """
 from alembic import op
 
@@ -173,42 +173,6 @@ def upgrade() -> None:
     """)
 
     op.execute("""
-        CREATE TABLE user_tab_configs (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-            context_key VARCHAR(100) NOT NULL,
-            tab_configs JSONB NOT NULL DEFAULT '[]',
-            status VARCHAR(20) NOT NULL DEFAULT 'active'
-                CHECK (status IN ('pending', 'active', 'archived')),
-            created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-            updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-            created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-            updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
-            UNIQUE(user_id, context_key)
-        )
-    """)
-
-    op.execute("""
-        CREATE TABLE user_bookmarks (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-            page_path VARCHAR(500) NOT NULL,
-            page_title VARCHAR(200) NOT NULL,
-            description TEXT,
-            color_text VARCHAR(50),
-            color_background VARCHAR(50),
-            display_order INT NOT NULL DEFAULT 0,
-            status VARCHAR(20) NOT NULL DEFAULT 'active'
-                CHECK (status IN ('pending', 'active', 'archived')),
-            created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-            updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-            created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-            updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
-            UNIQUE(user_id, page_path)
-        )
-    """)
-
-    op.execute("""
         CREATE TABLE notifications (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             url_param_id VARCHAR(12) UNIQUE NOT NULL,
@@ -255,139 +219,6 @@ def upgrade() -> None:
         )
     """)
 
-    # ── Tribes & Projects ─────────────────────────────────────────────────────
-
-    op.execute("""
-        CREATE TABLE projects (
-            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-            url_param_id VARCHAR(6) UNIQUE NOT NULL,
-            name VARCHAR(255) UNIQUE NOT NULL,
-            description TEXT,
-            theme_code VARCHAR(50) NULL,
-            document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-            updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
-            status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived'))
-        )
-    """)
-
-    op.execute("""
-        CREATE TABLE tribes (
-            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-            url_param_id VARCHAR(6) UNIQUE NOT NULL,
-            name VARCHAR(255) UNIQUE NOT NULL,
-            theme_code VARCHAR(50) NULL,
-            document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-            updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
-            status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived'))
-        )
-    """)
-
-    op.execute("""
-        CREATE TABLE tribes_projects (
-            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-            tribe_id UUID REFERENCES tribes(id) ON DELETE CASCADE NOT NULL,
-            project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
-            relation VARCHAR(20) NOT NULL CHECK (relation IN ('manager', 'member', 'guest')),
-            display_order INTEGER NOT NULL DEFAULT 0,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE (tribe_id, project_id)
-        )
-    """)
-
-    op.execute("""
-        CREATE TABLE positions (
-            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-            tribe_id UUID REFERENCES tribes(id) ON DELETE CASCADE NOT NULL,
-            person_id UUID REFERENCES persons(id) ON DELETE CASCADE NOT NULL,
-            position VARCHAR(50) NOT NULL CHECK (position IN ('manager', 'member', 'guest')),
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-            updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
-            status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
-            UNIQUE (tribe_id, person_id)
-        )
-    """)
-
-    # ── Features ──────────────────────────────────────────────────────────────
-
-    op.execute("""
-        CREATE TABLE projects_features (
-            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-            project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
-            feature_type VARCHAR(100) NOT NULL,
-            name VARCHAR(255) NOT NULL,
-            theme_code VARCHAR(50) NULL,
-            status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'archived')),
-            position INTEGER DEFAULT 0,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-            updated_by UUID REFERENCES users(id) ON DELETE SET NULL
-        )
-    """)
-
-    op.execute("""
-        CREATE TABLE todo_items (
-            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-            feature_instance_id UUID REFERENCES projects_features(id) ON DELETE CASCADE NOT NULL,
-            title VARCHAR(500) NOT NULL,
-            status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
-            todo_status VARCHAR(50) NOT NULL DEFAULT 'todo' CHECK (todo_status IN ('todo', 'done')),
-            document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
-            position INTEGER DEFAULT 0,
-            size INTEGER,
-            assigned_person_id UUID REFERENCES persons(id) ON DELETE SET NULL,
-            due_date DATE,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-            updated_by UUID REFERENCES users(id) ON DELETE SET NULL
-        )
-    """)
-
-    op.execute("""
-        CREATE TABLE kanban_columns (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            feature_instance_id UUID NOT NULL REFERENCES projects_features(id) ON DELETE CASCADE,
-            name VARCHAR(255) NOT NULL,
-            position INTEGER NOT NULL DEFAULT 0,
-            status VARCHAR(20) NOT NULL DEFAULT 'active'
-                CHECK (status IN ('pending', 'active', 'archived')),
-            created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-            updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-            created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-            updated_by UUID REFERENCES users(id) ON DELETE SET NULL
-        )
-    """)
-
-    op.execute("""
-        CREATE TABLE kanban_cards (
-            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-            feature_instance_id UUID NOT NULL REFERENCES projects_features(id) ON DELETE CASCADE,
-            column_id UUID NOT NULL REFERENCES kanban_columns(id) ON DELETE CASCADE,
-            parent_card_id UUID REFERENCES kanban_cards(id) ON DELETE CASCADE,
-            title VARCHAR(500) NOT NULL,
-            assigned_person_id UUID REFERENCES persons(id) ON DELETE SET NULL,
-            document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
-            position INTEGER NOT NULL DEFAULT 0,
-            size INTEGER,
-            due_date DATE,
-            status VARCHAR(20) NOT NULL DEFAULT 'active'
-                CHECK (status IN ('pending', 'active', 'archived')),
-            created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-            updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-            created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-            updated_by UUID REFERENCES users(id) ON DELETE SET NULL
-        )
-    """)
-
     # ── Labels ────────────────────────────────────────────────────────────────
 
     op.execute("""
@@ -395,7 +226,6 @@ def upgrade() -> None:
             id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
             name VARCHAR(255) NOT NULL,
             description TEXT,
-            feature_instance_id UUID REFERENCES projects_features(id) ON DELETE CASCADE,
             color VARCHAR(20) NOT NULL DEFAULT '#6b7280',
             position INTEGER NOT NULL DEFAULT 0,
             created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -406,8 +236,7 @@ def upgrade() -> None:
         )
     """)
 
-    op.execute("CREATE UNIQUE INDEX labels_name_global_unique ON labels (name) WHERE feature_instance_id IS NULL")
-    op.execute("CREATE UNIQUE INDEX labels_name_feature_unique ON labels (name, feature_instance_id) WHERE feature_instance_id IS NOT NULL")
+    op.execute("CREATE UNIQUE INDEX labels_name_global_unique ON labels (name)")
 
     op.execute("""
         CREATE TABLE label_entities (
@@ -460,7 +289,7 @@ def upgrade() -> None:
         CREATE TABLE projects_documents (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             url_param_id VARCHAR(6) UNIQUE NOT NULL,
-            project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+            project_id UUID NULL,
             document_id UUID NOT NULL REFERENCES documents(id) ON DELETE CASCADE,
             title VARCHAR(255) NOT NULL,
             toc_depth INTEGER NOT NULL DEFAULT 4,
@@ -477,7 +306,7 @@ def upgrade() -> None:
         CREATE TABLE document_pages (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             url_param_id VARCHAR(6) UNIQUE NOT NULL,
-            project_document_id UUID NOT NULL REFERENCES projects_documents(id) ON DELETE CASCADE,
+            project_document_id UUID NULL,
             title VARCHAR(255) NOT NULL,
             content_html TEXT NOT NULL DEFAULT '',
             content_summary TEXT,
@@ -499,7 +328,7 @@ def upgrade() -> None:
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             url_param_id VARCHAR(6) UNIQUE NOT NULL,
             document_id UUID NOT NULL UNIQUE REFERENCES documents(id) ON DELETE CASCADE,
-            project_document_id UUID NOT NULL REFERENCES projects_documents(id) ON DELETE CASCADE,
+            project_document_id UUID NULL,
             status VARCHAR(50) NOT NULL DEFAULT 'active'
                 CONSTRAINT publications_status_check CHECK (status IN ('pending', 'active', 'archived')),
             published_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -545,39 +374,22 @@ def upgrade() -> None:
     op.execute("CREATE INDEX idx_user_sessions_user_id ON user_sessions(user_id)")
     op.execute("CREATE INDEX idx_represents_user_id ON represents(user_id)")
     op.execute("CREATE INDEX idx_represents_person_id ON represents(person_id)")
-    op.execute("CREATE INDEX idx_tribes_url_param_id ON tribes(url_param_id)")
-    op.execute("CREATE INDEX idx_tribes_projects_tribe_id ON tribes_projects(tribe_id)")
-    op.execute("CREATE INDEX idx_tribes_projects_project_id ON tribes_projects(project_id)")
-    op.execute("CREATE INDEX idx_positions_tribe_id ON positions(tribe_id)")
-    op.execute("CREATE INDEX idx_positions_person_id ON positions(person_id)")
-    op.execute("CREATE INDEX idx_projects_url_param_id ON projects(url_param_id)")
-    op.execute("CREATE INDEX idx_projects_features_project_id ON projects_features(project_id)")
-    op.execute("CREATE INDEX idx_todo_items_feature_instance_id ON todo_items(feature_instance_id)")
-    op.execute("CREATE INDEX idx_kanban_columns_feature_instance ON kanban_columns(feature_instance_id)")
-    op.execute("CREATE INDEX idx_kanban_columns_position ON kanban_columns(feature_instance_id, position)")
-    op.execute("CREATE INDEX idx_kanban_cards_feature_instance ON kanban_cards(feature_instance_id)")
-    op.execute("CREATE INDEX idx_kanban_cards_column ON kanban_cards(column_id)")
-    op.execute("CREATE INDEX idx_kanban_cards_parent ON kanban_cards(parent_card_id)")
     op.execute("CREATE INDEX idx_mails_status ON mails(status)")
     op.execute("CREATE INDEX idx_mails_mail_status ON mails(mail_status)")
     op.execute("CREATE INDEX idx_mails_mail_type ON mails(mail_type)")
     op.execute("CREATE INDEX idx_mails_planned_at ON mails(planned_at)")
     op.execute("CREATE INDEX idx_mails_to_mail_id ON mails_to(mail_id)")
     op.execute("CREATE INDEX idx_mails_to_user_id ON mails_to(user_id)")
-    op.execute("CREATE INDEX idx_labels_feature_instance ON labels(feature_instance_id)")
     op.execute("CREATE INDEX idx_label_entities_label_id ON label_entities(label_id)")
     op.execute("CREATE INDEX idx_label_entities_entity ON label_entities(entity_type, entity_id)")
     op.execute("CREATE INDEX idx_document_entities_document_id ON document_entities(document_id)")
     op.execute("CREATE INDEX idx_document_entities_entity ON document_entities(entity_type, entity_id)")
-    op.execute("CREATE INDEX idx_projects_documents_project_id ON projects_documents(project_id)")
+    op.execute("CREATE INDEX idx_projects_documents_url_param_id ON projects_documents(url_param_id)")
     op.execute("CREATE INDEX idx_projects_documents_document_id ON projects_documents(document_id)")
     op.execute("CREATE INDEX idx_projects_documents_status ON projects_documents(status)")
-    op.execute("CREATE INDEX idx_projects_documents_url_param_id ON projects_documents(url_param_id)")
-    op.execute("CREATE INDEX idx_document_pages_project_document_id ON document_pages(project_document_id)")
-    op.execute("CREATE INDEX idx_document_pages_status ON document_pages(project_document_id, status)")
+    op.execute("CREATE INDEX idx_document_pages_status ON document_pages(status)")
     op.execute("CREATE INDEX idx_document_pages_content_fts ON document_pages USING GIN(to_tsvector('french', COALESCE(content_text, '')))")
     op.execute("CREATE INDEX idx_publications_document_id ON publications(document_id)")
-    op.execute("CREATE INDEX idx_publications_project_document_id ON publications(project_document_id)")
     op.execute("CREATE INDEX idx_publications_published_at ON publications(published_at DESC)")
     op.execute("CREATE INDEX idx_publications_url_param_id ON publications(url_param_id)")
     op.execute("CREATE INDEX idx_notifications_target_status ON notifications(target_user_id, notification_status)")
@@ -588,10 +400,9 @@ def upgrade() -> None:
     # ── Triggers ─────────────────────────────────────────────────────────────
 
     for table in (
-        'permissions', 'roles', 'documents', 'persons', 'users', 'projects', 'tribes',
-        'positions', 'represents', 'mails', 'labels', 'app_config',
-        'projects_features', 'todo_items', 'kanban_columns', 'kanban_cards',
-        'projects_documents', 'publications', 'user_tab_configs', 'user_bookmarks',
+        'permissions', 'roles', 'documents', 'persons', 'users',
+        'represents', 'mails', 'labels', 'app_config',
+        'projects_documents', 'publications',
         'notifications', 'document_pages', 'search_index',
     ):
         op.execute(
@@ -600,108 +411,20 @@ def upgrade() -> None:
             f"FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()"
         )
 
-    # ── Search index backfill ─────────────────────────────────────────────────
-
-    op.execute("""
-        INSERT INTO search_index (
-            entity_type, entity_id, content_text, content_summary,
-            routing_path, status, created_at, updated_at, created_by, updated_by
-        )
-        SELECT
-            'todo_item',
-            ti.id,
-            TRIM(CONCAT_WS(' ',
-                ti.title,
-                (SELECT string_agg(l.name, ' ' ORDER BY l.name)
-                 FROM label_entities le
-                 JOIN labels l ON l.id = le.label_id
-                 WHERE le.entity_id = ti.id
-                   AND le.entity_type = 'todo_item'
-                   AND l.status = 'active'),
-                d.content_text
-            )),
-            ti.title,
-            '/app/tribes/' || t.url_param_id
-                || '/projects/' || p.url_param_id
-                || '/' || pf.id::text
-                || '?taskId=' || ti.id::text,
-            'active',
-            NOW(),
-            NOW(),
-            NULL,
-            NULL
-        FROM todo_items ti
-        JOIN projects_features pf ON pf.id = ti.feature_instance_id AND pf.status = 'active'
-        JOIN projects p ON p.id = pf.project_id AND p.status = 'active'
-        JOIN tribes_projects tp ON tp.project_id = p.id
-        JOIN tribes t ON t.id = tp.tribe_id AND t.status = 'active'
-        LEFT JOIN documents d ON d.id = ti.document_id AND d.status = 'active'
-        WHERE ti.status != 'archived'
-        ON CONFLICT (entity_type, entity_id) DO NOTHING
-    """)
-
-    op.execute("""
-        INSERT INTO search_index (
-            entity_type, entity_id, content_text, content_summary,
-            routing_path, status, created_at, updated_at, created_by, updated_by
-        )
-        SELECT
-            'kanban_card',
-            kc.id,
-            TRIM(CONCAT_WS(' ',
-                kc.title,
-                (SELECT string_agg(l.name, ' ' ORDER BY l.name)
-                 FROM label_entities le
-                 JOIN labels l ON l.id = le.label_id
-                 WHERE le.entity_id = kc.id
-                   AND le.entity_type = 'kanban_card'
-                   AND l.status = 'active'),
-                d.content_text
-            )),
-            kc.title,
-            '/app/tribes/' || t.url_param_id
-                || '/projects/' || p.url_param_id
-                || '/' || pf.id::text
-                || '?taskId=' || kc.id::text,
-            'active',
-            NOW(),
-            NOW(),
-            NULL,
-            NULL
-        FROM kanban_cards kc
-        JOIN projects_features pf ON pf.id = kc.feature_instance_id AND pf.status = 'active'
-        JOIN projects p ON p.id = pf.project_id AND p.status = 'active'
-        JOIN tribes_projects tp ON tp.project_id = p.id
-        JOIN tribes t ON t.id = tp.tribe_id AND t.status = 'active'
-        LEFT JOIN documents d ON d.id = kc.document_id AND d.status = 'active'
-        WHERE kc.status != 'archived'
-        ON CONFLICT (entity_type, entity_id) DO NOTHING
-    """)
-
 
 def downgrade() -> None:
     tables = [
         'search_index',
         'document_pages',
         'notifications',
-        'user_bookmarks',
-        'user_tab_configs',
         'publications',
         'projects_documents',
-        'kanban_cards',
-        'kanban_columns',
-        'todo_items',
-        'projects_features',
         'document_entities',
         'label_entities',
         'labels',
         'app_config',
         'mails_to',
         'mails',
-        'positions',
-        'tribes_projects',
-        'tribes',
-        'projects',
         'represents',
         'user_sessions',
         'user_roles',

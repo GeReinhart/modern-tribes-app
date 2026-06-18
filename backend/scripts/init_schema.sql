@@ -1,5 +1,5 @@
 -- PostgreSQL Schema for Modern Tribes Application
--- Reflects full schema (alembic revision 003)
+-- Reflects full schema (alembic revision 001)
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
