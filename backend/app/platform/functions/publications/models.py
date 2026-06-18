@@ -44,9 +44,9 @@ class PublicationAdminItem(BaseModel):
     title: str
     content_summary: Optional[str] = None
     labels: List[LabelInfo] = []
-    tribe_id: str
-    tribe_name: str
-    project_id: str
-    project_name: str
+    tribe_id: Optional[str] = None
+    tribe_name: Optional[str] = None
+    project_id: Optional[str] = None
+    project_name: Optional[str] = None
     published_at: datetime
     published_by_login: Optional[str] = None

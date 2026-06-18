@@ -18,7 +18,6 @@ from app.platform.core.app_config import router as app_config
 from app.platform.core.app_config import query_router as query_app_config
 from app.platform.core.uploads import router as uploads
 from app.platform.functions.documents import router as documents
-from app.platform.functions.documents import page_router as document_pages
 from app.platform.functions.labels import router as labels
 from app.platform.functions.labels import query_router as query_labels
 from app.platform.functions.monitoring import router as query_monitoring
@@ -118,7 +117,6 @@ app.include_router(represents.router, prefix="/api/platform/functions/people")
 app.include_router(labels.router, prefix="/api/platform/functions")
 app.include_router(query_labels.router, prefix="/api/platform/functions")
 app.include_router(documents.router, prefix="/api/platform/functions")
-app.include_router(document_pages.router, prefix="/api/platform/functions/documents")
 app.include_router(query_monitoring.router, prefix="/api/platform/functions")
 app.include_router(app_publications.router, prefix="/api/platform/functions")
 app.include_router(public_publications.router, prefix="/api/platform/functions")

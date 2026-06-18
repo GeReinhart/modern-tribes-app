@@ -153,7 +153,7 @@ function PublicationAdminRow({
             {pub.title}
           </ThemedText>
           <ThemedText variant="secondary" size="small">
-            {pub.tribe_name} › {pub.project_name} ·{' '}
+            {pub.tribe_name && pub.project_name ? `${pub.tribe_name} › ${pub.project_name} · ` : ''}
             {new Date(pub.published_at).toISOString().slice(0, 10)}
             {pub.published_by_login && ` · ${pub.published_by_login}`}
           </ThemedText>
@@ -259,13 +259,17 @@ const PublicationsAdminPageContent: React.FC = () => {
   };
 
   const tribes = Array.from(
-    new Map(publications.map((p) => [p.tribe_id, p.tribe_name])).entries(),
+    new Map(
+      publications
+        .filter((p) => p.tribe_id && p.tribe_name)
+        .map((p) => [p.tribe_id!, p.tribe_name!]),
+    ).entries(),
   ).map(([id, name]) => ({ id, name }));
   const projects = Array.from(
     new Map(
       publications
-        .filter((p) => !tribeFilter || p.tribe_id === tribeFilter)
-        .map((p) => [p.project_id, p.project_name]),
+        .filter((p) => p.project_id && p.project_name && (!tribeFilter || p.tribe_id === tribeFilter))
+        .map((p) => [p.project_id!, p.project_name!]),
     ).entries(),
   ).map(([id, name]) => ({ id, name }));
 

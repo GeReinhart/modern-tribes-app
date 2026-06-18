@@ -8,15 +8,15 @@ import asyncpg
 from fastapi import HTTPException
 
 TABLES_WITH_STATUS = frozenset(
-    {"permissions", "roles", "documents", "persons", "users", "projects", "tribes", "positions", "labels"}
+    {"permissions", "roles", "documents", "persons", "users", "labels"}
 )
 
 TABLES_WITHOUT_CREATED_AT = frozenset(
-    {"user_roles", "role_permissions", "tribes_projects", "label_entities"}
+    {"user_roles", "role_permissions", "label_entities"}
 )
 
 URL_PARAM_ID_TABLES = frozenset(
-    {"users", "tribes", "projects", "projects_documents", "publications", "document_pages"}
+    {"users", "projects_documents", "publications", "document_pages"}
 )
 
 

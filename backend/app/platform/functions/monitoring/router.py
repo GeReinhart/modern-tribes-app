@@ -28,25 +28,13 @@ _QUERY = """
 SELECT entity, entity_id, entity_summary, entity_status, created_at, created_by, updated_at, updated_by
 FROM (
 
-SELECT 'Tribe' AS entity,
-       t.id::text AS entity_id,
-       name AS entity_summary,
-       t.status AS entity_status,
+SELECT 'Person' AS entity,
+       p.id::text AS entity_id,
+       first_name || ' ' || last_name AS entity_summary,
+       p.status AS entity_status,
        created_at, updated_at,
-       (SELECT email FROM users WHERE id = t.created_by) AS created_by,
-       (SELECT email FROM users WHERE id = t.updated_by) AS updated_by
-FROM tribes t
-WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
-
-UNION ALL
-
-SELECT 'Person',
-       p.id::text,
-       first_name || ' ' || last_name,
-       p.status,
-       created_at, updated_at,
-       (SELECT email FROM users WHERE id = p.created_by),
-       (SELECT email FROM users WHERE id = p.updated_by)
+       (SELECT email FROM users WHERE id = p.created_by) AS created_by,
+       (SELECT email FROM users WHERE id = p.updated_by) AS updated_by
 FROM persons p
 WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
 
@@ -88,18 +76,6 @@ WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
 
 UNION ALL
 
-SELECT 'Project',
-       pr.id::text,
-       name,
-       pr.status,
-       created_at, updated_at,
-       (SELECT email FROM users WHERE id = pr.created_by),
-       (SELECT email FROM users WHERE id = pr.updated_by)
-FROM projects pr
-WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
-
-UNION ALL
-
 SELECT 'Label',
        l.id::text,
        name,
@@ -108,18 +84,6 @@ SELECT 'Label',
        (SELECT email FROM users WHERE id = l.created_by),
        (SELECT email FROM users WHERE id = l.updated_by)
 FROM labels l
-WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
-
-UNION ALL
-
-SELECT 'Position',
-       pos.id::text,
-       position,
-       pos.status,
-       created_at, updated_at,
-       (SELECT email FROM users WHERE id = pos.created_by),
-       (SELECT email FROM users WHERE id = pos.updated_by)
-FROM positions pos
 WHERE GREATEST(created_at, updated_at) >= NOW() - make_interval(hours => $1)
 
 UNION ALL

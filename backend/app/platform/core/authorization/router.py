@@ -6,7 +6,6 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.platform.core.database import get_database
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.models import Authorization, PermissionEnum
-from app.platform.core.authorization.ownership import check_own_tribe_position_or_admin
 from app.platform.core.authorization.permissions import get_user_permissions
 
 router = APIRouter(prefix="/authorization", tags=["platform_core"])
@@ -39,62 +38,6 @@ async def current_user_has_at_least_one_permission(
     return Authorization(
         authorized=has_permission, message="" if has_permission else f"Required any of: {permissions}"
     )
-
-
-async def _check_permissions(permissions: str, current_user: dict) -> tuple[bool, str]:
-    user_permissions = await _get_user_permissions_or_raise(current_user)
-    required_permissions = [p.strip() for p in permissions.split(",")] + [PermissionEnum.ADMIN.value]
-
-    has_permission = any(perm in user_permissions for perm in required_permissions)
-
-    if not has_permission:
-        return False, f"Required any of: {permissions}"
-
-    return True, ""
-
-
-async def _authorize_tribe_access(
-    tribe_id: str, current_user: dict, position: str | None = None
-) -> Authorization:
-    try:
-        pool = get_database()
-        await check_own_tribe_position_or_admin(tribe_id, current_user, pool, required_position=position)
-        return Authorization(authorized=True, message="")
-    except HTTPException as e:
-        return Authorization(authorized=False, message=e.detail)
-
-
-@router.get("/permissions/any/{permissions}/own/tribe/{tribe_id}", response_model=Authorization)
-async def check_permission_and_tribe(
-    permissions: str, tribe_id: str, current_user: dict = Depends(get_current_user)
-):
-    """Check if the current user has the given permission and owns the specified tribe.
-
-    **Permissions:** authentication required — no specific permission
-    """
-    authorized, message = await _check_permissions(permissions, current_user)
-    if not authorized:
-        return Authorization(authorized=False, message=message)
-
-    return await _authorize_tribe_access(tribe_id, current_user)
-
-
-@router.get(
-    "/permissions/any/{permissions}/own/tribe/{tribe_id}/position/{position}",
-    response_model=Authorization,
-)
-async def check_permission_and_tribe_and_position(
-    permissions: str, tribe_id: str, position: str, current_user: dict = Depends(get_current_user)
-):
-    """Check if the current user has the given permission, owns the tribe, and holds the specified position.
-
-    **Permissions:** authentication required — no specific permission
-    """
-    authorized, message = await _check_permissions(permissions, current_user)
-    if not authorized:
-        return Authorization(authorized=False, message=message)
-
-    return await _authorize_tribe_access(tribe_id, current_user, position)
 
 
 # ============ DECORATORS ============

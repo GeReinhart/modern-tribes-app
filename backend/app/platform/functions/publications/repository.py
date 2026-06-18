@@ -111,12 +111,6 @@ async def fetch_publications_admin(
 ) -> list[dict]:
     params: list = []
     extra: list = []
-    if tribe_id:
-        extra.append(f"tp.tribe_id = ${len(params) + 1}")
-        params.append(UUID(tribe_id))
-    if project_id:
-        extra.append(f"proj.id = ${len(params) + 1}")
-        params.append(UUID(project_id))
     if q and q.strip():
         extra.append(
             f"to_tsvector('french', COALESCE(d.content_text, '')) "
@@ -125,21 +119,17 @@ async def fetch_publications_admin(
         params.append(q.strip())
     extra_clause = ("AND " + " AND ".join(extra)) if extra else ""
     query = f"""
-        SELECT DISTINCT ON (pub.id)
-               pub.id, pub.url_param_id, pub.document_id, pub.project_document_id, pub.published_at,
+        SELECT pub.id, pub.url_param_id, pub.document_id, pub.project_document_id, pub.published_at,
                pd.title, d.content_summary,
-               t.id AS tribe_id, t.name AS tribe_name,
-               proj.id AS project_id, proj.name AS project_name,
+               NULL::uuid AS tribe_id, NULL::text AS tribe_name,
+               NULL::uuid AS project_id, NULL::text AS project_name,
                u.login AS published_by_login
         FROM publications pub
         JOIN documents d ON d.id = pub.document_id
         JOIN projects_documents pd ON pd.id = pub.project_document_id
-        JOIN projects proj ON proj.id = pd.project_id
-        JOIN tribes_projects tp ON tp.project_id = proj.id
-        JOIN tribes t ON t.id = tp.tribe_id AND t.status = 'active'
         LEFT JOIN users u ON u.id = pub.published_by
         WHERE pub.status = 'active' {extra_clause}
-        ORDER BY pub.id, t.name ASC
+        ORDER BY pub.published_at DESC
     """
     async with pool.acquire() as conn:
         rows = await conn.fetch(query, *params)

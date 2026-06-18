@@ -38,10 +38,10 @@ export interface PublicationAdminItem {
   title: string;
   content_summary: string | null;
   labels: LabelInfo[];
-  tribe_id: string;
-  tribe_name: string;
-  project_id: string;
-  project_name: string;
+  tribe_id: string | null;
+  tribe_name: string | null;
+  project_id: string | null;
+  project_name: string | null;
   published_at: string;
   published_by_login: string | null;
 }

@@ -28,23 +28,6 @@ class PublicationService {
     return apiService.get<LabelInfo[]>('/platform/functions/publications/public/labels');
   }
 
-  // Authenticated endpoints (manager actions on project documents)
-
-  publish(
-    projectId: string,
-    projectDocumentId: string,
-  ): Promise<{ publication_url_param_id: string }> {
-    return apiService.patch<{ publication_url_param_id: string }>(
-      `/features/tribes-projects/project-documents/projects/${projectId}/documents/${projectDocumentId}/publish`,
-    );
-  }
-
-  unpublish(projectId: string, projectDocumentId: string): Promise<void> {
-    return apiService.patch<void>(
-      `/features/tribes-projects/project-documents/projects/${projectId}/documents/${projectDocumentId}/unpublish`,
-    );
-  }
-
   // Admin endpoints
 
   listAdmin(
