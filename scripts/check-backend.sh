@@ -8,6 +8,6 @@ cd "$BACKEND_DIR"
 python -m compileall -q app alembic
 
 echo "==> Linting..."
-ruff check app
+"$BACKEND_DIR/venv/bin/ruff" check app
 
 echo "==> Backend compile OK"

@@ -17,8 +17,8 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_HOST: str
     POSTGRES_PORT: int
-    POSTGRES_POOL_MIN: int
-    POSTGRES_POOL_MAX: int
+    POSTGRES_POOL_MIN: int = 2
+    POSTGRES_POOL_MAX: int = 10
 
     # File Upload
     UPLOAD_DIR: str = "./uploads"
@@ -43,7 +43,7 @@ class Settings(BaseSettings):
     MAILPACE_API_TOKEN: str = ""
 
     # Mail scheduler
-    MAIL_CRON_INTERVAL_SECONDS: int = 60
+    MAIL_CRON_INTERVAL_SECONDS: int = 5
 
     # CORS
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
@@ -70,7 +70,7 @@ class Settings(BaseSettings):
     def allowed_file_extensions_list(self) -> List[str]:
         return [ext.strip() for ext in self.ALLOWED_FILE_EXTENSIONS.split(",")]
 
-    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
 
 
 settings = Settings()

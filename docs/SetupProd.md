@@ -7,7 +7,7 @@
 - Run the init_db.py script
 
 ```bash
-python -m dotenv -f .env.prod run -- python backend/scripts/init_db.py --data-dir backend/scripts/data-prod
+python -m dotenv -f .env.db.prod run -- python backend/scripts/init_db.py --data-dir backend/scripts/data-prod
 ```
 
 
@@ -16,18 +16,12 @@ python -m dotenv -f .env.prod run -- python backend/scripts/init_db.py --data-di
 - Run the alembic upgrade head command
 ```bash
 cd backend
-set -a && source .env.prod && set +a && alembic upgrade head
+
+# Check migration status
+set -a && source .env.db.prod && set +a && alembic current
+
+
+# Migration update
+set -a && source .env.db.prod && set +a && alembic upgrade head
 ```
 
-## Run the backend from local connected to remote database
-
-- Build the image
-
-```bash
-podman build -f Dockerfile.backend -t modern-tribes-backend .
- ```
-
-- Run with .env.prod
-```bash
-podman run --env-file .env.prod -p 8000:8000 modern-tribes-backend
-```

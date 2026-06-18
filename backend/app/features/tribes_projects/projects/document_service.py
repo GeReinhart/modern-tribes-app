@@ -264,9 +264,6 @@ async def update_project_document(
 
     if data.content_html is not None:
         await update_document_content_with_revision(pool, document_id, data.content_html, current_user["id"])
-        await search_index_repo.index_projects_document(
-            pool, project_document_id, str(current_user["id"])
-        )
 
     if data.attachments is not None:
         await update_document_attachments(pool, document_id, data.attachments, current_user["id"])
@@ -274,6 +271,7 @@ async def update_project_document(
     if data.label_names is not None:
         await _sync_document_labels(pool, document_id, data.label_names)
 
+    await search_index_repo.index_projects_document(pool, project_document_id, str(current_user["id"]))
     return await get_project_document(project_id, project_document_id, pool)
 
 

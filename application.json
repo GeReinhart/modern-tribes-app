@@ -301,7 +301,7 @@
           "en": [
             "- global full-text search across documents, publications, todo items and kanban cards",
             "- indexed search targeting any element in the database",
-            "- labels applied to tasks are included in the indexed content",
+            "- labels applied to tasks and documents are included in the indexed content",
             "- navigating to any search result passes the query via ?q= in the URL",
             "- on the target page, matched search terms are highlighted with inverted colors (text/background swapped)",
             "- highlight.utils.ts: shared utility for tokenizing a query and injecting <mark> tags into HTML",
@@ -310,7 +310,7 @@
           "fr": [
             "- recherche plein texte globale sur les documents, publications, tâches todo et cartes kanban",
             "- recherche indexée ciblant n'importe quel élément de la base de données",
-            "- les étiquettes appliquées aux tâches sont incluses dans le contenu indexé",
+            "- les étiquettes appliquées aux tâches et aux documents sont incluses dans le contenu indexé",
             "- naviguer vers n'importe quel résultat de recherche transmet la requête via ?q= dans l'URL",
             "- sur la page cible, les termes recherchés sont mis en évidence avec des couleurs inversées (texte/fond inversés)",
             "- highlight.utils.ts : utilitaire partagé pour tokeniser une requête et injecter des balises <mark> dans le HTML",
@@ -725,14 +725,9 @@
             "- affiche l'appartenance aux tribus et les signets"
           ]
         },
-        "backend": {
-          "path": [
-            "backend/app/features/dashboard/**"
-          ]
-        },
         "frontend": {
           "path": [
-            "frontend/src/app/features/dashboard/**"
+            "frontend/src/app/features/glue/dashboard/**"
           ]
         }
       }

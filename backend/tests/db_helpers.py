@@ -82,7 +82,14 @@ async def _reset_schema():
 
 
 def _run_alembic():
-    env = {**os.environ, "POSTGRES_DB": TEST_DB_NAME, "POSTGRES_PORT": str(TEST_DB_PORT)}
+    env = {
+        **os.environ,
+        "POSTGRES_DB": TEST_DB_NAME,
+        "POSTGRES_PORT": str(TEST_DB_PORT),
+        "POSTGRES_USER": "admin",
+        "POSTGRES_PASSWORD": "password123",
+        "POSTGRES_HOST": "localhost",
+    }
     result = _alembic_upgrade(env)
     if result.returncode != 0:
         print("\n[test-db] Migration conflict detected; resetting schema...", flush=True)

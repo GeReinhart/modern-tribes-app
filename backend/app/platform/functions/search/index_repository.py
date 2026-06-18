@@ -50,7 +50,7 @@ async def index_projects_document(pool, project_document_uuid: str, user_id: str
     now = datetime.now(timezone.utc)
     async with pool.acquire() as conn:
         pd_row = await conn.fetchrow(
-            """SELECT pd.url_param_id, pd.project_id, pd.document_id
+            """SELECT pd.url_param_id, pd.project_id, pd.document_id, pd.title
                FROM projects_documents pd
                WHERE pd.id = $1 AND pd.status = 'active'""",
             UUID(project_document_uuid),
@@ -71,14 +71,18 @@ async def index_projects_document(pool, project_document_uuid: str, user_id: str
                LIMIT 1""",
             pd_row["project_id"],
         )
-    if not doc_row or not doc_row["content_text"] or not path_row:
+    if not doc_row or not path_row:
+        return
+    label_names = await _fetch_label_names(pool, pd_row["document_id"], "document")
+    content_text = _build_content_text(pd_row["title"] or "", label_names, doc_row["content_text"])
+    if not content_text:
         return
     routing_path = (
         f"/app/tribes/{path_row['tribe_url_param_id']}"
         f"/projects/{path_row['project_url_param_id']}"
         f"/documents/{pd_row['url_param_id']}"
     )
-    await _upsert(pool, "document", str(pd_row["document_id"]), doc_row["content_text"],
+    await _upsert(pool, "document", str(pd_row["document_id"]), content_text,
                   doc_row["content_summary"], routing_path, user_id, now)
 
 
