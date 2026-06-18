@@ -7,7 +7,7 @@ import { useAdminAccess } from '@/app/platform/core/authorization/useAdminAccess
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 type AdminPage =
   | 'authorization'
@@ -114,7 +114,6 @@ const ALL_ITEMS: NavItem[] = [
 export const AdminNavigation: React.FC<AdminNavigationProps> = ({
   currentPage,
 }) => {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { isAdmin, canManagePeople, canAssignProjects } = useAdminAccess();
@@ -137,8 +136,9 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({
         const isActive = page === currentPage;
         const color = isActive ? theme.colors.primary : theme.colors.text;
         return (
-          <div
+          <Link
             key={page}
+            to={path}
             role="menuitem"
             style={{
               padding: '12px 24px',
@@ -153,8 +153,8 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
+              textDecoration: 'none',
             }}
-            onClick={() => navigate(path)}
             onMouseEnter={(e) => {
               if (!isActive)
                 e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
@@ -166,7 +166,7 @@ export const AdminNavigation: React.FC<AdminNavigationProps> = ({
           >
             <ThemedSvgIcon name={icon} color={color} size={16} />
             {t(labelKey)}
-          </div>
+          </Link>
         );
       })}
     </div>

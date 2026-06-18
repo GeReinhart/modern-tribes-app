@@ -108,6 +108,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     tokenManager.setRefresher(doRefresh);
   }, [doRefresh]);
 
+  // Sync auth state when another tab updates localStorage (token refresh or logout).
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key !== 'access_token') return;
+      const newToken = e.newValue;
+      setToken(newToken);
+      if (!newToken) {
+        setUser(null);
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
   useEffect(() => {
     if (hasFetched.current) return;
     hasFetched.current = true;

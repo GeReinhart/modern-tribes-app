@@ -4,7 +4,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb.tsx';
 import {predefinedThemes} from "@/app/platform/core/layout/themes/themes.ts";
@@ -35,7 +35,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   breadcrumbTabs,
 }) => {
   const { theme, currentThemeKey } = useTheme();
-  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -167,11 +166,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     padding: '12px 24px',
   };
 
-  const handleNavItem = (path?: string) => {
-    if (path) navigate(path);
-    setIsMenuOpen(false);
-  };
-
   const hasMenuContent = true;
   const pageTitle =
     breadcrumbs && breadcrumbs.length > 0
@@ -211,22 +205,28 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                     {breadcrumbs.map((item, index) => {
                       const isLast = index === breadcrumbs.length - 1;
                       const clickable = !isLast && !!item.path;
-                      return (
-                        <div
-                          key={index}
-                          role="menuitem"
-                          style={menuNavItemStyle(clickable, isLast)}
-                          onClick={() => handleNavItem(item.path)}
-                          onMouseEnter={(e) => {
-                            if (clickable)
+                      const navStyle = { ...menuNavItemStyle(clickable, isLast), display: 'block', textDecoration: 'none' };
+                      if (clickable && item.path) {
+                        return (
+                          <Link
+                            key={index}
+                            to={item.path}
+                            role="menuitem"
+                            style={navStyle}
+                            onClick={() => setIsMenuOpen(false)}
+                            onMouseEnter={(e) => {
                               e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
-                          }}
-                          onMouseLeave={(e) => {
-                            if (clickable)
-                              e.currentTarget.style.backgroundColor =
-                                'transparent';
-                          }}
-                        >
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                          >
+                            {item.label}
+                          </Link>
+                        );
+                      }
+                      return (
+                        <div key={index} role="menuitem" style={navStyle}>
                           {item.label}
                         </div>
                       );
@@ -240,23 +240,23 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                       }}
                     >
                       {breadcrumbTabs.map((tab) => (
-                        <div
+                        <Link
                           key={tab.key}
+                          to={tab.path}
                           role="menuitem"
-                          style={menuNavItemStyle(true, tab.isActive, AREA_COLORS.tabActiveBorder)}
-                          onClick={() => handleNavItem(tab.path)}
+                          style={{ ...menuNavItemStyle(true, tab.isActive, AREA_COLORS.tabActiveBorder), display: 'block', textDecoration: 'none' }}
+                          onClick={() => setIsMenuOpen(false)}
                           onMouseEnter={(e) => {
                             if (!tab.isActive)
                               e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
                           }}
                           onMouseLeave={(e) => {
                             if (!tab.isActive)
-                              e.currentTarget.style.backgroundColor =
-                                'transparent';
+                              e.currentTarget.style.backgroundColor = 'transparent';
                           }}
                         >
                           {tab.label}
-                        </div>
+                        </Link>
                       ))}
                     </div>
                   )}

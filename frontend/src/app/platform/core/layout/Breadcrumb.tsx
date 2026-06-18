@@ -1,7 +1,7 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export interface BreadcrumbItem {
   label: string;
@@ -21,7 +21,6 @@ interface BreadcrumbProps {
 
 export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
   const { theme } = useTheme();
-  const navigate = useNavigate();
 
   const containerStyle: React.CSSProperties = {
     display: 'flex',
@@ -54,12 +53,6 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
     userSelect: 'none',
   };
 
-  const handleClick = (path?: string) => {
-    if (path) {
-      navigate(path);
-    }
-  };
-
   return (
     <nav style={containerStyle} aria-label="Breadcrumb">
       {items.map((item, index) => {
@@ -68,28 +61,24 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
 
         return (
           <React.Fragment key={index}>
-            <span
-              style={
-                isLast
-                  ? activeItemStyle
-                  : isClickable
-                    ? clickableItemStyle
-                    : itemStyle
-              }
-              onClick={() => handleClick(item.path)}
-              onMouseEnter={(e) => {
-                if (isClickable) {
+            {isClickable && item.path ? (
+              <Link
+                to={item.path}
+                style={{ ...clickableItemStyle, textDecoration: 'none' }}
+                onMouseEnter={(e) => {
                   e.currentTarget.style.color = theme.colors.primary;
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (isClickable) {
+                }}
+                onMouseLeave={(e) => {
                   e.currentTarget.style.color = theme.colors.text;
-                }
-              }}
-            >
-              {item.label}
-            </span>
+                }}
+              >
+                {item.label}
+              </Link>
+            ) : (
+              <span style={isLast ? activeItemStyle : itemStyle}>
+                {item.label}
+              </span>
+            )}
             {!isLast && <span style={separatorStyle}>/</span>}
           </React.Fragment>
         );
