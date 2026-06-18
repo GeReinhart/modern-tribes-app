@@ -107,10 +107,10 @@ const EditProjectPageContent: React.FC = () => {
       {
         icon: 'x',
         label: t('common.cancel'),
-        onClick: () => navigate(`/app/tribes/${tribeId}/projects/${projectId}`),
+        path: `/app/tribes/${tribeId}/projects/${projectId}`,
       },
     ],
-    [t, navigate, tribeId, projectId],
+    [t, tribeId, projectId],
   );
 
   if (loadingProject) {

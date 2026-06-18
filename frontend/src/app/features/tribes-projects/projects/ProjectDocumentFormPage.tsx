@@ -152,10 +152,10 @@ const ProjectDocumentFormPageContent: React.FC = () => {
       {
         icon: 'x',
         label: t('common.cancel'),
-        onClick: () => navigate(cancelPath),
+        path: cancelPath,
       },
     ],
-    [t, navigate, cancelPath],
+    [t, cancelPath],
   );
 
   if (isEdit && loadingDoc) {

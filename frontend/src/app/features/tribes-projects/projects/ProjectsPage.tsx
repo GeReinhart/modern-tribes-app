@@ -14,12 +14,11 @@ import { buildBookmarkDescription } from '@/app/features/bookmarks/types.ts';
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const ProjectsPageContent: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const navigate = useNavigate();
   const { user, isLoading: currentUserLoading } = useCurrentUserProfile();
   const { projects, loading: projectsLoading } = useUserProjects(
     user?.id || '',
@@ -75,10 +74,10 @@ const ProjectsPageContent: React.FC = () => {
       {
         icon: 'arrow-left',
         label: t('tribes.title'),
-        onClick: () => navigate('/app/tribes'),
+        path: '/app/tribes',
       },
     ],
-    [t, navigate],
+    [t],
   );
 
   if (currentUserLoading || projectsLoading) {

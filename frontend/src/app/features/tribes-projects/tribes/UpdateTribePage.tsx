@@ -134,11 +134,11 @@ const UpdateTribePageContent: React.FC = () => {
       {
         icon: 'x',
         label: t('common.cancel'),
-        onClick: () => navigate(`/app/tribes/${tribeId}`),
+        path: `/app/tribes/${tribeId}`,
         disabled: isSubmitting,
       },
     ],
-    [t, navigate, tribeId, isSubmitting],
+    [t, tribeId, isSubmitting],
   );
 
   // Get theme-dependent styles

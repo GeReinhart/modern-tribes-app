@@ -33,7 +33,7 @@ export function RowActionsMenu({
 
   const handleAction = (action: MenuAction) => {
     close();
-    action.onClick();
+    action.onClick?.();
   };
 
   return (

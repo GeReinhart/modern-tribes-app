@@ -85,9 +85,9 @@ const CreateTribeFormContent: React.FC = () => {
 
   const menuActions = useMemo(
     (): MenuAction[] => [
-      { icon: 'x', label: t('common.cancel'), onClick: () => navigate('/app') },
+      { icon: 'x', label: t('common.cancel'), path: '/app' },
     ],
-    [t, navigate],
+    [t],
   );
 
   // Get theme-dependent styles

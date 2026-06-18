@@ -87,7 +87,7 @@ const TribesPageContent: React.FC = () => {
             {
               icon: 'plus' as const,
               label: t('tribes.createTribe'),
-              onClick: () => navigate('/app/tribes/create'),
+              path: '/app/tribes/create',
             },
           ]
         : []),
@@ -96,12 +96,12 @@ const TribesPageContent: React.FC = () => {
             {
               icon: 'settings' as const,
               label: t('common.admin'),
-              onClick: () => navigate('/admin'),
+              path: '/admin',
             },
           ]
         : []),
     ],
-    [authorization?.authorized, isAdmin, t, navigate],
+    [authorization?.authorized, isAdmin, t],
   );
 
   if (currentUserLoading || tribesLoading) {

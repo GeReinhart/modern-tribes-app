@@ -120,41 +120,35 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const hasActionsRow = hasPageActions || hasTabActions;
 
   const renderActionItem = (action: MenuAction, index: number) => {
-    const color =
-      action.variant === 'danger' ? theme.colors.danger : theme.colors.text;
+    const color = action.variant === 'danger' ? theme.colors.danger : theme.colors.text;
+    const itemStyle: React.CSSProperties = {
+      padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '10px',
+      color, fontSize: 'var(--btn-font)', fontWeight: 600,
+      opacity: action.disabled ? 0.5 : 1,
+      cursor: action.disabled ? 'not-allowed' : 'pointer',
+      transition: 'background-color 0.15s ease',
+    };
+    const onHover = (e: React.MouseEvent<HTMLElement>, on: boolean) => {
+      if (!action.disabled)
+        e.currentTarget.style.backgroundColor = on ? `${theme.colors.primary}10` : 'transparent';
+    };
+    if (action.path && !action.disabled) {
+      return (
+        <Link key={index} to={action.path} role="menuitem"
+          style={{ ...itemStyle, textDecoration: 'none' }}
+          onClick={() => setIsMenuOpen(false)}
+          onMouseEnter={(e) => onHover(e, true)} onMouseLeave={(e) => onHover(e, false)}
+        >
+          <ThemedSvgIcon name={action.icon} color={color} size={16} />{action.label}
+        </Link>
+      );
+    }
     return (
-      <div
-        key={index}
-        role="menuitem"
-        style={{
-          padding: '12px 24px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          color,
-          fontSize: 'var(--btn-font)',
-          fontWeight: 600,
-          opacity: action.disabled ? 0.5 : 1,
-          cursor: action.disabled ? 'not-allowed' : 'pointer',
-          transition: 'background-color 0.15s ease',
-        }}
-        onClick={() => {
-          if (!action.disabled) {
-            action.onClick();
-            setIsMenuOpen(false);
-          }
-        }}
-        onMouseEnter={(e) => {
-          if (!action.disabled)
-            e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
-        }}
-        onMouseLeave={(e) => {
-          if (!action.disabled)
-            e.currentTarget.style.backgroundColor = 'transparent';
-        }}
+      <div key={index} role="menuitem" style={itemStyle}
+        onClick={() => { if (!action.disabled) { action.onClick?.(); setIsMenuOpen(false); } }}
+        onMouseEnter={(e) => onHover(e, true)} onMouseLeave={(e) => onHover(e, false)}
       >
-        <ThemedSvgIcon name={action.icon} color={color} size={16} />
-        {action.label}
+        <ThemedSvgIcon name={action.icon} color={color} size={16} />{action.label}
       </div>
     );
   };

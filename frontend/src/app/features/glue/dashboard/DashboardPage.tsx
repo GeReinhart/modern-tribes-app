@@ -19,7 +19,7 @@ import { TabActionsProvider } from '@/app/platform/core/layout/TabActionsContext
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const TABS = (t: (k: string) => string) => [
   {
@@ -42,7 +42,6 @@ const TABS = (t: (k: string) => string) => [
 const DashboardPageContent: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const navigate = useNavigate();
   const {
     data: authorization,
     error: authorizationError,
@@ -91,7 +90,7 @@ const DashboardPageContent: React.FC = () => {
             {
               icon: 'plus' as const,
               label: t('tribes.createTribe'),
-              onClick: () => navigate('/app/tribes/create'),
+              path: '/app/tribes/create',
             },
           ]
         : []),
@@ -100,12 +99,12 @@ const DashboardPageContent: React.FC = () => {
             {
               icon: 'settings' as const,
               label: t('common.admin'),
-              onClick: () => navigate('/admin'),
+              path: '/admin',
             },
           ]
         : []),
     ],
-    [authorization?.authorized, hasAdminAccess, t, navigate, setShowTabConfig],
+    [authorization?.authorized, hasAdminAccess, t, setShowTabConfig],
   );
 
   return (

@@ -171,10 +171,10 @@ const CreateProjectPageContent: React.FC = () => {
       {
         icon: 'x',
         label: t('common.cancel'),
-        onClick: () => navigate(`/app/tribes/${tribeId}`),
+        path: `/app/tribes/${tribeId}`,
       },
     ],
-    [t, navigate, tribeId],
+    [t, tribeId],
   );
 
   return (

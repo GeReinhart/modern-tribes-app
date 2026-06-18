@@ -124,10 +124,10 @@ const DocumentPageFormPageContent: React.FC = () => {
       {
         icon: 'x',
         label: t('common.cancel'),
-        onClick: () => navigate(docPath),
+        path: docPath,
       },
     ],
-    [t, navigate, docPath],
+    [t, docPath],
   );
 
   const inputStyle: React.CSSProperties = {

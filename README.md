@@ -33,7 +33,7 @@ A reusable base that can be forked to bootstrap any new application.
 - Entity lifecycle (active / archived) with full audit trail
 - Internationalisation (i18n) — EN / FR
 - Themeable UI with multiple colour themes
-- Installable PWA (mobile home screen)
+- Progressive Web App + TWA (Trusted Web Activity) support
 - Outbound email with scheduling
 - Rich-text editor with image upload and storage
 - Document revision history
@@ -43,14 +43,15 @@ A reusable base that can be forked to bootstrap any new application.
 
 **Functional**
 - User / Person separation (one user can represent multiple people)
-- Tribe management with per-tribe membership and roles
-- Projects attached to tribes
-- Project documents with labels and publication workflow
+- Rich document management with pages, content editing, attachments and revisions
 
 ### Application features (tag `1.x.y`)
 
-Pluggable modules added to projects:
+~ Pluggable modules added on the top of the platform:
 
+- **Tribe management** with per-tribe membership and roles
+- Projects attached to tribes
+- Project documents and publication workflow
 - **Todo list** — tasks with status tracking, notes, and archive
 - **Kanban** — columnar board (up to 4 columns), card notes, theme-coloured columns
 
@@ -62,11 +63,10 @@ Pluggable modules added to projects:
 - Python 3.12+ and `python3-devel` (`sudo dnf install python3-devel` on Fedora)
 - Docker Compose or Podman Compose
 
-### 1 — Infrastructure (PostgreSQL, pgAdmin, MailHog)
+### 1 — Infrastructure (PostgreSQL, pgAdmin, MailHog) and Backend
 
 ```bash
-cp .env.example .env
-podman-compose up -d        # or: docker compose up -d
+./scripts/start-backend.sh       # or: docker compose up -d
 ```
 
 | Service | URL |
@@ -75,29 +75,36 @@ podman-compose up -d        # or: docker compose up -d
 | MailHog | http://localhost:8025 |
 | PostgreSQL | localhost:5432 |
 
-### 2 — Backend
+#### Init database
 
 ```bash
-cd backend
-python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-
-# Seed schema + development data
-set -a && source .env && set +a && python scripts/init_db.py
-
-# Start with auto-reload
-set -a && source .env && set +a && uvicorn app.main:app --reload --port 8000
+./script/reset-db.sh
 ```
 
-API docs: http://localhost:8000/docs
-
-### 3 — Frontend
+#### Check area before coding
 
 ```bash
-cd frontend
-npm install
-npm run dev        # http://localhost:3000
+./script/check-area.sh
+./script/check-backend.sh
+./script/check-frontend.sh
 ```
+
+#### Tests
+
+```bash
+./script/run-backend-tests.sh
+```
+
+
+### 2 — Frontend
+
+```bash
+./scripts/start-frontend.sh    
+```
+
+| Service    | URL |
+|------------| --- |
+| Front      | http://localhost:3000 |
 
 ## Project goals
 

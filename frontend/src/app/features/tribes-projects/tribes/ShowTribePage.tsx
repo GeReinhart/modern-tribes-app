@@ -236,7 +236,7 @@ const ShowTribePageContent: React.FC = () => {
             {
               icon: 'plus' as const,
               label: t('common.project'),
-              onClick: () => navigate(`/app/tribes/${tribeId}/projects/new`),
+              path: `/app/tribes/${tribeId}/projects/new`,
             },
           ]
         : []),
@@ -259,7 +259,7 @@ const ShowTribePageContent: React.FC = () => {
             {
               icon: 'pencil' as const,
               label: t('common.edit'),
-              onClick: () => navigate(`/app/tribes/${tribeId}/update`),
+              path: `/app/tribes/${tribeId}/update`,
             },
             {
               icon: 'archive' as const,
@@ -271,7 +271,7 @@ const ShowTribePageContent: React.FC = () => {
           ]
         : []),
     ],
-    [isManager, activeTab, reorderingProjects, authorization?.authorized, archiving, tribeId, t, navigate, setShowTabConfig, setShowThemePicker, searchHighlight, searchParams, setSearchParams],
+    [isManager, activeTab, reorderingProjects, authorization?.authorized, archiving, tribeId, t, setShowTabConfig, setShowThemePicker, searchHighlight, searchParams, setSearchParams],
   );
 
   const breadcrumbs = React.useMemo(
