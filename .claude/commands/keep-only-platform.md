@@ -449,6 +449,63 @@ causing `InvalidPasswordError` when the test DB uses a different user.
 
 All must pass. The app should launch with `/app/about` as the home page.
 
+## Step 17 — Collapse the alembic migration chain into a single revision
+
+After verification passes, the migration chain has grown: `001` creates all tables
+(including feature ones), `002` removes them, `003` restores anything incorrectly dropped.
+This history is a liability: it creates all feature tables only to drop them on every DB
+reset, and it is confusing to read.
+
+Collapse the chain into a single `001` that creates only the platform schema in its final
+state, with no trace of feature tables.
+
+**When to do this:** only after all four check scripts pass on the current multi-revision
+chain. Never collapse before verification — a failing test tells you to amend the migration
+logic, not to squash it.
+
+### How to collapse
+
+1. **Read `init_schema.sql`** — it reflects the full platform schema in its final post-cleanup
+   state. This is the authoritative source for what the new single migration must create.
+
+2. **Replace `001_initial_schema.py`** with a new version whose `upgrade()` body matches
+   `init_schema.sql` exactly — same tables, indexes, triggers, FK constraints, in the same
+   order. Keep `revision = '001'` and `down_revision = None`.
+
+3. **Delete `002_remove_features.py` and `003_restore_projects_documents.py`** (and any other
+   intermediate migration produced during this run):
+   ```bash
+   rm backend/alembic/versions/002_remove_features.py
+   rm backend/alembic/versions/003_restore_projects_documents.py
+   ```
+
+4. **Update `backend/scripts/init_db.py`**:
+   - Set `ALEMBIC_REVISION = "001"`
+
+5. **Update `backend/scripts/init_schema.sql`**:
+   - Update the header comment to `-- Reflects full schema (alembic revision 001)`
+
+6. **Verify the collapsed chain** by running all checks again:
+   ```bash
+   ./scripts/check-application.json.sh
+   ./scripts/check-backend.sh
+   ./scripts/run-backend-tests.sh
+   ./scripts/check-frontend.sh
+   ```
+
+7. **Commit** the collapse as a single commit separate from the cleanup changes:
+   ```
+   refactor: collapse alembic migrations to single platform revision 001
+   ```
+
+### What NOT to do
+
+- Do not try to generate the new `001` body from the old multi-step chain — always derive it
+  from `init_schema.sql`, which is the canonical truth.
+- Do not keep the intermediate migrations "for history" — they belong in the git log, not in
+  the active migration chain. Any running DB that had the old chain applied will need a full
+  reset (`reset-db.sh`) after the collapse.
+
 ## Final step — update this skill
 
 After a successful run, update `.claude/commands/keep-only-platform.md` to reflect
