@@ -1,4 +1,3 @@
-import type { TaskLabelInfo, TaskPatch } from '@/app/features/tasks/types.ts';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import type { PersonOption } from '@/app/features/tasks/types.ts';
 
@@ -11,13 +10,7 @@ import type { MyTask, MyTasksResponse } from './types.ts';
 interface Props {
   data: MyTasksResponse;
   persons: PersonOption[];
-  canEdit: boolean;
-  onUpdate: (task: MyTask, patch: TaskPatch) => Promise<void>;
-  onToggleLabel: (task: MyTask, labelId: string) => Promise<void>;
-  onCreateLabel: (
-    task: MyTask,
-    data: { feature_instance_id: string; name: string; color: string },
-  ) => Promise<TaskLabelInfo | null>;
+  onMarkDone: (task: MyTask) => Promise<void>;
 }
 
 function sortTasks(tasks: MyTask[]): MyTask[] {
@@ -28,14 +21,7 @@ function sortTasks(tasks: MyTask[]): MyTask[] {
   });
 }
 
-const MyTasksList: React.FC<Props> = ({
-  data,
-  persons,
-  canEdit,
-  onUpdate,
-  onToggleLabel,
-  onCreateLabel,
-}) => {
+const MyTasksList: React.FC<Props> = ({ data, persons, onMarkDone }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
@@ -66,10 +52,7 @@ const MyTasksList: React.FC<Props> = ({
           key={`${task.source}-${task.id}`}
           task={task}
           persons={persons}
-          canEdit={canEdit}
-          onUpdate={(patch) => onUpdate(task, patch)}
-          onToggleLabel={(labelId) => onToggleLabel(task, labelId)}
-          onCreateLabel={(d) => onCreateLabel(task, d)}
+          onMarkDone={() => onMarkDone(task)}
         />
       ))}
     </div>

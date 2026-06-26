@@ -214,9 +214,15 @@ the referenced feature table, update the platform table:
   entirely and remove any index or unique constraint that depended on it.
 
 **Concrete case from this run:**
-- `projects_documents` was the `tribes-projects` feature table — removed entirely
-- `publications.project_document_id` and `document_pages.project_document_id` both had FKs to it → made nullable
-- `labels.feature_instance_id` referenced `projects_features(id)` → column dropped, unique indexes `labels_name_feature_unique` and `idx_labels_feature_instance` dropped; `labels_name_global_unique` simplified from `WHERE feature_instance_id IS NULL` to unconditional
+- `projects_documents` is a **platform table** (used by publications, documents/page_service,
+  and search) — do NOT drop it. Only `project_id` (a nullable column) was the feature-FK.
+  The migration should leave `projects_documents` untouched; `projects.id` FK is implicitly
+  dropped by CASCADE when `projects` is removed.
+- `publications.project_document_id` and `document_pages.project_document_id` both had FKs to
+  `projects_documents(id)` → made nullable in migration 002
+- `labels.feature_instance_id` referenced `projects_features(id)` → column dropped, unique indexes
+  `labels_name_feature_unique` and `idx_labels_feature_instance` dropped; `labels_name_global_unique`
+  simplified from `WHERE feature_instance_id IS NULL` to unconditional
 
 After editing, verify the file creates cleanly with no FK violations by scanning for `REFERENCES`
 pointing to removed tables.
@@ -278,7 +284,7 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Make project_document_id nullable in platform tables before dropping projects_documents
+    # Make project_document_id nullable — projects_documents is now a platform-only table
     op.execute("ALTER TABLE publications ALTER COLUMN project_document_id DROP NOT NULL")
     op.execute("ALTER TABLE document_pages ALTER COLUMN project_document_id DROP NOT NULL")
 
@@ -286,12 +292,14 @@ def upgrade() -> None:
     op.execute("ALTER TABLE labels DROP COLUMN IF EXISTS feature_instance_id")
 
     # Drop feature tables — CASCADE removes FK constraints in referencing tables
+    # NOTE: projects_documents is intentionally NOT dropped — it is a platform table
+    # used by publications, documents/pages and search. Only the project_id FK is
+    # dropped implicitly when the projects table is removed via CASCADE.
     op.execute("DROP TABLE IF EXISTS kanban_cards CASCADE")
     op.execute("DROP TABLE IF EXISTS kanban_columns CASCADE")
     op.execute("DROP TABLE IF EXISTS todo_items CASCADE")
     op.execute("DROP TABLE IF EXISTS user_tab_configs CASCADE")
     op.execute("DROP TABLE IF EXISTS user_bookmarks CASCADE")
-    op.execute("DROP TABLE IF EXISTS projects_documents CASCADE")
     op.execute("DROP TABLE IF EXISTS tribes_projects CASCADE")
     op.execute("DROP TABLE IF EXISTS positions CASCADE")
     op.execute("DROP TABLE IF EXISTS projects_features CASCADE")
@@ -323,6 +331,113 @@ Verify the migration chain parses cleanly:
 source backend/venv/bin/activate && python -m alembic history
 ```
 
+## Step 15 — Platform code referencing feature tables
+
+Even after feature code is deleted, **platform code** (monitoring, search, publications,
+authorization) may still contain queries or imports that reference the removed feature tables.
+These will not be caught by the import checker — they are SQL string literals or function calls.
+They cause test failures (`UndefinedTableError`) even when all feature directories are gone.
+
+Run this after Step 14 to detect them:
+```bash
+grep -rn "tribes\b\|positions\b\|projects_features\b\|tribes_projects\b" \
+  backend/app/platform/ --include="*.py" | grep -v "projects_documents"
+```
+
+### Monitoring router (`backend/app/platform/functions/monitoring/router.py`)
+
+The `_QUERY` string has a UNION ALL block for each tracked entity type. Remove any block
+that queries a feature table (`tribes`, `projects`, `positions`). Keep platform-only blocks
+(Person, User, Role, Permission, Label, Document, Mail, Represents).
+
+### Search repository (`backend/app/platform/functions/search/repository.py`)
+
+The search queries (`_SEARCH_ADMIN`, `_SEARCH_USER`) may JOIN with feature tables to resolve
+tribe/project context. Rewrite both to a single `_SEARCH_ALL` query that:
+- Removes all `LEFT JOIN tribes`, `LEFT JOIN projects`, `user_tribe_url_params` CTEs
+- Returns `NULL::text AS tribe_name, NULL::text AS project_name` in their place
+- Uses the same query for both `search_admin()` and `search_user()`
+
+### Search index repository (`backend/app/platform/functions/search/index_repository.py`)
+
+Functions that build search index entries for feature entities must be removed:
+`index_tribe_document`, `index_project_document`, `_fetch_task_routing`, `index_todo_item`,
+`index_kanban_card`.
+
+`index_projects_document` and `index_page` should be simplified to use flat routing paths
+(`/app/documents/{url_param_id}`) instead of nested project/tribe routing.
+
+### Publications admin query (`backend/app/platform/functions/publications/repository.py`)
+
+`fetch_publications_admin` may JOIN with `projects`, `tribes_projects`, `tribes` to populate
+admin context columns. Rewrite to:
+- Remove all JOINs with feature tables
+- Return `NULL::uuid AS tribe_id, NULL::text AS tribe_name, NULL::uuid AS project_id, NULL::text AS project_name`
+- Remove any `tribe_id`/`project_id` filter parameters that only made sense with the JOINs
+
+Also update the Pydantic model (`PublicationAdminItem`) to make these four fields Optional,
+and update `_row_to_admin_item` in the service to handle `None` values.
+
+On the frontend, update the `PublicationAdminItem` type and any component that renders these
+fields to guard against null (e.g. `pub.tribe_name && pub.project_name ? ... : ''`).
+
+### Authorization router (`backend/app/platform/core/authorization/router.py`)
+
+Remove any endpoint that checks tribe-level position ownership — these relied on the
+`positions` and `tribes` tables. Look for:
+- Endpoint helpers named `_authorize_tribe_access`, `_check_permissions` (tribe-based)
+- Routes matching `GET /permissions/.../own/tribe/{tribe_id}[/position/{position}]`
+
+Remove the corresponding import of `check_own_tribe_position_or_admin` from
+`ownership.py`, and remove that function from `ownership.py` itself.
+
+### Authorization project_access module (`backend/app/platform/core/authorization/project_access.py`)
+
+If this file only contained functions querying `positions`, `tribes_projects`, `projects`,
+empty it entirely (leave it as a blank file so existing imports don't break).
+
+### Page router (`backend/app/platform/functions/documents/page_router.py`)
+
+If all endpoints in this file required project-level access checks (now removed), empty
+the router to a minimal stub:
+```python
+from fastapi import APIRouter
+router = APIRouter(tags=["platform_documents"])
+```
+Also remove its registration from `backend/app/main.py`.
+
+Remove from `page_service.py` any service function that called a removed endpoint or
+required a project access check. Keep only `list_pages_for_publication`.
+
+### People persons repository (`backend/app/platform/functions/people/persons/repository.py`)
+
+If this file only contained `fetch_persons_for_feature` (which queried `projects_features`,
+`tribes_projects`, `positions`), empty it entirely.
+
+## Step 16 — Test DB credentials fix
+
+The test suite uses a dedicated Docker/Podman container with credentials `admin:password123`
+on port 5433. The alembic subprocess in `backend/tests/db_helpers.py` must pass these
+explicitly — it does not inherit them from the app's `.env` file.
+
+Check `_run_alembic()` in `db_helpers.py`:
+```python
+def _run_alembic():
+    env = {
+        **os.environ,
+        "POSTGRES_DB": TEST_DB_NAME,
+        "POSTGRES_PORT": str(TEST_DB_PORT),
+        # These must be present or alembic will default to the wrong user:
+        "POSTGRES_USER": TEST_DB_USER,        # "admin"
+        "POSTGRES_PASSWORD": TEST_DB_PASSWORD, # "password123"
+        "POSTGRES_HOST": "localhost",
+    }
+```
+
+If `POSTGRES_USER` and `POSTGRES_PASSWORD` are missing from the `env` dict, alembic will
+pick up whatever is in the ambient environment (often `postgres` from the app's `.env`),
+causing `InvalidPasswordError` when the test DB uses a different user.
+
 ## Verification
 
 ```bash
@@ -333,6 +448,63 @@ source backend/venv/bin/activate && python -m alembic history
 ```
 
 All must pass. The app should launch with `/app/about` as the home page.
+
+## Step 17 — Collapse the alembic migration chain into a single revision
+
+After verification passes, the migration chain has grown: `001` creates all tables
+(including feature ones), `002` removes them, `003` restores anything incorrectly dropped.
+This history is a liability: it creates all feature tables only to drop them on every DB
+reset, and it is confusing to read.
+
+Collapse the chain into a single `001` that creates only the platform schema in its final
+state, with no trace of feature tables.
+
+**When to do this:** only after all four check scripts pass on the current multi-revision
+chain. Never collapse before verification — a failing test tells you to amend the migration
+logic, not to squash it.
+
+### How to collapse
+
+1. **Read `init_schema.sql`** — it reflects the full platform schema in its final post-cleanup
+   state. This is the authoritative source for what the new single migration must create.
+
+2. **Replace `001_initial_schema.py`** with a new version whose `upgrade()` body matches
+   `init_schema.sql` exactly — same tables, indexes, triggers, FK constraints, in the same
+   order. Keep `revision = '001'` and `down_revision = None`.
+
+3. **Delete `002_remove_features.py` and `003_restore_projects_documents.py`** (and any other
+   intermediate migration produced during this run):
+   ```bash
+   rm backend/alembic/versions/002_remove_features.py
+   rm backend/alembic/versions/003_restore_projects_documents.py
+   ```
+
+4. **Update `backend/scripts/init_db.py`**:
+   - Set `ALEMBIC_REVISION = "001"`
+
+5. **Update `backend/scripts/init_schema.sql`**:
+   - Update the header comment to `-- Reflects full schema (alembic revision 001)`
+
+6. **Verify the collapsed chain** by running all checks again:
+   ```bash
+   ./scripts/check-application.json.sh
+   ./scripts/check-backend.sh
+   ./scripts/run-backend-tests.sh
+   ./scripts/check-frontend.sh
+   ```
+
+7. **Commit** the collapse as a single commit separate from the cleanup changes:
+   ```
+   refactor: collapse alembic migrations to single platform revision 001
+   ```
+
+### What NOT to do
+
+- Do not try to generate the new `001` body from the old multi-step chain — always derive it
+  from `init_schema.sql`, which is the canonical truth.
+- Do not keep the intermediate migrations "for history" — they belong in the git log, not in
+  the active migration chain. Any running DB that had the old chain applied will need a full
+  reset (`reset-db.sh`) after the collapse.
 
 ## Final step — update this skill
 

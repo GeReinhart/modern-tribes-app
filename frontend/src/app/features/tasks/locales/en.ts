@@ -51,6 +51,8 @@ const en: Record<string, string> = {
   'dashboard.tasks.empty': 'No upcoming tasks assigned to you.',
   'dashboard.tasks.openSource': 'Open in project',
   'dashboard.tasks.todoStatus': 'Todo',
+  'dashboard.tasks.markDone': 'Mark as done',
+  'dashboard.tasks.markDoneConfirm': 'Mark "{{title}}" as done?',
 };
 
 export default en;

@@ -5,6 +5,7 @@ import {
 import { ZoomControl } from '@/app/platform/core/layout/themes/components/ZoomControl.tsx';
 import { UserAvatarIcon } from '@/app/platform/functions/people/users/UserAvatarIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { useHeaderVisibility } from '@/app/platform/core/layout/HeaderVisibilityContext.tsx';
 
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -22,6 +23,7 @@ export const AppFooter: React.FC<AppFooterProps> = ({ bookmarkSlot }) => {
   const { theme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
+  const { headerVisible, toggleHeader } = useHeaderVisibility();
 
   const footerStyle: React.CSSProperties = {
 
@@ -75,7 +77,22 @@ export const AppFooter: React.FC<AppFooterProps> = ({ bookmarkSlot }) => {
         })}
         {bookmarkSlot}
       </div>
-      <ZoomControl />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+        <div
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: 0.7 }}
+          onClick={toggleHeader}
+          role="button"
+          aria-label={headerVisible ? 'Hide header' : 'Show header'}
+          title={headerVisible ? 'Hide header' : 'Show header'}
+        >
+          <ThemedSvgIcon
+            name={headerVisible ? 'chevrons-up' : 'chevrons-down'}
+            color={theme.colors.text}
+            size={20}
+          />
+        </div>
+        <ZoomControl />
+      </div>
     </footer>
   );
 };

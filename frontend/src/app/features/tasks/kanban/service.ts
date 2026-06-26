@@ -75,6 +75,13 @@ class KanbanService {
     );
   }
 
+  async moveCardToLastColumn(cardId: string): Promise<KanbanCard> {
+    return apiService.post<KanbanCard>(
+      `/features/tasks/kanban/cards/${cardId}/move-to-last-column`,
+      {},
+    );
+  }
+
   async moveCard(
     cardId: string,
     direction: MoveDirection,

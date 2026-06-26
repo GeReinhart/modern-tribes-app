@@ -305,6 +305,29 @@ async def _apply_reorder(conn, cards: list[dict], idx: int, direction: str, user
     return [cards[idx]["id"], cards[target_idx]["id"]]
 
 
+async def move_card_to_last_column(pool, card_id: str, user_id: str) -> Optional[dict]:
+    async with pool.acquire() as conn:
+        card_row = await conn.fetchrow(
+            "SELECT id, feature_instance_id FROM kanban_cards WHERE id = $1 AND status = 'active'",
+            UUID(card_id),
+        )
+        if not card_row:
+            return None
+        last_col = await conn.fetchrow(
+            "SELECT id FROM kanban_columns WHERE feature_instance_id = $1 AND status = 'active' ORDER BY position DESC LIMIT 1",
+            card_row["feature_instance_id"],
+        )
+        if not last_col:
+            return None
+        await conn.execute(
+            "UPDATE kanban_cards SET column_id = $1, updated_by = $2 WHERE id = $3",
+            last_col["id"],
+            UUID(user_id),
+            UUID(card_id),
+        )
+    return await fetch_card(pool, card_id)
+
+
 async def reorder_card_in_column(pool, card_id: str, direction: str, user_id: str) -> list[dict]:
     async with pool.acquire() as conn:
         card_row = await conn.fetchrow(

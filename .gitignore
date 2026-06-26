@@ -51,3 +51,4 @@ build/
 /.claude/worktrees/agent-*/
 /backend/.coverage*
 /backend/.env.db.prod
+package-lock.json

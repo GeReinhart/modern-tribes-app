@@ -20,7 +20,7 @@ interface Props {
   assignedPersonName?: string | null;
   canEdit: boolean;
   onClose: () => void;
-  onEdit: () => void;
+  onEdit?: () => void;
 }
 
 interface MetaProps {

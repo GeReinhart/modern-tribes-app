@@ -6,6 +6,7 @@ import React, { useMemo } from 'react';
 import { AppFooter } from './AppFooter.tsx';
 import { AppHeader } from './AppHeader.tsx';
 import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb.tsx';
+import { HeaderVisibilityProvider, useHeaderVisibility } from './HeaderVisibilityContext.tsx';
 import { useTabActionsContext } from './TabActionsContext.tsx';
 
 interface AppLayoutProps {
@@ -19,7 +20,7 @@ interface AppLayoutProps {
   bookmarkSlot?: React.ReactNode;
 }
 
-export const AppLayout: React.FC<AppLayoutProps> = ({
+const AppLayoutInner: React.FC<AppLayoutProps> = ({
   children,
   headerActions,
   secondaryActions,
@@ -31,6 +32,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 }) => {
   const { theme } = useTheme();
   const { tabActionsFromTab } = useTabActionsContext();
+  const { headerVisible } = useHeaderVisibility();
   const mergedTabActions = useMemo(
     () => [...(tabActions ?? []), ...tabActionsFromTab],
     [tabActions, tabActionsFromTab],
@@ -60,14 +62,16 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
 
   return (
     <div style={layoutStyle}>
-      <AppHeader
-        actions={headerActions}
-        secondaryActions={secondaryActions}
-        menuActions={menuActions}
-        tabActions={mergedTabActions}
-        breadcrumbs={breadcrumbs}
-        breadcrumbTabs={breadcrumbTabs}
-      />
+      {headerVisible && (
+        <AppHeader
+          actions={headerActions}
+          secondaryActions={secondaryActions}
+          menuActions={menuActions}
+          tabActions={mergedTabActions}
+          breadcrumbs={breadcrumbs}
+          breadcrumbTabs={breadcrumbTabs}
+        />
+      )}
       <main style={mainStyle}>
         <div style={contentStyle}>{children}</div>
       </main>
@@ -75,3 +79,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
     </div>
   );
 };
+
+export const AppLayout: React.FC<AppLayoutProps> = (props) => (
+  <HeaderVisibilityProvider>
+    <AppLayoutInner {...props} />
+  </HeaderVisibilityProvider>
+);

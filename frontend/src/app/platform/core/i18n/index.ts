@@ -6,6 +6,12 @@ import bookmarksEn from '@/app/features/bookmarks/locales/en.ts';
 import bookmarksFr from '@/app/features/bookmarks/locales/fr.ts';
 import glueEn from '@/app/features/glue/locales/en.ts';
 import glueFr from '@/app/features/glue/locales/fr.ts';
+import guitarNotesEn from '@/app/features/guitar/notes/locales/en.ts';
+import guitarNotesFr from '@/app/features/guitar/notes/locales/fr.ts';
+import guitarTunerEn from '@/app/features/guitar/tuner/locales/en.ts';
+import guitarTunerFr from '@/app/features/guitar/tuner/locales/fr.ts';
+import guitarMetronomeEn from '@/app/features/guitar/metronome/locales/en.ts';
+import guitarMetronomeFr from '@/app/features/guitar/metronome/locales/fr.ts';
 import tasksEn from '@/app/features/tasks/locales/en.ts';
 import tasksFr from '@/app/features/tasks/locales/fr.ts';
 import tribesProjectsEn from '@/app/features/tribes-projects/locales/en.ts';
@@ -26,6 +32,9 @@ i18n.use(initReactI18next).init({
         ...tasksEn,
         ...glueEn,
         ...tribesProjectsEn,
+        ...guitarNotesEn,
+        ...guitarTunerEn,
+        ...guitarMetronomeEn,
       },
     },
     fr: {
@@ -35,6 +44,9 @@ i18n.use(initReactI18next).init({
         ...tasksFr,
         ...glueFr,
         ...tribesProjectsFr,
+        ...guitarNotesFr,
+        ...guitarTunerFr,
+        ...guitarMetronomeFr,
       },
     },
   },

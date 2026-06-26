@@ -8,10 +8,11 @@
    - ./scripts/check-backend.sh
    - ./scripts/run-backend-tests.sh
    - ./scripts/check-frontend.sh
-   - read ./application.json it will give you a great idea of the project structure
+   - read ./application.json it will give you a great idea of the project structure; descriptions are written from the application user's perspective (what users see and do), not from the developer's perspective
 - 2 - **Apply changes** to the project.
    - Add screnario first and THEN ask me to check the scenario before you start coding.
-   - Don't forget to change the application.json file if there some changes on the files structure, new features, new tools, new functions. 
+   - Don't forget to change the application.json file if there some changes on the files structure, new features, new tools, new functions.
+   - When writing descriptions in application.json: write from the **user's perspective** — describe what users see and experience, not how it is implemented. Avoid API endpoint paths, library names, env var names, architecture terms and any other developer-facing details. Ask: "would a non-technical user of the app understand this line?"
 - 3 - **Check** the produced code is still a good status.
   - ./scripts/check-application.json.sh
   - ./scripts/check-backend.sh
@@ -62,6 +63,13 @@ When you encounter any of the following, refactor before continuing:
 - A function name contains "and" or describes multiple steps
 - A file imports from many unrelated modules (sign of mixed concerns)
 
+
+### Node.js Version Compatibility
+
+- The project requires **Node.js >= 22.12.0** (see `frontend/package.json` `engines` field).
+- `Dockerfile.frontend` must always use `node:22-alpine` (or a newer LTS). Never downgrade — build tools like Vite 8 and vite-plugin-pwa impose a minimum Node version.
+- When upgrading `vite`, `vite-plugin-pwa`, or any build-time dependency, check the `engines.node` field of the new version and update `Dockerfile.frontend` and `frontend/package.json` accordingly.
+- `Dockerfile.frontend` deletes the lockfile before installing (`rm -f package-lock.json && npm install`). This means Docker always resolves fresh versions within the semver ranges in `package.json`. If a build tool upgrade changes the Node.js requirement, the Docker build will silently get a different (newer) version and break. When this happens, the symptom is a syntax or runtime error inside `node_modules` during `npm run build`.
 
 ### Features
 

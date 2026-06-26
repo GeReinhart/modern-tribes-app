@@ -283,6 +283,26 @@ async def move_card(card_id: str, data: MoveCard, current_user: dict = Depends(g
     return [_card(await repo.fetch_card(pool, card_id))]
 
 
+@router.post("/cards/{card_id}/move-to-last-column", response_model=KanbanCardResponse)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def move_card_to_last_column(card_id: str, current_user: dict = Depends(get_current_user)):
+    """Move a kanban card to the last column (mark as done).
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
+    pool = get_database()
+    card = await repo.fetch_card(pool, card_id)
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found.")
+    uid = str(current_user["id"])
+    await label_service.require_feature_access(pool, str(card["feature_instance_id"]), current_user, "member")
+    updated = await repo.move_card_to_last_column(pool, card_id, uid)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Card not found.")
+    return _card(updated)
+
+
 @router.post("/cards/{card_id}/reorder", response_model=list[KanbanCardResponse])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def reorder_card(card_id: str, data: ReorderCard, current_user: dict = Depends(get_current_user)):

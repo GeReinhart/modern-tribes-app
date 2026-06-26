@@ -1,7 +1,7 @@
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
+import { ThemedConfirmDialog } from '@/app/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
 import TaskContentPopup from '@/app/features/tasks/TaskContentPopup.tsx';
-import TaskItemModal from '@/app/features/tasks/TaskItemModal.tsx';
-import type { TaskLabelInfo, TaskPatch } from '@/app/features/tasks/types.ts';
+import type { TaskLabelInfo } from '@/app/features/tasks/types.ts';
 import MyTasksCardContent from './MyTasksCardContent.tsx';
 import { fibColor, urgencyColor } from '@/app/features/tasks/types.ts';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
@@ -16,14 +16,7 @@ import type { MyTask } from './types.ts';
 interface Props {
   task: MyTask;
   persons: PersonOption[];
-  canEdit: boolean;
-  onUpdate: (patch: TaskPatch) => Promise<void>;
-  onToggleLabel: (labelId: string) => Promise<void>;
-  onCreateLabel: (data: {
-    feature_instance_id: string;
-    name: string;
-    color: string;
-  }) => Promise<TaskLabelInfo | null>;
+  onMarkDone: () => Promise<void>;
 }
 
 function buildSourcePath(task: MyTask): string {
@@ -31,20 +24,13 @@ function buildSourcePath(task: MyTask): string {
   return `/app/tribes/${task.tribe_url_param_id}/projects/${task.project_url_param_id}/${task.feature_instance_id}?taskId=${task.id}`;
 }
 
-const MyTasksCard: React.FC<Props> = ({
-  task,
-  persons,
-  canEdit,
-  onUpdate,
-  onToggleLabel,
-  onCreateLabel,
-}) => {
+const MyTasksCard: React.FC<Props> = ({ task, persons, onMarkDone }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const [modalOpen, setModalOpen] = useState(false);
   const [popupOpen, setPopupOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [confirmDone, setConfirmDone] = useState(false);
 
   const borderColor = task.size ? fibColor(task.size) : theme.colors.border;
   const uc = urgencyColor(task.due_date, task.size);
@@ -63,13 +49,6 @@ const MyTasksCard: React.FC<Props> = ({
 
   const statusLabel =
     task.source === 'todo' ? t('dashboard.tasks.todoStatus') : task.column_name;
-
-  const handleUpdate = (_id: string, patch: TaskPatch) => onUpdate(patch);
-  const handleToggleLabel = (
-    _id: string,
-    labelId: string,
-    _currentLabelIds: string[],
-  ) => onToggleLabel(labelId);
 
   return (
     <>
@@ -92,69 +71,69 @@ const MyTasksCard: React.FC<Props> = ({
           }}
         >
           <div
-            style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-xs)' }}
+            style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-sm)' }}
           >
             <span
-              onClick={() => setModalOpen(true)}
               style={{
                 flex: 1,
                 fontSize: 'var(--font-lg)',
                 fontWeight: 500,
                 color: theme.colors.text,
-                cursor: 'pointer',
                 lineHeight: 1.4,
               }}
             >
               {task.title}
             </span>
-            {canEdit && (
-              <button
-                onClick={() => setModalOpen(true)}
-                title={t('common.edit')}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '1px 2px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  opacity: 0.7,
-                  flexShrink: 0,
-                }}
-              >
-                <ThemedSvgIcon
-                  name="pencil"
-                  color={theme.colors.text}
-                  size={12}
-                />
-              </button>
-            )}
             <button
-              onClick={() => setExpanded((v) => !v)}
-              title={expanded ? t('features.kanban.hideContent') : t('features.kanban.showContent')}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '1px 2px', display: 'flex', alignItems: 'center', opacity: 0.75, flexShrink: 0 }}
-            >
-              <ThemedSvgIcon name={expanded ? 'chevron-up' : 'chevron-down'} color={theme.colors.text} size={13} />
-            </button>
-            <button
-              onClick={() => navigate(buildSourcePath(task))}
-              title={t('dashboard.tasks.openSource')}
+              onClick={() => setConfirmDone(true)}
+              title={t('dashboard.tasks.markDone')}
               style={{
                 background: 'none',
-                border: 'none',
+                border: `1px solid ${theme.colors.border}`,
+                borderRadius: 'var(--radius-sm)',
                 cursor: 'pointer',
-                padding: '1px 2px',
+                padding: '4px 8px',
                 display: 'flex',
                 alignItems: 'center',
                 opacity: 0.7,
                 flexShrink: 0,
               }}
             >
-              <ThemedSvgIcon
-                name="external-link"
-                color={theme.colors.primary}
-                size={12}
-              />
+              <ThemedSvgIcon name="check" color={theme.colors.text} size={16} />
+            </button>
+            <button
+              onClick={() => setExpanded((v) => !v)}
+              title={expanded ? t('features.kanban.hideContent') : t('features.kanban.showContent')}
+              style={{
+                background: 'none',
+                border: `1px solid ${theme.colors.border}`,
+                borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                padding: '4px 8px',
+                display: 'flex',
+                alignItems: 'center',
+                opacity: 0.75,
+                flexShrink: 0,
+              }}
+            >
+              <ThemedSvgIcon name={expanded ? 'chevron-up' : 'chevron-down'} color={theme.colors.text} size={16} />
+            </button>
+            <button
+              onClick={() => navigate(buildSourcePath(task))}
+              title={t('dashboard.tasks.openSource')}
+              style={{
+                background: 'none',
+                border: `1px solid ${theme.colors.primary}44`,
+                borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                padding: '4px 8px',
+                display: 'flex',
+                alignItems: 'center',
+                opacity: 0.85,
+                flexShrink: 0,
+              }}
+            >
+              <ThemedSvgIcon name="external-link" color={theme.colors.primary} size={16} />
             </button>
           </div>
           <div
@@ -186,7 +165,6 @@ const MyTasksCard: React.FC<Props> = ({
               {statusLabel}
             </span>
             <div style={{ flex: 1 }} />
-
             {task.size && (
               <span
                 style={{
@@ -241,6 +219,20 @@ const MyTasksCard: React.FC<Props> = ({
           />
         )}
       </div>
+
+      <ThemedConfirmDialog
+        isOpen={confirmDone}
+        onClose={() => setConfirmDone(false)}
+        onConfirm={() => {
+          onMarkDone();
+          setConfirmDone(false);
+        }}
+        title={t('dashboard.tasks.markDone')}
+        message={t('dashboard.tasks.markDoneConfirm', { title: task.title })}
+        confirmText={t('dashboard.tasks.markDone')}
+        cancelText={t('common.cancel')}
+      />
+
       {popupOpen && (
         <TaskContentPopup
           title={task.title}
@@ -249,35 +241,8 @@ const MyTasksCard: React.FC<Props> = ({
           size={task.size}
           dueDate={task.due_date}
           assignedPersonName={task.assigned_person_name}
-          canEdit={canEdit}
+          canEdit={false}
           onClose={() => setPopupOpen(false)}
-          onEdit={() => {
-            setPopupOpen(false);
-            setModalOpen(true);
-          }}
-        />
-      )}
-
-      {modalOpen && (
-        <TaskItemModal
-          value={{
-            id: task.id,
-            feature_instance_id: task.feature_instance_id,
-            title: task.title,
-            size: task.size,
-            due_date: task.due_date,
-            assigned_person_id: task.assigned_person_id,
-            document_content_html: task.document_content_html,
-            label_ids: task.label_ids,
-          }}
-          labels={labels}
-          persons={persons}
-          canEdit={canEdit}
-          canCreateLabel={canEdit}
-          onClose={() => setModalOpen(false)}
-          onUpdate={handleUpdate}
-          onToggleLabel={handleToggleLabel}
-          onCreateLabel={onCreateLabel}
         />
       )}
     </>

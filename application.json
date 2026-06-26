@@ -2,22 +2,14 @@
   "name": "Modern Tribes",
   "description": {
     "en": [
-      "- a backend and a frontend",
-      "- a platform with all the common tools needed for most applications",
-      "- a feature set that makes this application special",
-      "- the platform and the features have code in both backend and frontend",
-      "- the platform depends on external services and third-party libraries",
-      "- the features depend on external services, third-party libraries and the platform",
-      "- the platform does not depend on features"
+      "- Modern Tribes is a collaboration platform for teams (tribes) and their projects",
+      "- Organize work into projects with customizable tabs for tasks, documents and more",
+      "- Collaborate with your team, track progress, share knowledge and stay informed through notifications"
     ],
     "fr": [
-      "- un backend et un frontend",
-      "- une plateforme avec tous les outils communs nécessaires à la plupart des applications",
-      "- un ensemble de fonctionnalités qui rend cette application unique",
-      "- la plateforme et les fonctionnalités ont du code dans le backend et le frontend",
-      "- la plateforme dépend de services externes et de bibliothèques tierces",
-      "- les fonctionnalités dépendent de services externes, de bibliothèques tierces et de la plateforme",
-      "- la plateforme ne dépend pas des fonctionnalités"
+      "- Modern Tribes est une plateforme de collaboration pour les équipes (tribus) et leurs projets",
+      "- Organisez votre travail en projets avec des onglets personnalisables pour les tâches, documents et plus",
+      "- Collaborez avec votre équipe, suivez l'avancement, partagez des connaissances et restez informé"
     ]
   },
   "backend": {
@@ -38,14 +30,12 @@
         "package": "authentication",
         "description": {
           "en": [
-            "- authentication of the user",
-            "- magic link sent by email with a token",
-            "- token refresh and session management"
+            "- sign in with a magic link sent to your email — no password needed",
+            "- your session is kept active automatically so you stay signed in"
           ],
           "fr": [
-            "- authentification de l'utilisateur",
-            "- lien magique envoyé par email avec un token",
-            "- rafraîchissement du token et gestion des sessions"
+            "- connectez-vous avec un lien magique envoyé par email — pas de mot de passe",
+            "- votre session est maintenue automatiquement pour rester connecté"
           ]
         },
         "backend": {
@@ -67,14 +57,12 @@
         "package": "authorization",
         "description": {
           "en": [
-            "- role-based access control",
-            "- user -> roles -> permissions",
-            "- ownership and project-level access checks"
+            "- controls what each user can see and do based on their role and tribe membership",
+            "- members and managers have different levels of access to content"
           ],
           "fr": [
-            "- contrôle d'accès basé sur les rôles",
-            "- utilisateur -> rôles -> permissions",
-            "- vérifications de propriété et d'accès au niveau du projet"
+            "- contrôle ce que chaque utilisateur peut voir et faire selon son rôle et son appartenance à une tribu",
+            "- les membres et gestionnaires ont des niveaux d'accès différents"
           ]
         },
         "backend": {
@@ -97,12 +85,10 @@
         "package": "api",
         "description": {
           "en": [
-            "- HTTP client abstraction for all backend communication",
-            "- handles authentication headers, token refresh, and error handling"
+            "- all your actions are sent to the server in real time — connection issues are handled automatically"
           ],
           "fr": [
-            "- abstraction du client HTTP pour toutes les communications avec le backend",
-            "- gère les en-têtes d'authentification, le rafraîchissement des tokens et la gestion des erreurs"
+            "- toutes vos actions sont envoyées au serveur en temps réel — les problèmes de connexion sont gérés automatiquement"
           ]
         },
         "frontend": {
@@ -115,12 +101,10 @@
         "package": "browser",
         "description": {
           "en": [
-            "- browser API utilities and local storage management",
-            "- token storage helpers"
+            "- your preferences and session are stored in the browser so the app remembers your settings between visits"
           ],
           "fr": [
-            "- utilitaires d'API navigateur et gestion du stockage local",
-            "- helpers de stockage des tokens"
+            "- vos préférences et votre session sont stockées dans le navigateur pour retrouver vos réglages entre les visites"
           ]
         },
         "frontend": {
@@ -133,12 +117,12 @@
         "package": "layout",
         "description": {
           "en": [
-            "- main UI layout components: header, footer, navigation, breadcrumbs",
-            "- themed component library: buttons, inputs, modals, tables, icons"
+            "- the app's visual structure: header, navigation menus and breadcrumbs",
+            "- shared UI controls used throughout the app: buttons, text fields, modals, tables and icons"
           ],
           "fr": [
-            "- composants principaux d'interface : en-tête, pied de page, navigation, fil d'Ariane",
-            "- bibliothèque de composants thémés : boutons, champs, modales, tableaux, icônes"
+            "- la structure visuelle de l'app : en-tête, menus de navigation et fil d'Ariane",
+            "- contrôles partagés utilisés dans toute l'app : boutons, champs, modales, tableaux et icônes"
           ]
         },
         "frontend": {
@@ -151,12 +135,10 @@
         "package": "app-config",
         "description": {
           "en": [
-            "- global application configuration management",
-            "- stores and retrieves app-wide settings such as branding and feature flags"
+            "- app-wide settings: logo, app name and which features are enabled for users"
           ],
           "fr": [
-            "- gestion de la configuration globale de l'application",
-            "- stocke et récupère les paramètres globaux comme l'identité visuelle et les flags de fonctionnalités"
+            "- paramètres globaux de l'app : logo, nom de l'application et fonctionnalités accessibles aux utilisateurs"
           ]
         },
         "backend": {
@@ -177,12 +159,10 @@
         "package": "responsive",
         "description": {
           "en": [
-            "- responsive design utilities",
-            "- device detection (phone vs desktop) and zoom level management"
+            "- the app adapts its layout to your screen size — works on phones, tablets and desktops"
           ],
           "fr": [
-            "- utilitaires de design adaptatif",
-            "- détection de l'appareil (téléphone vs ordinateur) et gestion du niveau de zoom"
+            "- l'app adapte sa mise en page à la taille de votre écran — fonctionne sur téléphone, tablette et ordinateur"
           ]
         },
         "frontend": {
@@ -195,14 +175,12 @@
         "package": "i18n",
         "description": {
           "en": [
-            "- internationalization using react-i18next",
-            "- supports English and French",
-            "- language preference persisted on the user record"
+            "- available in English and French",
+            "- switch languages from your profile — your preference is saved"
           ],
           "fr": [
-            "- internationalisation avec react-i18next",
-            "- supporte l'anglais et le français",
-            "- préférence de langue persistée sur le profil utilisateur"
+            "- disponible en anglais et en français",
+            "- changez de langue depuis votre profil — votre préférence est enregistrée"
           ]
         },
         "backend": {
@@ -222,12 +200,10 @@
         "package": "labels",
         "description": {
           "en": [
-            "- system-wide label management",
-            "- labels can be applied to any entity (documents, tasks, etc.)"
+            "- create color labels and tag tasks, documents and other items to organize and filter them quickly"
           ],
           "fr": [
-            "- gestion des étiquettes à l'échelle du système",
-            "- les étiquettes peuvent être appliquées à n'importe quelle entité (documents, tâches, etc.)"
+            "- créez des étiquettes colorées et balisez les tâches, documents et autres éléments pour les organiser et filtrer facilement"
           ]
         },
         "backend": {
@@ -248,12 +224,12 @@
         "package": "monitoring",
         "description": {
           "en": [
-            "- tracks recent changes and document revisions across the system",
-            "- provides audit and history views"
+            "- see a live feed of what changed across your projects — documents edited, tasks updated and more",
+            "- review the full history of any document to see what was modified and when"
           ],
           "fr": [
-            "- suit les modifications récentes et les révisions de documents dans le système",
-            "- fournit des vues d'audit et d'historique"
+            "- consultez un fil d'activité en direct sur vos projets — documents modifiés, tâches mises à jour et plus",
+            "- consultez l'historique complet d'un document pour voir ce qui a été modifié et quand"
           ]
         },
         "backend": {
@@ -271,14 +247,12 @@
         "package": "publications",
         "description": {
           "en": [
-            "- document publishing workflow",
-            "- allows authenticated users to publish or unpublish project documents",
-            "- provides public access to published documents"
+            "- users can publish or unpublish project documents",
+            "- published documents are accessible publicly"
           ],
           "fr": [
-            "- flux de publication de documents",
-            "- permet aux utilisateurs authentifiés de publier ou dépublier des documents de projet",
-            "- fournit un accès public aux documents publiés"
+            "- les utilisateurs peuvent publier ou dépublier des documents de projet",
+            "- les documents publiés sont accessibles publiquement"
           ]
         },
         "backend": {
@@ -299,22 +273,14 @@
         "package": "search",
         "description": {
           "en": [
-            "- global full-text search across documents, publications, todo items and kanban cards",
-            "- indexed search targeting any element in the database",
-            "- labels applied to tasks and documents are included in the indexed content",
-            "- navigating to any search result passes the query via ?q= in the URL",
-            "- on the target page, matched search terms are highlighted with inverted colors (text/background swapped)",
-            "- highlight.utils.ts: shared utility for tokenizing a query and injecting <mark> tags into HTML",
-            "- InvertedMarkStyle.tsx: shared component rendering inverted-color <mark> CSS using the current theme"
+            "- search across all your tasks, documents, kanban cards and labels in one place",
+            "- matching text is highlighted on the result page for quick reading",
+            "- labels applied to items are also searchable"
           ],
           "fr": [
-            "- recherche plein texte globale sur les documents, publications, tâches todo et cartes kanban",
-            "- recherche indexée ciblant n'importe quel élément de la base de données",
-            "- les étiquettes appliquées aux tâches et aux documents sont incluses dans le contenu indexé",
-            "- naviguer vers n'importe quel résultat de recherche transmet la requête via ?q= dans l'URL",
-            "- sur la page cible, les termes recherchés sont mis en évidence avec des couleurs inversées (texte/fond inversés)",
-            "- highlight.utils.ts : utilitaire partagé pour tokeniser une requête et injecter des balises <mark> dans le HTML",
-            "- InvertedMarkStyle.tsx : composant partagé rendant le CSS <mark> en couleurs inversées avec le thème courant"
+            "- recherchez dans toutes vos tâches, documents, cartes kanban et étiquettes en un seul endroit",
+            "- le texte correspondant est mis en évidence sur la page de résultat pour une lecture rapide",
+            "- les étiquettes appliquées aux éléments sont également incluses dans la recherche"
           ]
         },
         "backend": {
@@ -335,16 +301,12 @@
         "package": "people",
         "description": {
           "en": [
-            "- manages users, persons and their relationships",
-            "- users: authentication accounts with roles and permissions",
-            "- persons: physical person records associated with tribes",
-            "- represents: links between users and persons"
+            "- manage the members of your tribe and their profiles",
+            "- a person can be linked to the account they use to sign in"
           ],
           "fr": [
-            "- gère les utilisateurs, les personnes et leurs relations",
-            "- utilisateurs : comptes d'authentification avec rôles et permissions",
-            "- personnes : enregistrements de personnes physiques associés aux tribus",
-            "- représente : liens entre utilisateurs et personnes"
+            "- gérez les membres de votre tribu et leurs profils",
+            "- une personne peut être liée au compte qu'elle utilise pour se connecter"
           ]
         },
         "backend": {
@@ -367,12 +329,10 @@
         "package": "documents",
         "description": {
           "en": [
-            "- rich document management with pages, content editing, attachments and revisions",
-            "- supports WYSIWYG editing"
+            "- create and edit rich-text documents with multiple pages, file attachments and a full revision history"
           ],
           "fr": [
-            "- gestion de documents enrichis avec pages, édition de contenu, pièces jointes et révisions",
-            "- supporte l'édition WYSIWYG"
+            "- créez et éditez des documents riches avec plusieurs pages, pièces jointes et un historique complet des révisions"
           ]
         },
         "backend": {
@@ -397,14 +357,14 @@
         "package": "notifications",
         "description": {
           "en": [
-            "- in-app notification system",
-            "- sending, status tracking and polling for new notifications",
-            "- admin interface for manual notification creation"
+            "- receive in-app alerts for important events in your projects",
+            "- view all your notifications and mark them as read",
+            "- admins can broadcast a notification to all users"
           ],
           "fr": [
-            "- système de notifications dans l'application",
-            "- envoi, suivi du statut et interrogation pour les nouvelles notifications",
-            "- interface d'administration pour la création manuelle de notifications"
+            "- recevez des alertes dans l'app pour les événements importants de vos projets",
+            "- consultez toutes vos notifications et marquez-les comme lues",
+            "- les administrateurs peuvent envoyer une notification à tous les utilisateurs"
           ]
         },
         "backend": {
@@ -425,16 +385,14 @@
         "package": "pwa",
         "description": {
           "en": [
-            "- Progressive Web App + TWA (Trusted Web Activity) support",
-            "- usePWAInstall hook: standalone detection, iOS/Android/Safari detection, beforeinstallprompt capture",
-            "- /install public page: device-aware guided installation (iOS Safari steps, Android install button + APK download, desktop fallback)",
-            "- install link injected into magic link emails"
+            "- install the app on your phone or computer for quick access — works on iOS, Android and desktop",
+            "- a guided install page walks you through the steps for your device",
+            "- the install link is included in your sign-in email"
           ],
           "fr": [
-            "- support Progressive Web App + TWA (Trusted Web Activity)",
-            "- hook usePWAInstall : détection standalone, iOS/Android/Safari, capture beforeinstallprompt",
-            "- page publique /install : guide d'installation selon l'appareil (iOS Safari, bouton Android + téléchargement APK, message bureau)",
-            "- lien d'installation injecté dans les e-mails de lien magique"
+            "- installez l'app sur votre téléphone ou ordinateur pour un accès rapide — iOS, Android et bureau",
+            "- une page d'installation guidée vous accompagne selon votre appareil",
+            "- le lien d'installation est inclus dans votre email de connexion"
           ]
         },
         "frontend": {
@@ -454,12 +412,10 @@
         "package": "revisions",
         "description": {
           "en": [
-            "- document revision history viewer with timeline interface",
-            "- browse historical versions of documents with date-based navigation"
+            "- browse the full edit history of a document and see how it looked at any point in time"
           ],
           "fr": [
-            "- visualiseur d'historique des révisions de documents avec interface chronologique",
-            "- parcourir les versions historiques des documents avec une navigation par date"
+            "- parcourez l'historique complet des modifications d'un document et voyez son état à n'importe quel moment"
           ]
         },
         "frontend": {
@@ -472,12 +428,12 @@
         "package": "mail",
         "description": {
           "en": [
-            "- email queuing, scheduling and management",
-            "- admin interface to view and filter sent or queued emails"
+            "- the app sends emails for sign-in links and other notifications",
+            "- admins can review the log of sent and pending emails"
           ],
           "fr": [
-            "- mise en file d'attente, planification et gestion des emails",
-            "- interface d'administration pour visualiser et filtrer les emails envoyés ou en attente"
+            "- l'app envoie des emails pour les liens de connexion et autres notifications",
+            "- les administrateurs peuvent consulter le journal des emails envoyés et en attente"
           ]
         },
         "backend": {
@@ -500,14 +456,14 @@
   "features": {
     "description": {
       "en": [
-        "- each feature is a self-contained package under features/ on both backend and frontend",
-        "- features follow hexagonal architecture: they depend on the platform, not the reverse",
-        "- a project can have multiple instances of the same feature, each accessible via a tab"
+        "- features are tools that can be added to a project as tabs (tasks, documents, guitar tools…)",
+        "- a project can have several tabs of the same type — each is a separate, independent instance",
+        "- the project manager chooses which features appear as tabs in each project"
       ],
       "fr": [
-        "- chaque fonctionnalité est un package autonome sous features/ sur le backend et le frontend",
-        "- les fonctionnalités suivent l'architecture hexagonale : elles dépendent de la plateforme, pas l'inverse",
-        "- un projet peut avoir plusieurs instances de la même fonctionnalité, chacune accessible via un onglet"
+        "- les fonctionnalités sont des outils ajoutables à un projet sous forme d'onglets (tâches, documents, guitare…)",
+        "- un projet peut avoir plusieurs onglets du même type — chacun est une instance séparée et indépendante",
+        "- le gestionnaire du projet choisit quelles fonctionnalités apparaissent comme onglets"
       ]
     },
     "features": [
@@ -515,12 +471,10 @@
         "package": "bookmarks",
         "description": {
           "en": [
-            "- user bookmarks for frequently accessed pages",
-            "- supports colors, ordering and editing"
+            "- save shortcuts to your most-visited pages with custom colors and your preferred order"
           ],
           "fr": [
-            "- signets utilisateur pour les pages fréquemment consultées",
-            "- supporte les couleurs, le tri et l'édition"
+            "- enregistrez des raccourcis vers vos pages les plus visitées avec des couleurs personnalisées et votre ordre préféré"
           ]
         },
         "backend": {
@@ -541,14 +495,12 @@
         "package": "tasks",
         "description": {
           "en": [
-            "- task management system with two presentation modes: todo list and kanban",
-            "- supports labels, person assignments, sizing, due dates and rich document content",
-            "- common types and components shared between todo_list and kanban sub-packages"
+            "- manage your team's work with two views: a to-do list and a visual kanban board",
+            "- assign tasks to people, add labels, set due dates and attach detailed notes"
           ],
           "fr": [
-            "- système de gestion des tâches avec deux modes : liste de tâches et kanban",
-            "- supporte les étiquettes, les assignations, la taille, les échéances et le contenu de documents riches",
-            "- types et composants communs partagés entre les sous-packages todo_list et kanban"
+            "- gérez le travail de votre équipe avec deux vues : une liste de tâches et un tableau kanban",
+            "- assignez des tâches, ajoutez des étiquettes, définissez des échéances et joignez des notes détaillées"
           ]
         },
         "backend": {
@@ -566,10 +518,10 @@
             "package": "todo_list",
             "description": {
               "en": [
-                "- linear task list interface with filtering"
+                "- a scrollable task list you can filter and check off one by one"
               ],
               "fr": [
-                "- interface de liste de tâches linéaire avec filtrage"
+                "- une liste de tâches défilante que vous pouvez filtrer et cocher une par une"
               ]
             },
             "backend": {
@@ -591,12 +543,12 @@
             "package": "kanban",
             "description": {
               "en": [
-                "- kanban board with drag-and-drop columns and cards",
-                "- supports card movement, reordering and column management"
+                "- a board with drag-and-drop columns — move cards between stages to track your team's progress",
+                "- reorder cards and manage columns as your workflow evolves"
               ],
               "fr": [
-                "- tableau kanban avec colonnes et cartes déplaçables par glisser-déposer",
-                "- supporte le déplacement de cartes, le réordonnancement et la gestion des colonnes"
+                "- un tableau avec des colonnes déplaçables — déplacez des cartes entre les étapes pour suivre l'avancement",
+                "- réorganisez les cartes et gérez les colonnes selon votre workflow"
               ]
             },
             "backend": {
@@ -619,16 +571,12 @@
             "package": "my_tasks",
             "description": {
               "en": [
-                "- aggregates tasks assigned to the current user across all projects",
-                "- cross-project view combining kanban cards and todo items",
-                "- filterable by tribe, project, person and label",
-                "- exposed at GET /features/my-tasks"
+                "- see all tasks assigned to you across every project in one place",
+                "- filter by tribe, project, person or label to focus on what matters"
               ],
               "fr": [
-                "- agrège les tâches assignées à l'utilisateur courant sur tous les projets",
-                "- vue transversale combinant les cartes kanban et les éléments todo",
-                "- filtrable par tribu, projet, personne et étiquette",
-                "- exposé sur GET /features/my-tasks"
+                "- consultez toutes les tâches qui vous sont assignées dans tous vos projets en un seul endroit",
+                "- filtrez par tribu, projet, personne ou étiquette pour vous concentrer sur l'essentiel"
               ]
             },
             "backend": {
@@ -648,20 +596,14 @@
         "package": "tribes-projects",
         "description": {
           "en": [
-            "- core organizational structure of the application",
-            "- tribes: top-level groups with members and positions",
-            "- projects: belong to a tribe, host feature instances and documents",
-            "- positions: named roles within a tribe",
-            "- feature instances: pluggable features attached to a project, each rendered as a tab",
-            "- theme_code: optional theme override on tribes, projects, and feature instances"
+            "- tribes are your teams — each tribe has members, named positions and its own projects",
+            "- projects host the feature tabs (tasks, documents…) where work happens",
+            "- apply a color theme at the tribe, project or tab level to personalize the look"
           ],
           "fr": [
-            "- structure organisationnelle principale de l'application",
-            "- tribus : groupes de premier niveau avec membres et postes",
-            "- projets : appartiennent à une tribu, hébergent des instances de fonctionnalités et des documents",
-            "- postes : rôles nommés au sein d'une tribu",
-            "- instances de fonctionnalités : fonctionnalités modulaires attachées à un projet, chacune affichée sous forme d'onglet",
-            "- theme_code : thème optionnel sur les tribus, projets et instances de fonctionnalités"
+            "- les tribus sont vos équipes — chaque tribu a des membres, des postes nommés et ses propres projets",
+            "- les projets hébergent les onglets de fonctionnalités (tâches, documents…) où le travail se fait",
+            "- appliquez un thème de couleur au niveau de la tribu, du projet ou de l'onglet pour personnaliser l'apparence"
           ]
         },
         "backend": {
@@ -686,14 +628,12 @@
         "package": "glue",
         "description": {
           "en": [
-            "- wiring layer between the platform and features",
-            "- feature-instances: manage feature instances attached to a project (projects_features table)",
-            "- tab-config: per-user tab visibility and ordering configuration"
+            "- attach tools (task lists, kanban boards, guitar tools…) to a project as named tabs",
+            "- each user can show, hide and reorder their tabs to match their own workflow"
           ],
           "fr": [
-            "- couche de câblage entre la plateforme et les fonctionnalités",
-            "- feature-instances : gère les instances de fonctionnalités attachées à un projet (table projects_features)",
-            "- tab-config : configuration de la visibilité et de l'ordre des onglets par utilisateur"
+            "- ajoutez des outils (listes de tâches, kanbans, outils guitare…) à un projet sous forme d'onglets nommés",
+            "- chaque utilisateur peut afficher, masquer et réorganiser ses onglets selon son usage"
           ]
         },
         "backend": {
@@ -715,14 +655,10 @@
         "package": "dashboard",
         "description": {
           "en": [
-            "- personalized user dashboard",
-            "- composes my_tasks, tribes and bookmarks tabs",
-            "- shows tribes membership and bookmarks"
+            "- personalized dashboard showing the user's tasks, tribes and bookmarks"
           ],
           "fr": [
-            "- tableau de bord personnalisé",
-            "- compose les onglets my_tasks, tribus et signets",
-            "- affiche l'appartenance aux tribus et les signets"
+            "- tableau de bord personnalisé affichant les tâches, tribus et signets de l'utilisateur"
           ]
         },
         "frontend": {
@@ -730,6 +666,104 @@
             "frontend/src/app/features/glue/dashboard/**"
           ]
         }
+      },
+      {
+        "package": "guitar",
+        "description": {
+          "en": [
+            "- a set of tools to support your guitar practice",
+            "- includes a note quiz, a chromatic tuner and a metronome",
+            "- shared: audioContext.ts (singleton Web Audio API context)"
+          ],
+          "fr": [
+            "- un ensemble d'outils pour soutenir votre pratique de la guitare",
+            "- comprend un quiz de notes, un accordeur chromatique et un métronome",
+            "- partagé : audioContext.ts (contexte Web Audio API singleton)"
+          ]
+        },
+        "sub_packages": [
+          {
+            "package": "notes",
+            "description": {
+              "en": [
+                "- a random note is played and displayed — guess it before it's revealed",
+                "- the fretboard shows which string and fret to play; the note name is hidden until you reveal it",
+                "- customize the interval, sound length, octave range and which notes to include — saved per tab",
+                "- audio samples download automatically on first visit and refresh daily",
+                "- feature_type: guitar_notes"
+              ],
+              "fr": [
+                "- une note aléatoire est jouée et affichée — devinez-la avant qu'elle soit révélée",
+                "- le manche montre la corde et la frette à jouer ; le nom de la note est caché jusqu'à la révélation",
+                "- personnalisez l'intervalle, la durée du son, la plage d'octaves et les notes à inclure — sauvegardé par onglet",
+                "- les samples audio se téléchargent automatiquement à la première visite et se mettent à jour chaque jour"
+              ]
+            },
+            "backend": {
+              "path": [
+                "backend/app/features/guitar/notes/**"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/guitar/notes/**"
+              ]
+            }
+          },
+          {
+            "package": "tuner",
+            "description": {
+              "en": [
+                "- tune your guitar using your device's microphone — the app listens and shows the closest note in real time",
+                "- a needle meter shows how flat or sharp you are; the note name turns green when you're in tune",
+                "- displays the detected note name, octave, frequency and deviation in cents"
+              ],
+              "fr": [
+                "- accordez votre guitare grâce au microphone de votre appareil — l'app écoute et affiche la note la plus proche",
+                "- une aiguille montre si vous êtes trop bas ou trop haut ; le nom de la note devient vert quand vous êtes accordé",
+                "- affiche le nom de la note, l'octave, la fréquence et l'écart en centièmes"
+              ]
+            },
+            "backend": {
+              "path": [
+                "backend/app/features/guitar/tuner/**"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/guitar/tuner/**",
+                "frontend/src/app/features/guitar/audioContext.ts"
+              ]
+            }
+          },
+          {
+            "package": "metronome",
+            "description": {
+              "en": [
+                "- keep time during your practice with an adjustable click track (20–300 BPM)",
+                "- a visual indicator lights up on each beat; beat 1 is accented for easy counting",
+                "- set the time signature (2–8 beats per bar) and tap the button to find your tempo by feel",
+                "- your BPM and time signature are saved automatically for each tab"
+              ],
+              "fr": [
+                "- gardez le tempo pendant votre pratique avec un clic ajustable (20–300 BPM)",
+                "- un indicateur visuel s'allume sur chaque temps ; le premier temps est accentué pour compter facilement",
+                "- réglez la signature rythmique (2–8 temps par mesure) et tapotez pour trouver votre tempo à l'oreille",
+                "- votre BPM et signature rythmique sont sauvegardés automatiquement par onglet"
+              ]
+            },
+            "backend": {
+              "path": [
+                "backend/app/features/guitar/metronome/**"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/guitar/metronome/**"
+              ]
+            }
+          }
+        ]
       }
     ]
   },

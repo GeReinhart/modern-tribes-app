@@ -23,7 +23,7 @@ Key ideas:
 
 ## Features
 
-### Platform (tag `0.1.x`)
+### Platform (tag `0.x.y`)
 
 A reusable base that can be forked to bootstrap any new application.
 

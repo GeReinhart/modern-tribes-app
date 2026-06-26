@@ -20,7 +20,7 @@
     "path": "./android-keystore.jks",
     "alias": "modern-tribes"
   },
-  "appVersionName": "0.0.1",
+  "appVersionName": "1.0.0",
   "appVersionCode": 3,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
@@ -39,5 +39,5 @@
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
   "displayOverride": [],
-  "appVersion": "0.0.1"
+  "appVersion": "1.0.0"
 }

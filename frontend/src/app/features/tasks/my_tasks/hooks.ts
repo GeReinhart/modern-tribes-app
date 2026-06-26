@@ -1,8 +1,5 @@
-import type { TaskPatch } from '@/app/features/tasks/types.ts';
 import { kanbanService } from '@/app/features/tasks/kanban/service.ts';
-import type { CardUpdate } from '@/app/features/tasks/kanban/types.ts';
 import { todoListService } from '@/app/features/tasks/todo_list/service.ts';
-import type { TodoItemUpdate } from '@/app/features/tasks/todo_list/types.ts';
 import { apiHooks } from '@/app/platform/core/api/api-hooks.ts';
 
 import { useCallback, useEffect } from 'react';
@@ -27,41 +24,13 @@ export function useMyTasks(filters: MyTasksFilters) {
 }
 
 export function useMyTaskMutations() {
-  const updateTask = useCallback(
-    async (task: MyTask, patch: TaskPatch): Promise<void> => {
-      if (task.source === 'kanban') {
-        await kanbanService.updateCard(task.id, patch as CardUpdate);
-      } else {
-        await todoListService.update(task.id, patch as TodoItemUpdate);
-      }
-    },
-    [],
-  );
+  const markAsDone = useCallback(async (task: MyTask): Promise<void> => {
+    if (task.source === 'kanban') {
+      await kanbanService.moveCardToLastColumn(task.id);
+    } else {
+      await todoListService.update(task.id, { todo_status: 'done' });
+    }
+  }, []);
 
-  const toggleLabel = useCallback(
-    async (task: MyTask, labelId: string): Promise<void> => {
-      const ids = task.label_ids;
-      if (task.source === 'kanban') {
-        if (ids.includes(labelId))
-          await kanbanService.removeCardLabel(task.id, labelId);
-        else await kanbanService.addCardLabel(task.id, labelId);
-      } else {
-        await todoListService.toggleLabel(task.id, labelId);
-      }
-    },
-    [],
-  );
-
-  const createLabel = useCallback(
-    async (
-      task: MyTask,
-      data: { feature_instance_id: string; name: string; color: string },
-    ) => {
-      if (task.source === 'kanban') return kanbanService.createLabel(data);
-      return todoListService.createLabel(data);
-    },
-    [],
-  );
-
-  return { updateTask, toggleLabel, createLabel };
+  return { markAsDone };
 }

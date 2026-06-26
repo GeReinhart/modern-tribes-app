@@ -1,5 +1,4 @@
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
-import type { TaskLabelInfo, TaskPatch } from '@/app/features/tasks/types.ts';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import type { PersonOption } from '@/app/features/tasks/types.ts';
 
@@ -34,7 +33,7 @@ const MyTasksTab: React.FC = () => {
   const [filters, setFilters] = useState<MyTasksFilters>({});
 
   const { data, loading, error, refetch } = useMyTasks(filters);
-  const { updateTask, toggleLabel, createLabel } = useMyTaskMutations();
+  const { markAsDone } = useMyTaskMutations();
 
   const tasks: MyTasksResponse = data ?? empty;
   const allTasks: MyTask[] = useMemo(
@@ -43,33 +42,12 @@ const MyTasksTab: React.FC = () => {
   );
   const effectivePersons = useMemo(() => uniquePersons(tasks), [tasks]);
 
-  const handleUpdate = useCallback(
-    async (task: MyTask, patch: TaskPatch) => {
-      await updateTask(task, patch);
+  const handleMarkDone = useCallback(
+    async (task: MyTask) => {
+      await markAsDone(task);
       await refetch();
     },
-    [updateTask, refetch],
-  );
-
-  const handleToggleLabel = useCallback(
-    async (task: MyTask, labelId: string) => {
-      await toggleLabel(task, labelId);
-      await refetch();
-    },
-    [toggleLabel, refetch],
-  );
-
-  const handleCreateLabel = useCallback(
-    async (
-      task: MyTask,
-      data: { feature_instance_id: string; name: string; color: string },
-    ): Promise<TaskLabelInfo | null> => {
-      const created = await createLabel(task, data);
-      await refetch();
-      if (!created) return null;
-      return { ...created, feature_instance_id: task.feature_instance_id };
-    },
-    [createLabel, refetch],
+    [markAsDone, refetch],
   );
 
   if (loading) {
@@ -107,10 +85,7 @@ const MyTasksTab: React.FC = () => {
       <MyTasksList
         data={tasks}
         persons={effectivePersons}
-        canEdit={true}
-        onUpdate={handleUpdate}
-        onToggleLabel={handleToggleLabel}
-        onCreateLabel={handleCreateLabel}
+        onMarkDone={handleMarkDone}
       />
     </div>
   );

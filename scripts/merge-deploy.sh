@@ -22,6 +22,7 @@ if [ -z "$COMMIT_MSG" ]; then
 fi
 
 echo "==> Check code..."
+./scripts/check-docker-packaging.sh || { echo "✗ Docker packaging check failed. Aborting."; exit 1; }
 ./scripts/check-backend.sh || { echo "✗ Backend checks failed. Aborting."; exit 1; }
 ./scripts/check-frontend.sh || { echo "✗ Frontend checks failed. Aborting."; exit 1; }
 echo "==> Test code..."

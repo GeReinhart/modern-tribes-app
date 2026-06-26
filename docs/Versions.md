@@ -27,3 +27,5 @@ It's a git tag.
 
 It's also defined in files:
 - `@/frontend/src/android/twa-manifest.json` `appVersion`
+- `@frontend/.env` `VITE_APP_VERSION`
+- `frontend/package.json` `version`

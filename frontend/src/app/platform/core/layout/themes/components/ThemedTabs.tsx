@@ -1,4 +1,5 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { useHeaderVisibility } from '@/app/platform/core/layout/HeaderVisibilityContext.tsx';
 
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -22,6 +23,9 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({
   onTabChange,
 }) => {
   const { theme } = useTheme();
+  const { headerVisible } = useHeaderVisibility();
+
+  if (!headerVisible) return null;
 
   return (
     <div

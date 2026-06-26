@@ -51,6 +51,8 @@ const fr: Record<string, string> = {
   'dashboard.tasks.empty': 'Aucune tâche à venir qui vous est assignée.',
   'dashboard.tasks.openSource': 'Ouvrir dans le projet',
   'dashboard.tasks.todoStatus': 'À faire',
+  'dashboard.tasks.markDone': 'Marquer comme fait',
+  'dashboard.tasks.markDoneConfirm': 'Marquer "{{title}}" comme fait ?',
 };
 
 export default fr;
