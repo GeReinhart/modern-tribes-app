@@ -217,6 +217,68 @@ async def get_tribes_summary_for_projects(current_user: dict = Depends(get_curre
     ]
 
 
+class UserAccessibleProject(BaseModel):
+    project_id: str
+    project_name: str
+    tribe_name: str
+
+
+_QUERY_ACCESSIBLE_WITH_TRIBES = """
+    SELECT project_id, project_name, MIN(tribe_name) AS tribe_name
+    FROM (
+        SELECT proj.id AS project_id, proj.name AS project_name, t.name AS tribe_name
+        FROM users u
+        JOIN persons p ON p.id = u.person_id AND p.status = 'active'
+        JOIN positions pos ON pos.person_id = p.id AND pos.status = 'active'
+        JOIN tribes t ON t.id = pos.tribe_id AND t.status = 'active'
+        JOIN tribes_projects tp ON tp.tribe_id = t.id
+        JOIN projects proj ON proj.id = tp.project_id AND proj.status = 'active'
+        WHERE u.id = $1
+
+        UNION
+
+        SELECT proj.id AS project_id, proj.name AS project_name, t.name AS tribe_name
+        FROM users u
+        JOIN represents r ON r.user_id = u.id AND r.status = 'active'
+        JOIN persons p ON p.id = r.person_id AND p.status = 'active'
+        JOIN positions pos ON pos.person_id = p.id AND pos.status = 'active'
+        JOIN tribes t ON t.id = pos.tribe_id AND t.status = 'active'
+        JOIN tribes_projects tp ON tp.tribe_id = t.id
+        JOIN projects proj ON proj.id = tp.project_id AND proj.status = 'active'
+        WHERE u.id = $1
+    ) sub
+    GROUP BY project_id, project_name
+    ORDER BY project_name ASC
+"""
+
+
+@router.get("/by/user/{user_id}/accessible-with-tribes", response_model=List[UserAccessibleProject])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_accessible_projects_with_tribes(
+    user_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """Get all active projects accessible to a user, with tribe name for display.
+
+    **Permissions:** admin | can_access_attached_tribes (own user only)
+    """
+    pool = get_database()
+    user_id = await resolve_url_param_id(pool, "users", user_id)
+    await check_own_user_or_admin(user_id, current_user, pool)
+
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(_QUERY_ACCESSIBLE_WITH_TRIBES, UUID(user_id))
+
+    return [
+        UserAccessibleProject(
+            project_id=str(r["project_id"]),
+            project_name=r["project_name"],
+            tribe_name=r["tribe_name"],
+        )
+        for r in rows
+    ]
+
+
 @router.get("/{project_id}/tribes", response_model=List[ProjectTribeEntry])
 @require_any_permission_decorator(PermissionEnum.ADMIN)
 async def get_tribes_for_project(

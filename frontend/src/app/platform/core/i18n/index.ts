@@ -2,6 +2,8 @@ import { initReactI18next } from 'react-i18next';
 
 import i18n from 'i18next';
 
+import eventsEn from '@/app/features/events/locales/en.ts';
+import eventsFr from '@/app/features/events/locales/fr.ts';
 import bookmarksEn from '@/app/features/bookmarks/locales/en.ts';
 import bookmarksFr from '@/app/features/bookmarks/locales/fr.ts';
 import glueEn from '@/app/features/glue/locales/en.ts';
@@ -28,6 +30,7 @@ i18n.use(initReactI18next).init({
     en: {
       translation: {
         ...en,
+        ...eventsEn,
         ...bookmarksEn,
         ...tasksEn,
         ...glueEn,
@@ -40,6 +43,7 @@ i18n.use(initReactI18next).init({
     fr: {
       translation: {
         ...fr,
+        ...eventsFr,
         ...bookmarksFr,
         ...tasksFr,
         ...glueFr,

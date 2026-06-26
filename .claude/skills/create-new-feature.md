@@ -30,17 +30,17 @@ Before writing any code, explore an existing feature that is structurally simila
 
 - `backend/app/features/tasks/` and `frontend/src/app/features/tasks/` — feature with sub-packages
 - `backend/app/features/bookmarks/` — simpler single-package feature
-- `frontend/src/app/features/glue/index.ts` — where frontend features register
+- `frontend/src/app/features/glue/index.ts` — where frontend features self-register (**critical wiring**)
 - `frontend/src/app/platform/core/i18n/index.ts` — where locales are assembled
 - `backend/app/features/registry.py` — backend feature registry
-- `backend/app/features/__init__.py` — backend self-registration trigger
+- `backend/app/features/__init__.py` — backend self-registration trigger (**critical wiring**)
 
 ### 3. Present a scenario for approval
 
 **Before writing any code**, describe to the user:
 
-- Package path on backend: `backend/app/features/<feature>/<sub-feature>/`
-- Package path on frontend: `frontend/src/app/features/<feature>/<sub-feature>/`
+- Package path on backend: `backend/app/features/<feature>/`
+- Package path on frontend: `frontend/src/app/features/<feature>/`
 - Whether a backend is needed (no backend needed for pure client-side features)
 - Files to create (list them)
 - Files to modify (list them)
@@ -68,7 +68,7 @@ When a feature has no backend (e.g., uses only browser APIs):
 **Wiring (files to modify):**
 
 1. `frontend/src/app/features/glue/index.ts` — add `import '../<group>/<sub>';`
-2. `frontend/src/app/platform/core/i18n/index.ts` — import and spread the new locales
+2. `frontend/src/app/platform/core/i18n/index.ts` — import and spread the new locales in both `en` and `fr` blocks
 3. `application.json` — add the feature entry under `features.features`
 
 ### 5. Full-stack features (backend + frontend)
@@ -82,15 +82,32 @@ In addition to the frontend steps above:
 | `__init__.py` | Registers router via `registry.register_feature(FeatureDefinition(...))` |
 | `models.py` | Pydantic models |
 | `repository.py` | Database queries |
-| `router.py` | FastAPI router |
+| `router.py` | FastAPI router — prefix must be unique (e.g. `/events`, `/my-labels`) |
+| `label_service.py` | If the feature needs labels or per-feature access checks |
 
-**Wiring (files to modify):**
+**Critical wiring (two places, both required):**
 
-1. `backend/app/features/__init__.py` — add `from app.features.<feature> import <sub>`
-2. `backend/app/main.py` — import router and add `app.include_router(...)` with prefix `/api/features`
-3. `application.json` — declare schema tables and paths
+1. `backend/app/features/__init__.py` — add `from app.features import <feature>  # noqa: F401 — triggers self-registration`
+2. `frontend/src/app/features/glue/index.ts` — add `import '../<feature>';`
 
-**Migration:** if schema changes are needed, add a new migration file under `backend/migrations/`.
+> ⚠️ Missing either of these produces "Type de fonctionnalité inconnu : <feature>" at runtime. The backend registry and frontend registry are independent — both must be updated.
+
+**Router mounting:** feature routers do **not** go in `main.py`. They self-register via `registry.register_feature()` and are collected by `get_all_routers()`, which mounts all of them under `/api/features/tasks`. The router's own `prefix` (e.g. `/events`) becomes the final path segment: `/api/features/tasks/events/...`.
+
+**Schema and migrations:** when new tables are needed:
+
+1. Add `CREATE TABLE IF NOT EXISTS ...` blocks to `backend/scripts/init_schema.sql`
+2. Create a new migration file `backend/alembic/versions/<NNN>_<description>.py` following the pattern in existing migrations (see `001_initial_schema.py`)
+3. Add dev-data CSV files under `backend/scripts/data-dev/<table>.csv`
+4. Update `backend/scripts/init_db.py`:
+   - Add the new tables to the `clear_tables` list (in dependency order — children before parents)
+   - Add a `create_<feature>()` method and call it in the main async flow
+
+**Scheduler:** if the feature needs a background task (e.g. reminders):
+
+1. Create `backend/app/features/<feature>/scheduler.py` with an `async def <feature>_scheduler()` loop
+2. Add the config interval to `backend/app/platform/core/config.py`
+3. Import and start the scheduler in `backend/app/main.py` alongside `mail_scheduler`
 
 ### 6. Code quality constraints
 
@@ -103,6 +120,8 @@ Every file must respect the project hard constraints:
 - Apply theme colors (`useTheme`) to all UI elements
 - Use `useTranslation` for all user-facing strings (add keys to both locales)
 - Never use `any` in TypeScript
+- Check available `IconName` values in `ThemedSvgIcon.tsx` before using an icon name
+- Check component prop signatures (e.g. `EditorJoditComponent` uses `content=` not `value=`) before importing
 
 ### 7. Run checks after implementation
 

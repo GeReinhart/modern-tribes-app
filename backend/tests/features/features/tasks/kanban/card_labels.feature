@@ -57,6 +57,7 @@ Feature: Manage card labels
         "status": "active",
         "size": null,
         "due_date": null,
+        "force_on_dashboard": false,
         "label_ids": ["0020"],
         "created_at": null,
         "updated_at": null,

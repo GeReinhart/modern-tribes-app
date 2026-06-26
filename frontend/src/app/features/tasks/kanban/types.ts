@@ -20,6 +20,7 @@ export interface KanbanCard {
   status: 'pending' | 'active' | 'archived';
   size: number | null;
   due_date: string | null;
+  force_on_dashboard: boolean;
   label_ids: string[];
   created_at: string | null;
   updated_at: string | null;
@@ -41,6 +42,7 @@ export interface CardCreate {
   title: string;
   assigned_person_id?: string | null;
   position?: number;
+  force_on_dashboard?: boolean;
 }
 
 export interface CardUpdate {
@@ -52,6 +54,7 @@ export interface CardUpdate {
   clear_size?: boolean;
   due_date?: string | null;
   clear_due_date?: boolean;
+  force_on_dashboard?: boolean;
 }
 
 export interface ColumnCreate {

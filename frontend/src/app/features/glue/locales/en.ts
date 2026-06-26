@@ -3,6 +3,11 @@ const en: Record<string, string> = {
   'dashboard.tabs.tasks': 'Tasks',
   'dashboard.tabs.tribes': 'Tribes',
   'dashboard.tabs.bookmarks': 'Bookmarks',
+  'dashboard.tabs.planning': 'Planning',
+
+  'dashboard.planning.noEvents': 'No events on this day.',
+  'dashboard.planning.noTasks': 'No tasks due today.',
+  'dashboard.planning.tasksDue': 'Tasks due',
 
   'tabConfig.configure': 'Tabs',
   'tabConfig.title': 'Tab configuration',
@@ -36,6 +41,17 @@ const en: Record<string, string> = {
   'admin.features.restoreMessage':
     '"{{name}}" will become visible again in the project.',
   'admin.features.selectProject': 'Select a project to manage its features',
+
+  'dashboard.quickAdd.addTask': 'Add task',
+  'dashboard.quickAdd.project': 'Project',
+  'dashboard.quickAdd.selectProject': 'Select a project...',
+  'dashboard.quickAdd.featureInstance': 'Tab',
+  'dashboard.quickAdd.selectInstance': 'Select a tab...',
+  'dashboard.quickAdd.noInstanceOfType': 'No compatible tab found.',
+  'dashboard.quickAdd.selectFeature': 'Select a tab',
+  'dashboard.quickAdd.changeFeature': 'Change',
+  'dashboard.quickAdd.taskTitlePlaceholder': 'Task title...',
+  'dashboard.quickAdd.create': 'Create',
 };
 
 export default en;

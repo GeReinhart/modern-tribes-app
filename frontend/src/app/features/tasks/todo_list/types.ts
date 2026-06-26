@@ -14,6 +14,7 @@ export interface TodoItem {
   position: number;
   size: number | null;
   due_date: string | null;
+  force_on_dashboard: boolean;
   assigned_person_id: string | null;
   assigned_person_name: string | null;
   label_ids: string[];
@@ -27,6 +28,7 @@ export interface TodoItemCreate {
   feature_instance_id: string;
   title: string;
   position?: number;
+  force_on_dashboard?: boolean;
 }
 
 export interface TodoItemUpdate {
@@ -41,4 +43,5 @@ export interface TodoItemUpdate {
   clear_assignee?: boolean;
   due_date?: string | null;
   clear_due_date?: boolean;
+  force_on_dashboard?: boolean;
 }

@@ -13,6 +13,10 @@ interface Props {
   onChange: (value: string) => void;
   disabled?: boolean;
   label?: string;
+  width?: string;
+  dateFormat?: string;
+  minDate?: string;
+  maxDate?: string;
 }
 
 function parseDate(value: string): Date | null {
@@ -39,6 +43,7 @@ const StyledInput = forwardRef<HTMLInputElement, StyledInputProps>(
     <input
       ref={ref}
       {...props}
+      readOnly
       style={{
         padding: '8px 12px',
         border: `1px solid ${borderColor}`,
@@ -50,6 +55,7 @@ const StyledInput = forwardRef<HTMLInputElement, StyledInputProps>(
         cursor: props.disabled ? 'not-allowed' : 'pointer',
         opacity: props.disabled ? 0.6 : 1,
         width: '100%',
+        textTransform: 'capitalize',
       }}
     />
   ),
@@ -60,6 +66,10 @@ const ThemedDateSelection: React.FC<Props> = ({
   onChange,
   disabled = false,
   label,
+  width,
+  dateFormat = 'dd/MM/yyyy',
+  minDate,
+  maxDate,
 }) => {
   const { theme } = useTheme();
 
@@ -84,13 +94,15 @@ const ThemedDateSelection: React.FC<Props> = ({
   };
 
   return (
-    <div style={{ flex: '1 1 160px' }}>
+    <div style={width ? { width } : { flex: '1 1 160px' }}>
       {label && <span style={labelStyle}>{label}</span>}
       <DatePicker
         selected={parseDate(value)}
         onChange={(date: Date | null) => onChange(date ? toISODate(date) : '')}
         locale={fr}
-        dateFormat="dd/MM/yyyy"
+        dateFormat={dateFormat}
+        minDate={minDate ? parseDate(minDate) ?? undefined : undefined}
+        maxDate={maxDate ? parseDate(maxDate) ?? undefined : undefined}
         disabled={disabled}
         placeholderText="jj/mm/aaaa"
         customInput={

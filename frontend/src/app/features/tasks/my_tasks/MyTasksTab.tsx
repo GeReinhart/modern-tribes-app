@@ -1,8 +1,11 @@
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 import type { PersonOption } from '@/app/features/tasks/types.ts';
+import DashboardAddTaskModal from '@/app/features/glue/dashboard/DashboardAddTaskModal.tsx';
 
 import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useMyTaskMutations, useMyTasks } from './hooks.ts';
 import type { MyTask, MyTasksFilters, MyTasksResponse } from './types.ts';
@@ -29,8 +32,10 @@ function uniquePersons(data: MyTasksResponse): PersonOption[] {
 const empty: MyTasksResponse = { kanban: [], todo: [] };
 
 const MyTasksTab: React.FC = () => {
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const [filters, setFilters] = useState<MyTasksFilters>({});
+  const [showAddTask, setShowAddTask] = useState(false);
 
   const { data, loading, error, refetch } = useMyTasks(filters);
   const { markAsDone } = useMyTaskMutations();
@@ -50,11 +55,21 @@ const MyTasksTab: React.FC = () => {
     [markAsDone, refetch],
   );
 
+  const tabActions = useMemo(
+    () => [
+      {
+        icon: 'plus' as const,
+        label: t('dashboard.quickAdd.addTask'),
+        onClick: () => setShowAddTask(true),
+      },
+    ],
+    [t],
+  );
+  useRegisterTabActions(tabActions);
+
   if (loading) {
     return (
-      <div
-        style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}
-      >
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 0' }}>
         <ThemedLoadingSpinner size="sm" />
       </div>
     );
@@ -62,13 +77,7 @@ const MyTasksTab: React.FC = () => {
 
   if (error) {
     return (
-      <div
-        style={{
-          color: theme.colors.danger,
-          fontSize: 'var(--font-sm)',
-          padding: '12px 0',
-        }}
-      >
+      <div style={{ color: theme.colors.danger, fontSize: 'var(--font-sm)', padding: '12px 0' }}>
         {error}
       </div>
     );
@@ -76,17 +85,28 @@ const MyTasksTab: React.FC = () => {
 
   return (
     <div>
-      <MyTasksFiltersPanel
-        tasks={allTasks}
-        filters={filters}
-        effectivePersons={effectivePersons}
-        onChange={setFilters}
-      />
+      <div style={{ marginBottom: '12px' }}>
+        <MyTasksFiltersPanel
+          tasks={allTasks}
+          filters={filters}
+          effectivePersons={effectivePersons}
+          onChange={setFilters}
+        />
+      </div>
+
       <MyTasksList
         data={tasks}
         persons={effectivePersons}
         onMarkDone={handleMarkDone}
+        onRefresh={refetch}
       />
+
+      {showAddTask && (
+        <DashboardAddTaskModal
+          onClose={() => setShowAddTask(false)}
+          onCreated={refetch}
+        />
+      )}
     </div>
   );
 };

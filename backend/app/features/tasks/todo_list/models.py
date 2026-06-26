@@ -7,6 +7,7 @@ class TodoItemCreate(BaseModel):
     feature_instance_id: str
     title: str
     position: int = 0
+    force_on_dashboard: bool = False
 
 
 class TodoItemUpdate(BaseModel):
@@ -21,6 +22,7 @@ class TodoItemUpdate(BaseModel):
     clear_assignee: bool = False
     due_date: Optional[date] = None
     clear_due_date: bool = False
+    force_on_dashboard: Optional[bool] = None
 
 
 class TodoItemResponse(BaseModel):
@@ -34,6 +36,7 @@ class TodoItemResponse(BaseModel):
     position: int
     size: Optional[int] = None
     due_date: Optional[date] = None
+    force_on_dashboard: bool = False
     assigned_person_id: Optional[str] = None
     assigned_person_name: Optional[str] = None
     label_ids: list[str] = []

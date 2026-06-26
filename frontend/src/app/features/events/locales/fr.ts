@@ -1,0 +1,28 @@
+const fr: Record<string, string> = {
+  'features.events.addEvent': 'Ajouter un événement',
+  'features.events.create': 'Créer',
+  'features.events.editEvent': 'Modifier l\'événement',
+  'features.events.viewEvent': 'Événement',
+  'features.events.title': 'Titre',
+  'features.events.titlePlaceholder': 'Titre de l\'événement...',
+  'features.events.schedule': 'Date et heure',
+  'features.events.allDay': 'Toute la journée',
+  'features.events.from': 'De',
+  'features.events.to': 'À',
+  'features.events.participants': 'Participants',
+  'features.events.labels': 'Étiquettes',
+  'features.events.storyPoints': 'Points d\'effort',
+  'features.events.notes': 'Notes',
+  'features.events.noNotes': 'Pas encore de notes.',
+  'features.events.reminders': 'Rappels',
+  'features.events.addReminder': 'Ajouter un rappel',
+  'features.events.reminderNotification': 'Notification',
+  'features.events.reminderMail': 'Email',
+  'features.events.delete': 'Supprimer',
+  'features.events.confirmDelete': 'Confirmer la suppression',
+  'features.events.during': 'pendant',
+  'features.events.duration': 'Durée',
+  'features.events.noEvents': 'Aucun événement ce jour.',
+};
+
+export default fr;

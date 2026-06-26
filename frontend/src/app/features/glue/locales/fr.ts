@@ -3,6 +3,11 @@ const fr: Record<string, string> = {
   'dashboard.tabs.tasks': 'Tâches',
   'dashboard.tabs.tribes': 'Tribus',
   'dashboard.tabs.bookmarks': 'Favoris',
+  'dashboard.tabs.planning': 'Planning',
+
+  'dashboard.planning.noEvents': 'Aucun événement ce jour.',
+  'dashboard.planning.noTasks': 'Aucune tâche à rendre aujourd\'hui.',
+  'dashboard.planning.tasksDue': 'Tâches à rendre',
 
   'tabConfig.configure': 'Onglets',
   'tabConfig.title': 'Configuration des onglets',
@@ -37,6 +42,17 @@ const fr: Record<string, string> = {
     '"{{name}}" redeviendra visible dans le projet.',
   'admin.features.selectProject':
     'Sélectionnez un projet pour gérer ses fonctionnalités',
+
+  'dashboard.quickAdd.addTask': 'Ajouter une tâche',
+  'dashboard.quickAdd.project': 'Projet',
+  'dashboard.quickAdd.selectProject': 'Sélectionner un projet...',
+  'dashboard.quickAdd.featureInstance': 'Onglet',
+  'dashboard.quickAdd.selectInstance': 'Sélectionner un onglet...',
+  'dashboard.quickAdd.noInstanceOfType': 'Aucun onglet compatible trouvé.',
+  'dashboard.quickAdd.selectFeature': 'Sélectionner un onglet',
+  'dashboard.quickAdd.changeFeature': 'Changer',
+  'dashboard.quickAdd.taskTitlePlaceholder': 'Titre de la tâche...',
+  'dashboard.quickAdd.create': 'Créer',
 };
 
 export default fr;

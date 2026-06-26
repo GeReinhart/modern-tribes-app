@@ -39,6 +39,22 @@ async def list_pending_for_user(pool, user_id: str) -> list[dict]:
         return [dict(r) for r in rows]
 
 
+async def list_all_for_admin(pool) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT n.id, n.url_param_id, n.target_user_id, n.message, n.sent_at,
+                   n.notification_status, n.created_at, u.email AS target_user_email
+            FROM notifications n
+            JOIN users u ON u.id = n.target_user_id
+            WHERE n.status = 'active'
+            ORDER BY n.created_at DESC
+            LIMIT 100
+            """
+        )
+        return [dict(r) for r in rows]
+
+
 async def update_notification_status(
     pool, notification_id: str, target_user_id: str, new_status: str
 ) -> dict:

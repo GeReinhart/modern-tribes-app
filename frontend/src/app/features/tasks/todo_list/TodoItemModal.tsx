@@ -72,6 +72,7 @@ const TodoItemModal: React.FC<Props> = ({
         assigned_person_id: item.assigned_person_id,
         document_content_html: item.document_content_html,
         label_ids: item.label_ids,
+        force_on_dashboard: item.force_on_dashboard,
         created_by: item.created_by,
         updated_by: item.updated_by,
         created_at: item.created_at,

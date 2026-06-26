@@ -56,6 +56,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     };
   }, [isMenuOpen]);
 
+  const TAB_COLUMN_LIMIT = 5;
+  const tabsCol1 = breadcrumbTabs?.slice(0, TAB_COLUMN_LIMIT) ?? [];
+  const tabsCol2 = breadcrumbTabs?.slice(TAB_COLUMN_LIMIT) ?? [];
+  const hasExtraTabs = tabsCol2.length > 0;
+
   const headerStyle: React.CSSProperties = {
     position: 'sticky',
     top: 0,
@@ -86,7 +91,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     border: `2px solid ${theme.colors.border}`,
     borderRadius: '12px',
     boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-    minWidth: breadcrumbTabs ? '360px' : '330px',
+    minWidth: hasExtraTabs ? '540px' : breadcrumbTabs ? '360px' : '330px',
     maxWidth: 'calc(100vw - 16px)',
     marginTop: '12px',
     overflow: 'hidden',
@@ -188,7 +193,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: breadcrumbTabs ? '1fr 1fr' : '1fr',
+                    gridTemplateColumns: hasExtraTabs ? '1fr 1fr 1fr' : breadcrumbTabs ? '1fr 1fr' : '1fr',
                     borderBottom:
                       secondaryActions || actions || hasActionsRow
                         ? `1px solid ${theme.colors.border}`
@@ -233,7 +238,35 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                         backgroundColor: AREA_COLORS.tabs,
                       }}
                     >
-                      {breadcrumbTabs.map((tab) => (
+                      {tabsCol1.map((tab) => (
+                        <Link
+                          key={tab.key}
+                          to={tab.path}
+                          role="menuitem"
+                          style={{ ...menuNavItemStyle(true, tab.isActive, AREA_COLORS.tabActiveBorder), display: 'block', textDecoration: 'none' }}
+                          onClick={() => setIsMenuOpen(false)}
+                          onMouseEnter={(e) => {
+                            if (!tab.isActive)
+                              e.currentTarget.style.backgroundColor = `${theme.colors.primary}10`;
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!tab.isActive)
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
+                        >
+                          {tab.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                  {hasExtraTabs && (
+                    <div
+                      style={{
+                        borderLeft: `1px solid ${theme.colors.border}`,
+                        backgroundColor: AREA_COLORS.tabs,
+                      }}
+                    >
+                      {tabsCol2.map((tab) => (
                         <Link
                           key={tab.key}
                           to={tab.path}

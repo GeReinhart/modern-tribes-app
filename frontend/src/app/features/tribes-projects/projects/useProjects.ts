@@ -8,6 +8,7 @@ import {
 } from '@/app/features/tribes-projects/projects/project_with_document.types.ts';
 import { Project, ProjectCreate, ProjectUpdate } from '@/app/features/tribes-projects/projects/project.types.ts';
 import {
+  AccessibleProjectWithTribe,
   ArchivedProjectEntry,
   ProjectTribesSummary,
   ProjectTribeWithMembers,
@@ -285,4 +286,22 @@ export function useProjectTribes() {
   }, [fetch]);
 
   return { projectTribes, loading, error };
+}
+
+export function useAccessibleProjectsWithTribes(userId: string) {
+  const [projects, setProjects] = useState<AccessibleProjectWithTribe[]>([]);
+  const { loading, error, execute } = apiHooks<AccessibleProjectWithTribe[]>();
+
+  const fetch = useCallback(() => {
+    if (!userId) return;
+    execute(() => projectService.getAccessibleWithTribes(userId)).then((data) => {
+      if (data) setProjects(data);
+    });
+  }, [userId, execute]);
+
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
+
+  return { projects, loading, error };
 }

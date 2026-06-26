@@ -9,6 +9,7 @@ _KANBAN_BASE = """
         c.assigned_person_id AS assigned_person_id,
         c.size AS size,
         c.due_date AS due_date,
+        c.force_on_dashboard AS force_on_dashboard,
         d.content_html AS document_content_html,
         pe.first_name || ' ' || pe.last_name AS assigned_person_name,
         pf.name AS feature_instance_name,
@@ -30,14 +31,33 @@ _KANBAN_BASE = """
     LEFT JOIN persons pe ON pe.id = c.assigned_person_id
     WHERE c.status = 'active'
     AND (
-        c.assigned_person_id IN (
-            SELECT u.person_id FROM users u WHERE u.id = $1 AND u.person_id IS NOT NULL
-            UNION
-            SELECT r.person_id FROM represents r WHERE r.user_id = $1 AND r.status = 'active'
+        (
+            (
+                c.assigned_person_id IN (
+                    SELECT u.person_id FROM users u WHERE u.id = $1 AND u.person_id IS NOT NULL
+                    UNION
+                    SELECT r.person_id FROM represents r WHERE r.user_id = $1 AND r.status = 'active'
+                )
+                OR c.assigned_person_id IS NULL
+            )
+            AND (c.due_date IS NOT NULL OR c.created_at < NOW() - INTERVAL '100 days')
         )
-        OR c.assigned_person_id IS NULL
+        OR (
+            c.force_on_dashboard = TRUE
+            AND EXISTS (
+                SELECT 1 FROM positions pos
+                JOIN persons per ON per.id = pos.person_id AND per.status = 'active'
+                JOIN users u ON u.person_id = per.id AND u.id = $1
+                JOIN tribes_projects tp2 ON tp2.tribe_id = pos.tribe_id
+                WHERE tp2.project_id = p.id AND pos.status = 'active'
+                UNION
+                SELECT 1 FROM positions pos2
+                JOIN represents rv ON rv.person_id = pos2.person_id AND rv.status = 'active'
+                JOIN tribes_projects tp3 ON tp3.tribe_id = pos2.tribe_id
+                WHERE rv.user_id = $1 AND tp3.project_id = p.id AND pos2.status = 'active'
+            )
+        )
     )
-    AND (c.due_date IS NOT NULL OR c.created_at < NOW() - INTERVAL '100 days')
     AND col.position < (
         SELECT MAX(kc2.position) FROM kanban_columns kc2
         WHERE kc2.feature_instance_id = c.feature_instance_id AND kc2.status = 'active'
@@ -53,6 +73,7 @@ _TODO_BASE = """
         i.assigned_person_id AS assigned_person_id,
         i.size AS size,
         i.due_date AS due_date,
+        i.force_on_dashboard AS force_on_dashboard,
         d.content_html AS document_content_html,
         pe.first_name || ' ' || pe.last_name AS assigned_person_name,
         pf.name AS feature_instance_name,
@@ -73,14 +94,33 @@ _TODO_BASE = """
     WHERE i.status = 'active'
     AND i.todo_status = 'todo'
     AND (
-        i.assigned_person_id IN (
-            SELECT u.person_id FROM users u WHERE u.id = $1 AND u.person_id IS NOT NULL
-            UNION
-            SELECT r.person_id FROM represents r WHERE r.user_id = $1 AND r.status = 'active'
+        (
+            (
+                i.assigned_person_id IN (
+                    SELECT u.person_id FROM users u WHERE u.id = $1 AND u.person_id IS NOT NULL
+                    UNION
+                    SELECT r.person_id FROM represents r WHERE r.user_id = $1 AND r.status = 'active'
+                )
+                OR i.assigned_person_id IS NULL
+            )
+            AND (i.due_date IS NOT NULL OR i.created_at < NOW() - INTERVAL '100 days')
         )
-        OR i.assigned_person_id IS NULL
+        OR (
+            i.force_on_dashboard = TRUE
+            AND EXISTS (
+                SELECT 1 FROM positions pos
+                JOIN persons per ON per.id = pos.person_id AND per.status = 'active'
+                JOIN users u ON u.person_id = per.id AND u.id = $1
+                JOIN tribes_projects tp2 ON tp2.tribe_id = pos.tribe_id
+                WHERE tp2.project_id = p.id AND pos.status = 'active'
+                UNION
+                SELECT 1 FROM positions pos2
+                JOIN represents rv ON rv.person_id = pos2.person_id AND rv.status = 'active'
+                JOIN tribes_projects tp3 ON tp3.tribe_id = pos2.tribe_id
+                WHERE rv.user_id = $1 AND tp3.project_id = p.id AND pos2.status = 'active'
+            )
+        )
     )
-    AND (i.due_date IS NOT NULL OR i.created_at < NOW() - INTERVAL '100 days')
 """
 
 _KANBAN_LABEL_EXISTS = (
@@ -130,6 +170,7 @@ def _kanban_row_to_dict(row, label_map: dict) -> dict:
         "assigned_person_name": row.get("assigned_person_name"),
         "size": row.get("size"),
         "due_date": row.get("due_date"),
+        "force_on_dashboard": row.get("force_on_dashboard", False) or False,
         "document_content_html": row.get("document_content_html"),
         "feature_instance_name": row["feature_instance_name"],
         "project_id": str(row["project_id"]),
@@ -154,6 +195,7 @@ def _todo_row_to_dict(row, label_map: dict) -> dict:
         "assigned_person_name": row.get("assigned_person_name"),
         "size": row.get("size"),
         "due_date": row.get("due_date"),
+        "force_on_dashboard": row.get("force_on_dashboard", False) or False,
         "document_content_html": row.get("document_content_html"),
         "feature_instance_name": row["feature_instance_name"],
         "project_id": str(row["project_id"]),

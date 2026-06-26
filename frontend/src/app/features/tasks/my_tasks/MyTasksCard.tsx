@@ -1,6 +1,6 @@
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedConfirmDialog } from '@/app/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
-import TaskContentPopup from '@/app/features/tasks/TaskContentPopup.tsx';
+import MyTaskEditModal from './MyTaskEditModal.tsx';
 import type { TaskLabelInfo } from '@/app/features/tasks/types.ts';
 import MyTasksCardContent from './MyTasksCardContent.tsx';
 import { fibColor, urgencyColor } from '@/app/features/tasks/types.ts';
@@ -17,6 +17,7 @@ interface Props {
   task: MyTask;
   persons: PersonOption[];
   onMarkDone: () => Promise<void>;
+  onRefresh?: () => void;
 }
 
 function buildSourcePath(task: MyTask): string {
@@ -24,11 +25,11 @@ function buildSourcePath(task: MyTask): string {
   return `/app/tribes/${task.tribe_url_param_id}/projects/${task.project_url_param_id}/${task.feature_instance_id}?taskId=${task.id}`;
 }
 
-const MyTasksCard: React.FC<Props> = ({ task, persons, onMarkDone }) => {
+const MyTasksCard: React.FC<Props> = ({ task, persons, onMarkDone, onRefresh }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const [popupOpen, setPopupOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [confirmDone, setConfirmDone] = useState(false);
 
@@ -215,7 +216,7 @@ const MyTasksCard: React.FC<Props> = ({ task, persons, onMarkDone }) => {
           <MyTasksCardContent
             documentContentHtml={task.document_content_html}
             labels={labels}
-            onOpenPopup={() => setPopupOpen(true)}
+            onOpenPopup={() => setEditOpen(true)}
           />
         )}
       </div>
@@ -233,16 +234,11 @@ const MyTasksCard: React.FC<Props> = ({ task, persons, onMarkDone }) => {
         cancelText={t('common.cancel')}
       />
 
-      {popupOpen && (
-        <TaskContentPopup
-          title={task.title}
-          documentContentHtml={task.document_content_html}
-          labels={labels}
-          size={task.size}
-          dueDate={task.due_date}
-          assignedPersonName={task.assigned_person_name}
-          canEdit={false}
-          onClose={() => setPopupOpen(false)}
+      {editOpen && (
+        <MyTaskEditModal
+          task={task}
+          onClose={() => setEditOpen(false)}
+          onSaved={() => { setEditOpen(false); onRefresh?.(); }}
         />
       )}
     </>

@@ -11,6 +11,7 @@ interface Props {
   data: MyTasksResponse;
   persons: PersonOption[];
   onMarkDone: (task: MyTask) => Promise<void>;
+  onRefresh?: () => void;
 }
 
 function sortTasks(tasks: MyTask[]): MyTask[] {
@@ -21,7 +22,7 @@ function sortTasks(tasks: MyTask[]): MyTask[] {
   });
 }
 
-const MyTasksList: React.FC<Props> = ({ data, persons, onMarkDone }) => {
+const MyTasksList: React.FC<Props> = ({ data, persons, onMarkDone, onRefresh }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
 
@@ -53,6 +54,7 @@ const MyTasksList: React.FC<Props> = ({ data, persons, onMarkDone }) => {
           task={task}
           persons={persons}
           onMarkDone={() => onMarkDone(task)}
+          onRefresh={onRefresh}
         />
       ))}
     </div>

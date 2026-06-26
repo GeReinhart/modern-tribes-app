@@ -29,6 +29,7 @@ const en: Record<string, string> = {
   'common.saving': 'Saving...',
   'common.createdBy': 'Created',
   'common.updatedBy': 'Updated',
+  'common.forceOnDashboard': 'Force on Dashboard',
 
   'auth.signIn': 'Sign in to your account',
   'auth.magicLinkHint': "We'll send you a magic link to sign in",
@@ -247,6 +248,15 @@ const en: Record<string, string> = {
   'admin.notifications.success': 'Notification queued for {{name}}',
   'admin.notifications.error': 'Failed to send notification',
   'admin.notifications.noResults': 'No users found. Type to search.',
+  'admin.notifications.history': 'History',
+  'admin.notifications.historyEmpty': 'No notifications sent yet.',
+  'admin.notifications.historyRecipient': 'Recipient',
+  'admin.notifications.historyMessage': 'Message',
+  'admin.notifications.historyStatus': 'Status',
+  'admin.notifications.historyDate': 'Date',
+  'admin.notifications.status.planned': 'Queued',
+  'admin.notifications.status.sent': 'Sent',
+  'admin.notifications.status.failed': 'Failed',
 
   'validation.errorOccurred': 'An error occurred. Please try again.',
 

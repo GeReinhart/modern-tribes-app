@@ -1,5 +1,6 @@
 import { apiService } from '@/app/platform/core/api/api.service.ts';
 import {
+  AdminNotificationItem,
   AppNotification,
   NotificationCreate,
   NotificationStatus,
@@ -11,6 +12,10 @@ class NotificationService {
     return apiService.get<UserSearchResult[]>(
       `/platform/functions/people/users/search?q=${encodeURIComponent(q)}`,
     );
+  }
+
+  async listForAdmin(): Promise<AdminNotificationItem[]> {
+    return apiService.get<AdminNotificationItem[]>('/platform/tools/notifications/admin');
   }
 
   async createForUser(payload: NotificationCreate): Promise<AppNotification> {

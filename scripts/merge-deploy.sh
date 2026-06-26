@@ -54,7 +54,7 @@ git push --force-with-lease origin deploy
 
 echo "==> Upgrade prod database..."
 cd $BACKEND_DIR
-set -a && source .env.prod && set +a && alembic upgrade head
+set -a && source .env.db.prod && set +a && alembic upgrade head
 
 echo "==> Back to main..."
 cd $ROOT_DIR

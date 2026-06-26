@@ -14,6 +14,17 @@ export interface AppNotification {
   created_at: string;
 }
 
+export interface AdminNotificationItem {
+  id: string;
+  url_param_id: string;
+  target_user_id: string;
+  target_user_email: string;
+  message: string;
+  sent_at: string | null;
+  notification_status: NotificationStatus;
+  created_at: string;
+}
+
 export interface NotificationCreate {
   target_user_id: string;
   message: string;

@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.base import BaseHTTPMiddleware
 
 import app.features  # noqa: F401 — triggers feature self-registration
 from app.platform.core.config import settings
@@ -32,6 +33,7 @@ from app.platform.functions.publications import public_router as public_publicat
 from app.platform.functions.search import router as search_platform_router
 from app.platform.tools.mail import query_router as mail_router
 from app.platform.tools.mail.scheduler import mail_scheduler
+from app.features.events.reminder_scheduler import event_reminder_scheduler
 from app.platform.tools.notifications import router as app_notifications
 from app.features.bookmarks import router as user_bookmarks
 from app.features.tasks.my_tasks import router as my_tasks_router
@@ -54,30 +56,50 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 _scheduler_task: asyncio.Task | None = None
+_reminder_task: asyncio.Task | None = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifecycle manager for startup and shutdown events"""
-    global _scheduler_task
+    global _scheduler_task, _reminder_task
 
     logger.info("Starting application...")
     await connect_to_postgres()
 
     _scheduler_task = asyncio.create_task(mail_scheduler())
+    _reminder_task = asyncio.create_task(event_reminder_scheduler())
     logger.info("Application started successfully")
 
     yield
 
     logger.info("Shutting down application...")
-    if _scheduler_task:
-        _scheduler_task.cancel()
-        try:
-            await _scheduler_task
-        except asyncio.CancelledError:
-            pass
+    for task in (_scheduler_task, _reminder_task):
+        if task:
+            task.cancel()
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
     await close_postgres_connection()
     logger.info("Application stopped")
+
+
+class CorsAuditMiddleware(BaseHTTPMiddleware):
+    """Logs the Origin header whenever a CORS preflight is rejected (status 400)."""
+
+    async def dispatch(self, request: Request, call_next):
+        origin = request.headers.get("origin", "<no-origin>")
+        if request.method == "OPTIONS":
+            logger.info("CORS preflight: origin=%s path=%s", origin, request.url.path)
+        response = await call_next(request)
+        if request.method == "OPTIONS" and response.status_code == 400:
+            logger.warning(
+                "CORS preflight REJECTED: origin=%s path=%s — add to CORS_ORIGINS if legitimate",
+                origin,
+                request.url.path,
+            )
+        return response
 
 
 # Create FastAPI application
@@ -96,6 +118,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# CorsAuditMiddleware must be registered AFTER CORSMiddleware so it sits
+# outermost in the stack and sees the request before CORS can reject it.
+app.add_middleware(CorsAuditMiddleware)
 
 
 @app.exception_handler(Exception)

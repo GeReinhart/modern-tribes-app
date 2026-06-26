@@ -7,6 +7,9 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
       includeAssets: ['modern-tribes.round-icon.svg', 'icon-192x192.png', 'icon-512x512.png'],
       manifest: {
@@ -45,10 +48,8 @@ export default defineConfig({
           },
         ],
       },
-      workbox: {
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
-        cleanupOutdatedCaches: true,
-        navigateFallbackDenylist: [/^\/downloads\//],
       },
     }),
   ],

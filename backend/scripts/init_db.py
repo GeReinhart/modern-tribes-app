@@ -19,7 +19,7 @@ POSTGRES_DB = os.getenv("POSTGRES_DB", "modern_tribes_db")
 POSTGRES_HOST = os.getenv("POSTGRES_HOST", "localhost")
 POSTGRES_PORT = int(os.getenv("POSTGRES_PORT", "5432"))
 
-ALEMBIC_REVISION = "001"
+ALEMBIC_REVISION = "003"
 
 
 _URL_PARAM_CHARS = string.ascii_letters + string.digits
@@ -92,6 +92,7 @@ class DatabaseInitializer:
 
     async def clear_tables(self):
         tables = [
+            "push_subscriptions",
             "notifications",
             "publications",
             "document_pages",

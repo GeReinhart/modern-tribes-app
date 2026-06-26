@@ -5,6 +5,7 @@ import {
 } from '@/app/features/tribes-projects/projects/project_with_document.types.ts';
 import { Project, ProjectCreate, ProjectUpdate } from '@/app/features/tribes-projects/projects/project.types.ts';
 import {
+  AccessibleProjectWithTribe,
   ArchivedProjectEntry,
   ProjectTribesSummary,
   ProjectTribeWithMembers,
@@ -92,6 +93,12 @@ class ProjectService {
   async getTribesPerProject(): Promise<ProjectTribesSummary[]> {
     return apiService.get<ProjectTribesSummary[]>(
       `${this.endpoint}/by/all/tribes-summary`,
+    );
+  }
+
+  async getAccessibleWithTribes(userId: string): Promise<AccessibleProjectWithTribe[]> {
+    return apiService.get<AccessibleProjectWithTribe[]>(
+      `${this.endpoint}/by/user/${userId}/accessible-with-tribes`,
     );
   }
 

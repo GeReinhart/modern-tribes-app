@@ -126,8 +126,7 @@ const TaskItemModalLabels: React.FC<Props> = ({
     }
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCreate = async () => {
     const name = newName.trim();
     if (!name) return;
     setAdding(true);
@@ -156,6 +155,7 @@ const TaskItemModalLabels: React.FC<Props> = ({
           return (
             <button
               key={label.id}
+              type="button"
               onClick={() => (canEdit ? onToggle(label.id) : undefined)}
               disabled={!canEdit}
               style={{
@@ -176,6 +176,7 @@ const TaskItemModalLabels: React.FC<Props> = ({
         })}
         {canCreateLabel && !showNew && (
           <button
+            type="button"
             onClick={() => {
               setShowNew(true);
               setTimeout(() => inputRef.current?.focus(), 0);
@@ -204,8 +205,7 @@ const TaskItemModalLabels: React.FC<Props> = ({
         )}
       </div>
       {canCreateLabel && showNew && (
-        <form
-          onSubmit={handleCreate}
+        <div
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -233,6 +233,7 @@ const TaskItemModalLabels: React.FC<Props> = ({
                 onBlur={() => setInputFocused(false)}
                 onKeyDown={(e) => {
                   if (e.key === 'Escape') resetForm();
+                  if (e.key === 'Enter') { e.preventDefault(); void handleCreate(); }
                 }}
                 placeholder={t('features.kanban.newLabelPlaceholder')}
                 style={{
@@ -291,14 +292,15 @@ const TaskItemModalLabels: React.FC<Props> = ({
             </ThemedButton>
             <ThemedButton
               variant="primary"
-              type="submit"
+              type="button"
+              onClick={handleCreate}
               disabled={!newName.trim() || adding}
               style={{ fontSize: 'var(--font-xs)', padding: '3px 10px' }}
             >
               {t('features.kanban.addLabel')}
             </ThemedButton>
           </div>
-        </form>
+        </div>
       )}
     </div>
   );

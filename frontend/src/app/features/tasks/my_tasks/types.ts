@@ -11,6 +11,7 @@ export interface MyTaskBase {
   due_date: string;
   assigned_person_id: string | null;
   assigned_person_name: string | null;
+  force_on_dashboard: boolean;
   feature_instance_id: string;
   feature_instance_name: string;
   project_id: string;

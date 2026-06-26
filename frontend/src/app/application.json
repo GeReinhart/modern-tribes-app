@@ -387,12 +387,14 @@
           "en": [
             "- install the app on your phone or computer for quick access — works on iOS, Android and desktop",
             "- a guided install page walks you through the steps for your device",
-            "- the install link is included in your sign-in email"
+            "- the install link is included in your sign-in email",
+            "- receive push notifications on your device even when the app is closed — event reminders and alerts arrive instantly"
           ],
           "fr": [
             "- installez l'app sur votre téléphone ou ordinateur pour un accès rapide — iOS, Android et bureau",
             "- une page d'installation guidée vous accompagne selon votre appareil",
-            "- le lien d'installation est inclus dans votre email de connexion"
+            "- le lien d'installation est inclus dans votre email de connexion",
+            "- recevez des notifications push sur votre appareil même quand l'app est fermée — rappels d'événements et alertes arrivent instantanément"
           ]
         },
         "frontend": {
@@ -655,15 +657,63 @@
         "package": "dashboard",
         "description": {
           "en": [
-            "- personalized dashboard showing the user's tasks, tribes and bookmarks"
+            "- personalized dashboard showing the user's tasks, tribes and bookmarks",
+            "- Planning tab: combined view of all events and tasks with due dates across all accessible projects, navigable day by day with label and project filters",
+            "- My Tasks tab: add a new task or kanban card directly from the dashboard by picking a project and tab",
+            "- Planning tab: add a new event directly from the dashboard by picking a project and calendar tab"
           ],
           "fr": [
-            "- tableau de bord personnalisé affichant les tâches, tribus et signets de l'utilisateur"
+            "- tableau de bord personnalisé affichant les tâches, tribus et signets de l'utilisateur",
+            "- onglet Planning : vue combinée de tous les événements et tâches à rendre sur tous les projets accessibles, navigable jour par jour avec filtres par étiquette et projet",
+            "- onglet Mes tâches : ajouter une tâche ou une carte kanban directement depuis le tableau de bord en choisissant un projet et un onglet",
+            "- onglet Planning : ajouter un événement directement depuis le tableau de bord en choisissant un projet et un onglet calendrier"
           ]
         },
         "frontend": {
           "path": [
             "frontend/src/app/features/glue/dashboard/**"
+          ]
+        }
+      },
+      {
+        "package": "events",
+        "description": {
+          "en": [
+            "- create and manage events within a project tab",
+            "- each event has a start and end time, or can span the whole day",
+            "- assign participants from the project tribe when creating or editing an event",
+            "- invite participants from the tribe, attach labels, set story points and add notes",
+            "- set reminders that notify participants by in-app alert or email before the event",
+            "- view events on a monthly calendar",
+            "- the day view shows a visual timeline where overlapping events appear in side-by-side columns",
+            "- the timeline spans from one hour before the first event to one hour after the last event",
+            "- the time picker uses a clock face with hour and minute selection, duration quick-adjust buttons, and adapts to mobile by hiding the day timeline"
+          ],
+          "fr": [
+            "- créez et gérez des événements dans un onglet de projet",
+            "- chaque événement a une heure de début et de fin, ou peut couvrir toute la journée",
+            "- assignez des participants depuis la tribu du projet lors de la création ou de l'édition",
+            "- invitez des participants de la tribu, ajoutez des étiquettes, des points d'effort et des notes",
+            "- définissez des rappels qui notifient les participants par alerte dans l'app ou par email",
+            "- visualisez les événements dans un calendrier mensuel",
+            "- la vue du jour affiche une ligne de temps visuelle où les événements qui se chevauchent apparaissent en colonnes côte à côte",
+            "- la ligne de temps s'étend d'une heure avant le premier événement à une heure après le dernier",
+            "- le sélecteur d'heure utilise un cadran d'horloge avec sélection heure/minute, des boutons de réglage rapide de la durée, et s'adapte au mobile en masquant la ligne de temps"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "events",
+            "events_participants",
+            "events_reminders"
+          ],
+          "path": [
+            "backend/app/features/events/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/features/events/**"
           ]
         }
       },
@@ -690,16 +740,13 @@
                 "- the fretboard shows which string and fret to play; the note name is hidden until you reveal it",
                 "- customize the interval, sound length, octave range and which notes to include — saved per tab",
                 "- audio samples download automatically on first visit and refresh daily",
-                "- feature_type: guitar_notes",
-                "- env var: VITE_GUITAR_SAMPLES_URL (see frontend/.env.example)"
+                "- feature_type: guitar_notes"
               ],
               "fr": [
                 "- une note aléatoire est jouée et affichée — devinez-la avant qu'elle soit révélée",
                 "- le manche montre la corde et la frette à jouer ; le nom de la note est caché jusqu'à la révélation",
                 "- personnalisez l'intervalle, la durée du son, la plage d'octaves et les notes à inclure — sauvegardé par onglet",
-                "- les samples audio se téléchargent automatiquement à la première visite et se mettent à jour chaque jour",
-                "- feature_type : guitar_notes",
-                "- variable d'environnement : VITE_GUITAR_SAMPLES_URL (voir frontend/.env.example)"
+                "- les samples audio se téléchargent automatiquement à la première visite et se mettent à jour chaque jour"
               ]
             },
             "backend": {
@@ -719,14 +766,12 @@
               "en": [
                 "- tune your guitar using your device's microphone — the app listens and shows the closest note in real time",
                 "- a needle meter shows how flat or sharp you are; the note name turns green when you're in tune",
-                "- displays the detected note name, octave, frequency and deviation in cents",
-                "- feature_type: guitar_tuner"
+                "- displays the detected note name, octave, frequency and deviation in cents"
               ],
               "fr": [
                 "- accordez votre guitare grâce au microphone de votre appareil — l'app écoute et affiche la note la plus proche",
                 "- une aiguille montre si vous êtes trop bas ou trop haut ; le nom de la note devient vert quand vous êtes accordé",
-                "- affiche le nom de la note, l'octave, la fréquence et l'écart en centièmes",
-                "- feature_type : guitar_tuner"
+                "- affiche le nom de la note, l'octave, la fréquence et l'écart en centièmes"
               ]
             },
             "backend": {
@@ -748,15 +793,13 @@
                 "- keep time during your practice with an adjustable click track (20–300 BPM)",
                 "- a visual indicator lights up on each beat; beat 1 is accented for easy counting",
                 "- set the time signature (2–8 beats per bar) and tap the button to find your tempo by feel",
-                "- your BPM and time signature are saved automatically for each tab",
-                "- feature_type: guitar_metronome"
+                "- your BPM and time signature are saved automatically for each tab"
               ],
               "fr": [
                 "- gardez le tempo pendant votre pratique avec un clic ajustable (20–300 BPM)",
                 "- un indicateur visuel s'allume sur chaque temps ; le premier temps est accentué pour compter facilement",
                 "- réglez la signature rythmique (2–8 temps par mesure) et tapotez pour trouver votre tempo à l'oreille",
-                "- votre BPM et signature rythmique sont sauvegardés automatiquement par onglet",
-                "- feature_type : guitar_metronome"
+                "- votre BPM et signature rythmique sont sauvegardés automatiquement par onglet"
               ]
             },
             "backend": {

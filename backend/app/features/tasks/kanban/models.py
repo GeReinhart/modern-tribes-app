@@ -24,6 +24,7 @@ class KanbanCardResponse(BaseModel):
     status: str
     size: Optional[int] = None
     due_date: Optional[date] = None
+    force_on_dashboard: bool = False
     label_ids: list[str] = []
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
@@ -52,6 +53,7 @@ class CardCreate(BaseModel):
     title: str
     assigned_person_id: Optional[str] = None
     position: int = 0
+    force_on_dashboard: bool = False
 
 
 class CardUpdate(BaseModel):
@@ -63,6 +65,7 @@ class CardUpdate(BaseModel):
     clear_size: bool = False
     due_date: Optional[date] = None
     clear_due_date: bool = False
+    force_on_dashboard: Optional[bool] = None
 
 
 class MoveCard(BaseModel):

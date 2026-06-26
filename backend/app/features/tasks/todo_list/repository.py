@@ -42,14 +42,15 @@ async def fetch_todo_item(pool, item_id: str) -> Optional[dict]:
     return dict(row) if row else None
 
 
-async def insert_todo_item(pool, feature_instance_id: str, title: str, position: int, user_id: str) -> dict:
+async def insert_todo_item(pool, feature_instance_id: str, title: str, position: int, user_id: str, force_on_dashboard: bool = False) -> dict:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            """INSERT INTO todo_items (feature_instance_id, title, position, created_by, updated_by)
-               VALUES ($1, $2, $3, $4, $4) RETURNING *""",
+            """INSERT INTO todo_items (feature_instance_id, title, position, force_on_dashboard, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $5, $5) RETURNING *""",
             UUID(feature_instance_id),
             title,
             position,
+            force_on_dashboard,
             UUID(user_id),
         )
     return dict(row)
@@ -78,6 +79,7 @@ async def update_todo_fields(
     clear_assignee: bool,
     due_date: Optional[date],
     clear_due_date: bool,
+    force_on_dashboard: Optional[bool],
     user_id: str,
 ) -> None:
     uid = UUID(user_id)
@@ -107,6 +109,10 @@ async def update_todo_fields(
         elif due_date is not None:
             await conn.execute(
                 "UPDATE todo_items SET due_date = $1, updated_by = $2 WHERE id = $3", due_date, uid, iid
+            )
+        if force_on_dashboard is not None:
+            await conn.execute(
+                "UPDATE todo_items SET force_on_dashboard = $1, updated_by = $2 WHERE id = $3", force_on_dashboard, uid, iid
             )
 
 

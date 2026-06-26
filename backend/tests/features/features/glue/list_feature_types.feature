@@ -36,7 +36,8 @@ Feature: List feature types
         {"feature_type": "todo_list", "label": "Todo List"},
         {"feature_type": "guitar_notes", "label": "Guitar - Notes"},
         {"feature_type": "guitar_tuner", "label": "Guitar - Tuner"},
-        {"feature_type": "guitar_metronome", "label": "Guitar - Metronome"}
+        {"feature_type": "guitar_metronome", "label": "Guitar - Metronome"},
+        {"feature_type": "events", "label": "Events"}
       ]
       """
 

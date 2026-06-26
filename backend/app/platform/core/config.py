@@ -45,12 +45,20 @@ class Settings(BaseSettings):
     # Mail scheduler
     MAIL_CRON_INTERVAL_SECONDS: int = 5
 
+    # Event reminder scheduler
+    EVENT_REMINDER_CRON_INTERVAL_SECONDS: int = 60
+
     # CORS
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
     # Base URL
     BASE_URL: str = "http://localhost:8000"
     FRONTEND_URL: str = "http://localhost:3000"
+
+    # VAPID keys for Web Push (generate with: python -m pywebpush --vapid-info)
+    VAPID_PUBLIC_KEY: str = ""
+    VAPID_PRIVATE_KEY: str = ""
+    VAPID_SUBJECT: str = "mailto:admin@modern-tribes.com"
 
     # Cellar (S3-compatible object storage — CleverCloud)
     CELLAR_ADDON_HOST: str = "cellar-c2.services.clever-cloud.com"

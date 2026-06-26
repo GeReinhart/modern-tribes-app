@@ -481,16 +481,27 @@ def given_positions_table(datatable):
             for row in datatable[1:]:
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
                 uid = rec.get("id")
-                await conn.execute(
-                    """INSERT INTO positions(id, tribe_id, person_id, position, status)
-                       VALUES($1, $2, $3, $4, $5)
-                       ON CONFLICT (tribe_id, person_id) DO NOTHING""",
-                    UUID(uid) if uid else None,
-                    UUID(rec["tribe_id"]),
-                    UUID(rec["person_id"]),
-                    rec.get("position", "member"),
-                    rec.get("status", "active"),
-                )
+                if uid:
+                    await conn.execute(
+                        """INSERT INTO positions(id, tribe_id, person_id, position, status)
+                           VALUES($1, $2, $3, $4, $5)
+                           ON CONFLICT (tribe_id, person_id) DO NOTHING""",
+                        UUID(uid),
+                        UUID(rec["tribe_id"]),
+                        UUID(rec["person_id"]),
+                        rec.get("position", "member"),
+                        rec.get("status", "active"),
+                    )
+                else:
+                    await conn.execute(
+                        """INSERT INTO positions(tribe_id, person_id, position, status)
+                           VALUES($1, $2, $3, $4)
+                           ON CONFLICT (tribe_id, person_id) DO NOTHING""",
+                        UUID(rec["tribe_id"]),
+                        UUID(rec["person_id"]),
+                        rec.get("position", "member"),
+                        rec.get("status", "active"),
+                    )
         finally:
             await conn.close()
     _run(_insert())
@@ -749,6 +760,14 @@ def get_resource(context, path):
     context["response"] = context["client"].get(expand_path_ids(path))
 
 
+@when(parsers.re(r"I DELETE (?P<path>\S+) with body:"))
+def delete_with_json_body(context, path, docstring):
+    body = expand_json_ids(json.loads(docstring))
+    context["response"] = context["client"].request(
+        "DELETE", expand_path_ids(path), json=body
+    )
+
+
 @when(parsers.re(r"I DELETE (?P<path>\S+)"))
 def delete_resource(context, path):
     context["response"] = context["client"].delete(expand_path_ids(path))
@@ -816,9 +835,15 @@ def _assert_db(table: str, datatable: list):
     for i, (exp, act) in enumerate(zip(expected_rows, actual_rows)):
         for j, col in enumerate(headers):
             act_val = act[col]
-            act_str = str(act_val) if act_val is not None else ""
-            # Integer columns must not be UUID-expanded; compare raw strings
-            exp_val = exp[j] if isinstance(act_val, int) else expand_id(exp[j])
+            if isinstance(act_val, bool):
+                act_str = str(act_val).lower()
+                exp_val = exp[j].lower()
+            elif isinstance(act_val, int):
+                act_str = str(act_val)
+                exp_val = exp[j]
+            else:
+                act_str = str(act_val) if act_val is not None else ""
+                exp_val = expand_id(exp[j])
             assert act_str == exp_val, f"{table}[{i}].{col}: expected {exp_val!r}, got {act_str!r}"
 
 
@@ -1084,3 +1109,129 @@ def given_search_index_table(datatable):
 @then("the search_index table contains:")
 def then_search_index_table(datatable):
     _assert_db("search_index", datatable)
+
+
+def _parse_dt(value: str | None):
+    if not value:
+        return None
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+@given("the events table contains:")
+def given_events_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not uid:
+                    continue
+                await conn.execute(
+                    """INSERT INTO events(id, feature_instance_id, title, start_at, end_at, all_day, status)
+                       VALUES($1, $2, $3, $4, $5, $6, $7)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid),
+                    UUID(rec["feature_instance_id"]),
+                    rec.get("title", "Event"),
+                    _parse_dt(rec.get("start_at")),
+                    _parse_dt(rec.get("end_at")),
+                    rec.get("all_day", "false").lower() == "true",
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the events table contains:")
+def then_events_table(datatable):
+    _assert_db("events", datatable)
+
+
+@given("the events_participants table contains:")
+def given_events_participants_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not uid:
+                    continue
+                await conn.execute(
+                    """INSERT INTO events_participants(id, event_id, person_id, status)
+                       VALUES($1, $2, $3, $4)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid),
+                    UUID(rec["event_id"]),
+                    UUID(rec["person_id"]),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the events_participants table contains:")
+def then_events_participants_table(datatable):
+    headers = datatable[0]
+    expected_rows = datatable[1:]
+
+    async def _query():
+        conn = await _conn()
+        try:
+            cols = ", ".join(f'"{h}"' for h in headers)
+            rows = await conn.fetch(
+                f"SELECT {cols} FROM events_participants ORDER BY created_at, id"
+            )
+            return [dict(r) for r in rows]
+        finally:
+            await conn.close()
+
+    actual_rows = _run(_query())
+    assert len(actual_rows) == len(expected_rows), (
+        f"events_participants: expected {len(expected_rows)} rows, got {len(actual_rows)}"
+    )
+    for i, (exp, act) in enumerate(zip(expected_rows, actual_rows)):
+        for j, col in enumerate(headers):
+            act_val = act[col]
+            act_str = str(act_val) if act_val is not None else ""
+            exp_val = exp[j] if isinstance(act_val, int) else expand_id(exp[j])
+            assert act_str == exp_val, (
+                f"events_participants[{i}].{col}: expected {exp_val!r}, got {act_str!r}"
+            )
+
+
+@given("the push_subscriptions table contains:")
+def given_push_subscriptions_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not uid:
+                    continue
+                await conn.execute(
+                    """INSERT INTO push_subscriptions(id, user_id, endpoint, p256dh, auth, status)
+                       VALUES($1, $2, $3, $4, $5, $6)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid),
+                    UUID(rec["user_id"]),
+                    rec["endpoint"],
+                    rec.get("p256dh", ""),
+                    rec.get("auth", ""),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the push_subscriptions table contains:")
+def then_push_subscriptions_table(datatable):
+    _assert_db("push_subscriptions", datatable)

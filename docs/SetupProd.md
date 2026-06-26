@@ -13,10 +13,19 @@ python -m dotenv -f .env.db.prod run -- python backend/scripts/init_db.py --data
 
 ### Update the schema
 
-- Run the alembic upgrade head command
+- Set up the virtual environment:
 ```bash
 cd backend
 
+rm -rf venv
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+- Run the alembic upgrade head command
+```bash
+cd backend
 # Check migration status
 set -a && source .env.db.prod && set +a && alembic current
 

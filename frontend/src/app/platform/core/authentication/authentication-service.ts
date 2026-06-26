@@ -12,10 +12,9 @@ export const authService = {
     });
 
     if (!response.ok) {
-      const data = await response.json();
-      const error: Error & { status?: number } = new Error(
-        data.detail || 'Failed to send magic link',
-      );
+      const data = await response.json().catch(() => ({}));
+      const detail = typeof data.detail === 'string' ? data.detail : undefined;
+      const error: Error & { status?: number } = new Error(detail || 'Failed to send magic link');
       error.status = response.status;
       throw error;
     }
@@ -30,8 +29,9 @@ export const authService = {
     );
 
     if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.detail || 'Verification failed');
+      const data = await response.json().catch(() => ({}));
+      const detail = typeof data.detail === 'string' ? data.detail : undefined;
+      throw new Error(detail || 'Verification failed');
     }
 
     return response.json();

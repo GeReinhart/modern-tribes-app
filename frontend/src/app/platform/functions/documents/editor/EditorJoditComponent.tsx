@@ -58,6 +58,7 @@ const EditorJoditComponent = ({
       readonly: false,
       minHeight,
       zIndex: 10000,
+      toolbarSticky: false,
       uploader: {
         insertImageAsBase64URI: false,
         imagesExtensions: appConfig.editorImageExtensions,

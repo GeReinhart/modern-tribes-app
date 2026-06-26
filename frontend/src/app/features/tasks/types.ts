@@ -61,6 +61,7 @@ export interface TaskPatch {
   assigned_person_id?: string;
   clear_assignee?: boolean;
   document_content_html?: string;
+  force_on_dashboard?: boolean;
 }
 
 export interface TaskEditValue {
@@ -72,6 +73,7 @@ export interface TaskEditValue {
   assigned_person_id: string | null;
   document_content_html: string | null;
   label_ids: string[];
+  force_on_dashboard?: boolean;
   created_by?: string | null;
   updated_by?: string | null;
   created_at?: string | null;

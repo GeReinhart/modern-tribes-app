@@ -14,7 +14,7 @@ async def fetch_board(pool, feature_instance_id: str) -> dict:
         cards = await conn.fetch(
             """SELECT kc.id, kc.feature_instance_id, kc.column_id,
                       kc.title, kc.assigned_person_id, kc.position, kc.status,
-                      kc.document_id, kc.size, kc.due_date,
+                      kc.document_id, kc.size, kc.due_date, kc.force_on_dashboard,
                       kc.created_at, kc.updated_at,
                       kc.created_by::text AS created_by,
                       kc.updated_by::text AS updated_by,
@@ -120,7 +120,7 @@ async def fetch_card(pool, card_id: str) -> Optional[dict]:
         row = await conn.fetchrow(
             """SELECT kc.id, kc.feature_instance_id, kc.column_id,
                       kc.title, kc.assigned_person_id, kc.position, kc.status,
-                      kc.document_id, kc.size, kc.due_date,
+                      kc.document_id, kc.size, kc.due_date, kc.force_on_dashboard,
                       kc.created_at, kc.updated_at,
                       kc.created_by::text AS created_by,
                       kc.updated_by::text AS updated_by,
@@ -148,17 +148,19 @@ async def insert_card(
     assigned_person_id: Optional[str],
     position: int,
     user_id: str,
+    force_on_dashboard: bool = False,
 ) -> dict:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """INSERT INTO kanban_cards
-               (feature_instance_id, column_id, title, assigned_person_id, position, created_by, updated_by)
-               VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING id""",
+               (feature_instance_id, column_id, title, assigned_person_id, position, force_on_dashboard, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $7) RETURNING id""",
             UUID(feature_instance_id),
             UUID(column_id),
             title,
             UUID(assigned_person_id) if assigned_person_id else None,
             position,
+            force_on_dashboard,
             UUID(user_id),
         )
     return await fetch_card(pool, str(row["id"]))
@@ -174,6 +176,7 @@ async def update_card_fields(
     clear_size: bool,
     due_date: Optional[date],
     clear_due_date: bool,
+    force_on_dashboard: Optional[bool],
     user_id: str,
 ) -> None:
     async with pool.acquire() as conn:
@@ -220,6 +223,13 @@ async def update_card_fields(
             await conn.execute(
                 "UPDATE kanban_cards SET due_date = $1, updated_by = $2 WHERE id = $3",
                 due_date,
+                UUID(user_id),
+                UUID(card_id),
+            )
+        if force_on_dashboard is not None:
+            await conn.execute(
+                "UPDATE kanban_cards SET force_on_dashboard = $1, updated_by = $2 WHERE id = $3",
+                force_on_dashboard,
                 UUID(user_id),
                 UUID(card_id),
             )

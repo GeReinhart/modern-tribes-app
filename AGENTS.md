@@ -53,6 +53,13 @@ These rules apply to all code you write or modify, in any language or layer.
 
 - **MUST**: follow @/docs/Packages.md 
 
+### Prefer Common/Shared Components
+
+- **Before building any UI element, check `frontend/src/app/platform/core/layout/themes/components/` for an existing themed component.**
+- **Never re-implement a UI control that already exists as a shared component.** Use the shared one and extend it if needed.
+- Known shared components include: `ThemedDateSelection` (date picker), `ThemePickerModal` (theme selector). Check the directory for the full list before coding.
+- If a common component does not cover a new use case (e.g., datetime with time), extend or generalize it — do not create a parallel implementation.
+
 ### Refactoring Triggers
 
 When you encounter any of the following, refactor before continuing:

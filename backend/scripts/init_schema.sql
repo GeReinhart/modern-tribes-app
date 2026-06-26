@@ -325,6 +325,7 @@ CREATE TABLE IF NOT EXISTS todo_items (
     size INTEGER,
     assigned_person_id UUID REFERENCES persons(id) ON DELETE SET NULL,
     due_date DATE,
+    force_on_dashboard BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
@@ -457,6 +458,7 @@ CREATE TABLE IF NOT EXISTS kanban_cards (
         CHECK (status IN ('pending', 'active', 'archived')),
     size INTEGER,
     due_date DATE,
+    force_on_dashboard BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
@@ -562,6 +564,79 @@ CREATE INDEX IF NOT EXISTS idx_search_index_entity ON search_index(entity_type, 
 CREATE INDEX IF NOT EXISTS idx_search_index_routing_path ON search_index(routing_path);
 CREATE INDEX IF NOT EXISTS idx_search_index_content_fts ON search_index USING GIN(to_tsvector('french', COALESCE(content_text, '')));
 CREATE OR REPLACE TRIGGER update_search_index_updated_at BEFORE UPDATE ON search_index FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Events (migration 002)
+CREATE TABLE IF NOT EXISTS events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    feature_instance_id UUID NOT NULL REFERENCES projects_features(id) ON DELETE CASCADE,
+    title VARCHAR(500) NOT NULL,
+    start_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    end_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    all_day BOOLEAN NOT NULL DEFAULT FALSE,
+    document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
+    size INTEGER CHECK (size > 0),
+    force_on_dashboard BOOLEAN NOT NULL DEFAULT FALSE,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_events_feature_instance ON events(feature_instance_id);
+CREATE INDEX IF NOT EXISTS idx_events_start_at ON events(start_at);
+CREATE OR REPLACE TRIGGER update_events_updated_at BEFORE UPDATE ON events FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Events participants (migration 002)
+CREATE TABLE IF NOT EXISTS events_participants (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    person_id UUID NOT NULL REFERENCES persons(id) ON DELETE CASCADE,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    UNIQUE(event_id, person_id)
+);
+CREATE OR REPLACE TRIGGER update_events_participants_updated_at BEFORE UPDATE ON events_participants FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Events reminders (migration 002)
+CREATE TABLE IF NOT EXISTS events_reminders (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    remind_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    reminder_type VARCHAR(20) NOT NULL DEFAULT 'notification'
+        CHECK (reminder_type IN ('notification', 'mail')),
+    sent BOOLEAN NOT NULL DEFAULT FALSE,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_events_reminders_remind_at ON events_reminders(remind_at) WHERE sent = FALSE;
+CREATE OR REPLACE TRIGGER update_events_reminders_updated_at BEFORE UPDATE ON events_reminders FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Push subscriptions (migration 003)
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    endpoint TEXT NOT NULL,
+    p256dh TEXT NOT NULL,
+    auth TEXT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    UNIQUE(user_id, endpoint)
+);
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user ON push_subscriptions(user_id) WHERE status = 'active';
+CREATE OR REPLACE TRIGGER update_push_subscriptions_updated_at BEFORE UPDATE ON push_subscriptions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Schema evolution: add columns that may be missing on databases created before they were introduced
 ALTER TABLE tribes_projects ADD COLUMN IF NOT EXISTS display_order INTEGER NOT NULL DEFAULT 0;

@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.ts
 import DashboardBookmarksTab from '@/app/features/bookmarks/DashboardBookmarksTab.tsx';
 import MyTasksTab from '@/app/features/tasks/my_tasks/MyTasksTab.tsx';
 import DashboardTribesTab from '@/app/features/glue/dashboard/tabs/DashboardTribesTab.tsx';
+import DashboardPlanningTab from '@/app/features/glue/dashboard/tabs/DashboardPlanningTab.tsx';
 import { TabConfigPopup } from '@/app/features/glue/tab-config/TabConfigPopup.tsx';
 import { useTabConfig } from '@/app/features/glue/tab-config/useTabConfig.ts';
 import { useUrlTab } from '@/app/features/glue/url-tab/useUrlTab.ts';
@@ -36,6 +37,11 @@ const TABS = (t: (k: string) => string) => [
     key: 'bookmarks',
     label: t('dashboard.tabs.bookmarks'),
     Component: DashboardBookmarksTab,
+  },
+  {
+    key: 'planning',
+    label: t('dashboard.tabs.planning'),
+    Component: DashboardPlanningTab,
   },
 ];
 

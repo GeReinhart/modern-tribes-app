@@ -29,6 +29,7 @@ const fr: Record<string, string> = {
   'common.saving': 'Enregistrement...',
   'common.createdBy': 'Créé le',
   'common.updatedBy': 'Modifié le',
+  'common.forceOnDashboard': 'Afficher sur le tableau de bord',
 
   'auth.signIn': 'Connexion à votre compte',
   'auth.magicLinkHint':
@@ -253,6 +254,15 @@ const fr: Record<string, string> = {
   'admin.notifications.error': "Échec de l'envoi de la notification",
   'admin.notifications.noResults':
     'Aucun utilisateur trouvé. Tapez pour rechercher.',
+  'admin.notifications.history': 'Historique',
+  'admin.notifications.historyEmpty': 'Aucune notification envoyée pour le moment.',
+  'admin.notifications.historyRecipient': 'Destinataire',
+  'admin.notifications.historyMessage': 'Message',
+  'admin.notifications.historyStatus': 'Statut',
+  'admin.notifications.historyDate': 'Date',
+  'admin.notifications.status.planned': 'En attente',
+  'admin.notifications.status.sent': 'Envoyée',
+  'admin.notifications.status.failed': 'Échec',
 
   'validation.errorOccurred': "Une erreur s'est produite. Veuillez réessayer.",
 

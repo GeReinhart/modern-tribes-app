@@ -43,6 +43,12 @@ export interface ProjectTribesSummary {
   tribe_names: string[];
 }
 
+export interface AccessibleProjectWithTribe {
+  project_id: string;
+  project_name: string;
+  tribe_name: string;
+}
+
 export interface ProjectTribeWithMembers {
   tribe_id: string;
   tribe_url_param_id: string;

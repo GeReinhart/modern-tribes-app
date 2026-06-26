@@ -68,6 +68,7 @@ const KanbanCardModal: React.FC<Props> = ({
         assigned_person_id: card.assigned_person_id,
         document_content_html: card.document_content_html,
         label_ids: card.label_ids,
+        force_on_dashboard: card.force_on_dashboard,
         created_by: card.created_by,
         updated_by: card.updated_by,
         created_at: card.created_at,

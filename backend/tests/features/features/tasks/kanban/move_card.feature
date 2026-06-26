@@ -57,6 +57,7 @@ Feature: Move a kanban card
           "status": "active",
           "size": null,
           "due_date": null,
+          "force_on_dashboard": false,
           "label_ids": [],
           "created_at": null,
           "updated_at": null,

@@ -4,8 +4,6 @@ import type { PersonOption } from '@/app/features/tasks/types.ts';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { FolderOpen, Layers, Tag, User } from 'lucide-react';
-
 import type { MyTask, MyTasksFilters } from './types.ts';
 
 interface Props {
@@ -75,127 +73,66 @@ const MyTasksFilters: React.FC<Props> = ({
       ...(key === 'tribe_id' ? { project_id: undefined } : {}),
     });
 
+  const hasFilters = Object.values(filters).some(Boolean);
+
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '6px',
-        marginBottom: '12px',
-      }}
-    >
-      {tribes.length > 0 && (
-        <div
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center', marginBottom: '12px' }}>
+      {tribes.map((tr) => (
+        <button
+          key={tr.id}
+          type="button"
+          onClick={() => toggle('tribe_id', tr.id)}
+          style={pillStyle(filters.tribe_id === tr.id, theme.colors.accent)}
+        >
+          {tr.name}
+        </button>
+      ))}
+      {projects.map((p) => (
+        <button
+          key={p.id}
+          type="button"
+          onClick={() => toggle('project_id', p.id)}
+          style={pillStyle(filters.project_id === p.id, theme.colors.primary)}
+        >
+          {p.name}
+        </button>
+      ))}
+      {effectivePersons.length > 1 && effectivePersons.map((p) => (
+        <button
+          key={p.id}
+          type="button"
+          onClick={() => toggle('person_id', p.id)}
+          style={pillStyle(filters.person_id === p.id, theme.colors.secondary)}
+        >
+          {p.name}
+        </button>
+      ))}
+      {labels.map((l) => (
+        <button
+          key={l.id}
+          type="button"
+          onClick={() => toggle('label_id', l.id)}
+          style={pillStyle(filters.label_id === l.id, l.color)}
+        >
+          {l.name}
+        </button>
+      ))}
+      {hasFilters && (
+        <button
+          type="button"
+          onClick={() => onChange({})}
           style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '6px',
-            alignItems: 'center',
+            fontSize: 'var(--font-xs)',
+            color: theme.colors.secondary,
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '2px 4px',
+            textDecoration: 'underline',
           }}
         >
-          <Layers size={14} color={theme.colors.secondary} />
-          {tribes.map((tr) => (
-            <button
-              key={tr.id}
-              type="button"
-              onClick={() => toggle('tribe_id', tr.id)}
-              style={pillStyle(filters.tribe_id === tr.id, theme.colors.accent)}
-            >
-              {tr.name}
-            </button>
-          ))}
-        </div>
-      )}
-      {projects.length > 0 && (
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '6px',
-            alignItems: 'center',
-          }}
-        >
-          <FolderOpen size={14} color={theme.colors.secondary} />
-          {projects.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => toggle('project_id', p.id)}
-              style={pillStyle(
-                filters.project_id === p.id,
-                theme.colors.primary,
-              )}
-            >
-              {p.name}
-            </button>
-          ))}
-        </div>
-      )}
-      {effectivePersons.length > 1 && (
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '6px',
-            alignItems: 'center',
-          }}
-        >
-          <User size={14} color={theme.colors.secondary} />
-          {effectivePersons.map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => toggle('person_id', p.id)}
-              style={pillStyle(
-                filters.person_id === p.id,
-                theme.colors.secondary,
-              )}
-            >
-              {p.name}
-            </button>
-          ))}
-        </div>
-      )}
-      {labels.length > 0 && (
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '6px',
-            alignItems: 'center',
-          }}
-        >
-          <Tag size={14} color={theme.colors.secondary} />
-          {labels.map((l) => (
-            <button
-              key={l.id}
-              type="button"
-              onClick={() => toggle('label_id', l.id)}
-              style={pillStyle(filters.label_id === l.id, l.color)}
-            >
-              {l.name}
-            </button>
-          ))}
-        </div>
-      )}
-      {Object.values(filters).some(Boolean) && (
-        <div>
-          <button
-            type="button"
-            onClick={() => onChange({})}
-            style={{
-              fontSize: 'var(--font-xs)',
-              color: theme.colors.secondary,
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '2px 0',
-              textDecoration: 'underline',
-            }}
-          >
-            {t('tribes.clearFilters')}
-          </button>
-        </div>
+          {t('tribes.clearFilters')}
+        </button>
       )}
     </div>
   );
