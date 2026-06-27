@@ -153,8 +153,8 @@ app.include_router(query_app_config.router, prefix="/api/platform/core")
 app.include_router(uploads.router, prefix="/api/platform/core")
 
 # Platform — Functions
-app.include_router(users.router, prefix="/api/platform/functions/people")
 app.include_router(query_users.router, prefix="/api/platform/functions/people")
+app.include_router(users.router, prefix="/api/platform/functions/people")
 app.include_router(persons.router, prefix="/api/platform/functions/people")
 app.include_router(represents.router, prefix="/api/platform/functions/people")
 app.include_router(labels.router, prefix="/api/platform/functions")

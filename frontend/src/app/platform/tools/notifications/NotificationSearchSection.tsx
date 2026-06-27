@@ -3,7 +3,7 @@ import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/componen
 import { ThemedTable } from '@/app/platform/core/layout/themes/components/ThemedTable.tsx';
 import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
-import { RowActionsMenu } from '@/app/platform/core/layout/themes/components/RowActionsMenu.tsx';
+import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useUserSearch } from '@/app/platform/functions/people/users/useUserSearch.ts';
 import { UserSearchResult } from '@/app/platform/tools/notifications/notification.types.ts';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
@@ -44,15 +44,24 @@ export function NotificationSearchSection({ onNotificationSent, onError }: Props
         key: 'actions',
         header: '',
         render: (u: UserSearchResult) => (
-          <RowActionsMenu
-            actions={[
-              {
-                icon: 'bell',
-                label: t('admin.notifications.sendAction'),
-                onClick: () => setModalUser(u),
-              },
-            ]}
-          />
+          <button
+            type="button"
+            onClick={() => setModalUser(u)}
+            title={t('admin.notifications.sendAction')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: theme.colors.primary,
+              padding: '4px',
+            }}
+          >
+            <ThemedSvgIcon name="plus" color="currentColor" size={14} />
+            <ThemedSvgIcon name="bell" color="currentColor" size={16} />
+          </button>
         ),
       },
     ],

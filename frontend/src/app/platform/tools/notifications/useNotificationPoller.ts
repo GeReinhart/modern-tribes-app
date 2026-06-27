@@ -12,11 +12,21 @@ const APP_NAME = 'Modern Tribes';
 async function displayBrowserNotification(
   notification: AppNotification,
 ): Promise<boolean> {
+  const options: NotificationOptions = {
+    body: notification.message,
+    tag: notification.id,
+  };
+  if ('serviceWorker' in navigator) {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      await registration.showNotification(APP_NAME, options);
+      return true;
+    } catch {
+      // fall through to legacy path
+    }
+  }
   try {
-    new Notification(APP_NAME, {
-      body: notification.message,
-      tag: notification.id,
-    });
+    new Notification(APP_NAME, options);
     return true;
   } catch {
     return false;

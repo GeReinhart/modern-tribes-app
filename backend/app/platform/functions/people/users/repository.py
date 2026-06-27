@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from app.platform.core.utils.db_helpers import row_with_json_to_dict
+from app.platform.core.utils.db_helpers import row_to_dict, row_with_json_to_dict
 
 
 async def update_user_roles(conn, user_id: str, role_ids: list[str]) -> None:
@@ -118,4 +118,4 @@ async def search_users(pool, q: str, limit: int = 50) -> list[dict]:
             pattern,
             limit,
         )
-        return [dict(r) for r in rows]
+        return [row_to_dict(r) for r in rows]
