@@ -27,6 +27,7 @@ class NotificationResponse(BaseModel):
     message: str
     sent_at: datetime | None
     notification_status: NotificationStatus
+    scheduled_for: datetime | None = None
     created_at: datetime
 
 
@@ -38,7 +39,12 @@ class AdminNotificationResponse(BaseModel):
     message: str
     sent_at: datetime | None
     notification_status: NotificationStatus
+    scheduled_for: datetime | None = None
     created_at: datetime
+
+
+class PushReceivedAck(BaseModel):
+    url_param_id: str
 
 
 class PushSubscriptionCreate(BaseModel):

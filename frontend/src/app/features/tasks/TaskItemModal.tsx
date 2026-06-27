@@ -9,7 +9,8 @@ import { useTranslation } from 'react-i18next';
 
 import { highlightHtml } from './highlightHtml.ts';
 import TaskItemModalMeta from './TaskItemModalMeta.tsx';
-import type { TaskItemModalProps, TaskLabelInfo, TaskPatch } from './types.ts';
+import TaskModalReminders from './TaskModalReminders.tsx';
+import type { TaskItemModalProps, TaskLabelInfo, TaskPatch, TaskReminderCreate } from './types.ts';
 
 interface Props extends TaskItemModalProps {
   highlightToken?: string;
@@ -17,7 +18,7 @@ interface Props extends TaskItemModalProps {
 
 const TaskItemModal: React.FC<Props> = ({
   value, labels, persons, canEdit, canCreateLabel,
-  onClose, onUpdate, onToggleLabel, onCreateLabel, highlightToken,
+  onClose, onUpdate, onToggleLabel, onSetReminders, onCreateLabel, highlightToken,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -32,6 +33,9 @@ const TaskItemModal: React.FC<Props> = ({
   const [saving, setSaving] = useState(false);
   const [localLabelIds, setLocalLabelIds] = useState<string[]>(value.label_ids);
   const [allLabels, setAllLabels] = useState<TaskLabelInfo[]>(labels);
+  const [localReminders, setLocalReminders] = useState<TaskReminderCreate[]>(
+    value.reminders.map((r) => ({ remind_at: r.remind_at, reminder_type: r.reminder_type }))
+  );
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -60,6 +64,7 @@ const TaskItemModal: React.FC<Props> = ({
     }
     if (forceOnDashboard !== (value.force_on_dashboard ?? false)) patch.force_on_dashboard = forceOnDashboard;
     if (Object.keys(patch).length > 0) await onUpdate(value.id, patch);
+    await onSetReminders(value.id, localReminders);
     setSaving(false);
     onClose();
   };
@@ -117,6 +122,11 @@ const TaskItemModal: React.FC<Props> = ({
             onToggle={handleToggle}
             onCreateLabel={onCreateLabel}
             onLabelCreated={handleLabelCreated}
+          />
+          <TaskModalReminders
+            reminders={localReminders}
+            canEdit={isEditing}
+            onChange={setLocalReminders}
           />
           <div>
             <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '8px', color: theme.colors.secondary }}>

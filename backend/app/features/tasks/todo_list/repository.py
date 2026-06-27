@@ -2,6 +2,8 @@ from datetime import date, datetime, timezone
 from typing import Optional
 from uuid import UUID
 
+from app.features.tasks import reminder_repository
+
 
 async def fetch_todo_items(pool, feature_instance_id: str) -> list[dict]:
     async with pool.acquire() as conn:
@@ -20,7 +22,14 @@ async def fetch_todo_items(pool, feature_instance_id: str) -> list[dict]:
                ORDER BY t.position ASC, t.created_at ASC""",
             UUID(feature_instance_id),
         )
-    return [dict(r) for r in rows]
+        item_ids = [r["id"] for r in rows]
+        reminders_map = await reminder_repository.fetch_reminders_map_conn(conn, 'todo_item', item_ids)
+    result = []
+    for r in rows:
+        row = dict(r)
+        row["reminders"] = reminders_map.get(str(r["id"]), [])
+        result.append(row)
+    return result
 
 
 async def fetch_todo_item(pool, item_id: str) -> Optional[dict]:
@@ -39,7 +48,12 @@ async def fetch_todo_item(pool, item_id: str) -> Optional[dict]:
                WHERE t.id = $1""",
             UUID(item_id),
         )
-    return dict(row) if row else None
+        if not row:
+            return None
+        reminders_map = await reminder_repository.fetch_reminders_map_conn(conn, 'todo_item', [row["id"]])
+    result = dict(row)
+    result["reminders"] = reminders_map.get(str(row["id"]), [])
+    return result
 
 
 async def insert_todo_item(pool, feature_instance_id: str, title: str, position: int, user_id: str, force_on_dashboard: bool = False) -> dict:

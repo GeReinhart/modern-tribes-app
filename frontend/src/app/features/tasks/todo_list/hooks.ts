@@ -1,9 +1,9 @@
-import { PersonOption } from './types.ts';
-
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { todoListService } from './service.ts';
 import {
+  PersonOption,
+  TaskReminderCreate,
   TodoItem,
   TodoItemCreate,
   TodoItemUpdate,
@@ -148,6 +148,20 @@ export function useTodoList(featureInstanceId: string | null) {
     [],
   );
 
+  const setReminders = useCallback(
+    async (itemId: string, reminders: TaskReminderCreate[]): Promise<void> => {
+      try {
+        const updated = await todoListService.setReminders(itemId, reminders);
+        setItems((prev) =>
+          prev.map((i) => (i.id === itemId ? { ...i, reminders: updated } : i)),
+        );
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Error');
+      }
+    },
+    [],
+  );
+
   return {
     items,
     labels,
@@ -160,6 +174,7 @@ export function useTodoList(featureInstanceId: string | null) {
     updateLabel,
     deleteLabel,
     toggleLabel,
+    setReminders,
     refetch: fetchItems,
   };
 }

@@ -48,6 +48,10 @@ class Settings(BaseSettings):
     # Event reminder scheduler
     EVENT_REMINDER_CRON_INTERVAL_SECONDS: int = 60
 
+    # Notification archival
+    NOTIFICATION_RETENTION_DAYS: int = 30
+    NOTIFICATION_ARCHIVAL_CRON_INTERVAL_SECONDS: int = 86400
+
     # CORS
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 

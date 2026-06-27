@@ -259,6 +259,7 @@ const fr: Record<string, string> = {
   'admin.notifications.historyRecipient': 'Destinataire',
   'admin.notifications.historyMessage': 'Message',
   'admin.notifications.historyStatus': 'Statut',
+  'admin.notifications.historyScheduledFor': 'Planifiée pour',
   'admin.notifications.historyDate': 'Date',
   'admin.notifications.status.planned': 'En attente',
   'admin.notifications.status.sent': 'Envoyée',
@@ -356,6 +357,13 @@ const fr: Record<string, string> = {
   'install.desktop.title': 'Ouvrir sur votre téléphone',
   'install.desktop.desc':
     "Visitez cette adresse sur votre Android ou iPhone pour installer l'application :",
+  'install.version.upToDate': 'Vous êtes à jour (version {{version}})',
+  'install.version.updateAvailable': 'Mise à jour disponible : version {{version}}',
+  'install.version.updateDesc': "Une nouvelle version de l'application est disponible. Téléchargez l'APK pour mettre à jour.",
+  'install.version.backToApp': "Retour à l'application",
+  'notifications.deniedBanner.message':
+    "Les notifications sont bloquées. Pour les réactiver, ouvrez Chrome → appuyez sur l'icône cadenas à côté de la barre d'adresse → Paramètres du site → Notifications → Autoriser.",
+  'notifications.deniedBanner.dismiss': 'Ignorer',
 };
 
 export default fr;

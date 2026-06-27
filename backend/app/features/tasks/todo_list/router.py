@@ -6,11 +6,14 @@ from app.platform.core.authorization.router import require_any_permission_decora
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.database import get_database
 from app.platform.core.utils.document_helpers import strip_html, extract_content_summary
-from app.features.tasks import label_service
+from app.features.tasks import label_service, reminder_service
 from app.features.tasks.todo_list import repository as todo_repository
 from app.platform.functions.labels import repository as labels_repo
 from app.platform.functions.search import index_repository as search_index
-from app.features.tasks.models import PersonOption, FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate
+from app.features.tasks.models import (
+    PersonOption, FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate,
+    TaskReminderCreate, TaskReminderResponse,
+)
 from app.features.tasks.todo_list.models import (
     TodoItemCreate, TodoItemUpdate, TodoItemResponse,
 )
@@ -35,6 +38,7 @@ def _row_to_todo(row: dict) -> TodoItemResponse:
         assigned_person_id=str(row["assigned_person_id"]) if row.get("assigned_person_id") else None,
         assigned_person_name=row.get("assigned_person_name"),
         label_ids=list(row.get("label_ids") or []),
+        reminders=[TaskReminderResponse(**r) for r in (row.get("reminders") or [])],
         created_at=row["created_at"],
         updated_at=row["updated_at"],
         created_by=str(row["created_by"]) if row.get("created_by") else None,
@@ -129,6 +133,26 @@ async def update_todo_item(item_id: str, data: TodoItemUpdate, current_user: dic
     else:
         await search_index.archive_entity(pool, "todo_item", item_id, user_id)
     return _row_to_todo(row)
+
+
+@router.post("/{item_id}/reminders", response_model=list[TaskReminderResponse])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def set_todo_reminders(item_id: str, data: list[TaskReminderCreate], current_user: dict = Depends(get_current_user)):
+    """Set reminders for a todo item (replaces existing reminders).
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
+    pool = get_database()
+    user_id = str(current_user["id"])
+    async with pool.acquire() as conn:
+        item_row = await conn.fetchrow("SELECT feature_instance_id FROM todo_items WHERE id = $1", UUID(item_id))
+    if not item_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo item not found.")
+    await label_service.require_feature_access(pool, str(item_row["feature_instance_id"]), current_user, "member")
+    reminders_data = [{"remind_at": r.remind_at, "reminder_type": r.reminder_type} for r in data]
+    result = await reminder_service.set_reminders(pool, "todo_item", item_id, reminders_data, user_id)
+    return [TaskReminderResponse(**r) for r in result]
 
 
 @router.post("/{item_id}/labels/{label_id}", response_model=list[str])

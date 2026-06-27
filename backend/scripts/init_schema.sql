@@ -477,6 +477,8 @@ CREATE TABLE IF NOT EXISTS notifications (
     sent_at TIMESTAMP WITH TIME ZONE NULL,
     notification_status VARCHAR(20) NOT NULL DEFAULT 'planned'
         CHECK (notification_status IN ('planned', 'sent', 'failed')),
+    scheduled_for TIMESTAMP WITH TIME ZONE NULL,
+    reminder_id UUID NULL REFERENCES reminders(id),
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -485,6 +487,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     updated_by UUID REFERENCES users(id) ON DELETE SET NULL
 );
 CREATE INDEX IF NOT EXISTS idx_notifications_target_status ON notifications(target_user_id, notification_status);
+CREATE INDEX IF NOT EXISTS idx_notifications_reminder_id ON notifications(reminder_id);
 
 -- updated_at triggers
 CREATE OR REPLACE TRIGGER update_permissions_updated_at BEFORE UPDATE ON permissions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -506,6 +509,7 @@ CREATE OR REPLACE TRIGGER update_publications_updated_at BEFORE UPDATE ON public
 CREATE OR REPLACE TRIGGER update_kanban_columns_updated_at BEFORE UPDATE ON kanban_columns FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE OR REPLACE TRIGGER update_kanban_cards_updated_at BEFORE UPDATE ON kanban_cards FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE OR REPLACE TRIGGER update_notifications_updated_at BEFORE UPDATE ON notifications FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_reminders_updated_at BEFORE UPDATE ON reminders FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE OR REPLACE TRIGGER update_document_pages_updated_at BEFORE UPDATE ON document_pages FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- User tab configs table (migration 007)
@@ -602,10 +606,12 @@ CREATE TABLE IF NOT EXISTS events_participants (
 );
 CREATE OR REPLACE TRIGGER update_events_participants_updated_at BEFORE UPDATE ON events_participants FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Events reminders (migration 002)
-CREATE TABLE IF NOT EXISTS events_reminders (
+-- Reminders (migration 006) — generic reminders for any entity (event, todo_item, kanban_card)
+CREATE TABLE IF NOT EXISTS reminders (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    entity_type VARCHAR(50) NOT NULL
+        CHECK (entity_type IN ('event', 'todo_item', 'kanban_card')),
+    entity_id UUID NOT NULL,
     remind_at TIMESTAMP WITH TIME ZONE NOT NULL,
     reminder_type VARCHAR(20) NOT NULL DEFAULT 'notification'
         CHECK (reminder_type IN ('notification', 'mail')),
@@ -617,8 +623,9 @@ CREATE TABLE IF NOT EXISTS events_reminders (
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
     updated_by UUID REFERENCES users(id) ON DELETE SET NULL
 );
-CREATE INDEX IF NOT EXISTS idx_events_reminders_remind_at ON events_reminders(remind_at) WHERE sent = FALSE;
-CREATE OR REPLACE TRIGGER update_events_reminders_updated_at BEFORE UPDATE ON events_reminders FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE INDEX IF NOT EXISTS idx_reminders_entity ON reminders(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_reminders_remind_at ON reminders(remind_at) WHERE sent = FALSE;
+CREATE OR REPLACE TRIGGER update_reminders_updated_at BEFORE UPDATE ON reminders FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Push subscriptions (migration 003)
 CREATE TABLE IF NOT EXISTS push_subscriptions (

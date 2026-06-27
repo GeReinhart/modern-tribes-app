@@ -20,6 +20,10 @@ def test_get_pending_admin():
 def test_get_pending_regular():
     pass
 
+@scenario(FEATURE, "Future-scheduled notification is excluded from pending list")
+def test_future_scheduled_excluded():
+    pass
+
 @pytest.fixture
 def admin_client():
     _test_app.dependency_overrides[get_current_user] = lambda: _ADMIN_USER

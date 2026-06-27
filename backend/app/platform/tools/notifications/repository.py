@@ -1,23 +1,30 @@
 from datetime import datetime, timezone
+from typing import Optional
 from uuid import UUID
 
 
 async def insert_notification(
-    pool, target_user_id: str, message: str, current_user_id: str, url_param_id: str
+    pool,
+    target_user_id: str,
+    message: str,
+    current_user_id: Optional[str],
+    url_param_id: str,
+    scheduled_for=None,
+    reminder_id: Optional[str] = None,
 ) -> dict:
+    author = UUID(current_user_id) if current_user_id else None
+    rid = UUID(reminder_id) if reminder_id else None
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """
             INSERT INTO notifications
-                (url_param_id, target_user_id, message, notification_status, created_by, updated_by)
-            VALUES ($1, $2, $3, 'planned', $4, $4)
+                (url_param_id, target_user_id, message, notification_status,
+                 scheduled_for, reminder_id, created_by, updated_by)
+            VALUES ($1, $2, $3, 'planned', $4, $5, $6, $6)
             RETURNING id, url_param_id, target_user_id, message, sent_at,
-                      notification_status, created_at
+                      notification_status, scheduled_for, reminder_id, created_at
             """,
-            url_param_id,
-            UUID(target_user_id),
-            message,
-            UUID(current_user_id),
+            url_param_id, UUID(target_user_id), message, scheduled_for, rid, author,
         )
         return dict(row)
 
@@ -27,11 +34,12 @@ async def list_pending_for_user(pool, user_id: str) -> list[dict]:
         rows = await conn.fetch(
             """
             SELECT id, url_param_id, target_user_id, message, sent_at,
-                   notification_status, created_at
+                   notification_status, scheduled_for, created_at
             FROM notifications
             WHERE target_user_id = $1
               AND notification_status = 'planned'
               AND status = 'active'
+              AND (scheduled_for IS NULL OR scheduled_for <= NOW())
             ORDER BY created_at ASC
             """,
             UUID(user_id),
@@ -44,7 +52,8 @@ async def list_all_for_admin(pool) -> list[dict]:
         rows = await conn.fetch(
             """
             SELECT n.id, n.url_param_id, n.target_user_id, n.message, n.sent_at,
-                   n.notification_status, n.created_at, u.email AS target_user_email
+                   n.notification_status, n.scheduled_for, n.created_at,
+                   u.email AS target_user_email
             FROM notifications n
             JOIN users u ON u.id = n.target_user_id
             WHERE n.status = 'active'
@@ -53,6 +62,77 @@ async def list_all_for_admin(pool) -> list[dict]:
             """
         )
         return [dict(r) for r in rows]
+
+
+async def list_planned_by_reminder_id(pool, reminder_id: str) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """
+            SELECT id, url_param_id, target_user_id, message, notification_status
+            FROM notifications
+            WHERE reminder_id = $1
+              AND notification_status = 'planned'
+              AND status = 'active'
+            """,
+            UUID(reminder_id),
+        )
+        return [dict(r) for r in rows]
+
+
+async def archive_by_reminder_id(pool, reminder_id: str) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute(
+            """
+            UPDATE notifications
+            SET status = 'archived'
+            WHERE reminder_id = $1
+              AND notification_status = 'planned'
+              AND status = 'active'
+            """,
+            UUID(reminder_id),
+        )
+
+
+async def update_message(pool, notification_id: str, message: str) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute(
+            "UPDATE notifications SET message = $1 WHERE id = $2",
+            message, UUID(notification_id),
+        )
+
+
+async def archive_old_notifications(pool, retention_days: int) -> int:
+    async with pool.acquire() as conn:
+        result = await conn.execute(
+            """
+            UPDATE notifications
+            SET status = 'archived'
+            WHERE status = 'active'
+              AND notification_status IN ('sent', 'failed')
+              AND created_at < NOW() - ($1 || ' days')::INTERVAL
+            """,
+            str(retention_days),
+        )
+        return int(result.split()[-1])
+
+
+async def mark_push_received(pool, url_param_id: str) -> dict:
+    sent_at = datetime.now(timezone.utc)
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            """
+            UPDATE notifications
+            SET notification_status = 'sent',
+                sent_at = COALESCE(sent_at, $1)
+            WHERE url_param_id = $2
+              AND notification_status = 'planned'
+              AND status = 'active'
+            RETURNING id, url_param_id, target_user_id, message, sent_at,
+                      notification_status, scheduled_for, created_at
+            """,
+            sent_at, url_param_id,
+        )
+        return dict(row) if row else None
 
 
 async def update_notification_status(
@@ -69,11 +149,8 @@ async def update_notification_status(
               AND target_user_id = $4
               AND status = 'active'
             RETURNING id, url_param_id, target_user_id, message, sent_at,
-                      notification_status, created_at
+                      notification_status, scheduled_for, created_at
             """,
-            new_status,
-            sent_at,
-            UUID(notification_id),
-            UUID(target_user_id),
+            new_status, sent_at, UUID(notification_id), UUID(target_user_id),
         )
         return dict(row) if row else None

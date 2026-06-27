@@ -46,6 +46,7 @@ interface Props {
     labelId: string,
     currentLabelIds: string[],
   ) => Promise<void>;
+  onSetReminders: (cardId: string, reminders: { remind_at: string; reminder_type: 'notification' | 'mail' }[]) => Promise<void>;
   onCreateLabel: (data: LabelCreate) => Promise<KanbanLabel | null>;
 }
 
@@ -72,6 +73,7 @@ const KanbanColumn: React.FC<Props> = ({
   onMoveCard,
   onReorderCard,
   onToggleLabel,
+  onSetReminders,
   onCreateLabel,
 }) => {
   const { t } = useTranslation();
@@ -273,6 +275,7 @@ const KanbanColumn: React.FC<Props> = ({
             onMove={onMoveCard}
             onReorder={onReorderCard}
             onToggleLabel={onToggleLabel}
+            onSetReminders={onSetReminders}
             onCreateLabel={onCreateLabel}
           />
         ))}
@@ -317,6 +320,7 @@ const KanbanColumn: React.FC<Props> = ({
                 onMove={onMoveCard}
                 onReorder={onReorderCard}
                 onToggleLabel={onToggleLabel}
+                onSetReminders={onSetReminders}
                 onCreateLabel={onCreateLabel}
               />
             ))}

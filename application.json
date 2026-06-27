@@ -498,11 +498,13 @@
         "description": {
           "en": [
             "- manage your team's work with two views: a to-do list and a visual kanban board",
-            "- assign tasks to people, add labels, set due dates and attach detailed notes"
+            "- assign tasks to people, add labels, set due dates and attach detailed notes",
+            "- set reminders on any task or card to get notified by push notification or email at a chosen date and time"
           ],
           "fr": [
             "- gérez le travail de votre équipe avec deux vues : une liste de tâches et un tableau kanban",
-            "- assignez des tâches, ajoutez des étiquettes, définissez des échéances et joignez des notes détaillées"
+            "- assignez des tâches, ajoutez des étiquettes, définissez des échéances et joignez des notes détaillées",
+            "- définissez des rappels sur n'importe quelle tâche ou carte pour être notifié par notification push ou email à la date et l'heure choisies"
           ]
         },
         "backend": {

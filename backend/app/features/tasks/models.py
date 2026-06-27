@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 
 class PersonOption(BaseModel):
@@ -23,3 +24,17 @@ class FeatureLabelCreate(BaseModel):
 class FeatureLabelUpdate(BaseModel):
     name: Optional[str] = None
     color: Optional[str] = None
+
+
+class TaskReminderCreate(BaseModel):
+    remind_at: datetime
+    reminder_type: str = 'notification'
+
+
+class TaskReminderResponse(BaseModel):
+    id: str
+    entity_type: str
+    entity_id: str
+    remind_at: datetime
+    reminder_type: str
+    sent: bool

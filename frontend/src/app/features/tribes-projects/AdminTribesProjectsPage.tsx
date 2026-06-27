@@ -1,3 +1,4 @@
+import { formatDate } from '@/app/platform/core/dateFormat.ts';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
@@ -183,7 +184,7 @@ const TribesTab: React.FC<TribesTabProps> = ({ canWrite }) => {
       {
         key: 'created_at',
         header: t('common.created'),
-        render: (tr: Tribe) => new Date(tr.created_at).toLocaleDateString(),
+        render: (tr: Tribe) => formatDate(tr.created_at),
       },
       {
         key: 'status',
@@ -432,7 +433,7 @@ const ProjectsTab: React.FC = () => {
       {
         key: 'created_at',
         header: t('common.created'),
-        render: (p: Project) => new Date(p.created_at).toLocaleDateString(),
+        render: (p: Project) => formatDate(p.created_at),
       },
       {
         key: 'status',

@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, date
 
+from app.features.tasks.models import TaskReminderResponse
+
 
 class TodoItemCreate(BaseModel):
     feature_instance_id: str
@@ -40,6 +42,7 @@ class TodoItemResponse(BaseModel):
     assigned_person_id: Optional[str] = None
     assigned_person_name: Optional[str] = None
     label_ids: list[str] = []
+    reminders: list[TaskReminderResponse] = []
     created_at: datetime
     updated_at: datetime
     created_by: Optional[str] = None

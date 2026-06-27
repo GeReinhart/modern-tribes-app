@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
+import { formatDateTime } from '@/app/platform/core/dateFormat.ts';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
@@ -199,7 +200,7 @@ const DocumentRevisionsPageContent: React.FC = () => {
                             fontWeight: isSelected ? 600 : 400,
                           }}
                         >
-                          {new Date(r.updated_at).toLocaleString()}
+                          {formatDateTime(r.updated_at)}
                         </span>
                         {r.is_current && (
                           <span
@@ -252,7 +253,7 @@ const DocumentRevisionsPageContent: React.FC = () => {
                     }}
                   >
                     <ThemedText size="small" variant="secondary">
-                      {new Date(selectedRevision.updated_at).toLocaleString()}
+                      {formatDateTime(selectedRevision.updated_at)}
                       {selectedRevision.updated_by &&
                         ` — ${selectedRevision.updated_by}`}
                     </ThemedText>

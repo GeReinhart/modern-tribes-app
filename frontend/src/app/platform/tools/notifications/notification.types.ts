@@ -22,6 +22,7 @@ export interface AdminNotificationItem {
   message: string;
   sent_at: string | null;
   notification_status: NotificationStatus;
+  scheduled_for: string | null;
   created_at: string;
 }
 

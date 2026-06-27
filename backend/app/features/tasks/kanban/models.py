@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
 
-from app.features.tasks.models import FeatureLabel
+from app.features.tasks.models import FeatureLabel, TaskReminderResponse
 
 
 class KanbanColumnResponse(BaseModel):
@@ -26,6 +26,7 @@ class KanbanCardResponse(BaseModel):
     due_date: Optional[date] = None
     force_on_dashboard: bool = False
     label_ids: list[str] = []
+    reminders: list[TaskReminderResponse] = []
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
     created_by: Optional[str] = None

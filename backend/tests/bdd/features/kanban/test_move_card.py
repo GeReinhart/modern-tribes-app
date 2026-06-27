@@ -4,11 +4,13 @@ from fastapi.testclient import TestClient
 from pytest_bdd import scenario
 from app.platform.core.authentication.router import get_current_user
 from app.features.tasks.kanban.router import router
+from app.features.tasks.kanban.card_router import card_router
 from tests.conftest import _ADMIN_USER, _REGULAR_USER
 from tests.db_helpers import db_lifespan
 
 _test_app = FastAPI(lifespan=db_lifespan)
 _test_app.include_router(router, prefix="/api/features/tasks")
+_test_app.include_router(card_router, prefix="/api/features/tasks")
 
 FEATURE = "../../../features/features/tasks/kanban/move_card.feature"
 

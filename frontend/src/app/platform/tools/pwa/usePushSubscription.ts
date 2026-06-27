@@ -15,7 +15,11 @@ function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
 
 async function subscribeIfNeeded(registration: ServiceWorkerRegistration): Promise<void> {
   const existing = await registration.pushManager.getSubscription();
-  if (existing) return;
+  if (existing) {
+    // Always re-register so the backend recovers if it deleted a stale subscription.
+    await pushService.subscribe(existing);
+    return;
+  }
 
   const vapidPublicKey = await pushService.getVapidPublicKey();
   if (!vapidPublicKey) return;

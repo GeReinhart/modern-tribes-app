@@ -14,6 +14,7 @@ import {
   MoveDirection,
   PersonOption,
   ReorderDirection,
+  TaskReminderCreate,
 } from './types.ts';
 
 const POLL_INTERVAL_MS = 10_000;
@@ -304,6 +305,23 @@ export function useKanban(featureInstanceId: string | null) {
     [],
   );
 
+  const setCardReminders = useCallback(
+    async (cardId: string, reminders: TaskReminderCreate[]): Promise<void> => {
+      try {
+        const updated = await kanbanService.setReminders(cardId, reminders);
+        setBoard((prev) => ({
+          ...prev,
+          cards: prev.cards.map((c) =>
+            c.id === cardId ? { ...c, reminders: updated } : c,
+          ),
+        }));
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'An error occurred');
+      }
+    },
+    [],
+  );
+
   return {
     board,
     persons,
@@ -323,6 +341,7 @@ export function useKanban(featureInstanceId: string | null) {
     updateLabel,
     deleteLabel,
     toggleCardLabel,
+    setCardReminders,
     refetch: fetchBoard,
   };
 }

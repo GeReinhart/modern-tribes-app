@@ -1,5 +1,5 @@
-import type { FeatureLabel } from '@/app/features/tasks/types.ts';
-export type { FeatureLabel as KanbanLabel } from '@/app/features/tasks/types.ts';
+import type { FeatureLabel, TaskReminder } from '@/app/features/tasks/types.ts';
+export type { FeatureLabel as KanbanLabel, TaskReminder, TaskReminderCreate } from '@/app/features/tasks/types.ts';
 
 export interface KanbanColumn {
   id: string;
@@ -22,6 +22,7 @@ export interface KanbanCard {
   due_date: string | null;
   force_on_dashboard: boolean;
   label_ids: string[];
+  reminders: TaskReminder[];
   created_at: string | null;
   updated_at: string | null;
   created_by: string | null;

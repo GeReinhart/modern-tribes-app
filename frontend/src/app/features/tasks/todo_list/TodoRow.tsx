@@ -19,6 +19,7 @@ interface Props {
   onSetStatus: (id: string, status: 'pending' | 'active' | 'archived') => void;
   onUpdate: (itemId: string, data: TodoItemUpdate) => Promise<void>;
   onToggleLabel: (itemId: string, labelId: string) => Promise<void>;
+  onSetReminders: (itemId: string, reminders: { remind_at: string; reminder_type: 'notification' | 'mail' }[]) => Promise<void>;
   onCreateLabel: (data: TodoLabelCreate) => Promise<TodoLabel | null>;
 }
 
@@ -32,6 +33,7 @@ const TodoRow: React.FC<Props> = ({
   onSetStatus,
   onUpdate,
   onToggleLabel,
+  onSetReminders,
   onCreateLabel,
 }) => {
   const { t } = useTranslation();
@@ -371,6 +373,7 @@ const TodoRow: React.FC<Props> = ({
           onClose={() => setModalOpen(false)}
           onUpdate={onUpdate}
           onToggleLabel={onToggleLabel}
+          onSetReminders={onSetReminders}
           onCreateLabel={onCreateLabel}
         />
       )}

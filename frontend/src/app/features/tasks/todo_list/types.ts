@@ -1,4 +1,5 @@
-export type { PersonOption } from '@/app/features/tasks/types.ts';
+import type { TaskReminder } from '@/app/features/tasks/types.ts';
+export type { PersonOption, TaskReminder, TaskReminderCreate } from '@/app/features/tasks/types.ts';
 export { FIBONACCI, fibColor, urgencyColor } from '@/app/features/tasks/types.ts';
 
 export type { FeatureLabel as TodoLabel, FeatureLabelCreate as TodoLabelCreate, FeatureLabelUpdate as TodoLabelUpdate } from '@/app/features/tasks/types.ts';
@@ -18,6 +19,7 @@ export interface TodoItem {
   assigned_person_id: string | null;
   assigned_person_name: string | null;
   label_ids: string[];
+  reminders: TaskReminder[];
   created_at: string;
   updated_at: string;
   created_by: string | null;

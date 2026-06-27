@@ -1,13 +1,13 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.platform.core.database import get_database
 from app.platform.core.authorization.models import PermissionEnum
+from app.platform.core.authorization.permissions import get_user_permissions
 from app.platform.functions.people.users.models import UserDisplayInfo, UserSearchResult, UserWithPermissions
 from app.platform.functions.people.users import repository as user_repo
 from app.platform.core.authentication.router import get_current_user
-from app.platform.core.authorization.router import require_permission_decorator
 
 router = APIRouter(prefix="/users", tags=["platform_people"])
 
@@ -15,7 +15,6 @@ ENTITY_NAME = "User"
 
 
 @router.get("/search", response_model=List[UserSearchResult])
-@require_permission_decorator(PermissionEnum.ADMIN)
 async def search_users(
     q: str = Query(min_length=1),
     current_user: dict = Depends(get_current_user),
@@ -25,6 +24,9 @@ async def search_users(
     **Permissions:** admin
     """
     pool = get_database()
+    user_perms = await get_user_permissions(pool, str(current_user["id"]))
+    if PermissionEnum.ADMIN not in user_perms:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Permission required: admin")
     return await user_repo.search_users(pool, q)
 
 

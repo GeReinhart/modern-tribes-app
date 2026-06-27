@@ -11,14 +11,16 @@ def _is_vapid_configured() -> bool:
     return bool(settings.VAPID_PUBLIC_KEY and settings.VAPID_PRIVATE_KEY)
 
 
-def _send_one(subscription_info: dict, message: str) -> bool:
+def _send_one(subscription_info: dict, message: str, url_param_id: str) -> bool:
     from pywebpush import webpush, WebPushException
     try:
         webpush(
             subscription_info=subscription_info,
-            data=json.dumps({"message": message}),
+            data=json.dumps({"message": message, "url_param_id": url_param_id}),
             vapid_private_key=settings.VAPID_PRIVATE_KEY,
             vapid_claims={"sub": settings.VAPID_SUBJECT},
+            ttl=86400,
+            headers={"Urgency": "high"},
         )
         return True
     except WebPushException as exc:
@@ -28,7 +30,7 @@ def _send_one(subscription_info: dict, message: str) -> bool:
         return False
 
 
-async def send_to_user(pool, user_id: str, message: str) -> bool:
+async def send_to_user(pool, user_id: str, message: str, url_param_id: str) -> bool:
     """Send a push to all active subscriptions for the user.
 
     Returns True if at least one push was delivered.
@@ -46,7 +48,7 @@ async def send_to_user(pool, user_id: str, message: str) -> bool:
             "endpoint": sub["endpoint"],
             "keys": {"p256dh": sub["p256dh"], "auth": sub["auth"]},
         }
-        result = _send_one(subscription_info, message)
+        result = _send_one(subscription_info, message, url_param_id)
         if result is None:
             await push_repository.delete_by_endpoint(pool, sub["endpoint"])
         elif result:

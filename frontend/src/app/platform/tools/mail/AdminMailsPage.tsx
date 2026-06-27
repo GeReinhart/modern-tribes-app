@@ -1,3 +1,4 @@
+import { formatDateTime } from '@/app/platform/core/dateFormat.ts';
 import { ThemedSelect } from '@/app/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { StatusBadge } from '@/app/platform/core/layout/themes/components/StatusBadge.tsx';
 import { ThemedBadge } from '@/app/platform/core/layout/themes/components/ThemedBadge.tsx';
@@ -90,7 +91,7 @@ const MailsPageContent: React.FC = () => {
         header: t('admin.mails.plannedAt'),
         render: (m: MailWithRecipients) => (
           <span style={{ fontSize: '13px', color: theme.colors.secondary }}>
-            {new Date(m.planned_at).toLocaleString()}
+            {formatDateTime(m.planned_at)}
           </span>
         ),
       },
@@ -99,7 +100,7 @@ const MailsPageContent: React.FC = () => {
         header: t('admin.mails.sentAt'),
         render: (m: MailWithRecipients) => (
           <span style={{ fontSize: '13px', color: theme.colors.secondary }}>
-            {m.sent_at ? new Date(m.sent_at).toLocaleString() : '—'}
+            {m.sent_at ? formatDateTime(m.sent_at) : '—'}
           </span>
         ),
       },

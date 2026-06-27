@@ -13,6 +13,8 @@ import {
   MoveDirection,
   PersonOption,
   ReorderDirection,
+  TaskReminder,
+  TaskReminderCreate,
 } from './types.ts';
 
 class KanbanService {
@@ -127,6 +129,13 @@ class KanbanService {
   async removeCardLabel(cardId: string, labelId: string): Promise<KanbanCard> {
     return apiService.delete<KanbanCard>(
       `/features/tasks/kanban/cards/${cardId}/labels/${labelId}`,
+    );
+  }
+
+  async setReminders(cardId: string, reminders: TaskReminderCreate[]): Promise<TaskReminder[]> {
+    return apiService.post<TaskReminder[]>(
+      `/features/tasks/kanban/cards/${cardId}/reminders`,
+      reminders,
     );
   }
 }

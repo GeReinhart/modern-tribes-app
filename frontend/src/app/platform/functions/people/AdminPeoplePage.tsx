@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
+import { formatDate } from '@/app/platform/core/dateFormat.ts';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
 import { StatusBadge } from '@/app/platform/core/layout/themes/components/StatusBadge.tsx';
@@ -252,7 +253,7 @@ const UsersTab: React.FC = () => {
         key: 'created_at',
         header: t('common.created'),
         render: (u: UserWithRolesAndPermissions) =>
-          new Date(u.created_at).toLocaleDateString(),
+          formatDate(u.created_at),
       },
       {
         key: 'status',
@@ -569,7 +570,7 @@ const PersonsTab: React.FC = () => {
       {
         key: 'created_at',
         header: t('common.created'),
-        render: (p: Person) => new Date(p.created_at).toLocaleDateString(),
+        render: (p: Person) => formatDate(p.created_at),
       },
       {
         key: 'status',

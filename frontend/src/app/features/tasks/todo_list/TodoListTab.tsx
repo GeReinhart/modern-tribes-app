@@ -38,6 +38,7 @@ const TodoListTab: React.FC<Props> = ({
     updateLabel,
     deleteLabel,
     toggleLabel,
+    setReminders,
   } = useTodoList(featureInstanceId);
 
   const [searchParams] = useSearchParams();
@@ -239,6 +240,7 @@ const TodoListTab: React.FC<Props> = ({
             onSetStatus={(id, s) => updateItem(id, { status: s })}
             onUpdate={updateItem}
             onToggleLabel={toggleLabel}
+            onSetReminders={setReminders}
             onCreateLabel={createLabel}
           />
         ))}
@@ -290,6 +292,7 @@ const TodoListTab: React.FC<Props> = ({
           onClose={closeDeepLinked}
           onUpdate={updateItem}
           onToggleLabel={toggleLabel}
+          onSetReminders={setReminders}
           onCreateLabel={createLabel}
         />
       )}

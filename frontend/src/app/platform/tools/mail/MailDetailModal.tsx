@@ -1,3 +1,4 @@
+import { formatDateTime } from '@/app/platform/core/dateFormat.ts';
 import { StatusBadge } from '@/app/platform/core/layout/themes/components/StatusBadge.tsx';
 import { ThemedBadge } from '@/app/platform/core/layout/themes/components/ThemedBadge.tsx';
 import { ThemedDivider } from '@/app/platform/core/layout/themes/components/ThemedDivider.tsx';
@@ -87,14 +88,14 @@ export const MailDetailModal: React.FC<MailDetailModalProps> = ({
           {row(
             t('admin.mails.plannedAt'),
             <ThemedText variant="text" size="small">
-              {new Date(mail.planned_at).toLocaleString()}
+              {formatDateTime(mail.planned_at)}
             </ThemedText>,
           )}
           {mail.sent_at &&
             row(
               t('admin.mails.sentAt'),
               <ThemedText variant="text" size="small">
-                {new Date(mail.sent_at).toLocaleString()}
+                {formatDateTime(mail.sent_at)}
               </ThemedText>,
             )}
           {mail.created_by &&

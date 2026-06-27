@@ -54,7 +54,12 @@ git push --force-with-lease origin deploy
 
 echo "==> Upgrade prod database..."
 cd $BACKEND_DIR
-set -a && source .env.db.prod && set +a && alembic upgrade head
+if [ ! -f "venv/bin/alembic" ]; then
+    echo "==> venv missing or incomplete — installing backend dependencies..."
+    python3 -m venv venv
+    venv/bin/pip install -r requirements.txt
+fi
+set -a && source .env.db.prod && set +a && venv/bin/alembic upgrade head
 
 echo "==> Back to main..."
 cd $ROOT_DIR

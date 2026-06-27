@@ -58,9 +58,22 @@ DOWNLOADS_DIR="$ROOT_DIR/frontend/public/downloads"
 mkdir -p "$DOWNLOADS_DIR"
 cp "$APK" "$DOWNLOADS_DIR/modern-tribes.apk"
 
+VERSION_CODE=$(node -e "const m=require('$MANIFEST');process.stdout.write(String(m.appVersionCode))")
+VERSION_NAME=$(node -e "const m=require('$MANIFEST');process.stdout.write(m.appVersionName)")
+
+echo "{\"versionCode\":$VERSION_CODE,\"versionName\":\"$VERSION_NAME\"}" \
+  > "$ROOT_DIR/frontend/public/apk-version.json"
+
+FRONTEND_ENV="$ROOT_DIR/frontend/.env"
+if [ -f "$FRONTEND_ENV" ]; then
+  sed -i "s/^VITE_APK_VERSION_CODE=.*/VITE_APK_VERSION_CODE=$VERSION_CODE/" "$FRONTEND_ENV"
+fi
+
 echo ""
 echo "==> APK ready: $APK"
 echo "==> Copied to: $DOWNLOADS_DIR/modern-tribes.apk (served at /downloads/modern-tribes.apk)"
+echo "==> Version: $VERSION_NAME ($VERSION_CODE)"
+echo "==> Updated frontend/public/apk-version.json and frontend/.env"
 echo ""
 
 # Extract fingerprint — prompt for keystore password so keytool doesn't fail silently

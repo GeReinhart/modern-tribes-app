@@ -7,6 +7,7 @@ from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.database import get_database
 from app.platform.functions.labels import repository as labels_repo
 from app.features.events import repository as event_repository
+from app.features.events import service as event_service
 from app.features.events.label_service import (
     require_feature_access,
     list_persons_for_feature,
@@ -179,7 +180,7 @@ async def set_reminders(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found.")
     await require_feature_access(pool, str(ev["feature_instance_id"]), current_user, "member")
     reminder_dicts = [{"remind_at": r.remind_at, "reminder_type": r.reminder_type} for r in reminders]
-    await event_repository.set_reminders(pool, event_id, reminder_dicts, user_id)
+    await event_service.set_reminders(pool, event_id, reminder_dicts, user_id)
     full = await event_repository.fetch_event(pool, event_id)
     return full["reminders"] if full else []
 

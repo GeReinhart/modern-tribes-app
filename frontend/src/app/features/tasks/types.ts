@@ -64,6 +64,20 @@ export interface TaskPatch {
   force_on_dashboard?: boolean;
 }
 
+export interface TaskReminder {
+  id: string;
+  entity_type: string;
+  entity_id: string;
+  remind_at: string;
+  reminder_type: 'notification' | 'mail';
+  sent: boolean;
+}
+
+export interface TaskReminderCreate {
+  remind_at: string;
+  reminder_type: 'notification' | 'mail';
+}
+
 export interface TaskEditValue {
   id: string;
   feature_instance_id: string;
@@ -73,6 +87,7 @@ export interface TaskEditValue {
   assigned_person_id: string | null;
   document_content_html: string | null;
   label_ids: string[];
+  reminders: TaskReminder[];
   force_on_dashboard?: boolean;
   created_by?: string | null;
   updated_by?: string | null;
@@ -89,6 +104,7 @@ export interface TaskItemModalProps {
   onClose: () => void;
   onUpdate: (id: string, patch: TaskPatch) => Promise<void>;
   onToggleLabel: (id: string, labelId: string, currentLabelIds: string[]) => Promise<void>;
+  onSetReminders: (id: string, reminders: TaskReminderCreate[]) => Promise<void>;
   onCreateLabel: (data: {
     feature_instance_id: string;
     name: string;

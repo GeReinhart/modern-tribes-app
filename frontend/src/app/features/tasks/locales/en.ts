@@ -47,6 +47,10 @@ const en: Record<string, string> = {
   'features.kanban.hideContent': 'Hide content',
   'features.kanban.showContent': 'Show content',
   'features.tasks.openInPopup': 'Open in full view',
+  'features.tasks.reminders': 'Reminders',
+  'features.tasks.addReminder': 'Add reminder',
+  'features.tasks.reminderNotification': 'Push notification',
+  'features.tasks.reminderMail': 'Email',
 
   'dashboard.tasks.empty': 'No upcoming tasks assigned to you.',
   'dashboard.tasks.openSource': 'Open in project',

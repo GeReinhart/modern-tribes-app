@@ -80,9 +80,9 @@ async def _fetch_reminders_map(conn, event_ids: list) -> dict:
     if not event_ids:
         return {}
     rows = await conn.fetch(
-        """SELECT id, event_id, remind_at, reminder_type, sent
-           FROM events_reminders
-           WHERE event_id = ANY($1) AND status = 'active'
+        """SELECT id, entity_id AS event_id, remind_at, reminder_type, sent
+           FROM reminders
+           WHERE entity_type = 'event' AND entity_id = ANY($1) AND status = 'active'
            ORDER BY remind_at ASC""",
         event_ids,
     )
@@ -290,20 +290,32 @@ async def set_participants(pool, event_id: str, person_ids: list[str], user_id: 
             )
 
 
-async def set_reminders(pool, event_id: str, reminders: list[dict], user_id: str) -> None:
+async def get_active_reminder_ids(pool, event_id: str) -> list[str]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT id FROM reminders WHERE entity_type = 'event' AND entity_id = $1 AND status = 'active'",
+            UUID(event_id),
+        )
+    return [str(r["id"]) for r in rows]
+
+
+async def set_reminders(pool, event_id: str, reminders: list[dict], user_id: str) -> list[dict]:
     eid = UUID(event_id)
     uid = UUID(user_id)
     async with pool.acquire() as conn:
         await conn.execute(
-            "UPDATE events_reminders SET status = 'archived', updated_by = $1 WHERE event_id = $2",
+            "UPDATE reminders SET status = 'archived', updated_by = $1 WHERE entity_type = 'event' AND entity_id = $2",
             uid, eid,
         )
+        new_reminders = []
         for r in reminders:
-            await conn.execute(
-                """INSERT INTO events_reminders (event_id, remind_at, reminder_type, created_by, updated_by)
-                   VALUES ($1, $2, $3, $4, $4)""",
+            row = await conn.fetchrow(
+                """INSERT INTO reminders (entity_type, entity_id, remind_at, reminder_type, created_by, updated_by)
+                   VALUES ('event', $1, $2, $3, $4, $4) RETURNING id, remind_at, reminder_type""",
                 eid, r["remind_at"], r["reminder_type"], uid,
             )
+            new_reminders.append(dict(row))
+    return new_reminders
 
 
 async def delete_event(pool, event_id: str) -> None:
@@ -314,11 +326,12 @@ async def delete_event(pool, event_id: str) -> None:
 async def fetch_due_reminders(pool) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            """SELECT r.id, r.event_id, r.reminder_type, e.title AS event_title,
-                      e.start_at AS event_start_at, e.feature_instance_id
-               FROM events_reminders r
-               JOIN events e ON e.id = r.event_id AND e.status = 'active'
-               WHERE r.remind_at <= NOW() AND r.sent = FALSE AND r.status = 'active'""",
+            """SELECT r.id, r.entity_id AS event_id, r.reminder_type, e.title AS event_title,
+                      e.start_at AS event_start_at, e.feature_instance_id,
+                      e.created_by AS event_creator_id
+               FROM reminders r
+               JOIN events e ON e.id = r.entity_id AND e.status = 'active'
+               WHERE r.entity_type = 'event' AND r.remind_at <= NOW() AND r.sent = FALSE AND r.status = 'active'""",
         )
     return [dict(r) for r in rows]
 
@@ -326,7 +339,7 @@ async def fetch_due_reminders(pool) -> list[dict]:
 async def mark_reminder_sent(pool, reminder_id: str) -> None:
     async with pool.acquire() as conn:
         await conn.execute(
-            "UPDATE events_reminders SET sent = TRUE, updated_at = NOW() WHERE id = $1",
+            "UPDATE reminders SET sent = TRUE, updated_at = NOW() WHERE id = $1",
             UUID(reminder_id),
         )
 
@@ -334,10 +347,16 @@ async def mark_reminder_sent(pool, reminder_id: str) -> None:
 async def fetch_participant_users(pool, event_id: str) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            """SELECT u.id AS user_id, u.email, p.first_name || ' ' || p.last_name AS person_name
+            """SELECT DISTINCT u.id AS user_id, u.email, p.first_name || ' ' || p.last_name AS person_name
                FROM events_participants ep
                JOIN persons p ON p.id = ep.person_id AND p.status = 'active'
-               JOIN users u ON u.person_id = p.id AND u.status = 'active'
+               JOIN users u ON (
+                   u.person_id = p.id
+                   OR EXISTS (
+                       SELECT 1 FROM represents r
+                       WHERE r.user_id = u.id AND r.person_id = p.id AND r.status = 'active'
+                   )
+               ) AND u.status = 'active'
                WHERE ep.event_id = $1 AND ep.status = 'active'""",
             UUID(event_id),
         )

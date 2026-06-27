@@ -2,6 +2,7 @@ import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedC
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedTable } from '@/app/platform/core/layout/themes/components/ThemedTable.tsx';
 import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
+import { formatDateTime } from '@/app/platform/core/dateFormat.ts';
 import { notificationService } from '@/app/platform/tools/notifications/notification.service.ts';
 import {
   AdminNotificationItem,
@@ -42,6 +43,11 @@ export function NotificationHistorySection({ refreshKey }: Props): React.ReactEl
     load();
   }, [load, refreshKey]);
 
+  useEffect(() => {
+    const id = setInterval(load, 30_000);
+    return () => clearInterval(id);
+  }, [load]);
+
   const columns = useMemo(
     () => [
       {
@@ -71,10 +77,20 @@ export function NotificationHistorySection({ refreshKey }: Props): React.ReactEl
         ),
       },
       {
+        key: 'scheduled_for',
+        header: t('admin.notifications.historyScheduledFor'),
+        render: (item: AdminNotificationItem) =>
+          item.scheduled_for ? (
+            <span>{formatDateTime(item.scheduled_for)}</span>
+          ) : (
+            <span style={{ color: theme.colors.ghost }}>—</span>
+          ),
+      },
+      {
         key: 'created_at',
         header: t('admin.notifications.historyDate'),
         render: (item: AdminNotificationItem) => (
-          <span>{new Date(item.created_at).toLocaleString()}</span>
+          <span>{formatDateTime(item.created_at)}</span>
         ),
       },
     ],

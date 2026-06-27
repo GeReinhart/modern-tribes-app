@@ -2,6 +2,8 @@ from datetime import date
 from typing import Optional
 from uuid import UUID
 
+from app.features.tasks import reminder_repository
+
 
 async def fetch_board(pool, feature_instance_id: str) -> dict:
     async with pool.acquire() as conn:
@@ -38,9 +40,16 @@ async def fetch_board(pool, feature_instance_id: str) -> dict:
                ORDER BY position ASC""",
             UUID(feature_instance_id),
         )
+        card_ids = [r["id"] for r in cards]
+        reminders_map = await reminder_repository.fetch_reminders_map_conn(conn, 'kanban_card', card_ids)
+    enriched_cards = []
+    for r in cards:
+        card = dict(r)
+        card["reminders"] = reminders_map.get(str(r["id"]), [])
+        enriched_cards.append(card)
     return {
         "columns": [dict(r) for r in cols],
-        "cards": [dict(r) for r in cards],
+        "cards": enriched_cards,
         "labels": [dict(r) for r in labels],
     }
 
@@ -137,7 +146,12 @@ async def fetch_card(pool, card_id: str) -> Optional[dict]:
                WHERE kc.id = $1""",
             UUID(card_id),
         )
-    return dict(row) if row else None
+        if not row:
+            return None
+        reminders_map = await reminder_repository.fetch_reminders_map_conn(conn, 'kanban_card', [row["id"]])
+    result = dict(row)
+    result["reminders"] = reminders_map.get(str(row["id"]), [])
+    return result
 
 
 async def insert_card(

@@ -307,15 +307,20 @@ def given_notifications_table(datatable):
                 if not uid or not target_user:
                     continue
                 url_param = rec.get("url_param_id", url_param_id_from_uuid(uid) + "xx")[:12]
+                created_at = _parse_created_at(rec.get("created_at"))
+                scheduled_for = _parse_created_at(rec.get("scheduled_for"))
+                reminder_raw = rec.get("reminder_id")
+                reminder_id = UUID(reminder_raw) if reminder_raw else None
                 await conn.execute(
-                    """INSERT INTO notifications(id, url_param_id, target_user_id, message, notification_status)
-                       VALUES($1, $2, $3, $4, $5)
+                    """INSERT INTO notifications(
+                           id, url_param_id, target_user_id, message, notification_status,
+                           scheduled_for, reminder_id, created_at
+                       ) VALUES($1, $2, $3, $4, $5, $6, $7, COALESCE($8, NOW()))
                        ON CONFLICT (id) DO NOTHING""",
-                    UUID(uid),
-                    url_param,
-                    UUID(target_user),
+                    UUID(uid), url_param, UUID(target_user),
                     rec.get("message", "Test notification"),
                     rec.get("notification_status", "sent"),
+                    scheduled_for, reminder_id, created_at,
                 )
         finally:
             await conn.close()
@@ -568,6 +573,7 @@ def given_kanban_cards_table(datatable):
                 assigned = rec.get("assigned_person_id")
                 due = rec.get("due_date")
                 created_at = _parse_created_at(rec.get("created_at"))
+                created_by = rec.get("created_by")
                 fields = [
                     "id", "feature_instance_id", "column_id", "title",
                     "assigned_person_id", "due_date", "status", "position",
@@ -585,6 +591,9 @@ def given_kanban_cards_table(datatable):
                 if created_at is not None:
                     fields.append("created_at")
                     values.append(created_at)
+                if created_by is not None:
+                    fields.append("created_by")
+                    values.append(UUID(created_by))
                 placeholders = ", ".join(f"${i + 1}" for i in range(len(fields)))
                 query = (
                     f"INSERT INTO kanban_cards({', '.join(fields)}) "
@@ -608,6 +617,7 @@ def given_todo_items_table(datatable):
                 assigned = rec.get("assigned_person_id")
                 due = rec.get("due_date")
                 created_at = _parse_created_at(rec.get("created_at"))
+                created_by = rec.get("created_by")
                 fields = [
                     "id", "feature_instance_id", "title", "todo_status",
                     "assigned_person_id", "due_date", "status", "position",
@@ -625,6 +635,9 @@ def given_todo_items_table(datatable):
                 if created_at is not None:
                     fields.append("created_at")
                     values.append(created_at)
+                if created_by is not None:
+                    fields.append("created_by")
+                    values.append(UUID(created_by))
                 placeholders = ", ".join(f"${i + 1}" for i in range(len(fields)))
                 query = (
                     f"INSERT INTO todo_items({', '.join(fields)}) "
@@ -842,7 +855,12 @@ def _assert_db(table: str, datatable: list):
                 act_str = str(act_val)
                 exp_val = exp[j]
             else:
-                act_str = str(act_val) if act_val is not None else ""
+                if act_val is None:
+                    act_str = ""
+                elif isinstance(act_val, datetime):
+                    act_str = act_val.isoformat()
+                else:
+                    act_str = str(act_val)
                 exp_val = expand_id(exp[j])
             assert act_str == exp_val, f"{table}[{i}].{col}: expected {exp_val!r}, got {act_str!r}"
 
@@ -1235,3 +1253,65 @@ def given_push_subscriptions_table(datatable):
 @then("the push_subscriptions table contains:")
 def then_push_subscriptions_table(datatable):
     _assert_db("push_subscriptions", datatable)
+
+
+@given("the reminders table contains:")
+def given_reminders_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not uid:
+                    continue
+                remind_at_raw = rec.get("remind_at")
+                remind_at = _parse_created_at(remind_at_raw) if remind_at_raw else None
+                sent_raw = rec.get("sent", "false")
+                sent = sent_raw.lower() == "true" if isinstance(sent_raw, str) else bool(sent_raw)
+                created_by_raw = rec.get("created_by")
+                await conn.execute(
+                    """INSERT INTO reminders(id, entity_type, entity_id, remind_at, reminder_type, sent, created_by)
+                       VALUES($1, $2, $3, $4, $5, $6, $7)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid), rec["entity_type"], UUID(rec["entity_id"]), remind_at,
+                    rec.get("reminder_type", "notification"), sent,
+                    UUID(created_by_raw) if created_by_raw else None,
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the reminders table contains:")
+def then_reminders_table(datatable):
+    async def _query_active_reminders(headers):
+        conn = await _conn()
+        try:
+            cols = ", ".join(f'"{h}"' for h in headers)
+            rows = await conn.fetch(
+                f"SELECT {cols} FROM reminders WHERE status = 'active' ORDER BY created_at, id"
+            )
+            return [dict(r) for r in rows]
+        finally:
+            await conn.close()
+    headers = datatable[0]
+    expected_rows = datatable[1:]
+    actual_rows = _run(_query_active_reminders(headers))
+    assert len(actual_rows) == len(expected_rows), (
+        f"reminders: expected {len(expected_rows)} rows, got {len(actual_rows)}"
+    )
+    for i, (exp, act) in enumerate(zip(expected_rows, actual_rows)):
+        for j, col in enumerate(headers):
+            act_val = act[col]
+            if isinstance(act_val, bool):
+                act_str = str(act_val).lower()
+                exp_val = exp[j].lower()
+            elif isinstance(act_val, int):
+                act_str = str(act_val)
+                exp_val = exp[j]
+            else:
+                act_str = "" if act_val is None else (act_val.isoformat() if isinstance(act_val, datetime) else str(act_val))
+                exp_val = expand_id(exp[j])
+            assert act_str == exp_val, f"reminders[{i}].{col}: expected {exp_val!r}, got {act_str!r}"

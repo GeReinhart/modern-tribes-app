@@ -34,6 +34,8 @@ from app.platform.functions.search import router as search_platform_router
 from app.platform.tools.mail import query_router as mail_router
 from app.platform.tools.mail.scheduler import mail_scheduler
 from app.features.events.reminder_scheduler import event_reminder_scheduler
+from app.features.tasks.reminder_scheduler import task_reminder_scheduler
+from app.platform.tools.notifications.archival_scheduler import notification_archival_scheduler
 from app.platform.tools.notifications import router as app_notifications
 from app.features.bookmarks import router as user_bookmarks
 from app.features.tasks.my_tasks import router as my_tasks_router
@@ -57,24 +59,28 @@ logger = logging.getLogger(__name__)
 
 _scheduler_task: asyncio.Task | None = None
 _reminder_task: asyncio.Task | None = None
+_task_reminder_task: asyncio.Task | None = None
+_archival_task: asyncio.Task | None = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifecycle manager for startup and shutdown events"""
-    global _scheduler_task, _reminder_task
+    global _scheduler_task, _reminder_task, _task_reminder_task, _archival_task
 
     logger.info("Starting application...")
     await connect_to_postgres()
 
     _scheduler_task = asyncio.create_task(mail_scheduler())
     _reminder_task = asyncio.create_task(event_reminder_scheduler())
+    _task_reminder_task = asyncio.create_task(task_reminder_scheduler())
+    _archival_task = asyncio.create_task(notification_archival_scheduler())
     logger.info("Application started successfully")
 
     yield
 
     logger.info("Shutting down application...")
-    for task in (_scheduler_task, _reminder_task):
+    for task in (_scheduler_task, _reminder_task, _task_reminder_task, _archival_task):
         if task:
             task.cancel()
             try:
@@ -150,8 +156,8 @@ app.include_router(query_app_config.router, prefix="/api/platform/core")
 app.include_router(uploads.router, prefix="/api/platform/core")
 
 # Platform — Functions
-app.include_router(users.router, prefix="/api/platform/functions/people")
 app.include_router(query_users.router, prefix="/api/platform/functions/people")
+app.include_router(users.router, prefix="/api/platform/functions/people")
 app.include_router(persons.router, prefix="/api/platform/functions/people")
 app.include_router(represents.router, prefix="/api/platform/functions/people")
 app.include_router(labels.router, prefix="/api/platform/functions")

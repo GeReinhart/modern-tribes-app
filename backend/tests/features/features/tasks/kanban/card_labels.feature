@@ -59,6 +59,7 @@ Feature: Manage card labels
         "due_date": null,
         "force_on_dashboard": false,
         "label_ids": ["0020"],
+        "reminders": [],
         "created_at": null,
         "updated_at": null,
         "created_by": null,

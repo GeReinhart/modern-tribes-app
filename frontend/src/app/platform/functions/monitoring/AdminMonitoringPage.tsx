@@ -1,4 +1,5 @@
 import { ThemedSelect } from '@/app/platform/core/layout/themes/components/ThemedSelect.tsx';
+import { formatDateTime } from '@/app/platform/core/dateFormat.ts';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedTable } from '@/app/platform/core/layout/themes/components/ThemedTable.tsx';
@@ -134,7 +135,7 @@ const MonitoringPageContent: React.FC = () => {
               color: theme.colors.secondary,
             }}
           >
-            {new Date(r.created_at).toLocaleString()}
+            {formatDateTime(r.created_at)}
           </span>
         ),
       },
@@ -157,7 +158,7 @@ const MonitoringPageContent: React.FC = () => {
               color: theme.colors.secondary,
             }}
           >
-            {new Date(r.updated_at).toLocaleString()}
+            {formatDateTime(r.updated_at)}
           </span>
         ),
       },

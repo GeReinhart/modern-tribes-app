@@ -57,6 +57,7 @@ Feature: Update a kanban card
         "due_date": null,
         "force_on_dashboard": false,
         "label_ids": [],
+        "reminders": [],
         "created_at": null,
         "updated_at": null,
         "created_by": null,

@@ -30,3 +30,18 @@ Feature: Get pending notifications
     Given I am authenticated as a regular user: user.id 0002
     When I GET /api/platform/tools/notifications/pending
     Then the response status code is 200
+
+  Scenario: Future-scheduled notification is excluded from pending list
+    Given I am authenticated as a regular user: user.id 0002
+    And the notifications table contains:
+      | id   | target_user_id | message      | notification_status | scheduled_for        |
+      | 0010 | 0002           | Future notif | planned             | 2099-01-01T10:00:00Z |
+    When I GET /api/platform/tools/notifications/pending
+    Then the response status code is 200
+    And the response body is:
+      """
+      []
+      """
+    And the notifications table contains:
+      | id   | notification_status | scheduled_for        |
+      | 0010 | planned             | 2099-01-01T10:00:00+00:00 |

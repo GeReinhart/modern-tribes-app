@@ -1,5 +1,5 @@
 import TaskItemModal from '@/app/features/tasks/TaskItemModal.tsx';
-import type { TaskLabelInfo, TaskPatch } from '@/app/features/tasks/types.ts';
+import type { TaskLabelInfo, TaskPatch, TaskReminderCreate } from '@/app/features/tasks/types.ts';
 import type { PersonOption } from './types.ts';
 
 import React from 'react';
@@ -21,6 +21,7 @@ interface Props {
   onClose: () => void;
   onUpdate: (itemId: string, data: TodoItemUpdate) => Promise<void>;
   onToggleLabel: (itemId: string, labelId: string) => Promise<void>;
+  onSetReminders: (itemId: string, reminders: TaskReminderCreate[]) => Promise<void>;
   onCreateLabel: (data: TodoLabelCreate) => Promise<TodoLabel | null>;
 }
 
@@ -34,6 +35,7 @@ const TodoItemModal: React.FC<Props> = ({
   onClose,
   onUpdate,
   onToggleLabel,
+  onSetReminders,
   onCreateLabel,
 }) => {
   const taskLabels: TaskLabelInfo[] = labels.map((l) => ({
@@ -49,6 +51,9 @@ const TodoItemModal: React.FC<Props> = ({
     labelId: string,
     _currentLabelIds: string[],
   ) => onToggleLabel(item.id, labelId);
+
+  const handleSetReminders = (_id: string, reminders: TaskReminderCreate[]) =>
+    onSetReminders(item.id, reminders);
 
   const handleCreateLabel = async (data: {
     feature_instance_id: string;
@@ -72,6 +77,7 @@ const TodoItemModal: React.FC<Props> = ({
         assigned_person_id: item.assigned_person_id,
         document_content_html: item.document_content_html,
         label_ids: item.label_ids,
+        reminders: item.reminders,
         force_on_dashboard: item.force_on_dashboard,
         created_by: item.created_by,
         updated_by: item.updated_by,
@@ -85,6 +91,7 @@ const TodoItemModal: React.FC<Props> = ({
       onClose={onClose}
       onUpdate={handleUpdate}
       onToggleLabel={handleToggleLabel}
+      onSetReminders={handleSetReminders}
       onCreateLabel={handleCreateLabel}
     />
   );

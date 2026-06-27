@@ -32,6 +32,7 @@ function toKanbanCard(task: MyKanbanTask): KanbanCard {
     due_date: task.due_date || null,
     force_on_dashboard: task.force_on_dashboard,
     label_ids: task.label_ids,
+    reminders: [],
     created_at: null,
     updated_at: null,
     created_by: null,
@@ -55,6 +56,7 @@ function toTodoItem(task: MyTodoTask): TodoItem {
     assigned_person_id: task.assigned_person_id,
     assigned_person_name: task.assigned_person_name,
     label_ids: task.label_ids,
+    reminders: [],
     created_at: '',
     updated_at: '',
     created_by: null,
@@ -96,6 +98,7 @@ const MyTaskEditModal: React.FC<Props> = ({ task, onClose, onSaved }) => {
           if (currentLabelIds.includes(labelId)) await kanbanService.removeCardLabel(cardId, labelId);
           else await kanbanService.addCardLabel(cardId, labelId);
         }}
+        onSetReminders={async (cardId, reminders) => { await kanbanService.setReminders(cardId, reminders); onSaved(); }}
         onCreateLabel={async (data: LabelCreate) => { try { return await kanbanService.createLabel(data); } catch { return null; } }}
       />
     );
@@ -111,6 +114,7 @@ const MyTaskEditModal: React.FC<Props> = ({ task, onClose, onSaved }) => {
       onClose={onClose}
       onUpdate={async (itemId: string, data: TodoItemUpdate) => { await todoListService.update(itemId, data); onSaved(); }}
       onToggleLabel={async (_itemId: string, labelId: string) => { await todoListService.toggleLabel(task.id, labelId); }}
+      onSetReminders={async (itemId, reminders) => { await todoListService.setReminders(itemId, reminders); onSaved(); }}
       onCreateLabel={async (data: TodoLabelCreate) => { try { return await todoListService.createLabel(data); } catch { return null; } }}
     />
   );

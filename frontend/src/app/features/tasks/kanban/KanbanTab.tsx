@@ -45,6 +45,7 @@ const KanbanTab: React.FC<Props> = ({
     updateLabel,
     deleteLabel,
     toggleCardLabel,
+    setCardReminders,
   } = useKanban(featureInstanceId);
 
   const [searchParams] = useSearchParams();
@@ -253,6 +254,7 @@ const KanbanTab: React.FC<Props> = ({
             onMoveCard={moveCard}
             onReorderCard={reorderCard}
             onToggleLabel={toggleCardLabel}
+            onSetReminders={setCardReminders}
             onCreateLabel={createLabel}
           />
         ))}
@@ -279,6 +281,7 @@ const KanbanTab: React.FC<Props> = ({
           onClose={closeDeepLinked}
           onUpdate={updateCard}
           onToggleLabel={toggleCardLabel}
+          onSetReminders={setCardReminders}
           onCreateLabel={createLabel}
         />
       )}

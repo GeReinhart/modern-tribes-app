@@ -1,3 +1,4 @@
+import { formatDate } from '@/app/platform/core/dateFormat.ts';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
@@ -100,7 +101,7 @@ const DocumentsCrudPageContent: React.FC = () => {
       {
         key: 'created_at',
         header: t('common.created'),
-        render: (d: Document) => new Date(d.created_at).toLocaleDateString(),
+        render: (d: Document) => formatDate(d.created_at),
       },
       {
         key: 'status',

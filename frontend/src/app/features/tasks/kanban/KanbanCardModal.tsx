@@ -1,5 +1,5 @@
 import TaskItemModal from '@/app/features/tasks/TaskItemModal.tsx';
-import type { TaskLabelInfo, TaskPatch } from '@/app/features/tasks/types.ts';
+import type { TaskLabelInfo, TaskPatch, TaskReminderCreate } from '@/app/features/tasks/types.ts';
 
 import React from 'react';
 
@@ -24,6 +24,7 @@ interface Props {
     labelId: string,
     currentLabelIds: string[],
   ) => Promise<void>;
+  onSetReminders: (cardId: string, reminders: TaskReminderCreate[]) => Promise<void>;
   onCreateLabel: (data: LabelCreate) => Promise<KanbanLabel | null>;
 }
 
@@ -36,6 +37,7 @@ const KanbanCardModal: React.FC<Props> = ({
   onClose,
   onUpdate,
   onToggleLabel,
+  onSetReminders,
   onCreateLabel,
 }) => {
   const labels: TaskLabelInfo[] = boardLabels.map((l) => ({
@@ -45,6 +47,9 @@ const KanbanCardModal: React.FC<Props> = ({
 
   const handleUpdate = (id: string, patch: TaskPatch) =>
     onUpdate(id, patch as CardUpdate);
+
+  const handleSetReminders = (_id: string, reminders: TaskReminderCreate[]) =>
+    onSetReminders(card.id, reminders);
 
   const handleCreateLabel = async (data: {
     feature_instance_id: string;
@@ -68,6 +73,7 @@ const KanbanCardModal: React.FC<Props> = ({
         assigned_person_id: card.assigned_person_id,
         document_content_html: card.document_content_html,
         label_ids: card.label_ids,
+        reminders: card.reminders,
         force_on_dashboard: card.force_on_dashboard,
         created_by: card.created_by,
         updated_by: card.updated_by,
@@ -81,6 +87,7 @@ const KanbanCardModal: React.FC<Props> = ({
       onClose={onClose}
       onUpdate={handleUpdate}
       onToggleLabel={onToggleLabel}
+      onSetReminders={handleSetReminders}
       onCreateLabel={handleCreateLabel}
     />
   );

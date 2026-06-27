@@ -1,7 +1,9 @@
 import { apiService } from '@/app/platform/core/api/api.service.ts';
-import { PersonOption } from './types.ts';
 
 import {
+  PersonOption,
+  TaskReminder,
+  TaskReminderCreate,
   TodoItem,
   TodoItemCreate,
   TodoItemUpdate,
@@ -57,6 +59,13 @@ class TodoListService {
   async listPersons(featureInstanceId: string): Promise<PersonOption[]> {
     return apiService.get<PersonOption[]>(
       `/features/tasks/todo-items/persons/${featureInstanceId}`,
+    );
+  }
+
+  async setReminders(itemId: string, reminders: TaskReminderCreate[]): Promise<TaskReminder[]> {
+    return apiService.post<TaskReminder[]>(
+      `/features/tasks/todo-items/${itemId}/reminders`,
+      reminders,
     );
   }
 }
