@@ -41,6 +41,10 @@ class AdminNotificationResponse(BaseModel):
     created_at: datetime
 
 
+class PushReceivedAck(BaseModel):
+    url_param_id: str
+
+
 class PushSubscriptionCreate(BaseModel):
     endpoint: HttpUrl
     p256dh: str

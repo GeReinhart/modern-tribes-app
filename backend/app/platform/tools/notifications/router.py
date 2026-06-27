@@ -8,6 +8,7 @@ from app.platform.tools.notifications.models import (
     NotificationCreate,
     NotificationResponse,
     NotificationStatusUpdate,
+    PushReceivedAck,
     PushSubscriptionCreate,
     PushSubscriptionDelete,
     PushSubscriptionResponse,
@@ -17,6 +18,7 @@ from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_permission_decorator
 from app.platform.tools.notifications import service as notification_service
 from app.platform.tools.notifications import push_service
+from app.platform.tools.notifications import repository as notification_repo
 
 router = APIRouter(prefix="/notifications", tags=["platform_tools"])
 
@@ -78,6 +80,17 @@ async def report_notification_status(
         current_user["id"],
         payload.notification_status.value,
     )
+
+
+@router.post("/push/received", status_code=status.HTTP_204_NO_CONTENT)
+async def push_notification_received(payload: PushReceivedAck):
+    """Called by the service worker when a push notification is displayed on device.
+
+    No authentication required — the url_param_id acts as a delivery token.
+    Only transitions planned → sent, so replaying it is safe.
+    """
+    pool = get_database()
+    await notification_repo.mark_push_received(pool, payload.url_param_id)
 
 
 @router.get("/push/vapid-public-key")

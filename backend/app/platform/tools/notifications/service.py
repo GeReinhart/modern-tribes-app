@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from fastapi import HTTPException, status
 
@@ -9,14 +10,18 @@ from app.platform.core.utils.db_helpers import check_document_exists, generate_u
 logger = logging.getLogger(__name__)
 
 
-async def create_for_user(pool, target_user_id: str, message: str, current_user_id: str) -> dict:
+async def create_for_user(
+    pool, target_user_id: str, message: str, current_user_id: Optional[str]
+) -> dict:
     await check_document_exists(pool, "users", target_user_id, "User")
     url_param_id = generate_url_param_id()
     notification = await notification_repo.insert_notification(
         pool, target_user_id, message, current_user_id, url_param_id
     )
     try:
-        delivered = await push_service.send_to_user(pool, target_user_id, message)
+        delivered = await push_service.send_to_user(
+            pool, target_user_id, message, notification["url_param_id"]
+        )
         if delivered:
             await notification_repo.update_notification_status(
                 pool, str(notification["id"]), target_user_id, "sent"

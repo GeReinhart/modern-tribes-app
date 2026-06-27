@@ -347,6 +347,13 @@ const en: Record<string, string> = {
   'install.desktop.title': 'Open on your phone',
   'install.desktop.desc':
     'Visit this address on your Android or iPhone to install the app:',
+  'install.version.upToDate': 'You are up to date (version {{version}})',
+  'install.version.updateAvailable': 'Update available: version {{version}}',
+  'install.version.updateDesc': 'A new version of the app is available. Download the APK to upgrade.',
+  'install.version.backToApp': 'Back to the app',
+  'notifications.deniedBanner.message':
+    'Notifications are blocked. To re-enable them, open Chrome → tap the lock icon next to the address bar → Site settings → Notifications → Allow.',
+  'notifications.deniedBanner.dismiss': 'Dismiss',
 };
 
 export default en;

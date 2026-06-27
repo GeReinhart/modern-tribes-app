@@ -1,13 +1,14 @@
 import { useAuth } from '@/app/platform/core/authentication/AuthContext.tsx';
 import { useNotificationPoller } from '@/app/platform/tools/notifications/useNotificationPoller.ts';
+import { NotificationPermissionBanner } from '@/app/platform/tools/notifications/NotificationPermissionBanner.tsx';
 import { usePushSubscription } from '@/app/platform/tools/pwa/usePushSubscription.ts';
 
 import React from 'react';
 
-function ActivePoller(): null {
+function ActivePoller(): React.ReactElement {
   useNotificationPoller();
   usePushSubscription();
-  return null;
+  return <NotificationPermissionBanner />;
 }
 
 export function NotificationsPoller(): React.ReactElement | null {

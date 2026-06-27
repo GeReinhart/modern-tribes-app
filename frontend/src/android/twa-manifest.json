@@ -11,7 +11,7 @@
   "navigationDividerColor": "#000000",
   "navigationDividerColorDark": "#000000",
   "backgroundColor": "#FFFFFF",
-  "enableNotifications": false,
+  "enableNotifications": true,
   "startUrl": "/",
   "iconUrl": "https://www.reinhart.online/icon-512x512.png",
   "maskableIconUrl": "https://www.reinhart.online/icon-512x512.png",
@@ -20,8 +20,8 @@
     "path": "./android-keystore.jks",
     "alias": "modern-tribes"
   },
-  "appVersionName": "1.0.0",
-  "appVersionCode": 3,
+  "appVersionName": "1.2.1",
+  "appVersionCode": 5,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://www.reinhart.online/manifest.webmanifest",
@@ -39,5 +39,5 @@
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
   "displayOverride": [],
-  "appVersion": "1.0.0"
+  "appVersion": "1.2.1"
 }

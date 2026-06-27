@@ -8,14 +8,28 @@ cleanupOutdatedCaches();
 
 self.addEventListener('push', (event: PushEvent) => {
   if (!event.data) return;
-  const { message } = event.data.json() as { message: string };
-  event.waitUntil(
-    self.registration.showNotification('Modern Tribes', {
+  const { message, url_param_id } = event.data.json() as {
+    message: string;
+    url_param_id?: string;
+  };
+
+  const showAndAck = self.registration
+    .showNotification('Modern Tribes', {
       body: message,
       icon: '/icon-192x192.png',
       badge: '/icon-192x192.png',
-    }),
-  );
+      data: { url_param_id },
+    })
+    .then(() => {
+      if (!url_param_id) return;
+      return fetch('/api/platform/tools/notifications/push/received', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url_param_id }),
+      });
+    });
+
+  event.waitUntil(showAndAck);
 });
 
 self.addEventListener('notificationclick', (event: NotificationEvent) => {

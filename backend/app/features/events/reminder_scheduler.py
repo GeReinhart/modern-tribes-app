@@ -8,9 +8,6 @@ from app.features.events import repository as event_repository
 
 logger = logging.getLogger(__name__)
 
-_SYSTEM_USER_ID = "00000000-0000-0000-0000-000000000000"
-
-
 async def _notify_participants(pool, reminder: dict) -> None:
     event_id = str(reminder["event_id"])
     title = reminder["event_title"]
@@ -22,7 +19,7 @@ async def _notify_participants(pool, reminder: dict) -> None:
     for user in users:
         try:
             await notification_service.create_for_user(
-                pool, str(user["user_id"]), message, _SYSTEM_USER_ID
+                pool, str(user["user_id"]), message, None
             )
         except Exception:
             logger.exception("Failed to send reminder notification to user %s", user["user_id"])

@@ -307,16 +307,26 @@ def given_notifications_table(datatable):
                 if not uid or not target_user:
                     continue
                 url_param = rec.get("url_param_id", url_param_id_from_uuid(uid) + "xx")[:12]
-                await conn.execute(
-                    """INSERT INTO notifications(id, url_param_id, target_user_id, message, notification_status)
-                       VALUES($1, $2, $3, $4, $5)
-                       ON CONFLICT (id) DO NOTHING""",
-                    UUID(uid),
-                    url_param,
-                    UUID(target_user),
-                    rec.get("message", "Test notification"),
-                    rec.get("notification_status", "sent"),
-                )
+                created_at = _parse_created_at(rec.get("created_at"))
+                if created_at:
+                    await conn.execute(
+                        """INSERT INTO notifications(id, url_param_id, target_user_id, message, notification_status, created_at)
+                           VALUES($1, $2, $3, $4, $5, $6)
+                           ON CONFLICT (id) DO NOTHING""",
+                        UUID(uid), url_param, UUID(target_user),
+                        rec.get("message", "Test notification"),
+                        rec.get("notification_status", "sent"),
+                        created_at,
+                    )
+                else:
+                    await conn.execute(
+                        """INSERT INTO notifications(id, url_param_id, target_user_id, message, notification_status)
+                           VALUES($1, $2, $3, $4, $5)
+                           ON CONFLICT (id) DO NOTHING""",
+                        UUID(uid), url_param, UUID(target_user),
+                        rec.get("message", "Test notification"),
+                        rec.get("notification_status", "sent"),
+                    )
         finally:
             await conn.close()
     _run(_insert())
