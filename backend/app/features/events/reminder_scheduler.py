@@ -15,14 +15,22 @@ async def _notify_participants(pool, reminder: dict) -> None:
     start_str = start_at.strftime("%d/%m %H:%M") if start_at else ""
     message = f'Reminder: "{title}" starts at {start_str}'
 
-    users = await event_repository.fetch_participant_users(pool, event_id)
-    for user in users:
+    participant_users = await event_repository.fetch_participant_users(pool, event_id)
+    user_ids: set[str] = {str(u["user_id"]) for u in participant_users}
+
+    creator_id = reminder.get("event_creator_id")
+    if creator_id:
+        user_ids.add(str(creator_id))
+
+    if not user_ids:
+        logger.info("Reminder %s: no users to notify for event %s", reminder["id"], event_id)
+        return
+
+    for user_id in user_ids:
         try:
-            await notification_service.create_for_user(
-                pool, str(user["user_id"]), message, None
-            )
+            await notification_service.create_for_user(pool, user_id, message, None)
         except Exception:
-            logger.exception("Failed to send reminder notification to user %s", user["user_id"])
+            logger.exception("Failed to send reminder notification to user %s", user_id)
 
 
 async def _mail_participants(pool, reminder: dict) -> None:

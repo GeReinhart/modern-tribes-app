@@ -15,6 +15,7 @@ async function displayBrowserNotification(
   const options: NotificationOptions = {
     body: notification.message,
     tag: notification.id,
+    icon: '/icon-192x192.png',
   };
   if ('serviceWorker' in navigator) {
     try {

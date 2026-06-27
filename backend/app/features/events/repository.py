@@ -315,7 +315,8 @@ async def fetch_due_reminders(pool) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             """SELECT r.id, r.event_id, r.reminder_type, e.title AS event_title,
-                      e.start_at AS event_start_at, e.feature_instance_id
+                      e.start_at AS event_start_at, e.feature_instance_id,
+                      e.created_by AS event_creator_id
                FROM events_reminders r
                JOIN events e ON e.id = r.event_id AND e.status = 'active'
                WHERE r.remind_at <= NOW() AND r.sent = FALSE AND r.status = 'active'""",
