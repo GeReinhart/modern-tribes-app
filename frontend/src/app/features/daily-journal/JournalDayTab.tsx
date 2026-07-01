@@ -22,12 +22,13 @@ interface Props {
   onDeleteBlock: (blockId: string) => Promise<void>;
   onReorderBlocks: (orderedIds: string[]) => Promise<void>;
   onToggleLabel: (blockId: string, labelId: string) => void;
+  onCreateLabel: (name: string, color: string) => Promise<void>;
 }
 
 const JournalDayTab: React.FC<Props> = ({
   selectedDate, blocks, labels, days, filterLabelId,
   onDateChange, onFilterLabel,
-  onCreateBlock, onUpdateBlock, onDeleteBlock, onReorderBlocks, onToggleLabel,
+  onCreateBlock, onUpdateBlock, onDeleteBlock, onReorderBlocks, onToggleLabel, onCreateLabel,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -103,6 +104,7 @@ const JournalDayTab: React.FC<Props> = ({
               onSave={c => onUpdateBlock(block.id, c)}
               onDelete={() => onDeleteBlock(block.id)}
               onToggleLabel={lId => onToggleLabel(block.id, lId)}
+              onCreateLabel={onCreateLabel}
             />
             {insertingAt === index + 1 ? (
               <JournalNewBlockForm onSave={c => handleInsert(index + 1, c)} onCancel={() => setInsertingAt(null)} />

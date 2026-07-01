@@ -17,11 +17,12 @@ interface Props {
   onSave: (contentHtml: string) => Promise<void>;
   onDelete: () => Promise<void>;
   onToggleLabel: (labelId: string) => void;
+  onCreateLabel: (name: string, color: string) => Promise<void>;
 }
 
 const JournalBlockCard: React.FC<Props> = ({
   block, labels, canEdit, isFirst, isLast,
-  onMoveUp, onMoveDown, onSave, onDelete, onToggleLabel,
+  onMoveUp, onMoveDown, onSave, onDelete, onToggleLabel, onCreateLabel,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -41,81 +42,69 @@ const JournalBlockCard: React.FC<Props> = ({
   };
 
   return (
-    <div
-      style={{
-        border: `1px solid ${theme.colors.border}`,
-        borderRadius: '8px',
-        backgroundColor: theme.colors.surface,
-        overflow: 'hidden',
-      }}
-    >
-      {/* Header row: labels + actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px 4px' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', flex: 1 }}>
-          {blockLabels.map(l => (
-            <span
-              key={l.id}
-              style={{
-                padding: '1px 8px', borderRadius: '10px',
-                background: l.color, color: '#fff',
-                fontSize: '11px', fontWeight: 600,
-              }}
-            >
-              {l.name}
-            </span>
-          ))}
-        </div>
+    <div style={{ display: 'flex', gap: '0', border: `1px solid ${theme.colors.border}`, borderRadius: '8px', backgroundColor: theme.colors.surface, overflow: 'hidden' }}>
+
+      {/* Left strip: label dots */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', padding: '10px 6px', borderRight: `1px solid ${theme.colors.border}`, minWidth: '20px', background: theme.colors.surface }}>
+        {blockLabels.map(l => (
+          <span key={l.id} title={l.name} style={{ width: 8, height: 8, borderRadius: '50%', background: l.color, flexShrink: 0 }} />
+        ))}
+      </div>
+
+      {/* Main content area */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {/* Action bar */}
         {canEdit && !editing && (
-          <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexShrink: 0 }}>
-            <JournalLabelPicker labels={labels} activeLabelIds={block.label_ids} onToggle={onToggleLabel} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 10px 2px', justifyContent: 'flex-end' }}>
+            <JournalLabelPicker labels={labels} activeLabelIds={block.label_ids} onToggle={onToggleLabel} onCreateLabel={onCreateLabel} />
             <button type="button" onClick={() => { setEditContent(block.content_html ?? ''); setEditing(true); }} title={t('journal.editBlock')}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', opacity: 0.7 }}>
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', opacity: 0.6 }}>
               <ThemedSvgIcon name="pencil" color={theme.colors.text} size={13} />
             </button>
             <button type="button" onClick={onDelete} title={t('journal.deleteBlock')}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', opacity: 0.7 }}>
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', opacity: 0.6 }}>
               <ThemedSvgIcon name="archive" color={theme.colors.danger} size={13} />
             </button>
             {!isFirst && (
               <button type="button" onClick={onMoveUp} title={t('journal.moveUp')}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', opacity: 0.7 }}>
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', opacity: 0.6 }}>
                 <ThemedSvgIcon name="chevron-up" color={theme.colors.text} size={13} />
               </button>
             )}
             {!isLast && (
               <button type="button" onClick={onMoveDown} title={t('journal.moveDown')}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', opacity: 0.7 }}>
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', opacity: 0.6 }}>
                 <ThemedSvgIcon name="chevron-down" color={theme.colors.text} size={13} />
               </button>
             )}
           </div>
         )}
-      </div>
 
-      {/* Content */}
-      <div style={{ padding: '4px 12px 12px' }}>
-        {editing ? (
-          <>
-            <EditorJoditComponent content={editContent} onChange={setEditContent} minHeight={160} compact />
-            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-              <button type="button" onClick={handleSave}
-                style={{ padding: '6px 16px', borderRadius: '6px', background: theme.colors.primary, color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 'var(--font-sm)' }}>
-                {t('journal.save')}
-              </button>
-              <button type="button" onClick={handleCancel}
-                style={{ padding: '6px 16px', borderRadius: '6px', background: 'none', color: theme.colors.secondary, border: `1px solid ${theme.colors.border}`, cursor: 'pointer', fontSize: 'var(--font-sm)' }}>
-                {t('journal.cancel')}
-              </button>
-            </div>
-          </>
-        ) : (
-          <div
-            className="prose max-w-none"
-            style={{ fontSize: 'var(--font-sm)', color: theme.colors.text, cursor: canEdit ? 'pointer' : 'default' }}
-            dangerouslySetInnerHTML={{ __html: block.content_html ?? '' }}
-            onClick={canEdit ? () => { setEditContent(block.content_html ?? ''); setEditing(true); } : undefined}
-          />
-        )}
+        {/* Content */}
+        <div style={{ padding: canEdit && !editing ? '2px 12px 12px' : '10px 12px 12px' }}>
+          {editing ? (
+            <>
+              <EditorJoditComponent content={editContent} onChange={setEditContent} minHeight={160} compact />
+              <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                <button type="button" onClick={handleSave}
+                  style={{ padding: '6px 16px', borderRadius: '6px', background: theme.colors.primary, color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 'var(--font-sm)' }}>
+                  {t('journal.save')}
+                </button>
+                <button type="button" onClick={handleCancel}
+                  style={{ padding: '6px 16px', borderRadius: '6px', background: 'none', color: theme.colors.secondary, border: `1px solid ${theme.colors.border}`, cursor: 'pointer', fontSize: 'var(--font-sm)' }}>
+                  {t('journal.cancel')}
+                </button>
+              </div>
+            </>
+          ) : (
+            <div
+              className="prose max-w-none"
+              style={{ fontSize: 'var(--font-sm)', color: theme.colors.text, cursor: canEdit ? 'pointer' : 'default' }}
+              dangerouslySetInnerHTML={{ __html: block.content_html ?? '' }}
+              onClick={canEdit ? () => { setEditContent(block.content_html ?? ''); setEditing(true); } : undefined}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

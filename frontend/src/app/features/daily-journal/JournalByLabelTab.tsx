@@ -77,6 +77,7 @@ const JournalByLabelTab: React.FC<Props> = ({ featureInstanceId, labels }) => {
                 onSave={async () => {}}
                 onDelete={async () => {}}
                 onToggleLabel={() => {}}
+                onCreateLabel={async () => {}}
               />
             ))}
           </div>

@@ -16,7 +16,7 @@ const JournalTab: React.FC<FeatureTabProps> = ({ featureInstanceId }) => {
 
   const {
     blocks, labels, days,
-    createBlock, updateBlock, deleteBlock, reorderBlocks, toggleLabel,
+    createBlock, updateBlock, deleteBlock, reorderBlocks, toggleLabel, createLabel,
   } = useJournalDay(featureInstanceId, selectedDate);
 
   const tabs = [
@@ -43,6 +43,7 @@ const JournalTab: React.FC<FeatureTabProps> = ({ featureInstanceId }) => {
             onDeleteBlock={deleteBlock}
             onReorderBlocks={reorderBlocks}
             onToggleLabel={toggleLabel}
+            onCreateLabel={async (name, color) => { await createLabel(name, color); }}
           />
         ) : (
           <JournalByLabelTab featureInstanceId={featureInstanceId} labels={labels} />
