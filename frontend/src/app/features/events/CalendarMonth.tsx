@@ -16,6 +16,7 @@ interface Props {
   onPrevMonth: () => void;
   onNextMonth: () => void;
   taskDates?: Set<string>;
+  journalDates?: Set<string>;
 }
 
 interface BarInfo {
@@ -34,8 +35,10 @@ const DOT_COLORS = ['#3b82f6', '#22c55e', '#ef4444', '#f97316', '#8b5cf6'];
 
 const TASK_DOT_COLOR = '#f97316';
 
+const JOURNAL_DOT_COLOR = '#8b5cf6';
+
 const CalendarMonth: React.FC<Props> = ({
-  year, month, events, labels, selectedDate, onSelectDate, onPrevMonth, onNextMonth, taskDates,
+  year, month, events, labels, selectedDate, onSelectDate, onPrevMonth, onNextMonth, taskDates, journalDates,
 }) => {
   const { theme } = useTheme();
   const { i18n } = useTranslation();
@@ -135,6 +138,7 @@ const CalendarMonth: React.FC<Props> = ({
           const singleDayEvents = (eventsByDay.get(dateStr) ?? [])
             .filter(ev => ev.start_at.slice(0, 10) === ev.end_at.slice(0, 10));
           const hasTaskDue = taskDates?.has(dateStr) ?? false;
+          const hasJournalEntry = journalDates?.has(dateStr) ?? false;
 
           return (
             <button
@@ -174,6 +178,9 @@ const CalendarMonth: React.FC<Props> = ({
               </div>
               {hasTaskDue && (
                 <span style={{ width: '5px', height: '5px', borderRadius: '2px', backgroundColor: isSelected ? theme.colors.surface : TASK_DOT_COLOR, flexShrink: 0 }} />
+              )}
+              {hasJournalEntry && (
+                <span style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: isSelected ? theme.colors.surface : JOURNAL_DOT_COLOR, flexShrink: 0 }} />
               )}
             </button>
           );

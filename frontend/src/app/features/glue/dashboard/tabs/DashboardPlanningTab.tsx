@@ -11,6 +11,8 @@ import { useMyTaskMutations, useMyTasks } from '@/app/features/tasks/my_tasks/ho
 import MyTasksList from '@/app/features/tasks/my_tasks/MyTasksList.tsx';
 import type { MyTasksResponse } from '@/app/features/tasks/my_tasks/types.ts';
 import DashboardAddEventModal from '@/app/features/glue/dashboard/DashboardAddEventModal.tsx';
+import DashboardJournalSection from '@/app/features/glue/dashboard/DashboardJournalSection.tsx';
+import { journalService } from '@/app/features/daily-journal/service.ts';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -45,6 +47,7 @@ const DashboardPlanningTab: React.FC = () => {
   const [activeProjectIds, setActiveProjectIds] = useState<string[]>([]);
   const [activePersonIds, setActivePersonIds] = useState<string[]>([]);
   const [showAddEvent, setShowAddEvent] = useState(false);
+  const [journalDates, setJournalDates] = useState<Set<string>>(new Set());
 
   const tabActions = useMemo(
     () => [{ icon: 'plus' as const, label: t('features.events.addEvent'), onClick: () => setShowAddEvent(true) }],
@@ -57,6 +60,10 @@ const DashboardPlanningTab: React.FC = () => {
   const tasks: MyTasksResponse = data ?? emptyTasks;
 
   useEffect(() => { eventsService.listAccessible().then(setEvents); }, []);
+
+  useEffect(() => {
+    journalService.listAccessibleDates(year, month + 1).then(dates => setJournalDates(new Set(dates)));
+  }, [year, month]);
 
   const prevDay = () => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() - 1); setSelectedDate(d.toISOString().slice(0, 10)); };
   const nextDay = () => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() + 1); setSelectedDate(d.toISOString().slice(0, 10)); };
@@ -129,7 +136,7 @@ const DashboardPlanningTab: React.FC = () => {
         year={year} month={month} events={events} labels={allLabels}
         selectedDate={selectedDate} onSelectDate={setSelectedDate}
         onPrevMonth={prevMonth} onNextMonth={nextMonth}
-        taskDates={taskDates}
+        taskDates={taskDates} journalDates={journalDates}
       />
       <div style={{ height: '1px', backgroundColor: theme.colors.border, margin: '16px 0' }} />
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
@@ -185,6 +192,7 @@ const DashboardPlanningTab: React.FC = () => {
         </div>
         <MyTasksList data={filteredDayTasks} persons={taskPersons} onMarkDone={async task => { await markAsDone(task); await refetch(); }} />
       </div>
+      <DashboardJournalSection selectedDate={selectedDate} />
       {viewingEvent && !editingEvent && (
         <EventViewModal event={viewingEvent} labels={allLabels} persons={allPersons} canEdit={true}
           projectName={viewingEvent.project_name} onClose={() => setViewingEvent(null)}
