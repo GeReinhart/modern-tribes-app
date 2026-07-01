@@ -42,10 +42,10 @@ const JournalBlockCard: React.FC<Props> = ({
   };
 
   return (
-    <div style={{ display: 'flex', gap: '0', border: `1px solid ${theme.colors.border}`, borderRadius: '8px', backgroundColor: theme.colors.surface, overflow: 'hidden' }}>
+    <div style={{ display: 'flex', gap: '0', border: `1px solid ${theme.colors.border}`, borderRadius: '8px', backgroundColor: theme.colors.surface, position: 'relative' }}>
 
       {/* Left strip: label dots */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', padding: '10px 6px', borderRight: `1px solid ${theme.colors.border}`, minWidth: '20px', background: theme.colors.surface }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', padding: '10px 6px', borderRight: `1px solid ${theme.colors.border}`, minWidth: '20px', background: theme.colors.surface, borderRadius: '8px 0 0 8px' }}>
         {blockLabels.map(l => (
           <span key={l.id} title={l.name} style={{ width: 8, height: 8, borderRadius: '50%', background: l.color, flexShrink: 0 }} />
         ))}
