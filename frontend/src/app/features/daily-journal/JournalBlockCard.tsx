@@ -96,7 +96,7 @@ const JournalBlockCard: React.FC<Props> = ({
       <div style={{ padding: '4px 12px 12px' }}>
         {editing ? (
           <>
-            <EditorJoditComponent content={editContent} onChange={setEditContent} minHeight={120} compact />
+            <EditorJoditComponent content={editContent} onChange={setEditContent} minHeight={160} compact />
             <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
               <button type="button" onClick={handleSave}
                 style={{ padding: '6px 16px', borderRadius: '6px', background: theme.colors.primary, color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 'var(--font-sm)' }}>

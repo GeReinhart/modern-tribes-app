@@ -31,7 +31,7 @@ const JournalNewBlockForm: React.FC<Props> = ({ onSave, onCancel }) => {
       padding: '10px 12px',
       backgroundColor: theme.colors.surface,
     }}>
-      <EditorJoditComponent content={content} onChange={setContent} minHeight={100} compact />
+      <EditorJoditComponent content={content} onChange={setContent} minHeight={160} compact />
       <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
         <button
           type="button"
