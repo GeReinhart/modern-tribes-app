@@ -10,7 +10,8 @@ import type {
   JournalDashboardResponse,
 } from './types.ts';
 
-const BASE = '/features/daily-journal';
+const BASE = '/features/tasks/daily-journal';
+const LABELS_BASE = '/features/tasks/journal-labels';
 
 class JournalService {
   async listBlocksForDay(featureInstanceId: string, date: string): Promise<JournalBlock[]> {
@@ -55,19 +56,19 @@ class JournalService {
   }
 
   async listLabels(featureInstanceId: string): Promise<JournalLabel[]> {
-    return apiService.get<JournalLabel[]>(`/journal-labels/by-instance/${featureInstanceId}`);
+    return apiService.get<JournalLabel[]>(`${LABELS_BASE}/by-instance/${featureInstanceId}`);
   }
 
   async createLabel(data: JournalLabelCreate): Promise<JournalLabel> {
-    return apiService.post<JournalLabel>('/journal-labels/', data);
+    return apiService.post<JournalLabel>(`${LABELS_BASE}/`, data);
   }
 
   async updateLabel(labelId: string, data: JournalLabelUpdate): Promise<JournalLabel> {
-    return apiService.patch<JournalLabel>(`/journal-labels/${labelId}`, data);
+    return apiService.patch<JournalLabel>(`${LABELS_BASE}/${labelId}`, data);
   }
 
   async deleteLabel(labelId: string): Promise<void> {
-    return apiService.delete<void>(`/journal-labels/${labelId}`);
+    return apiService.delete<void>(`${LABELS_BASE}/${labelId}`);
   }
 
   async listAccessible(date: string): Promise<JournalDashboardResponse> {
