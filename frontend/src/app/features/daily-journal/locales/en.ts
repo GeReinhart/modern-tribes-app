@@ -1,0 +1,20 @@
+const en: Record<string, string> = {
+  'journal.tabDay': 'Day',
+  'journal.tabByLabel': 'By label',
+  'journal.emptyDay': 'No entries for this day. Click + to start writing.',
+  'journal.addBlock': 'Add a block',
+  'journal.editBlock': 'Edit',
+  'journal.deleteBlock': 'Delete',
+  'journal.save': 'Save',
+  'journal.cancel': 'Cancel',
+  'journal.moveUp': 'Move up',
+  'journal.moveDown': 'Move down',
+  'journal.labels': 'Labels',
+  'journal.noLabel': 'No label selected',
+  'journal.selectLabel': 'Filter by label...',
+  'journal.journalEntries': 'Journal entries',
+  'journal.blockCount': '{{count}} block',
+  'journal.blockCount_other': '{{count}} blocks',
+};
+
+export default en;

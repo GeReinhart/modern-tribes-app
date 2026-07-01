@@ -5,3 +5,4 @@ import '../guitar/notes';
 import '../guitar/tuner';
 import '../guitar/metronome';
 import '../events';
+import '../daily-journal';

@@ -645,5 +645,23 @@ CREATE TABLE IF NOT EXISTS push_subscriptions (
 CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user ON push_subscriptions(user_id) WHERE status = 'active';
 CREATE OR REPLACE TRIGGER update_push_subscriptions_updated_at BEFORE UPDATE ON push_subscriptions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- Journal blocks (migration 007)
+CREATE TABLE IF NOT EXISTS journal_blocks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    feature_instance_id UUID NOT NULL REFERENCES projects_features(id) ON DELETE CASCADE,
+    date DATE NOT NULL,
+    document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
+    position INTEGER NOT NULL DEFAULT 0,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_journal_blocks_feature_date ON journal_blocks(feature_instance_id, date);
+CREATE INDEX IF NOT EXISTS idx_journal_blocks_feature_status ON journal_blocks(feature_instance_id, status);
+CREATE OR REPLACE TRIGGER update_journal_blocks_updated_at BEFORE UPDATE ON journal_blocks FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 -- Schema evolution: add columns that may be missing on databases created before they were introduced
 ALTER TABLE tribes_projects ADD COLUMN IF NOT EXISTS display_order INTEGER NOT NULL DEFAULT 0;
