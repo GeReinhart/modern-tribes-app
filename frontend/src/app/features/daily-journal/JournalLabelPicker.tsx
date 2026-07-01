@@ -70,7 +70,7 @@ const JournalLabelPicker: React.FC<Props> = ({ labels, activeLabelIds, onToggle,
         <div style={{
           position: 'absolute',
           top: '100%',
-          left: 0,
+          right: 0,
           zIndex: 200,
           background: theme.colors.surface,
           border: `1px solid ${theme.colors.border}`,
