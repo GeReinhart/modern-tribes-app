@@ -102,7 +102,7 @@ const JournalLabelPicker: React.FC<Props> = ({ labels, activeLabelIds, onToggle,
             {!creating ? (
               <button type="button" onClick={() => setCreating(true)}
                 style={{ display: 'flex', alignItems: 'center', gap: '6px', width: '100%', padding: '5px 8px', background: 'none', border: 'none', borderRadius: '5px', cursor: 'pointer', color: theme.colors.primary, fontSize: '11px', fontWeight: 600 }}>
-                + Create label
+                + {t('journal.createLabel')}
               </button>
             ) : (
               <div style={{ padding: '4px 2px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -112,7 +112,7 @@ const JournalLabelPicker: React.FC<Props> = ({ labels, activeLabelIds, onToggle,
                   value={newName}
                   onChange={e => setNewName(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleCreate()}
-                  placeholder="Label name"
+                  placeholder={t('journal.labelNamePlaceholder')}
                   style={{ width: '100%', padding: '4px 8px', borderRadius: '5px', border: `1px solid ${theme.colors.border}`, background: theme.colors.surface, color: theme.colors.text, fontSize: '12px', boxSizing: 'border-box' }}
                 />
                 <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
@@ -124,11 +124,11 @@ const JournalLabelPicker: React.FC<Props> = ({ labels, activeLabelIds, onToggle,
                 <div style={{ display: 'flex', gap: '4px' }}>
                   <button type="button" onClick={handleCreate} disabled={!newName.trim()}
                     style={{ flex: 1, padding: '4px', borderRadius: '5px', background: theme.colors.primary, color: '#fff', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 600, opacity: newName.trim() ? 1 : 0.5 }}>
-                    Create
+                    {t('journal.create')}
                   </button>
                   <button type="button" onClick={() => setCreating(false)}
                     style={{ padding: '4px 8px', borderRadius: '5px', background: 'none', border: `1px solid ${theme.colors.border}`, cursor: 'pointer', fontSize: '11px', color: theme.colors.secondary }}>
-                    Cancel
+                    {t('journal.cancel')}
                   </button>
                 </div>
               </div>

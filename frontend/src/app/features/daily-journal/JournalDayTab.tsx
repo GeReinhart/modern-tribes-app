@@ -66,7 +66,7 @@ const JournalDayTab: React.FC<Props> = ({
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '16px', alignItems: 'center' }}>
           <button type="button" onClick={() => onFilterLabel(null)}
             style={{ padding: '3px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 600, border: `1.5px solid ${!filterLabelId ? theme.colors.primary : theme.colors.border}`, background: !filterLabelId ? theme.colors.primary + '22' : 'none', cursor: 'pointer', color: theme.colors.text }}>
-            All
+            {t('journal.all')}
           </button>
           {labels.map(l => (
             <button key={l.id} type="button" onClick={() => onFilterLabel(l.id === filterLabelId ? null : l.id)}
