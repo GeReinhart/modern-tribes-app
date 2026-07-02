@@ -225,6 +225,32 @@ def given_documents_table(datatable):
     _run(_insert())
 
 
+@given("the journal_blocks table contains:")
+def given_journal_blocks_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec["id"]
+                document_id = rec.get("document_id")
+                await conn.execute(
+                    """INSERT INTO journal_blocks(id, feature_instance_id, date, document_id, position, status)
+                       VALUES($1, $2, $3, $4, $5, $6)
+                       ON CONFLICT (id) DO UPDATE SET status = EXCLUDED.status""",
+                    UUID(uid),
+                    UUID(rec["feature_instance_id"]),
+                    coerce("date", rec["date"]),
+                    UUID(document_id) if document_id else None,
+                    coerce("position", rec.get("position", "0")),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
 @given("the labels table contains:")
 def given_labels_table(datatable):
     async def _insert():
@@ -522,13 +548,14 @@ def given_projects_features_table(datatable):
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
                 uid = rec["id"]
                 await conn.execute(
-                    """INSERT INTO projects_features(id, project_id, feature_type, name, status, position)
-                       VALUES($1, $2, $3, $4, $5, $6)
+                    """INSERT INTO projects_features(id, project_id, feature_type, name, icon, status, position)
+                       VALUES($1, $2, $3, $4, $5, $6, $7)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(uid),
                     UUID(rec["project_id"]),
                     rec.get("feature_type", "kanban"),
-                    rec.get("name", "Feature"),
+                    rec.get("name") or None,
+                    rec.get("icon") or None,
                     rec.get("status", "active"),
                     coerce("position", rec.get("position", "0")),
                 )
@@ -1253,6 +1280,49 @@ def given_push_subscriptions_table(datatable):
 @then("the push_subscriptions table contains:")
 def then_push_subscriptions_table(datatable):
     _assert_db("push_subscriptions", datatable)
+
+
+@given("the dashboard_pinned_tabs table contains:")
+def given_dashboard_pinned_tabs_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                user_id = rec.get("user_id")
+                bookmark_id = rec.get("bookmark_id")
+                if not user_id or not bookmark_id:
+                    continue
+                if uid:
+                    await conn.execute(
+                        """INSERT INTO dashboard_pinned_tabs(id, user_id, bookmark_id, display_order, status)
+                           VALUES($1, $2, $3, $4, $5)
+                           ON CONFLICT (id) DO NOTHING""",
+                        UUID(uid),
+                        UUID(user_id),
+                        UUID(bookmark_id),
+                        coerce("display_order", rec.get("display_order", "0")),
+                        rec.get("status", "active"),
+                    )
+                else:
+                    await conn.execute(
+                        """INSERT INTO dashboard_pinned_tabs(user_id, bookmark_id, display_order, status)
+                           VALUES($1, $2, $3, $4)""",
+                        UUID(user_id),
+                        UUID(bookmark_id),
+                        coerce("display_order", rec.get("display_order", "0")),
+                        rec.get("status", "active"),
+                    )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the dashboard_pinned_tabs table contains:")
+def then_dashboard_pinned_tabs_table(datatable):
+    _assert_db("dashboard_pinned_tabs", datatable)
 
 
 @given("the reminders table contains:")

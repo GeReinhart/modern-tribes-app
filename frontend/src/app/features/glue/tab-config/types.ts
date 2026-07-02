@@ -3,12 +3,16 @@ export interface TabConfigItem {
   visible: boolean;
   order: number;
   is_default: boolean;
+  icon?: string | null;
+  name?: string | null;
 }
 
 export interface TabWithConfig {
   key: string;
   label: string;
   color?: string;
+  icon?: string | null;
+  name?: string | null;
   visible: boolean;
   order: number;
   is_default: boolean;

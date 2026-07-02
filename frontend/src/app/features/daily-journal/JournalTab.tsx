@@ -1,6 +1,7 @@
 import { ThemedTabs } from '@/app/platform/core/layout/themes/components/ThemedTabs.tsx';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import type { FeatureTabProps } from '@/app/features/glue/registry.ts';
 import JournalByLabelTab from './JournalByLabelTab.tsx';
 import JournalDayTab from './JournalDayTab.tsx';
@@ -10,9 +11,11 @@ const TODAY = new Date().toISOString().slice(0, 10);
 
 const JournalTab: React.FC<FeatureTabProps> = ({ featureInstanceId }) => {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<'day' | 'by-label'>('day');
-  const [selectedDate, setSelectedDate] = useState(TODAY);
+  const [selectedDate, setSelectedDate] = useState(() => searchParams.get('date') ?? TODAY);
   const [filterLabelId, setFilterLabelId] = useState<string | null>(null);
+  const searchQuery = searchParams.get('q') ?? '';
 
   const {
     blocks, labels, days,
@@ -36,6 +39,7 @@ const JournalTab: React.FC<FeatureTabProps> = ({ featureInstanceId }) => {
             labels={labels}
             days={days}
             filterLabelId={filterLabelId}
+            searchQuery={searchQuery}
             onDateChange={setSelectedDate}
             onFilterLabel={setFilterLabelId}
             onCreateBlock={createBlock}

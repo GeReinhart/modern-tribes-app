@@ -22,6 +22,14 @@ def test_create_feature_instance_admin():
 def test_create_feature_instance_forbidden():
     pass
 
+@scenario(FEATURE, "POST /feature-instances/projects/0100/features with an icon and no name — the instance is created icon-only")
+def test_create_feature_instance_icon_only():
+    pass
+
+@scenario(FEATURE, "POST /feature-instances/projects/0100/features with neither name nor icon — 422 error")
+def test_create_feature_instance_no_name_no_icon():
+    pass
+
 @pytest.fixture
 def admin_client():
     _test_app.dependency_overrides[get_current_user] = lambda: _ADMIN_USER

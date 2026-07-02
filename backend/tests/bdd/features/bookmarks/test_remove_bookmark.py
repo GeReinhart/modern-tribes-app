@@ -21,6 +21,10 @@ def test_remove_bookmark_viewer():
 def test_remove_bookmark_forbidden():
     pass
 
+@scenario(FEATURE, "DELETE /bookmarks/0010 when the bookmark is pinned as a dashboard tab — 409 error")
+def test_remove_bookmark_pinned():
+    pass
+
 @pytest.fixture
 def non_admin_client():
     _test_app.dependency_overrides[get_current_user] = lambda: _REGULAR_USER

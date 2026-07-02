@@ -1,5 +1,6 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { useHeaderVisibility } from '@/app/platform/core/layout/HeaderVisibilityContext.tsx';
+import { IconName, ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -8,6 +9,7 @@ interface Tab {
   key: string;
   label: string;
   color?: string;
+  icon?: string | null;
   href?: string;
 }
 
@@ -56,18 +58,26 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({
           fontSize: 'var(--font-sm)',
           transition: 'all 0.15s',
           textDecoration: 'none',
-          display: 'inline-block',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
         };
+        const content = (
+          <>
+            {tab.icon && <ThemedSvgIcon name={tab.icon as IconName} color="currentColor" size={14} />}
+            {tab.label && <span>{tab.label}</span>}
+          </>
+        );
         if (tab.href) {
           return (
             <Link key={tab.key} to={tab.href} style={tabStyle}>
-              {tab.label}
+              {content}
             </Link>
           );
         }
         return (
           <button key={tab.key} onClick={() => onTabChange(tab.key)} style={tabStyle}>
-            {tab.label}
+            {content}
           </button>
         );
       })}

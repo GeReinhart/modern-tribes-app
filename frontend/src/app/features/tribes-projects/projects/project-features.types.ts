@@ -2,7 +2,8 @@ export interface ProjectFeatureInstance {
   id: string;
   project_id: string;
   feature_type: string;
-  name: string;
+  name: string | null;
+  icon?: string | null;
   theme_code?: string | null;
   status: 'active' | 'archived';
   position: number;
@@ -14,13 +15,15 @@ export interface ProjectFeatureInstance {
 
 export interface ProjectFeatureInstanceCreate {
   feature_type: string;
-  name: string;
+  name?: string;
+  icon?: string | null;
   position?: number;
   theme_code?: string | null;
 }
 
 export interface ProjectFeatureInstanceUpdate {
   name?: string;
+  icon?: string | null;
   status?: string;
   position?: number;
   theme_code?: string | null;

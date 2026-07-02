@@ -3,7 +3,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ChevronDown, ChevronUp, Pencil, Archive } from 'lucide-react';
+import { ChevronDown, ChevronUp, Pencil, Archive, Pin, PinOff } from 'lucide-react';
 
 import { BookmarkEditModal } from './BookmarkEditModal.tsx';
 import {
@@ -17,10 +17,13 @@ interface BookmarkCardProps {
   index: number;
   total: number;
   configuring: boolean;
+  isPinned?: boolean;
+  canPin?: boolean;
   onMove: (index: number, dir: 'up' | 'down') => void;
   onRemove: (bookmark: UserBookmark) => void;
   onNavigate: (pagePath: string) => void;
   onUpdate: (bookmarkId: string, data: UserBookmarkUpdate) => Promise<void>;
+  onTogglePin?: (bookmark: UserBookmark) => Promise<void>;
 }
 
 export const BookmarkCard: React.FC<BookmarkCardProps> = ({
@@ -28,10 +31,13 @@ export const BookmarkCard: React.FC<BookmarkCardProps> = ({
   index,
   total,
   configuring,
+  isPinned = false,
+  canPin = false,
   onMove,
   onRemove,
   onNavigate,
   onUpdate,
+  onTogglePin,
 }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -131,6 +137,18 @@ export const BookmarkCard: React.FC<BookmarkCardProps> = ({
             >
               <ChevronDown size={16} />
             </button>
+            {canPin && onTogglePin && (
+              <button
+                style={{
+                  ...iconBtnStyle(),
+                  color: isPinned ? theme.colors.primary : theme.colors.secondary,
+                }}
+                onClick={() => onTogglePin(bookmark)}
+                title={isPinned ? t('dashboard.pinnedTab.unpin') : t('dashboard.pinnedTab.pin')}
+              >
+                {isPinned ? <PinOff size={16} /> : <Pin size={16} />}
+              </button>
+            )}
             <button
               style={iconBtnStyle()}
               onClick={() => setEditing(true)}

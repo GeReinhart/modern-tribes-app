@@ -49,6 +49,7 @@ class JournalDashboardEntry(BaseModel):
     feature_instance_name: str
     project_id: str
     project_name: str
+    tribe_id: str
     block_count: int
 
 

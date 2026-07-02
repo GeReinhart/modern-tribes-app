@@ -384,10 +384,10 @@ class DatabaseInitializer:
                     print(f"✗ Unknown project '{row['project']}' in projects_features.csv")
                     sys.exit(1)
                 r = await conn.fetchrow(
-                    """INSERT INTO projects_features (project_id, feature_type, name, position)
-                       VALUES ($1, $2, $3, $4) RETURNING id""",
+                    """INSERT INTO projects_features (project_id, feature_type, name, icon, position)
+                       VALUES ($1, $2, $3, $4, $5) RETURNING id""",
                     project_ids[row["project"]], row["feature_type"],
-                    row["name"], int(row.get("position") or 0),
+                    row["name"], row.get("icon") or None, int(row.get("position") or 0),
                 )
                 ids[f"{row['project']}|{row['name']}"] = str(r["id"])
         print(f"✓ Created {len(ids)} project features")

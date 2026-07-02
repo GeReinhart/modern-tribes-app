@@ -7,6 +7,7 @@ export interface TabDefinition {
   key: string;
   label: string;
   color?: string;
+  icon?: string | null;
 }
 
 export interface NavTab extends TabDefinition {

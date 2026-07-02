@@ -60,7 +60,7 @@ function FeaturesPageContent() {
 
   const [confirm, setConfirm] = useState<{
     id: string;
-    name: string;
+    name: string | null;
     nextStatus: 'active' | 'archived';
   } | null>(null);
   const [actioning, setActioning] = useState(false);

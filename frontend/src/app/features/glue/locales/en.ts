@@ -18,6 +18,12 @@ const en: Record<string, string> = {
   'tabConfig.moveDown': 'Move down',
   'tabConfig.toggleVisibility': 'Toggle visibility',
   'tabConfig.setDefault': 'Set as default tab',
+  'tabConfig.icon': 'Icon',
+  'tabConfig.name': 'Name',
+  'tabConfig.nameOrIconRequired': 'Set a name or choose an icon',
+  'tabConfig.hideName': 'Hide the name (icon only)',
+  'tabConfig.showName': 'Show the name',
+  'tabConfig.setIconFirst': 'Choose an icon first',
 
   'features.addFeature': 'Add Feature',
   'features.feature': 'Feature',
@@ -26,6 +32,7 @@ const en: Record<string, string> = {
   'features.selectType': 'Select a type...',
   'features.featureName': 'Name',
   'features.featureNamePlaceholder': 'e.g. Sprint backlog',
+  'features.featureIcon': 'Icon (optional if a name is set)',
   'features.rename': 'Rename feature',
   'features.archive': 'Archive feature',
   'features.archiveTitle': 'Archive this feature?',
@@ -52,6 +59,10 @@ const en: Record<string, string> = {
   'dashboard.quickAdd.changeFeature': 'Change',
   'dashboard.quickAdd.taskTitlePlaceholder': 'Task title...',
   'dashboard.quickAdd.create': 'Create',
+
+  'dashboard.pinnedTab.pin': 'Pin as tab',
+  'dashboard.pinnedTab.unpin': 'Unpin tab',
+  'dashboard.pinnedTab.unavailable': 'This feature is no longer available. You can unpin this tab.',
 };
 
 export default en;

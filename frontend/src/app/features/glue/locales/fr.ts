@@ -18,6 +18,12 @@ const fr: Record<string, string> = {
   'tabConfig.moveDown': 'Descendre',
   'tabConfig.toggleVisibility': 'Basculer la visibilité',
   'tabConfig.setDefault': 'Définir comme onglet par défaut',
+  'tabConfig.icon': 'Icône',
+  'tabConfig.name': 'Nom',
+  'tabConfig.nameOrIconRequired': 'Renseignez un nom ou choisissez une icône',
+  'tabConfig.hideName': 'Masquer le nom (icône seule)',
+  'tabConfig.showName': 'Afficher le nom',
+  'tabConfig.setIconFirst': 'Choisissez d\'abord une icône',
 
   'features.addFeature': 'Ajouter une fonctionnalité',
   'features.feature': 'Fonctionnalité',
@@ -26,6 +32,7 @@ const fr: Record<string, string> = {
   'features.selectType': 'Sélectionner un type...',
   'features.featureName': 'Nom',
   'features.featureNamePlaceholder': 'ex. Backlog du sprint',
+  'features.featureIcon': 'Icône (facultative si un nom est renseigné)',
   'features.rename': 'Renommer la fonctionnalité',
   'features.archive': 'Archiver la fonctionnalité',
   'features.archiveTitle': 'Archiver cette fonctionnalité ?',
@@ -53,6 +60,10 @@ const fr: Record<string, string> = {
   'dashboard.quickAdd.changeFeature': 'Changer',
   'dashboard.quickAdd.taskTitlePlaceholder': 'Titre de la tâche...',
   'dashboard.quickAdd.create': 'Créer',
+
+  'dashboard.pinnedTab.pin': 'Épingler comme onglet',
+  'dashboard.pinnedTab.unpin': 'Désépingler',
+  'dashboard.pinnedTab.unavailable': 'Cette fonctionnalité n\'est plus disponible. Vous pouvez désépingler cet onglet.',
 };
 
 export default fr;

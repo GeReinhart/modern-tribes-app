@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 
 class TabConfigItem(BaseModel):
@@ -8,6 +8,15 @@ class TabConfigItem(BaseModel):
     visible: bool
     order: int
     is_default: bool = False
+    icon: Optional[str] = None
+    name: Optional[str] = None
+
+    @model_validator(mode="after")
+    def validate_name_or_icon(self):
+        """Clearing the name to show an icon-only tab requires an icon."""
+        if self.name == "" and not self.icon:
+            raise ValueError("Either name or icon must be provided when name is cleared.")
+        return self
 
 
 class UserTabConfigRequest(BaseModel):

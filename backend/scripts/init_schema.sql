@@ -252,14 +252,16 @@ CREATE TABLE IF NOT EXISTS projects_features (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
     feature_type VARCHAR(100) NOT NULL,
-    name VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NULL,
+    icon VARCHAR(50) NULL,
     theme_code VARCHAR(50) NULL,
     status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'archived')),
     position INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT chk_projects_features_name_or_icon CHECK ((name IS NOT NULL AND name <> '') OR icon IS NOT NULL)
 );
 
 -- Labels table (unified: global admin labels + feature-instance-scoped labels for kanban/todo)
@@ -662,6 +664,22 @@ CREATE TABLE IF NOT EXISTS journal_blocks (
 CREATE INDEX IF NOT EXISTS idx_journal_blocks_feature_date ON journal_blocks(feature_instance_id, date);
 CREATE INDEX IF NOT EXISTS idx_journal_blocks_feature_status ON journal_blocks(feature_instance_id, status);
 CREATE OR REPLACE TRIGGER update_journal_blocks_updated_at BEFORE UPDATE ON journal_blocks FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Dashboard pinned tabs (migration 008)
+CREATE TABLE IF NOT EXISTS dashboard_pinned_tabs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    bookmark_id UUID NOT NULL REFERENCES user_bookmarks(id),
+    display_order INT NOT NULL DEFAULT 0,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT uq_user_bookmark_pinned UNIQUE(user_id, bookmark_id)
+);
+CREATE OR REPLACE TRIGGER update_dashboard_pinned_tabs_updated_at BEFORE UPDATE ON dashboard_pinned_tabs FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Schema evolution: add columns that may be missing on databases created before they were introduced
 ALTER TABLE tribes_projects ADD COLUMN IF NOT EXISTS display_order INTEGER NOT NULL DEFAULT 0;

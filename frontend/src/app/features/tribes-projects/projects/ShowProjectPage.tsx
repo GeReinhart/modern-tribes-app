@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
+import { IconPicker } from '@/app/platform/core/layout/themes/components/IconPicker.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedBadge } from '@/app/platform/core/layout/themes/components/ThemedBadge.tsx';
 import { ThemedConfirmDialog } from '@/app/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
@@ -65,20 +66,23 @@ const getPositionVariant = (
 
 const AddFeatureModal: React.FC<{
   onClose: () => void;
-  onAdd: (featureType: string, name: string) => Promise<void>;
+  onAdd: (featureType: string, name: string, icon: string | null) => Promise<void>;
 }> = ({ onClose, onAdd }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { featureTypes } = useFeatureTypes();
   const [featureType, setFeatureType] = useState('');
   const [name, setName] = useState('');
+  const [icon, setIcon] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  const canSubmit = Boolean(featureType) && (Boolean(name.trim()) || Boolean(icon));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!featureType || !name.trim()) return;
+    if (!canSubmit) return;
     setSaving(true);
-    await onAdd(featureType, name.trim());
+    await onAdd(featureType, name.trim(), icon);
     setSaving(false);
     onClose();
   };
@@ -162,8 +166,20 @@ const AddFeatureModal: React.FC<{
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={t('features.featureNamePlaceholder')}
-              required
             />
+          </div>
+          <div style={{ marginBottom: '20px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: 'var(--font-sm)',
+                marginBottom: '4px',
+                color: theme.colors.secondary,
+              }}
+            >
+              {t('features.featureIcon')}
+            </label>
+            <IconPicker value={icon} onChange={setIcon} />
           </div>
           <div
             style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}
@@ -182,7 +198,7 @@ const AddFeatureModal: React.FC<{
             <ThemedButton
               variant="primary"
               type="submit"
-              disabled={saving || !featureType || !name.trim()}
+              disabled={saving || !canSubmit}
               leftIcon={
                 <ThemedSvgIcon name="plus" color="currentColor" size={16} />
               }
@@ -241,14 +257,16 @@ const ShowProjectPageContent: React.FC = () => {
   const [archiveProjectOpen, setArchiveProjectOpen] = useState(false);
   const [archiveTarget, setArchiveTarget] = useState<{
     id: string;
-    name: string;
+    name: string | null;
   } | null>(null);
   const [renameTarget, setRenameTarget] = useState<{
     id: string;
-    name: string;
+    name: string | null;
+    icon?: string | null;
     theme_code?: string | null;
   } | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const [renameIcon, setRenameIcon] = useState<string | null>(null);
   const [renameThemeCode, setRenameThemeCode] = useState<string | null>(null);
 
   const myProjectPosition = useMemo((): ProjectEntry | null => {
@@ -309,7 +327,8 @@ const ShowProjectPageContent: React.FC = () => {
         : [];
     const featureTabs = features.map((f) => ({
       key: f.id,
-      label: f.name,
+      label: f.name ?? '',
+      icon: f.icon,
       color: f.theme_code ? predefinedThemes[f.theme_code]?.colors.primary : undefined,
     }));
     return [...base, ...tribeTab, ...featureTabs];
@@ -406,11 +425,13 @@ const ShowProjectPageContent: React.FC = () => {
               icon: 'pencil' as const,
               label: t('features.feature'),
               onClick: () => {
-                setRenameValue(activeFeature.name);
+                setRenameValue(activeFeature.name ?? '');
+                setRenameIcon(activeFeature.icon ?? null);
                 setRenameThemeCode(activeFeature.theme_code ?? null);
                 setRenameTarget({
                   id: activeFeature.id,
                   name: activeFeature.name,
+                  icon: activeFeature.icon,
                   theme_code: activeFeature.theme_code,
                 });
               },
@@ -761,10 +782,11 @@ const ShowProjectPageContent: React.FC = () => {
       {showAddFeature && (
         <AddFeatureModal
           onClose={() => setShowAddFeature(false)}
-          onAdd={async (featureType, name) => {
+          onAdd={async (featureType, name, icon) => {
             const created = await createFeature({
               feature_type: featureType,
-              name,
+              name: name || undefined,
+              icon,
               position: features.length,
             });
             if (created)
@@ -804,8 +826,9 @@ const ShowProjectPageContent: React.FC = () => {
               onSubmit={async (e) => {
                 e.preventDefault();
                 const trimmed = renameValue.trim();
-                const updates: { name?: string; theme_code?: string | null } = {};
-                if (trimmed && trimmed !== renameTarget.name) updates.name = trimmed;
+                const updates: { name?: string; icon?: string | null; theme_code?: string | null } = {};
+                if (trimmed !== (renameTarget.name ?? '')) updates.name = trimmed;
+                if (renameIcon !== (renameTarget.icon ?? null)) updates.icon = renameIcon;
                 if (renameThemeCode !== (renameTarget.theme_code ?? null)) updates.theme_code = renameThemeCode;
                 if (Object.keys(updates).length > 0)
                   await updateFeature(renameTarget.id, updates);
@@ -831,6 +854,19 @@ const ShowProjectPageContent: React.FC = () => {
                   marginBottom: '16px',
                 }}
               />
+              <div style={{ marginBottom: '16px' }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: 'var(--font-sm)',
+                    marginBottom: '4px',
+                    color: theme.colors.secondary,
+                  }}
+                >
+                  {t('features.featureIcon')}
+                </label>
+                <IconPicker value={renameIcon} onChange={setRenameIcon} />
+              </div>
               <div style={{ marginBottom: '16px' }}>
                 <ThemeCodeSelect
                   label={t('theme.selectTheme')}
@@ -858,7 +894,7 @@ const ShowProjectPageContent: React.FC = () => {
                 <ThemedButton
                   variant="primary"
                   type="submit"
-                  disabled={!renameValue.trim()}
+                  disabled={!renameValue.trim() && !renameIcon}
                   leftIcon={
                     <ThemedSvgIcon name="save" color="currentColor" size={16} />
                   }

@@ -46,7 +46,14 @@ async def fetch_accessible_journal_summary(pool, user_id: str, day: date) -> lis
         rows = await conn.fetch(
             """SELECT pf.id AS feature_instance_id, pf.name AS feature_instance_name,
                       p.id AS project_id, p.name AS project_name,
-                      COUNT(jb.id) AS block_count
+                      COUNT(jb.id) AS block_count,
+                      (SELECT tp.tribe_id
+                       FROM positions pos
+                       JOIN represents r ON r.person_id = pos.person_id AND r.status = 'active'
+                       JOIN tribes_projects tp ON tp.tribe_id = pos.tribe_id
+                       WHERE r.user_id = $1 AND tp.project_id = p.id AND pos.status = 'active'
+                       ORDER BY (pos.position = 'manager') DESC, tp.tribe_id
+                       LIMIT 1) AS tribe_id
                FROM projects_features pf
                JOIN projects p ON p.id = pf.project_id AND p.status = 'active'
                JOIN journal_blocks jb ON jb.feature_instance_id = pf.id
@@ -73,7 +80,12 @@ async def fetch_all_journal_summary(pool, day: date) -> list[dict]:
         rows = await conn.fetch(
             """SELECT pf.id AS feature_instance_id, pf.name AS feature_instance_name,
                       p.id AS project_id, p.name AS project_name,
-                      COUNT(jb.id) AS block_count
+                      COUNT(jb.id) AS block_count,
+                      (SELECT tp.tribe_id
+                       FROM tribes_projects tp
+                       WHERE tp.project_id = p.id
+                       ORDER BY (tp.relation = 'manager') DESC, tp.tribe_id
+                       LIMIT 1) AS tribe_id
                FROM projects_features pf
                JOIN projects p ON p.id = pf.project_id AND p.status = 'active'
                JOIN journal_blocks jb ON jb.feature_instance_id = pf.id

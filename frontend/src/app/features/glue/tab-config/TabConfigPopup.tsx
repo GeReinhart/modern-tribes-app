@@ -1,18 +1,19 @@
-import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
-import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
+import { IconPicker } from '@/app/platform/core/layout/themes/components/IconPicker.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ChevronDown, ChevronUp } from 'lucide-react';
-
+import { TabConfigFooter } from './TabConfigFooter.tsx';
+import { isNameInvalid, TabConfigHeader, TabConfigRow } from './TabConfigRow.tsx';
 import { TabWithConfig } from './types.ts';
 
 interface TabConfigPopupProps {
   tabsWithConfig: TabWithConfig[];
   onSave: (updated: TabWithConfig[]) => Promise<void>;
   onClose: () => void;
+  pinnedTabKeys?: Set<string>;
+  onUnpinTab?: (key: string) => Promise<void>;
 }
 
 function moveTab(
@@ -46,17 +47,41 @@ function setDefault(tabs: TabWithConfig[], key: string): TabWithConfig[] {
   return tabs.map((t) => ({ ...t, is_default: t.key === key }));
 }
 
+function setIcon(tabs: TabWithConfig[], key: string, icon: string | null): TabWithConfig[] {
+  return tabs.map((t) => (t.key === key ? { ...t, icon } : t));
+}
+
+function setName(tabs: TabWithConfig[], key: string, name: string): TabWithConfig[] {
+  return tabs.map((t) => (t.key === key ? { ...t, name: name === '' ? undefined : name } : t));
+}
+
+function toggleNameHidden(tabs: TabWithConfig[], key: string): TabWithConfig[] {
+  return tabs.map((t) => (t.key === key ? { ...t, name: t.name === '' ? undefined : '' } : t));
+}
+
 export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
   tabsWithConfig,
   onSave,
   onClose,
+  pinnedTabKeys,
+  onUnpinTab,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const [draft, setDraft] = useState<TabWithConfig[]>(tabsWithConfig);
   const [saving, setSaving] = useState(false);
+  const [editingIconKey, setEditingIconKey] = useState<string | null>(null);
+
+  const hasInvalidRow = draft.some(isNameInvalid);
+
+  const handleUnpin = async (key: string) => {
+    if (!onUnpinTab) return;
+    await onUnpinTab(key);
+    setDraft((prev) => prev.filter((tab) => tab.key !== key));
+  };
 
   const handleSave = async () => {
+    if (hasInvalidRow) return;
     setSaving(true);
     try {
       await onSave(draft);
@@ -86,7 +111,7 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
           borderRadius: '12px',
           padding: 'var(--space-xl)',
           boxShadow: '0 16px 48px rgba(0,0,0,0.2)',
-          width: '480px',
+          width: '620px',
           maxWidth: '95vw',
           display: 'flex',
           flexDirection: 'column',
@@ -111,202 +136,52 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
             gap: 'var(--space-sm)',
           }}
         >
-          <TabConfigHeader theme={theme} t={t} />
+          <TabConfigHeader theme={theme} t={t} hasPinnedTabs={(pinnedTabKeys?.size ?? 0) > 0} />
           {draft.map((tab, index) => (
-            <TabConfigRow
-              key={tab.key}
-              tab={tab}
-              index={index}
-              total={draft.length}
-              theme={theme}
-              t={t}
-              onMoveUp={() => setDraft((prev) => moveTab(prev, index, -1))}
-              onMoveDown={() => setDraft((prev) => moveTab(prev, index, 1))}
-              onToggleVisible={() =>
-                setDraft((prev) => toggleVisible(prev, tab.key))
-              }
-              onSetDefault={() => setDraft((prev) => setDefault(prev, tab.key))}
-            />
+            <React.Fragment key={tab.key}>
+              <TabConfigRow
+                tab={tab}
+                index={index}
+                total={draft.length}
+                theme={theme}
+                t={t}
+                isPinned={pinnedTabKeys?.has(tab.key) ?? false}
+                hasPinnedTabs={(pinnedTabKeys?.size ?? 0) > 0}
+                isEditingIcon={editingIconKey === tab.key}
+                onMoveUp={() => setDraft((prev) => moveTab(prev, index, -1))}
+                onMoveDown={() => setDraft((prev) => moveTab(prev, index, 1))}
+                onToggleVisible={() =>
+                  setDraft((prev) => toggleVisible(prev, tab.key))
+                }
+                onSetDefault={() => setDraft((prev) => setDefault(prev, tab.key))}
+                onUnpin={() => handleUnpin(tab.key)}
+                onToggleIconEditor={() =>
+                  setEditingIconKey((prev) => (prev === tab.key ? null : tab.key))
+                }
+                onNameChange={(name) => setDraft((prev) => setName(prev, tab.key, name))}
+                onToggleHidden={() => setDraft((prev) => toggleNameHidden(prev, tab.key))}
+              />
+              {editingIconKey === tab.key && (
+                <IconPicker
+                  value={tab.icon}
+                  onChange={(icon) => {
+                    setDraft((prev) => setIcon(prev, tab.key, icon));
+                    setEditingIconKey(null);
+                  }}
+                />
+              )}
+            </React.Fragment>
           ))}
         </div>
 
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            gap: 'var(--space-sm)',
-            marginTop: 'var(--space-sm)',
-          }}
-        >
-          <ThemedButton
-            variant="ghost"
-            onClick={onClose}
-            leftIcon={
-              <ThemedSvgIcon name="x" color="currentColor" size={16} />
-            }
-          >
-            {t('common.cancel')}
-          </ThemedButton>
-          <ThemedButton
-            variant="primary"
-            onClick={handleSave}
-            disabled={saving}
-            leftIcon={
-              <ThemedSvgIcon name="save" color="currentColor" size={16} />
-            }
-          >
-            {saving ? t('common.saving') : t('common.save')}
-          </ThemedButton>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-interface TabConfigHeaderProps {
-  theme: ReturnType<typeof useTheme>['theme'];
-  t: (k: string) => string;
-}
-
-const TabConfigHeader: React.FC<TabConfigHeaderProps> = ({ theme, t }) => (
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: '1fr auto auto auto',
-      gap: 'var(--space-sm)',
-      alignItems: 'center',
-      paddingBottom: 'var(--space-xs)',
-      borderBottom: `1px solid ${theme.colors.border}`,
-      color: theme.colors.secondary,
-      fontSize: 'var(--font-sm)',
-      fontWeight: 600,
-    }}
-  >
-    <span>{t('tabConfig.tab')}</span>
-    <span style={{ textAlign: 'center', width: '72px' }}>
-      {t('tabConfig.visible')}
-    </span>
-    <span style={{ textAlign: 'center', width: '64px' }}>
-      {t('tabConfig.default')}
-    </span>
-    <span style={{ width: '56px' }} />
-  </div>
-);
-
-interface TabConfigRowProps {
-  tab: TabWithConfig;
-  index: number;
-  total: number;
-  theme: ReturnType<typeof useTheme>['theme'];
-  t: (k: string) => string;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
-  onToggleVisible: () => void;
-  onSetDefault: () => void;
-}
-
-const TabConfigRow: React.FC<TabConfigRowProps> = ({
-  tab,
-  index,
-  total,
-  theme,
-  t,
-  onMoveUp,
-  onMoveDown,
-  onToggleVisible,
-  onSetDefault,
-}) => {
-  const rowStyle: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: '1fr auto auto auto',
-    gap: 'var(--space-sm)',
-    alignItems: 'center',
-    padding: 'var(--space-xs) var(--space-sm)',
-    borderRadius: '6px',
-    backgroundColor: tab.visible ? 'transparent' : `${theme.colors.border}40`,
-  };
-
-  return (
-    <div style={rowStyle}>
-      <span
-        style={{
-          color: tab.visible ? theme.colors.text : theme.colors.secondary,
-          fontWeight: tab.is_default ? 600 : 400,
-        }}
-      >
-        {tab.label}
-      </span>
-
-      <div style={{ display: 'flex', justifyContent: 'center', width: '72px' }}>
-        <input
-          type="checkbox"
-          checked={tab.visible}
-          onChange={onToggleVisible}
-          aria-label={t('tabConfig.toggleVisibility')}
-          style={{
-            width: '16px',
-            height: '16px',
-            cursor: 'pointer',
-            accentColor: theme.colors.primary,
-          }}
+        <TabConfigFooter
+          theme={theme}
+          t={t}
+          hasInvalidRow={hasInvalidRow}
+          saving={saving}
+          onClose={onClose}
+          onSave={handleSave}
         />
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'center', width: '64px' }}>
-        <input
-          type="radio"
-          checked={tab.is_default}
-          disabled={!tab.visible}
-          onChange={onSetDefault}
-          aria-label={t('tabConfig.setDefault')}
-          style={{
-            width: '16px',
-            height: '16px',
-            cursor: tab.visible ? 'pointer' : 'not-allowed',
-            accentColor: theme.colors.primary,
-          }}
-        />
-      </div>
-
-      <div
-        style={{
-          display: 'flex',
-          gap: '2px',
-          width: '56px',
-          justifyContent: 'flex-end',
-        }}
-      >
-        <button
-          onClick={onMoveUp}
-          disabled={index === 0}
-          style={{
-            padding: '2px 4px',
-            border: 'none',
-            background: 'transparent',
-            cursor: index === 0 ? 'not-allowed' : 'pointer',
-            color: index === 0 ? theme.colors.secondary : theme.colors.text,
-            borderRadius: '4px',
-          }}
-          aria-label={t('tabConfig.moveUp')}
-        >
-          <ChevronUp size={16} />
-        </button>
-        <button
-          onClick={onMoveDown}
-          disabled={index === total - 1}
-          style={{
-            padding: '2px 4px',
-            border: 'none',
-            background: 'transparent',
-            cursor: index === total - 1 ? 'not-allowed' : 'pointer',
-            color:
-              index === total - 1 ? theme.colors.secondary : theme.colors.text,
-            borderRadius: '4px',
-          }}
-          aria-label={t('tabConfig.moveDown')}
-        >
-          <ChevronDown size={16} />
-        </button>
       </div>
     </div>
   );

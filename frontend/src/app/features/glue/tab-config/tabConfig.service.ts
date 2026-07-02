@@ -18,11 +18,13 @@ export const tabConfigService = {
     tabConfigs: TabWithConfig[],
   ): Promise<TabConfigResponse> => {
     const payload: TabConfigItem[] = tabConfigs.map(
-      ({ key, visible, order, is_default }) => ({
+      ({ key, visible, order, is_default, icon, name }) => ({
         key,
         visible,
         order,
         is_default,
+        icon,
+        name,
       }),
     );
     return apiService.put<TabConfigResponse>(

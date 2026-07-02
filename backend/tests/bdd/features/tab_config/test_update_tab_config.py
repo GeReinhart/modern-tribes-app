@@ -20,6 +20,22 @@ def test_update_tab_config_viewer():
 def test_update_tab_config_forbidden():
     pass
 
+@scenario(FEATURE, "PUT /tab-configs/my-context as viewer — a personal icon override round-trips")
+def test_update_tab_config_icon_override():
+    pass
+
+@scenario(FEATURE, "PUT /tab-configs/my-context as viewer — a personal name override round-trips")
+def test_update_tab_config_name_override():
+    pass
+
+@scenario(FEATURE, "PUT /tab-configs/my-context as viewer — clearing the name with an icon set makes the tab icon-only")
+def test_update_tab_config_icon_only():
+    pass
+
+@scenario(FEATURE, "PUT /tab-configs/my-context — clearing the name with no icon set — 422 error")
+def test_update_tab_config_name_cleared_no_icon():
+    pass
+
 @pytest.fixture
 def non_admin_client():
     _test_app.dependency_overrides[get_current_user] = lambda: _REGULAR_USER

@@ -14,6 +14,7 @@ const en: Record<string, string> = {
   'common.error': 'Error:',
   'common.success': 'Success!',
   'common.noData': 'No data found',
+  'common.none': 'None',
   'common.home': 'Home',
   'common.admin': 'Admin',
   'common.installApp': 'Install app',

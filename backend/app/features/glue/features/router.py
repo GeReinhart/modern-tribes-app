@@ -19,6 +19,23 @@ from app.platform.core.authorization.project_access import check_project_access_
 router = APIRouter(prefix="/feature-instances", tags=["features_glue"])
 
 
+def _row_to_response(row: dict) -> ProjectFeatureInstanceResponse:
+    return ProjectFeatureInstanceResponse(
+        id=str(row["id"]),
+        project_id=str(row["project_id"]),
+        feature_type=row["feature_type"],
+        name=row["name"],
+        icon=row["icon"],
+        theme_code=row["theme_code"],
+        status=row["status"],
+        position=row["position"],
+        created_at=row["created_at"],
+        updated_at=row["updated_at"],
+        created_by=str(row["created_by"]) if row["created_by"] else None,
+        updated_by=str(row["updated_by"]) if row["updated_by"] else None,
+    )
+
+
 @router.get("/feature-types", response_model=list[FeatureTypeInfo])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def get_feature_types(current_user: dict = Depends(get_current_user)):
@@ -54,22 +71,7 @@ async def list_project_features(
         params = [UUID(project_id)]
     async with pool.acquire() as conn:
         rows = await conn.fetch(query, *params)
-    return [
-        ProjectFeatureInstanceResponse(
-            id=str(r["id"]),
-            project_id=str(r["project_id"]),
-            feature_type=r["feature_type"],
-            name=r["name"],
-            theme_code=r["theme_code"],
-            status=r["status"],
-            position=r["position"],
-            created_at=r["created_at"],
-            updated_at=r["updated_at"],
-            created_by=str(r["created_by"]) if r["created_by"] else None,
-            updated_by=str(r["updated_by"]) if r["updated_by"] else None,
-        )
-        for r in rows
-    ]
+    return [_row_to_response(dict(r)) for r in rows]
 
 
 @router.post(
@@ -93,30 +95,45 @@ async def create_project_feature(
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """
-            INSERT INTO projects_features (project_id, feature_type, name, theme_code, position, created_by, updated_by)
-            VALUES ($1, $2, $3, $4, $5, $6, $6)
+            INSERT INTO projects_features (project_id, feature_type, name, icon, theme_code, position, created_by, updated_by)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $7)
             RETURNING *
             """,
             UUID(project_id),
             data.feature_type,
             data.name,
+            data.icon,
             data.theme_code,
             data.position,
             user_id,
         )
-    return ProjectFeatureInstanceResponse(
-        id=str(row["id"]),
-        project_id=str(row["project_id"]),
-        feature_type=row["feature_type"],
-        name=row["name"],
-        theme_code=row["theme_code"],
-        status=row["status"],
-        position=row["position"],
-        created_at=row["created_at"],
-        updated_at=row["updated_at"],
-        created_by=str(row["created_by"]) if row["created_by"] else None,
-        updated_by=str(row["updated_by"]) if row["updated_by"] else None,
-    )
+    return _row_to_response(dict(row))
+
+
+def _build_feature_updates(data: ProjectFeatureInstanceUpdate, user_id: UUID) -> dict:
+    updates: dict = {"updated_by": user_id}
+    if data.name is not None:
+        updates["name"] = data.name
+    if data.status is not None:
+        updates["status"] = data.status
+    if data.position is not None:
+        updates["position"] = data.position
+    if "theme_code" in data.model_fields_set:
+        updates["theme_code"] = data.theme_code
+    if "icon" in data.model_fields_set:
+        updates["icon"] = data.icon
+    return updates
+
+
+async def _assert_resulting_name_or_icon(conn, feature_id: str, updates: dict) -> None:
+    """A tab must keep a name, an icon, or both after the update is applied."""
+    if "name" not in updates and "icon" not in updates:
+        return
+    current = await conn.fetchrow("SELECT name, icon FROM projects_features WHERE id = $1", UUID(feature_id))
+    resulting_name = updates.get("name", current["name"] if current else None)
+    resulting_icon = updates.get("icon", current["icon"] if current else None)
+    if not (resulting_name and resulting_name.strip()) and not resulting_icon:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Either name or icon must be provided.")
 
 
 @router.patch("/projects/{project_id}/features/{feature_id}", response_model=ProjectFeatureInstanceResponse)
@@ -127,7 +144,7 @@ async def update_project_feature(
     data: ProjectFeatureInstanceUpdate,
     current_user: dict = Depends(get_current_user),
 ):
-    """Update a feature instance (name, status, position).
+    """Update a feature instance (name, icon, status, position).
 
     **Permissions:** admin | can_access_attached_tribes
     **Project access:** minimum position ≥ manager
@@ -136,20 +153,13 @@ async def update_project_feature(
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position="manager")
     user_id = UUID(str(current_user["id"]))
-    updates: dict = {"updated_by": user_id}
-    if data.name is not None:
-        updates["name"] = data.name
-    if data.status is not None:
-        updates["status"] = data.status
-    if data.position is not None:
-        updates["position"] = data.position
-    if "theme_code" in data.model_fields_set:
-        updates["theme_code"] = data.theme_code
+    updates = _build_feature_updates(data, user_id)
 
     set_clauses = ", ".join(f"{k} = ${i+2}" for i, k in enumerate(updates.keys()))
     values = list(updates.values())
 
     async with pool.acquire() as conn:
+        await _assert_resulting_name_or_icon(conn, feature_id, updates)
         row = await conn.fetchrow(
             f"UPDATE projects_features SET {set_clauses} WHERE id = $1 AND project_id = ${len(values)+2} RETURNING *",
             UUID(feature_id),
@@ -158,16 +168,4 @@ async def update_project_feature(
         )
     if not row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Feature instance not found.")
-    return ProjectFeatureInstanceResponse(
-        id=str(row["id"]),
-        project_id=str(row["project_id"]),
-        feature_type=row["feature_type"],
-        name=row["name"],
-        theme_code=row["theme_code"],
-        status=row["status"],
-        position=row["position"],
-        created_at=row["created_at"],
-        updated_at=row["updated_at"],
-        created_by=str(row["created_by"]) if row["created_by"] else None,
-        updated_by=str(row["updated_by"]) if row["updated_by"] else None,
-    )
+    return _row_to_response(dict(row))

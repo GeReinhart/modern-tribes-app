@@ -13,36 +13,26 @@ import { authorizationHooks } from '@/app/platform/core/authorization/authorizat
 import { useAdminAccess } from '@/app/platform/core/authorization/useAdminAccess.ts';
 import { errorStyle } from '@/app/platform/core/layout/themes/theme.styles.tsx';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
-
 import { BookmarkToggle } from '@/app/features/bookmarks/BookmarkToggle.tsx';
 import { buildBookmarkDescription } from '@/app/features/bookmarks/types.ts';
 import { TabActionsProvider } from '@/app/platform/core/layout/TabActionsContext.tsx';
+import { PinnedBookmarkTab } from '@/app/features/glue/dashboard/PinnedBookmarkTab.tsx';
+import { PinnedTabsProvider, usePinnedTabsContext } from '@/app/features/glue/dashboard/PinnedTabsContext.tsx';
+import {
+  makePinnedTabKey,
+  parsePinnedTabKey,
+  parseProjectFeaturePath,
+} from '@/app/features/glue/dashboard/pinnedTabs.types.ts';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
-const TABS = (t: (k: string) => string) => [
-  {
-    key: 'tasks',
-    label: t('dashboard.tabs.tasks'),
-    Component: MyTasksTab,
-  },
-  {
-    key: 'tribes',
-    label: t('dashboard.tabs.tribes'),
-    Component: DashboardTribesTab,
-  },
-  {
-    key: 'bookmarks',
-    label: t('dashboard.tabs.bookmarks'),
-    Component: DashboardBookmarksTab,
-  },
-  {
-    key: 'planning',
-    label: t('dashboard.tabs.planning'),
-    Component: DashboardPlanningTab,
-  },
+const STATIC_TABS = (t: (k: string) => string) => [
+  { key: 'tasks', label: t('dashboard.tabs.tasks'), Component: MyTasksTab },
+  { key: 'tribes', label: t('dashboard.tabs.tribes'), Component: DashboardTribesTab },
+  { key: 'bookmarks', label: t('dashboard.tabs.bookmarks'), Component: DashboardBookmarksTab },
+  { key: 'planning', label: t('dashboard.tabs.planning'), Component: DashboardPlanningTab },
 ];
 
 const DashboardPageContent: React.FC = () => {
@@ -55,11 +45,17 @@ const DashboardPageContent: React.FC = () => {
   } = authorizationHooks();
   const { hasAdminAccess } = useAdminAccess();
   const [showTabConfig, setShowTabConfig] = useState(false);
+  const { pinnedTabs, unpin } = usePinnedTabsContext();
 
-  const allTabs = useMemo(
-    () => TABS(t).map(({ key, label }) => ({ key, label })),
-    [t],
-  );
+  const allTabs = useMemo(() => {
+    const staticTabs = STATIC_TABS(t).map(({ key, label }) => ({ key, label }));
+    const dynamicTabs = pinnedTabs.map((pt) => ({
+      key: makePinnedTabKey(pt.bookmark_id),
+      label: pt.page_title,
+    }));
+    return [...staticTabs, ...dynamicTabs];
+  }, [t, pinnedTabs]);
+
   const { visibleTabs, defaultTabKey, tabsWithConfig, saveConfig } =
     useTabConfig('dashboard', allTabs);
   const { activeTab, breadcrumbTabs, handleTabChange, navTabs } = useUrlTab(
@@ -67,17 +63,9 @@ const DashboardPageContent: React.FC = () => {
     '/app/dashboard',
     defaultTabKey,
   );
-  const ActiveComponent =
-    TABS(t).find((tb) => tb.key === activeTab)?.Component ?? MyTasksTab;
 
-  const breadcrumbs = useMemo(
-    () => [
-      { label: t('dashboard.title') },
-    ],
-    [t],
-  );
+  const breadcrumbs = useMemo(() => [{ label: t('dashboard.title') }], [t]);
 
-  // Check authorization
   useEffect(() => {
     verifyAuthorization(['admin', 'can_create_own_tribes']).catch((err) => {
       console.error('Authorization check failed:', err);
@@ -92,25 +80,27 @@ const DashboardPageContent: React.FC = () => {
         onClick: () => setShowTabConfig(true),
       },
       ...(authorization?.authorized
-        ? [
-            {
-              icon: 'plus' as const,
-              label: t('tribes.createTribe'),
-              path: '/app/tribes/create',
-            },
-          ]
+        ? [{ icon: 'plus' as const, label: t('tribes.createTribe'), path: '/app/tribes/create' }]
         : []),
       ...(hasAdminAccess
-        ? [
-            {
-              icon: 'settings' as const,
-              label: t('common.admin'),
-              path: '/admin',
-            },
-          ]
+        ? [{ icon: 'settings' as const, label: t('common.admin'), path: '/admin' }]
         : []),
     ],
-    [authorization?.authorized, hasAdminAccess, t, setShowTabConfig],
+    [authorization?.authorized, hasAdminAccess, t],
+  );
+
+  const activeStaticTab = STATIC_TABS(t).find((tb) => tb.key === activeTab);
+  const activePinnedBookmarkId = parsePinnedTabKey(activeTab);
+  const activePinnedTab = activePinnedBookmarkId
+    ? pinnedTabs.find((pt) => pt.bookmark_id === activePinnedBookmarkId)
+    : null;
+  const activePinnedPathParams = activePinnedTab
+    ? parseProjectFeaturePath(activePinnedTab.page_path)
+    : null;
+
+  const pinnedTabKeySet = useMemo(
+    () => new Set(pinnedTabs.map((pt) => makePinnedTabKey(pt.bookmark_id))),
+    [pinnedTabs],
   );
 
   return (
@@ -118,17 +108,29 @@ const DashboardPageContent: React.FC = () => {
       breadcrumbs={breadcrumbs}
       breadcrumbTabs={breadcrumbTabs}
       menuActions={menuActions}
-      bookmarkSlot={<BookmarkToggle pagePath={location.pathname} pageTitle={t('dashboard.title')} pageDescription={buildBookmarkDescription(breadcrumbs)} />}
+      bookmarkSlot={
+        <BookmarkToggle
+          pagePath={location.pathname}
+          pageTitle={t('dashboard.title')}
+          pageDescription={buildBookmarkDescription(breadcrumbs)}
+        />
+      }
     >
       {showTabConfig && (
         <TabConfigPopup
           tabsWithConfig={tabsWithConfig}
           onSave={saveConfig}
           onClose={() => setShowTabConfig(false)}
+          pinnedTabKeys={pinnedTabKeySet}
+          onUnpinTab={async (key) => {
+            const bookmarkId = parsePinnedTabKey(key);
+            if (!bookmarkId) return;
+            const pt = pinnedTabs.find((p) => p.bookmark_id === bookmarkId);
+            if (pt) await unpin(pt.id);
+          }}
         />
       )}
 
-      {/* Authorization Error Message */}
       {authorizationError && (
         <ThemedCard>
           <div style={errorStyle}>
@@ -137,21 +139,30 @@ const DashboardPageContent: React.FC = () => {
         </ThemedCard>
       )}
 
-      <ThemedTabs
-        tabs={navTabs}
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-      />
-      <ActiveComponent />
+      <ThemedTabs tabs={navTabs} activeTab={activeTab} onTabChange={handleTabChange} />
+
+      {activeStaticTab && <activeStaticTab.Component />}
+
+      {activePinnedTab && activePinnedPathParams && (
+        <PinnedBookmarkTab
+          key={activePinnedTab.id}
+          pagePath={activePinnedTab.page_path}
+          pathParams={activePinnedPathParams}
+          pinnedTabId={activePinnedTab.id}
+          onUnpin={unpin}
+        />
+      )}
     </AppLayout>
   );
 };
 
 const DashboardPage: React.FC = () => (
   <ThemeProvider defaultTheme="default">
-    <TabActionsProvider>
-      <DashboardPageContent />
-    </TabActionsProvider>
+    <PinnedTabsProvider>
+      <TabActionsProvider>
+        <DashboardPageContent />
+      </TabActionsProvider>
+    </PinnedTabsProvider>
   </ThemeProvider>
 );
 

@@ -22,6 +22,14 @@ def test_update_feature_instance_admin():
 def test_update_feature_instance_forbidden():
     pass
 
+@scenario(FEATURE, "PATCH /feature-instances/projects/0100/features/0010 — set an icon and clear the name")
+def test_update_feature_instance_icon_clears_name():
+    pass
+
+@scenario(FEATURE, "PATCH /feature-instances/projects/0100/features/0010 — clearing the name with no icon set — 400 error")
+def test_update_feature_instance_clear_name_no_icon():
+    pass
+
 @pytest.fixture
 def admin_client():
     _test_app.dependency_overrides[get_current_user] = lambda: _ADMIN_USER
