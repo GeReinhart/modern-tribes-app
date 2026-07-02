@@ -1,6 +1,8 @@
 import { ThemedSection } from '@/app/platform/core/layout/themes/components/ThemedSection.tsx';
 import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
+import { usePinnedTabsContext } from '@/app/features/glue/dashboard/PinnedTabsContext.tsx';
+import { isProjectFeaturePath } from '@/app/features/glue/dashboard/pinnedTabs.types.ts';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,14 +15,8 @@ import { UserBookmark, UserBookmarkUpdate } from './types.ts';
 const DashboardBookmarksTab: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const {
-    bookmarks,
-    toggleBookmark,
-    reorderBookmarks,
-    updateBookmark,
-    isLoading,
-  } = useBookmarks();
-
+  const { bookmarks, toggleBookmark, reorderBookmarks, updateBookmark, isLoading } = useBookmarks();
+  const { isPinned, getPinnedTabId, pin, unpin } = usePinnedTabsContext();
   const [configuring, setConfiguring] = useState(false);
 
   const tabActions = useMemo(
@@ -39,10 +35,7 @@ const DashboardBookmarksTab: React.FC = () => {
   const handleMove = async (index: number, dir: 'up' | 'down') => {
     const target = dir === 'up' ? index - 1 : index + 1;
     const reordered = [...bookmarks];
-    [reordered[index], reordered[target]] = [
-      reordered[target],
-      reordered[index],
-    ];
+    [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
     await reorderBookmarks(reordered.map((b) => b.id));
   };
 
@@ -52,6 +45,15 @@ const DashboardBookmarksTab: React.FC = () => {
 
   const handleUpdate = async (bookmarkId: string, data: UserBookmarkUpdate) => {
     await updateBookmark(bookmarkId, data);
+  };
+
+  const handleTogglePin = async (bookmark: UserBookmark) => {
+    if (isPinned(bookmark.id)) {
+      const pinnedTabId = getPinnedTabId(bookmark.id);
+      if (pinnedTabId) await unpin(pinnedTabId);
+    } else {
+      await pin(bookmark.id);
+    }
   };
 
   if (isLoading) {
@@ -78,10 +80,13 @@ const DashboardBookmarksTab: React.FC = () => {
             index={index}
             total={bookmarks.length}
             configuring={configuring}
+            isPinned={isPinned(bookmark.id)}
+            canPin={isProjectFeaturePath(bookmark.page_path)}
             onMove={handleMove}
             onRemove={handleRemove}
             onNavigate={(path) => navigate(path)}
             onUpdate={handleUpdate}
+            onTogglePin={handleTogglePin}
           />
         ))}
       </div>

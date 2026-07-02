@@ -52,6 +52,8 @@ async def update_bookmark(
 
 
 async def remove_bookmark(user_id: str, bookmark_id: str, pool) -> None:
+    from app.features.glue.dashboard.service import check_bookmark_not_pinned
+    await check_bookmark_not_pinned(bookmark_id, pool)
     await user_bookmarks_repository.remove_bookmark(pool, user_id, bookmark_id)
 
 

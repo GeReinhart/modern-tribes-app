@@ -5,7 +5,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Unlink } from 'lucide-react';
 
 import { TabWithConfig } from './types.ts';
 
@@ -13,6 +13,8 @@ interface TabConfigPopupProps {
   tabsWithConfig: TabWithConfig[];
   onSave: (updated: TabWithConfig[]) => Promise<void>;
   onClose: () => void;
+  pinnedTabKeys?: Set<string>;
+  onUnpinTab?: (key: string) => Promise<void>;
 }
 
 function moveTab(
@@ -50,11 +52,19 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
   tabsWithConfig,
   onSave,
   onClose,
+  pinnedTabKeys,
+  onUnpinTab,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const [draft, setDraft] = useState<TabWithConfig[]>(tabsWithConfig);
   const [saving, setSaving] = useState(false);
+
+  const handleUnpin = async (key: string) => {
+    if (!onUnpinTab) return;
+    await onUnpinTab(key);
+    setDraft((prev) => prev.filter((tab) => tab.key !== key));
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -111,7 +121,7 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
             gap: 'var(--space-sm)',
           }}
         >
-          <TabConfigHeader theme={theme} t={t} />
+          <TabConfigHeader theme={theme} t={t} hasPinnedTabs={(pinnedTabKeys?.size ?? 0) > 0} />
           {draft.map((tab, index) => (
             <TabConfigRow
               key={tab.key}
@@ -120,12 +130,15 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
               total={draft.length}
               theme={theme}
               t={t}
+              isPinned={pinnedTabKeys?.has(tab.key) ?? false}
+              hasPinnedTabs={(pinnedTabKeys?.size ?? 0) > 0}
               onMoveUp={() => setDraft((prev) => moveTab(prev, index, -1))}
               onMoveDown={() => setDraft((prev) => moveTab(prev, index, 1))}
               onToggleVisible={() =>
                 setDraft((prev) => toggleVisible(prev, tab.key))
               }
               onSetDefault={() => setDraft((prev) => setDefault(prev, tab.key))}
+              onUnpin={() => handleUnpin(tab.key)}
             />
           ))}
         </div>
@@ -166,13 +179,14 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
 interface TabConfigHeaderProps {
   theme: ReturnType<typeof useTheme>['theme'];
   t: (k: string) => string;
+  hasPinnedTabs: boolean;
 }
 
-const TabConfigHeader: React.FC<TabConfigHeaderProps> = ({ theme, t }) => (
+const TabConfigHeader: React.FC<TabConfigHeaderProps> = ({ theme, t, hasPinnedTabs }) => (
   <div
     style={{
       display: 'grid',
-      gridTemplateColumns: '1fr auto auto auto',
+      gridTemplateColumns: `1fr auto auto auto${hasPinnedTabs ? ' auto' : ''}`,
       gap: 'var(--space-sm)',
       alignItems: 'center',
       paddingBottom: 'var(--space-xs)',
@@ -190,6 +204,7 @@ const TabConfigHeader: React.FC<TabConfigHeaderProps> = ({ theme, t }) => (
       {t('tabConfig.default')}
     </span>
     <span style={{ width: '56px' }} />
+    {hasPinnedTabs && <span style={{ width: '28px' }} />}
   </div>
 );
 
@@ -199,10 +214,13 @@ interface TabConfigRowProps {
   total: number;
   theme: ReturnType<typeof useTheme>['theme'];
   t: (k: string) => string;
+  isPinned: boolean;
+  hasPinnedTabs: boolean;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onToggleVisible: () => void;
   onSetDefault: () => void;
+  onUnpin: () => void;
 }
 
 const TabConfigRow: React.FC<TabConfigRowProps> = ({
@@ -211,14 +229,17 @@ const TabConfigRow: React.FC<TabConfigRowProps> = ({
   total,
   theme,
   t,
+  isPinned,
+  hasPinnedTabs,
   onMoveUp,
   onMoveDown,
   onToggleVisible,
   onSetDefault,
+  onUnpin,
 }) => {
   const rowStyle: React.CSSProperties = {
     display: 'grid',
-    gridTemplateColumns: '1fr auto auto auto',
+    gridTemplateColumns: `1fr auto auto auto${hasPinnedTabs ? ' auto' : ''}`,
     gap: 'var(--space-sm)',
     alignItems: 'center',
     padding: 'var(--space-xs) var(--space-sm)',
@@ -308,6 +329,26 @@ const TabConfigRow: React.FC<TabConfigRowProps> = ({
           <ChevronDown size={16} />
         </button>
       </div>
+
+      {isPinned && (
+        <button
+          onClick={onUnpin}
+          style={{
+            padding: '2px 4px',
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
+            color: theme.colors.danger,
+            borderRadius: '4px',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+          title={t('dashboard.pinnedTab.unpin')}
+          aria-label={t('dashboard.pinnedTab.unpin')}
+        >
+          <Unlink size={16} />
+        </button>
+      )}
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import { highlightHtml } from '@/app/platform/functions/search/highlight.utils.ts';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import JournalLabelPicker from './JournalLabelPicker.tsx';
@@ -12,6 +13,7 @@ interface Props {
   canEdit: boolean;
   isFirst: boolean;
   isLast: boolean;
+  searchQuery?: string;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onSave: (contentHtml: string) => Promise<void>;
@@ -21,7 +23,7 @@ interface Props {
 }
 
 const JournalBlockCard: React.FC<Props> = ({
-  block, labels, canEdit, isFirst, isLast,
+  block, labels, canEdit, isFirst, isLast, searchQuery,
   onMoveUp, onMoveDown, onSave, onDelete, onToggleLabel, onCreateLabel,
 }) => {
   const { t } = useTranslation();
@@ -97,12 +99,17 @@ const JournalBlockCard: React.FC<Props> = ({
               </div>
             </>
           ) : (
-            <div
-              className="prose max-w-none"
-              style={{ fontSize: 'var(--font-sm)', color: theme.colors.text, cursor: canEdit ? 'pointer' : 'default' }}
-              dangerouslySetInnerHTML={{ __html: block.content_html ?? '' }}
-              onClick={canEdit ? () => { setEditContent(block.content_html ?? ''); setEditing(true); } : undefined}
-            />
+            <>
+              <div
+                className="prose max-w-none"
+                style={{ fontSize: 'var(--font-sm)', color: theme.colors.text, cursor: canEdit ? 'pointer' : 'default' }}
+                dangerouslySetInnerHTML={{ __html: searchQuery ? highlightHtml(block.content_html ?? '', searchQuery) : (block.content_html ?? '') }}
+                onClick={canEdit ? () => { setEditContent(block.content_html ?? ''); setEditing(true); } : undefined}
+              />
+              {searchQuery && (
+                <style>{`mark { background-color: ${theme.colors.primary}30; color: ${theme.colors.primary}; border-radius: 2px; padding: 0 2px; }`}</style>
+              )}
+            </>
           )}
         </div>
       </div>

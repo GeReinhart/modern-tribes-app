@@ -663,5 +663,21 @@ CREATE INDEX IF NOT EXISTS idx_journal_blocks_feature_date ON journal_blocks(fea
 CREATE INDEX IF NOT EXISTS idx_journal_blocks_feature_status ON journal_blocks(feature_instance_id, status);
 CREATE OR REPLACE TRIGGER update_journal_blocks_updated_at BEFORE UPDATE ON journal_blocks FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- Dashboard pinned tabs (migration 008)
+CREATE TABLE IF NOT EXISTS dashboard_pinned_tabs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    bookmark_id UUID NOT NULL REFERENCES user_bookmarks(id),
+    display_order INT NOT NULL DEFAULT 0,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT uq_user_bookmark_pinned UNIQUE(user_id, bookmark_id)
+);
+CREATE OR REPLACE TRIGGER update_dashboard_pinned_tabs_updated_at BEFORE UPDATE ON dashboard_pinned_tabs FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 -- Schema evolution: add columns that may be missing on databases created before they were introduced
 ALTER TABLE tribes_projects ADD COLUMN IF NOT EXISTS display_order INTEGER NOT NULL DEFAULT 0;

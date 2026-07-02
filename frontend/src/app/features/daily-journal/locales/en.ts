@@ -19,6 +19,7 @@ const en: Record<string, string> = {
   'journal.journalEntries': 'Journal entries',
   'journal.blockCount': '{{count}} block',
   'journal.blockCount_other': '{{count}} blocks',
+  'journal.today': 'Today',
 };
 
 export default en;

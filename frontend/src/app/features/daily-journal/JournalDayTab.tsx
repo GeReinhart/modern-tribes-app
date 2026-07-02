@@ -15,6 +15,7 @@ interface Props {
   labels: JournalLabel[];
   days: string[];
   filterLabelId: string | null;
+  searchQuery?: string;
   onDateChange: (date: string) => void;
   onFilterLabel: (labelId: string | null) => void;
   onCreateBlock: (position: number, contentHtml: string) => Promise<void>;
@@ -26,7 +27,7 @@ interface Props {
 }
 
 const JournalDayTab: React.FC<Props> = ({
-  selectedDate, blocks, labels, days, filterLabelId,
+  selectedDate, blocks, labels, days, filterLabelId, searchQuery,
   onDateChange, onFilterLabel,
   onCreateBlock, onUpdateBlock, onDeleteBlock, onReorderBlocks, onToggleLabel, onCreateLabel,
 }) => {
@@ -99,6 +100,7 @@ const JournalDayTab: React.FC<Props> = ({
             <JournalBlockCard
               block={block} labels={labels} canEdit
               isFirst={globalIndex === 0} isLast={globalIndex === blocks.length - 1}
+              searchQuery={searchQuery}
               onMoveUp={() => handleMoveUp(globalIndex)}
               onMoveDown={() => handleMoveDown(globalIndex)}
               onSave={c => onUpdateBlock(block.id, c)}

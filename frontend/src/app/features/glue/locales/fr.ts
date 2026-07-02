@@ -53,6 +53,10 @@ const fr: Record<string, string> = {
   'dashboard.quickAdd.changeFeature': 'Changer',
   'dashboard.quickAdd.taskTitlePlaceholder': 'Titre de la tâche...',
   'dashboard.quickAdd.create': 'Créer',
+
+  'dashboard.pinnedTab.pin': 'Épingler comme onglet',
+  'dashboard.pinnedTab.unpin': 'Désépingler',
+  'dashboard.pinnedTab.unavailable': 'Cette fonctionnalité n\'est plus disponible. Vous pouvez désépingler cet onglet.',
 };
 
 export default fr;

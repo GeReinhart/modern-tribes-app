@@ -1255,6 +1255,49 @@ def then_push_subscriptions_table(datatable):
     _assert_db("push_subscriptions", datatable)
 
 
+@given("the dashboard_pinned_tabs table contains:")
+def given_dashboard_pinned_tabs_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                user_id = rec.get("user_id")
+                bookmark_id = rec.get("bookmark_id")
+                if not user_id or not bookmark_id:
+                    continue
+                if uid:
+                    await conn.execute(
+                        """INSERT INTO dashboard_pinned_tabs(id, user_id, bookmark_id, display_order, status)
+                           VALUES($1, $2, $3, $4, $5)
+                           ON CONFLICT (id) DO NOTHING""",
+                        UUID(uid),
+                        UUID(user_id),
+                        UUID(bookmark_id),
+                        coerce("display_order", rec.get("display_order", "0")),
+                        rec.get("status", "active"),
+                    )
+                else:
+                    await conn.execute(
+                        """INSERT INTO dashboard_pinned_tabs(user_id, bookmark_id, display_order, status)
+                           VALUES($1, $2, $3, $4)""",
+                        UUID(user_id),
+                        UUID(bookmark_id),
+                        coerce("display_order", rec.get("display_order", "0")),
+                        rec.get("status", "active"),
+                    )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the dashboard_pinned_tabs table contains:")
+def then_dashboard_pinned_tabs_table(datatable):
+    _assert_db("dashboard_pinned_tabs", datatable)
+
+
 @given("the reminders table contains:")
 def given_reminders_table(datatable):
     async def _insert():

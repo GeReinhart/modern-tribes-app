@@ -52,6 +52,10 @@ const en: Record<string, string> = {
   'dashboard.quickAdd.changeFeature': 'Change',
   'dashboard.quickAdd.taskTitlePlaceholder': 'Task title...',
   'dashboard.quickAdd.create': 'Create',
+
+  'dashboard.pinnedTab.pin': 'Pin as tab',
+  'dashboard.pinnedTab.unpin': 'Unpin tab',
+  'dashboard.pinnedTab.unavailable': 'This feature is no longer available. You can unpin this tab.',
 };
 
 export default en;
