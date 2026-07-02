@@ -18,6 +18,7 @@ const fr: Record<string, string> = {
   'tabConfig.moveDown': 'Descendre',
   'tabConfig.toggleVisibility': 'Basculer la visibilité',
   'tabConfig.setDefault': 'Définir comme onglet par défaut',
+  'tabConfig.icon': 'Icône',
 
   'features.addFeature': 'Ajouter une fonctionnalité',
   'features.feature': 'Fonctionnalité',
@@ -26,6 +27,7 @@ const fr: Record<string, string> = {
   'features.selectType': 'Sélectionner un type...',
   'features.featureName': 'Nom',
   'features.featureNamePlaceholder': 'ex. Backlog du sprint',
+  'features.featureIcon': 'Icône (facultative si un nom est renseigné)',
   'features.rename': 'Renommer la fonctionnalité',
   'features.archive': 'Archiver la fonctionnalité',
   'features.archiveTitle': 'Archiver cette fonctionnalité ?',

@@ -54,6 +54,7 @@ export interface JournalDashboardEntry {
   feature_instance_name: string;
   project_id: string;
   project_name: string;
+  tribe_id: string;
   block_count: number;
 }
 

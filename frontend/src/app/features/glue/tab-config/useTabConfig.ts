@@ -24,6 +24,7 @@ function mergeWithSaved(
       key: tab.key,
       label: tab.label,
       color: tab.color,
+      icon: s ? s.icon : tab.icon,
       visible: s ? s.visible : true,
       order: s ? s.order : index,
       is_default: s ? s.is_default : false,
@@ -68,14 +69,14 @@ export function useTabConfig(
   const tabsWithConfig = useMemo(
     () => mergeWithSaved(allTabs, savedConfigs),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [allTabs.map((t) => `${t.key}:${t.color ?? ''}`).join(','), savedConfigs],
+    [allTabs.map((t) => `${t.key}:${t.color ?? ''}:${t.icon ?? ''}`).join(','), savedConfigs],
   );
 
   const visibleTabs = useMemo(
     () =>
       tabsWithConfig
         .filter((t) => t.visible)
-        .map(({ key, label, color }) => ({ key, label, color })),
+        .map(({ key, label, color, icon }) => ({ key, label, color, icon })),
     [tabsWithConfig],
   );
 

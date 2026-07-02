@@ -18,6 +18,7 @@ const en: Record<string, string> = {
   'tabConfig.moveDown': 'Move down',
   'tabConfig.toggleVisibility': 'Toggle visibility',
   'tabConfig.setDefault': 'Set as default tab',
+  'tabConfig.icon': 'Icon',
 
   'features.addFeature': 'Add Feature',
   'features.feature': 'Feature',
@@ -26,6 +27,7 @@ const en: Record<string, string> = {
   'features.selectType': 'Select a type...',
   'features.featureName': 'Name',
   'features.featureNamePlaceholder': 'e.g. Sprint backlog',
+  'features.featureIcon': 'Icon (optional if a name is set)',
   'features.rename': 'Rename feature',
   'features.archive': 'Archive feature',
   'features.archiveTitle': 'Archive this feature?',

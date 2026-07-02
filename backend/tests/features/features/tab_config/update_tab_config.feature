@@ -45,6 +45,25 @@ Feature: Update tab configuration
       | user_id | context_key | tab_configs |
       | 0002    | my-context  | []          |
 
+  Scenario: PUT /tab-configs/my-context as viewer — a personal icon override round-trips
+    Given I am authenticated as a regular user: user.id 0002
+    And the user_tab_configs table contains:
+      | id | user_id | context_key | tab_configs |
+    When I PUT /api/features/glue/tab-configs/my-context with body:
+      """
+      {"tab_configs": [{"key": "documents", "visible": true, "order": 0, "is_default": true, "icon": "file-text"}]}
+      """
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "context_key": "my-context",
+        "tab_configs": [
+          {"key": "documents", "visible": true, "order": 0, "is_default": true, "icon": "file-text"}
+        ]
+      }
+      """
+
   @error_case
   Scenario: PUT /tab-configs/my-context as a user with no app access — 403 error
     Given I am authenticated as the person's owner: user.id 0003

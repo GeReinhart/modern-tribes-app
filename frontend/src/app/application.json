@@ -633,11 +633,15 @@
         "description": {
           "en": [
             "- attach tools (task lists, kanban boards, guitar tools…) to a project as named tabs",
-            "- each user can show, hide and reorder their tabs to match their own workflow"
+            "- each user can show, hide and reorder their tabs to match their own workflow",
+            "- when adding or renaming a tab, pick an icon from the app's icon set to prefix it — once an icon is set, giving the tab a name becomes optional",
+            "- each user can also pick their own icon for any tab from the tab settings, overriding the tab's default icon just for themselves"
           ],
           "fr": [
             "- ajoutez des outils (listes de tâches, kanbans, outils guitare…) à un projet sous forme d'onglets nommés",
-            "- chaque utilisateur peut afficher, masquer et réorganiser ses onglets selon son usage"
+            "- chaque utilisateur peut afficher, masquer et réorganiser ses onglets selon son usage",
+            "- lors de l'ajout ou du renommage d'un onglet, choisissez une icône parmi celles de l'application pour le préfixer — une fois une icône choisie, donner un nom à l'onglet devient facultatif",
+            "- chaque utilisateur peut aussi choisir sa propre icône pour n'importe quel onglet depuis les réglages des onglets, ce qui remplace l'icône par défaut uniquement pour lui"
           ]
         },
         "backend": {
@@ -830,14 +834,16 @@
             "- write rich-text blocks for each day and label them to organize your notes",
             "- navigate between days that have content, or browse all entries by label",
             "- blocks appear in the global search",
-            "- the planning dashboard shows the number of journal entries for the selected day and highlights days with content on the calendar"
+            "- the planning dashboard shows the number of journal entries for the selected day and highlights days with content on the calendar",
+            "- click a journal entry on the dashboard to jump straight to that day's journal in its project"
           ],
           "fr": [
             "- ajoutez un journal quotidien à n'importe quel projet, partagé avec tous les membres de la tribu",
             "- rédigez des blocs de texte enrichi pour chaque jour et étiquetez-les pour organiser vos notes",
             "- naviguez entre les jours qui ont du contenu ou parcourez toutes les entrées par étiquette",
             "- les blocs apparaissent dans la recherche globale",
-            "- le tableau de bord planning indique le nombre d'entrées de journal pour le jour sélectionné et met en valeur les jours avec du contenu sur le calendrier"
+            "- le tableau de bord planning indique le nombre d'entrées de journal pour le jour sélectionné et met en valeur les jours avec du contenu sur le calendrier",
+            "- cliquez sur une entrée de journal du tableau de bord pour accéder directement au journal de ce jour dans son projet"
           ]
         },
         "backend": {

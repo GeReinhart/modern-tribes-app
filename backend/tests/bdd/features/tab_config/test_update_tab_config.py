@@ -20,6 +20,10 @@ def test_update_tab_config_viewer():
 def test_update_tab_config_forbidden():
     pass
 
+@scenario(FEATURE, "PUT /tab-configs/my-context as viewer — a personal icon override round-trips")
+def test_update_tab_config_icon_override():
+    pass
+
 @pytest.fixture
 def non_admin_client():
     _test_app.dependency_overrides[get_current_user] = lambda: _REGULAR_USER

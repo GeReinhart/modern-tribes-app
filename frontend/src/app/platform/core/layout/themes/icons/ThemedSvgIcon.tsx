@@ -41,6 +41,15 @@ interface ThemedSvgIconProps {
   size?: number;
 }
 
+export const ICON_NAMES: IconName[] = [
+  'plus', 'trash', 'pencil', 'eye', 'arrow-left', 'arrow-right',
+  'chevron-up', 'chevron-down', 'chevrons-up', 'chevrons-down',
+  'check', 'x', 'upload', 'download', 'save', 'search', 'user',
+  'logout', 'refresh', 'settings', 'archive', 'file-text', 'warning',
+  'info', 'arrow-up', 'arrow-down', 'hash', 'eye-off', 'external-link',
+  'bell', 'more-vertical', 'palette', 'calendar',
+];
+
 const paths: Record<IconName, React.ReactNode> = {
   plus: (
     <>

@@ -47,6 +47,42 @@ Feature: Create a feature instance on a project
       | project_id | name       | feature_type | status |
       | 0100       | Team Board | kanban       | active |
 
+  Scenario: POST /feature-instances/projects/0100/features with an icon and no name — the instance is created icon-only
+    Given I am authenticated as an administrator: user.id 0001
+    And the projects_features table contains:
+      | id | project_id | name | feature_type | status |
+    When I POST /api/features/glue/feature-instances/projects/0100/features with body:
+      """
+      {"icon": "calendar", "feature_type": "kanban"}
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "project_id": "0100",
+        "feature_type": "kanban",
+        "name": null,
+        "icon": "calendar",
+        "status": "active"
+      }
+      """
+    And the projects_features table contains:
+      | project_id | name | icon     | feature_type | status |
+      | 0100       |      | calendar | kanban       | active |
+
+  @error_case
+  Scenario: POST /feature-instances/projects/0100/features with neither name nor icon — 422 error
+    Given I am authenticated as an administrator: user.id 0001
+    And the projects_features table contains:
+      | id | project_id | name | feature_type | status |
+    When I POST /api/features/glue/feature-instances/projects/0100/features with body:
+      """
+      {"feature_type": "kanban"}
+      """
+    Then the response status code is 422
+    And the projects_features table contains:
+      | id | project_id | name | feature_type | status |
+
   @error_case
   Scenario: POST /feature-instances/projects/0100/features as a viewer without project access — 403 error
     Given I am authenticated as a regular user: user.id 0002

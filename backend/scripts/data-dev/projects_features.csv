@@ -1,11 +1,11 @@
-project,feature_type,name,position
-Summer BBQ,todo_list,Event Checklist,0
-Holiday Gift Exchange,todo_list,Gift Exchange Tasks,0
-Book of the Month,todo_list,Reading Tasks,0
-Annual Camping Trip,todo_list,Camp Preparation,0
-Charity Marathon,todo_list,Training Milestones,0
-Community Garden,todo_list,Garden Tasks,0
-Movie Night Series,todo_list,Movie Night Prep,0
-Home Renovation Help,todo_list,Renovation Projects,0
-Cooking Workshop,todo_list,Workshop Preparation,0
-Local Sports Tournament,todo_list,Tournament Organization,0
+project,feature_type,name,icon,position
+Summer BBQ,todo_list,Event Checklist,check,0
+Holiday Gift Exchange,todo_list,Gift Exchange Tasks,,0
+Book of the Month,todo_list,Reading Tasks,,0
+Annual Camping Trip,todo_list,Camp Preparation,,0
+Charity Marathon,todo_list,Training Milestones,,0
+Community Garden,todo_list,Garden Tasks,,0
+Movie Night Series,todo_list,Movie Night Prep,,0
+Home Renovation Help,todo_list,Renovation Projects,,0
+Cooking Workshop,todo_list,Workshop Preparation,calendar,0
+Local Sports Tournament,todo_list,Tournament Organization,,0

@@ -1,6 +1,7 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { journalService } from '@/app/features/daily-journal/service.ts';
 import type { JournalDashboardEntry } from '@/app/features/daily-journal/types.ts';
 
@@ -8,9 +9,14 @@ interface Props {
   selectedDate: string;
 }
 
+function journalEntryPath(entry: JournalDashboardEntry, selectedDate: string): string {
+  return `/app/tribes/${entry.tribe_id}/projects/${entry.project_id}/${entry.feature_instance_id}?date=${selectedDate}`;
+}
+
 const DashboardJournalSection: React.FC<Props> = ({ selectedDate }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const [entries, setEntries] = useState<JournalDashboardEntry[]>([]);
 
   useEffect(() => {
@@ -27,7 +33,10 @@ const DashboardJournalSection: React.FC<Props> = ({ selectedDate }) => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
         {entries.map(entry => (
           <div key={entry.feature_instance_id}
-            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', borderRadius: '8px', background: theme.colors.surface, border: `1px solid ${theme.colors.border}` }}>
+            onClick={() => navigate(journalEntryPath(entry, selectedDate))}
+            onMouseEnter={e => { e.currentTarget.style.background = theme.colors.primary + '10'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = theme.colors.surface; }}
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', borderRadius: '8px', background: theme.colors.surface, border: `1px solid ${theme.colors.border}`, cursor: 'pointer' }}>
             <div>
               <span style={{ fontWeight: 600, fontSize: 'var(--font-sm)', color: theme.colors.text }}>{entry.feature_instance_name}</span>
               <span style={{ fontSize: 'var(--font-xs)', color: theme.colors.secondary, marginLeft: '6px' }}>{entry.project_name}</span>

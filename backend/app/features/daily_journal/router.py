@@ -81,6 +81,7 @@ async def list_accessible_journal_summary(
             feature_instance_name=r["feature_instance_name"],
             project_id=str(r["project_id"]),
             project_name=r["project_name"],
+            tribe_id=str(r["tribe_id"]),
             block_count=r["block_count"],
         )
         for r in rows

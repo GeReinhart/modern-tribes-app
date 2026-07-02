@@ -1,5 +1,6 @@
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
-import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
+import { IconPicker } from '@/app/platform/core/layout/themes/components/IconPicker.tsx';
+import { IconName, ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';
@@ -48,6 +49,10 @@ function setDefault(tabs: TabWithConfig[], key: string): TabWithConfig[] {
   return tabs.map((t) => ({ ...t, is_default: t.key === key }));
 }
 
+function setIcon(tabs: TabWithConfig[], key: string, icon: string | null): TabWithConfig[] {
+  return tabs.map((t) => (t.key === key ? { ...t, icon } : t));
+}
+
 export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
   tabsWithConfig,
   onSave,
@@ -59,6 +64,7 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
   const { theme } = useTheme();
   const [draft, setDraft] = useState<TabWithConfig[]>(tabsWithConfig);
   const [saving, setSaving] = useState(false);
+  const [editingIconKey, setEditingIconKey] = useState<string | null>(null);
 
   const handleUnpin = async (key: string) => {
     if (!onUnpinTab) return;
@@ -123,23 +129,34 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
         >
           <TabConfigHeader theme={theme} t={t} hasPinnedTabs={(pinnedTabKeys?.size ?? 0) > 0} />
           {draft.map((tab, index) => (
-            <TabConfigRow
-              key={tab.key}
-              tab={tab}
-              index={index}
-              total={draft.length}
-              theme={theme}
-              t={t}
-              isPinned={pinnedTabKeys?.has(tab.key) ?? false}
-              hasPinnedTabs={(pinnedTabKeys?.size ?? 0) > 0}
-              onMoveUp={() => setDraft((prev) => moveTab(prev, index, -1))}
-              onMoveDown={() => setDraft((prev) => moveTab(prev, index, 1))}
-              onToggleVisible={() =>
-                setDraft((prev) => toggleVisible(prev, tab.key))
-              }
-              onSetDefault={() => setDraft((prev) => setDefault(prev, tab.key))}
-              onUnpin={() => handleUnpin(tab.key)}
-            />
+            <React.Fragment key={tab.key}>
+              <TabConfigRow
+                tab={tab}
+                index={index}
+                total={draft.length}
+                theme={theme}
+                t={t}
+                isPinned={pinnedTabKeys?.has(tab.key) ?? false}
+                hasPinnedTabs={(pinnedTabKeys?.size ?? 0) > 0}
+                isEditingIcon={editingIconKey === tab.key}
+                onMoveUp={() => setDraft((prev) => moveTab(prev, index, -1))}
+                onMoveDown={() => setDraft((prev) => moveTab(prev, index, 1))}
+                onToggleVisible={() =>
+                  setDraft((prev) => toggleVisible(prev, tab.key))
+                }
+                onSetDefault={() => setDraft((prev) => setDefault(prev, tab.key))}
+                onUnpin={() => handleUnpin(tab.key)}
+                onToggleIconEditor={() =>
+                  setEditingIconKey((prev) => (prev === tab.key ? null : tab.key))
+                }
+              />
+              {editingIconKey === tab.key && (
+                <IconPicker
+                  value={tab.icon}
+                  onChange={(icon) => setDraft((prev) => setIcon(prev, tab.key, icon))}
+                />
+              )}
+            </React.Fragment>
           ))}
         </div>
 
@@ -186,7 +203,7 @@ const TabConfigHeader: React.FC<TabConfigHeaderProps> = ({ theme, t, hasPinnedTa
   <div
     style={{
       display: 'grid',
-      gridTemplateColumns: `1fr auto auto auto${hasPinnedTabs ? ' auto' : ''}`,
+      gridTemplateColumns: `auto 1fr auto auto auto${hasPinnedTabs ? ' auto' : ''}`,
       gap: 'var(--space-sm)',
       alignItems: 'center',
       paddingBottom: 'var(--space-xs)',
@@ -196,6 +213,7 @@ const TabConfigHeader: React.FC<TabConfigHeaderProps> = ({ theme, t, hasPinnedTa
       fontWeight: 600,
     }}
   >
+    <span style={{ width: '32px' }} />
     <span>{t('tabConfig.tab')}</span>
     <span style={{ textAlign: 'center', width: '72px' }}>
       {t('tabConfig.visible')}
@@ -216,11 +234,13 @@ interface TabConfigRowProps {
   t: (k: string) => string;
   isPinned: boolean;
   hasPinnedTabs: boolean;
+  isEditingIcon: boolean;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onToggleVisible: () => void;
   onSetDefault: () => void;
   onUnpin: () => void;
+  onToggleIconEditor: () => void;
 }
 
 const TabConfigRow: React.FC<TabConfigRowProps> = ({
@@ -231,15 +251,17 @@ const TabConfigRow: React.FC<TabConfigRowProps> = ({
   t,
   isPinned,
   hasPinnedTabs,
+  isEditingIcon,
   onMoveUp,
   onMoveDown,
   onToggleVisible,
   onSetDefault,
   onUnpin,
+  onToggleIconEditor,
 }) => {
   const rowStyle: React.CSSProperties = {
     display: 'grid',
-    gridTemplateColumns: `1fr auto auto auto${hasPinnedTabs ? ' auto' : ''}`,
+    gridTemplateColumns: `auto 1fr auto auto auto${hasPinnedTabs ? ' auto' : ''}`,
     gap: 'var(--space-sm)',
     alignItems: 'center',
     padding: 'var(--space-xs) var(--space-sm)',
@@ -249,6 +271,29 @@ const TabConfigRow: React.FC<TabConfigRowProps> = ({
 
   return (
     <div style={rowStyle}>
+      <button
+        type="button"
+        onClick={onToggleIconEditor}
+        title={t('tabConfig.icon')}
+        aria-label={t('tabConfig.icon')}
+        style={{
+          width: '32px',
+          height: '32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          border: `1px solid ${isEditingIcon ? theme.colors.primary : theme.colors.border}`,
+          borderRadius: '8px',
+          backgroundColor: 'transparent',
+          cursor: 'pointer',
+        }}
+      >
+        {tab.icon ? (
+          <ThemedSvgIcon name={tab.icon as IconName} color={theme.colors.text} size={16} />
+        ) : (
+          <span style={{ color: theme.colors.secondary, fontSize: 'var(--font-xs)' }}>+</span>
+        )}
+      </button>
       <span
         style={{
           color: tab.visible ? theme.colors.text : theme.colors.secondary,

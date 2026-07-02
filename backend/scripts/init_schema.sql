@@ -252,14 +252,16 @@ CREATE TABLE IF NOT EXISTS projects_features (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
     feature_type VARCHAR(100) NOT NULL,
-    name VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NULL,
+    icon VARCHAR(50) NULL,
     theme_code VARCHAR(50) NULL,
     status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'archived')),
     position INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT chk_projects_features_name_or_icon CHECK ((name IS NOT NULL AND name <> '') OR icon IS NOT NULL)
 );
 
 -- Labels table (unified: global admin labels + feature-instance-scoped labels for kanban/todo)

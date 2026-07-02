@@ -14,6 +14,7 @@ const fr: Record<string, string> = {
   'common.error': 'Erreur :',
   'common.success': 'Succès !',
   'common.noData': 'Aucune donnée',
+  'common.none': 'Aucune',
   'common.home': 'Accueil',
   'common.admin': 'Admin',
   'common.installApp': "Installer l'app",

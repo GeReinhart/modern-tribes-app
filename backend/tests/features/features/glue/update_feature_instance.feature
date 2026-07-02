@@ -48,6 +48,43 @@ Feature: Update a feature instance on a project
       | id   | project_id | name         | feature_type | status |
       | 0010 | 0100       | Sprint Board | kanban       | active |
 
+  Scenario: PATCH /feature-instances/projects/0100/features/0010 — set an icon and clear the name
+    Given I am authenticated as an administrator: user.id 0001
+    And the projects_features table contains:
+      | id   | project_id | name  | feature_type | status |
+      | 0010 | 0100       | Board | kanban       | active |
+    When I PATCH /api/features/glue/feature-instances/projects/0100/features/0010 with body:
+      """
+      {"name": "", "icon": "calendar"}
+      """
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "0010",
+        "name": "",
+        "icon": "calendar"
+      }
+      """
+    And the projects_features table contains:
+      | id   | project_id | name | icon     | feature_type | status |
+      | 0010 | 0100       |      | calendar | kanban       | active |
+
+  @error_case
+  Scenario: PATCH /feature-instances/projects/0100/features/0010 — clearing the name with no icon set — 400 error
+    Given I am authenticated as an administrator: user.id 0001
+    And the projects_features table contains:
+      | id   | project_id | name  | feature_type | status |
+      | 0010 | 0100       | Board | kanban       | active |
+    When I PATCH /api/features/glue/feature-instances/projects/0100/features/0010 with body:
+      """
+      {"name": ""}
+      """
+    Then the response status code is 400
+    And the projects_features table contains:
+      | id   | project_id | name  | feature_type | status |
+      | 0010 | 0100       | Board | kanban       | active |
+
   @error_case
   Scenario: PATCH /feature-instances/projects/0100/features/0010 as a viewer without project access — 403 error
     Given I am authenticated as a regular user: user.id 0002
