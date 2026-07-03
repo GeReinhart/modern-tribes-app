@@ -91,7 +91,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     border: `2px solid ${theme.colors.border}`,
     borderRadius: '12px',
     boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
-    minWidth: hasExtraTabs ? '540px' : breadcrumbTabs ? '360px' : '330px',
+    minWidth: hasExtraTabs ? '420px' : breadcrumbTabs ? '360px' : '330px',
     maxWidth: 'calc(100vw - 16px)',
     marginTop: '12px',
     overflow: 'hidden',
@@ -193,7 +193,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: hasExtraTabs ? '1fr 1fr 1fr' : breadcrumbTabs ? '1fr 1fr' : '1fr',
+                    gridTemplateColumns: hasExtraTabs ? 'auto auto auto' : breadcrumbTabs ? 'auto auto' : '1fr',
                     borderBottom:
                       secondaryActions || actions || hasActionsRow
                         ? `1px solid ${theme.colors.border}`
@@ -236,6 +236,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                       style={{
                         borderLeft: `1px solid ${theme.colors.border}`,
                         backgroundColor: AREA_COLORS.tabs,
+                        display: 'flex',
+                        flexDirection: 'column',
                       }}
                     >
                       {tabsCol1.map((tab) => (
@@ -243,7 +245,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                           key={tab.key}
                           to={tab.path}
                           role="menuitem"
-                          style={{ ...menuNavItemStyle(true, tab.isActive, AREA_COLORS.tabActiveBorder), display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}
+                          style={{ ...menuNavItemStyle(true, tab.isActive, AREA_COLORS.tabActiveBorder), display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}
                           onClick={() => setIsMenuOpen(false)}
                           onMouseEnter={(e) => {
                             if (!tab.isActive)
@@ -265,6 +267,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                       style={{
                         borderLeft: `1px solid ${theme.colors.border}`,
                         backgroundColor: AREA_COLORS.tabs,
+                        display: 'flex',
+                        flexDirection: 'column',
                       }}
                     >
                       {tabsCol2.map((tab) => (
@@ -272,7 +276,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                           key={tab.key}
                           to={tab.path}
                           role="menuitem"
-                          style={{ ...menuNavItemStyle(true, tab.isActive, AREA_COLORS.tabActiveBorder), display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}
+                          style={{ ...menuNavItemStyle(true, tab.isActive, AREA_COLORS.tabActiveBorder), display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}
                           onClick={() => setIsMenuOpen(false)}
                           onMouseEnter={(e) => {
                             if (!tab.isActive)

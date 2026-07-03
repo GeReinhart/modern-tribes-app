@@ -76,6 +76,7 @@ const en: Record<string, string> = {
   'dashboard.directory.noProjects': 'No accessible projects yet.',
   'dashboard.directory.noTaskInstances': 'No accessible task boards or lists yet.',
   'dashboard.directory.noEventInstances': 'No accessible event calendars yet.',
+  'dashboard.directory.noFilterMatches': 'No results for the selected tribes.',
 
   'dashboard.pinnedTab.pin': 'Pin as tab',
   'dashboard.pinnedTab.unpin': 'Unpin tab',

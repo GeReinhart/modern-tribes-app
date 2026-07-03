@@ -77,6 +77,7 @@ const fr: Record<string, string> = {
   'dashboard.directory.noProjects': 'Aucun projet accessible pour le moment.',
   'dashboard.directory.noTaskInstances': 'Aucun tableau ou liste de tâches accessible pour le moment.',
   'dashboard.directory.noEventInstances': 'Aucun calendrier accessible pour le moment.',
+  'dashboard.directory.noFilterMatches': 'Aucun résultat pour les tribus sélectionnées.',
 
   'dashboard.pinnedTab.pin': 'Épingler comme onglet',
   'dashboard.pinnedTab.unpin': 'Désépingler',

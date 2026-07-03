@@ -43,8 +43,11 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({
       {tabs.map((tab) => {
         const isActive = activeTab === tab.key;
         const tabColor = tab.color ?? theme.colors.primary;
+        const isIconOnly = !!tab.icon && !tab.label;
+        const horizontalPadding = tab.label ? 'var(--space-lg)' : 'var(--space-sm)';
+        const iconSize = isIconOnly ? 22 : 14;
         const tabStyle: React.CSSProperties = {
-          padding: 'var(--space-sm) var(--space-lg)',
+          padding: `var(--space-sm) ${horizontalPadding}`,
           border: 'none',
           borderBottom: isActive
             ? `3px solid ${tabColor}`
@@ -64,7 +67,7 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({
         };
         const content = (
           <>
-            {tab.icon && <ThemedSvgIcon name={tab.icon as IconName} color="currentColor" size={14} />}
+            {tab.icon && <ThemedSvgIcon name={tab.icon as IconName} color="currentColor" size={iconSize} />}
             {tab.label && <span>{tab.label}</span>}
           </>
         );

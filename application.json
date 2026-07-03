@@ -676,6 +676,7 @@
             "- Projects tab: browse every project you have access to, with its tribe and a count of its open tasks and upcoming events",
             "- Tasks tab: browse every kanban board and to-do list you have access to, with a count of open items on each",
             "- Events tab: browse every event calendar you have access to, with a count of upcoming events on each",
+            "- on the Projects, Tasks and Events tabs, tap one or more tribe badges at the top to narrow the list down to just those tribes",
             "- clicking a project, task board, to-do list or event calendar opens it directly"
           ],
           "fr": [
@@ -689,6 +690,7 @@
             "- onglet Projets : parcourez tous les projets auxquels vous avez accès, avec leur tribu et le nombre de tâches ouvertes et d'événements à venir",
             "- onglet Tâches : parcourez tous les tableaux kanban et listes de tâches auxquels vous avez accès, avec le nombre d'éléments ouverts pour chacun",
             "- onglet Événements : parcourez tous les calendriers d'événements auxquels vous avez accès, avec le nombre d'événements à venir pour chacun",
+            "- sur les onglets Projets, Tâches et Événements, appuyez sur une ou plusieurs tribus en haut pour limiter la liste à ces tribus",
             "- cliquer sur un projet, un tableau de tâches, une liste ou un calendrier l'ouvre directement"
           ]
         },
