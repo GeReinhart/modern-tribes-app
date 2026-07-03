@@ -5,6 +5,7 @@ import EventCreateForm from '@/app/features/events/EventCreateForm.tsx';
 import type { EventCreate, EventReminderCreate, FeatureLabel, FeatureLabelCreate, PersonOption } from '@/app/features/events/types.ts';
 import type { ProjectFeatureInstance } from '@/app/features/tribes-projects/projects/project-features.types.ts';
 import FeatureInstanceBadgePicker from './FeatureInstanceBadgePicker.tsx';
+import { resolveQuickAddDefault, useQuickAddDefaults } from './useQuickAddDefaults.ts';
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +24,8 @@ const DashboardAddEventModal: React.FC<Props> = ({ selectedDate, onClose, onCrea
   const [selectedInstance, setSelectedInstance] = useState<ProjectFeatureInstance | null>(null);
   const [persons, setPersons] = useState<PersonOption[]>([]);
   const [labels, setLabels] = useState<FeatureLabel[]>([]);
+  const { data: quickAddDefaults } = useQuickAddDefaults();
+  const preferredInstanceId = resolveQuickAddDefault(quickAddDefaults?.event);
 
   useEffect(() => {
     if (!selectedInstance) { setPersons([]); setLabels([]); return; }
@@ -74,6 +77,7 @@ const DashboardAddEventModal: React.FC<Props> = ({ selectedDate, onClose, onCrea
             featureTypes={EVENT_FEATURE_TYPES}
             selectedInstanceId={selectedInstance?.id ?? null}
             onSelect={setSelectedInstance}
+            preferredInstanceId={preferredInstanceId}
           />
 
           {selectedInstance && (

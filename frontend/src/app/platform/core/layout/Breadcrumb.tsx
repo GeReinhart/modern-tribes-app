@@ -13,6 +13,7 @@ export interface BreadcrumbTab {
   label: string;
   path: string;
   isActive: boolean;
+  icon?: string | null;
 }
 
 interface BreadcrumbProps {

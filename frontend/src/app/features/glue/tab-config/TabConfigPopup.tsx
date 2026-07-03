@@ -1,5 +1,6 @@
 import { IconPicker } from '@/app/platform/core/layout/themes/components/IconPicker.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { QuickAddDefaultsSection } from '@/app/features/glue/dashboard/QuickAddDefaultsSection.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +15,7 @@ interface TabConfigPopupProps {
   onClose: () => void;
   pinnedTabKeys?: Set<string>;
   onUnpinTab?: (key: string) => Promise<void>;
+  showQuickAddDefaults?: boolean;
 }
 
 function moveTab(
@@ -65,6 +67,7 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
   onClose,
   pinnedTabKeys,
   onUnpinTab,
+  showQuickAddDefaults,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -173,6 +176,13 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
             </React.Fragment>
           ))}
         </div>
+
+        {showQuickAddDefaults && (
+          <>
+            <div style={{ height: '1px', backgroundColor: theme.colors.border }} />
+            <QuickAddDefaultsSection />
+          </>
+        )}
 
         <TabConfigFooter
           theme={theme}

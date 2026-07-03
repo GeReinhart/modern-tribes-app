@@ -2,7 +2,9 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import ClockFace from '@/app/platform/core/layout/themes/components/ClockFace.tsx';
 
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
+import { diffMinutes, formatDuration } from './dateUtils.ts';
 import EventDayTimeline from './EventDayTimeline.tsx';
 import EventDurationSelector from './EventDurationSelector.tsx';
 
@@ -32,14 +34,6 @@ function fmtDt(date: Date): string {
   return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}T${p(date.getHours())}:${p(date.getMinutes())}`;
 }
 
-function fmtDuration(start: string, end: string): string {
-  const mins = Math.round((parseDt(end).getTime() - parseDt(start).getTime()) / 60000);
-  if (mins <= 0) return '';
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  return h === 0 ? `${m}min` : m === 0 ? `${h}h` : `${h}h ${m}min`;
-}
-
 function useIsNarrow(): boolean {
   const [narrow, setNarrow] = useState(() => window.innerWidth < 700);
   useEffect(() => {
@@ -53,6 +47,7 @@ function useIsNarrow(): boolean {
 
 const EventTimePicker: React.FC<Props> = ({ startAt, endAt, onStartAtChange, onEndAtChange, disabled = false, label, showDuration = true, maxAt, eventStartAt, eventEndAt, eventTitle }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const isNarrow = useIsNarrow();
   const [open, setOpen] = useState(false);
   const [section, setSection] = useState<'hour' | 'minute'>('hour');
@@ -132,8 +127,8 @@ const EventTimePicker: React.FC<Props> = ({ startAt, endAt, onStartAtChange, onE
               <span onClick={() => setSection('hour')} style={segStyle(section === 'hour')}>{p2(tempH)}</span>
               <span style={{ fontSize: '52px', fontWeight: 300, color: 'rgba(255,255,255,0.8)', lineHeight: 1 }}>:</span>
               <span onClick={() => setSection('minute')} style={segStyle(section === 'minute')}>{p2(tempM)}</span>
-              {showDuration && fmtDuration(tempStart, tempEnd) && (
-                <span style={{ fontSize: isNarrow ? '18px' : '22px', fontWeight: 600, color: 'rgba(255,255,255,0.85)', marginLeft: '16px', alignSelf: 'flex-end', paddingBottom: '10px' }}>{fmtDuration(tempStart, tempEnd)}</span>
+              {showDuration && formatDuration(diffMinutes(tempStart, tempEnd), t) && (
+                <span style={{ fontSize: isNarrow ? '18px' : '22px', fontWeight: 600, color: 'rgba(255,255,255,0.85)', marginLeft: '16px', alignSelf: 'flex-end', paddingBottom: '10px' }}>{formatDuration(diffMinutes(tempStart, tempEnd), t)}</span>
               )}
             </div>
 

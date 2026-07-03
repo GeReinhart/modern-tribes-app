@@ -61,8 +61,7 @@ const TaskCreateForm: React.FC<Props> = ({
     setLocalLabelIds((prev) => [...prev, label.id]);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!title.trim()) return;
     setSaving(true);
     try {
@@ -81,11 +80,12 @@ const TaskCreateForm: React.FC<Props> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
       <input
         placeholder={t('features.kanban.addCardPlaceholder')}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit(); }}
         style={{ ...inputStyle, fontSize: 'var(--font-md)', fontWeight: 600 }}
         autoFocus
       />
@@ -128,14 +128,14 @@ const TaskCreateForm: React.FC<Props> = ({
       </label>
 
       <div style={{ display: 'flex', gap: '8px' }}>
-        <ThemedButton variant="primary" type="submit" disabled={!title.trim() || saving}>
+        <ThemedButton variant="primary" type="button" onClick={handleSubmit} disabled={!title.trim() || saving}>
           {t('dashboard.quickAdd.create')}
         </ThemedButton>
         <ThemedButton variant="secondary" type="button" onClick={onCancel}>
           {t('common.cancel')}
         </ThemedButton>
       </div>
-    </form>
+    </div>
   );
 };
 

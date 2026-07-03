@@ -7,6 +7,7 @@ const fr: Record<string, string> = {
   'features.events.titlePlaceholder': 'Titre de l\'événement...',
   'features.events.schedule': 'Date et heure',
   'features.events.allDay': 'Toute la journée',
+  'features.events.multiDay': 'Plusieurs jours',
   'features.events.from': 'De',
   'features.events.to': 'À',
   'features.events.participants': 'Participants',
@@ -22,6 +23,8 @@ const fr: Record<string, string> = {
   'features.events.confirmDelete': 'Confirmer la suppression',
   'features.events.during': 'pendant',
   'features.events.duration': 'Durée',
+  'features.events.durationDays': '{{days}} jour(s) et {{hours}} heure(s)',
+  'features.events.midnight': 'Minuit',
   'features.events.noEvents': 'Aucun événement ce jour.',
 };
 

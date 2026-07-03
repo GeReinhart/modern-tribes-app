@@ -47,6 +47,7 @@ export function useUrlTab(
         label: t.label,
         path: `${basePath}/${t.key}`,
         isActive: t.key === activeTab,
+        icon: t.icon,
       })),
     [tabs, basePath, activeTab],
   );

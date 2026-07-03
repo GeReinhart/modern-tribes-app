@@ -104,6 +104,7 @@ const TaskItemModalMeta: React.FC<Props> = ({
             {FIBONACCI.map((n) => (
               <button
                 key={n}
+                type="button"
                 onClick={() => canEdit ? onSizeChange(size === n ? null : n) : undefined}
                 disabled={!canEdit}
                 style={{

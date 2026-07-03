@@ -6,6 +6,7 @@ import TaskItemModalLabels from '@/app/features/tasks/TaskItemModalLabels.tsx';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import EventForceOnDashboardField from './EventForceOnDashboardField.tsx';
 import EventModalMeta from './EventModalMeta.tsx';
 import EventModalReminders from './EventModalReminders.tsx';
 import type { EventCreate, EventReminderCreate, FeatureLabel, FeatureLabelCreate, PersonOption } from './types.ts';
@@ -46,6 +47,7 @@ const EventCreateForm: React.FC<Props> = ({
   const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [allDay, setAllDay] = useState(false);
+  const [multiDay, setMultiDay] = useState(false);
   const [startAt, setStartAt] = useState(selectedDate + 'T09:00');
   const [endAt, setEndAt] = useState(selectedDate + 'T10:00');
   const [participantIds, setParticipantIds] = useState<string[]>([]);
@@ -59,14 +61,18 @@ const EventCreateForm: React.FC<Props> = ({
 
   const taskLabels = labels.map((l) => ({ ...l, feature_instance_id: featureInstanceId }));
 
+  const handleMultiDayChange = (v: boolean) => {
+    setMultiDay(v);
+    if (!v) setEndAt(startAt.slice(0, 10) + 'T' + endAt.slice(11, 16));
+  };
+
   const handleToggleLabel = (labelId: string) => {
     setLocalLabelIds((prev) =>
       prev.includes(labelId) ? prev.filter((id) => id !== labelId) : [...prev, labelId],
     );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!title.trim()) return;
     const data: EventCreate = {
       feature_instance_id: featureInstanceId,
@@ -97,14 +103,22 @@ const EventCreateForm: React.FC<Props> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <input placeholder={t('features.events.titlePlaceholder')} value={title} onChange={(e) => setTitle(e.target.value)} style={inputStyle} autoFocus />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <input
+        placeholder={t('features.events.titlePlaceholder')}
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter') handleSubmit(); }}
+        style={inputStyle}
+        autoFocus
+      />
 
       <EventModalMeta
-        allDay={allDay} startAt={startAt} endAt={endAt}
+        allDay={allDay} multiDay={multiDay} startAt={startAt} endAt={endAt}
         persons={persons} participantIds={participantIds}
         size={size} canEdit={true}
         onAllDayChange={setAllDay}
+        onMultiDayChange={handleMultiDayChange}
         onStartAtChange={setStartAt}
         onEndAtChange={setEndAt}
         onParticipantsChange={setParticipantIds}
@@ -139,23 +153,13 @@ const EventCreateForm: React.FC<Props> = ({
         <EditorJoditComponent content={notes} onChange={setNotes} compact={true} minHeight={200} />
       </div>
 
-      <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', userSelect: 'none' }}>
-        <input
-          type="checkbox"
-          checked={forceOnDashboard}
-          onChange={(e) => setForceOnDashboard(e.target.checked)}
-          style={{ width: '16px', height: '16px', accentColor: theme.colors.primary, cursor: 'pointer' }}
-        />
-        <span style={{ fontSize: 'var(--font-sm)', color: theme.colors.text, fontWeight: 600 }}>
-          {t('common.forceOnDashboard')}
-        </span>
-      </label>
+      <EventForceOnDashboardField value={forceOnDashboard} canEdit={true} onChange={setForceOnDashboard} />
 
       <div style={{ display: 'flex', gap: '8px' }}>
-        <ThemedButton variant="primary" type="submit" disabled={!title.trim()}>{t('features.events.create')}</ThemedButton>
+        <ThemedButton variant="primary" type="button" onClick={handleSubmit} disabled={!title.trim()}>{t('features.events.create')}</ThemedButton>
         <ThemedButton variant="secondary" type="button" onClick={onCancel}>{t('common.cancel')}</ThemedButton>
       </div>
-    </form>
+    </div>
   );
 };
 

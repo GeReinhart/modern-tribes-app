@@ -42,6 +42,8 @@ from app.features.tasks.my_tasks import router as my_tasks_router
 from app.features.glue.features import router as project_features
 from app.features.glue.tab_config import router as user_tab_configs
 from app.features.glue.dashboard import router as dashboard_pinned_tabs
+from app.features.glue.quick_add_defaults import router as quick_add_defaults
+from app.features.glue.dashboard_directory import router as dashboard_directory
 from app.features.tribes_projects.positions import router as positions
 from app.features.tribes_projects.projects import router as projects
 from app.features.tribes_projects.projects import app_router as project_with_document
@@ -184,6 +186,8 @@ app.include_router(my_tasks_router.router, prefix="/api/features")
 app.include_router(project_features.router, prefix="/api/features/glue")
 app.include_router(user_tab_configs.router, prefix="/api/features/glue")
 app.include_router(dashboard_pinned_tabs.router, prefix="/api/features/glue")
+app.include_router(quick_add_defaults.router, prefix="/api/features/glue")
+app.include_router(dashboard_directory.router, prefix="/api/features/glue")
 
 # Features — Tribes-Projects
 app.include_router(crud_tribes.router, prefix="/api/features/tribes-projects")

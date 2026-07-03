@@ -138,6 +138,7 @@ const EventsTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager }) =
 
       <EventDayView
         events={filteredDayEvents} labels={labels} persons={persons}
+        selectedDate={selectedDate}
         onSelectEvent={setViewingEvent}
         onEditEvent={canEdit ? setSelectedEvent : undefined}
       />

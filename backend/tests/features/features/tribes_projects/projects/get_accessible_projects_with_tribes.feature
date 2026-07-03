@@ -55,17 +55,23 @@ Feature: Get accessible projects with tribe name for a user
       [
         {
           "project_id": "0020",
+          "project_url_param_id": "000020",
           "project_name": "Alpha",
+          "tribe_url_param_id": "000010",
           "tribe_name": "Engineering"
         },
         {
           "project_id": "0021",
+          "project_url_param_id": "000021",
           "project_name": "Beta",
+          "tribe_url_param_id": "000011",
           "tribe_name": "Marketing"
         },
         {
           "project_id": "0022",
+          "project_url_param_id": "000022",
           "project_name": "Gamma",
+          "tribe_url_param_id": "000010",
           "tribe_name": "Engineering"
         }
       ]

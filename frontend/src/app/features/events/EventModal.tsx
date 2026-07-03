@@ -1,8 +1,6 @@
-import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
-import TaskItemModalLabels from '@/app/features/tasks/TaskItemModalLabels.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,8 +14,8 @@ import type {
   PersonOption,
 } from './types.ts';
 import { isoToLocalDt } from './dateUtils.ts';
-import EventModalReminders from './EventModalReminders.tsx';
-import EventModalMeta from './EventModalMeta.tsx';
+import EventDeleteConfirm from './EventDeleteConfirm.tsx';
+import EventModalFields from './EventModalFields.tsx';
 
 interface Props {
   event: CalendarEvent | null;
@@ -46,6 +44,9 @@ const EventModal: React.FC<Props> = ({
   const [allDay, setAllDay] = useState(event?.all_day ?? false);
   const [startAt, setStartAt] = useState(event?.start_at ? isoToLocalDt(event.start_at) : '');
   const [endAt, setEndAt] = useState(event?.end_at ? isoToLocalDt(event.end_at) : '');
+  const [multiDay, setMultiDay] = useState(
+    !!event && !event.all_day && isoToLocalDt(event.start_at).slice(0, 10) !== isoToLocalDt(event.end_at).slice(0, 10),
+  );
   const [notes, setNotes] = useState(event?.document_content_html ?? '');
   const [size, setSize] = useState<number | null>(event?.size ?? null);
   const [forceOnDashboard, setForceOnDashboard] = useState(event?.force_on_dashboard ?? false);
@@ -85,6 +86,11 @@ const EventModal: React.FC<Props> = ({
     onClose();
   };
 
+  const handleMultiDayChange = (v: boolean) => {
+    setMultiDay(v);
+    if (!v) setEndAt(startAt.slice(0, 10) + 'T' + endAt.slice(11, 16));
+  };
+
   const handleDelete = async () => {
     setSaving(true);
     await onDelete(event.id);
@@ -101,18 +107,6 @@ const EventModal: React.FC<Props> = ({
     } catch {
       setLocalLabelIds((prev) => (was ? [...prev, labelId] : prev.filter((id) => id !== labelId)));
     }
-  };
-
-  const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '8px 12px',
-    border: `1px solid ${theme.colors.border}`, borderRadius: '8px',
-    backgroundColor: theme.colors.surface, color: theme.colors.text,
-    fontSize: 'var(--font-sm)', boxSizing: 'border-box',
-  };
-
-  const sectionLabel: React.CSSProperties = {
-    fontSize: '11px', fontWeight: 700, textTransform: 'uppercase',
-    color: theme.colors.secondary, marginBottom: '6px',
   };
 
   return (
@@ -133,80 +127,35 @@ const EventModal: React.FC<Props> = ({
           </button>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div>
-            <div style={sectionLabel}>{t('features.events.title')}</div>
-            {isEditing ? (
-              <input value={title} onChange={(e) => setTitle(e.target.value)} style={inputStyle} />
-            ) : (
-              <span style={{ color: theme.colors.text }}>{event.title}</span>
-            )}
-          </div>
-
-          <EventModalMeta
-            allDay={allDay} startAt={startAt} endAt={endAt}
-            persons={persons} participantIds={participantIds}
-            size={size} canEdit={isEditing}
-            onAllDayChange={setAllDay}
-            onStartAtChange={setStartAt}
-            onEndAtChange={setEndAt}
-            onParticipantsChange={setParticipantIds}
-            onSizeChange={setSize}
-          />
-
-          <div>
-            <div style={sectionLabel}>{t('features.events.labels')}</div>
-            <TaskItemModalLabels
-              labels={taskLabels}
-              activeIds={localLabelIds}
-              canEdit={isEditing}
-              canCreateLabel={isManager && isEditing}
-              featureInstanceId={featureInstanceId}
-              onToggle={handleToggle}
-              onCreateLabel={onCreateLabel as Parameters<typeof TaskItemModalLabels>[0]['onCreateLabel']}
-              onLabelCreated={(label) => setLocalLabelIds((prev) => [...prev, label.id])}
-            />
-          </div>
-
-          <EventModalReminders
-            reminders={reminders}
-            canEdit={isEditing}
-            onChange={setReminders}
-            eventStartAt={startAt}
-            eventEndAt={endAt}
-            eventTitle={title}
-          />
-
-          <div>
-            <div style={sectionLabel}>{t('features.events.notes')}</div>
-            {isEditing ? (
-              <EditorJoditComponent content={notes} onChange={setNotes} />
-            ) : notes ? (
-              <div dangerouslySetInnerHTML={{ __html: notes }} style={{ fontSize: 'var(--font-sm)', color: theme.colors.text }} />
-            ) : (
-              <span style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary }}>{t('features.events.noNotes')}</span>
-            )}
-          </div>
-
-          {isEditing ? (
-            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', userSelect: 'none' }}>
-              <input
-                type="checkbox"
-                checked={forceOnDashboard}
-                onChange={(e) => setForceOnDashboard(e.target.checked)}
-                style={{ width: '16px', height: '16px', accentColor: theme.colors.primary, cursor: 'pointer' }}
-              />
-              <span style={{ fontSize: 'var(--font-sm)', color: theme.colors.text, fontWeight: 600 }}>
-                {t('common.forceOnDashboard')}
-              </span>
-            </label>
-          ) : forceOnDashboard ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: 'var(--font-xs)', color: theme.colors.primary, fontWeight: 600 }}>
-              <span>📌</span>
-              <span>{t('common.forceOnDashboard')}</span>
-            </div>
-          ) : null}
-        </div>
+        <EventModalFields
+          event={event}
+          isEditing={isEditing}
+          title={title}
+          onTitleChange={setTitle}
+          allDay={allDay} multiDay={multiDay} startAt={startAt} endAt={endAt}
+          onAllDayChange={setAllDay}
+          onMultiDayChange={handleMultiDayChange}
+          onStartAtChange={setStartAt}
+          onEndAtChange={setEndAt}
+          persons={persons}
+          participantIds={participantIds}
+          onParticipantsChange={setParticipantIds}
+          size={size}
+          onSizeChange={setSize}
+          taskLabels={taskLabels}
+          localLabelIds={localLabelIds}
+          isManager={isManager}
+          featureInstanceId={featureInstanceId}
+          onToggleLabel={handleToggle}
+          onCreateLabel={onCreateLabel}
+          onLabelCreated={(label) => setLocalLabelIds((prev) => [...prev, label.id])}
+          reminders={reminders}
+          onRemindersChange={setReminders}
+          notes={notes}
+          onNotesChange={setNotes}
+          forceOnDashboard={forceOnDashboard}
+          onForceOnDashboardChange={setForceOnDashboard}
+        />
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '24px' }}>
           <div>
@@ -232,18 +181,12 @@ const EventModal: React.FC<Props> = ({
         </div>
 
         {confirming && (
-          <div style={{ position: 'absolute', inset: 0, borderRadius: '12px', backgroundColor: theme.colors.surface, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', padding: '32px' }}>
-            <span style={{ fontSize: 'var(--font-lg)', fontWeight: 700, color: theme.colors.text, textAlign: 'center' }}>
-              {t('features.events.confirmDelete')}
-            </span>
-            <span style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary, textAlign: 'center' }}>
-              {event.title}
-            </span>
-            <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
-              <ThemedButton variant="secondary" onClick={() => setConfirming(false)} disabled={saving}>{t('common.cancel')}</ThemedButton>
-              <ThemedButton variant="danger" onClick={handleDelete} disabled={saving}>{t('features.events.delete')}</ThemedButton>
-            </div>
-          </div>
+          <EventDeleteConfirm
+            eventTitle={event.title}
+            saving={saving}
+            onCancel={() => setConfirming(false)}
+            onConfirm={handleDelete}
+          />
         )}
       </div>
     </div>

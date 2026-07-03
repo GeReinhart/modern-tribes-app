@@ -1122,6 +1122,36 @@ def then_user_tab_configs_table(datatable):
     _assert_db("user_tab_configs", datatable)
 
 
+@given("the user_quick_add_defaults table contains:")
+def given_user_quick_add_defaults_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                fi_id = rec.get("feature_instance_id")
+                await conn.execute(
+                    """INSERT INTO user_quick_add_defaults(id, user_id, quick_add_type, feature_instance_id, status)
+                       VALUES(COALESCE($1, gen_random_uuid()), $2, $3, $4, $5)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid) if uid else None,
+                    UUID(rec["user_id"]),
+                    rec["quick_add_type"],
+                    UUID(fi_id) if fi_id else None,
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the user_quick_add_defaults table contains:")
+def then_user_quick_add_defaults_table(datatable):
+    _assert_db("user_quick_add_defaults", datatable)
+
+
 @given("the search_index table contains:")
 def given_search_index_table(datatable):
     async def _insert():

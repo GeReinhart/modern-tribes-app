@@ -681,5 +681,21 @@ CREATE TABLE IF NOT EXISTS dashboard_pinned_tabs (
 );
 CREATE OR REPLACE TRIGGER update_dashboard_pinned_tabs_updated_at BEFORE UPDATE ON dashboard_pinned_tabs FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- User quick-add defaults (migration 010)
+CREATE TABLE IF NOT EXISTS user_quick_add_defaults (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    quick_add_type VARCHAR(20) NOT NULL CHECK (quick_add_type IN ('task', 'event')),
+    feature_instance_id UUID REFERENCES projects_features(id) ON DELETE SET NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    UNIQUE(user_id, quick_add_type)
+);
+CREATE OR REPLACE TRIGGER update_user_quick_add_defaults_updated_at BEFORE UPDATE ON user_quick_add_defaults FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 -- Schema evolution: add columns that may be missing on databases created before they were introduced
 ALTER TABLE tribes_projects ADD COLUMN IF NOT EXISTS display_order INTEGER NOT NULL DEFAULT 0;

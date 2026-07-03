@@ -7,6 +7,7 @@ import type { PersonOption, TaskLabelInfo } from '@/app/features/tasks/types.ts'
 import type { ProjectFeatureInstance } from '@/app/features/tribes-projects/projects/project-features.types.ts';
 import TaskCreateForm, { type TaskCreateData } from '@/app/features/tasks/TaskCreateForm.tsx';
 import FeatureInstanceBadgePicker from './FeatureInstanceBadgePicker.tsx';
+import { resolveQuickAddDefault, useQuickAddDefaults } from './useQuickAddDefaults.ts';
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,6 +29,8 @@ const DashboardAddTaskModal: React.FC<Props> = ({ onClose, onCreated }) => {
   const [selectedInstance, setSelectedInstance] = useState<ProjectFeatureInstance | null>(null);
   const [persons, setPersons] = useState<PersonOption[]>([]);
   const [labels, setLabels] = useState<TaskLabelInfo[]>([]);
+  const { data: quickAddDefaults } = useQuickAddDefaults();
+  const preferredInstanceId = resolveQuickAddDefault(quickAddDefaults?.task);
 
   useEffect(() => {
     if (!selectedInstance) { setPersons([]); setLabels([]); return; }
@@ -109,6 +112,7 @@ const DashboardAddTaskModal: React.FC<Props> = ({ onClose, onCreated }) => {
             featureTypes={TASK_FEATURE_TYPES}
             selectedInstanceId={selectedInstance?.id ?? null}
             onSelect={setSelectedInstance}
+            preferredInstanceId={preferredInstanceId}
           />
 
           {selectedInstance && (

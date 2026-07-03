@@ -1,5 +1,5 @@
 import { ApplicationLogo } from '@/app/platform/core/layout/themes/icons/ApplicationLogo.tsx';
-import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
+import { IconName, ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 
@@ -243,7 +243,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                           key={tab.key}
                           to={tab.path}
                           role="menuitem"
-                          style={{ ...menuNavItemStyle(true, tab.isActive, AREA_COLORS.tabActiveBorder), display: 'block', textDecoration: 'none' }}
+                          style={{ ...menuNavItemStyle(true, tab.isActive, AREA_COLORS.tabActiveBorder), display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}
                           onClick={() => setIsMenuOpen(false)}
                           onMouseEnter={(e) => {
                             if (!tab.isActive)
@@ -254,7 +254,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                               e.currentTarget.style.backgroundColor = 'transparent';
                           }}
                         >
-                          {tab.label}
+                          {tab.icon && <ThemedSvgIcon name={tab.icon as IconName} color="currentColor" size={16} />}
+                          {tab.label && <span>{tab.label}</span>}
                         </Link>
                       ))}
                     </div>
@@ -271,7 +272,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                           key={tab.key}
                           to={tab.path}
                           role="menuitem"
-                          style={{ ...menuNavItemStyle(true, tab.isActive, AREA_COLORS.tabActiveBorder), display: 'block', textDecoration: 'none' }}
+                          style={{ ...menuNavItemStyle(true, tab.isActive, AREA_COLORS.tabActiveBorder), display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}
                           onClick={() => setIsMenuOpen(false)}
                           onMouseEnter={(e) => {
                             if (!tab.isActive)
@@ -282,7 +283,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
                               e.currentTarget.style.backgroundColor = 'transparent';
                           }}
                         >
-                          {tab.label}
+                          {tab.icon && <ThemedSvgIcon name={tab.icon as IconName} color="currentColor" size={16} />}
+                          {tab.label && <span>{tab.label}</span>}
                         </Link>
                       ))}
                     </div>

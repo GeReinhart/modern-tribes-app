@@ -6,6 +6,9 @@ import DashboardBookmarksTab from '@/app/features/bookmarks/DashboardBookmarksTa
 import MyTasksTab from '@/app/features/tasks/my_tasks/MyTasksTab.tsx';
 import DashboardTribesTab from '@/app/features/glue/dashboard/tabs/DashboardTribesTab.tsx';
 import DashboardPlanningTab from '@/app/features/glue/dashboard/tabs/DashboardPlanningTab.tsx';
+import DashboardProjectsTab from '@/app/features/glue/dashboard/tabs/DashboardProjectsTab.tsx';
+import DashboardTaskInstancesTab from '@/app/features/glue/dashboard/tabs/DashboardTaskInstancesTab.tsx';
+import DashboardEventInstancesTab from '@/app/features/glue/dashboard/tabs/DashboardEventInstancesTab.tsx';
 import { TabConfigPopup } from '@/app/features/glue/tab-config/TabConfigPopup.tsx';
 import { useTabConfig } from '@/app/features/glue/tab-config/useTabConfig.ts';
 import { useUrlTab } from '@/app/features/glue/url-tab/useUrlTab.ts';
@@ -33,6 +36,9 @@ const STATIC_TABS = (t: (k: string) => string) => [
   { key: 'tribes', label: t('dashboard.tabs.tribes'), Component: DashboardTribesTab },
   { key: 'bookmarks', label: t('dashboard.tabs.bookmarks'), Component: DashboardBookmarksTab },
   { key: 'planning', label: t('dashboard.tabs.planning'), Component: DashboardPlanningTab },
+  { key: 'projects', label: t('dashboard.tabs.projects'), Component: DashboardProjectsTab },
+  { key: 'task-instances', label: t('dashboard.tabs.taskInstances'), Component: DashboardTaskInstancesTab },
+  { key: 'event-instances', label: t('dashboard.tabs.eventInstances'), Component: DashboardEventInstancesTab },
 ];
 
 const DashboardPageContent: React.FC = () => {
@@ -122,6 +128,7 @@ const DashboardPageContent: React.FC = () => {
           onSave={saveConfig}
           onClose={() => setShowTabConfig(false)}
           pinnedTabKeys={pinnedTabKeySet}
+          showQuickAddDefaults
           onUnpinTab={async (key) => {
             const bookmarkId = parsePinnedTabKey(key);
             if (!bookmarkId) return;

@@ -10,6 +10,8 @@ interface Props {
   color: string;
   top: number;
   height: number;
+  startLabel: string;
+  endLabel: string;
   col: number;
   totalCols: number;
   labels: FeatureLabel[];
@@ -18,16 +20,11 @@ interface Props {
   onEdit?: (event: CalendarEvent) => void;
 }
 
-function fmtTime(iso: string): string {
-  const d = new Date(iso);
-  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-}
-
 function initials(name: string): string {
   return name.split(' ').filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
 }
 
-const DayEventCard: React.FC<Props> = ({ event, color, top, height, col, totalCols, labels, persons, onView, onEdit }) => {
+const DayEventCard: React.FC<Props> = ({ event, color, top, height, startLabel, endLabel, col, totalCols, labels, persons, onView, onEdit }) => {
   const { theme } = useTheme();
   const colPct = 100 / totalCols;
 
@@ -79,7 +76,7 @@ const DayEventCard: React.FC<Props> = ({ event, color, top, height, col, totalCo
       </div>
       {height > 36 && (
         <span style={{ fontSize: '12px', color: theme.colors.secondary, display: 'block', whiteSpace: 'nowrap', fontWeight: 600 }}>
-          {fmtTime(event.start_at)} → {fmtTime(event.end_at)}
+          {startLabel} → {endLabel}
         </span>
       )}
 

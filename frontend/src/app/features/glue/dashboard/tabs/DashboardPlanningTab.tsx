@@ -183,6 +183,7 @@ const DashboardPlanningTab: React.FC = () => {
       )}
       <EventDayView
         events={filteredDayEvents} labels={allLabels} persons={allPersons}
+        selectedDate={selectedDate}
         onSelectEvent={e => setViewingEvent(e as PlanningEvent)}
         onEditEvent={e => startEditing(e as PlanningEvent)}
       />

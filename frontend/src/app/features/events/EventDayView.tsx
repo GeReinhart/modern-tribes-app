@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next';
 
 import DayEventCard from './DayEventCard.tsx';
 import type { CalendarEvent, FeatureLabel, PersonOption } from './types.ts';
-import { buildDayLayout } from './eventDayViewLayout.ts';
+import { buildDayLayout, clipToDay, dayBoundsMs, spansFullDay } from './eventDayViewLayout.ts';
+import type { ClippedRange } from './eventDayViewLayout.ts';
 
 const HOUR_H = 64;
 const MIN_EVENT_H = 18;
@@ -17,43 +18,41 @@ interface Props {
   events: CalendarEvent[];
   labels: FeatureLabel[];
   persons: PersonOption[];
+  selectedDate: string;
   onSelectEvent: (event: CalendarEvent) => void;
   onEditEvent?: (event: CalendarEvent) => void;
 }
 
-function isoToDecimalH(iso: string): number {
-  const d = new Date(iso);
-  return d.getHours() + d.getMinutes() / 60;
-}
-
-function computeRange(events: CalendarEvent[]): { startH: number; endH: number } {
-  if (!events.length) return { startH: DEFAULT_START_H, endH: DEFAULT_END_H };
-  const starts = events.map(e => isoToDecimalH(e.start_at));
-  const ends = events.map(e => isoToDecimalH(e.end_at));
+function computeRange(ranges: ClippedRange[]): { startH: number; endH: number } {
+  if (!ranges.length) return { startH: DEFAULT_START_H, endH: DEFAULT_END_H };
   return {
-    startH: Math.max(0, Math.floor(Math.min(...starts)) - 1),
-    endH: Math.min(24, Math.ceil(Math.max(...ends)) + 1),
+    startH: Math.max(0, Math.floor(Math.min(...ranges.map(r => r.startH))) - 1),
+    endH: Math.min(24, Math.ceil(Math.max(...ranges.map(r => r.endH))) + 1),
   };
 }
 
-const EventDayView: React.FC<Props> = ({ events, labels, persons, onSelectEvent, onEditEvent }) => {
+const EventDayView: React.FC<Props> = ({ events, labels, persons, selectedDate, onSelectEvent, onEditEvent }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
-  const allDayEvents = events.filter(e => e.all_day);
-  const timedEvents = events.filter(e => !e.all_day);
+  const allDayEvents = events.filter(e => e.all_day || spansFullDay(e, selectedDate));
+  const timedEvents = events.filter(e => !e.all_day && !spansFullDay(e, selectedDate));
   const layout = buildDayLayout(timedEvents);
 
-  const { startH, endH } = computeRange(timedEvents);
+  const bounds = dayBoundsMs(selectedDate);
+  const clippedRanges = new Map(timedEvents.map(e => [e.id, clipToDay(e, bounds)]));
+
+  const { startH, endH } = computeRange([...clippedRanges.values()]);
   const visibleHours = Array.from({ length: endH - startH + 1 }, (_, i) => startH + i);
   const containerH = (endH - startH) * HOUR_H;
 
-  const toPx = (iso: string) => (isoToDecimalH(iso) - startH) * HOUR_H;
+  const toPx = (h: number) => (h - startH) * HOUR_H;
 
   const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const nowH = now.getHours() + now.getMinutes() / 60;
   const nowPx = (nowH - startH) * HOUR_H;
-  const showNow = nowH >= startH && nowH <= endH;
+  const showNow = selectedDate === todayStr && nowH >= startH && nowH <= endH;
 
   const eventColor = (event: CalendarEvent): string => {
     const label = labels.find(l => event.label_ids.includes(l.id));
@@ -161,8 +160,10 @@ const EventDayView: React.FC<Props> = ({ events, labels, persons, onSelectEvent,
 
           {/* Events */}
           {layout.map(({ event, col, totalCols }) => {
-            const top = toPx(event.start_at);
-            const height = Math.max(toPx(event.end_at) - top, MIN_EVENT_H);
+            const range = clippedRanges.get(event.id)!;
+            const top = toPx(range.startH);
+            const height = Math.max(toPx(range.endH) - top, MIN_EVENT_H);
+            const midnight = t('features.events.midnight');
             return (
               <DayEventCard
                 key={event.id}
@@ -170,6 +171,8 @@ const EventDayView: React.FC<Props> = ({ events, labels, persons, onSelectEvent,
                 color={eventColor(event)}
                 top={top}
                 height={height}
+                startLabel={range.startIsMidnight ? midnight : range.startLabel}
+                endLabel={range.endIsMidnight ? midnight : range.endLabel}
                 col={col}
                 totalCols={totalCols}
                 labels={labels}

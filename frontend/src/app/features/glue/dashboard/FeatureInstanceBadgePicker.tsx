@@ -10,12 +10,14 @@ interface Props {
   featureTypes: string[];
   selectedInstanceId: string | null;
   onSelect: (instance: ProjectFeatureInstance | null) => void;
+  preferredInstanceId?: string | null;
 }
 
 const FeatureInstanceBadgePicker: React.FC<Props> = ({
   featureTypes,
   selectedInstanceId,
   onSelect,
+  preferredInstanceId,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -27,10 +29,16 @@ const FeatureInstanceBadgePicker: React.FC<Props> = ({
   );
 
   useEffect(() => {
-    if (!loading && filtered.length === 1 && selectedInstanceId === null) {
+    if (loading || selectedInstanceId !== null) return;
+    const preferred = preferredInstanceId
+      ? filtered.find((o) => o.instance.id === preferredInstanceId)
+      : undefined;
+    if (preferred) {
+      onSelect(preferred.instance);
+    } else if (filtered.length === 1) {
       onSelect(filtered[0].instance);
     }
-  }, [loading, filtered, selectedInstanceId, onSelect]);
+  }, [loading, filtered, selectedInstanceId, preferredInstanceId, onSelect]);
 
   const sectionLabel: React.CSSProperties = {
     fontSize: '11px',

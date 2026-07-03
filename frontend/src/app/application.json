@@ -671,7 +671,12 @@
             "- My Tasks tab: add a new task or kanban card directly from the dashboard by picking a project and tab",
             "- Planning tab: add a new event directly from the dashboard by picking a project and calendar tab",
             "- pin any bookmarked feature tab (tasks, kanban, journal…) as a dashboard tab to view its content directly in the dashboard",
-            "- pinned tabs are shown alongside the standard tabs and can be reordered or removed from the tab configurator"
+            "- pinned tabs are shown alongside the standard tabs and can be reordered or removed from the tab configurator",
+            "- in the tab configurator, choose a default project/tab that quick-add pre-fills automatically when adding a task or an event, so you don't have to pick it every time",
+            "- Projects tab: browse every project you have access to, with its tribe and a count of its open tasks and upcoming events",
+            "- Tasks tab: browse every kanban board and to-do list you have access to, with a count of open items on each",
+            "- Events tab: browse every event calendar you have access to, with a count of upcoming events on each",
+            "- clicking a project, task board, to-do list or event calendar opens it directly"
           ],
           "fr": [
             "- tableau de bord personnalisé affichant les tâches, tribus et signets de l'utilisateur",
@@ -679,7 +684,12 @@
             "- onglet Mes tâches : ajouter une tâche ou une carte kanban directement depuis le tableau de bord en choisissant un projet et un onglet",
             "- onglet Planning : ajouter un événement directement depuis le tableau de bord en choisissant un projet et un onglet calendrier",
             "- épinglez n'importe quel favori pointant vers une fonctionnalité (tâches, kanban, journal…) comme onglet du tableau de bord pour en voir le contenu directement",
-            "- les onglets épinglés s'affichent avec les onglets standards et peuvent être réordonnés ou supprimés depuis le configurateur d'onglets"
+            "- les onglets épinglés s'affichent avec les onglets standards et peuvent être réordonnés ou supprimés depuis le configurateur d'onglets",
+            "- dans le configurateur d'onglets, choisissez un projet/onglet par défaut que l'ajout rapide pré-remplit automatiquement lors de l'ajout d'une tâche ou d'un événement, pour ne pas avoir à le choisir à chaque fois",
+            "- onglet Projets : parcourez tous les projets auxquels vous avez accès, avec leur tribu et le nombre de tâches ouvertes et d'événements à venir",
+            "- onglet Tâches : parcourez tous les tableaux kanban et listes de tâches auxquels vous avez accès, avec le nombre d'éléments ouverts pour chacun",
+            "- onglet Événements : parcourez tous les calendriers d'événements auxquels vous avez accès, avec le nombre d'événements à venir pour chacun",
+            "- cliquer sur un projet, un tableau de tâches, une liste ou un calendrier l'ouvre directement"
           ]
         },
         "frontend": {
@@ -694,6 +704,7 @@
           "en": [
             "- create and manage events within a project tab",
             "- each event has a start and end time, or can span the whole day",
+            "- an event can also span several days with specific start and end times, by checking \"Multi-day\" instead of \"All day\"",
             "- assign participants from the project tribe when creating or editing an event",
             "- invite participants from the tribe, attach labels, set story points and add notes",
             "- set reminders that notify participants by in-app alert or email before the event",
@@ -705,6 +716,7 @@
           "fr": [
             "- créez et gérez des événements dans un onglet de projet",
             "- chaque événement a une heure de début et de fin, ou peut couvrir toute la journée",
+            "- un événement peut aussi s'étaler sur plusieurs jours avec des heures de début et de fin précises, en cochant \"Plusieurs jours\" au lieu de \"Toute la journée\"",
             "- assignez des participants depuis la tribu du projet lors de la création ou de l'édition",
             "- invitez des participants de la tribu, ajoutez des étiquettes, des points d'effort et des notes",
             "- définissez des rappels qui notifient les participants par alerte dans l'app ou par email",

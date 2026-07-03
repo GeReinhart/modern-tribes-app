@@ -4,6 +4,9 @@ const en: Record<string, string> = {
   'dashboard.tabs.tribes': 'Tribes',
   'dashboard.tabs.bookmarks': 'Bookmarks',
   'dashboard.tabs.planning': 'Planning',
+  'dashboard.tabs.projects': 'Projects',
+  'dashboard.tabs.taskInstances': 'Tasks',
+  'dashboard.tabs.eventInstances': 'Events',
 
   'dashboard.planning.noEvents': 'No events on this day.',
   'dashboard.planning.noTasks': 'No tasks due today.',
@@ -59,6 +62,20 @@ const en: Record<string, string> = {
   'dashboard.quickAdd.changeFeature': 'Change',
   'dashboard.quickAdd.taskTitlePlaceholder': 'Task title...',
   'dashboard.quickAdd.create': 'Create',
+
+  'dashboard.quickAddDefaults.title': 'Quick-add defaults',
+  'dashboard.quickAddDefaults.task': 'Task',
+  'dashboard.quickAddDefaults.event': 'Event',
+  'dashboard.quickAddDefaults.none': 'None (ask each time)',
+
+  'dashboard.directory.openTasks': 'open tasks',
+  'dashboard.directory.upcomingEvents': 'upcoming events',
+  'dashboard.directory.kanbanBoard': 'Kanban board',
+  'dashboard.directory.todoList': 'Todo list',
+  'dashboard.directory.eventCalendar': 'Event calendar',
+  'dashboard.directory.noProjects': 'No accessible projects yet.',
+  'dashboard.directory.noTaskInstances': 'No accessible task boards or lists yet.',
+  'dashboard.directory.noEventInstances': 'No accessible event calendars yet.',
 
   'dashboard.pinnedTab.pin': 'Pin as tab',
   'dashboard.pinnedTab.unpin': 'Unpin tab',

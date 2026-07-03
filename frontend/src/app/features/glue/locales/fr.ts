@@ -4,6 +4,9 @@ const fr: Record<string, string> = {
   'dashboard.tabs.tribes': 'Tribus',
   'dashboard.tabs.bookmarks': 'Favoris',
   'dashboard.tabs.planning': 'Planning',
+  'dashboard.tabs.projects': 'Projets',
+  'dashboard.tabs.taskInstances': 'Tâches',
+  'dashboard.tabs.eventInstances': 'Événements',
 
   'dashboard.planning.noEvents': 'Aucun événement ce jour.',
   'dashboard.planning.noTasks': 'Aucune tâche à rendre aujourd\'hui.',
@@ -60,6 +63,20 @@ const fr: Record<string, string> = {
   'dashboard.quickAdd.changeFeature': 'Changer',
   'dashboard.quickAdd.taskTitlePlaceholder': 'Titre de la tâche...',
   'dashboard.quickAdd.create': 'Créer',
+
+  'dashboard.quickAddDefaults.title': 'Valeurs par défaut de l\'ajout rapide',
+  'dashboard.quickAddDefaults.task': 'Tâche',
+  'dashboard.quickAddDefaults.event': 'Événement',
+  'dashboard.quickAddDefaults.none': 'Aucun (demander à chaque fois)',
+
+  'dashboard.directory.openTasks': 'tâches ouvertes',
+  'dashboard.directory.upcomingEvents': 'événements à venir',
+  'dashboard.directory.kanbanBoard': 'Tableau Kanban',
+  'dashboard.directory.todoList': 'Liste de tâches',
+  'dashboard.directory.eventCalendar': 'Calendrier',
+  'dashboard.directory.noProjects': 'Aucun projet accessible pour le moment.',
+  'dashboard.directory.noTaskInstances': 'Aucun tableau ou liste de tâches accessible pour le moment.',
+  'dashboard.directory.noEventInstances': 'Aucun calendrier accessible pour le moment.',
 
   'dashboard.pinnedTab.pin': 'Épingler comme onglet',
   'dashboard.pinnedTab.unpin': 'Désépingler',
