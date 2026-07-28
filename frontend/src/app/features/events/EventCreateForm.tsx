@@ -1,6 +1,8 @@
 import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import { ColorSwatchPicker } from '@/app/platform/core/layout/themes/components/ColorSwatchPicker.tsx';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { LABEL_COLORS } from '@/app/platform/core/layout/themes/themes.ts';
 import TaskItemModalLabels from '@/app/features/tasks/TaskItemModalLabels.tsx';
 
 import React, { useState } from 'react';
@@ -53,6 +55,7 @@ const EventCreateForm: React.FC<Props> = ({
   const [participantIds, setParticipantIds] = useState<string[]>([]);
   const [size, setSize] = useState<number | null>(null);
   const [notes, setNotes] = useState('');
+  const [color, setColor] = useState(LABEL_COLORS[0]);
   const [forceOnDashboard, setForceOnDashboard] = useState(false);
   const [localLabelIds, setLocalLabelIds] = useState<string[]>([]);
   const [reminders, setReminders] = useState<EventReminderCreate[]>(() =>
@@ -80,6 +83,7 @@ const EventCreateForm: React.FC<Props> = ({
       start_at: new Date(startAt).toISOString(),
       end_at: new Date(endAt).toISOString(),
       all_day: allDay,
+      color,
       force_on_dashboard: forceOnDashboard,
     };
     if (notes.trim()) data.document_content_html = notes;
@@ -137,6 +141,11 @@ const EventCreateForm: React.FC<Props> = ({
           onCreateLabel={onCreateLabel as Parameters<typeof TaskItemModalLabels>[0]['onCreateLabel']}
           onLabelCreated={(label) => setLocalLabelIds((prev) => [...prev, label.id])}
         />
+      </div>
+
+      <div>
+        <div style={sectionLabel}>{t('features.events.color')}</div>
+        <ColorSwatchPicker colors={LABEL_COLORS} value={color} onChange={setColor} />
       </div>
 
       <EventModalReminders

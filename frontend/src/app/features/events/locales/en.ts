@@ -12,6 +12,7 @@ const en: Record<string, string> = {
   'features.events.to': 'To',
   'features.events.participants': 'Participants',
   'features.events.labels': 'Labels',
+  'features.events.color': 'Color',
   'features.events.storyPoints': 'Story points',
   'features.events.notes': 'Notes',
   'features.events.noNotes': 'No notes yet.',

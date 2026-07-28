@@ -1,3 +1,4 @@
+import { ColorSwatchPicker } from '@/app/platform/core/layout/themes/components/ColorSwatchPicker.tsx';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { LABEL_COLORS } from '@/app/platform/core/layout/themes/themes.ts';
@@ -256,28 +257,7 @@ const TaskItemModalLabels: React.FC<Props> = ({
                 />
               )}
             </div>
-            <div style={{ display: 'flex', gap: '4px' }}>
-              {LABEL_COLORS.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setNewColor(c)}
-                  style={{
-                    width: '20px',
-                    height: '20px',
-                    borderRadius: '50%',
-                    background: c,
-                    border:
-                      newColor === c
-                        ? `2px solid ${theme.colors.text}`
-                        : '2px solid transparent',
-                    cursor: 'pointer',
-                    padding: 0,
-                    flexShrink: 0,
-                  }}
-                />
-              ))}
-            </div>
+            <ColorSwatchPicker colors={LABEL_COLORS} value={newColor} onChange={setNewColor} />
           </div>
           <div
             style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}

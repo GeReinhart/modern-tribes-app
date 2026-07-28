@@ -54,11 +54,6 @@ const EventDayView: React.FC<Props> = ({ events, labels, persons, selectedDate, 
   const nowPx = (nowH - startH) * HOUR_H;
   const showNow = selectedDate === todayStr && nowH >= startH && nowH <= endH;
 
-  const eventColor = (event: CalendarEvent): string => {
-    const label = labels.find(l => event.label_ids.includes(l.id));
-    return label?.color ?? theme.colors.primary;
-  };
-
   return (
     <div>
       {allDayEvents.length > 0 && (
@@ -68,7 +63,7 @@ const EventDayView: React.FC<Props> = ({ events, labels, persons, selectedDate, 
           </span>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
             {allDayEvents.map(ev => {
-              const color = eventColor(ev);
+              const color = ev.color;
               return (
                 <div
                   key={ev.id}
@@ -168,7 +163,7 @@ const EventDayView: React.FC<Props> = ({ events, labels, persons, selectedDate, 
               <DayEventCard
                 key={event.id}
                 event={event}
-                color={eventColor(event)}
+                color={event.color}
                 top={top}
                 height={height}
                 startLabel={range.startIsMidnight ? midnight : range.startLabel}

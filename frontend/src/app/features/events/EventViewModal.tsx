@@ -84,8 +84,11 @@ const EventViewModal: React.FC<Props> = ({ event, labels, persons, canEdit, proj
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
           <div style={{ flex: 1 }}>
-            <span style={{ fontWeight: 800, fontSize: 'var(--font-lg)', color: theme.colors.text, display: 'block' }}>
-              {event.title}
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: event.color, flexShrink: 0 }} />
+              <span style={{ fontWeight: 800, fontSize: 'var(--font-lg)', color: theme.colors.text }}>
+                {event.title}
+              </span>
             </span>
             {projectName && (
               <span style={{ fontSize: 'var(--font-xs)', color: theme.colors.secondary, marginTop: '2px', display: 'block' }}>

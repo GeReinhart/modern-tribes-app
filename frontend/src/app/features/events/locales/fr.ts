@@ -12,6 +12,7 @@ const fr: Record<string, string> = {
   'features.events.to': 'À',
   'features.events.participants': 'Participants',
   'features.events.labels': 'Étiquettes',
+  'features.events.color': 'Couleur',
   'features.events.storyPoints': 'Points d\'effort',
   'features.events.notes': 'Notes',
   'features.events.noNotes': 'Pas encore de notes.',

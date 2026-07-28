@@ -4,13 +4,12 @@ import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvg
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { CalendarEvent, FeatureLabel } from './types.ts';
+import type { CalendarEvent } from './types.ts';
 
 interface Props {
   year: number;
   month: number;
   events: CalendarEvent[];
-  labels: FeatureLabel[];
   selectedDate: string | null;
   onSelectDate: (date: string) => void;
   onPrevMonth: () => void;
@@ -31,14 +30,12 @@ function isoDate(y: number, m: number, d: number): string {
   return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 }
 
-const DOT_COLORS = ['#3b82f6', '#22c55e', '#ef4444', '#f97316', '#8b5cf6'];
-
 const TASK_DOT_COLOR = '#f97316';
 
 const JOURNAL_DOT_COLOR = '#8b5cf6';
 
 const CalendarMonth: React.FC<Props> = ({
-  year, month, events, labels, selectedDate, onSelectDate, onPrevMonth, onNextMonth, taskDates, journalDates,
+  year, month, events, selectedDate, onSelectDate, onPrevMonth, onNextMonth, taskDates, journalDates,
 }) => {
   const { theme } = useTheme();
   const { i18n } = useTranslation();
@@ -64,35 +61,21 @@ const CalendarMonth: React.FC<Props> = ({
     return map;
   }, [events]);
 
-  const labelColorMap = useMemo(() => {
-    const map = new Map<string, string>();
-    labels.forEach((l) => map.set(l.id, l.color));
-    return map;
-  }, [labels]);
-
   const multiDayBars = useMemo((): BarInfo[] => {
     const multi = events.filter(e => e.start_at.slice(0, 10) !== e.end_at.slice(0, 10));
     const sorted = [...multi].sort((a, b) => a.start_at.localeCompare(b.start_at));
     const bars: BarInfo[] = [];
     const laneEnds: string[] = [];
-    for (let i = 0; i < sorted.length; i++) {
-      const ev = sorted[i];
+    for (const ev of sorted) {
       const startDate = ev.start_at.slice(0, 10);
       const endDate = ev.end_at.slice(0, 10);
-      const firstLabel = ev.label_ids[0];
-      const color = firstLabel ? (labelColorMap.get(firstLabel) ?? DOT_COLORS[i % DOT_COLORS.length]) : DOT_COLORS[i % DOT_COLORS.length];
       let lane = laneEnds.findIndex(end => end < startDate);
       if (lane === -1) lane = laneEnds.length;
       laneEnds[lane] = endDate;
-      bars.push({ eventId: ev.id, color, lane, startDate, endDate });
+      bars.push({ eventId: ev.id, color: ev.color, lane, startDate, endDate });
     }
     return bars;
-  }, [events, labelColorMap]);
-
-  const getEventColor = (ev: CalendarEvent, index: number): string => {
-    const firstLabel = ev.label_ids[0];
-    return firstLabel ? (labelColorMap.get(firstLabel) ?? DOT_COLORS[index % DOT_COLORS.length]) : DOT_COLORS[index % DOT_COLORS.length];
-  };
+  }, [events]);
 
   const dayNames = useMemo(() => {
     const monday = new Date(2024, 0, 1);
@@ -172,8 +155,8 @@ const CalendarMonth: React.FC<Props> = ({
                 </div>
               )}
               <div style={{ display: 'flex', gap: '2px', flexWrap: 'wrap', justifyContent: 'center', minHeight: '6px' }}>
-                {singleDayEvents.slice(0, 3).map((ev, idx) => (
-                  <span key={ev.id} style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: isSelected ? theme.colors.surface : getEventColor(ev, idx), flexShrink: 0 }} />
+                {singleDayEvents.slice(0, 3).map((ev) => (
+                  <span key={ev.id} style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: isSelected ? theme.colors.surface : ev.color, flexShrink: 0 }} />
                 ))}
               </div>
               {hasTaskDue && (

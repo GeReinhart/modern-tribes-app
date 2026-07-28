@@ -29,6 +29,7 @@ export interface CalendarEvent {
   document_id: string | null;
   document_content_html: string | null;
   size: number | null;
+  color: string;
   force_on_dashboard: boolean;
   status: string;
   participant_ids: string[];
@@ -64,6 +65,7 @@ export interface EventCreate {
   all_day: boolean;
   document_content_html?: string;
   size?: number | null;
+  color: string;
   force_on_dashboard?: boolean;
 }
 
@@ -75,5 +77,6 @@ export interface EventUpdate {
   document_content_html?: string;
   size?: number | null;
   clear_size?: boolean;
+  color?: string;
   force_on_dashboard?: boolean;
 }

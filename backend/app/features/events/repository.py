@@ -214,13 +214,14 @@ def _enrich_planning_row(row: dict, participants_map: dict, reminders_map: dict,
 
 
 async def insert_event(
-    pool, feature_instance_id: str, title: str, start_at: datetime, end_at: datetime, all_day: bool, user_id: str, force_on_dashboard: bool = False
+    pool, feature_instance_id: str, title: str, start_at: datetime, end_at: datetime, all_day: bool, user_id: str,
+    color: str, force_on_dashboard: bool = False
 ) -> dict:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            """INSERT INTO events (feature_instance_id, title, start_at, end_at, all_day, force_on_dashboard, created_by, updated_by)
-               VALUES ($1, $2, $3, $4, $5, $6, $7, $7) RETURNING *""",
-            UUID(feature_instance_id), title, start_at, end_at, all_day, force_on_dashboard, UUID(user_id),
+            """INSERT INTO events (feature_instance_id, title, start_at, end_at, all_day, color, force_on_dashboard, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8) RETURNING *""",
+            UUID(feature_instance_id), title, start_at, end_at, all_day, color, force_on_dashboard, UUID(user_id),
         )
     return dict(row)
 

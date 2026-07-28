@@ -133,7 +133,7 @@ const DashboardPlanningTab: React.FC = () => {
   return (
     <div>
       <CalendarMonth
-        year={year} month={month} events={events} labels={allLabels}
+        year={year} month={month} events={events}
         selectedDate={selectedDate} onSelectDate={setSelectedDate}
         onPrevMonth={prevMonth} onNextMonth={nextMonth}
         taskDates={taskDates} journalDates={journalDates}

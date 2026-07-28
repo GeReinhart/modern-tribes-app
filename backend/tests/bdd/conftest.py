@@ -1204,8 +1204,8 @@ def given_events_table(datatable):
                 if not uid:
                     continue
                 await conn.execute(
-                    """INSERT INTO events(id, feature_instance_id, title, start_at, end_at, all_day, status)
-                       VALUES($1, $2, $3, $4, $5, $6, $7)
+                    """INSERT INTO events(id, feature_instance_id, title, start_at, end_at, all_day, color, status)
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(uid),
                     UUID(rec["feature_instance_id"]),
@@ -1213,6 +1213,7 @@ def given_events_table(datatable):
                     _parse_dt(rec.get("start_at")),
                     _parse_dt(rec.get("end_at")),
                     rec.get("all_day", "false").lower() == "true",
+                    rec.get("color", "#6b7280"),
                     rec.get("status", "active"),
                 )
         finally:

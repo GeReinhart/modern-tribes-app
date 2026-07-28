@@ -81,7 +81,7 @@ const EventsTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager }) =
       )}
 
       <CalendarMonth
-        year={year} month={month} events={events} labels={labels}
+        year={year} month={month} events={events}
         selectedDate={selectedDate} onSelectDate={setSelectedDate}
         onPrevMonth={prevMonth} onNextMonth={nextMonth}
       />

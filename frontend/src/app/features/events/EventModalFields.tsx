@@ -1,5 +1,7 @@
 import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import { ColorSwatchPicker } from '@/app/platform/core/layout/themes/components/ColorSwatchPicker.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { LABEL_COLORS } from '@/app/platform/core/layout/themes/themes.ts';
 import TaskItemModalLabels from '@/app/features/tasks/TaskItemModalLabels.tsx';
 
 import React from 'react';
@@ -42,6 +44,8 @@ interface Props {
   onToggleLabel: (labelId: string) => void;
   onCreateLabel: (data: FeatureLabelCreate) => Promise<FeatureLabel | null>;
   onLabelCreated: (label: TaskLabelInfo) => void;
+  color: string;
+  onColorChange: (v: string) => void;
   reminders: EventReminderCreate[];
   onRemindersChange: (r: EventReminderCreate[]) => void;
   notes: string;
@@ -55,6 +59,7 @@ const EventModalFields: React.FC<Props> = ({
   allDay, multiDay, startAt, endAt, onAllDayChange, onMultiDayChange, onStartAtChange, onEndAtChange,
   persons, participantIds, onParticipantsChange, size, onSizeChange,
   taskLabels, localLabelIds, isManager, featureInstanceId, onToggleLabel, onCreateLabel, onLabelCreated,
+  color, onColorChange,
   reminders, onRemindersChange, notes, onNotesChange,
   forceOnDashboard, onForceOnDashboardChange,
 }) => {
@@ -108,6 +113,15 @@ const EventModalFields: React.FC<Props> = ({
           onCreateLabel={onCreateLabel as Parameters<typeof TaskItemModalLabels>[0]['onCreateLabel']}
           onLabelCreated={onLabelCreated}
         />
+      </div>
+
+      <div>
+        <div style={sectionLabel}>{t('features.events.color')}</div>
+        {isEditing ? (
+          <ColorSwatchPicker colors={LABEL_COLORS} value={color} onChange={onColorChange} />
+        ) : (
+          <span style={{ display: 'inline-block', width: '20px', height: '20px', borderRadius: '50%', backgroundColor: color }} />
+        )}
       </div>
 
       <EventModalReminders

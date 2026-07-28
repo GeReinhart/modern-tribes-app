@@ -581,6 +581,7 @@ CREATE TABLE IF NOT EXISTS events (
     all_day BOOLEAN NOT NULL DEFAULT FALSE,
     document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
     size INTEGER CHECK (size > 0),
+    color VARCHAR(20) NOT NULL DEFAULT '#6b7280',
     force_on_dashboard BOOLEAN NOT NULL DEFAULT FALSE,
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CHECK (status IN ('pending', 'active', 'archived')),

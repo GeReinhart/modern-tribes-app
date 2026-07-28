@@ -1,3 +1,4 @@
+import { ColorSwatchPicker } from '@/app/platform/core/layout/themes/components/ColorSwatchPicker.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
@@ -120,28 +121,7 @@ export const LabelBar: React.FC<LabelBarProps> = ({
                   outline: 'none',
                 }}
               />
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                {COLOR_PALETTE.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    onClick={() => setEditColor(c)}
-                    style={{
-                      width: '18px',
-                      height: '18px',
-                      borderRadius: '50%',
-                      backgroundColor: c,
-                      border:
-                        editColor === c
-                          ? `2px solid ${theme.colors.text}`
-                          : '2px solid transparent',
-                      cursor: 'pointer',
-                      padding: 0,
-                      flexShrink: 0,
-                    }}
-                  />
-                ))}
-              </div>
+              <ColorSwatchPicker colors={COLOR_PALETTE} value={editColor} onChange={setEditColor} size={18} />
               <div style={{ display: 'flex', gap: '4px' }}>
                 <button
                   type="button"

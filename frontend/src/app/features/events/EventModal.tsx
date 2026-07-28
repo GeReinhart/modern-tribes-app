@@ -49,6 +49,7 @@ const EventModal: React.FC<Props> = ({
   );
   const [notes, setNotes] = useState(event?.document_content_html ?? '');
   const [size, setSize] = useState<number | null>(event?.size ?? null);
+  const [color, setColor] = useState(event?.color ?? '#6b7280');
   const [forceOnDashboard, setForceOnDashboard] = useState(event?.force_on_dashboard ?? false);
   const [participantIds, setParticipantIds] = useState<string[]>(event?.participant_ids ?? []);
   const [reminders, setReminders] = useState<EventReminderCreate[]>(
@@ -75,6 +76,7 @@ const EventModal: React.FC<Props> = ({
       if (size === null) patch.clear_size = true;
       else patch.size = size;
     }
+    if (color !== event.color) patch.color = color;
     if (forceOnDashboard !== (event.force_on_dashboard ?? false)) patch.force_on_dashboard = forceOnDashboard;
     if (Object.keys(patch).length > 0) await onUpdate(event.id, patch);
     await onSetParticipants(event.id, participantIds);
@@ -149,6 +151,8 @@ const EventModal: React.FC<Props> = ({
           onToggleLabel={handleToggle}
           onCreateLabel={onCreateLabel}
           onLabelCreated={(label) => setLocalLabelIds((prev) => [...prev, label.id])}
+          color={color}
+          onColorChange={setColor}
           reminders={reminders}
           onRemindersChange={setReminders}
           notes={notes}

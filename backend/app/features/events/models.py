@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
+DEFAULT_EVENT_COLOR = '#6b7280'
+
 
 class EventCreate(BaseModel):
     feature_instance_id: str
@@ -11,6 +13,7 @@ class EventCreate(BaseModel):
     all_day: bool = False
     document_content_html: Optional[str] = None
     size: Optional[int] = None
+    color: str = DEFAULT_EVENT_COLOR
     force_on_dashboard: bool = False
 
 
@@ -22,6 +25,7 @@ class EventUpdate(BaseModel):
     document_content_html: Optional[str] = None
     size: Optional[int] = None
     clear_size: bool = False
+    color: Optional[str] = None
     force_on_dashboard: Optional[bool] = None
 
 
@@ -53,6 +57,7 @@ class EventResponse(BaseModel):
     document_id: Optional[str] = None
     document_content_html: Optional[str] = None
     size: Optional[int] = None
+    color: str
     force_on_dashboard: bool = False
     status: str
     participant_ids: list[str] = []

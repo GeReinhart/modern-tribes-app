@@ -39,6 +39,7 @@ def _row_to_event(row: dict) -> EventResponse:
         document_id=str(row["document_id"]) if row.get("document_id") else None,
         document_content_html=row.get("document_content_html"),
         size=row.get("size"),
+        color=row["color"],
         force_on_dashboard=row.get("force_on_dashboard", False) or False,
         status=row["status"],
         participant_ids=list(row.get("participant_ids") or []),
@@ -103,7 +104,8 @@ async def create_event(data: EventCreate, current_user: dict = Depends(get_curre
     user_id = str(current_user["id"])
     await require_feature_access(pool, data.feature_instance_id, current_user, "member")
     row = await event_repository.insert_event(
-        pool, data.feature_instance_id, data.title, data.start_at, data.end_at, data.all_day, user_id, data.force_on_dashboard,
+        pool, data.feature_instance_id, data.title, data.start_at, data.end_at, data.all_day, user_id,
+        data.color, data.force_on_dashboard,
     )
     event_id = str(row["id"])
     if data.document_content_html:
@@ -135,6 +137,8 @@ async def update_event(event_id: str, data: EventUpdate, current_user: dict = De
         basic["end_at"] = data.end_at
     if data.all_day is not None:
         basic["all_day"] = data.all_day
+    if data.color is not None:
+        basic["color"] = data.color
     if data.force_on_dashboard is not None:
         basic["force_on_dashboard"] = data.force_on_dashboard
     await event_repository.update_event_basic(pool, event_id, basic, user_id)
