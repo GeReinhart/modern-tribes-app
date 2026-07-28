@@ -123,6 +123,7 @@ const DocumentPageFormPageContent: React.FC = () => {
     (): MenuAction[] => [
       {
         icon: 'x',
+        badgeIcon: 'file-text',
         label: t('common.cancel'),
         path: docPath,
       },

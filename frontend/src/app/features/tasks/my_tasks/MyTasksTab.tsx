@@ -59,6 +59,7 @@ const MyTasksTab: React.FC = () => {
     () => [
       {
         icon: 'plus' as const,
+        badgeIcon: 'check-square' as const,
         label: t('dashboard.quickAdd.addTask'),
         onClick: () => setShowAddTask(true),
       },

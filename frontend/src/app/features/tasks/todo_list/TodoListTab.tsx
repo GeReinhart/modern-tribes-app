@@ -73,6 +73,7 @@ const TodoListTab: React.FC<Props> = ({
         ? [
             {
               icon: 'settings' as const,
+              badgeIcon: 'layers' as const,
               label: configuring
                 ? t('features.todo.doneConfiguring')
                 : t('features.todo.configure'),
@@ -96,6 +97,7 @@ const TodoListTab: React.FC<Props> = ({
         ? [
             {
               icon: 'x' as const,
+              badgeIcon: 'layers' as const,
               label: t('search.removeHighlight'),
               onClick: () => {
                 const next = new URLSearchParams(searchParams);

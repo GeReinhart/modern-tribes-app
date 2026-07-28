@@ -118,11 +118,13 @@
         "description": {
           "en": [
             "- the app's visual structure: header, navigation menus and breadcrumbs",
-            "- shared UI controls used throughout the app: buttons, text fields, modals, tables and icons"
+            "- shared UI controls used throughout the app: buttons, text fields, modals, tables and icons",
+            "- an optional icon-only toolbar for the current page's actions, so they don't require opening the menu; from your profile you can choose to show it in the header, in the footer, or keep it hidden"
           ],
           "fr": [
             "- la structure visuelle de l'app : en-tête, menus de navigation et fil d'Ariane",
-            "- contrôles partagés utilisés dans toute l'app : boutons, champs, modales, tableaux et icônes"
+            "- contrôles partagés utilisés dans toute l'app : boutons, champs, modales, tableaux et icônes",
+            "- une barre d'outils optionnelle avec des icônes pour les actions de la page en cours, sans avoir à ouvrir le menu ; depuis votre profil, vous pouvez choisir de l'afficher dans l'en-tête, dans le pied de page, ou de la garder masquée"
           ]
         },
         "frontend": {

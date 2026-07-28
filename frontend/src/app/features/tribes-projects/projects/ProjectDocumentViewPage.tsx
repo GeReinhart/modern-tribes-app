@@ -221,6 +221,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
         ? [
             {
               icon: 'x' as const,
+              badgeIcon: 'search' as const,
               label: t('search.removeHighlight'),
               onClick: () => {
                 const next = new URLSearchParams(searchParams);

@@ -86,6 +86,7 @@ const TribesPageContent: React.FC = () => {
         ? [
             {
               icon: 'plus' as const,
+              badgeIcon: 'users' as const,
               label: t('tribes.createTribe'),
               path: '/app/tribes/create',
             },
@@ -94,7 +95,7 @@ const TribesPageContent: React.FC = () => {
       ...(isAdmin
         ? [
             {
-              icon: 'settings' as const,
+              icon: 'shield' as const,
               label: t('common.admin'),
               path: '/admin',
             },

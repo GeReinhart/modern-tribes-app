@@ -56,6 +56,7 @@ export const ProjectDocumentsTab: React.FC<ProjectDocumentsTabProps> = ({
         ? [
             {
               icon: 'plus' as const,
+              badgeIcon: 'file-text' as const,
               label: t('projectDocuments.addDocument'),
               onClick: () =>
                 navigate(

@@ -11,6 +11,7 @@ import { useCurrentUserProfile } from '@/app/platform/functions/people/users/use
 import { usePerson } from '@/app/platform/functions/people/persons/usePersons.ts';
 import { useRepresentsByUserId } from '@/app/platform/functions/people/represents/useRepresents.ts';
 import { authService } from '@/app/platform/core/authentication/authentication-service.ts';
+import { ToolbarPlacementControl } from '@/app/platform/functions/people/ToolbarPlacementControl.tsx';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -149,6 +150,9 @@ function ProfilePageContent() {
             </div>
           </div>
         </ThemedCard>
+
+        {/* Toolbar placement */}
+        <ToolbarPlacementControl />
 
         {/* Personal Information */}
         {person && (

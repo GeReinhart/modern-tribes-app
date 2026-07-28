@@ -50,7 +50,7 @@ const DashboardPlanningTab: React.FC = () => {
   const [journalDates, setJournalDates] = useState<Set<string>>(new Set());
 
   const tabActions = useMemo(
-    () => [{ icon: 'plus' as const, label: t('features.events.addEvent'), onClick: () => setShowAddEvent(true) }],
+    () => [{ icon: 'plus' as const, badgeIcon: 'calendar' as const, label: t('features.events.addEvent'), onClick: () => setShowAddEvent(true) }],
     [t],
   );
   useRegisterTabActions(tabActions);

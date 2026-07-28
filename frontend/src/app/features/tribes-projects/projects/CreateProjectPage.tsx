@@ -170,6 +170,7 @@ const CreateProjectPageContent: React.FC = () => {
     (): MenuAction[] => [
       {
         icon: 'x',
+        badgeIcon: 'briefcase',
         label: t('common.cancel'),
         path: `/app/tribes/${tribeId}`,
       },

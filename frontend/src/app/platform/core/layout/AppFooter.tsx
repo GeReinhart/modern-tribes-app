@@ -2,16 +2,19 @@ import {
   IconName,
   ThemedSvgIcon,
 } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
+import { ActionsToolbar } from '@/app/platform/core/layout/themes/components/ActionsToolbar.tsx';
 import { ZoomControl } from '@/app/platform/core/layout/themes/components/ZoomControl.tsx';
 import { UserAvatarIcon } from '@/app/platform/functions/people/users/UserAvatarIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { useHeaderVisibility } from '@/app/platform/core/layout/HeaderVisibilityContext.tsx';
+import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface AppFooterProps {
   bookmarkSlot?: React.ReactNode;
+  toolbarActions?: MenuAction[];
 }
 
 const NAV_ITEMS: { path: string; icon: IconName; label: string }[] = [
@@ -19,14 +22,13 @@ const NAV_ITEMS: { path: string; icon: IconName; label: string }[] = [
   { path: '/app/about', icon: 'info', label: 'About' },
 ];
 
-export const AppFooter: React.FC<AppFooterProps> = ({ bookmarkSlot }) => {
+export const AppFooter: React.FC<AppFooterProps> = ({ bookmarkSlot, toolbarActions }) => {
   const { theme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const { headerVisible, toggleHeader } = useHeaderVisibility();
 
   const footerStyle: React.CSSProperties = {
-
     position: 'sticky',
     bottom: 0,
     zIndex: 10,
@@ -35,8 +37,21 @@ export const AppFooter: React.FC<AppFooterProps> = ({ bookmarkSlot }) => {
     borderTop: `1px solid ${theme.colors.primary}40`,
     boxShadow: '0 -2px 8px rgba(0,0,0,0.10)',
     display: 'flex',
+    flexDirection: 'column',
+  };
+
+  const navRowStyle: React.CSSProperties = {
+    display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+  };
+
+  const toolbarRowStyle: React.CSSProperties = {
+    display: 'flex',
+    justifyContent: 'center',
+    borderBottom: `1px solid ${theme.colors.border}`,
+    marginBottom: '2px',
+    paddingBottom: '2px',
   };
 
   const navStyle: React.CSSProperties = {
@@ -54,44 +69,51 @@ export const AppFooter: React.FC<AppFooterProps> = ({ bookmarkSlot }) => {
 
   return (
     <footer style={footerStyle}>
-      <div style={navStyle}>
-        <UserAvatarIcon size={28} />
-        {NAV_ITEMS.map(({ path, icon, label }) => {
-          const isActive = location.pathname === path;
-          return (
-            <div
-              key={path}
-              style={navIconStyle(isActive)}
-              onClick={() => navigate(path)}
-              role="button"
-              aria-label={label}
-              title={label}
-            >
-              <ThemedSvgIcon
-                name={icon}
-                color={isActive ? theme.colors.primary : theme.colors.text}
-                size={20}
-              />
-            </div>
-          );
-        })}
-        {bookmarkSlot}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
-        <div
-          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: 0.7 }}
-          onClick={toggleHeader}
-          role="button"
-          aria-label={headerVisible ? 'Hide header' : 'Show header'}
-          title={headerVisible ? 'Hide header' : 'Show header'}
-        >
-          <ThemedSvgIcon
-            name={headerVisible ? 'chevrons-up' : 'chevrons-down'}
-            color={theme.colors.text}
-            size={20}
-          />
+      {toolbarActions && toolbarActions.length > 0 && (
+        <div style={toolbarRowStyle}>
+          <ActionsToolbar actions={toolbarActions} menuDirection="up" />
         </div>
-        <ZoomControl />
+      )}
+      <div style={navRowStyle}>
+        <div style={navStyle}>
+          <UserAvatarIcon size={28} />
+          {NAV_ITEMS.map(({ path, icon, label }) => {
+            const isActive = location.pathname === path;
+            return (
+              <div
+                key={path}
+                style={navIconStyle(isActive)}
+                onClick={() => navigate(path)}
+                role="button"
+                aria-label={label}
+                title={label}
+              >
+                <ThemedSvgIcon
+                  name={icon}
+                  color={isActive ? theme.colors.primary : theme.colors.text}
+                  size={20}
+                />
+              </div>
+            );
+          })}
+          {bookmarkSlot}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+          <div
+            style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: 0.7 }}
+            onClick={toggleHeader}
+            role="button"
+            aria-label={headerVisible ? 'Hide header' : 'Show header'}
+            title={headerVisible ? 'Hide header' : 'Show header'}
+          >
+            <ThemedSvgIcon
+              name={headerVisible ? 'chevrons-up' : 'chevrons-down'}
+              color={theme.colors.text}
+              size={20}
+            />
+          </div>
+          <ZoomControl />
+        </div>
       </div>
     </footer>
   );

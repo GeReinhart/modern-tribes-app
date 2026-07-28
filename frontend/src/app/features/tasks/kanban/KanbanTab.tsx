@@ -74,6 +74,7 @@ const KanbanTab: React.FC<Props> = ({
         ? [
             {
               icon: 'settings' as const,
+              badgeIcon: 'layers' as const,
               label: configuring
                 ? t('features.kanban.saveColumns')
                 : t('features.kanban.configureColumns'),
@@ -97,6 +98,7 @@ const KanbanTab: React.FC<Props> = ({
         ? [
             {
               icon: 'x' as const,
+              badgeIcon: 'layers' as const,
               label: t('search.removeHighlight'),
               onClick: () => {
                 const next = new URLSearchParams(searchParams);

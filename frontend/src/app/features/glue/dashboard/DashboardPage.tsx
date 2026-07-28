@@ -86,10 +86,10 @@ const DashboardPageContent: React.FC = () => {
         onClick: () => setShowTabConfig(true),
       },
       ...(authorization?.authorized
-        ? [{ icon: 'plus' as const, label: t('tribes.createTribe'), path: '/app/tribes/create' }]
+        ? [{ icon: 'plus' as const, badgeIcon: 'users' as const, label: t('tribes.createTribe'), path: '/app/tribes/create' }]
         : []),
       ...(hasAdminAccess
-        ? [{ icon: 'settings' as const, label: t('common.admin'), path: '/admin' }]
+        ? [{ icon: 'shield' as const, label: t('common.admin'), path: '/admin' }]
         : []),
     ],
     [authorization?.authorized, hasAdminAccess, t],

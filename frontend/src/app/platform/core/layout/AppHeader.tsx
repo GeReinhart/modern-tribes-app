@@ -1,5 +1,6 @@
 import { ApplicationLogo } from '@/app/platform/core/layout/themes/icons/ApplicationLogo.tsx';
 import { IconName, ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
+import { ActionIcon } from '@/app/platform/core/layout/themes/components/ActionIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 
@@ -144,7 +145,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           onClick={() => setIsMenuOpen(false)}
           onMouseEnter={(e) => onHover(e, true)} onMouseLeave={(e) => onHover(e, false)}
         >
-          <ThemedSvgIcon name={action.icon} color={color} size={16} />{action.label}
+          <ActionIcon action={action} color={color} size={16} />{action.label}
         </Link>
       );
     }
@@ -153,7 +154,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         onClick={() => { if (!action.disabled) { action.onClick?.(); setIsMenuOpen(false); } }}
         onMouseEnter={(e) => onHover(e, true)} onMouseLeave={(e) => onHover(e, false)}
       >
-        <ThemedSvgIcon name={action.icon} color={color} size={16} />{action.label}
+        <ActionIcon action={action} color={color} size={16} />{action.label}
       </div>
     );
   };

@@ -378,6 +378,7 @@ const ShowProjectPageContent: React.FC = () => {
         ? [
             {
               icon: 'x' as const,
+              badgeIcon: 'search' as const,
               label: t('search.removeHighlight'),
               onClick: () => {
                 const next = new URLSearchParams(searchParams);
@@ -391,22 +392,26 @@ const ShowProjectPageContent: React.FC = () => {
         ? [
             {
               icon: 'plus' as const,
+              badgeIcon: 'layers' as const,
               label: t('features.feature'),
               onClick: () => setShowAddFeature(true),
             },
             {
               icon: 'palette' as const,
+              badgeIcon: 'briefcase' as const,
               label: t('common.project'),
               onClick: () => setShowProjectThemePicker(true),
             },
             {
               icon: 'pencil' as const,
+              badgeIcon: 'briefcase' as const,
               label: t('common.project'),
               onClick: () =>
                 navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit`),
             },
             {
               icon: 'archive' as const,
+              badgeIcon: 'briefcase' as const,
               label: t('common.project'),
               onClick: () => setArchiveProjectOpen(true),
               variant: 'danger' as const,
@@ -423,6 +428,7 @@ const ShowProjectPageContent: React.FC = () => {
         ? [
             {
               icon: 'pencil' as const,
+              badgeIcon: 'layers' as const,
               label: t('features.feature'),
               onClick: () => {
                 setRenameValue(activeFeature.name ?? '');
@@ -438,11 +444,13 @@ const ShowProjectPageContent: React.FC = () => {
             },
             {
               icon: 'palette' as const,
+              badgeIcon: 'layers' as const,
               label: t('features.feature'),
               onClick: () => setShowFeatureThemePicker(true),
             },
             {
               icon: 'archive' as const,
+              badgeIcon: 'layers' as const,
               label: t('features.feature'),
               onClick: () =>
                 setArchiveTarget({

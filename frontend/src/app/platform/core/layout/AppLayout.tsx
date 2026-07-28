@@ -1,13 +1,15 @@
-import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
+import { ToolbarBar } from '@/app/platform/core/layout/themes/components/ToolbarBar.tsx';
+import { useAppLayoutState } from '@/app/platform/core/layout/useAppLayoutState.ts';
+import { useAppLayoutStyles } from '@/app/platform/core/layout/useAppLayoutStyles.ts';
 
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import { AppFooter } from './AppFooter.tsx';
 import { AppHeader } from './AppHeader.tsx';
 import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb.tsx';
-import { HeaderVisibilityProvider, useHeaderVisibility } from './HeaderVisibilityContext.tsx';
-import { useTabActionsContext } from './TabActionsContext.tsx';
+import { HeaderVisibilityProvider } from './HeaderVisibilityContext.tsx';
+import { ToolbarPlacementProvider } from './ToolbarPlacementContext.tsx';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -30,35 +32,14 @@ const AppLayoutInner: React.FC<AppLayoutProps> = ({
   breadcrumbTabs,
   bookmarkSlot,
 }) => {
-  const { theme } = useTheme();
-  const { tabActionsFromTab } = useTabActionsContext();
-  const { headerVisible } = useHeaderVisibility();
-  const mergedTabActions = useMemo(
-    () => [...(tabActions ?? []), ...tabActionsFromTab],
-    [tabActions, tabActionsFromTab],
-  );
-
-  const layoutStyle: React.CSSProperties = {
-    minHeight: '100vh',
-    backgroundColor: theme.colors.surface,
-    display: 'flex',
-    flexDirection: 'column',
-  };
-
-  const mainStyle: React.CSSProperties = {
-    flex: 1,
-    display: 'flex',
-    justifyContent: 'center',
-    padding: 'var(--main-pad)',
-  };
-
-  const contentStyle: React.CSSProperties = {
-    width: '100%',
-    maxWidth: '1420px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-  };
+  const {
+    theme,
+    headerVisible,
+    toolbarPlacement,
+    mergedTabActions,
+    toolbarActions,
+  } = useAppLayoutState({ menuActions, tabActions });
+  const { layoutStyle, mainStyle, contentStyle } = useAppLayoutStyles(theme);
 
   return (
     <div style={layoutStyle}>
@@ -72,16 +53,22 @@ const AppLayoutInner: React.FC<AppLayoutProps> = ({
           breadcrumbTabs={breadcrumbTabs}
         />
       )}
+      {toolbarPlacement === 'header' && <ToolbarBar actions={toolbarActions} />}
       <main style={mainStyle}>
         <div style={contentStyle}>{children}</div>
       </main>
-      <AppFooter bookmarkSlot={bookmarkSlot} />
+      <AppFooter
+        bookmarkSlot={bookmarkSlot}
+        toolbarActions={toolbarPlacement === 'footer' ? toolbarActions : undefined}
+      />
     </div>
   );
 };
 
 export const AppLayout: React.FC<AppLayoutProps> = (props) => (
   <HeaderVisibilityProvider>
-    <AppLayoutInner {...props} />
+    <ToolbarPlacementProvider>
+      <AppLayoutInner {...props} />
+    </ToolbarPlacementProvider>
   </HeaderVisibilityProvider>
 );

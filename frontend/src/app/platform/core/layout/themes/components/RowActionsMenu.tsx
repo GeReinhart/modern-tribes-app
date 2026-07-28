@@ -1,15 +1,23 @@
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
+import { ActionIcon } from '@/app/platform/core/layout/themes/components/ActionIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 interface RowActionsMenuProps {
   actions: MenuAction[];
+  triggerLabel?: string;
+  triggerIconSize?: number;
+  direction?: 'up' | 'down';
 }
 
 export function RowActionsMenu({
   actions,
+  triggerLabel = 'Row actions',
+  triggerIconSize = 16,
+  direction = 'down',
 }: RowActionsMenuProps): React.ReactElement {
   const { theme } = useTheme();
   const [open, setOpen] = useState(false);
@@ -43,7 +51,8 @@ export function RowActionsMenu({
     >
       <button
         onClick={() => setOpen((prev) => !prev)}
-        aria-label="Row actions"
+        aria-label={triggerLabel}
+        title={triggerLabel}
         style={{
           background: 'none',
           border: 'none',
@@ -56,7 +65,7 @@ export function RowActionsMenu({
         <ThemedSvgIcon
           name="more-vertical"
           color={theme.colors.text}
-          size={16}
+          size={triggerIconSize}
         />
       </button>
       {open && (
@@ -64,7 +73,7 @@ export function RowActionsMenu({
           style={{
             position: 'absolute',
             right: 0,
-            top: '100%',
+            ...(direction === 'up' ? { bottom: '100%' } : { top: '100%' }),
             zIndex: 50,
             background: theme.colors.surface,
             border: `1px solid ${theme.colors.border}`,
@@ -74,37 +83,48 @@ export function RowActionsMenu({
             padding: 'var(--space-xs) 0',
           }}
         >
-          {actions.map((action) => (
-            <button
-              key={action.label}
-              disabled={action.disabled}
-              onClick={() => handleAction(action)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--space-sm)',
-                width: '100%',
-                padding: 'var(--space-sm) var(--space-md)',
-                background: 'none',
-                border: 'none',
-                cursor: action.disabled ? 'not-allowed' : 'pointer',
-                color:
-                  action.variant === 'danger' ? 'theme.colors.danger' : theme.colors.text,
-                opacity: action.disabled ? 0.5 : 1,
-                fontSize: 'var(--font-sm)',
-                textAlign: 'left',
-              }}
-            >
-              <ThemedSvgIcon
-                name={action.icon}
-                color={
-                  action.variant === 'danger' ? 'theme.colors.danger' : theme.colors.text
-                }
-                size={14}
-              />
-              {action.label}
-            </button>
-          ))}
+          {actions.map((action) => {
+            const color =
+              action.variant === 'danger' ? theme.colors.danger : theme.colors.text;
+            const itemStyle: React.CSSProperties = {
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-sm)',
+              width: '100%',
+              padding: 'var(--space-sm) var(--space-md)',
+              background: 'none',
+              border: 'none',
+              cursor: action.disabled ? 'not-allowed' : 'pointer',
+              color,
+              opacity: action.disabled ? 0.5 : 1,
+              fontSize: 'var(--font-sm)',
+              textAlign: 'left',
+            };
+            if (action.path && !action.disabled) {
+              return (
+                <Link
+                  key={action.label}
+                  to={action.path}
+                  style={{ ...itemStyle, textDecoration: 'none' }}
+                  onClick={close}
+                >
+                  <ActionIcon action={action} color={color} size={14} />
+                  {action.label}
+                </Link>
+              );
+            }
+            return (
+              <button
+                key={action.label}
+                disabled={action.disabled}
+                onClick={() => handleAction(action)}
+                style={itemStyle}
+              >
+                <ActionIcon action={action} color={color} size={14} />
+                {action.label}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

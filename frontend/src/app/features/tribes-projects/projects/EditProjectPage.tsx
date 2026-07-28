@@ -106,6 +106,7 @@ const EditProjectPageContent: React.FC = () => {
     (): MenuAction[] => [
       {
         icon: 'x',
+        badgeIcon: 'briefcase',
         label: t('common.cancel'),
         path: `/app/tribes/${tribeId}/projects/${projectId}`,
       },

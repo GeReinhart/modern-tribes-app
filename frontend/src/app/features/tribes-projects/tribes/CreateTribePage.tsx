@@ -85,7 +85,7 @@ const CreateTribeFormContent: React.FC = () => {
 
   const menuActions = useMemo(
     (): MenuAction[] => [
-      { icon: 'x', label: t('common.cancel'), path: '/app' },
+      { icon: 'x', badgeIcon: 'users', label: t('common.cancel'), path: '/app' },
     ],
     [t],
   );

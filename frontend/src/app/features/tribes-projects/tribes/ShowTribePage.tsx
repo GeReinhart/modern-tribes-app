@@ -222,6 +222,7 @@ const ShowTribePageContent: React.FC = () => {
         ? [
             {
               icon: 'x' as const,
+              badgeIcon: 'search' as const,
               label: t('search.removeHighlight'),
               onClick: () => {
                 const next = new URLSearchParams(searchParams);
@@ -235,6 +236,7 @@ const ShowTribePageContent: React.FC = () => {
         ? [
             {
               icon: 'plus' as const,
+              badgeIcon: 'briefcase' as const,
               label: t('common.project'),
               path: `/app/tribes/${tribeId}/projects/new`,
             },
@@ -253,16 +255,19 @@ const ShowTribePageContent: React.FC = () => {
         ? [
             {
               icon: 'palette' as const,
+              badgeIcon: 'users' as const,
               label: t('tribes.title'),
               onClick: () => setShowThemePicker(true),
             },
             {
               icon: 'pencil' as const,
+              badgeIcon: 'users' as const,
               label: t('common.edit'),
               path: `/app/tribes/${tribeId}/update`,
             },
             {
               icon: 'archive' as const,
+              badgeIcon: 'users' as const,
               label: t('tribes.archive'),
               onClick: () => setShowArchiveConfirm(true),
               variant: 'danger' as const,

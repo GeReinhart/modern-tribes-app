@@ -133,6 +133,7 @@ const UpdateTribePageContent: React.FC = () => {
     (): MenuAction[] => [
       {
         icon: 'x',
+        badgeIcon: 'users',
         label: t('common.cancel'),
         path: `/app/tribes/${tribeId}`,
         disabled: isSubmitting,

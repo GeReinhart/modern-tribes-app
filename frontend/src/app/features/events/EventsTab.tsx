@@ -66,7 +66,7 @@ const EventsTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager }) =
   }, [dayEvents, activeLabelIds, activePersonIds]);
 
   const tabActions = useMemo(() => canEdit ? [{
-    icon: 'calendar' as const, label: t('features.events.addEvent'),
+    icon: 'plus' as const, badgeIcon: 'calendar' as const, label: t('features.events.addEvent'),
     onClick: () => setCreating(true),
   }] : [], [canEdit, t]);
 

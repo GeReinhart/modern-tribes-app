@@ -49,6 +49,7 @@ export const documentViewMenuActionsHooks = ({
         ? [
             {
               icon: 'pencil' as const,
+              badgeIcon: 'file-text' as const,
               label: t('common.edit'),
               onClick: () =>
                 navigate(
@@ -93,6 +94,7 @@ export const documentViewMenuActionsHooks = ({
         ? [
             {
               icon: 'archive' as const,
+              badgeIcon: 'file-text' as const,
               label: t('common.archive'),
               onClick: onArchive,
               variant: 'danger' as const,

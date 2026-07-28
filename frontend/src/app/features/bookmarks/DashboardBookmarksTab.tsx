@@ -23,6 +23,7 @@ const DashboardBookmarksTab: React.FC = () => {
     () => [
       {
         icon: 'settings' as const,
+        badgeIcon: 'layers' as const,
         label: configuring ? t('bookmarks.configuring') : t('bookmarks.configure'),
         onClick: () => setConfiguring((v) => !v),
       },

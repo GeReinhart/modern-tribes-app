@@ -151,6 +151,7 @@ const ProjectDocumentFormPageContent: React.FC = () => {
     (): MenuAction[] => [
       {
         icon: 'x',
+        badgeIcon: 'file-text',
         label: t('common.cancel'),
         path: cancelPath,
       },
