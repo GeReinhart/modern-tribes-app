@@ -5,6 +5,8 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { CalendarEvent } from './types.ts';
+import { computeMultiDayBars } from './weekLayout.ts';
+import type { BarInfo } from './weekLayout.ts';
 
 interface Props {
   year: number;
@@ -16,14 +18,6 @@ interface Props {
   onNextMonth: () => void;
   taskDates?: Set<string>;
   journalDates?: Set<string>;
-}
-
-interface BarInfo {
-  eventId: string;
-  color: string;
-  lane: number;
-  startDate: string;
-  endDate: string;
 }
 
 function isoDate(y: number, m: number, d: number): string {
@@ -61,21 +55,7 @@ const CalendarMonth: React.FC<Props> = ({
     return map;
   }, [events]);
 
-  const multiDayBars = useMemo((): BarInfo[] => {
-    const multi = events.filter(e => e.start_at.slice(0, 10) !== e.end_at.slice(0, 10));
-    const sorted = [...multi].sort((a, b) => a.start_at.localeCompare(b.start_at));
-    const bars: BarInfo[] = [];
-    const laneEnds: string[] = [];
-    for (const ev of sorted) {
-      const startDate = ev.start_at.slice(0, 10);
-      const endDate = ev.end_at.slice(0, 10);
-      let lane = laneEnds.findIndex(end => end < startDate);
-      if (lane === -1) lane = laneEnds.length;
-      laneEnds[lane] = endDate;
-      bars.push({ eventId: ev.id, color: ev.color, lane, startDate, endDate });
-    }
-    return bars;
-  }, [events]);
+  const multiDayBars = useMemo((): BarInfo[] => computeMultiDayBars(events), [events]);
 
   const dayNames = useMemo(() => {
     const monday = new Date(2024, 0, 1);

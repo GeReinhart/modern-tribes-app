@@ -58,7 +58,10 @@ const EventModal: React.FC<Props> = ({
   const [localLabelIds, setLocalLabelIds] = useState<string[]>(event?.label_ids ?? []);
   const [saving, setSaving] = useState(false);
   const [confirming, setConfirming] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  // EventModal is only ever opened from an explicit "edit" action (the
+  // read-only case is handled separately by EventViewModal), so it should
+  // start in edit mode rather than force a redundant second click.
+  const [isEditing, setIsEditing] = useState(true);
 
   if (!event) return null;
 

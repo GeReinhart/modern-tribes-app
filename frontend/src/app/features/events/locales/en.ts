@@ -27,6 +27,9 @@ const en: Record<string, string> = {
   'features.events.durationDays': '{{days}} day(s) and {{hours}} hour(s)',
   'features.events.midnight': 'Midnight',
   'features.events.noEvents': 'No events on this day.',
+  'features.events.noEventsWeek': 'No events this week.',
+  'features.events.switchToWeekView': 'Switch to week view',
+  'features.events.switchToDayView': 'Switch to day view',
 };
 
 export default en;

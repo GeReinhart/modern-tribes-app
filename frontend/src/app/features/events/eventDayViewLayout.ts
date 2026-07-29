@@ -60,6 +60,24 @@ export function clipToDay(event: CalendarEvent, bounds: DayBounds): ClippedRange
   };
 }
 
+export const DEFAULT_START_H = 8;
+
+export const DEFAULT_END_H = 20;
+
+export interface HourRange {
+  startH: number;
+  endH: number;
+}
+
+// Widens the default 8-20h window to fit every clipped event range, with a 1h margin.
+export function computeRange(ranges: ClippedRange[]): HourRange {
+  if (!ranges.length) return { startH: DEFAULT_START_H, endH: DEFAULT_END_H };
+  return {
+    startH: Math.max(0, Math.floor(Math.min(...ranges.map(r => r.startH))) - 1),
+    endH: Math.min(24, Math.ceil(Math.max(...ranges.map(r => r.endH))) + 1),
+  };
+}
+
 export function buildDayLayout(events: CalendarEvent[]): LayoutItem[] {
   if (!events.length) return [];
 

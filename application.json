@@ -670,6 +670,7 @@
           "en": [
             "- personalized dashboard showing the user's tasks, tribes and bookmarks",
             "- Planning tab: combined view of all events and tasks with due dates across all accessible projects, navigable day by day with label and project filters",
+            "- Planning tab: switch to a week view showing the 7 days side by side with the hours of the day as rows, from an action in the tab's menu or toolbar; the tasks due list below still follows the selected day",
             "- My Tasks tab: add a new task or kanban card directly from the dashboard by picking a project and tab",
             "- Planning tab: add a new event directly from the dashboard by picking a project and calendar tab",
             "- pin any bookmarked feature tab (tasks, kanban, journal…) as a dashboard tab to view its content directly in the dashboard",
@@ -684,6 +685,7 @@
           "fr": [
             "- tableau de bord personnalisé affichant les tâches, tribus et signets de l'utilisateur",
             "- onglet Planning : vue combinée de tous les événements et tâches à rendre sur tous les projets accessibles, navigable jour par jour avec filtres par étiquette et projet",
+            "- onglet Planning : basculez vers une vue semaine affichant les 7 jours côte à côte avec les heures de la journée en lignes, depuis une action du menu ou de la barre d'outils de l'onglet ; la liste des tâches à rendre en dessous reste liée au jour sélectionné",
             "- onglet Mes tâches : ajouter une tâche ou une carte kanban directement depuis le tableau de bord en choisissant un projet et un onglet",
             "- onglet Planning : ajouter un événement directement depuis le tableau de bord en choisissant un projet et un onglet calendrier",
             "- épinglez n'importe quel favori pointant vers une fonctionnalité (tâches, kanban, journal…) comme onglet du tableau de bord pour en voir le contenu directement",
@@ -715,6 +717,7 @@
             "- set reminders that notify participants by in-app alert or email before the event",
             "- view events on a monthly calendar",
             "- the day view shows a visual timeline where overlapping events appear in side-by-side columns",
+            "- switch to a week view showing the 7 days of the week side by side with the hours of the day as rows, from an action in the tab's menu or toolbar; the choice is remembered next time",
             "- the timeline spans from one hour before the first event to one hour after the last event",
             "- the time picker uses a clock face with hour and minute selection, duration quick-adjust buttons, and adapts to mobile by hiding the day timeline"
           ],
@@ -728,6 +731,7 @@
             "- définissez des rappels qui notifient les participants par alerte dans l'app ou par email",
             "- visualisez les événements dans un calendrier mensuel",
             "- la vue du jour affiche une ligne de temps visuelle où les événements qui se chevauchent apparaissent en colonnes côte à côte",
+            "- basculez vers une vue semaine affichant les 7 jours côte à côte avec les heures de la journée en lignes, depuis une action du menu ou de la barre d'outils de l'onglet ; le choix est mémorisé pour la prochaine fois",
             "- la ligne de temps s'étend d'une heure avant le premier événement à une heure après le dernier",
             "- le sélecteur d'heure utilise un cadran d'horloge avec sélection heure/minute, des boutons de réglage rapide de la durée, et s'adapte au mobile en masquant la ligne de temps"
           ]

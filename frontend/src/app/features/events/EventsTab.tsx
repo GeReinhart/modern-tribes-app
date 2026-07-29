@@ -11,7 +11,12 @@ import EventCreateModal from './EventCreateModal.tsx';
 import EventDayView from './EventDayView.tsx';
 import EventModal from './EventModal.tsx';
 import EventViewModal from './EventViewModal.tsx';
-import type { CalendarEvent, FeatureLabel, PersonOption } from './types.ts';
+import EventWeekView from './EventWeekView.tsx';
+import CalendarFilterBar from './CalendarFilterBar.tsx';
+import type { FilterChipGroup } from './CalendarFilterBar.tsx';
+import { useCalendarViewToggle } from './useCalendarViewToggle.ts';
+import { useVisibleCalendarEvents } from './useVisibleCalendarEvents.ts';
+import type { CalendarEvent } from './types.ts';
 
 interface Props {
   featureInstanceId: string;
@@ -38,37 +43,48 @@ const EventsTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager }) =
   const [activeLabelIds, setActiveLabelIds] = useState<string[]>([]);
   const [activePersonIds, setActivePersonIds] = useState<string[]>([]);
 
+  const { viewMode, toggleAction } = useCalendarViewToggle(`events-view-mode-${featureInstanceId}`, t);
+  const { visibleEvents, visibleLabels, visiblePersons } = useVisibleCalendarEvents(events, labels, persons, selectedDate, viewMode);
+
+  const selectDate = (date: string) => {
+    setSelectedDate(date);
+    const [y, m] = date.split('-').map(Number);
+    setYear(y); setMonth(m - 1);
+  };
+  const shiftSelectedDate = (days: number) => {
+    const d = new Date(selectedDate + 'T12:00:00');
+    d.setDate(d.getDate() + days);
+    selectDate(d.toISOString().slice(0, 10));
+  };
   const prevMonth = () => { if (month === 0) { setYear(y => y - 1); setMonth(11); } else setMonth(m => m - 1); };
   const nextMonth = () => { if (month === 11) { setYear(y => y + 1); setMonth(0); } else setMonth(m => m + 1); };
 
-  const dayEvents = useMemo(
-    () => events.filter(e => e.start_at.slice(0, 10) <= selectedDate && e.end_at.slice(0, 10) >= selectedDate).sort((a, b) => a.start_at.localeCompare(b.start_at)),
-    [events, selectedDate],
-  );
-
-  const dayLabels = useMemo((): FeatureLabel[] => {
-    const ids = new Set(dayEvents.flatMap(e => e.label_ids));
-    return labels.filter(l => ids.has(l.id));
-  }, [dayEvents, labels]);
-
-  const dayPersons = useMemo((): PersonOption[] => {
-    const ids = new Set(dayEvents.flatMap(e => e.participant_ids));
-    return persons.filter(p => ids.has(p.id));
-  }, [dayEvents, persons]);
-
-  const filteredDayEvents = useMemo(() => {
-    if (activeLabelIds.length === 0 && activePersonIds.length === 0) return dayEvents;
-    return dayEvents.filter(e => {
+  const filteredEvents = useMemo(() => {
+    if (activeLabelIds.length === 0 && activePersonIds.length === 0) return visibleEvents;
+    return visibleEvents.filter(e => {
       const labelOk = activeLabelIds.length === 0 || activeLabelIds.some(id => e.label_ids.includes(id));
       const personOk = activePersonIds.length === 0 || activePersonIds.some(id => e.participant_ids.includes(id));
       return labelOk && personOk;
     });
-  }, [dayEvents, activeLabelIds, activePersonIds]);
+  }, [visibleEvents, activeLabelIds, activePersonIds]);
 
-  const tabActions = useMemo(() => canEdit ? [{
-    icon: 'plus' as const, badgeIcon: 'calendar' as const, label: t('features.events.addEvent'),
-    onClick: () => setCreating(true),
-  }] : [], [canEdit, t]);
+  const filterGroups: FilterChipGroup[] = useMemo(() => [
+    ...visibleLabels.map(label => ({
+      id: label.id, label: label.name, color: label.color,
+      active: activeLabelIds.includes(label.id),
+      onToggle: () => setActiveLabelIds(prev => prev.includes(label.id) ? prev.filter(id => id !== label.id) : [...prev, label.id]),
+    })),
+    ...visiblePersons.map(person => ({
+      id: person.id, label: person.name, color: theme.colors.secondary, activeTextColor: theme.colors.surface,
+      active: activePersonIds.includes(person.id),
+      onToggle: () => setActivePersonIds(prev => prev.includes(person.id) ? prev.filter(id => id !== person.id) : [...prev, person.id]),
+    })),
+  ], [visibleLabels, visiblePersons, activeLabelIds, activePersonIds, theme]);
+
+  const tabActions = useMemo(() => [
+    ...(canEdit ? [{ icon: 'plus' as const, badgeIcon: 'calendar' as const, label: t('features.events.addEvent'), onClick: () => setCreating(true) }] : []),
+    toggleAction,
+  ], [canEdit, t, toggleAction]);
 
   useRegisterTabActions(tabActions);
 
@@ -80,17 +96,21 @@ const EventsTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager }) =
         </div>
       )}
 
-      <CalendarMonth
-        year={year} month={month} events={events}
-        selectedDate={selectedDate} onSelectDate={setSelectedDate}
-        onPrevMonth={prevMonth} onNextMonth={nextMonth}
-      />
+      {viewMode === 'day' && (
+        <>
+          <CalendarMonth
+            year={year} month={month} events={events}
+            selectedDate={selectedDate} onSelectDate={selectDate}
+            onPrevMonth={prevMonth} onNextMonth={nextMonth}
+          />
 
-      <div style={{ height: '1px', backgroundColor: theme.colors.border, margin: '16px 0' }} />
+          <div style={{ height: '1px', backgroundColor: theme.colors.border, margin: '16px 0' }} />
 
-      <div style={{ marginBottom: '8px', fontWeight: 700, fontSize: 'var(--font-sm)', color: theme.colors.secondary }}>
-        {new Date(selectedDate + 'T12:00:00').toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-      </div>
+          <div style={{ marginBottom: '8px', fontWeight: 700, fontSize: 'var(--font-sm)', color: theme.colors.secondary }}>
+            {new Date(selectedDate + 'T12:00:00').toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </div>
+        </>
+      )}
 
       {canEdit && (
         <button
@@ -109,39 +129,24 @@ const EventsTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager }) =
         </button>
       )}
 
-      {(dayLabels.length > 0 || dayPersons.length > 0) && (
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
-          {dayLabels.map(label => {
-            const active = activeLabelIds.includes(label.id);
-            return (
-              <button key={label.id} type="button"
-                onClick={() => setActiveLabelIds(prev => active ? prev.filter(id => id !== label.id) : [...prev, label.id])}
-                style={{ padding: '3px 10px', borderRadius: '12px', border: `2px solid ${label.color}`, backgroundColor: active ? label.color : 'transparent', color: active ? 'white' : label.color, fontSize: 'var(--font-xs)', fontWeight: 700, cursor: 'pointer' }}
-              >
-                {label.name}
-              </button>
-            );
-          })}
-          {dayPersons.map(person => {
-            const active = activePersonIds.includes(person.id);
-            return (
-              <button key={person.id} type="button"
-                onClick={() => setActivePersonIds(prev => active ? prev.filter(id => id !== person.id) : [...prev, person.id])}
-                style={{ padding: '3px 10px', borderRadius: '12px', border: `2px solid ${theme.colors.secondary}`, backgroundColor: active ? theme.colors.secondary : 'transparent', color: active ? theme.colors.surface : theme.colors.secondary, fontSize: 'var(--font-xs)', fontWeight: 700, cursor: 'pointer' }}
-              >
-                {person.name}
-              </button>
-            );
-          })}
-        </div>
-      )}
+      <CalendarFilterBar groups={filterGroups} />
 
-      <EventDayView
-        events={filteredDayEvents} labels={labels} persons={persons}
-        selectedDate={selectedDate}
-        onSelectEvent={setViewingEvent}
-        onEditEvent={canEdit ? setSelectedEvent : undefined}
-      />
+      {viewMode === 'day' ? (
+        <EventDayView
+          events={filteredEvents} labels={labels} persons={persons}
+          selectedDate={selectedDate}
+          onSelectEvent={setViewingEvent}
+          onEditEvent={canEdit ? setSelectedEvent : undefined}
+        />
+      ) : (
+        <EventWeekView
+          events={filteredEvents} labels={labels} persons={persons}
+          selectedDate={selectedDate} onSelectDate={selectDate}
+          onPrevWeek={() => shiftSelectedDate(-7)} onNextWeek={() => shiftSelectedDate(7)}
+          onSelectEvent={setViewingEvent}
+          onEditEvent={canEdit ? setSelectedEvent : undefined}
+        />
+      )}
 
       {creating && (
         <EventCreateModal

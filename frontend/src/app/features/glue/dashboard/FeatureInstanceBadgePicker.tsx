@@ -1,7 +1,8 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import type { ProjectFeatureInstance } from '@/app/features/tribes-projects/projects/project-features.types.ts';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useAllFeatureInstances } from './useAllFeatureInstances.ts';
@@ -28,17 +29,25 @@ const FeatureInstanceBadgePicker: React.FC<Props> = ({
     [options, featureTypes],
   );
 
+  // Tracks an explicit "change" click so the auto-select effect below
+  // doesn't immediately snap back to the same preferred instance. Set only
+  // by handleChange, never by the auto-select itself, so it can never
+  // suppress the initial preselection.
+  const userClearedRef = useRef(false);
+
   useEffect(() => {
-    if (loading || selectedInstanceId !== null) return;
+    if (loading || selectedInstanceId !== null || userClearedRef.current) return;
     const preferred = preferredInstanceId
       ? filtered.find((o) => o.instance.id === preferredInstanceId)
       : undefined;
-    if (preferred) {
-      onSelect(preferred.instance);
-    } else if (filtered.length === 1) {
-      onSelect(filtered[0].instance);
-    }
+    const toSelect = preferred ?? (filtered.length === 1 ? filtered[0] : undefined);
+    if (toSelect) onSelect(toSelect.instance);
   }, [loading, filtered, selectedInstanceId, preferredInstanceId, onSelect]);
+
+  const handleChange = () => {
+    userClearedRef.current = true;
+    onSelect(null);
+  };
 
   const sectionLabel: React.CSSProperties = {
     fontSize: '11px',
@@ -60,38 +69,44 @@ const FeatureInstanceBadgePicker: React.FC<Props> = ({
 
   if (selectedOption) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div>
         <div style={sectionLabel}>{t('dashboard.quickAdd.selectFeature')}</div>
-        <span
-          style={{
-            padding: '6px 14px',
-            borderRadius: '20px',
-            border: `2px solid ${theme.colors.primary}`,
-            backgroundColor: `${theme.colors.primary}25`,
-            color: theme.colors.primary,
-            fontSize: 'var(--font-xs)',
-            fontWeight: 700,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {selectedOption.tribe_name} — {selectedOption.project_name} — {selectedOption.instance.name}
-        </span>
-        <button
-          type="button"
-          onClick={() => onSelect(null)}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            fontSize: 'var(--font-xs)',
-            color: theme.colors.secondary,
-            textDecoration: 'underline',
-            padding: 0,
-            flexShrink: 0,
-          }}
-        >
-          {t('dashboard.quickAdd.changeFeature')}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span
+            style={{
+              flex: 1, minWidth: 0,
+              padding: '6px 14px',
+              borderRadius: '20px',
+              border: `2px solid ${theme.colors.primary}`,
+              backgroundColor: `${theme.colors.primary}25`,
+              color: theme.colors.primary,
+              fontSize: 'var(--font-xs)',
+              fontWeight: 700,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {selectedOption.tribe_name} — {selectedOption.project_name} — {selectedOption.instance.name}
+          </span>
+          <button
+            type="button"
+            onClick={handleChange}
+            title={t('dashboard.quickAdd.changeFeature')}
+            aria-label={t('dashboard.quickAdd.changeFeature')}
+            style={{
+              background: 'none',
+              border: `1px solid ${theme.colors.border}`,
+              borderRadius: 'var(--radius-md)',
+              cursor: 'pointer',
+              padding: '6px',
+              lineHeight: 0,
+              flexShrink: 0,
+            }}
+          >
+            <ThemedSvgIcon name="refresh" color={theme.colors.secondary} size={16} />
+          </button>
+        </div>
       </div>
     );
   }
