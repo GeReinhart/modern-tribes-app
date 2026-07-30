@@ -57,6 +57,46 @@ Feature: Create a represents link
     And the represents table contains:
       | user_id | person_id | status |
 
+  Scenario: POST /represents/ for a pair that is already active — 409 conflict and the database is not modified
+    Given I am authenticated as an administrator: user.id 0001
+    And the persons table contains:
+      | id   | first_name | last_name | gender | status |
+      | 0020 | Alice      | Dupont    | female | active |
+    And the represents table contains:
+      | user_id | person_id | status |
+      | 0002    | 0020      | active |
+    When I POST /api/platform/functions/people/represents/ with body:
+      """
+      {
+        "user_id": "0002",
+        "person_id": "0020"
+      }
+      """
+    Then the response status code is 409
+    And the represents table contains:
+      | user_id | person_id | status |
+      | 0002    | 0020      | active |
+
+  Scenario: POST /represents/ for a pair whose existing link is archived — the link is reactivated instead of duplicated
+    Given I am authenticated as an administrator: user.id 0001
+    And the persons table contains:
+      | id   | first_name | last_name | gender | status |
+      | 0020 | Alice      | Dupont    | female | active |
+    And the represents table contains:
+      | user_id | person_id | status   |
+      | 0002    | 0020      | archived |
+    When I POST /api/platform/functions/people/represents/ with body:
+      """
+      {
+        "user_id": "0002",
+        "person_id": "0020"
+      }
+      """
+    Then the response status code is 200
+    And the represents table contains:
+      | user_id | person_id | status |
+      | 0002    | 0020      | active |
+
   @error_case
   Scenario: POST /represents/ as a viewer — 403 error and the database is not modified
     Given I am authenticated as a regular user: user.id 0002

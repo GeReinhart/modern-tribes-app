@@ -2,10 +2,8 @@ import {
   ModalBody,
   ThemedModal,
 } from '@/app/platform/core/layout/themes/components/ThemedModal.tsx';
-import {
-  useRepresentsByUserId,
-  useRepresentsMutations,
-} from '@/app/platform/functions/people/represents/useRepresents.ts';
+import { useRepresentsByUserId } from '@/app/platform/functions/people/represents/useRepresents.ts';
+import { useSyncRepresentedPersons } from '@/app/platform/functions/people/represents/useSyncRepresentedPersons.ts';
 import { FormMode } from '@/app/platform/core/common.types.ts';
 import { User, UserCreate, UserUpdate } from '@/app/platform/functions/people/users/user.types.ts';
 
@@ -31,7 +29,7 @@ export const UserModal: React.FC<UserModalProps> = ({
   const { represents, loading: representsLoading } = useRepresentsByUserId(
     user?.id ?? null,
   );
-  const { createRepresents, deleteRepresents } = useRepresentsMutations();
+  const { syncRepresentedPersons } = useSyncRepresentedPersons();
 
   const initialRepresentPersonIds = representsLoading
     ? undefined
@@ -50,23 +48,7 @@ export const UserModal: React.FC<UserModalProps> = ({
     await onSubmit(data);
 
     if (mode === 'edit' && user?.id) {
-      const existingIds = represents.map((r) => r.person_id);
-      const toAdd = representPersonIds.filter(
-        (id) => !existingIds.includes(id),
-      );
-      const toRemove = represents.filter(
-        (r) => !representPersonIds.includes(r.person_id),
-      );
-      await Promise.all([
-        ...toAdd.map((pid) =>
-          createRepresents({
-            user_id: user.id!,
-            person_id: pid,
-            status: 'active',
-          }),
-        ),
-        ...toRemove.map((r) => deleteRepresents(r.id)),
-      ]);
+      await syncRepresentedPersons(user.id, represents, representPersonIds);
     }
 
     onClose();

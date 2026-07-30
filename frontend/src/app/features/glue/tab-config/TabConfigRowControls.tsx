@@ -3,8 +3,6 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React from 'react';
 
-import { Eye, EyeOff } from 'lucide-react';
-
 import { isNameInvalid } from './TabConfigRow.tsx';
 import { TabWithConfig } from './types.ts';
 
@@ -92,9 +90,10 @@ export const NameInput: React.FC<{
           opacity: hidden ? 0.6 : 1,
         }}
       />
-      <button
-        type="button"
-        onClick={onToggleHidden}
+      <input
+        type="checkbox"
+        checked={!hidden}
+        onChange={onToggleHidden}
         disabled={toggleDisabled}
         title={
           toggleDisabled
@@ -106,21 +105,14 @@ export const NameInput: React.FC<{
         aria-label={hidden ? t('tabConfig.showName') : t('tabConfig.hideName')}
         style={{
           position: 'absolute',
-          right: '4px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '2px',
-          border: 'none',
-          background: 'transparent',
+          right: '6px',
+          width: '14px',
+          height: '14px',
           cursor: toggleDisabled ? 'not-allowed' : 'pointer',
-          color: theme.colors.secondary,
           opacity: toggleDisabled ? 0.4 : 1,
-          borderRadius: '4px',
+          accentColor: theme.colors.primary,
         }}
-      >
-        {hidden ? <Eye size={14} /> : <EyeOff size={14} />}
-      </button>
+      />
     </div>
   );
 };

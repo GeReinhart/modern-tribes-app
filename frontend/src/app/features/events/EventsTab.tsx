@@ -2,8 +2,9 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 
 import { useEvents } from './hooks.ts';
 import CalendarMonth from './CalendarMonth.tsx';
@@ -14,6 +15,7 @@ import EventViewModal from './EventViewModal.tsx';
 import EventWeekView from './EventWeekView.tsx';
 import CalendarFilterBar from './CalendarFilterBar.tsx';
 import type { FilterChipGroup } from './CalendarFilterBar.tsx';
+import { isoToLocalDt } from './dateUtils.ts';
 import { useCalendarViewToggle } from './useCalendarViewToggle.ts';
 import { useVisibleCalendarEvents } from './useVisibleCalendarEvents.ts';
 import type { CalendarEvent } from './types.ts';
@@ -45,6 +47,26 @@ const EventsTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager }) =
 
   const { viewMode, toggleAction } = useCalendarViewToggle(`events-view-mode-${featureInstanceId}`, t);
   const { visibleEvents, visibleLabels, visiblePersons } = useVisibleCalendarEvents(events, labels, persons, selectedDate, viewMode);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlEventId = searchParams.get('eventId');
+
+  useEffect(() => {
+    if (!urlEventId) return;
+    const deepLinkedEvent = events.find((e) => e.id === urlEventId);
+    if (!deepLinkedEvent) return;
+    const deepLinkedDate = isoToLocalDt(deepLinkedEvent.start_at).slice(0, 10);
+    setSelectedDate(deepLinkedDate);
+    const [y, m] = deepLinkedDate.split('-').map(Number);
+    setYear(y); setMonth(m - 1);
+    setViewingEvent(deepLinkedEvent);
+  }, [urlEventId, events]);
+
+  const closeDeepLinked = () => {
+    searchParams.delete('eventId');
+    setSearchParams(searchParams, { replace: true });
+    setViewingEvent(null);
+  };
 
   const selectDate = (date: string) => {
     setSelectedDate(date);
@@ -175,7 +197,7 @@ const EventsTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager }) =
           labels={labels}
           persons={persons}
           canEdit={canEdit}
-          onClose={() => setViewingEvent(null)}
+          onClose={closeDeepLinked}
           onEdit={(event) => { setViewingEvent(null); setSelectedEvent(event); }}
         />
       )}

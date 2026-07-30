@@ -20,6 +20,14 @@ def test_create_represents_success():
 def test_create_represents_missing_field():
     pass
 
+@scenario(FEATURE, "POST /represents/ for a pair that is already active — 409 conflict and the database is not modified")
+def test_create_represents_already_active():
+    pass
+
+@scenario(FEATURE, "POST /represents/ for a pair whose existing link is archived — the link is reactivated instead of duplicated")
+def test_create_represents_reactivate_archived():
+    pass
+
 @scenario(FEATURE, "POST /represents/ as a viewer — 403 error and the database is not modified")
 def test_create_represents_forbidden():
     pass

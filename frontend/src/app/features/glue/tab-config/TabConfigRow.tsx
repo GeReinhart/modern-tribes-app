@@ -112,6 +112,10 @@ export const TabConfigHeader: React.FC<TabConfigHeaderProps> = ({ theme, t, hasP
       color: theme.colors.secondary,
       fontSize: 'var(--font-sm)',
       fontWeight: 600,
+      position: 'sticky',
+      top: 0,
+      backgroundColor: theme.colors.surface,
+      zIndex: 1,
     }}
   >
     <span style={{ width: '32px' }} />

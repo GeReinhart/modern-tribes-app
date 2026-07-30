@@ -3,6 +3,7 @@ const fr: Record<string, string> = {
   'features.events.create': 'Créer',
   'features.events.editEvent': 'Modifier l\'événement',
   'features.events.viewEvent': 'Événement',
+  'features.events.openInProject': 'Ouvrir dans le projet',
   'features.events.title': 'Titre',
   'features.events.titlePlaceholder': 'Titre de l\'événement...',
   'features.events.schedule': 'Date et heure',

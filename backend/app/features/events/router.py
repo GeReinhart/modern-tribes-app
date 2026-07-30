@@ -61,6 +61,8 @@ def _row_to_planning_event(row: dict) -> PlanningEventResponse:
         project_id=str(row["project_id"]),
         project_url_param_id=row.get("project_url_param_id"),
         project_name=row["project_name"],
+        tribe_url_param_id=row.get("tribe_url_param_id"),
+        tribe_name=row.get("tribe_name"),
         labels=[PlanningEventLabel(**lb) for lb in (row.get("labels") or [])],
     )
 

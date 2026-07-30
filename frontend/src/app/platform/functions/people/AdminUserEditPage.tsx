@@ -8,10 +8,8 @@ import {
 } from '@/app/platform/core/layout/AdminNavigation.tsx';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
-import {
-  useRepresentsByUserId,
-  useRepresentsMutations,
-} from '@/app/platform/functions/people/represents/useRepresents.ts';
+import { useRepresentsByUserId } from '@/app/platform/functions/people/represents/useRepresents.ts';
+import { useSyncRepresentedPersons } from '@/app/platform/functions/people/represents/useSyncRepresentedPersons.ts';
 import {
   useUserMutations,
   useUserWithRolesAndPermissions,
@@ -34,7 +32,7 @@ const UserEditPageContent: React.FC = () => {
     userId ?? null,
   );
   const { updateUser } = useUserMutations();
-  const { createRepresents, deleteRepresents } = useRepresentsMutations();
+  const { syncRepresentedPersons } = useSyncRepresentedPersons();
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const breadcrumbs = useMemo(
@@ -58,24 +56,7 @@ const UserEditPageContent: React.FC = () => {
     try {
       const data = _data as UserUpdate;
       await updateUser(user.id, data);
-
-      const existingIds = represents.map((r) => r.person_id);
-      const toAdd = representPersonIds.filter(
-        (id) => !existingIds.includes(id),
-      );
-      const toRemove = represents.filter(
-        (r) => !representPersonIds.includes(r.person_id),
-      );
-      await Promise.all([
-        ...toAdd.map((pid) =>
-          createRepresents({
-            user_id: user.id,
-            person_id: pid,
-            status: 'active',
-          }),
-        ),
-        ...toRemove.map((r) => deleteRepresents(r.id)),
-      ]);
+      await syncRepresentedPersons(user.id, represents, representPersonIds);
 
       navigate('/admin/people');
     } catch (err: unknown) {

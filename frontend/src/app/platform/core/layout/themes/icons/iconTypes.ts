@@ -96,7 +96,8 @@ export type IconName =
   | 'shield'
   | 'columns'
   | 'check-square'
-  | 'file';
+  | 'file'
+  | 'maximize';
 
 export const ICON_NAMES: IconName[] = [
   'plus', 'trash', 'pencil', 'eye', 'arrow-left', 'arrow-right',
@@ -115,5 +116,5 @@ export const ICON_NAMES: IconName[] = [
   'copy', 'rotate-cw', 'dollar-sign', 'database', 'server', 'cloud',
   'coffee', 'headphones', 'mic', 'volume-2', 'disc', 'dumbbell', 'ball',
   'watch', 'trending-up', 'compass', 'shield', 'columns', 'check-square',
-  'file',
+  'file', 'maximize',
 ];

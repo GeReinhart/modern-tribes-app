@@ -22,22 +22,19 @@ const MyTasksCardContent: React.FC<Props> = ({ documentContentHtml, labels, onOp
         <button
           onClick={onOpenPopup}
           title={t('features.tasks.openInPopup')}
+          aria-label={t('features.tasks.openInPopup')}
           style={{
             background: 'none',
             border: `1px solid ${theme.colors.primary}`,
             borderRadius: '6px',
             cursor: 'pointer',
-            padding: '4px 10px',
+            padding: '4px',
             display: 'flex',
             alignItems: 'center',
-            gap: '5px',
-            color: theme.colors.primary,
-            fontSize: 'var(--font-xs)',
-            fontWeight: 600,
+            justifyContent: 'center',
           }}
         >
-          <ThemedSvgIcon name="external-link" color={theme.colors.primary} size={12} />
-          {t('features.tasks.openInPopup')}
+          <ThemedSvgIcon name="maximize" color={theme.colors.primary} size={14} />
         </button>
       </div>
       {labels.length > 0 && (

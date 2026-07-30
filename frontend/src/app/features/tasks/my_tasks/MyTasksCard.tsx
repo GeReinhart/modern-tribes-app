@@ -1,5 +1,6 @@
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedConfirmDialog } from '@/app/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
+import { buildFeatureInstancePath } from '@/app/platform/core/routing/featureInstancePath.ts';
 import MyTaskEditModal from './MyTaskEditModal.tsx';
 import type { TaskLabelInfo } from '@/app/features/tasks/types.ts';
 import MyTasksCardContent from './MyTasksCardContent.tsx';
@@ -18,11 +19,6 @@ interface Props {
   persons: PersonOption[];
   onMarkDone: () => Promise<void>;
   onRefresh?: () => void;
-}
-
-function buildSourcePath(task: MyTask): string {
-  if (!task.tribe_url_param_id || !task.project_url_param_id) return `/app/tribes`;
-  return `/app/tribes/${task.tribe_url_param_id}/projects/${task.project_url_param_id}/${task.feature_instance_id}?taskId=${task.id}`;
 }
 
 const MyTasksCard: React.FC<Props> = ({ task, persons, onMarkDone, onRefresh }) => {
@@ -120,7 +116,7 @@ const MyTasksCard: React.FC<Props> = ({ task, persons, onMarkDone, onRefresh }) 
               <ThemedSvgIcon name={expanded ? 'chevron-up' : 'chevron-down'} color={theme.colors.text} size={16} />
             </button>
             <button
-              onClick={() => navigate(buildSourcePath(task))}
+              onClick={() => navigate(buildFeatureInstancePath(task, { taskId: task.id }))}
               title={t('dashboard.tasks.openSource')}
               style={{
                 background: 'none',

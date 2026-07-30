@@ -58,7 +58,7 @@ function setName(tabs: TabWithConfig[], key: string, name: string): TabWithConfi
 }
 
 function toggleNameHidden(tabs: TabWithConfig[], key: string): TabWithConfig[] {
-  return tabs.map((t) => (t.key === key ? { ...t, name: t.name === '' ? undefined : '' } : t));
+  return tabs.map((t) => (t.key === key ? { ...t, name: t.name === '' ? t.label : '' } : t));
 }
 
 export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
@@ -116,9 +116,11 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
           boxShadow: '0 16px 48px rgba(0,0,0,0.2)',
           width: '620px',
           maxWidth: '95vw',
+          maxHeight: '90vh',
           display: 'flex',
           flexDirection: 'column',
           gap: 'var(--space-md)',
+          overflow: 'hidden',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -127,6 +129,7 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
             fontSize: 'var(--font-lg)',
             fontWeight: 700,
             color: theme.colors.text,
+            flexShrink: 0,
           }}
         >
           {t('tabConfig.title')}
@@ -137,6 +140,8 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--space-sm)',
+            overflowY: 'auto',
+            minHeight: 0,
           }}
         >
           <TabConfigHeader theme={theme} t={t} hasPinnedTabs={(pinnedTabKeys?.size ?? 0) > 0} />

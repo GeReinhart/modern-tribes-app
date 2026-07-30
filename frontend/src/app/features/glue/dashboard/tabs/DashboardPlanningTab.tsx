@@ -1,5 +1,6 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
+import { buildFeatureInstancePath } from '@/app/platform/core/routing/featureInstancePath.ts';
 import CalendarFilterBar from '@/app/features/events/CalendarFilterBar.tsx';
 import type { FilterChipGroup } from '@/app/features/events/CalendarFilterBar.tsx';
 import EventDayView from '@/app/features/events/EventDayView.tsx';
@@ -21,12 +22,14 @@ import { journalService } from '@/app/features/daily-journal/service.ts';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 const emptyTasks: MyTasksResponse = { kanban: [], todo: [] };
 
 const DashboardPlanningTab: React.FC = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState(today.toISOString().slice(0, 10));
   const [year, setYear] = useState(today.getFullYear());
@@ -172,6 +175,7 @@ const DashboardPlanningTab: React.FC = () => {
         <EventViewModal event={viewingEvent} labels={allLabels} persons={allPersons} canEdit={true}
           projectName={viewingEvent.project_name} onClose={() => setViewingEvent(null)}
           onEdit={e => startEditing(e as PlanningEvent)}
+          onOpenInProject={() => navigate(buildFeatureInstancePath(viewingEvent, { eventId: viewingEvent.id }))}
         />
       )}
       {editingEvent && (

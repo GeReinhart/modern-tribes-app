@@ -15,6 +15,7 @@ interface Props {
   projectName?: string;
   onClose: () => void;
   onEdit: (event: CalendarEvent) => void;
+  onOpenInProject?: () => void;
 }
 
 function fmtTime(iso: string): string {
@@ -61,7 +62,7 @@ function ScheduleDisplay({ event, locale, t, theme }: ScheduleProps) {
   );
 }
 
-const EventViewModal: React.FC<Props> = ({ event, labels, persons, canEdit, projectName, onClose, onEdit }) => {
+const EventViewModal: React.FC<Props> = ({ event, labels, persons, canEdit, projectName, onClose, onEdit, onOpenInProject }) => {
   const { theme } = useTheme();
   const { t, i18n } = useTranslation();
 
@@ -97,6 +98,11 @@ const EventViewModal: React.FC<Props> = ({ event, labels, persons, canEdit, proj
             )}
           </div>
           <div style={{ display: 'flex', gap: '4px', marginLeft: '8px', flexShrink: 0 }}>
+            {onOpenInProject && (
+              <button type="button" onClick={onOpenInProject} title={t('features.events.openInProject')} aria-label={t('features.events.openInProject')} style={{ background: 'none', border: `1.5px solid ${theme.colors.border}`, borderRadius: '8px', padding: '6px', cursor: 'pointer', color: theme.colors.primary, lineHeight: 0 }}>
+                <ThemedSvgIcon name="maximize" color="currentColor" size={18} />
+              </button>
+            )}
             {canEdit && (
               <button type="button" onClick={() => onEdit(event)} title={t('common.edit')} style={{ background: 'none', border: `1.5px solid ${theme.colors.border}`, borderRadius: '8px', padding: '6px', cursor: 'pointer', color: theme.colors.primary, lineHeight: 0 }}>
                 <ThemedSvgIcon name="pencil" color="currentColor" size={18} />

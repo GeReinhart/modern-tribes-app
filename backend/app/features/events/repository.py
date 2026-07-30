@@ -135,11 +135,15 @@ async def fetch_accessible_events(pool, user_id: str) -> list[dict]:
                    pf.name AS feature_instance_name,
                    p.id AS project_id,
                    p.url_param_id AS project_url_param_id,
-                   p.name AS project_name
+                   p.name AS project_name,
+                   t.url_param_id AS tribe_url_param_id,
+                   t.name AS tribe_name
             FROM events e
             JOIN projects_features pf ON pf.id = e.feature_instance_id
                 AND pf.status = 'active' AND pf.feature_type = 'events'
             JOIN projects p ON p.id = pf.project_id AND p.status = 'active'
+            LEFT JOIN tribes_projects tp ON tp.project_id = p.id
+            LEFT JOIN tribes t ON t.id = tp.tribe_id AND t.status = 'active'
             LEFT JOIN documents d ON d.id = e.document_id
             WHERE e.status = 'active'
             AND (
@@ -147,14 +151,14 @@ async def fetch_accessible_events(pool, user_id: str) -> list[dict]:
                     SELECT 1 FROM positions pos
                     JOIN persons per ON per.id = pos.person_id AND per.status = 'active'
                     JOIN users u ON u.person_id = per.id AND u.id = $1
-                    JOIN tribes_projects tp ON tp.tribe_id = pos.tribe_id
-                    WHERE tp.project_id = p.id AND pos.status = 'active'
+                    JOIN tribes_projects tp2 ON tp2.tribe_id = pos.tribe_id
+                    WHERE tp2.project_id = p.id AND pos.status = 'active'
                 )
                 OR EXISTS (
                     SELECT 1 FROM positions pos
                     JOIN represents r ON r.person_id = pos.person_id AND r.status = 'active'
-                    JOIN tribes_projects tp ON tp.tribe_id = pos.tribe_id
-                    WHERE r.user_id = $1 AND tp.project_id = p.id AND pos.status = 'active'
+                    JOIN tribes_projects tp2 ON tp2.tribe_id = pos.tribe_id
+                    WHERE r.user_id = $1 AND tp2.project_id = p.id AND pos.status = 'active'
                 )
             )
             ORDER BY e.start_at ASC
@@ -188,11 +192,15 @@ async def fetch_all_events_with_project(pool) -> list[dict]:
                    pf.name AS feature_instance_name,
                    p.id AS project_id,
                    p.url_param_id AS project_url_param_id,
-                   p.name AS project_name
+                   p.name AS project_name,
+                   t.url_param_id AS tribe_url_param_id,
+                   t.name AS tribe_name
             FROM events e
             JOIN projects_features pf ON pf.id = e.feature_instance_id
                 AND pf.status = 'active' AND pf.feature_type = 'events'
             JOIN projects p ON p.id = pf.project_id AND p.status = 'active'
+            LEFT JOIN tribes_projects tp ON tp.project_id = p.id
+            LEFT JOIN tribes t ON t.id = tp.tribe_id AND t.status = 'active'
             LEFT JOIN documents d ON d.id = e.document_id
             WHERE e.status = 'active'
             ORDER BY e.start_at ASC

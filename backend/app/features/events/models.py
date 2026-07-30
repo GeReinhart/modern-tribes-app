@@ -82,4 +82,6 @@ class PlanningEventResponse(EventResponse):
     project_id: str
     project_url_param_id: Optional[str] = None
     project_name: str
+    tribe_url_param_id: Optional[str] = None
+    tribe_name: Optional[str] = None
     labels: list[PlanningEventLabel] = []

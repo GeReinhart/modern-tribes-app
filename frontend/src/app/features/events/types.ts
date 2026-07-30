@@ -54,6 +54,8 @@ export interface PlanningEvent extends CalendarEvent {
   project_id: string;
   project_url_param_id: string | null;
   project_name: string;
+  tribe_url_param_id: string | null;
+  tribe_name: string | null;
   labels: PlanningEventLabel[];
 }
 

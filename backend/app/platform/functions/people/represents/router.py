@@ -1,11 +1,12 @@
 from typing import List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 from app.platform.core.database import get_database
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.functions.people.represents.models import Represents, RepresentsCreate, RepresentsUpdate
+from app.platform.functions.people.represents.repository import find_represents_pair, reactivate_represents
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import (
     require_any_permission_decorator,
@@ -68,8 +69,12 @@ async def get_represents(represents_id: str, current_user: dict = Depends(get_cu
 
 @router.post("/", response_model=Represents, status_code=status.HTTP_201_CREATED)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_MANAGE_PEOPLE)
-async def create_represents(represents: RepresentsCreate, current_user: dict = Depends(get_current_user)):
+async def create_represents(
+    represents: RepresentsCreate, response: Response, current_user: dict = Depends(get_current_user)
+):
     """Create a new representation link between a user and a person.
+
+    If the link already exists and is archived, it is reactivated instead of duplicated.
 
     **Permissions:** admin | can_manage_people
     """
@@ -82,6 +87,13 @@ async def create_represents(represents: RepresentsCreate, current_user: dict = D
             {"table": "persons", "id": represents.person_id, "name": "Person"},
         ]
     )
+
+    existing = await find_represents_pair(pool, represents.user_id, represents.person_id)
+    if existing:
+        if existing["status"] == "active":
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="This user already represents this person")
+        response.status_code = status.HTTP_200_OK
+        return await reactivate_represents(pool, existing["id"], current_user["id"])
 
     data = represents.model_dump()
     data["created_by"] = UUID(current_user["id"])
