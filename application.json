@@ -759,12 +759,12 @@
         "description": {
           "en": [
             "- a set of tools to support your guitar practice",
-            "- includes a note quiz, a chromatic tuner and a metronome",
+            "- includes a note quiz, a chromatic tuner, a metronome, a chord inventory and a songbook",
             "- shared: audioContext.ts (singleton Web Audio API context)"
           ],
           "fr": [
             "- un ensemble d'outils pour soutenir votre pratique de la guitare",
-            "- comprend un quiz de notes, un accordeur chromatique et un métronome",
+            "- comprend un quiz de notes, un accordeur chromatique, un métronome, un inventaire d'accords et un répertoire de morceaux",
             "- partagé : audioContext.ts (contexte Web Audio API singleton)"
           ]
         },
@@ -847,6 +847,85 @@
             "frontend": {
               "path": [
                 "frontend/src/app/features/guitar/metronome/**"
+              ]
+            }
+          },
+          {
+            "package": "chords",
+            "description": {
+              "en": [
+                "- a shared inventory of guitar chord diagrams, built-in plus anything anyone adds",
+                "- each chord shows which fret to press on each string, with a muted-string marker for strings that shouldn't be played",
+                "- the root note, the fifth and every other interval each get their own distinct icon on the diagram, so you can see the chord's structure at a glance",
+                "- give a chord a name like a common chord name and the root note is suggested automatically — you can always correct it",
+                "- add a description to any chord, built-in or your own, and anyone can edit it",
+                "- search the inventory by name or by root note"
+              ],
+              "fr": [
+                "- un inventaire d'accords de guitare partagé, avec des accords prédéfinis et ceux ajoutés par les utilisateurs",
+                "- chaque accord indique la frette à presser sur chaque corde, avec un repère pour les cordes à ne pas jouer",
+                "- la fondamentale, la quinte et chaque autre intervalle ont leur propre icône sur le schéma, pour visualiser la structure de l'accord en un coup d'œil",
+                "- donnez un nom courant à l'accord et la fondamentale est proposée automatiquement — vous pouvez toujours la corriger",
+                "- ajoutez une description à n'importe quel accord, prédéfini ou personnel, modifiable par tous",
+                "- recherchez dans l'inventaire par nom ou par fondamentale"
+              ]
+            },
+            "backend": {
+              "path": [
+                "backend/app/features/guitar/chords/**"
+              ],
+              "schema": [
+                "guitar_chords"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/guitar/chords/**"
+              ]
+            }
+          },
+          {
+            "package": "song",
+            "description": {
+              "en": [
+                "- keep a songbook of the songs your group is practicing, shared by every song tab attached to the same project",
+                "- a song has a title, an author, a tempo in BPM, a time signature and a capo position",
+                "- build the chord progression by searching the shared chord inventory, or add a brand new chord on the spot without leaving the song",
+                "- reorder the chords in a song, and leave a comment on a chord just for that song (e.g. a playing tip)",
+                "- removing a chord from a song only removes it from that song — it stays in the shared inventory",
+                "- play a metronome at the song's own tempo and time signature, with the first beat of each bar highlighted",
+                "- each song has its own page with a short, shareable link, so you can bookmark it or send it directly to a bandmate",
+                "- the song page opens in a clean, read-only view for practicing; switch to an edit mode to add, reorder, remove or comment on chords",
+                "- creating or editing a song's own details (title, author, tempo, capo) is its own page too",
+                "- choose how chord diagrams look for each song: a full labeled view or a simplified dots-only view, in small, medium or large — saved with the song",
+                "- add a rich-text description to a song (practice notes, links, formatting) shown in its own card above the chords"
+              ],
+              "fr": [
+                "- tenez un répertoire des morceaux que votre groupe travaille, partagé par tous les onglets morceaux d'un même projet",
+                "- un morceau a un titre, un auteur, un tempo en BPM, une signature rythmique et une position de capo",
+                "- construisez la grille d'accords en cherchant dans l'inventaire partagé, ou ajoutez un nouvel accord sans quitter le morceau",
+                "- réorganisez les accords d'un morceau, et laissez un commentaire sur un accord propre à ce morceau (ex : une astuce de jeu)",
+                "- retirer un accord d'un morceau ne le retire que de ce morceau — il reste dans l'inventaire partagé",
+                "- lancez un métronome au tempo et à la signature rythmique du morceau, avec le premier temps de chaque mesure mis en valeur",
+                "- chaque morceau a sa propre page avec un lien court et partageable, pour le mettre en favori ou l'envoyer directement à un musicien du groupe",
+                "- la page du morceau s'ouvre en lecture seule pour s'entraîner ; passez en mode modification pour ajouter, réorganiser, retirer ou commenter les accords",
+                "- la création ou la modification des informations du morceau (titre, auteur, tempo, capo) se fait aussi sur sa propre page",
+                "- choisissez l'apparence des diagrammes d'accords pour chaque morceau : vue complète étiquetée ou simplifiée avec juste des points, en petit, moyen ou grand — enregistré avec le morceau",
+                "- ajoutez une description enrichie à un morceau (notes de répétition, liens, mise en forme), affichée dans sa propre carte au-dessus des accords"
+              ]
+            },
+            "backend": {
+              "path": [
+                "backend/app/features/guitar/song/**"
+              ],
+              "schema": [
+                "guitar_songs",
+                "guitar_songs_chords"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/guitar/song/**"
               ]
             }
           }

@@ -98,6 +98,8 @@ class DatabaseInitializer:
             "document_pages",
             "projects_documents",
             "todo_items",
+            "guitar_songs_chords",
+            "guitar_songs",
             "projects_features",
             "document_entities",
             "label_entities",
@@ -413,6 +415,64 @@ class DatabaseInitializer:
         print(f"✓ Created {count} todo items")
         return count
 
+    async def create_guitar_songs(self, project_ids: Dict[str, str], user_ids: Dict[str, str]) -> Dict[str, str]:
+        rows = self.load_csv("guitar_songs.csv")
+        ids: Dict[str, str] = {}
+        admin_id = user_ids.get("admin")
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                if row["project"] not in project_ids:
+                    print(f"✗ Unknown project '{row['project']}' in guitar_songs.csv")
+                    sys.exit(1)
+                document_id = None
+                description_html = row.get("description_html") or ""
+                if description_html:
+                    doc_r = await conn.fetchrow(
+                        "INSERT INTO documents (content_html, content_summary, content_text) VALUES ($1, $2, $3) RETURNING id",
+                        description_html, description_html[:30], _strip_html(description_html),
+                    )
+                    document_id = str(doc_r["id"])
+                r = await conn.fetchrow(
+                    """INSERT INTO guitar_songs (
+                           project_id, url_param_id, title, author, tempo_bpm, beats_per_bar, capo,
+                           chord_diagram_style, chord_diagram_size, document_id, created_by, updated_by
+                       )
+                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $11) RETURNING id""",
+                    project_ids[row["project"]], _generate_url_param_id(), row["title"], row.get("author") or None,
+                    int(row.get("tempo_bpm") or 120), int(row.get("beats_per_bar") or 4),
+                    int(row.get("capo") or 0), row.get("chord_diagram_style") or "full",
+                    row.get("chord_diagram_size") or "medium", document_id, admin_id,
+                )
+                ids[f"{row['project']}|{row['title']}"] = str(r["id"])
+        print(f"✓ Created {len(ids)} guitar songs")
+        return ids
+
+    async def create_guitar_songs_chords(self, song_ids: Dict[str, str], user_ids: Dict[str, str]) -> int:
+        rows = self.load_csv("guitar_songs_chords.csv")
+        count = 0
+        admin_id = user_ids.get("admin")
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                key = f"{row['project']}|{row['song_title']}"
+                if key not in song_ids:
+                    print(f"✗ Unknown song '{key}' in guitar_songs_chords.csv")
+                    sys.exit(1)
+                chord = await conn.fetchrow(
+                    "SELECT id FROM guitar_chords WHERE name = $1 LIMIT 1", row["chord_name"]
+                )
+                if not chord:
+                    print(f"✗ Unknown chord '{row['chord_name']}' in guitar_songs_chords.csv")
+                    sys.exit(1)
+                await conn.execute(
+                    """INSERT INTO guitar_songs_chords (song_id, chord_id, position, comment, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $5, $5)""",
+                    song_ids[key], chord["id"], int(row.get("position") or 1),
+                    row.get("comment") or None, admin_id,
+                )
+                count += 1
+        print(f"✓ Created {count} guitar song chords")
+        return count
+
     async def create_mails(self) -> Dict[str, str]:
         rows = self.load_csv("mails.csv")
         ids: Dict[str, str] = {}
@@ -533,6 +593,8 @@ class DatabaseInitializer:
             pages_count = await self.create_document_pages(pd_ids, user_ids)
             feature_ids = await self.create_projects_features(project_ids)
             todo_count = await self.create_todo_items(feature_ids, user_ids)
+            song_ids = await self.create_guitar_songs(project_ids, user_ids)
+            song_chords_count = await self.create_guitar_songs_chords(song_ids, user_ids)
             mail_ids = await self.create_mails()
             mails_to_count = await self.create_mails_to(mail_ids, user_ids)
             represents_count = await self.create_represents(person_ids, user_ids)
@@ -554,6 +616,8 @@ class DatabaseInitializer:
             print(f"   • Document pages:           {pages_count}")
             print(f"   • Project features:         {len(feature_ids)}")
             print(f"   • Todo items:               {todo_count}")
+            print(f"   • Guitar songs:             {len(song_ids)}")
+            print(f"   • Guitar song chords:       {song_chords_count}")
             print(f"   • Mails:                    {len(mail_ids)}")
             print(f"   • Mail recipients:          {mails_to_count}")
             print(f"   • Represents relations:     {represents_count}")

@@ -14,6 +14,10 @@ import guitarTunerEn from '@/app/features/guitar/tuner/locales/en.ts';
 import guitarTunerFr from '@/app/features/guitar/tuner/locales/fr.ts';
 import guitarMetronomeEn from '@/app/features/guitar/metronome/locales/en.ts';
 import guitarMetronomeFr from '@/app/features/guitar/metronome/locales/fr.ts';
+import guitarChordsEn from '@/app/features/guitar/chords/locales/en.ts';
+import guitarChordsFr from '@/app/features/guitar/chords/locales/fr.ts';
+import guitarSongEn from '@/app/features/guitar/song/locales/en.ts';
+import guitarSongFr from '@/app/features/guitar/song/locales/fr.ts';
 import dailyJournalEn from '@/app/features/daily-journal/locales/en.ts';
 import dailyJournalFr from '@/app/features/daily-journal/locales/fr.ts';
 import tasksEn from '@/app/features/tasks/locales/en.ts';
@@ -40,6 +44,8 @@ i18n.use(initReactI18next).init({
         ...guitarNotesEn,
         ...guitarTunerEn,
         ...guitarMetronomeEn,
+        ...guitarChordsEn,
+        ...guitarSongEn,
         ...dailyJournalEn,
       },
     },
@@ -54,6 +60,8 @@ i18n.use(initReactI18next).init({
         ...guitarNotesFr,
         ...guitarTunerFr,
         ...guitarMetronomeFr,
+        ...guitarChordsFr,
+        ...guitarSongFr,
         ...dailyJournalFr,
       },
     },

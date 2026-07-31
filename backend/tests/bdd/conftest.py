@@ -8,7 +8,7 @@ import asyncpg
 import pytest
 from pytest_bdd import given, parsers, then, when
 
-from tests.db_helpers import TEST_DB_DSN, coerce, url_param_id_from_uuid
+from tests.db_helpers import TEST_DB_DSN, coerce, is_int_column, url_param_id_from_uuid
 from tests.helpers import assert_table, expand_id, expand_json_ids, expand_path_ids
 
 
@@ -1150,6 +1150,114 @@ def given_user_quick_add_defaults_table(datatable):
 @then("the user_quick_add_defaults table contains:")
 def then_user_quick_add_defaults_table(datatable):
     _assert_db("user_quick_add_defaults", datatable)
+
+
+@given("the guitar_chords table contains:")
+def given_guitar_chords_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                await conn.execute(
+                    """INSERT INTO guitar_chords(id, name, root_note, description, frets, status)
+                       VALUES(COALESCE($1, gen_random_uuid()), $2, $3, $4, $5::jsonb, $6)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid) if uid else None,
+                    rec.get("name", "Chord"),
+                    rec.get("root_note", "C"),
+                    rec.get("description") or None,
+                    rec.get("frets", "[]"),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the guitar_chords table contains:")
+def then_guitar_chords_table(datatable):
+    _assert_db("guitar_chords", datatable)
+
+
+@given("the guitar_songs table contains:")
+def given_guitar_songs_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {
+                    headers[i]: (row[i] if is_int_column(headers[i]) else expand_id(row[i]))
+                    for i in range(len(headers))
+                }
+                uid = rec.get("id")
+                if not uid:
+                    continue
+                document_id = rec.get("document_id")
+                await conn.execute(
+                    """INSERT INTO guitar_songs(
+                           id, url_param_id, project_id, title, author, tempo_bpm, beats_per_bar, capo,
+                           chord_diagram_style, chord_diagram_size, document_id, status
+                       )
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid),
+                    rec.get("url_param_id", url_param_id_from_uuid(uid)),
+                    UUID(rec["project_id"]),
+                    rec.get("title", "Song"),
+                    rec.get("author") or None,
+                    coerce("tempo_bpm", rec.get("tempo_bpm", "120")),
+                    coerce("beats_per_bar", rec.get("beats_per_bar", "4")),
+                    coerce("capo", rec.get("capo", "0")),
+                    rec.get("chord_diagram_style", "full"),
+                    rec.get("chord_diagram_size", "medium"),
+                    UUID(document_id) if document_id else None,
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the guitar_songs table contains:")
+def then_guitar_songs_table(datatable):
+    _assert_db("guitar_songs", datatable)
+
+
+@given("the guitar_songs_chords table contains:")
+def given_guitar_songs_chords_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {
+                    headers[i]: (row[i] if is_int_column(headers[i]) else expand_id(row[i]))
+                    for i in range(len(headers))
+                }
+                uid = rec.get("id")
+                await conn.execute(
+                    """INSERT INTO guitar_songs_chords(id, song_id, chord_id, position, comment, status)
+                       VALUES(COALESCE($1, gen_random_uuid()), $2, $3, $4, $5, $6)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid) if uid else None,
+                    UUID(rec["song_id"]),
+                    UUID(rec["chord_id"]),
+                    coerce("position", rec.get("position", "1")),
+                    rec.get("comment") or None,
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the guitar_songs_chords table contains:")
+def then_guitar_songs_chords_table(datatable):
+    _assert_db("guitar_songs_chords", datatable)
 
 
 @given("the search_index table contains:")

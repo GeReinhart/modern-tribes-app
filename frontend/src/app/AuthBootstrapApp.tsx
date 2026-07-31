@@ -32,6 +32,8 @@ import { ProjectDocumentViewPage } from '@/app/features/tribes-projects/projects
 import { ProjectsPage } from '@/app/features/tribes-projects/projects/ProjectsPage.tsx';
 import { SearchPage } from '@/app/platform/functions/search/SearchPage.tsx';
 import ShowProjectPage from '@/app/features/tribes-projects/projects/ShowProjectPage.tsx';
+import { SongDetailPage } from '@/app/features/guitar/song/SongDetailPage.tsx';
+import { SongFormPage } from '@/app/features/guitar/song/SongFormPage.tsx';
 import ShowTribePage from '@/app/features/tribes-projects/tribes/ShowTribePage.tsx';
 import { TribesPage } from '@/app/features/tribes-projects/tribes/TribesPage.tsx';
 import UpdateTribePage from '@/app/features/tribes-projects/tribes/UpdateTribePage.tsx';
@@ -220,6 +222,18 @@ function AuthBootstrapApp() {
                       <Route
                         path="/app/tribes/:tribeId/projects/:projectId/documents/:projectDocumentId/pages/:pageId/edit"
                         element={<DocumentPageFormPage />}
+                      />
+                      <Route
+                        path="/app/tribes/:tribeId/projects/:projectId/songs/new"
+                        element={<SongFormPage />}
+                      />
+                      <Route
+                        path="/app/tribes/:tribeId/projects/:projectId/songs/:songId"
+                        element={<SongDetailPage />}
+                      />
+                      <Route
+                        path="/app/tribes/:tribeId/projects/:projectId/songs/:songId/edit"
+                        element={<SongFormPage />}
                       />
                       <Route path="/app/projects" element={<ProjectsPage />} />
                       <Route path="/app/search" element={<SearchPage />} />
