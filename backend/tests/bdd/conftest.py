@@ -1152,6 +1152,36 @@ def then_user_quick_add_defaults_table(datatable):
     _assert_db("user_quick_add_defaults", datatable)
 
 
+@given("the guitar_chords table contains:")
+def given_guitar_chords_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                await conn.execute(
+                    """INSERT INTO guitar_chords(id, name, root_note, description, frets, status)
+                       VALUES(COALESCE($1, gen_random_uuid()), $2, $3, $4, $5::jsonb, $6)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid) if uid else None,
+                    rec.get("name", "Chord"),
+                    rec.get("root_note", "C"),
+                    rec.get("description") or None,
+                    rec.get("frets", "[]"),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the guitar_chords table contains:")
+def then_guitar_chords_table(datatable):
+    _assert_db("guitar_chords", datatable)
+
+
 @given("the search_index table contains:")
 def given_search_index_table(datatable):
     async def _insert():

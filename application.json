@@ -759,12 +759,12 @@
         "description": {
           "en": [
             "- a set of tools to support your guitar practice",
-            "- includes a note quiz, a chromatic tuner and a metronome",
+            "- includes a note quiz, a chromatic tuner, a metronome and a chord inventory",
             "- shared: audioContext.ts (singleton Web Audio API context)"
           ],
           "fr": [
             "- un ensemble d'outils pour soutenir votre pratique de la guitare",
-            "- comprend un quiz de notes, un accordeur chromatique et un métronome",
+            "- comprend un quiz de notes, un accordeur chromatique, un métronome et un inventaire d'accords",
             "- partagé : audioContext.ts (contexte Web Audio API singleton)"
           ]
         },
@@ -847,6 +847,40 @@
             "frontend": {
               "path": [
                 "frontend/src/app/features/guitar/metronome/**"
+              ]
+            }
+          },
+          {
+            "package": "chords",
+            "description": {
+              "en": [
+                "- a shared inventory of guitar chord diagrams, built-in plus anything anyone adds",
+                "- each chord shows which fret to press on each string, with a muted-string marker for strings that shouldn't be played",
+                "- the root note, the fifth and every other interval each get their own distinct icon on the diagram, so you can see the chord's structure at a glance",
+                "- give a chord a name like a common chord name and the root note is suggested automatically — you can always correct it",
+                "- add a description to any chord, built-in or your own, and anyone can edit it",
+                "- search the inventory by name or by root note"
+              ],
+              "fr": [
+                "- un inventaire d'accords de guitare partagé, avec des accords prédéfinis et ceux ajoutés par les utilisateurs",
+                "- chaque accord indique la frette à presser sur chaque corde, avec un repère pour les cordes à ne pas jouer",
+                "- la fondamentale, la quinte et chaque autre intervalle ont leur propre icône sur le schéma, pour visualiser la structure de l'accord en un coup d'œil",
+                "- donnez un nom courant à l'accord et la fondamentale est proposée automatiquement — vous pouvez toujours la corriger",
+                "- ajoutez une description à n'importe quel accord, prédéfini ou personnel, modifiable par tous",
+                "- recherchez dans l'inventaire par nom ou par fondamentale"
+              ]
+            },
+            "backend": {
+              "path": [
+                "backend/app/features/guitar/chords/**"
+              ],
+              "schema": [
+                "guitar_chords"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/guitar/chords/**"
               ]
             }
           }

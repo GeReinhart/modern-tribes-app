@@ -698,5 +698,21 @@ CREATE TABLE IF NOT EXISTS user_quick_add_defaults (
 );
 CREATE OR REPLACE TRIGGER update_user_quick_add_defaults_updated_at BEFORE UPDATE ON user_quick_add_defaults FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- Guitar chords inventory (migration 012)
+CREATE TABLE IF NOT EXISTS guitar_chords (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(50) NOT NULL,
+    root_note VARCHAR(3) NOT NULL,
+    description TEXT,
+    frets JSONB NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE OR REPLACE TRIGGER update_guitar_chords_updated_at BEFORE UPDATE ON guitar_chords FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 -- Schema evolution: add columns that may be missing on databases created before they were introduced
 ALTER TABLE tribes_projects ADD COLUMN IF NOT EXISTS display_order INTEGER NOT NULL DEFAULT 0;
