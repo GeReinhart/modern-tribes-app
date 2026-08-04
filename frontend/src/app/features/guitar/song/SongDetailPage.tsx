@@ -20,6 +20,7 @@ import { AddChordToSongModal } from './AddChordToSongModal.tsx';
 import { guitarSongsService } from './service.ts';
 import { SongChordRow } from './SongChordRow.tsx';
 import { SongMetronomeControls } from './SongMetronomeControls.tsx';
+import { SongStatCard } from './SongStatCard.tsx';
 import { useGuitarSong } from './useGuitarSong.ts';
 
 const SongDetailPageContent: React.FC = () => {
@@ -113,9 +114,15 @@ const SongDetailPageContent: React.FC = () => {
   return (
     <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions} bookmarkSlot={bookmarkSlot}>
       <ThemedSection themeId="main_1">
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', color: theme.colors.secondary, fontSize: '13px', marginBottom: '12px' }}>
-          {song.author && <span>{song.author}</span>}
-          {song.capo > 0 && <span>{t('guitarSong.detail.capoBadge', { fret: song.capo })}</span>}
+        {song.author && (
+          <div style={{ fontSize: '20px', fontWeight: 600, color: theme.colors.primary, marginBottom: '12px' }}>
+            {song.author}
+          </div>
+        )}
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
+          <SongStatCard label={t('guitarSong.detail.statBpm')} value={song.tempo_bpm} />
+          <SongStatCard label={t('guitarSong.detail.statBeatsPerBar')} value={song.beats_per_bar} />
+          <SongStatCard label={t('guitarSong.detail.statCapo')} value={song.capo > 0 ? song.capo : '–'} />
         </div>
         {writeMode ? (
           <SongMetronomeControls tempoBpm={song.tempo_bpm} beatsPerBar={song.beats_per_bar} />
