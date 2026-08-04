@@ -38,6 +38,7 @@ Feature: List feature types
         {"feature_type": "guitar_tuner", "label": "Guitar - Tuner"},
         {"feature_type": "guitar_metronome", "label": "Guitar - Metronome"},
         {"feature_type": "guitar_chords", "label": "Guitar - Chords"},
+        {"feature_type": "guitar_song", "label": "Guitar - Song"},
         {"feature_type": "events", "label": "Events"},
         {"feature_type": "daily_journal", "label": "Daily Journal"}
       ]

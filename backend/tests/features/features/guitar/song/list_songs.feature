@@ -5,9 +5,8 @@ Feature: List guitar songs
 
   Background:
     Given the users table contains:
-      | id   | email           | status |
-      | 0002 | member@test.com | active |
-      | 0003 | guest@test.com  | active |
+      | id   | email         | status |
+      | 0002 | user@test.com | active |
     And the roles table contains:
       | name   | status |
       | viewer | active |
@@ -15,17 +14,14 @@ Feature: List guitar songs
       | role   | permission                 |
       | viewer | can_access_attached_tribes |
     And the user_roles table contains:
-      | user            | role   |
-      | member@test.com | viewer |
-      | guest@test.com  | viewer |
+      | user          | role   |
+      | user@test.com | viewer |
     And the persons table contains:
       | id   | first_name | last_name | status |
       | 0030 | Mia        | Member    | active |
-      | 0031 | Gus        | Guest     | active |
     And the users table contains:
-      | id   | email           | person_id | status |
-      | 0002 | member@test.com | 0030      | active |
-      | 0003 | guest@test.com  | 0031      | active |
+      | id   | email         | person_id | status |
+      | 0002 | user@test.com | 0030      | active |
     And the tribes table contains:
       | id   | name | status |
       | 0010 | Band | active |
@@ -35,10 +31,6 @@ Feature: List guitar songs
     And the tribes_projects table contains:
       | tribe_id | project_id | relation |
       | 0010     | 0020       | manager  |
-    And the positions table contains:
-      | id   | tribe_id | person_id | position | status |
-      | 1001 | 0010     | 0030      | member   | active |
-      | 1002 | 0010     | 0031      | guest    | active |
     And the projects_features table contains:
       | id   | project_id | feature_type | name              | status |
       | 0100 | 0020       | guitar_song  | Rehearsal setlist | active |
@@ -50,6 +42,9 @@ Feature: List guitar songs
 
   Scenario: GET songs through one guitar_song tab — the project's active songs are returned
     Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
     When I GET /api/features/tasks/guitar-songs/instances/0100/songs
     Then the response status code is 200
     And the response body includes:
@@ -62,6 +57,9 @@ Feature: List guitar songs
 
   Scenario: GET songs through a second guitar_song tab of the same project — the same songs are returned
     Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
     When I GET /api/features/tasks/guitar-songs/instances/0101/songs
     Then the response status code is 200
     And the response body includes:
@@ -73,6 +71,9 @@ Feature: List guitar songs
       """
 
   Scenario: GET songs as a guest — read access is allowed
-    Given I am authenticated as a regular user: user.id 0003
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | guest    | active |
     When I GET /api/features/tasks/guitar-songs/instances/0100/songs
     Then the response status code is 200
