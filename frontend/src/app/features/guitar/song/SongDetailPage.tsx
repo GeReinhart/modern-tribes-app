@@ -150,7 +150,7 @@ const SongDetailPageContent: React.FC = () => {
           </div>
         </div>
         <ThemedCard bordered className="p-4">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px' }}>
             {song.chords.map((songChord, index) => (
               <SongChordRow
                 key={songChord.id}

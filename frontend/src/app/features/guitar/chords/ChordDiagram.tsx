@@ -9,10 +9,10 @@ import { FretValue } from './types.ts';
 export type ChordDiagramStyle = 'full' | 'simple';
 export type ChordDiagramSize = 'small' | 'medium' | 'large';
 
-const BASE_CELL_W = 34;
-const BASE_ROW_H = 34;
-const BASE_NUT_H = 5;
-const BASE_MARKER_SIZE = 26;
+const BASE_CELL_W = 28;
+const BASE_ROW_H = 28;
+const BASE_NUT_H = 4;
+const BASE_MARKER_SIZE = 20;
 
 const SIZE_SCALE: Record<ChordDiagramSize, number> = {
   small: 0.7,
