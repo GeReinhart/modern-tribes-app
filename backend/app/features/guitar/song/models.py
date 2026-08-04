@@ -11,6 +11,7 @@ class GuitarSongCreate(BaseModel):
     author: Optional[str] = None
     tempo_bpm: int = Field(default=120, ge=20, le=300)
     beats_per_bar: int = Field(default=4, ge=2, le=8)
+    capo: int = Field(default=0, ge=0, le=12)
 
 
 class GuitarSongUpdate(BaseModel):
@@ -18,6 +19,7 @@ class GuitarSongUpdate(BaseModel):
     author: Optional[str] = None
     tempo_bpm: Optional[int] = Field(default=None, ge=20, le=300)
     beats_per_bar: Optional[int] = Field(default=None, ge=2, le=8)
+    capo: Optional[int] = Field(default=None, ge=0, le=12)
 
 
 class GuitarSongResponse(BaseModel):
@@ -28,6 +30,7 @@ class GuitarSongResponse(BaseModel):
     author: Optional[str] = None
     tempo_bpm: int
     beats_per_bar: int
+    capo: int
     status: str
     created_at: datetime
     updated_at: datetime

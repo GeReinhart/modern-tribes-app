@@ -2,14 +2,12 @@ import { ThemedButton } from '@/app/platform/core/layout/themes/components/Theme
 import { ThemedErrorMessage } from '@/app/platform/core/layout/themes/components/ThemedErrorMessage.tsx';
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { guitarSongsService } from './service.ts';
 import { SongCard } from './SongCard.tsx';
-import { SongFormModal } from './SongFormModal.tsx';
-import { GuitarSong, GuitarSongCreate } from './types.ts';
+import { GuitarSong } from './types.ts';
 import { useGuitarSongs } from './useGuitarSongs.ts';
 
 interface Props {
@@ -18,17 +16,11 @@ interface Props {
   isManager: boolean;
 }
 
-const SongsTab: React.FC<Props> = ({ featureInstanceId, canEdit }) => {
+const SongsTab: React.FC<Props> = ({ canEdit }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { tribeId, projectId } = useParams<{ tribeId: string; projectId: string }>();
-  const { songs, loading, error, reload } = useGuitarSongs(featureInstanceId);
-  const [formOpen, setFormOpen] = useState(false);
-
-  const handleCreate = async (data: GuitarSongCreate) => {
-    await guitarSongsService.createSong(featureInstanceId, data);
-    await reload();
-  };
+  const { songs, loading, error, reload } = useGuitarSongs(projectId || '');
 
   const openSong = (song: GuitarSong) => {
     navigate(`/app/tribes/${tribeId}/projects/${projectId}/songs/${song.url_param_id}`);
@@ -41,7 +33,10 @@ const SongsTab: React.FC<Props> = ({ featureInstanceId, canEdit }) => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '16px' }}>
       {canEdit && (
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <ThemedButton onClick={() => setFormOpen(true)} fullWidth={false}>
+          <ThemedButton
+            onClick={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}/songs/new`)}
+            fullWidth={false}
+          >
             {t('guitarSong.list.add')}
           </ThemedButton>
         </div>
@@ -51,7 +46,6 @@ const SongsTab: React.FC<Props> = ({ featureInstanceId, canEdit }) => {
           <SongCard key={song.id} song={song} onOpen={() => openSong(song)} />
         ))}
       </div>
-      <SongFormModal isOpen={formOpen} onClose={() => setFormOpen(false)} onSubmit={handleCreate} />
     </div>
   );
 };

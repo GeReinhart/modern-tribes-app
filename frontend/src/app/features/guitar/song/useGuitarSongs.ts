@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { guitarSongsService } from './service.ts';
 import { GuitarSong } from './types.ts';
 
-export const useGuitarSongs = (featureInstanceId: string) => {
+export const useGuitarSongs = (projectId: string) => {
   const [songs, setSongs] = useState<GuitarSong[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -12,7 +12,7 @@ export const useGuitarSongs = (featureInstanceId: string) => {
     setLoading(true);
     setError(null);
     try {
-      setSongs(await guitarSongsService.listSongs(featureInstanceId));
+      setSongs(await guitarSongsService.listSongs(projectId));
     } catch {
       setError('error');
     } finally {
@@ -20,6 +20,6 @@ export const useGuitarSongs = (featureInstanceId: string) => {
     }
   };
 
-  useEffect(() => { reload(); }, [featureInstanceId]);
+  useEffect(() => { reload(); }, [projectId]);
   return { songs, loading, error, reload };
 };

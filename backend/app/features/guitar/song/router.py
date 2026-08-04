@@ -20,30 +20,34 @@ from app.features.guitar.song.models import (
 router = APIRouter(prefix="/guitar-songs", tags=["features_guitar_song"])
 
 
-@router.get("/instances/{feature_instance_id}/songs", response_model=list[GuitarSongResponse])
+@router.get("/projects/{project_id}/songs", response_model=list[GuitarSongResponse])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
-async def list_songs(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
-    """List the songs shared by every guitar_song tab of this feature instance's project.
+async def list_songs(project_id: str, current_user: dict = Depends(get_current_user)):
+    """List the songs in a project's shared songbook.
 
     **Permissions:** admin | can_access_attached_tribes
     **Project access:** minimum position ≥ guest
     """
-    return await song_service.list_songs(get_database(), feature_instance_id, current_user)
+    pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    return await song_service.list_songs(pool, project_id, current_user)
 
 
 @router.post(
-    "/instances/{feature_instance_id}/songs", response_model=GuitarSongResponse, status_code=status.HTTP_201_CREATED
+    "/projects/{project_id}/songs", response_model=GuitarSongResponse, status_code=status.HTTP_201_CREATED
 )
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def create_song(
-    feature_instance_id: str, data: GuitarSongCreate, current_user: dict = Depends(get_current_user)
+    project_id: str, data: GuitarSongCreate, current_user: dict = Depends(get_current_user)
 ):
     """Add a song to the project's shared songbook.
 
     **Permissions:** admin | can_access_attached_tribes
     **Project access:** minimum position ≥ member
     """
-    return await song_service.create_song(get_database(), feature_instance_id, data, current_user)
+    pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    return await song_service.create_song(pool, project_id, data, current_user)
 
 
 @router.get("/songs/{song_id}", response_model=GuitarSongDetailResponse)

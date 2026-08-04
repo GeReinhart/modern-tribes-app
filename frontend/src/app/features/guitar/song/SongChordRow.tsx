@@ -57,14 +57,21 @@ export const SongChordRow: React.FC<SongChordRowProps> = ({
         <ChordDiagram frets={songChord.chord.frets} rootNote={songChord.chord.root_note} />
       </div>
       <div style={{ flex: 1, minWidth: '160px' }}>
-        <ThemedInput
-          label={t('guitarSong.detail.comment')}
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          onBlur={handleBlur}
-          placeholder={t('guitarSong.detail.commentPlaceholder')}
-          disabled={!canEdit}
-        />
+        {canEdit ? (
+          <ThemedInput
+            label={t('guitarSong.detail.comment')}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            onBlur={handleBlur}
+            placeholder={t('guitarSong.detail.commentPlaceholder')}
+          />
+        ) : (
+          songChord.comment && (
+            <div style={{ color: theme.colors.text, fontSize: '13px', opacity: 0.85, fontStyle: 'italic' }}>
+              {songChord.comment}
+            </div>
+          )
+        )}
       </div>
       {canManage && (
         <ThemedIconButton

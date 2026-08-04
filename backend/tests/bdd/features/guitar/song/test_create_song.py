@@ -19,6 +19,11 @@ def test_create_song_as_member():
     pass
 
 
+@scenario(FEATURE, "POST a song without a capo — it defaults to 0")
+def test_create_song_default_capo():
+    pass
+
+
 @scenario(FEATURE, "POST a song as a project guest — 403 error and the database is not modified")
 def test_create_song_as_guest():
     pass
@@ -31,6 +36,11 @@ def test_create_song_tempo_out_of_range():
 
 @scenario(FEATURE, "POST a song with a beats_per_bar out of range — 422 error and the database is not modified")
 def test_create_song_beats_per_bar_out_of_range():
+    pass
+
+
+@scenario(FEATURE, "POST a song with a capo out of range — 422 error and the database is not modified")
+def test_create_song_capo_out_of_range():
     pass
 
 

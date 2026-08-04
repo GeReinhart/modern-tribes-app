@@ -2,7 +2,7 @@ import json
 from uuid import UUID
 
 _SONG_SELECT_FIELDS = (
-    "id::text, url_param_id, project_id::text, title, author, tempo_bpm, beats_per_bar, status, "
+    "id::text, url_param_id, project_id::text, title, author, tempo_bpm, beats_per_bar, capo, status, "
     "created_at, updated_at, created_by::text, updated_by::text"
 )
 
@@ -14,14 +14,6 @@ _SONG_CHORD_JOIN_SELECT = """
     c.created_at AS chord_created_at, c.updated_at AS chord_updated_at,
     c.created_by::text AS chord_created_by, c.updated_by::text AS chord_updated_by
 """
-
-
-async def get_project_id_for_instance(pool, feature_instance_id: str) -> str | None:
-    async with pool.acquire() as conn:
-        row = await conn.fetchrow(
-            "SELECT project_id FROM projects_features WHERE id = $1", UUID(feature_instance_id)
-        )
-    return str(row["project_id"]) if row else None
 
 
 async def get_project_id_for_song(pool, song_id: str) -> str | None:
@@ -64,14 +56,14 @@ async def fetch_song(pool, song_id: str) -> dict | None:
 
 async def insert_song(
     pool, project_id: str, url_param_id: str, title: str, author: str | None,
-    tempo_bpm: int, beats_per_bar: int, user_id: str,
+    tempo_bpm: int, beats_per_bar: int, capo: int, user_id: str,
 ) -> dict:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            f"""INSERT INTO guitar_songs (project_id, url_param_id, title, author, tempo_bpm, beats_per_bar, created_by, updated_by)
-                VALUES ($1, $2, $3, $4, $5, $6, $7::uuid, $7::uuid)
+            f"""INSERT INTO guitar_songs (project_id, url_param_id, title, author, tempo_bpm, beats_per_bar, capo, created_by, updated_by)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8::uuid, $8::uuid)
                 RETURNING {_SONG_SELECT_FIELDS}""",
-            UUID(project_id), url_param_id, title, author, tempo_bpm, beats_per_bar, UUID(user_id),
+            UUID(project_id), url_param_id, title, author, tempo_bpm, beats_per_bar, capo, UUID(user_id),
         )
     return dict(row)
 

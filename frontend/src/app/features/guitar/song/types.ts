@@ -8,6 +8,7 @@ export interface GuitarSong {
   author: string | null;
   tempo_bpm: number;
   beats_per_bar: number;
+  capo: number;
   status: string;
   created_at: string;
   updated_at: string;
@@ -20,6 +21,7 @@ export interface GuitarSongCreate {
   author?: string | null;
   tempo_bpm: number;
   beats_per_bar: number;
+  capo?: number;
 }
 
 export interface GuitarSongUpdate {
@@ -27,6 +29,7 @@ export interface GuitarSongUpdate {
   author?: string | null;
   tempo_bpm?: number;
   beats_per_bar?: number;
+  capo?: number;
 }
 
 export interface GuitarSongChord {

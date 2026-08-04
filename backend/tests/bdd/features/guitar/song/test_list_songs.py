@@ -14,18 +14,18 @@ _test_app.include_router(router, prefix="/api/features/tasks")
 FEATURE = "../../../../features/features/guitar/song/list_songs.feature"
 
 
-@scenario(FEATURE, "GET songs through one guitar_song tab — the project's active songs are returned")
-def test_list_songs_via_first_tab():
+@scenario(FEATURE, "GET a project's songs as a member — the project's active songs are returned")
+def test_list_songs_as_member():
     pass
 
 
-@scenario(FEATURE, "GET songs through a second guitar_song tab of the same project — the same songs are returned")
-def test_list_songs_via_second_tab():
-    pass
-
-
-@scenario(FEATURE, "GET songs as a guest — read access is allowed")
+@scenario(FEATURE, "GET a project's songs as a guest — read access is allowed")
 def test_list_songs_as_guest():
+    pass
+
+
+@scenario(FEATURE, "GET a project's songs with no project membership — 403 error")
+def test_list_songs_forbidden():
     pass
 
 

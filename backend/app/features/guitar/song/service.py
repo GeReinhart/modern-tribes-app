@@ -15,13 +15,6 @@ from app.features.guitar.song.models import (
 )
 
 
-async def _require_instance_project(pool, feature_instance_id: str) -> str:
-    project_id = await repo.get_project_id_for_instance(pool, feature_instance_id)
-    if project_id is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Feature instance not found.")
-    return project_id
-
-
 async def _require_song_project(pool, song_id: str) -> str:
     project_id = await repo.get_project_id_for_song(pool, song_id)
     if project_id is None:
@@ -36,19 +29,17 @@ async def _require_song_chord_context(pool, song_chord_id: str) -> dict:
     return context
 
 
-async def list_songs(pool, feature_instance_id: str, user: dict) -> list[GuitarSongResponse]:
-    project_id = await _require_instance_project(pool, feature_instance_id)
+async def list_songs(pool, project_id: str, user: dict) -> list[GuitarSongResponse]:
     await check_project_access_or_admin(project_id, user, pool, min_position="guest")
     rows = await repo.fetch_songs(pool, project_id)
     return [GuitarSongResponse(**row) for row in rows]
 
 
-async def create_song(pool, feature_instance_id: str, data: GuitarSongCreate, user: dict) -> GuitarSongResponse:
-    project_id = await _require_instance_project(pool, feature_instance_id)
+async def create_song(pool, project_id: str, data: GuitarSongCreate, user: dict) -> GuitarSongResponse:
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
     row = await repo.insert_song(
         pool, project_id, generate_url_param_id(), data.title, data.author,
-        data.tempo_bpm, data.beats_per_bar, user["id"],
+        data.tempo_bpm, data.beats_per_bar, data.capo, user["id"],
     )
     return GuitarSongResponse(**row)
 

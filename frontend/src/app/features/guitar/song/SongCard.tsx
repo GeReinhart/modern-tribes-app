@@ -23,6 +23,7 @@ export const SongCard: React.FC<SongCardProps> = ({ song, onOpen }) => {
       )}
       <div style={{ fontSize: '12px', color: theme.colors.text, opacity: 0.7 }}>
         {t('guitarSong.card.tempo', { bpm: song.tempo_bpm, beats: song.beats_per_bar })}
+        {song.capo > 0 && ` · ${t('guitarSong.card.capo', { fret: song.capo })}`}
       </div>
     </ThemedCard>
   );

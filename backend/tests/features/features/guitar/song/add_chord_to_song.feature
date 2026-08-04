@@ -31,9 +31,6 @@ Feature: Add a chord to a guitar song
     And the tribes_projects table contains:
       | tribe_id | project_id | relation |
       | 0010     | 0020       | manager  |
-    And the projects_features table contains:
-      | id   | project_id | feature_type | name    | status |
-      | 0100 | 0020       | guitar_song  | Setlist | active |
     And the guitar_songs table contains:
       | id   | project_id | title      | author | tempo_bpm | beats_per_bar | status |
       | 0200 | 0020       | Wonderwall | Oasis  | 87        | 4             | active |

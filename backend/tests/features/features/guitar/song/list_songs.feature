@@ -1,6 +1,6 @@
 Feature: List guitar songs
   As a project member
-  I want to see all the songs in the guitar_song tab
+  I want to see all the songs in the project's songbook
   So that I can pick one to practice
 
   Background:
@@ -31,21 +31,17 @@ Feature: List guitar songs
     And the tribes_projects table contains:
       | tribe_id | project_id | relation |
       | 0010     | 0020       | manager  |
-    And the projects_features table contains:
-      | id   | project_id | feature_type | name              | status |
-      | 0100 | 0020       | guitar_song  | Rehearsal setlist | active |
-      | 0101 | 0020       | guitar_song  | Gig setlist       | active |
     And the guitar_songs table contains:
       | id   | project_id | title      | author           | tempo_bpm | beats_per_bar | status |
       | 0200 | 0020       | Wonderwall | Oasis            | 87        | 4             | active |
       | 0201 | 0020       | Zombie     | The Cranberries  | 84        | 4             | active |
 
-  Scenario: GET songs through one guitar_song tab — the project's active songs are returned
+  Scenario: GET a project's songs as a member — the project's active songs are returned
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:
       | id   | tribe_id | person_id | position | status |
       | 1001 | 0010     | 0030      | member   | active |
-    When I GET /api/features/tasks/guitar-songs/instances/0100/songs
+    When I GET /api/features/tasks/guitar-songs/projects/0020/songs
     Then the response status code is 200
     And the response body includes:
       """
@@ -55,25 +51,16 @@ Feature: List guitar songs
       ]
       """
 
-  Scenario: GET songs through a second guitar_song tab of the same project — the same songs are returned
-    Given I am authenticated as a regular user: user.id 0002
-    And the positions table contains:
-      | id   | tribe_id | person_id | position | status |
-      | 1001 | 0010     | 0030      | member   | active |
-    When I GET /api/features/tasks/guitar-songs/instances/0101/songs
-    Then the response status code is 200
-    And the response body includes:
-      """
-      [
-        {"id": "0200", "title": "Wonderwall"},
-        {"id": "0201", "title": "Zombie"}
-      ]
-      """
-
-  Scenario: GET songs as a guest — read access is allowed
+  Scenario: GET a project's songs as a guest — read access is allowed
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:
       | id   | tribe_id | person_id | position | status |
       | 1001 | 0010     | 0030      | guest    | active |
-    When I GET /api/features/tasks/guitar-songs/instances/0100/songs
+    When I GET /api/features/tasks/guitar-songs/projects/0020/songs
     Then the response status code is 200
+
+  @error_case
+  Scenario: GET a project's songs with no project membership — 403 error
+    Given I am authenticated as a regular user: user.id 0002
+    When I GET /api/features/tasks/guitar-songs/projects/0020/songs
+    Then the response status code is 403

@@ -4,7 +4,14 @@ import { ThemedSubmitButton } from '@/app/platform/core/layout/themes/components
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { MAX_BEATS_PER_BAR, MAX_TEMPO_BPM, MIN_BEATS_PER_BAR, MIN_TEMPO_BPM } from './songLimits.ts';
+import {
+  MAX_BEATS_PER_BAR,
+  MAX_CAPO,
+  MAX_TEMPO_BPM,
+  MIN_BEATS_PER_BAR,
+  MIN_CAPO,
+  MIN_TEMPO_BPM,
+} from './songLimits.ts';
 import { GuitarSong, GuitarSongCreate } from './types.ts';
 
 interface SongFormProps {
@@ -19,6 +26,7 @@ export const SongForm: React.FC<SongFormProps> = ({ song, onSubmit, onCancel }) 
   const [author, setAuthor] = useState(song?.author ?? '');
   const [tempoBpm, setTempoBpm] = useState(song?.tempo_bpm ?? 120);
   const [beatsPerBar, setBeatsPerBar] = useState(song?.beats_per_bar ?? 4);
+  const [capo, setCapo] = useState(song?.capo ?? 0);
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,6 +39,7 @@ export const SongForm: React.FC<SongFormProps> = ({ song, onSubmit, onCancel }) 
         author: author.trim() || null,
         tempo_bpm: tempoBpm,
         beats_per_bar: beatsPerBar,
+        capo,
       });
     } finally {
       setSaving(false);
@@ -68,12 +77,20 @@ export const SongForm: React.FC<SongFormProps> = ({ song, onSubmit, onCancel }) 
         value={beatsPerBar}
         onChange={(e) => setBeatsPerBar(Number(e.target.value))}
       />
+      <ThemedInput
+        label={t('guitarSong.form.capo')}
+        type="number"
+        min={MIN_CAPO}
+        max={MAX_CAPO}
+        value={capo}
+        onChange={(e) => setCapo(Number(e.target.value))}
+      />
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
         <ThemedSubmitButton type="button" variant="ghost" fullWidth={false} onClick={onCancel}>
           {t('common.cancel')}
         </ThemedSubmitButton>
         <ThemedSubmitButton type="submit" fullWidth={false} isLoading={saving} disabled={!title.trim()}>
-          {t('common.save')}
+          {song ? t('common.update') : t('common.create')}
         </ThemedSubmitButton>
       </div>
     </form>

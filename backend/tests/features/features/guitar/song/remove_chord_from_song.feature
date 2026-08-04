@@ -23,9 +23,6 @@ Feature: Remove a chord from a guitar song
     And the projects table contains:
       | id   | name      | status |
       | 0020 | Rehearsal | active |
-    And the projects_features table contains:
-      | id   | project_id | feature_type | name    | status |
-      | 0100 | 0020       | guitar_song  | Setlist | active |
     And the guitar_songs table contains:
       | id   | project_id | title      | author | tempo_bpm | beats_per_bar | status |
       | 0200 | 0020       | Wonderwall | Oasis  | 87        | 4             | active |

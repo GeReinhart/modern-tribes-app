@@ -3,12 +3,13 @@ import { useEffect, useState } from 'react';
 import { guitarSongsService } from './service.ts';
 import { GuitarSongChordCreate, GuitarSongChordUpdate, GuitarSongDetail, MoveDirection } from './types.ts';
 
-export const useGuitarSong = (songId: string) => {
+export const useGuitarSong = (songId: string | null) => {
   const [song, setSong] = useState<GuitarSongDetail | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!!songId);
   const [error, setError] = useState<string | null>(null);
 
   const reload = async () => {
+    if (!songId) return;
     setLoading(true);
     setError(null);
     try {
@@ -23,6 +24,7 @@ export const useGuitarSong = (songId: string) => {
   useEffect(() => { reload(); }, [songId]);
 
   const addChord = async (data: GuitarSongChordCreate) => {
+    if (!songId) return;
     await guitarSongsService.addChordToSong(songId, data);
     await reload();
   };

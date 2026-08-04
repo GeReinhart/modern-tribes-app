@@ -14,11 +14,11 @@ import {
 const BASE = '/features/tasks/guitar-songs';
 
 export const guitarSongsService = {
-  listSongs: (featureInstanceId: string): Promise<GuitarSong[]> =>
-    apiService.get<GuitarSong[]>(`${BASE}/instances/${featureInstanceId}/songs`),
+  listSongs: (projectId: string): Promise<GuitarSong[]> =>
+    apiService.get<GuitarSong[]>(`${BASE}/projects/${projectId}/songs`),
 
-  createSong: (featureInstanceId: string, data: GuitarSongCreate): Promise<GuitarSong> =>
-    apiService.post<GuitarSong>(`${BASE}/instances/${featureInstanceId}/songs`, data),
+  createSong: (projectId: string, data: GuitarSongCreate): Promise<GuitarSong> =>
+    apiService.post<GuitarSong>(`${BASE}/projects/${projectId}/songs`, data),
 
   getSong: (songId: string): Promise<GuitarSongDetail> =>
     apiService.get<GuitarSongDetail>(`${BASE}/songs/${songId}`),
