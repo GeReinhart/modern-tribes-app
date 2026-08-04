@@ -149,24 +149,26 @@ const SongDetailPageContent: React.FC = () => {
             )}
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {song.chords.map((songChord, index) => (
-            <SongChordRow
-              key={songChord.id}
-              songChord={songChord}
-              isFirst={index === 0}
-              isLast={index === song.chords.length - 1}
-              canEdit={chordsEditable}
-              canManage={chordsManageable}
-              diagramStyle={song.chord_diagram_style}
-              diagramSize={song.chord_diagram_size}
-              onMoveUp={() => moveChord(songChord.id, 'prev')}
-              onMoveDown={() => moveChord(songChord.id, 'next')}
-              onRemove={() => removeChord(songChord.id)}
-              onCommentBlur={(comment) => updateComment(songChord.id, { comment: comment || null })}
-            />
-          ))}
-        </div>
+        <ThemedCard bordered className="p-4">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+            {song.chords.map((songChord, index) => (
+              <SongChordRow
+                key={songChord.id}
+                songChord={songChord}
+                isFirst={index === 0}
+                isLast={index === song.chords.length - 1}
+                canEdit={chordsEditable}
+                canManage={chordsManageable}
+                diagramStyle={song.chord_diagram_style}
+                diagramSize={song.chord_diagram_size}
+                onMoveUp={() => moveChord(songChord.id, 'prev')}
+                onMoveDown={() => moveChord(songChord.id, 'next')}
+                onRemove={() => removeChord(songChord.id)}
+                onCommentBlur={(comment) => updateComment(songChord.id, { comment: comment || null })}
+              />
+            ))}
+          </div>
+        </ThemedCard>
       </ThemedSection>
       <AddChordToSongModal
         isOpen={pickerOpen}

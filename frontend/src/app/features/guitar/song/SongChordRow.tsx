@@ -1,5 +1,4 @@
 import { ChordDiagram, ChordDiagramSize, ChordDiagramStyle } from '@/app/features/guitar/chords/ChordDiagram.tsx';
-import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedIconButton } from '@/app/platform/core/layout/themes/components/ThemedIconButton.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
@@ -45,48 +44,41 @@ export const SongChordRow: React.FC<SongChordRowProps> = ({
   };
 
   return (
-    <ThemedCard bordered className="flex gap-3 p-3 items-start">
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '130px' }}>
       {canManage && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <div style={{ display: 'flex', gap: '2px' }}>
           <ThemedIconButton
             action={{ icon: 'chevron-up', label: t('guitarSong.detail.moveUp'), onClick: onMoveUp, disabled: isFirst }}
           />
           <ThemedIconButton
             action={{ icon: 'chevron-down', label: t('guitarSong.detail.moveDown'), onClick: onMoveDown, disabled: isLast }}
           />
+          <ThemedIconButton
+            action={{ icon: 'trash', label: t('guitarSong.detail.removeChord'), onClick: onRemove, variant: 'danger' }}
+          />
         </div>
       )}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'center' }}>
-        <div style={{ fontWeight: 700, color: theme.colors.text }}>{songChord.chord.name}</div>
-        <ChordDiagram
-          frets={songChord.chord.frets}
-          rootNote={songChord.chord.root_note}
-          diagramStyle={diagramStyle}
-          diagramSize={diagramSize}
+      <div style={{ fontWeight: 700, color: theme.colors.text }}>{songChord.chord.name}</div>
+      <ChordDiagram
+        frets={songChord.chord.frets}
+        rootNote={songChord.chord.root_note}
+        diagramStyle={diagramStyle}
+        diagramSize={diagramSize}
+      />
+      {canEdit ? (
+        <ThemedInput
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          onBlur={handleBlur}
+          placeholder={t('guitarSong.detail.commentPlaceholder')}
         />
-      </div>
-      <div style={{ flex: 1, minWidth: '160px' }}>
-        {canEdit ? (
-          <ThemedInput
-            label={t('guitarSong.detail.comment')}
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            onBlur={handleBlur}
-            placeholder={t('guitarSong.detail.commentPlaceholder')}
-          />
-        ) : (
-          songChord.comment && (
-            <div style={{ color: theme.colors.text, fontSize: '13px', opacity: 0.85, fontStyle: 'italic' }}>
-              {songChord.comment}
-            </div>
-          )
-        )}
-      </div>
-      {canManage && (
-        <ThemedIconButton
-          action={{ icon: 'trash', label: t('guitarSong.detail.removeChord'), onClick: onRemove, variant: 'danger' }}
-        />
+      ) : (
+        songChord.comment && (
+          <div style={{ color: theme.colors.text, fontSize: '13px', opacity: 0.85, fontStyle: 'italic', textAlign: 'center' }}>
+            {songChord.comment}
+          </div>
+        )
       )}
-    </ThemedCard>
+    </div>
   );
 };
