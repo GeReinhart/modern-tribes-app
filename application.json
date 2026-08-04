@@ -893,7 +893,8 @@
                 "- build the chord progression by searching the shared chord inventory, or add a brand new chord on the spot without leaving the song",
                 "- reorder the chords in a song, and leave a comment on a chord just for that song (e.g. a capo position or a playing tip)",
                 "- removing a chord from a song only removes it from that song — it stays in the shared inventory",
-                "- play a metronome at the song's own tempo and time signature, with the first beat of each bar highlighted"
+                "- play a metronome at the song's own tempo and time signature, with the first beat of each bar highlighted",
+                "- each song has its own page with a short, shareable link, so you can bookmark it or send it directly to a bandmate"
               ],
               "fr": [
                 "- tenez un répertoire des morceaux que votre groupe travaille, partagé par tous les onglets morceaux d'un même projet",
@@ -901,7 +902,8 @@
                 "- construisez la grille d'accords en cherchant dans l'inventaire partagé, ou ajoutez un nouvel accord sans quitter le morceau",
                 "- réorganisez les accords d'un morceau, et laissez un commentaire sur un accord propre à ce morceau (ex : une position de capo ou une astuce de jeu)",
                 "- retirer un accord d'un morceau ne le retire que de ce morceau — il reste dans l'inventaire partagé",
-                "- lancez un métronome au tempo et à la signature rythmique du morceau, avec le premier temps de chaque mesure mis en valeur"
+                "- lancez un métronome au tempo et à la signature rythmique du morceau, avec le premier temps de chaque mesure mis en valeur",
+                "- chaque morceau a sa propre page avec un lien court et partageable, pour le mettre en favori ou l'envoyer directement à un musicien du groupe"
               ]
             },
             "backend": {

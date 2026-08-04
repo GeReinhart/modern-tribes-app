@@ -13,6 +13,8 @@ interface SongChordRowProps {
   songChord: GuitarSongChord;
   isFirst: boolean;
   isLast: boolean;
+  canEdit: boolean;
+  canManage: boolean;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onRemove: () => void;
@@ -23,6 +25,8 @@ export const SongChordRow: React.FC<SongChordRowProps> = ({
   songChord,
   isFirst,
   isLast,
+  canEdit,
+  canManage,
   onMoveUp,
   onMoveDown,
   onRemove,
@@ -38,14 +42,16 @@ export const SongChordRow: React.FC<SongChordRowProps> = ({
 
   return (
     <ThemedCard bordered className="flex gap-3 p-3 items-start">
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <ThemedIconButton
-          action={{ icon: 'chevron-up', label: t('guitarSong.detail.moveUp'), onClick: onMoveUp, disabled: isFirst }}
-        />
-        <ThemedIconButton
-          action={{ icon: 'chevron-down', label: t('guitarSong.detail.moveDown'), onClick: onMoveDown, disabled: isLast }}
-        />
-      </div>
+      {canManage && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <ThemedIconButton
+            action={{ icon: 'chevron-up', label: t('guitarSong.detail.moveUp'), onClick: onMoveUp, disabled: isFirst }}
+          />
+          <ThemedIconButton
+            action={{ icon: 'chevron-down', label: t('guitarSong.detail.moveDown'), onClick: onMoveDown, disabled: isLast }}
+          />
+        </div>
+      )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'center' }}>
         <div style={{ fontWeight: 700, color: theme.colors.text }}>{songChord.chord.name}</div>
         <ChordDiagram frets={songChord.chord.frets} rootNote={songChord.chord.root_note} />
@@ -57,11 +63,14 @@ export const SongChordRow: React.FC<SongChordRowProps> = ({
           onChange={(e) => setComment(e.target.value)}
           onBlur={handleBlur}
           placeholder={t('guitarSong.detail.commentPlaceholder')}
+          disabled={!canEdit}
         />
       </div>
-      <ThemedIconButton
-        action={{ icon: 'trash', label: t('guitarSong.detail.removeChord'), onClick: onRemove, variant: 'danger' }}
-      />
+      {canManage && (
+        <ThemedIconButton
+          action={{ icon: 'trash', label: t('guitarSong.detail.removeChord'), onClick: onRemove, variant: 'danger' }}
+        />
+      )}
     </ThemedCard>
   );
 };

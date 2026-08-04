@@ -2,6 +2,7 @@ import { GuitarChord } from '../chords/types.ts';
 
 export interface GuitarSong {
   id: string;
+  url_param_id: string;
   project_id: string;
   title: string;
   author: string | null;

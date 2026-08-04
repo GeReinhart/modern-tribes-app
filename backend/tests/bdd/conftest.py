@@ -1191,11 +1191,14 @@ def given_guitar_songs_table(datatable):
             for row in datatable[1:]:
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
                 uid = rec.get("id")
+                if not uid:
+                    continue
                 await conn.execute(
-                    """INSERT INTO guitar_songs(id, project_id, title, author, tempo_bpm, beats_per_bar, status)
-                       VALUES(COALESCE($1, gen_random_uuid()), $2, $3, $4, $5, $6, $7)
+                    """INSERT INTO guitar_songs(id, url_param_id, project_id, title, author, tempo_bpm, beats_per_bar, status)
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
                        ON CONFLICT (id) DO NOTHING""",
-                    UUID(uid) if uid else None,
+                    UUID(uid),
+                    rec.get("url_param_id", url_param_id_from_uuid(uid)),
                     UUID(rec["project_id"]),
                     rec.get("title", "Song"),
                     rec.get("author") or None,

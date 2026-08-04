@@ -4,12 +4,12 @@ import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/componen
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { guitarSongsService } from './service.ts';
 import { SongCard } from './SongCard.tsx';
-import { SongDetailModal } from './SongDetailModal.tsx';
 import { SongFormModal } from './SongFormModal.tsx';
-import { GuitarSongCreate } from './types.ts';
+import { GuitarSong, GuitarSongCreate } from './types.ts';
 import { useGuitarSongs } from './useGuitarSongs.ts';
 
 interface Props {
@@ -18,20 +18,20 @@ interface Props {
   isManager: boolean;
 }
 
-const SongsTab: React.FC<Props> = ({ featureInstanceId }) => {
+const SongsTab: React.FC<Props> = ({ featureInstanceId, canEdit }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { tribeId, projectId } = useParams<{ tribeId: string; projectId: string }>();
   const { songs, loading, error, reload } = useGuitarSongs(featureInstanceId);
   const [formOpen, setFormOpen] = useState(false);
-  const [openSongId, setOpenSongId] = useState<string | null>(null);
 
   const handleCreate = async (data: GuitarSongCreate) => {
     await guitarSongsService.createSong(featureInstanceId, data);
     await reload();
   };
 
-  const handleArchived = async () => {
-    setOpenSongId(null);
-    await reload();
+  const openSong = (song: GuitarSong) => {
+    navigate(`/app/tribes/${tribeId}/projects/${projectId}/songs/${song.url_param_id}`);
   };
 
   if (loading) return <ThemedLoadingSpinner text={t('common.loading')} />;
@@ -39,20 +39,19 @@ const SongsTab: React.FC<Props> = ({ featureInstanceId }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: '16px' }}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <ThemedButton onClick={() => setFormOpen(true)} fullWidth={false}>
-          {t('guitarSong.list.add')}
-        </ThemedButton>
-      </div>
+      {canEdit && (
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <ThemedButton onClick={() => setFormOpen(true)} fullWidth={false}>
+            {t('guitarSong.list.add')}
+          </ThemedButton>
+        </div>
+      )}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '16px' }}>
         {songs.map((song) => (
-          <SongCard key={song.id} song={song} onOpen={() => setOpenSongId(song.id)} />
+          <SongCard key={song.id} song={song} onOpen={() => openSong(song)} />
         ))}
       </div>
       <SongFormModal isOpen={formOpen} onClose={() => setFormOpen(false)} onSubmit={handleCreate} />
-      {openSongId && (
-        <SongDetailModal songId={openSongId} onClose={() => setOpenSongId(null)} onArchived={handleArchived} />
-      )}
     </div>
   );
 };

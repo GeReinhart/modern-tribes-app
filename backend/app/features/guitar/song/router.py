@@ -4,6 +4,7 @@ from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.database import get_database
+from app.platform.core.utils.db_helpers import resolve_url_param_id
 from app.features.guitar.song import service as song_service
 from app.features.guitar.song.models import (
     GuitarSongChordCreate,
@@ -53,7 +54,9 @@ async def get_song(song_id: str, current_user: dict = Depends(get_current_user))
     **Permissions:** admin | can_access_attached_tribes
     **Project access:** minimum position ≥ guest
     """
-    return await song_service.get_song(get_database(), song_id, current_user)
+    pool = get_database()
+    song_id = await resolve_url_param_id(pool, "guitar_songs", song_id)
+    return await song_service.get_song(pool, song_id, current_user)
 
 
 @router.patch("/songs/{song_id}", response_model=GuitarSongResponse)
@@ -64,7 +67,9 @@ async def update_song(song_id: str, data: GuitarSongUpdate, current_user: dict =
     **Permissions:** admin | can_access_attached_tribes
     **Project access:** minimum position ≥ member
     """
-    return await song_service.update_song(get_database(), song_id, data, current_user)
+    pool = get_database()
+    song_id = await resolve_url_param_id(pool, "guitar_songs", song_id)
+    return await song_service.update_song(pool, song_id, data, current_user)
 
 
 @router.delete("/songs/{song_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -75,7 +80,9 @@ async def archive_song(song_id: str, current_user: dict = Depends(get_current_us
     **Permissions:** admin | can_access_attached_tribes
     **Project access:** minimum position ≥ manager
     """
-    await song_service.archive_song(get_database(), song_id, current_user)
+    pool = get_database()
+    song_id = await resolve_url_param_id(pool, "guitar_songs", song_id)
+    await song_service.archive_song(pool, song_id, current_user)
 
 
 @router.post(
@@ -90,7 +97,9 @@ async def add_chord_to_song(
     **Permissions:** admin | can_access_attached_tribes
     **Project access:** minimum position ≥ member
     """
-    return await song_service.add_chord_to_song(get_database(), song_id, data, current_user)
+    pool = get_database()
+    song_id = await resolve_url_param_id(pool, "guitar_songs", song_id)
+    return await song_service.add_chord_to_song(pool, song_id, data, current_user)
 
 
 @router.patch("/song-chords/{song_chord_id}", response_model=GuitarSongChordResponse)

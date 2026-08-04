@@ -2,7 +2,7 @@ import json
 from uuid import UUID
 
 _SONG_SELECT_FIELDS = (
-    "id::text, project_id::text, title, author, tempo_bpm, beats_per_bar, status, "
+    "id::text, url_param_id, project_id::text, title, author, tempo_bpm, beats_per_bar, status, "
     "created_at, updated_at, created_by::text, updated_by::text"
 )
 
@@ -63,14 +63,15 @@ async def fetch_song(pool, song_id: str) -> dict | None:
 
 
 async def insert_song(
-    pool, project_id: str, title: str, author: str | None, tempo_bpm: int, beats_per_bar: int, user_id: str
+    pool, project_id: str, url_param_id: str, title: str, author: str | None,
+    tempo_bpm: int, beats_per_bar: int, user_id: str,
 ) -> dict:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            f"""INSERT INTO guitar_songs (project_id, title, author, tempo_bpm, beats_per_bar, created_by, updated_by)
-                VALUES ($1, $2, $3, $4, $5, $6::uuid, $6::uuid)
+            f"""INSERT INTO guitar_songs (project_id, url_param_id, title, author, tempo_bpm, beats_per_bar, created_by, updated_by)
+                VALUES ($1, $2, $3, $4, $5, $6, $7::uuid, $7::uuid)
                 RETURNING {_SONG_SELECT_FIELDS}""",
-            UUID(project_id), title, author, tempo_bpm, beats_per_bar, UUID(user_id),
+            UUID(project_id), url_param_id, title, author, tempo_bpm, beats_per_bar, UUID(user_id),
         )
     return dict(row)
 

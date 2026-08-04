@@ -1,6 +1,7 @@
 from fastapi import HTTPException, status
 
 from app.platform.core.authorization.project_access import check_project_access_or_admin
+from app.platform.core.utils.db_helpers import generate_url_param_id
 from app.features.guitar.song import repository as repo
 from app.features.guitar.song.models import (
     GuitarSongChordCreate,
@@ -46,7 +47,8 @@ async def create_song(pool, feature_instance_id: str, data: GuitarSongCreate, us
     project_id = await _require_instance_project(pool, feature_instance_id)
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
     row = await repo.insert_song(
-        pool, project_id, data.title, data.author, data.tempo_bpm, data.beats_per_bar, user["id"]
+        pool, project_id, generate_url_param_id(), data.title, data.author,
+        data.tempo_bpm, data.beats_per_bar, user["id"],
     )
     return GuitarSongResponse(**row)
 

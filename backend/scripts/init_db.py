@@ -425,9 +425,9 @@ class DatabaseInitializer:
                     print(f"✗ Unknown project '{row['project']}' in guitar_songs.csv")
                     sys.exit(1)
                 r = await conn.fetchrow(
-                    """INSERT INTO guitar_songs (project_id, title, author, tempo_bpm, beats_per_bar, created_by, updated_by)
-                       VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING id""",
-                    project_ids[row["project"]], row["title"], row.get("author") or None,
+                    """INSERT INTO guitar_songs (project_id, url_param_id, title, author, tempo_bpm, beats_per_bar, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $5, $6, $7, $7) RETURNING id""",
+                    project_ids[row["project"]], _generate_url_param_id(), row["title"], row.get("author") or None,
                     int(row.get("tempo_bpm") or 120), int(row.get("beats_per_bar") or 4), admin_id,
                 )
                 ids[f"{row['project']}|{row['title']}"] = str(r["id"])

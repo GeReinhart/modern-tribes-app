@@ -16,7 +16,7 @@ TABLES_WITHOUT_CREATED_AT = frozenset(
 )
 
 URL_PARAM_ID_TABLES = frozenset(
-    {"users", "tribes", "projects", "projects_documents", "publications", "document_pages"}
+    {"users", "tribes", "projects", "projects_documents", "publications", "document_pages", "guitar_songs"}
 )
 
 

@@ -22,6 +22,7 @@ class GuitarSongUpdate(BaseModel):
 
 class GuitarSongResponse(BaseModel):
     id: str
+    url_param_id: str
     project_id: str
     title: str
     author: Optional[str] = None
