@@ -1,5 +1,7 @@
 import BeatIndicator from '@/app/features/guitar/metronome/BeatIndicator.tsx';
 import { useMetronome } from '@/app/features/guitar/metronome/useMetronome.ts';
+import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
+import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';
@@ -19,41 +21,57 @@ export const SongMetronomeControls: React.FC<SongMetronomeControlsProps> = ({ te
   const { isRunning, activeBeat, toggle } = useMetronome(tempoBpm, beatsPerBar, accentEnabled, noop);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', padding: '12px' }}>
-      <BeatIndicator beatsPerBar={beatsPerBar} activeBeat={activeBeat} accentEnabled={accentEnabled} />
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+    <ThemedCard bordered className="flex flex-col items-center gap-1 p-2">
+      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
         <button
           type="button"
           onClick={toggle}
+          title={isRunning ? t('features.guitarMetronome.stop') : t('features.guitarMetronome.start')}
           style={{
-            padding: '8px 28px',
-            borderRadius: '20px',
-            border: `2px solid ${isRunning ? theme.colors.text : theme.colors.primary}`,
-            backgroundColor: isRunning ? 'transparent' : theme.colors.primary,
-            color: isRunning ? theme.colors.text : theme.colors.surface,
-            fontSize: '15px',
-            fontWeight: 'bold',
+            width: '22px',
+            height: '22px',
+            borderRadius: '50%',
+            border: `1px solid ${theme.colors.primary}`,
+            backgroundColor: isRunning ? theme.colors.primary : 'transparent',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             cursor: 'pointer',
+            flexShrink: 0,
           }}
         >
-          {isRunning ? t('features.guitarMetronome.stop') : t('features.guitarMetronome.start')}
+          {isRunning ? (
+            <div style={{ width: '8px', height: '8px', backgroundColor: theme.colors.surface }} />
+          ) : (
+            <div
+              style={{
+                width: 0,
+                height: 0,
+                borderTop: '5px solid transparent',
+                borderBottom: '5px solid transparent',
+                borderLeft: `8px solid ${theme.colors.primary}`,
+                marginLeft: '2px',
+              }}
+            />
+          )}
         </button>
         <button
           type="button"
           onClick={() => setAccentEnabled(!accentEnabled)}
-          style={{
-            padding: '4px 12px',
-            borderRadius: '12px',
-            border: `1px solid ${theme.colors.primary}`,
-            backgroundColor: accentEnabled ? theme.colors.primary : 'transparent',
-            color: accentEnabled ? theme.colors.surface : theme.colors.primary,
-            fontSize: '11px',
-            cursor: 'pointer',
-          }}
+          title={accentEnabled ? t('features.guitarMetronome.accentOn') : t('features.guitarMetronome.accentOff')}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 0 }}
         >
-          {accentEnabled ? t('features.guitarMetronome.accentOn') : t('features.guitarMetronome.accentOff')}
+          <ThemedSvgIcon name="star" color={accentEnabled ? theme.colors.primary : theme.colors.secondary} size={16} />
         </button>
       </div>
-    </div>
+      <BeatIndicator
+        beatsPerBar={beatsPerBar}
+        activeBeat={activeBeat}
+        accentEnabled={accentEnabled}
+        size={5}
+        accentSize={8}
+        gap={3}
+      />
+    </ThemedCard>
   );
 };

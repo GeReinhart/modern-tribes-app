@@ -5,23 +5,33 @@ interface Props {
   beatsPerBar: number;
   activeBeat: number | null;
   accentEnabled: boolean;
+  size?: number;
+  accentSize?: number;
+  gap?: number;
 }
 
-const BeatIndicator: React.FC<Props> = ({ beatsPerBar, activeBeat, accentEnabled }) => {
+const BeatIndicator: React.FC<Props> = ({
+  beatsPerBar,
+  activeBeat,
+  accentEnabled,
+  size = 28,
+  accentSize = 52,
+  gap = 16,
+}) => {
   const { theme } = useTheme();
 
   return (
-    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+    <div style={{ display: 'flex', gap: `${gap}px`, alignItems: 'center' }}>
       {Array.from({ length: beatsPerBar }, (_, i) => {
         const isActive = activeBeat === i;
         const isAccent = accentEnabled && i === 0;
-        const size = isAccent ? '52px' : '28px';
+        const dotSize = `${isAccent ? accentSize : size}px`;
         return (
           <div
             key={i}
             style={{
-              width: size,
-              height: size,
+              width: dotSize,
+              height: dotSize,
               borderRadius: '50%',
               backgroundColor: isActive
                 ? (isAccent ? theme.colors.primary : theme.colors.text)

@@ -4,7 +4,6 @@ import { useProjectPermissions } from '@/app/features/tribes-projects/projects/u
 import { useProject } from '@/app/features/tribes-projects/projects/useProjects.ts';
 import { useTribeWithPositions } from '@/app/features/tribes-projects/tribes/useTribesWithPositions.ts';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
-import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedConfirmDialog } from '@/app/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
 import { ThemedIconButton } from '@/app/platform/core/layout/themes/components/ThemedIconButton.tsx';
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
@@ -123,14 +122,8 @@ const SongDetailPageContent: React.FC = () => {
           <SongStatCard icon="activity" label={t('guitarSong.detail.statBpm')} value={song.tempo_bpm} />
           <SongStatCard icon="hash" label={t('guitarSong.detail.statBeatsPerBar')} value={song.beats_per_bar} />
           <SongStatCard icon="lock" label={t('guitarSong.detail.statCapo')} value={song.capo > 0 ? song.capo : '–'} />
-        </div>
-        {writeMode ? (
           <SongMetronomeControls tempoBpm={song.tempo_bpm} beatsPerBar={song.beats_per_bar} />
-        ) : (
-          <ThemedCard bordered className="p-3">
-            <SongMetronomeControls tempoBpm={song.tempo_bpm} beatsPerBar={song.beats_per_bar} />
-          </ThemedCard>
-        )}
+        </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '20px 0 12px' }}>
           <div style={{ fontWeight: 600, color: theme.colors.text }}>{t('guitarSong.detail.chords')}</div>
           <div style={{ display: 'flex', gap: '4px' }}>
