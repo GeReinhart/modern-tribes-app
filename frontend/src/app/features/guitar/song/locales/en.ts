@@ -1,0 +1,26 @@
+const en: Record<string, string> = {
+  'guitarSong.list.add': 'Add song',
+  'guitarSong.list.loadError': 'Could not load the songbook.',
+  'guitarSong.card.tempo': '{{bpm}} BPM · {{beats}} beats/bar',
+  'guitarSong.form.title': 'Title',
+  'guitarSong.form.author': 'Author',
+  'guitarSong.form.tempoBpm': 'Tempo (BPM)',
+  'guitarSong.form.beatsPerBar': 'Beats per bar',
+  'guitarSong.form.addTitle': 'Add a song',
+  'guitarSong.form.editTitle': 'Edit song',
+  'guitarSong.detail.loadError': 'Could not load the song.',
+  'guitarSong.detail.chords': 'Chords',
+  'guitarSong.detail.addChord': 'Add chord',
+  'guitarSong.detail.removeChord': 'Remove from song',
+  'guitarSong.detail.moveUp': 'Move up',
+  'guitarSong.detail.moveDown': 'Move down',
+  'guitarSong.detail.comment': 'Comment',
+  'guitarSong.detail.commentPlaceholder': 'e.g. capo 2, play softly…',
+  'guitarSong.detail.archive': 'Archive song',
+  'guitarSong.detail.archiveTitle': 'Archive song',
+  'guitarSong.detail.archiveMessage': 'Archive "{{title}}"? It will no longer appear in the songbook.',
+  'guitarSong.picker.title': 'Add a chord to this song',
+  'guitarSong.picker.add': 'Add to song',
+};
+
+export default en;

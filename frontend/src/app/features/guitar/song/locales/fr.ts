@@ -1,0 +1,26 @@
+const fr: Record<string, string> = {
+  'guitarSong.list.add': 'Ajouter un morceau',
+  'guitarSong.list.loadError': 'Impossible de charger le répertoire.',
+  'guitarSong.card.tempo': '{{bpm}} BPM · {{beats}} temps/mesure',
+  'guitarSong.form.title': 'Titre',
+  'guitarSong.form.author': 'Auteur',
+  'guitarSong.form.tempoBpm': 'Tempo (BPM)',
+  'guitarSong.form.beatsPerBar': 'Temps par mesure',
+  'guitarSong.form.addTitle': 'Ajouter un morceau',
+  'guitarSong.form.editTitle': 'Modifier le morceau',
+  'guitarSong.detail.loadError': 'Impossible de charger le morceau.',
+  'guitarSong.detail.chords': 'Accords',
+  'guitarSong.detail.addChord': 'Ajouter un accord',
+  'guitarSong.detail.removeChord': 'Retirer du morceau',
+  'guitarSong.detail.moveUp': 'Monter',
+  'guitarSong.detail.moveDown': 'Descendre',
+  'guitarSong.detail.comment': 'Commentaire',
+  'guitarSong.detail.commentPlaceholder': 'ex : capo 2, jouer doucement…',
+  'guitarSong.detail.archive': 'Archiver le morceau',
+  'guitarSong.detail.archiveTitle': 'Archiver le morceau',
+  'guitarSong.detail.archiveMessage': 'Archiver « {{title}} » ? Il n\'apparaîtra plus dans le répertoire.',
+  'guitarSong.picker.title': 'Ajouter un accord à ce morceau',
+  'guitarSong.picker.add': 'Ajouter au morceau',
+};
+
+export default fr;

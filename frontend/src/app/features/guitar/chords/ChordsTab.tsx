@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { ChordCard } from './ChordCard.tsx';
 import { ChordsFilterBar } from './ChordsFilterBar.tsx';
 import { ChordFormModal } from './ChordFormModal.tsx';
+import { filterGuitarChords } from './filterChords.ts';
 import { guitarChordsService } from './service.ts';
 import { GuitarChord, GuitarChordCreate } from './types.ts';
 import { useGuitarChords } from './useGuitarChords.ts';
@@ -28,9 +29,7 @@ const ChordsTab: React.FC<Props> = () => {
   const [deleteTarget, setDeleteTarget] = useState<GuitarChord | null>(null);
 
   const filteredChords = useMemo(
-    () => chords.filter((chord) =>
-      chord.name.toLowerCase().includes(search.trim().toLowerCase())
-      && (!rootFilter || chord.root_note === rootFilter)),
+    () => filterGuitarChords(chords, search, rootFilter),
     [chords, search, rootFilter],
   );
 
