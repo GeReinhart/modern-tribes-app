@@ -759,12 +759,12 @@
         "description": {
           "en": [
             "- a set of tools to support your guitar practice",
-            "- includes a note quiz, a chromatic tuner, a metronome and a chord inventory",
+            "- includes a note quiz, a chromatic tuner, a metronome, a chord inventory and a songbook",
             "- shared: audioContext.ts (singleton Web Audio API context)"
           ],
           "fr": [
             "- un ensemble d'outils pour soutenir votre pratique de la guitare",
-            "- comprend un quiz de notes, un accordeur chromatique, un métronome et un inventaire d'accords",
+            "- comprend un quiz de notes, un accordeur chromatique, un métronome, un inventaire d'accords et un répertoire de morceaux",
             "- partagé : audioContext.ts (contexte Web Audio API singleton)"
           ]
         },
@@ -881,6 +881,41 @@
             "frontend": {
               "path": [
                 "frontend/src/app/features/guitar/chords/**"
+              ]
+            }
+          },
+          {
+            "package": "song",
+            "description": {
+              "en": [
+                "- keep a songbook of the songs your group is practicing, shared by every song tab attached to the same project",
+                "- a song has a title, an author, a tempo in BPM and a time signature",
+                "- build the chord progression by searching the shared chord inventory, or add a brand new chord on the spot without leaving the song",
+                "- reorder the chords in a song, and leave a comment on a chord just for that song (e.g. a capo position or a playing tip)",
+                "- removing a chord from a song only removes it from that song — it stays in the shared inventory",
+                "- play a metronome at the song's own tempo and time signature, with the first beat of each bar highlighted"
+              ],
+              "fr": [
+                "- tenez un répertoire des morceaux que votre groupe travaille, partagé par tous les onglets morceaux d'un même projet",
+                "- un morceau a un titre, un auteur, un tempo en BPM et une signature rythmique",
+                "- construisez la grille d'accords en cherchant dans l'inventaire partagé, ou ajoutez un nouvel accord sans quitter le morceau",
+                "- réorganisez les accords d'un morceau, et laissez un commentaire sur un accord propre à ce morceau (ex : une position de capo ou une astuce de jeu)",
+                "- retirer un accord d'un morceau ne le retire que de ce morceau — il reste dans l'inventaire partagé",
+                "- lancez un métronome au tempo et à la signature rythmique du morceau, avec le premier temps de chaque mesure mis en valeur"
+              ]
+            },
+            "backend": {
+              "path": [
+                "backend/app/features/guitar/song/**"
+              ],
+              "schema": [
+                "guitar_songs",
+                "guitar_songs_chords"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/guitar/song/**"
               ]
             }
           }
