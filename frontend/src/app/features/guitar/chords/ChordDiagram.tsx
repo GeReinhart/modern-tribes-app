@@ -20,6 +20,8 @@ const SIZE_SCALE: Record<ChordDiagramSize, number> = {
   large: 1.3,
 };
 
+const MARKER_FRETS = new Set([3, 5, 7, 10, 12, 15]);
+
 interface ChordDiagramProps {
   frets: FretValue[];
   rootNote: string;
@@ -83,11 +85,25 @@ export const ChordDiagram: React.FC<ChordDiagramProps> = ({
         <div style={{ height: '14px' }} />
         <div style={{ height: `${rowH}px` }} />
         {baseFret === 1 && <div style={{ height: `${nutH}px` }} />}
-        {rows.map((fret) => (
-          <div key={fret} style={{ height: `${rowH}px`, display: 'flex', alignItems: 'center', paddingLeft: '4px', fontSize: '10px', color: theme.colors.secondary }}>
-            {fret}
-          </div>
-        ))}
+        {rows.map((fret) => {
+          const isMarkerFret = MARKER_FRETS.has(fret);
+          return (
+            <div
+              key={fret}
+              style={{
+                height: `${rowH}px`,
+                display: 'flex',
+                alignItems: 'center',
+                paddingLeft: '4px',
+                fontSize: isMarkerFret ? '12px' : '10px',
+                fontWeight: isMarkerFret ? 700 : 400,
+                color: isMarkerFret ? theme.colors.text : theme.colors.secondary,
+              }}
+            >
+              {fret}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
