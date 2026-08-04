@@ -120,9 +120,9 @@ const SongDetailPageContent: React.FC = () => {
           </div>
         )}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
-          <SongStatCard label={t('guitarSong.detail.statBpm')} value={song.tempo_bpm} />
-          <SongStatCard label={t('guitarSong.detail.statBeatsPerBar')} value={song.beats_per_bar} />
-          <SongStatCard label={t('guitarSong.detail.statCapo')} value={song.capo > 0 ? song.capo : '–'} />
+          <SongStatCard icon="activity" label={t('guitarSong.detail.statBpm')} value={song.tempo_bpm} />
+          <SongStatCard icon="hash" label={t('guitarSong.detail.statBeatsPerBar')} value={song.beats_per_bar} />
+          <SongStatCard icon="lock" label={t('guitarSong.detail.statCapo')} value={song.capo > 0 ? song.capo : '–'} />
         </div>
         {writeMode ? (
           <SongMetronomeControls tempoBpm={song.tempo_bpm} beatsPerBar={song.beats_per_bar} />
