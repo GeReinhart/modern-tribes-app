@@ -1,3 +1,4 @@
+import { ChordDiagramSize, ChordDiagramStyle } from '../chords/ChordDiagram.tsx';
 import { GuitarChord } from '../chords/types.ts';
 
 export interface GuitarSong {
@@ -9,6 +10,8 @@ export interface GuitarSong {
   tempo_bpm: number;
   beats_per_bar: number;
   capo: number;
+  chord_diagram_style: ChordDiagramStyle;
+  chord_diagram_size: ChordDiagramSize;
   status: string;
   created_at: string;
   updated_at: string;
@@ -22,6 +25,8 @@ export interface GuitarSongCreate {
   tempo_bpm: number;
   beats_per_bar: number;
   capo?: number;
+  chord_diagram_style?: ChordDiagramStyle;
+  chord_diagram_size?: ChordDiagramSize;
 }
 
 export interface GuitarSongUpdate {
@@ -30,6 +35,8 @@ export interface GuitarSongUpdate {
   tempo_bpm?: number;
   beats_per_bar?: number;
   capo?: number;
+  chord_diagram_style?: ChordDiagramStyle;
+  chord_diagram_size?: ChordDiagramSize;
 }
 
 export interface GuitarSongChord {

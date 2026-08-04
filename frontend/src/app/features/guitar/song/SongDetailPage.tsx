@@ -152,6 +152,8 @@ const SongDetailPageContent: React.FC = () => {
               isLast={index === song.chords.length - 1}
               canEdit={chordsEditable}
               canManage={chordsManageable}
+              diagramStyle={song.chord_diagram_style}
+              diagramSize={song.chord_diagram_size}
               onMoveUp={() => moveChord(songChord.id, 'prev')}
               onMoveDown={() => moveChord(songChord.id, 'next')}
               onRemove={() => removeChord(songChord.id)}
@@ -163,6 +165,8 @@ const SongDetailPageContent: React.FC = () => {
       <AddChordToSongModal
         isOpen={pickerOpen}
         existingChordIds={chordIds}
+        diagramStyle={song.chord_diagram_style}
+        diagramSize={song.chord_diagram_size}
         onClose={() => setPickerOpen(false)}
         onPickChord={async (chordId) => { await addChord({ chord_id: chordId }); }}
       />

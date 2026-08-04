@@ -1,4 +1,4 @@
-import { ChordDiagram } from '@/app/features/guitar/chords/ChordDiagram.tsx';
+import { ChordDiagram, ChordDiagramSize, ChordDiagramStyle } from '@/app/features/guitar/chords/ChordDiagram.tsx';
 import { GuitarChord } from '@/app/features/guitar/chords/types.ts';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedIconButton } from '@/app/platform/core/layout/themes/components/ThemedIconButton.tsx';
@@ -10,10 +10,18 @@ import { useTranslation } from 'react-i18next';
 interface SongChordPickerCardProps {
   chord: GuitarChord;
   alreadyInSong: boolean;
+  diagramStyle: ChordDiagramStyle;
+  diagramSize: ChordDiagramSize;
   onAdd: () => void;
 }
 
-export const SongChordPickerCard: React.FC<SongChordPickerCardProps> = ({ chord, alreadyInSong, onAdd }) => {
+export const SongChordPickerCard: React.FC<SongChordPickerCardProps> = ({
+  chord,
+  alreadyInSong,
+  diagramStyle,
+  diagramSize,
+  onAdd,
+}) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
@@ -21,7 +29,7 @@ export const SongChordPickerCard: React.FC<SongChordPickerCardProps> = ({ chord,
     <ThemedCard bordered className="flex items-center justify-between gap-2 p-3">
       <div>
         <div style={{ fontWeight: 700, color: theme.colors.text }}>{chord.name}</div>
-        <ChordDiagram frets={chord.frets} rootNote={chord.root_note} />
+        <ChordDiagram frets={chord.frets} rootNote={chord.root_note} diagramStyle={diagramStyle} diagramSize={diagramSize} />
       </div>
       <ThemedIconButton
         action={{

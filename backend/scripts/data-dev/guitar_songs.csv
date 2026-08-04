@@ -1,4 +1,4 @@
-project,title,author,tempo_bpm,beats_per_bar,capo
-Summer BBQ,Wonderwall,Oasis,87,4,2
-Summer BBQ,Knockin' on Heaven's Door,Bob Dylan,72,4,0
-Summer BBQ,Ho Hey,The Lumineers,138,4,0
+project,title,author,tempo_bpm,beats_per_bar,capo,chord_diagram_style,chord_diagram_size
+Summer BBQ,Wonderwall,Oasis,87,4,2,full,medium
+Summer BBQ,Knockin' on Heaven's Door,Bob Dylan,72,4,0,full,medium
+Summer BBQ,Ho Hey,The Lumineers,138,4,0,simple,large

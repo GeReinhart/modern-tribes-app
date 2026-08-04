@@ -6,28 +6,52 @@ import { computeFretWindow, intervalSemitoneFromRoot } from './chordTheory.ts';
 import { IntervalMarker, MutedMarker } from './IntervalMarker.tsx';
 import { FretValue } from './types.ts';
 
-const CELL_W = 34;
-const ROW_H = 34;
-const NUT_H = 5;
-const MARKER_SIZE = 26;
+export type ChordDiagramStyle = 'full' | 'simple';
+export type ChordDiagramSize = 'small' | 'medium' | 'large';
+
+const BASE_CELL_W = 34;
+const BASE_ROW_H = 34;
+const BASE_NUT_H = 5;
+const BASE_MARKER_SIZE = 26;
+
+const SIZE_SCALE: Record<ChordDiagramSize, number> = {
+  small: 0.7,
+  medium: 1,
+  large: 1.3,
+};
 
 interface ChordDiagramProps {
   frets: FretValue[];
   rootNote: string;
+  diagramStyle?: ChordDiagramStyle;
+  diagramSize?: ChordDiagramSize;
 }
 
-const StringMarker: React.FC<{ stringIndex: number; fret: number; rootNote: string }> = ({
-  stringIndex,
-  fret,
-  rootNote,
-}) => {
+const StringMarker: React.FC<{
+  stringIndex: number;
+  fret: number;
+  rootNote: string;
+  simple: boolean;
+  markerSize: number;
+}> = ({ stringIndex, fret, rootNote, simple, markerSize }) => {
   const semitone = intervalSemitoneFromRoot(rootNote, stringIndex, fret);
   if (semitone === null) return null;
-  return <IntervalMarker semitone={semitone} size={MARKER_SIZE} />;
+  return <IntervalMarker semitone={semitone} size={markerSize} simple={simple} />;
 };
 
-export const ChordDiagram: React.FC<ChordDiagramProps> = ({ frets, rootNote }) => {
+export const ChordDiagram: React.FC<ChordDiagramProps> = ({
+  frets,
+  rootNote,
+  diagramStyle = 'full',
+  diagramSize = 'medium',
+}) => {
   const { theme } = useTheme();
+  const scale = SIZE_SCALE[diagramSize];
+  const simple = diagramStyle === 'simple';
+  const cellW = BASE_CELL_W * scale;
+  const rowH = BASE_ROW_H * scale;
+  const nutH = BASE_NUT_H * scale;
+  const markerSize = BASE_MARKER_SIZE * scale;
   const { baseFret, windowSize } = computeFretWindow(frets);
   const rows = Array.from({ length: windowSize }, (_, i) => baseFret + i);
 
@@ -37,20 +61,30 @@ export const ChordDiagram: React.FC<ChordDiagramProps> = ({ frets, rootNote }) =
         <div style={{ height: '14px', fontSize: '11px', color: theme.colors.secondary }}>
           {baseFret > 1 ? `${baseFret}fr` : ''}
         </div>
-        <OpenMuteRow frets={frets} rootNote={rootNote} />
+        <OpenMuteRow frets={frets} rootNote={rootNote} simple={simple} cellW={cellW} rowH={rowH} markerSize={markerSize} />
         {baseFret === 1 && (
-          <div style={{ width: CELL_W * 6, height: NUT_H, backgroundColor: theme.colors.text }} />
+          <div style={{ width: cellW * 6, height: nutH, backgroundColor: theme.colors.text }} />
         )}
         {rows.map((fret) => (
-          <FretRow key={fret} fret={fret} frets={frets} rootNote={rootNote} borderColor={theme.colors.ghost} />
+          <FretRow
+            key={fret}
+            fret={fret}
+            frets={frets}
+            rootNote={rootNote}
+            borderColor={theme.colors.ghost}
+            simple={simple}
+            cellW={cellW}
+            rowH={rowH}
+            markerSize={markerSize}
+          />
         ))}
       </div>
       <div>
         <div style={{ height: '14px' }} />
-        <div style={{ height: `${ROW_H}px` }} />
-        {baseFret === 1 && <div style={{ height: `${NUT_H}px` }} />}
+        <div style={{ height: `${rowH}px` }} />
+        {baseFret === 1 && <div style={{ height: `${nutH}px` }} />}
         {rows.map((fret) => (
-          <div key={fret} style={{ height: `${ROW_H}px`, display: 'flex', alignItems: 'center', paddingLeft: '4px', fontSize: '10px', color: theme.colors.secondary }}>
+          <div key={fret} style={{ height: `${rowH}px`, display: 'flex', alignItems: 'center', paddingLeft: '4px', fontSize: '10px', color: theme.colors.secondary }}>
             {fret}
           </div>
         ))}
@@ -59,12 +93,21 @@ export const ChordDiagram: React.FC<ChordDiagramProps> = ({ frets, rootNote }) =
   );
 };
 
-const OpenMuteRow: React.FC<{ frets: FretValue[]; rootNote: string }> = ({ frets, rootNote }) => (
+interface OpenMuteRowProps {
+  frets: FretValue[];
+  rootNote: string;
+  simple: boolean;
+  cellW: number;
+  rowH: number;
+  markerSize: number;
+}
+
+const OpenMuteRow: React.FC<OpenMuteRowProps> = ({ frets, rootNote, simple, cellW, rowH, markerSize }) => (
   <div style={{ display: 'flex' }}>
     {frets.map((fret, stringIndex) => (
-      <div key={stringIndex} style={{ width: CELL_W, height: ROW_H, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        {fret === 'X' && <MutedMarker size={MARKER_SIZE} />}
-        {fret === 0 && <StringMarker stringIndex={stringIndex} fret={0} rootNote={rootNote} />}
+      <div key={stringIndex} style={{ width: cellW, height: rowH, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {fret === 'X' && <MutedMarker size={markerSize} />}
+        {fret === 0 && <StringMarker stringIndex={stringIndex} fret={0} rootNote={rootNote} simple={simple} markerSize={markerSize} />}
       </div>
     ))}
   </div>
@@ -75,23 +118,29 @@ interface FretRowProps {
   frets: FretValue[];
   rootNote: string;
   borderColor: string;
+  simple: boolean;
+  cellW: number;
+  rowH: number;
+  markerSize: number;
 }
 
-const FretRow: React.FC<FretRowProps> = ({ fret, frets, rootNote, borderColor }) => (
+const FretRow: React.FC<FretRowProps> = ({ fret, frets, rootNote, borderColor, simple, cellW, rowH, markerSize }) => (
   <div style={{ display: 'flex', borderBottom: `1px solid ${borderColor}` }}>
     {frets.map((stringFret, stringIndex) => (
       <div
         key={stringIndex}
         style={{
-          width: CELL_W,
-          height: ROW_H,
+          width: cellW,
+          height: rowH,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           borderLeft: stringIndex > 0 ? `1px solid ${borderColor}` : undefined,
         }}
       >
-        {stringFret === fret && <StringMarker stringIndex={stringIndex} fret={fret} rootNote={rootNote} />}
+        {stringFret === fret && (
+          <StringMarker stringIndex={stringIndex} fret={fret} rootNote={rootNote} simple={simple} markerSize={markerSize} />
+        )}
       </div>
     ))}
   </div>

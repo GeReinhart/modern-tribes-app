@@ -1,3 +1,4 @@
+import { ChordDiagramSize, ChordDiagramStyle } from '@/app/features/guitar/chords/ChordDiagram.tsx';
 import { ChordFormModal } from '@/app/features/guitar/chords/ChordFormModal.tsx';
 import { ChordsFilterBar } from '@/app/features/guitar/chords/ChordsFilterBar.tsx';
 import { filterGuitarChords } from '@/app/features/guitar/chords/filterChords.ts';
@@ -14,6 +15,8 @@ import { SongChordPickerCard } from './SongChordPickerCard.tsx';
 interface AddChordToSongModalProps {
   isOpen: boolean;
   existingChordIds: string[];
+  diagramStyle: ChordDiagramStyle;
+  diagramSize: ChordDiagramSize;
   onClose: () => void;
   onPickChord: (chordId: string) => Promise<void>;
 }
@@ -21,6 +24,8 @@ interface AddChordToSongModalProps {
 export const AddChordToSongModal: React.FC<AddChordToSongModalProps> = ({
   isOpen,
   existingChordIds,
+  diagramStyle,
+  diagramSize,
   onClose,
   onPickChord,
 }) => {
@@ -58,6 +63,8 @@ export const AddChordToSongModal: React.FC<AddChordToSongModalProps> = ({
                 key={chord.id}
                 chord={chord}
                 alreadyInSong={existingChordIds.includes(chord.id)}
+                diagramStyle={diagramStyle}
+                diagramSize={diagramSize}
                 onAdd={() => onPickChord(chord.id)}
               />
             ))}

@@ -1,4 +1,4 @@
-import { ChordDiagram } from '@/app/features/guitar/chords/ChordDiagram.tsx';
+import { ChordDiagram, ChordDiagramSize, ChordDiagramStyle } from '@/app/features/guitar/chords/ChordDiagram.tsx';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedIconButton } from '@/app/platform/core/layout/themes/components/ThemedIconButton.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
@@ -15,6 +15,8 @@ interface SongChordRowProps {
   isLast: boolean;
   canEdit: boolean;
   canManage: boolean;
+  diagramStyle: ChordDiagramStyle;
+  diagramSize: ChordDiagramSize;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onRemove: () => void;
@@ -27,6 +29,8 @@ export const SongChordRow: React.FC<SongChordRowProps> = ({
   isLast,
   canEdit,
   canManage,
+  diagramStyle,
+  diagramSize,
   onMoveUp,
   onMoveDown,
   onRemove,
@@ -54,7 +58,12 @@ export const SongChordRow: React.FC<SongChordRowProps> = ({
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', alignItems: 'center' }}>
         <div style={{ fontWeight: 700, color: theme.colors.text }}>{songChord.chord.name}</div>
-        <ChordDiagram frets={songChord.chord.frets} rootNote={songChord.chord.root_note} />
+        <ChordDiagram
+          frets={songChord.chord.frets}
+          rootNote={songChord.chord.root_note}
+          diagramStyle={diagramStyle}
+          diagramSize={diagramSize}
+        />
       </div>
       <div style={{ flex: 1, minWidth: '160px' }}>
         {canEdit ? (

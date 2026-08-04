@@ -24,6 +24,16 @@ def test_create_song_default_capo():
     pass
 
 
+@scenario(FEATURE, "POST a song with a chord diagram style and size — they are saved")
+def test_create_song_chord_diagram_prefs():
+    pass
+
+
+@scenario(FEATURE, "POST a song with an invalid chord diagram style — 422 error and the database is not modified")
+def test_create_song_invalid_chord_diagram_style():
+    pass
+
+
 @scenario(FEATURE, "POST a song as a project guest — 403 error and the database is not modified")
 def test_create_song_as_guest():
     pass

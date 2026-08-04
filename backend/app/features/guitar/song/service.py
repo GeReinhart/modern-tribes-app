@@ -39,7 +39,8 @@ async def create_song(pool, project_id: str, data: GuitarSongCreate, user: dict)
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
     row = await repo.insert_song(
         pool, project_id, generate_url_param_id(), data.title, data.author,
-        data.tempo_bpm, data.beats_per_bar, data.capo, user["id"],
+        data.tempo_bpm, data.beats_per_bar, data.capo,
+        data.chord_diagram_style, data.chord_diagram_size, user["id"],
     )
     return GuitarSongResponse(**row)
 

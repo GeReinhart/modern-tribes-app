@@ -1,9 +1,11 @@
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
+import { ThemedSelect } from '@/app/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { ThemedSubmitButton } from '@/app/platform/core/layout/themes/components/ThemedSubmitButton.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ChordDiagramSize, ChordDiagramStyle } from '../chords/ChordDiagram.tsx';
 import {
   MAX_BEATS_PER_BAR,
   MAX_CAPO,
@@ -27,7 +29,19 @@ export const SongForm: React.FC<SongFormProps> = ({ song, onSubmit, onCancel }) 
   const [tempoBpm, setTempoBpm] = useState(song?.tempo_bpm ?? 120);
   const [beatsPerBar, setBeatsPerBar] = useState(song?.beats_per_bar ?? 4);
   const [capo, setCapo] = useState(song?.capo ?? 0);
+  const [diagramStyle, setDiagramStyle] = useState<ChordDiagramStyle>(song?.chord_diagram_style ?? 'full');
+  const [diagramSize, setDiagramSize] = useState<ChordDiagramSize>(song?.chord_diagram_size ?? 'medium');
   const [saving, setSaving] = useState(false);
+
+  const diagramStyleOptions = [
+    { value: 'full', label: t('guitarSong.form.diagramStyleFull') },
+    { value: 'simple', label: t('guitarSong.form.diagramStyleSimple') },
+  ];
+  const diagramSizeOptions = [
+    { value: 'small', label: t('guitarSong.form.diagramSizeSmall') },
+    { value: 'medium', label: t('guitarSong.form.diagramSizeMedium') },
+    { value: 'large', label: t('guitarSong.form.diagramSizeLarge') },
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +54,8 @@ export const SongForm: React.FC<SongFormProps> = ({ song, onSubmit, onCancel }) 
         tempo_bpm: tempoBpm,
         beats_per_bar: beatsPerBar,
         capo,
+        chord_diagram_style: diagramStyle,
+        chord_diagram_size: diagramSize,
       });
     } finally {
       setSaving(false);
@@ -84,6 +100,20 @@ export const SongForm: React.FC<SongFormProps> = ({ song, onSubmit, onCancel }) 
         max={MAX_CAPO}
         value={capo}
         onChange={(e) => setCapo(Number(e.target.value))}
+      />
+      <ThemedSelect
+        label={t('guitarSong.form.diagramStyle')}
+        options={diagramStyleOptions}
+        value={diagramStyle}
+        allowEmpty={false}
+        onChange={(value) => setDiagramStyle(value as ChordDiagramStyle)}
+      />
+      <ThemedSelect
+        label={t('guitarSong.form.diagramSize')}
+        options={diagramSizeOptions}
+        value={diagramSize}
+        allowEmpty={false}
+        onChange={(value) => setDiagramSize(value as ChordDiagramSize)}
       />
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
         <ThemedSubmitButton type="button" variant="ghost" fullWidth={false} onClick={onCancel}>

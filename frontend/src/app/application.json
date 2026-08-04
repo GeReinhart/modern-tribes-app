@@ -896,7 +896,8 @@
                 "- play a metronome at the song's own tempo and time signature, with the first beat of each bar highlighted",
                 "- each song has its own page with a short, shareable link, so you can bookmark it or send it directly to a bandmate",
                 "- the song page opens in a clean, read-only view for practicing; switch to an edit mode to add, reorder, remove or comment on chords",
-                "- creating or editing a song's own details (title, author, tempo, capo) is its own page too"
+                "- creating or editing a song's own details (title, author, tempo, capo) is its own page too",
+                "- choose how chord diagrams look for each song: a full labeled view or a simplified dots-only view, in small, medium or large — saved with the song"
               ],
               "fr": [
                 "- tenez un répertoire des morceaux que votre groupe travaille, partagé par tous les onglets morceaux d'un même projet",
@@ -907,7 +908,8 @@
                 "- lancez un métronome au tempo et à la signature rythmique du morceau, avec le premier temps de chaque mesure mis en valeur",
                 "- chaque morceau a sa propre page avec un lien court et partageable, pour le mettre en favori ou l'envoyer directement à un musicien du groupe",
                 "- la page du morceau s'ouvre en lecture seule pour s'entraîner ; passez en mode modification pour ajouter, réorganiser, retirer ou commenter les accords",
-                "- la création ou la modification des informations du morceau (titre, auteur, tempo, capo) se fait aussi sur sa propre page"
+                "- la création ou la modification des informations du morceau (titre, auteur, tempo, capo) se fait aussi sur sa propre page",
+                "- choisissez l'apparence des diagrammes d'accords pour chaque morceau : vue complète étiquetée ou simplifiée avec juste des points, en petit, moyen ou grand — enregistré avec le morceau"
               ]
             },
             "backend": {

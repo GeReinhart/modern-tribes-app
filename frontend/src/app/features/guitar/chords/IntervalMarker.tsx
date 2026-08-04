@@ -7,10 +7,26 @@ import { INTERVAL_LABELS } from './chordTheory.ts';
 interface IntervalMarkerProps {
   semitone: number;
   size?: number;
+  simple?: boolean;
 }
 
-export const IntervalMarker: React.FC<IntervalMarkerProps> = ({ semitone, size = 26 }) => {
+export const IntervalMarker: React.FC<IntervalMarkerProps> = ({ semitone, size = 26, simple = false }) => {
   const { theme } = useTheme();
+
+  if (simple) {
+    return (
+      <div
+        style={{
+          width: size,
+          height: size,
+          borderRadius: '50%',
+          backgroundColor: theme.colors.text,
+          flexShrink: 0,
+        }}
+      />
+    );
+  }
+
   const isRoot = semitone === 0;
   const fontSize = INTERVAL_LABELS[semitone].length > 2 ? size * 0.34 : size * 0.4;
 

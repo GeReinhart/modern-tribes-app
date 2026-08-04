@@ -1194,8 +1194,11 @@ def given_guitar_songs_table(datatable):
                 if not uid:
                     continue
                 await conn.execute(
-                    """INSERT INTO guitar_songs(id, url_param_id, project_id, title, author, tempo_bpm, beats_per_bar, capo, status)
-                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                    """INSERT INTO guitar_songs(
+                           id, url_param_id, project_id, title, author, tempo_bpm, beats_per_bar, capo,
+                           chord_diagram_style, chord_diagram_size, status
+                       )
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(uid),
                     rec.get("url_param_id", url_param_id_from_uuid(uid)),
@@ -1205,6 +1208,8 @@ def given_guitar_songs_table(datatable):
                     coerce("tempo_bpm", rec.get("tempo_bpm", "120")),
                     coerce("beats_per_bar", rec.get("beats_per_bar", "4")),
                     coerce("capo", rec.get("capo", "0")),
+                    rec.get("chord_diagram_style", "full"),
+                    rec.get("chord_diagram_size", "medium"),
                     rec.get("status", "active"),
                 )
         finally:
