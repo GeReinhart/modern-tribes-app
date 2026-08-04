@@ -8,7 +8,7 @@ import asyncpg
 import pytest
 from pytest_bdd import given, parsers, then, when
 
-from tests.db_helpers import TEST_DB_DSN, coerce, url_param_id_from_uuid
+from tests.db_helpers import TEST_DB_DSN, coerce, is_int_column, url_param_id_from_uuid
 from tests.helpers import assert_table, expand_id, expand_json_ids, expand_path_ids
 
 
@@ -1189,16 +1189,20 @@ def given_guitar_songs_table(datatable):
         try:
             headers = datatable[0]
             for row in datatable[1:]:
-                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                rec = {
+                    headers[i]: (row[i] if is_int_column(headers[i]) else expand_id(row[i]))
+                    for i in range(len(headers))
+                }
                 uid = rec.get("id")
                 if not uid:
                     continue
+                document_id = rec.get("document_id")
                 await conn.execute(
                     """INSERT INTO guitar_songs(
                            id, url_param_id, project_id, title, author, tempo_bpm, beats_per_bar, capo,
-                           chord_diagram_style, chord_diagram_size, status
+                           chord_diagram_style, chord_diagram_size, document_id, status
                        )
-                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(uid),
                     rec.get("url_param_id", url_param_id_from_uuid(uid)),
@@ -1210,6 +1214,7 @@ def given_guitar_songs_table(datatable):
                     coerce("capo", rec.get("capo", "0")),
                     rec.get("chord_diagram_style", "full"),
                     rec.get("chord_diagram_size", "medium"),
+                    UUID(document_id) if document_id else None,
                     rec.get("status", "active"),
                 )
         finally:
@@ -1229,7 +1234,10 @@ def given_guitar_songs_chords_table(datatable):
         try:
             headers = datatable[0]
             for row in datatable[1:]:
-                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                rec = {
+                    headers[i]: (row[i] if is_int_column(headers[i]) else expand_id(row[i]))
+                    for i in range(len(headers))
+                }
                 uid = rec.get("id")
                 await conn.execute(
                     """INSERT INTO guitar_songs_chords(id, song_id, chord_id, position, comment, status)

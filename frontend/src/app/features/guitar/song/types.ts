@@ -12,6 +12,8 @@ export interface GuitarSong {
   capo: number;
   chord_diagram_style: ChordDiagramStyle;
   chord_diagram_size: ChordDiagramSize;
+  document_id: string | null;
+  description_html: string;
   status: string;
   created_at: string;
   updated_at: string;
@@ -27,6 +29,7 @@ export interface GuitarSongCreate {
   capo?: number;
   chord_diagram_style?: ChordDiagramStyle;
   chord_diagram_size?: ChordDiagramSize;
+  description_html?: string | null;
 }
 
 export interface GuitarSongUpdate {
@@ -37,6 +40,7 @@ export interface GuitarSongUpdate {
   capo?: number;
   chord_diagram_style?: ChordDiagramStyle;
   chord_diagram_size?: ChordDiagramSize;
+  description_html?: string | null;
 }
 
 export interface GuitarSongChord {

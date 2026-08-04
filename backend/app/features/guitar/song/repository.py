@@ -3,7 +3,7 @@ from uuid import UUID
 
 _SONG_SELECT_FIELDS = (
     "id::text, url_param_id, project_id::text, title, author, tempo_bpm, beats_per_bar, capo, "
-    "chord_diagram_style, chord_diagram_size, status, "
+    "chord_diagram_style, chord_diagram_size, document_id::text, status, "
     "created_at, updated_at, created_by::text, updated_by::text"
 )
 
@@ -58,18 +58,28 @@ async def fetch_song(pool, song_id: str) -> dict | None:
 async def insert_song(
     pool, project_id: str, url_param_id: str, title: str, author: str | None,
     tempo_bpm: int, beats_per_bar: int, capo: int,
-    chord_diagram_style: str, chord_diagram_size: str, user_id: str,
+    chord_diagram_style: str, chord_diagram_size: str, document_id: str | None, user_id: str,
 ) -> dict:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             f"""INSERT INTO guitar_songs (
                     project_id, url_param_id, title, author, tempo_bpm, beats_per_bar, capo,
-                    chord_diagram_style, chord_diagram_size, created_by, updated_by
+                    chord_diagram_style, chord_diagram_size, document_id, created_by, updated_by
                 )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::uuid, $10::uuid)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::uuid, $11::uuid)
                 RETURNING {_SONG_SELECT_FIELDS}""",
             UUID(project_id), url_param_id, title, author, tempo_bpm, beats_per_bar, capo,
-            chord_diagram_style, chord_diagram_size, UUID(user_id),
+            chord_diagram_style, chord_diagram_size, UUID(document_id) if document_id else None, UUID(user_id),
+        )
+    return dict(row)
+
+
+async def set_song_document(pool, song_id: str, document_id: str, user_id: str) -> dict:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            f"""UPDATE guitar_songs SET document_id = $1, updated_by = $2, updated_at = NOW()
+                WHERE id = $3 RETURNING {_SONG_SELECT_FIELDS}""",
+            UUID(document_id), UUID(user_id), UUID(song_id),
         )
     return dict(row)
 

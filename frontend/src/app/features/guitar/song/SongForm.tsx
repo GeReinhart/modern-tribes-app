@@ -1,6 +1,8 @@
+import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedSelect } from '@/app/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { ThemedSubmitButton } from '@/app/platform/core/layout/themes/components/ThemedSubmitButton.tsx';
+import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +33,7 @@ export const SongForm: React.FC<SongFormProps> = ({ song, onSubmit, onCancel }) 
   const [capo, setCapo] = useState(song?.capo ?? 0);
   const [diagramStyle, setDiagramStyle] = useState<ChordDiagramStyle>(song?.chord_diagram_style ?? 'full');
   const [diagramSize, setDiagramSize] = useState<ChordDiagramSize>(song?.chord_diagram_size ?? 'medium');
+  const [descriptionHtml, setDescriptionHtml] = useState(song?.description_html ?? '');
   const [saving, setSaving] = useState(false);
 
   const diagramStyleOptions = [
@@ -56,6 +59,7 @@ export const SongForm: React.FC<SongFormProps> = ({ song, onSubmit, onCancel }) 
         capo,
         chord_diagram_style: diagramStyle,
         chord_diagram_size: diagramSize,
+        description_html: descriptionHtml,
       });
     } finally {
       setSaving(false);
@@ -115,6 +119,14 @@ export const SongForm: React.FC<SongFormProps> = ({ song, onSubmit, onCancel }) 
         allowEmpty={false}
         onChange={(value) => setDiagramSize(value as ChordDiagramSize)}
       />
+      <div>
+        <ThemedText size="medium" as="h3" style={{ marginBottom: '8px' }}>
+          {t('guitarSong.form.description')}
+        </ThemedText>
+        <div className="border border-gray-300 rounded-lg overflow-hidden">
+          <EditorJoditComponent content={descriptionHtml} onChange={setDescriptionHtml} compact minHeight={200} />
+        </div>
+      </div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
         <ThemedSubmitButton type="button" variant="ghost" fullWidth={false} onClick={onCancel}>
           {t('common.cancel')}

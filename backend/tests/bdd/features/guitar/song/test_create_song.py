@@ -34,6 +34,16 @@ def test_create_song_invalid_chord_diagram_style():
     pass
 
 
+@scenario(FEATURE, "POST a song with a description — a document is created for it")
+def test_create_song_with_description():
+    pass
+
+
+@scenario(FEATURE, "POST a song without a description — no document is created")
+def test_create_song_without_description():
+    pass
+
+
 @scenario(FEATURE, "POST a song as a project guest — 403 error and the database is not modified")
 def test_create_song_as_guest():
     pass

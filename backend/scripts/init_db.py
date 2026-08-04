@@ -424,16 +424,24 @@ class DatabaseInitializer:
                 if row["project"] not in project_ids:
                     print(f"✗ Unknown project '{row['project']}' in guitar_songs.csv")
                     sys.exit(1)
+                document_id = None
+                description_html = row.get("description_html") or ""
+                if description_html:
+                    doc_r = await conn.fetchrow(
+                        "INSERT INTO documents (content_html, content_summary, content_text) VALUES ($1, $2, $3) RETURNING id",
+                        description_html, description_html[:30], _strip_html(description_html),
+                    )
+                    document_id = str(doc_r["id"])
                 r = await conn.fetchrow(
                     """INSERT INTO guitar_songs (
                            project_id, url_param_id, title, author, tempo_bpm, beats_per_bar, capo,
-                           chord_diagram_style, chord_diagram_size, created_by, updated_by
+                           chord_diagram_style, chord_diagram_size, document_id, created_by, updated_by
                        )
-                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $10) RETURNING id""",
+                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $11) RETURNING id""",
                     project_ids[row["project"]], _generate_url_param_id(), row["title"], row.get("author") or None,
                     int(row.get("tempo_bpm") or 120), int(row.get("beats_per_bar") or 4),
                     int(row.get("capo") or 0), row.get("chord_diagram_style") or "full",
-                    row.get("chord_diagram_size") or "medium", admin_id,
+                    row.get("chord_diagram_size") or "medium", document_id, admin_id,
                 )
                 ids[f"{row['project']}|{row['title']}"] = str(r["id"])
         print(f"✓ Created {len(ids)} guitar songs")

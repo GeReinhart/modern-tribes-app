@@ -14,6 +14,7 @@ class GuitarSongCreate(BaseModel):
     capo: int = Field(default=0, ge=0, le=12)
     chord_diagram_style: Literal["full", "simple"] = "full"
     chord_diagram_size: Literal["small", "medium", "large"] = "medium"
+    description_html: Optional[str] = None
 
 
 class GuitarSongUpdate(BaseModel):
@@ -24,6 +25,7 @@ class GuitarSongUpdate(BaseModel):
     capo: Optional[int] = Field(default=None, ge=0, le=12)
     chord_diagram_style: Optional[Literal["full", "simple"]] = None
     chord_diagram_size: Optional[Literal["small", "medium", "large"]] = None
+    description_html: Optional[str] = None
 
 
 class GuitarSongResponse(BaseModel):
@@ -37,6 +39,8 @@ class GuitarSongResponse(BaseModel):
     capo: int
     chord_diagram_style: str
     chord_diagram_size: str
+    document_id: Optional[str] = None
+    description_html: str = ""
     status: str
     created_at: datetime
     updated_at: datetime

@@ -15,6 +15,7 @@ const fr: Record<string, string> = {
   'guitarSong.form.diagramSizeSmall': 'Petite',
   'guitarSong.form.diagramSizeMedium': 'Moyenne',
   'guitarSong.form.diagramSizeLarge': 'Grande',
+  'guitarSong.form.description': 'Description',
   'guitarSong.form.addTitle': 'Ajouter un morceau',
   'guitarSong.form.editTitle': 'Modifier le morceau',
   'guitarSong.detail.loadError': 'Impossible de charger le morceau.',

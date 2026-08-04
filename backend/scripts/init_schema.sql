@@ -714,7 +714,7 @@ CREATE TABLE IF NOT EXISTS guitar_chords (
 );
 CREATE OR REPLACE TRIGGER update_guitar_chords_updated_at BEFORE UPDATE ON guitar_chords FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Guitar songs, scoped to a project and shared by every guitar_song tab of that project (migrations 014, 015, 016, 017)
+-- Guitar songs, scoped to a project and shared by every guitar_song tab of that project (migrations 014, 015, 016, 017, 018)
 CREATE TABLE IF NOT EXISTS guitar_songs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     url_param_id VARCHAR(6) UNIQUE NOT NULL,
@@ -726,6 +726,7 @@ CREATE TABLE IF NOT EXISTS guitar_songs (
     capo INTEGER NOT NULL DEFAULT 0 CHECK (capo BETWEEN 0 AND 12),
     chord_diagram_style VARCHAR(20) NOT NULL DEFAULT 'full' CHECK (chord_diagram_style IN ('full', 'simple')),
     chord_diagram_size VARCHAR(20) NOT NULL DEFAULT 'medium' CHECK (chord_diagram_size IN ('small', 'medium', 'large')),
+    document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),

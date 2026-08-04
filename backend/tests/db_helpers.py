@@ -19,6 +19,16 @@ _DATE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 _INT_COLS = {"position", "size", "toc_depth", "order_index", "display_order", "tempo_bpm", "beats_per_bar", "capo"}
 
 
+def is_int_column(col: str) -> bool:
+    """True for columns that always hold a plain integer, never a short-id-style value.
+
+    Given/Then table steps must skip expand_id() for these columns: a value like tempo_bpm=87
+    would otherwise be misread as a 2-digit short id and zero-padded into a fake UUID string,
+    which coerce() then can't tell apart from a real UUID column.
+    """
+    return col in _INT_COLS
+
+
 def url_param_id_from_uuid(uuid_str: str) -> str:
     """Derive a deterministic 6-char url_param_id from a UUID string."""
     return uuid_str.replace("-", "")[-6:]

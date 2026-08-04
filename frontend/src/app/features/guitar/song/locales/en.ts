@@ -15,6 +15,7 @@ const en: Record<string, string> = {
   'guitarSong.form.diagramSizeSmall': 'Small',
   'guitarSong.form.diagramSizeMedium': 'Medium',
   'guitarSong.form.diagramSizeLarge': 'Large',
+  'guitarSong.form.description': 'Description',
   'guitarSong.form.addTitle': 'Add a song',
   'guitarSong.form.editTitle': 'Edit song',
   'guitarSong.detail.loadError': 'Could not load the song.',

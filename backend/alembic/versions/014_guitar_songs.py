@@ -16,11 +16,16 @@ def upgrade() -> None:
     op.execute("""
         CREATE TABLE IF NOT EXISTS guitar_songs (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            url_param_id VARCHAR(6) UNIQUE NOT NULL,
             project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
             title VARCHAR(255) NOT NULL,
             author VARCHAR(255),
             tempo_bpm INTEGER NOT NULL DEFAULT 120 CHECK (tempo_bpm BETWEEN 20 AND 300),
             beats_per_bar INTEGER NOT NULL DEFAULT 4 CHECK (beats_per_bar BETWEEN 2 AND 8),
+            capo INTEGER NOT NULL DEFAULT 0 CHECK (capo BETWEEN 0 AND 12),
+            chord_diagram_style VARCHAR(20) NOT NULL DEFAULT 'full' CHECK (chord_diagram_style IN ('full', 'simple')),
+            chord_diagram_size VARCHAR(20) NOT NULL DEFAULT 'medium' CHECK (chord_diagram_size IN ('small', 'medium', 'large')),
+            document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
             status VARCHAR(20) NOT NULL DEFAULT 'active'
                 CHECK (status IN ('pending', 'active', 'archived')),
             created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),

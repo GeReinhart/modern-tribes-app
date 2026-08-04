@@ -1,7 +1,9 @@
 from fastapi import HTTPException, status
 
 from app.platform.core.authorization.project_access import check_project_access_or_admin
+from app.platform.core.uploads.helpers import create_document_with_attachments, get_document_with_attachments
 from app.platform.core.utils.db_helpers import generate_url_param_id
+from app.platform.core.utils.document_helpers import update_document_content_with_revision
 from app.features.guitar.song import repository as repo
 from app.features.guitar.song.models import (
     GuitarSongChordCreate,
@@ -32,17 +34,21 @@ async def _require_song_chord_context(pool, song_chord_id: str) -> dict:
 async def list_songs(pool, project_id: str, user: dict) -> list[GuitarSongResponse]:
     await check_project_access_or_admin(project_id, user, pool, min_position="guest")
     rows = await repo.fetch_songs(pool, project_id)
-    return [GuitarSongResponse(**row) for row in rows]
+    return [GuitarSongResponse(**row, description_html="") for row in rows]
 
 
 async def create_song(pool, project_id: str, data: GuitarSongCreate, user: dict) -> GuitarSongResponse:
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
+    document_id = None
+    if data.description_html:
+        document = await create_document_with_attachments(pool, data.description_html, [], user["id"])
+        document_id = str(document["id"])
     row = await repo.insert_song(
         pool, project_id, generate_url_param_id(), data.title, data.author,
         data.tempo_bpm, data.beats_per_bar, data.capo,
-        data.chord_diagram_style, data.chord_diagram_size, user["id"],
+        data.chord_diagram_style, data.chord_diagram_size, document_id, user["id"],
     )
-    return GuitarSongResponse(**row)
+    return await _build_song_response(pool, row)
 
 
 async def get_song(pool, song_id: str, user: dict) -> GuitarSongDetailResponse:
@@ -50,15 +56,41 @@ async def get_song(pool, song_id: str, user: dict) -> GuitarSongDetailResponse:
     await check_project_access_or_admin(project_id, user, pool, min_position="guest")
     song_row = await repo.fetch_song(pool, song_id)
     chords = await repo.fetch_song_chords(pool, song_id)
-    return GuitarSongDetailResponse(**song_row, chords=[GuitarSongChordResponse(**c) for c in chords])
+    song_response = await _build_song_response(pool, song_row)
+    return GuitarSongDetailResponse(
+        **song_response.model_dump(), chords=[GuitarSongChordResponse(**c) for c in chords]
+    )
 
 
 async def update_song(pool, song_id: str, data: GuitarSongUpdate, user: dict) -> GuitarSongResponse:
     project_id = await _require_song_project(pool, song_id)
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
-    updates = data.model_dump(exclude_unset=True)
-    row = await repo.update_song(pool, song_id, updates, user["id"])
-    return GuitarSongResponse(**row)
+    updates = data.model_dump(exclude_unset=True, exclude={"description_html"})
+    await repo.update_song(pool, song_id, updates, user["id"])
+    if "description_html" in data.model_fields_set:
+        await _update_song_description(pool, song_id, data.description_html, user["id"])
+    row = await repo.fetch_song(pool, song_id)
+    return await _build_song_response(pool, row)
+
+
+async def _update_song_description(pool, song_id: str, description_html: str | None, user_id: str) -> None:
+    row = await repo.fetch_song(pool, song_id)
+    document_id = row.get("document_id")
+    if not document_id:
+        document = await create_document_with_attachments(pool, description_html or "", [], user_id)
+        await repo.set_song_document(pool, song_id, str(document["id"]), user_id)
+    else:
+        await update_document_content_with_revision(pool, str(document_id), description_html or "", user_id)
+
+
+async def _build_song_response(pool, row: dict) -> GuitarSongResponse:
+    document_id = row.get("document_id")
+    description_html = ""
+    if document_id:
+        document = await get_document_with_attachments(pool, str(document_id))
+        if document:
+            description_html = document.get("content_html", "")
+    return GuitarSongResponse(**row, description_html=description_html)
 
 
 async def archive_song(pool, song_id: str, user: dict) -> None:
