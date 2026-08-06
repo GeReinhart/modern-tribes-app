@@ -42,6 +42,9 @@ interface JoditEditorComponentProps {
   onChange: (content: string) => void;
   minHeight?: number;
   compact?: boolean;
+  // Compact toolbars drop the fullsize button by default to stay small; set this when a
+  // compact editor still needs a way to expand for a longer piece of writing.
+  allowFullscreen?: boolean;
 }
 
 const EditorJoditComponent = ({
@@ -49,6 +52,7 @@ const EditorJoditComponent = ({
   onChange,
   minHeight = 600,
   compact = false,
+  allowFullscreen = false,
 }: JoditEditorComponentProps) => {
   const editor = useRef(null);
   const { config: appConfig } = useAppConfig();
@@ -170,7 +174,7 @@ const EditorJoditComponent = ({
         },
       },
       buttons: compact
-        ? COMPACT_BUTTONS
+        ? (allowFullscreen ? [...COMPACT_BUTTONS, '|', 'fullsize'] : COMPACT_BUTTONS)
         : [
             'source',
             '|',
@@ -206,7 +210,7 @@ const EditorJoditComponent = ({
           ],
       buttonsXS: COMPACT_BUTTONS,
     }),
-    [appConfig.editorImageExtensions, minHeight, compact],
+    [appConfig.editorImageExtensions, minHeight, compact, allowFullscreen],
   );
 
   return (

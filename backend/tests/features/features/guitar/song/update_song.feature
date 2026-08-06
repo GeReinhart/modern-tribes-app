@@ -49,6 +49,35 @@ Feature: Update a guitar song
       | id   | project_id | title      | author | tempo_bpm | beats_per_bar | capo | status |
       | 0200 | 0020       | Wonderwall | Oasis  | 90        | 4             | 2    | active |
 
+  Scenario: PATCH a song's lyrics presentation settings — they are updated
+    Given I am authenticated as a regular user: user.id 0002
+    And the guitar_songs table contains:
+      | id   | project_id | title      | author | tempo_bpm | beats_per_bar | capo | status |
+      | 0200 | 0020       | Wonderwall | Oasis  | 87        | 4             | 2    | active |
+    When I PATCH /api/features/tasks/guitar-songs/songs/0200 with body:
+      """
+      {"lyrics_line_spacing_px": 20, "lyrics_text_size_px": 24, "lyrics_chord_size_px": 26}
+      """
+    Then the response status code is 200
+    And the guitar_songs table contains:
+      | id   | project_id | title      | author | tempo_bpm | beats_per_bar | capo | lyrics_line_spacing_px | lyrics_text_size_px | lyrics_chord_size_px | status |
+      | 0200 | 0020       | Wonderwall | Oasis  | 87        | 4             | 2    | 20                     | 24                   | 26                    | active |
+
+  @error_case
+  Scenario: PATCH a song's lyrics chord size out of range — 422 error and the database is not modified
+    Given I am authenticated as a regular user: user.id 0002
+    And the guitar_songs table contains:
+      | id   | project_id | title      | author | tempo_bpm | beats_per_bar | capo | status |
+      | 0200 | 0020       | Wonderwall | Oasis  | 87        | 4             | 2    | active |
+    When I PATCH /api/features/tasks/guitar-songs/songs/0200 with body:
+      """
+      {"lyrics_chord_size_px": 100}
+      """
+    Then the response status code is 422
+    And the guitar_songs table contains:
+      | id   | project_id | title      | author | tempo_bpm | beats_per_bar | capo | status |
+      | 0200 | 0020       | Wonderwall | Oasis  | 87        | 4             | 2    | active |
+
   Scenario: PATCH a description onto a song with none yet — a document is created and linked
     Given I am authenticated as a regular user: user.id 0002
     And the guitar_songs table contains:

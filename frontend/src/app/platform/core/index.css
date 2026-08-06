@@ -97,6 +97,44 @@
 .jodit-wysiwyg sub { vertical-align: sub; font-size: 75%; }
 .jodit-wysiwyg sup { vertical-align: super; font-size: 75%; }
 
+/* Compact numeric inputs (e.g. layout margin fields) drop the native spin buttons so the
+   reclaimed width stays usable for typing digits next to a leading icon */
+.no-number-spinner::-webkit-inner-spin-button,
+.no-number-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Guitar song presentation layout: manual page breaks only apply when printing */
+@media print {
+    .song-layout-page-break {
+        page-break-before: always;
+    }
+    .song-layout-page-break-indicator {
+        display: none;
+    }
+}
+
+/* On screen, a page break shows as a dashed rule instead of an actual break */
+.song-layout-page-break-indicator {
+    border: none;
+    border-top: 2px dashed currentColor;
+    opacity: 0.4;
+    margin: 0 0 16px 0;
+}
+
+/* SongInlineEditableNumber (SongInlineEditableField.tsx) draws its own +/- step buttons, so the
+   browser's native number spinner would otherwise show twice -- once from the browser, once
+   from this component. */
+.song-number-input::-webkit-outer-spin-button,
+.song-number-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.song-number-input {
+    -moz-appearance: textfield;
+}
+
 /* Custom animations */
 @layer utilities {
     .animate-fade-in {

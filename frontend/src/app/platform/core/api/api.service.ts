@@ -64,6 +64,15 @@ class ApiService {
     return this.request<T>(endpoint, { method: 'GET' });
   }
 
+  async getBlob(endpoint: string): Promise<Blob> {
+    const url = `${getAPIBaseUrl()}${endpoint}`;
+    const response = await fetch(url, { headers: this.getAuthHeaders() });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.blob();
+  }
+
   async post<T>(endpoint: string, data: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'POST',

@@ -35,6 +35,19 @@ async def fetch_chord(pool, chord_id: str) -> dict | None:
     return _row_to_dict(row) if row else None
 
 
+async def fetch_chords_by_ids(pool, chord_ids: set[str]) -> dict[str, dict]:
+    """Bulk-resolve chord ids referenced inline in another feature's JSONB content (e.g. a
+    layout block's lyrics_words), keyed by id, to avoid an N+1 per reference."""
+    if not chord_ids:
+        return {}
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            f"SELECT {_SELECT_FIELDS} FROM guitar_chords WHERE id = ANY($1::uuid[])",
+            [UUID(chord_id) for chord_id in chord_ids],
+        )
+    return {row["id"]: _row_to_dict(row) for row in rows}
+
+
 async def insert_chord(
     pool, name: str, root_note: str, description: str | None, frets: list, user_id: str
 ) -> dict:

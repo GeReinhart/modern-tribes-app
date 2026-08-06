@@ -1,0 +1,8 @@
+project,song_title,block_position,line_index,word_index,position,chord_name
+Summer BBQ,Wonderwall,1,0,0,start,Em7
+Summer BBQ,Wonderwall,1,0,5,start,G
+Summer BBQ,Wonderwall,2,0,0,start,Dsus4
+Summer BBQ,Wonderwall,3,0,0,start,Dsus4
+Summer BBQ,Wonderwall,3,0,3,middle,G
+Summer BBQ,Wonderwall,3,0,6,start,A
+Summer BBQ,Wonderwall,3,0,6,after,Em7

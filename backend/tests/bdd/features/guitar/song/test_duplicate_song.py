@@ -11,26 +11,16 @@ from tests.db_helpers import db_lifespan
 _test_app = FastAPI(lifespan=db_lifespan)
 _test_app.include_router(router, prefix="/api/features/tasks")
 
-FEATURE = "../../../../features/features/guitar/song/add_chord_to_song.feature"
+FEATURE = "../../../../features/features/guitar/song/duplicate_song.feature"
 
 
-@scenario(FEATURE, "POST a chord onto a song as a member — the chord is linked at the next position")
-def test_add_chord_as_member():
+@scenario(FEATURE, 'POST duplicate on a song — a new song is created with the same content, titled "<title> - COPIE"')
+def test_duplicate_song():
     pass
 
 
-@scenario(FEATURE, "POST a second chord onto the same song — it is linked at the next position after the first")
-def test_add_second_chord():
-    pass
-
-
-@scenario(FEATURE, "POST the same chord onto the same song twice — 409 error and the database is not modified")
-def test_add_duplicate_chord():
-    pass
-
-
-@scenario(FEATURE, "POST a chord onto a song as a guest — 403 error and the database is not modified")
-def test_add_chord_as_guest():
+@scenario(FEATURE, "POST duplicate as a project outsider — 403 and no song is created")
+def test_duplicate_song_as_outsider():
     pass
 
 

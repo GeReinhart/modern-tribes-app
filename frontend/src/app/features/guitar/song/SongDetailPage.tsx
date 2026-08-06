@@ -3,28 +3,27 @@ import { buildBookmarkDescription } from '@/app/features/bookmarks/types.ts';
 import { useProjectPermissions } from '@/app/features/tribes-projects/projects/useProjectPermissions.ts';
 import { useProject } from '@/app/features/tribes-projects/projects/useProjects.ts';
 import { useTribeWithPositions } from '@/app/features/tribes-projects/tribes/useTribesWithPositions.ts';
+import { useDocumentTitle } from '@/app/platform/core/browser/useDocumentTitle.ts';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
-import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedConfirmDialog } from '@/app/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
-import { ThemedIconButton } from '@/app/platform/core/layout/themes/components/ThemedIconButton.tsx';
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedSection } from '@/app/platform/core/layout/themes/components/ThemedSection.tsx';
-import { ThemeProvider, useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { errorStyle } from '@/app/platform/core/layout/themes/theme.styles.tsx';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-import { AddChordToSongModal } from './AddChordToSongModal.tsx';
 import { guitarSongsService } from './service.ts';
-import { SongChordRow } from './SongChordRow.tsx';
-import { SongMetronomeControls } from './SongMetronomeControls.tsx';
-import { SongStatCard } from './SongStatCard.tsx';
+import { SongBlockClipboardPreviewModal } from './SongBlockClipboardPreviewModal.tsx';
+import { SongDetailBody } from './SongDetailBody.tsx';
+import { songDocumentTitle } from './songDocumentTitle.ts';
 import { useGuitarSong } from './useGuitarSong.ts';
+import { useGuitarSongLabels } from './useGuitarSongLabels.ts';
+import { useSongBlockClipboard } from './useSongBlockClipboard.ts';
 
 const SongDetailPageContent: React.FC = () => {
-  const { theme } = useTheme();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,15 +32,15 @@ const SongDetailPageContent: React.FC = () => {
   const { tribe } = useTribeWithPositions(tribeId || null);
   const { project } = useProject(projectId || null);
   const { isManager, canEdit } = useProjectPermissions(tribeId || null, projectId || null);
-  const { song, loading, error, addChord, updateComment, moveChord, removeChord } = useGuitarSong(songId || null);
+  const hook = useGuitarSong(songId || null);
+  const { song, loading, error } = hook;
+  const labelsHook = useGuitarSongLabels(projectId || null);
+  const clipboardHook = useSongBlockClipboard();
+  useDocumentTitle(song ? songDocumentTitle(song, t('common.edit')) : undefined);
 
-  const [writeMode, setWriteMode] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState(false);
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
   const [archiving, setArchiving] = useState(false);
-
-  const chordsEditable = writeMode && canEdit;
-  const chordsManageable = writeMode && isManager;
+  const [clipboardPreviewOpen, setClipboardPreviewOpen] = useState(false);
 
   const breadcrumbs = useMemo(
     () => [
@@ -49,9 +48,9 @@ const SongDetailPageContent: React.FC = () => {
       { label: t('tribes.title'), path: '/app/tribes' },
       { label: tribe?.name || t('common.loading'), path: `/app/tribes/${tribeId}` },
       { label: project?.name || t('common.loading'), path: `/app/tribes/${tribeId}/projects/${projectId}` },
-      { label: song?.title || t('common.loading') },
+      { label: song ? songDocumentTitle(song, t('common.edit')) : t('common.loading') },
     ],
-    [tribe?.name, project?.name, song?.title, tribeId, projectId, t],
+    [tribe?.name, project?.name, song, tribeId, projectId, t],
   );
 
   const bookmarkSlot = song?.title ? (
@@ -77,20 +76,24 @@ const SongDetailPageContent: React.FC = () => {
   const menuActions = useMemo(() => {
     if (!song) return [];
     return [
-      ...(canEdit
+      {
+        icon: 'eye' as const,
+        label: t('guitarSong.layout.presentationMode'),
+        path: `/app/tribes/${tribeId}/projects/${projectId}/songs/${songId}/present`,
+      },
+      ...(canEdit && clipboardHook.clipboard
         ? [{
-            icon: 'pencil' as const,
-            label: t('common.edit'),
-            path: `/app/tribes/${tribeId}/projects/${projectId}/songs/${songId}/edit`,
+            icon: 'clipboard' as const, label: t('guitarSong.layout.previewClipboard'),
+            onClick: () => setClipboardPreviewOpen(true),
           }]
         : []),
       ...(isManager
         ? [{ icon: 'trash' as const, label: t('guitarSong.detail.archive'), onClick: () => setArchiveConfirmOpen(true) }]
         : []),
     ];
-  }, [song, canEdit, isManager, t, tribeId, projectId, songId]);
+  }, [song, isManager, canEdit, clipboardHook.clipboard, t, tribeId, projectId, songId]);
 
-  if (loading) {
+  if (loading && !song) {
     return (
       <AppLayout breadcrumbs={breadcrumbs}>
         <div style={{ display: 'flex', justifyContent: 'center', padding: '48px' }}>
@@ -109,75 +112,14 @@ const SongDetailPageContent: React.FC = () => {
     );
   }
 
-  const chordIds = song.chords.map((sc) => sc.chord.id);
-
   return (
     <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions} bookmarkSlot={bookmarkSlot}>
       <ThemedSection themeId="main_1">
-        {song.author && (
-          <div style={{ fontSize: '20px', fontWeight: 600, color: theme.colors.primary, marginBottom: '12px' }}>
-            {song.author}
-          </div>
-        )}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
-          <SongStatCard icon="activity" label={t('guitarSong.detail.statBpm')} value={song.tempo_bpm} />
-          <SongStatCard icon="hash" label={t('guitarSong.detail.statBeatsPerBar')} value={song.beats_per_bar} />
-          <SongStatCard icon="lock" label={t('guitarSong.detail.statCapo')} value={song.capo > 0 ? song.capo : '–'} />
-          <SongMetronomeControls tempoBpm={song.tempo_bpm} beatsPerBar={song.beats_per_bar} />
-        </div>
-        {song.description_html && (
-          <ThemedCard bordered className="p-4">
-            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: song.description_html }} />
-          </ThemedCard>
-        )}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '20px 0 12px' }}>
-          <div style={{ fontWeight: 600, color: theme.colors.text }}>{t('guitarSong.detail.chords')}</div>
-          <div style={{ display: 'flex', gap: '4px' }}>
-            {chordsEditable && (
-              <ThemedIconButton
-                action={{ icon: 'plus', label: t('guitarSong.detail.addChord'), onClick: () => setPickerOpen(true) }}
-              />
-            )}
-            {canEdit && (
-              <ThemedIconButton
-                action={{
-                  icon: writeMode ? 'eye' : 'pencil',
-                  label: writeMode ? t('guitarSong.detail.readMode') : t('guitarSong.detail.writeMode'),
-                  onClick: () => setWriteMode(!writeMode),
-                }}
-              />
-            )}
-          </div>
-        </div>
-        <ThemedCard bordered className="p-4">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px' }}>
-            {song.chords.map((songChord, index) => (
-              <SongChordRow
-                key={songChord.id}
-                songChord={songChord}
-                isFirst={index === 0}
-                isLast={index === song.chords.length - 1}
-                canEdit={chordsEditable}
-                canManage={chordsManageable}
-                diagramStyle={song.chord_diagram_style}
-                diagramSize={song.chord_diagram_size}
-                onMoveUp={() => moveChord(songChord.id, 'prev')}
-                onMoveDown={() => moveChord(songChord.id, 'next')}
-                onRemove={() => removeChord(songChord.id)}
-                onCommentBlur={(comment) => updateComment(songChord.id, { comment: comment || null })}
-              />
-            ))}
-          </div>
-        </ThemedCard>
+        <SongDetailBody
+          song={song} canEdit={canEdit} isManager={isManager} hook={hook} labelsHook={labelsHook}
+          clipboardHook={clipboardHook}
+        />
       </ThemedSection>
-      <AddChordToSongModal
-        isOpen={pickerOpen}
-        existingChordIds={chordIds}
-        diagramStyle={song.chord_diagram_style}
-        diagramSize={song.chord_diagram_size}
-        onClose={() => setPickerOpen(false)}
-        onPickChord={async (chordId) => { await addChord({ chord_id: chordId }); }}
-      />
       <ThemedConfirmDialog
         isOpen={archiveConfirmOpen}
         onClose={() => setArchiveConfirmOpen(false)}
@@ -186,6 +128,10 @@ const SongDetailPageContent: React.FC = () => {
         message={t('guitarSong.detail.archiveMessage', { title: song.title })}
         variant="danger"
         isLoading={archiving}
+      />
+      <SongBlockClipboardPreviewModal
+        isOpen={clipboardPreviewOpen} onClose={() => setClipboardPreviewOpen(false)}
+        copied={clipboardHook.clipboard} song={song}
       />
     </AppLayout>
   );

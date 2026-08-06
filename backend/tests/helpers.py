@@ -1,11 +1,17 @@
 import re
 from enum import Enum
 
-_SHORT_ID_RE = re.compile(r'^\d{1,4}$')
+_SHORT_ID_RE = re.compile(r'^\d{4}$')
 
 
 def expand_id(value: str) -> str:
-    """Expand a 1–4 digit short ID to a zero-padded UUID (e.g. '0001' → '00000000-0000-0000-0000-000000000001')."""
+    """Expand a 4-digit short ID to a zero-padded UUID (e.g. '0001' → '00000000-0000-0000-0000-000000000001').
+
+    Exactly 4 digits, matching the test suite's short-ID convention. This keeps
+    plain 1-3 digit numeric path segments (e.g. a lyrics-word coordinate like
+    /lyrics-words/0/9/chords/start) and non-id numeric strings in JSON bodies
+    (e.g. an app_config "value") from being mistaken for short IDs.
+    """
     if _SHORT_ID_RE.match(value):
         return f"00000000-0000-0000-0000-{int(value):012d}"
     return value

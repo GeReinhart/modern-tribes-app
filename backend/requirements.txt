@@ -17,6 +17,8 @@ boto3==1.43.6
 httpx==0.28.1
 pywebpush==2.0.3
 tzdata==2025.2
+weasyprint==69.0
+qrcode==8.2
 ruff==0.15.14
 
 # Testing

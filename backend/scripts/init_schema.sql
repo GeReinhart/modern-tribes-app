@@ -264,12 +264,14 @@ CREATE TABLE IF NOT EXISTS projects_features (
     CONSTRAINT chk_projects_features_name_or_icon CHECK ((name IS NOT NULL AND name <> '') OR icon IS NOT NULL)
 );
 
--- Labels table (unified: global admin labels + feature-instance-scoped labels for kanban/todo)
+-- Labels table (unified: global admin labels + feature-instance-scoped labels for kanban/todo
+-- + project-scoped labels for entities shared across a project's tabs, e.g. guitar songs)
 CREATE TABLE IF NOT EXISTS labels (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
     description TEXT,
     feature_instance_id UUID REFERENCES projects_features(id) ON DELETE CASCADE,
+    project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
     color VARCHAR(20) NOT NULL DEFAULT '#6b7280',
     position INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -278,9 +280,11 @@ CREATE TABLE IF NOT EXISTS labels (
     updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived'))
 );
-CREATE UNIQUE INDEX IF NOT EXISTS labels_name_global_unique ON labels (name) WHERE feature_instance_id IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS labels_name_global_unique ON labels (name) WHERE feature_instance_id IS NULL AND project_id IS NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS labels_name_feature_unique ON labels (name, feature_instance_id) WHERE feature_instance_id IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS labels_name_project_unique ON labels (name, project_id) WHERE project_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_labels_feature_instance ON labels (feature_instance_id);
+CREATE INDEX IF NOT EXISTS idx_labels_project ON labels (project_id);
 
 -- Label entities table (polymorphic)
 CREATE TABLE IF NOT EXISTS label_entities (
@@ -714,18 +718,36 @@ CREATE TABLE IF NOT EXISTS guitar_chords (
 );
 CREATE OR REPLACE TRIGGER update_guitar_chords_updated_at BEFORE UPDATE ON guitar_chords FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- Guitar song authors, a shared inventory per project, reused by name across its songs (migration 015)
+CREATE TABLE IF NOT EXISTS guitar_song_author (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE OR REPLACE TRIGGER update_guitar_song_author_updated_at BEFORE UPDATE ON guitar_song_author FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE INDEX IF NOT EXISTS idx_guitar_song_author_project ON guitar_song_author(project_id);
+
 -- Guitar songs, scoped to a project and shared by every guitar_song tab of that project (migrations 014, 015, 016, 017, 018)
 CREATE TABLE IF NOT EXISTS guitar_songs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     url_param_id VARCHAR(6) UNIQUE NOT NULL,
     project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
     title VARCHAR(255) NOT NULL,
-    author VARCHAR(255),
+    author_id UUID REFERENCES guitar_song_author(id) ON DELETE SET NULL,
     tempo_bpm INTEGER NOT NULL DEFAULT 120 CHECK (tempo_bpm BETWEEN 20 AND 300),
     beats_per_bar INTEGER NOT NULL DEFAULT 4 CHECK (beats_per_bar BETWEEN 2 AND 8),
     capo INTEGER NOT NULL DEFAULT 0 CHECK (capo BETWEEN 0 AND 12),
     chord_diagram_style VARCHAR(20) NOT NULL DEFAULT 'full' CHECK (chord_diagram_style IN ('full', 'simple')),
-    chord_diagram_size VARCHAR(20) NOT NULL DEFAULT 'medium' CHECK (chord_diagram_size IN ('small', 'medium', 'large')),
+    chord_diagram_size VARCHAR(20) NOT NULL DEFAULT 'm' CHECK (chord_diagram_size IN ('xxs', 'xs', 's', 'm', 'l', 'xl', 'xxl')),
+    lyrics_line_spacing_px INTEGER NOT NULL DEFAULT 10 CHECK (lyrics_line_spacing_px BETWEEN 0 AND 60),
+    lyrics_text_size_px INTEGER NOT NULL DEFAULT 16 CHECK (lyrics_text_size_px BETWEEN 8 AND 40),
+    lyrics_chord_size_px INTEGER NOT NULL DEFAULT 18 CHECK (lyrics_chord_size_px BETWEEN 8 AND 40),
     document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CHECK (status IN ('pending', 'active', 'archived')),
@@ -738,22 +760,157 @@ CREATE OR REPLACE TRIGGER update_guitar_songs_updated_at BEFORE UPDATE ON guitar
 CREATE INDEX IF NOT EXISTS idx_guitar_songs_project ON guitar_songs(project_id);
 
 -- Chords used in a guitar song, in order, with an optional per-song comment (migration 014)
-CREATE TABLE IF NOT EXISTS guitar_songs_chords (
+-- Ordered list of videos attached to a song (migration 015)
+CREATE TABLE IF NOT EXISTS guitar_songs_videos (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     song_id UUID REFERENCES guitar_songs(id) ON DELETE CASCADE NOT NULL,
-    chord_id UUID REFERENCES guitar_chords(id) ON DELETE CASCADE NOT NULL,
+    title VARCHAR(255),
+    url TEXT NOT NULL,
     position INTEGER NOT NULL DEFAULT 1,
-    comment TEXT,
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
-    UNIQUE (song_id, chord_id)
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
 );
-CREATE OR REPLACE TRIGGER update_guitar_songs_chords_updated_at BEFORE UPDATE ON guitar_songs_chords FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE INDEX IF NOT EXISTS idx_guitar_songs_chords_song ON guitar_songs_chords(song_id);
+CREATE OR REPLACE TRIGGER update_guitar_songs_videos_updated_at BEFORE UPDATE ON guitar_songs_videos FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE INDEX IF NOT EXISTS idx_guitar_songs_videos_song ON guitar_songs_videos(song_id);
+
+-- Page margins for a song's presentation/print layout, one row per song (migration 015)
+CREATE TABLE IF NOT EXISTS guitar_songs_layout_settings (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    song_id UUID REFERENCES guitar_songs(id) ON DELETE CASCADE NOT NULL UNIQUE,
+    margin_top_mm NUMERIC(5,1) NOT NULL DEFAULT 15.0 CHECK (margin_top_mm BETWEEN 0 AND 100),
+    margin_right_mm NUMERIC(5,1) NOT NULL DEFAULT 15.0 CHECK (margin_right_mm BETWEEN 0 AND 100),
+    margin_bottom_mm NUMERIC(5,1) NOT NULL DEFAULT 15.0 CHECK (margin_bottom_mm BETWEEN 0 AND 100),
+    margin_left_mm NUMERIC(5,1) NOT NULL DEFAULT 15.0 CHECK (margin_left_mm BETWEEN 0 AND 100),
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE OR REPLACE TRIGGER update_guitar_songs_layout_settings_updated_at BEFORE UPDATE ON guitar_songs_layout_settings FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Ordered rows of a song's presentation/print layout template (migration 015)
+CREATE TABLE IF NOT EXISTS guitar_songs_layout_rows (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    song_id UUID REFERENCES guitar_songs(id) ON DELETE CASCADE NOT NULL,
+    position INTEGER NOT NULL DEFAULT 1,
+    page_break_before BOOLEAN NOT NULL DEFAULT FALSE,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE OR REPLACE TRIGGER update_guitar_songs_layout_rows_updated_at BEFORE UPDATE ON guitar_songs_layout_rows FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE INDEX IF NOT EXISTS idx_guitar_songs_layout_rows_song ON guitar_songs_layout_rows(song_id);
+
+-- Columns within a layout row; widths in twelfths of the row (migration 015, renamed in 023)
+CREATE TABLE IF NOT EXISTS guitar_songs_layout_columns (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    row_id UUID REFERENCES guitar_songs_layout_rows(id) ON DELETE CASCADE NOT NULL,
+    song_id UUID REFERENCES guitar_songs(id) ON DELETE CASCADE NOT NULL,
+    position INTEGER NOT NULL DEFAULT 1,
+    width_twelfths INTEGER NOT NULL CHECK (width_twelfths BETWEEN 1 AND 12),
+    align VARCHAR(10) NOT NULL DEFAULT 'left' CHECK (align IN ('left', 'center', 'right')),
+    padding_top_mm NUMERIC(5,1) NOT NULL DEFAULT 0 CHECK (padding_top_mm BETWEEN 0 AND 100),
+    padding_right_mm NUMERIC(5,1) NOT NULL DEFAULT 0 CHECK (padding_right_mm BETWEEN 0 AND 100),
+    padding_bottom_mm NUMERIC(5,1) NOT NULL DEFAULT 0 CHECK (padding_bottom_mm BETWEEN 0 AND 100),
+    padding_left_mm NUMERIC(5,1) NOT NULL DEFAULT 0 CHECK (padding_left_mm BETWEEN 0 AND 100),
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE OR REPLACE TRIGGER update_guitar_songs_layout_columns_updated_at BEFORE UPDATE ON guitar_songs_layout_columns FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE INDEX IF NOT EXISTS idx_guitar_songs_layout_columns_row ON guitar_songs_layout_columns(row_id);
+
+-- One or more stacked content blocks within a column, e.g. Title + Author. A 'custom' block
+-- carries its own title + rich-text document, a 'chord_grid' block its own grid, and a 'sections'
+-- block its own lyrics/chords -- each unlike every other block type may repeat within the same
+-- song (migration 015, sections content folded in at migration 024)
+CREATE TABLE IF NOT EXISTS guitar_songs_layout_column_blocks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    column_id UUID REFERENCES guitar_songs_layout_columns(id) ON DELETE CASCADE NOT NULL,
+    song_id UUID REFERENCES guitar_songs(id) ON DELETE CASCADE NOT NULL,
+    position INTEGER NOT NULL DEFAULT 1,
+    block_type VARCHAR(20) NOT NULL CHECK (block_type IN (
+        'title', 'author', 'tempo', 'time_signature', 'capo', 'description', 'chords', 'sections', 'videos',
+        'labels', 'custom', 'chord_grid'
+    )),
+    width_twelfths SMALLINT NOT NULL DEFAULT 12 CHECK (width_twelfths BETWEEN 1 AND 12),
+    zoom_percent SMALLINT NOT NULL DEFAULT 100 CHECK (zoom_percent BETWEEN 30 AND 200),
+    show_card BOOLEAN NOT NULL DEFAULT FALSE,
+    -- H5 (migration 029) is a deliberately toned-down option: non-bold, italic, unlike H1-H4.
+    title_heading_level VARCHAR(2) NOT NULL DEFAULT 'h3' CHECK (title_heading_level IN ('h1', 'h2', 'h3', 'h4', 'h5')),
+    padding_top_mm NUMERIC(5,1) NOT NULL DEFAULT 0 CHECK (padding_top_mm BETWEEN 0 AND 100),
+    padding_right_mm NUMERIC(5,1) NOT NULL DEFAULT 0 CHECK (padding_right_mm BETWEEN 0 AND 100),
+    padding_bottom_mm NUMERIC(5,1) NOT NULL DEFAULT 0 CHECK (padding_bottom_mm BETWEEN 0 AND 100),
+    padding_left_mm NUMERIC(5,1) NOT NULL DEFAULT 0 CHECK (padding_left_mm BETWEEN 0 AND 100),
+    custom_title VARCHAR(255),
+    custom_document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
+    -- Chord Grid block content: a free-form table (list of rows, each a list of cells), each
+    -- cell an ordered mix of chord references and short text. NULL for every other block type.
+    chord_grid_rows JSONB,
+    -- 'chord_grid' block only (migration 028): font size of the chord name text shown in this
+    -- table's own cells, independent of the song-wide chord_diagram_size. Meaningless for every
+    -- other block type, which is why it's not NULL-able like chord_grid_rows -- there is no
+    -- "unset" state, just a starting default every chord_grid block has from creation.
+    chord_grid_chord_size_px SMALLINT NOT NULL DEFAULT 18 CHECK (chord_grid_chord_size_px BETWEEN 8 AND 40),
+    -- "Lyrics & Chords" block content (block_type = 'sections'); NULL for every other type, and
+    -- also NULL on a block that mirrors another one via linked_to_block_id (migration 024).
+    -- NULL lyrics_text means the block hasn't been set up yet (still shows the setup picker);
+    -- '' is a deliberate, valid "configured but empty" state, so the two must stay distinct.
+    lyrics_text TEXT,
+    -- Tokenized lyrics with their chord attachments, always re-derived server-side from
+    -- lyrics_text -- the client only ever sends a chord at a (line, word, position) coordinate,
+    -- never this structure itself. A word with text '' is an intentional empty slot (3+
+    -- consecutive spaces in lyrics_text) -- a place to hang a chord with no lyric under it.
+    -- Shape: [[{"text": "Today", "chords": {"start": "<guitar_chords.id>"}}, ...], ...]
+    lyrics_words JSONB,
+    -- Mirrors another 'sections' block's content (one level only, no chains) so a repeated
+    -- chorus is authored once. A link block's own content columns above always stay NULL.
+    linked_to_block_id UUID REFERENCES guitar_songs_layout_column_blocks(id) ON DELETE SET NULL,
+    -- 'chords' block content (migration 027): this block's own ordered chord list, each entry
+    -- {"chord_id": "<guitar_chords.id>", "comment": "..."}. NULL for every other block type. A
+    -- song may have more than one 'chords' block (e.g. "Main chords", "Outro chords") -- the
+    -- same chord can appear in more than one, each keeping its own independent comment. The
+    -- song's own overall chord list is the deduplicated union of every 'chords' block's own list.
+    chords JSONB,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE OR REPLACE TRIGGER update_guitar_songs_layout_column_blocks_updated_at BEFORE UPDATE ON guitar_songs_layout_column_blocks FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE INDEX IF NOT EXISTS idx_guitar_songs_layout_column_blocks_column ON guitar_songs_layout_column_blocks(column_id);
+CREATE INDEX IF NOT EXISTS idx_guitar_songs_layout_column_blocks_linked_to ON guitar_songs_layout_column_blocks(linked_to_block_id);
+CREATE UNIQUE INDEX IF NOT EXISTS guitar_songs_layout_column_blocks_unique ON guitar_songs_layout_column_blocks (song_id, block_type) WHERE status = 'active' AND block_type NOT IN ('custom', 'sections', 'chord_grid', 'chords');
+
+-- One rendered PDF kept per song, regenerated only when its content_hash no longer matches
+-- the currently-resolved layout HTML (migration 015)
+CREATE TABLE IF NOT EXISTS guitar_songs_layout_pdf_cache (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    song_id UUID REFERENCES guitar_songs(id) ON DELETE CASCADE NOT NULL UNIQUE,
+    content_hash VARCHAR(64) NOT NULL,
+    pdf_bytes BYTEA NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE OR REPLACE TRIGGER update_guitar_songs_layout_pdf_cache_updated_at BEFORE UPDATE ON guitar_songs_layout_pdf_cache FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Schema evolution: add columns that may be missing on databases created before they were introduced
 ALTER TABLE tribes_projects ADD COLUMN IF NOT EXISTS display_order INTEGER NOT NULL DEFAULT 0;

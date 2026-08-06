@@ -9,6 +9,9 @@ export const iconPathsCore: Partial<Record<IconName, React.ReactNode>> = {
       <line x1="5" y1="12" x2="19" y2="12" />
     </>
   ),
+  minus: (
+    <line x1="5" y1="12" x2="19" y2="12" />
+  ),
   trash: (
     <>
       <polyline points="3 6 5 6 21 6" />

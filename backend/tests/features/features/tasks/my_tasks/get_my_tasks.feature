@@ -148,10 +148,10 @@ Feature: Get my tasks
       | 5002 | 4001                | Done        | 2        | active |
     And the kanban_cards table contains:
       | id   | feature_instance_id | column_id | title      | assigned_person_id | created_at | status |
-      | 6001 | 4001                | 5001      | Old task   | 1001               | 2026-01-01 | active |
+      | 6001 | 4001                | 5001      | Old task   | 1001               | -150d      | active |
     And the todo_items table contains:
       | id   | feature_instance_id | title    | assigned_person_id | created_at | todo_status | status |
-      | 7001 | 4002                | Old todo | 1001               | 2026-01-01 | todo        | active |
+      | 7001 | 4002                | Old todo | 1001               | -150d      | todo        | active |
     When I GET /api/features/my-tasks
     Then the response status code is 200
     And the response body includes:
@@ -193,10 +193,10 @@ Feature: Get my tasks
       | 5002 | 4001                | Done        | 2        | active |
     And the kanban_cards table contains:
       | id   | feature_instance_id | column_id | title            | created_at | status |
-      | 6001 | 4001                | 5001      | Old unassigned   | 2026-01-01 | active |
+      | 6001 | 4001                | 5001      | Old unassigned   | -150d      | active |
     And the todo_items table contains:
       | id   | feature_instance_id | title              | created_at | todo_status | status |
-      | 7001 | 4002                | Old unassigned todo| 2026-01-01 | todo        | active |
+      | 7001 | 4002                | Old unassigned todo| -150d      | todo        | active |
     When I GET /api/features/my-tasks
     Then the response status code is 200
     And the response body includes:
@@ -279,10 +279,10 @@ Feature: Get my tasks
       | 5002 | 4001                | Done        | 2        | active |
     And the kanban_cards table contains:
       | id   | feature_instance_id | column_id | title        | assigned_person_id | created_at | status |
-      | 6001 | 4001                | 5001      | Recent task  | 1001               | 2026-05-01 | active |
+      | 6001 | 4001                | 5001      | Recent task  | 1001               | -30d       | active |
     And the todo_items table contains:
       | id   | feature_instance_id | title       | assigned_person_id | created_at | todo_status | status |
-      | 7001 | 4002                | Recent todo | 1001               | 2026-05-01 | todo        | active |
+      | 7001 | 4002                | Recent todo | 1001               | -30d       | todo        | active |
     When I GET /api/features/my-tasks
     Then the response status code is 200
     And the response body is:

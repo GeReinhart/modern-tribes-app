@@ -1,4 +1,4 @@
-import { ChordDiagram, ChordDiagramSize, ChordDiagramStyle } from '@/app/features/guitar/chords/ChordDiagram.tsx';
+import { ChordDiagram, ChordDiagramSize, ChordDiagramStyle, diagramPixelWidth } from '@/app/features/guitar/chords/ChordDiagram.tsx';
 import { ThemedIconButton } from '@/app/platform/core/layout/themes/components/ThemedIconButton.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
@@ -43,8 +43,10 @@ export const SongChordRow: React.FC<SongChordRowProps> = ({
     if (comment !== (songChord.comment ?? '')) onCommentBlur(comment);
   };
 
+  const cardWidth = Math.max(130, diagramPixelWidth(diagramSize, diagramStyle));
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: '130px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', width: `${cardWidth}px` }}>
       {canManage && (
         <div style={{ display: 'flex', gap: '2px' }}>
           <ThemedIconButton

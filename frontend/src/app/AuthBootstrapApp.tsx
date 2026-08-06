@@ -34,6 +34,7 @@ import { SearchPage } from '@/app/platform/functions/search/SearchPage.tsx';
 import ShowProjectPage from '@/app/features/tribes-projects/projects/ShowProjectPage.tsx';
 import { SongDetailPage } from '@/app/features/guitar/song/SongDetailPage.tsx';
 import { SongFormPage } from '@/app/features/guitar/song/SongFormPage.tsx';
+import { SongPresentationPage } from '@/app/features/guitar/song/SongPresentationPage.tsx';
 import ShowTribePage from '@/app/features/tribes-projects/tribes/ShowTribePage.tsx';
 import { TribesPage } from '@/app/features/tribes-projects/tribes/TribesPage.tsx';
 import UpdateTribePage from '@/app/features/tribes-projects/tribes/UpdateTribePage.tsx';
@@ -232,8 +233,8 @@ function AuthBootstrapApp() {
                         element={<SongDetailPage />}
                       />
                       <Route
-                        path="/app/tribes/:tribeId/projects/:projectId/songs/:songId/edit"
-                        element={<SongFormPage />}
+                        path="/app/tribes/:tribeId/projects/:projectId/songs/:songId/present"
+                        element={<SongPresentationPage />}
                       />
                       <Route path="/app/projects" element={<ProjectsPage />} />
                       <Route path="/app/search" element={<SearchPage />} />

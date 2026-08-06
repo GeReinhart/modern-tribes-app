@@ -34,6 +34,21 @@ def test_create_song_invalid_chord_diagram_style():
     pass
 
 
+@scenario(FEATURE, "POST a song with lyrics presentation settings — they are saved")
+def test_create_song_lyrics_presentation_prefs():
+    pass
+
+
+@scenario(FEATURE, "POST a song without lyrics presentation settings — they default to 10/16/18")
+def test_create_song_default_lyrics_presentation_prefs():
+    pass
+
+
+@scenario(FEATURE, "POST a song with a lyrics text size out of range — 422 error and the database is not modified")
+def test_create_song_lyrics_text_size_out_of_range():
+    pass
+
+
 @scenario(FEATURE, "POST a song with a description — a document is created for it")
 def test_create_song_with_description():
     pass
@@ -61,6 +76,39 @@ def test_create_song_beats_per_bar_out_of_range():
 
 @scenario(FEATURE, "POST a song with a capo out of range — 422 error and the database is not modified")
 def test_create_song_capo_out_of_range():
+    pass
+
+
+@scenario(FEATURE, "POST a song — it is seeded with the default presentation layout template")
+def test_create_song_seeds_default_layout():
+    pass
+
+
+@scenario(FEATURE, "POST a song with blank_layout — no rows are seeded, ready to be built from scratch")
+def test_create_song_blank_layout():
+    pass
+
+
+@scenario(FEATURE, "POST a song with a template_song_id — the template's layout is copied instead of the default")
+def test_create_song_with_layout_template():
+    pass
+
+
+@scenario(FEATURE, "POST a song with a template_song_id from another project — 404 and no song is created")
+def test_create_song_with_cross_project_template():
+    pass
+
+
+@scenario(
+    FEATURE,
+    "POST a song with a copy_from_song_id — content and layout are copied, but title/author stay the request's own",
+)
+def test_create_song_with_copy_from_song():
+    pass
+
+
+@scenario(FEATURE, "POST a song with a copy_from_song_id from another project — 404 and no song is created")
+def test_create_song_with_cross_project_copy_from_song():
     pass
 
 

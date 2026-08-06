@@ -16,7 +16,11 @@ _BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 _UUID_RE = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', re.I)
 _DATE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
-_INT_COLS = {"position", "size", "toc_depth", "order_index", "display_order", "tempo_bpm", "beats_per_bar", "capo"}
+_INT_COLS = {
+    "position", "size", "toc_depth", "order_index", "display_order", "tempo_bpm", "beats_per_bar", "capo",
+    "width_twelfths",
+    "lyrics_line_spacing_px", "lyrics_text_size_px", "lyrics_chord_size_px",
+}
 
 
 def is_int_column(col: str) -> bool:

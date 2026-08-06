@@ -1,4 +1,4 @@
-import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
+import { IconName, ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ActionIcon } from '@/app/platform/core/layout/themes/components/ActionIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
@@ -9,21 +9,30 @@ import { Link } from 'react-router-dom';
 interface RowActionsMenuProps {
   actions: MenuAction[];
   triggerLabel?: string;
+  triggerIcon?: IconName;
   triggerIconSize?: number;
   direction?: 'up' | 'down';
+  onOpenChange?: (open: boolean) => void;
 }
 
 export function RowActionsMenu({
   actions,
   triggerLabel = 'Row actions',
+  triggerIcon = 'more-vertical',
   triggerIconSize = 16,
   direction = 'down',
+  onOpenChange,
 }: RowActionsMenuProps): React.ReactElement {
   const { theme } = useTheme();
-  const [open, setOpen] = useState(false);
+  const [open, setOpenState] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const close = useCallback(() => setOpen(false), []);
+  const setOpen = useCallback((next: boolean) => {
+    setOpenState(next);
+    onOpenChange?.(next);
+  }, [onOpenChange]);
+
+  const close = useCallback(() => setOpen(false), [setOpen]);
 
   useEffect(() => {
     if (!open) return;
@@ -50,7 +59,7 @@ export function RowActionsMenu({
       style={{ position: 'relative', display: 'inline-block' }}
     >
       <button
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={() => setOpen(!open)}
         aria-label={triggerLabel}
         title={triggerLabel}
         style={{
@@ -63,7 +72,7 @@ export function RowActionsMenu({
         }}
       >
         <ThemedSvgIcon
-          name="more-vertical"
+          name={triggerIcon}
           color={theme.colors.text}
           size={triggerIconSize}
         />

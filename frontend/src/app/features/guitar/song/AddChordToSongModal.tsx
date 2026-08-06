@@ -12,11 +12,15 @@ import { useTranslation } from 'react-i18next';
 
 import { SongChordPickerCard } from './SongChordPickerCard.tsx';
 
+// Fixed at "xs" regardless of the song's own diagram size -- this is a compact picker grid to
+// browse and pick from, not the song's actual rendered content, so it stays small and consistent
+// no matter how large the song itself is configured to show its chords.
+const PICKER_DIAGRAM_SIZE: ChordDiagramSize = 'xs';
+
 interface AddChordToSongModalProps {
   isOpen: boolean;
   existingChordIds: string[];
   diagramStyle: ChordDiagramStyle;
-  diagramSize: ChordDiagramSize;
   onClose: () => void;
   onPickChord: (chordId: string) => Promise<void>;
 }
@@ -25,7 +29,6 @@ export const AddChordToSongModal: React.FC<AddChordToSongModalProps> = ({
   isOpen,
   existingChordIds,
   diagramStyle,
-  diagramSize,
   onClose,
   onPickChord,
 }) => {
@@ -57,14 +60,19 @@ export const AddChordToSongModal: React.FC<AddChordToSongModalProps> = ({
             onRootFilterChange={setRootFilter}
             onAdd={() => setCreateFormOpen(true)}
           />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
+          <div
+            style={{
+              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px',
+              maxHeight: '420px', overflowY: 'auto', paddingRight: '4px',
+            }}
+          >
             {filteredChords.map((chord) => (
               <SongChordPickerCard
                 key={chord.id}
                 chord={chord}
                 alreadyInSong={existingChordIds.includes(chord.id)}
                 diagramStyle={diagramStyle}
-                diagramSize={diagramSize}
+                diagramSize={PICKER_DIAGRAM_SIZE}
                 onAdd={() => onPickChord(chord.id)}
               />
             ))}

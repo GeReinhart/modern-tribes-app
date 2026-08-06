@@ -7,7 +7,7 @@ import { IntervalMarker, MutedMarker } from './IntervalMarker.tsx';
 import { FretValue } from './types.ts';
 
 export type ChordDiagramStyle = 'full' | 'simple';
-export type ChordDiagramSize = 'small' | 'medium' | 'large';
+export type ChordDiagramSize = 'xxs' | 'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl';
 
 const BASE_CELL_W = 28;
 const BASE_ROW_H = 28;
@@ -15,12 +15,35 @@ const BASE_NUT_H = 4;
 const BASE_MARKER_SIZE = 20;
 
 const SIZE_SCALE: Record<ChordDiagramSize, number> = {
-  small: 0.7,
-  medium: 1,
-  large: 1.3,
+  xxs: 0.35,
+  xs: 0.45,
+  s: 0.55,
+  m: 0.7,
+  l: 0.85,
+  xl: 1,
+  xxl: 1.2,
+};
+
+// Below this, a "full" (labeled) marker's own interval text ("b7", "M3"...) no longer fits its
+// circle at all -- the label overflows and visually bleeds into neighboring markers/rows instead
+// of just looking cramped. "simple" markers are plain dots with no text, so they have no such
+// floor and can shrink all the way down. This only affects "full" style at "xxs"/"xs"/"s"; every
+// other size was already at or above it before this ramp existed.
+const MIN_LABELED_SCALE = 0.55;
+
+export const effectiveDiagramScale = (diagramSize: ChordDiagramSize, diagramStyle: ChordDiagramStyle): number => {
+  const scale = SIZE_SCALE[diagramSize];
+  return diagramStyle === 'simple' ? scale : Math.max(scale, MIN_LABELED_SCALE);
 };
 
 const MARKER_FRETS = new Set([3, 5, 7, 10, 12, 15]);
+
+// Total rendered width of a diagram (6-string grid + the fret-number column beside it, which
+// doesn't scale with diagramSize). Callers that give a diagram a fixed-width container (e.g. a
+// card centered in a flex-wrap row) must size it with this, or a larger diagram overflows a
+// container sized for a smaller one and visually overlaps its neighbors.
+export const diagramPixelWidth = (diagramSize: ChordDiagramSize, diagramStyle: ChordDiagramStyle): number =>
+  BASE_CELL_W * 6 * effectiveDiagramScale(diagramSize, diagramStyle) + 20;
 
 interface ChordDiagramProps {
   frets: FretValue[];
@@ -45,10 +68,10 @@ export const ChordDiagram: React.FC<ChordDiagramProps> = ({
   frets,
   rootNote,
   diagramStyle = 'full',
-  diagramSize = 'medium',
+  diagramSize = 'm',
 }) => {
   const { theme } = useTheme();
-  const scale = SIZE_SCALE[diagramSize];
+  const scale = effectiveDiagramScale(diagramSize, diagramStyle);
   const simple = diagramStyle === 'simple';
   const cellW = BASE_CELL_W * scale;
   const rowH = BASE_ROW_H * scale;

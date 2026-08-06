@@ -4,14 +4,16 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { GuitarSong } from './types.ts';
+import { SongLabelChips } from './SongLabelChips.tsx';
+import { GuitarSong, GuitarSongLabel } from './types.ts';
 
 interface SongCardProps {
   song: GuitarSong;
+  labels: GuitarSongLabel[];
   onOpen: () => void;
 }
 
-export const SongCard: React.FC<SongCardProps> = ({ song, onOpen }) => {
+export const SongCard: React.FC<SongCardProps> = ({ song, labels, onOpen }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
@@ -25,6 +27,7 @@ export const SongCard: React.FC<SongCardProps> = ({ song, onOpen }) => {
         {t('guitarSong.card.tempo', { bpm: song.tempo_bpm, beats: song.beats_per_bar })}
         {song.capo > 0 && ` · ${t('guitarSong.card.capo', { fret: song.capo })}`}
       </div>
+      <SongLabelChips labels={labels} labelIds={song.label_ids} />
     </ThemedCard>
   );
 };

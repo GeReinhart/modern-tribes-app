@@ -14,7 +14,7 @@ export const ThemedText: React.FC<{
     | 'ghost'
     | 'text';
   size?: 'small' | 'medium' | 'large';
-  as?: 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'span' | 'div';
+  as?: 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'span' | 'div';
   theme?: Theme;
   style?: React.CSSProperties;
 }> = ({
