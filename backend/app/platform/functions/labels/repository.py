@@ -13,6 +13,45 @@ async def fetch_labels_for_feature(pool, feature_instance_id: str) -> list[dict]
     ]
 
 
+async def fetch_labels_for_project(pool, project_id: str) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT id, name, color, position FROM labels WHERE project_id = $1 AND status = 'active' ORDER BY position ASC",
+            UUID(project_id),
+        )
+    return [
+        {"id": str(r["id"]), "name": r["name"], "color": r["color"], "position": r["position"]} for r in rows
+    ]
+
+
+async def insert_project_label(pool, project_id: str, name: str, color: str, user_id: str) -> dict:
+    async with pool.acquire() as conn:
+        position = await conn.fetchval(
+            "SELECT COALESCE(MAX(position), -1) + 1 FROM labels WHERE project_id = $1",
+            UUID(project_id),
+        )
+        row = await conn.fetchrow(
+            """INSERT INTO labels (name, color, position, project_id, status, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, 'active', $5, $5) RETURNING id, name, color, position""",
+            name,
+            color,
+            position,
+            UUID(project_id),
+            UUID(user_id),
+        )
+    return {"id": str(row["id"]), "name": row["name"], "color": row["color"], "position": row["position"]}
+
+
+async def fetch_label_ids_for_entity(pool, entity_type: str, entity_id: str) -> list[str]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT label_id::text FROM label_entities WHERE entity_type = $1 AND entity_id = $2",
+            entity_type,
+            UUID(entity_id),
+        )
+    return [r["label_id"] for r in rows]
+
+
 async def fetch_label_by_id(pool, label_id: str) -> Optional[dict]:
     async with pool.acquire() as conn:
         row = await conn.fetchrow("SELECT * FROM labels WHERE id = $1", UUID(label_id))

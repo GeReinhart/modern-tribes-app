@@ -1,31 +1,38 @@
-import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
-import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
-import { ThemedSelect } from '@/app/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { ThemedSubmitButton } from '@/app/platform/core/layout/themes/components/ThemedSubmitButton.tsx';
-import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ChordDiagramSize, ChordDiagramStyle } from '../chords/ChordDiagram.tsx';
-import {
-  MAX_BEATS_PER_BAR,
-  MAX_CAPO,
-  MAX_TEMPO_BPM,
-  MIN_BEATS_PER_BAR,
-  MIN_CAPO,
-  MIN_TEMPO_BPM,
-} from './songLimits.ts';
-import { GuitarSong, GuitarSongCreate } from './types.ts';
+import { SongFormChordsSection } from './SongFormChordsSection.tsx';
+import { SongFormCustomBlocksSection } from './SongFormCustomBlocksSection.tsx';
+import { SongFormFields } from './SongFormFields.tsx';
+import { SongFormLabelsSection } from './SongFormLabelsSection.tsx';
+import { SongFormSectionsSection } from './SongFormSectionsSection.tsx';
+import { SongFormTemplatePicker } from './SongFormTemplatePicker.tsx';
+import { SongFormVideosSection } from './SongFormVideosSection.tsx';
+import { GuitarSongCreate, GuitarSongDetail } from './types.ts';
+import { useGuitarSong } from './useGuitarSong.ts';
+import { useGuitarSongAuthors } from './useGuitarSongAuthors.ts';
+import { useGuitarSongLabels } from './useGuitarSongLabels.ts';
+import { useGuitarSongs } from './useGuitarSongs.ts';
 
 interface SongFormProps {
-  song?: GuitarSong;
+  song?: GuitarSongDetail;
+  projectId: string | null;
+  isManager: boolean;
+  hook?: ReturnType<typeof useGuitarSong>;
+  labelsHook?: ReturnType<typeof useGuitarSongLabels>;
   onSubmit: (data: GuitarSongCreate) => Promise<void>;
   onCancel: () => void;
 }
 
-export const SongForm: React.FC<SongFormProps> = ({ song, onSubmit, onCancel }) => {
+export const SongForm: React.FC<SongFormProps> = ({
+  song, projectId, isManager, hook, labelsHook, onSubmit, onCancel,
+}) => {
   const { t } = useTranslation();
+  const authors = useGuitarSongAuthors(projectId);
+  const { songs: existingSongs } = useGuitarSongs(projectId || '');
   const [title, setTitle] = useState(song?.title ?? '');
   const [author, setAuthor] = useState(song?.author ?? '');
   const [tempoBpm, setTempoBpm] = useState(song?.tempo_bpm ?? 120);
@@ -34,17 +41,8 @@ export const SongForm: React.FC<SongFormProps> = ({ song, onSubmit, onCancel }) 
   const [diagramStyle, setDiagramStyle] = useState<ChordDiagramStyle>(song?.chord_diagram_style ?? 'full');
   const [diagramSize, setDiagramSize] = useState<ChordDiagramSize>(song?.chord_diagram_size ?? 'medium');
   const [descriptionHtml, setDescriptionHtml] = useState(song?.description_html ?? '');
+  const [templateSongId, setTemplateSongId] = useState('');
   const [saving, setSaving] = useState(false);
-
-  const diagramStyleOptions = [
-    { value: 'full', label: t('guitarSong.form.diagramStyleFull') },
-    { value: 'simple', label: t('guitarSong.form.diagramStyleSimple') },
-  ];
-  const diagramSizeOptions = [
-    { value: 'small', label: t('guitarSong.form.diagramSizeSmall') },
-    { value: 'medium', label: t('guitarSong.form.diagramSizeMedium') },
-    { value: 'large', label: t('guitarSong.form.diagramSizeLarge') },
-  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,6 +58,7 @@ export const SongForm: React.FC<SongFormProps> = ({ song, onSubmit, onCancel }) 
         chord_diagram_style: diagramStyle,
         chord_diagram_size: diagramSize,
         description_html: descriptionHtml,
+        ...(song ? {} : { template_song_id: templateSongId || null }),
       });
     } finally {
       setSaving(false);
@@ -68,65 +67,81 @@ export const SongForm: React.FC<SongFormProps> = ({ song, onSubmit, onCancel }) 
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <ThemedInput
-        label={t('guitarSong.form.title')}
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        maxLength={255}
-        required
+      {!song && (
+        <SongFormTemplatePicker songs={existingSongs} value={templateSongId} onChange={setTemplateSongId} />
+      )}
+      <SongFormFields
+        authors={authors}
+        title={title}
+        onTitleChange={setTitle}
+        author={author}
+        onAuthorChange={setAuthor}
+        tempoBpm={tempoBpm}
+        onTempoBpmChange={setTempoBpm}
+        beatsPerBar={beatsPerBar}
+        onBeatsPerBarChange={setBeatsPerBar}
+        capo={capo}
+        onCapoChange={setCapo}
+        diagramStyle={diagramStyle}
+        onDiagramStyleChange={setDiagramStyle}
+        diagramSize={diagramSize}
+        onDiagramSizeChange={setDiagramSize}
+        descriptionHtml={descriptionHtml}
+        onDescriptionHtmlChange={setDescriptionHtml}
       />
-      <ThemedInput
-        label={t('guitarSong.form.author')}
-        value={author}
-        onChange={(e) => setAuthor(e.target.value)}
-        maxLength={255}
-      />
-      <ThemedInput
-        label={t('guitarSong.form.tempoBpm')}
-        type="number"
-        min={MIN_TEMPO_BPM}
-        max={MAX_TEMPO_BPM}
-        value={tempoBpm}
-        onChange={(e) => setTempoBpm(Number(e.target.value))}
-      />
-      <ThemedInput
-        label={t('guitarSong.form.beatsPerBar')}
-        type="number"
-        min={MIN_BEATS_PER_BAR}
-        max={MAX_BEATS_PER_BAR}
-        value={beatsPerBar}
-        onChange={(e) => setBeatsPerBar(Number(e.target.value))}
-      />
-      <ThemedInput
-        label={t('guitarSong.form.capo')}
-        type="number"
-        min={MIN_CAPO}
-        max={MAX_CAPO}
-        value={capo}
-        onChange={(e) => setCapo(Number(e.target.value))}
-      />
-      <ThemedSelect
-        label={t('guitarSong.form.diagramStyle')}
-        options={diagramStyleOptions}
-        value={diagramStyle}
-        allowEmpty={false}
-        onChange={(value) => setDiagramStyle(value as ChordDiagramStyle)}
-      />
-      <ThemedSelect
-        label={t('guitarSong.form.diagramSize')}
-        options={diagramSizeOptions}
-        value={diagramSize}
-        allowEmpty={false}
-        onChange={(value) => setDiagramSize(value as ChordDiagramSize)}
-      />
-      <div>
-        <ThemedText size="medium" as="h3" style={{ marginBottom: '8px' }}>
-          {t('guitarSong.form.description')}
-        </ThemedText>
-        <div className="border border-gray-300 rounded-lg overflow-hidden">
-          <EditorJoditComponent content={descriptionHtml} onChange={setDescriptionHtml} compact minHeight={200} />
-        </div>
-      </div>
+      {song && hook && (
+        <SongFormChordsSection
+          chords={song.chords}
+          diagramStyle={song.chord_diagram_style}
+          diagramSize={song.chord_diagram_size}
+          canManage={isManager}
+          onAddChord={hook.addChord}
+          onRemoveChord={hook.removeChord}
+        />
+      )}
+      {song && hook && (
+        <SongFormSectionsSection
+          sections={song.sections}
+          canManage={isManager}
+          diagramStyle={song.chord_diagram_style}
+          diagramSize={song.chord_diagram_size}
+          songChords={song.chords.map((songChord) => songChord.chord)}
+          onAddSection={hook.addSection}
+          onUpdateSection={hook.updateSection}
+          onMoveSection={hook.moveSection}
+          onRemoveSection={hook.removeSection}
+          onDuplicateSection={hook.duplicateSection}
+          onSaveLyrics={hook.updateSectionLyrics}
+          onSetWordChord={hook.setWordChord}
+          onAddChordToSection={hook.addChordToSection}
+          onMoveSectionChord={hook.moveSectionChord}
+          onRemoveSectionChord={hook.removeSectionChord}
+        />
+      )}
+      {song && hook && (
+        <SongFormVideosSection
+          videos={song.videos}
+          canManage={isManager}
+          onAdd={hook.addVideo}
+          onUpdate={hook.updateVideo}
+          onMove={hook.moveVideo}
+          onRemove={hook.removeVideo}
+        />
+      )}
+      {song && hook && (
+        <SongFormCustomBlocksSection layout={song.layout} onUpdateBlock={hook.updateLayoutBlockContent} />
+      )}
+      {song && hook && labelsHook && (
+        <SongFormLabelsSection
+          labels={labelsHook.labels}
+          attachedLabelIds={song.label_ids}
+          canManage={isManager}
+          onToggle={(labelId) => hook.toggleLabel(labelId, song.label_ids.includes(labelId))}
+          onCreate={labelsHook.createLabel}
+          onUpdate={labelsHook.updateLabel}
+          onDelete={labelsHook.deleteLabel}
+        />
+      )}
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
         <ThemedSubmitButton type="button" variant="ghost" fullWidth={false} onClick={onCancel}>
           {t('common.cancel')}

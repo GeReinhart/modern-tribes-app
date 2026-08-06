@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { guitarSongsService } from './service.ts';
-import { GuitarSong } from './types.ts';
+import { GuitarSong, GuitarSongDetail } from './types.ts';
 
 export const useGuitarSongs = (projectId: string) => {
   const [songs, setSongs] = useState<GuitarSong[]>([]);
@@ -20,6 +20,12 @@ export const useGuitarSongs = (projectId: string) => {
     }
   };
 
+  const duplicateSong = async (songId: string): Promise<GuitarSongDetail> => {
+    const duplicated = await guitarSongsService.duplicateSong(songId);
+    await reload();
+    return duplicated;
+  };
+
   useEffect(() => { reload(); }, [projectId]);
-  return { songs, loading, error, reload };
+  return { songs, loading, error, reload, duplicateSong };
 };

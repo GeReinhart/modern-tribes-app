@@ -29,6 +29,9 @@ export const guitarSongsService = {
   archiveSong: (songId: string): Promise<void> =>
     apiService.delete<void>(`${BASE}/songs/${songId}`),
 
+  duplicateSong: (songId: string): Promise<GuitarSongDetail> =>
+    apiService.post<GuitarSongDetail>(`${BASE}/songs/${songId}/duplicate`, {}),
+
   addChordToSong: (songId: string, data: GuitarSongChordCreate): Promise<GuitarSongChord> =>
     apiService.post<GuitarSongChord>(`${BASE}/songs/${songId}/chords`, data),
 

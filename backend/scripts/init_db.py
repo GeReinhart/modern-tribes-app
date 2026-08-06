@@ -5,11 +5,15 @@ import argparse
 import csv
 import random
 import string
+import sys
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Dict, List, Tuple
 from dotenv import load_dotenv
 import asyncpg
-import sys
+
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+from app.features.guitar.song.layout.default_template import DEFAULT_LAYOUT_ROWS  # noqa: E402
 
 load_dotenv()
 
@@ -98,8 +102,17 @@ class DatabaseInitializer:
             "document_pages",
             "projects_documents",
             "todo_items",
+            "guitar_songs_layout_column_blocks",
+            "guitar_songs_layout_columns",
+            "guitar_songs_layout_rows",
+            "guitar_songs_layout_settings",
+            "guitar_songs_section_words",
+            "guitar_songs_section_chords",
+            "guitar_songs_sections",
+            "guitar_songs_videos",
             "guitar_songs_chords",
             "guitar_songs",
+            "guitar_song_author",
             "projects_features",
             "document_entities",
             "label_entities",
@@ -415,6 +428,19 @@ class DatabaseInitializer:
         print(f"✓ Created {count} todo items")
         return count
 
+    async def _find_or_create_guitar_song_author(self, conn, project_id: str, name: str | None) -> str | None:
+        if not name:
+            return None
+        row = await conn.fetchrow(
+            "SELECT id FROM guitar_song_author WHERE project_id = $1 AND name = $2", project_id, name
+        )
+        if row:
+            return str(row["id"])
+        row = await conn.fetchrow(
+            "INSERT INTO guitar_song_author (project_id, name) VALUES ($1, $2) RETURNING id", project_id, name
+        )
+        return str(row["id"])
+
     async def create_guitar_songs(self, project_ids: Dict[str, str], user_ids: Dict[str, str]) -> Dict[str, str]:
         rows = self.load_csv("guitar_songs.csv")
         ids: Dict[str, str] = {}
@@ -432,13 +458,15 @@ class DatabaseInitializer:
                         description_html, description_html[:30], _strip_html(description_html),
                     )
                     document_id = str(doc_r["id"])
+                project_id = project_ids[row["project"]]
+                author_id = await self._find_or_create_guitar_song_author(conn, project_id, row.get("author") or None)
                 r = await conn.fetchrow(
                     """INSERT INTO guitar_songs (
-                           project_id, url_param_id, title, author, tempo_bpm, beats_per_bar, capo,
+                           project_id, url_param_id, title, author_id, tempo_bpm, beats_per_bar, capo,
                            chord_diagram_style, chord_diagram_size, document_id, created_by, updated_by
                        )
                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $11) RETURNING id""",
-                    project_ids[row["project"]], _generate_url_param_id(), row["title"], row.get("author") or None,
+                    project_id, _generate_url_param_id(), row["title"], author_id,
                     int(row.get("tempo_bpm") or 120), int(row.get("beats_per_bar") or 4),
                     int(row.get("capo") or 0), row.get("chord_diagram_style") or "full",
                     row.get("chord_diagram_size") or "medium", document_id, admin_id,
@@ -471,6 +499,154 @@ class DatabaseInitializer:
                 )
                 count += 1
         print(f"✓ Created {count} guitar song chords")
+        return count
+
+    async def create_guitar_song_sections(self, song_ids: Dict[str, str], user_ids: Dict[str, str]) -> Dict[str, str]:
+        rows = self.load_csv("guitar_song_sections.csv")
+        ids: Dict[str, str] = {}
+        admin_id = user_ids.get("admin")
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                key = f"{row['project']}|{row['song_title']}"
+                if key not in song_ids:
+                    print(f"✗ Unknown song '{key}' in guitar_song_sections.csv")
+                    sys.exit(1)
+                lyrics_text = row.get("lyrics_text") or None
+                r = await conn.fetchrow(
+                    """INSERT INTO guitar_songs_sections (
+                           song_id, position, type_label, custom_label, content_mode, lyrics_text,
+                           created_by, updated_by
+                       )
+                       VALUES ($1, $2, $3, $4, $5, $6, $7, $7) RETURNING id""",
+                    song_ids[key], int(row["position"]), row["type_label"], row.get("custom_label") or None,
+                    row.get("content_mode") or "lyrics", lyrics_text, admin_id,
+                )
+                section_id = str(r["id"])
+                ids[f"{key}|{row['position']}"] = section_id
+                if lyrics_text:
+                    for line_index, line in enumerate(lyrics_text.split("\\n")):
+                        for word_index, word in enumerate(line.split()):
+                            await conn.execute(
+                                """INSERT INTO guitar_songs_section_words
+                                       (section_id, line_index, word_index, word_text, created_by, updated_by)
+                                   VALUES ($1, $2, $3, $4, $5, $5)""",
+                                section_id, line_index, word_index, word, admin_id,
+                            )
+        print(f"✓ Created {len(ids)} guitar song sections")
+        return ids
+
+    async def attach_guitar_song_section_word_chords(
+        self, section_ids: Dict[str, str], user_ids: Dict[str, str]
+    ) -> int:
+        rows = self.load_csv("guitar_song_section_word_chords.csv")
+        count = 0
+        admin_id = user_ids.get("admin")
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                key = f"{row['project']}|{row['song_title']}|{row['section_position']}"
+                if key not in section_ids:
+                    print(f"✗ Unknown section '{key}' in guitar_song_section_word_chords.csv")
+                    sys.exit(1)
+                chord = await conn.fetchrow(
+                    "SELECT id FROM guitar_chords WHERE name = $1 LIMIT 1", row["chord_name"]
+                )
+                if not chord:
+                    print(f"✗ Unknown chord '{row['chord_name']}' in guitar_song_section_word_chords.csv")
+                    sys.exit(1)
+                word = await conn.fetchrow(
+                    """SELECT id FROM guitar_songs_section_words
+                       WHERE section_id = $1 AND line_index = $2 AND word_index = $3""",
+                    section_ids[key], int(row["line_index"]), int(row["word_index"]),
+                )
+                if not word:
+                    print(f"✗ Unknown word at line {row['line_index']}, index {row['word_index']} for section '{key}'")
+                    sys.exit(1)
+                await conn.execute(
+                    """INSERT INTO guitar_songs_section_word_chords (word_id, position, chord_id, created_by, updated_by)
+                       VALUES ($1, 'start', $2, $3, $3)""",
+                    word["id"], chord["id"], admin_id,
+                )
+                count += 1
+        print(f"✓ Attached {count} chords to section words")
+        return count
+
+    async def create_guitar_song_section_chords(self, section_ids: Dict[str, str], user_ids: Dict[str, str]) -> int:
+        rows = self.load_csv("guitar_song_section_chords.csv")
+        count = 0
+        admin_id = user_ids.get("admin")
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                key = f"{row['project']}|{row['song_title']}|{row['section_position']}"
+                if key not in section_ids:
+                    print(f"✗ Unknown section '{key}' in guitar_song_section_chords.csv")
+                    sys.exit(1)
+                chord = await conn.fetchrow(
+                    "SELECT id FROM guitar_chords WHERE name = $1 LIMIT 1", row["chord_name"]
+                )
+                if not chord:
+                    print(f"✗ Unknown chord '{row['chord_name']}' in guitar_song_section_chords.csv")
+                    sys.exit(1)
+                await conn.execute(
+                    """INSERT INTO guitar_songs_section_chords (section_id, chord_id, position, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $4)""",
+                    section_ids[key], chord["id"], int(row.get("position") or 1), admin_id,
+                )
+                count += 1
+        print(f"✓ Created {count} guitar song section chords")
+        return count
+
+    async def create_guitar_song_videos(self, song_ids: Dict[str, str], user_ids: Dict[str, str]) -> int:
+        rows = self.load_csv("guitar_song_videos.csv")
+        count = 0
+        admin_id = user_ids.get("admin")
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                key = f"{row['project']}|{row['song_title']}"
+                if key not in song_ids:
+                    print(f"✗ Unknown song '{key}' in guitar_song_videos.csv")
+                    sys.exit(1)
+                await conn.execute(
+                    """INSERT INTO guitar_songs_videos (song_id, title, url, position, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $5, $5)""",
+                    song_ids[key], row.get("title") or None, row["url"], int(row.get("position") or 1), admin_id,
+                )
+                count += 1
+        print(f"✓ Created {count} guitar song videos")
+        return count
+
+    async def create_guitar_song_layouts(self, song_ids: Dict[str, str], user_ids: Dict[str, str]) -> int:
+        admin_id = user_ids.get("admin")
+        count = 0
+        async with self.pool.acquire() as conn:
+            for song_id in song_ids.values():
+                await conn.execute(
+                    "INSERT INTO guitar_songs_layout_settings (song_id, created_by, updated_by) VALUES ($1, $2, $2)",
+                    song_id, admin_id,
+                )
+                for position, row in enumerate(DEFAULT_LAYOUT_ROWS, start=1):
+                    row_r = await conn.fetchrow(
+                        """INSERT INTO guitar_songs_layout_rows (song_id, position, page_break_before, created_by, updated_by)
+                           VALUES ($1, $2, $3, $4, $4) RETURNING id""",
+                        song_id, position, row["page_break_before"], admin_id,
+                    )
+                    row_id = row_r["id"]
+                    for col_position, column in enumerate(row["columns"], start=1):
+                        col_r = await conn.fetchrow(
+                            """INSERT INTO guitar_songs_layout_columns
+                                   (row_id, song_id, position, width_eighths, align, created_by, updated_by)
+                               VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING id""",
+                            row_id, song_id, col_position, column["width_eighths"], column["align"], admin_id,
+                        )
+                        column_id = col_r["id"]
+                        for block_position, block_type in enumerate(column["block_types"], start=1):
+                            await conn.execute(
+                                """INSERT INTO guitar_songs_layout_column_blocks
+                                       (column_id, song_id, position, block_type, created_by, updated_by)
+                                   VALUES ($1, $2, $3, $4, $5, $5)""",
+                                column_id, song_id, block_position, block_type, admin_id,
+                            )
+                    count += 1
+        print(f"✓ Created default layout templates for {len(song_ids)} guitar songs ({count} rows)")
         return count
 
     async def create_mails(self) -> Dict[str, str]:
@@ -595,6 +771,11 @@ class DatabaseInitializer:
             todo_count = await self.create_todo_items(feature_ids, user_ids)
             song_ids = await self.create_guitar_songs(project_ids, user_ids)
             song_chords_count = await self.create_guitar_songs_chords(song_ids, user_ids)
+            section_ids = await self.create_guitar_song_sections(song_ids, user_ids)
+            await self.attach_guitar_song_section_word_chords(section_ids, user_ids)
+            section_chords_count = await self.create_guitar_song_section_chords(section_ids, user_ids)
+            video_count = await self.create_guitar_song_videos(song_ids, user_ids)
+            layout_row_count = await self.create_guitar_song_layouts(song_ids, user_ids)
             mail_ids = await self.create_mails()
             mails_to_count = await self.create_mails_to(mail_ids, user_ids)
             represents_count = await self.create_represents(person_ids, user_ids)
@@ -618,6 +799,10 @@ class DatabaseInitializer:
             print(f"   • Todo items:               {todo_count}")
             print(f"   • Guitar songs:             {len(song_ids)}")
             print(f"   • Guitar song chords:       {song_chords_count}")
+            print(f"   • Guitar song sections:     {len(section_ids)}")
+            print(f"   • Guitar song section chords: {section_chords_count}")
+            print(f"   • Guitar song videos:       {video_count}")
+            print(f"   • Guitar song layout rows:  {layout_row_count}")
             print(f"   • Mails:                    {len(mail_ids)}")
             print(f"   • Mail recipients:          {mails_to_count}")
             print(f"   • Represents relations:     {represents_count}")

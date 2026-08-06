@@ -64,6 +64,21 @@ def test_create_song_capo_out_of_range():
     pass
 
 
+@scenario(FEATURE, "POST a song — it is seeded with the default presentation layout template")
+def test_create_song_seeds_default_layout():
+    pass
+
+
+@scenario(FEATURE, "POST a song with a template_song_id — the template's layout is copied instead of the default")
+def test_create_song_with_layout_template():
+    pass
+
+
+@scenario(FEATURE, "POST a song with a template_song_id from another project — 404 and no song is created")
+def test_create_song_with_cross_project_template():
+    pass
+
+
 @pytest.fixture
 def non_admin_client():
     _test_app.dependency_overrides[get_current_user] = lambda: _REGULAR_USER

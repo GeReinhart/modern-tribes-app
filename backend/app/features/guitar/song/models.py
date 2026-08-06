@@ -4,6 +4,11 @@ from typing import List, Literal, Optional
 from pydantic import BaseModel, Field
 
 from app.features.guitar.chords.models import GuitarChordResponse
+from app.features.guitar.song.layout.models import GuitarSongLayoutResponse
+from app.features.guitar.song.sections.models import GuitarSongSectionResponse
+from app.features.guitar.song.video.models import GuitarSongVideoResponse
+
+ChordDiagramSize = Literal["very_small", "small", "medium", "large"]
 
 
 class GuitarSongCreate(BaseModel):
@@ -13,8 +18,9 @@ class GuitarSongCreate(BaseModel):
     beats_per_bar: int = Field(default=4, ge=2, le=8)
     capo: int = Field(default=0, ge=0, le=12)
     chord_diagram_style: Literal["full", "simple"] = "full"
-    chord_diagram_size: Literal["small", "medium", "large"] = "medium"
+    chord_diagram_size: ChordDiagramSize = "medium"
     description_html: Optional[str] = None
+    template_song_id: Optional[str] = None
 
 
 class GuitarSongUpdate(BaseModel):
@@ -24,7 +30,7 @@ class GuitarSongUpdate(BaseModel):
     beats_per_bar: Optional[int] = Field(default=None, ge=2, le=8)
     capo: Optional[int] = Field(default=None, ge=0, le=12)
     chord_diagram_style: Optional[Literal["full", "simple"]] = None
-    chord_diagram_size: Optional[Literal["small", "medium", "large"]] = None
+    chord_diagram_size: Optional[ChordDiagramSize] = None
     description_html: Optional[str] = None
 
 
@@ -41,6 +47,7 @@ class GuitarSongResponse(BaseModel):
     chord_diagram_size: str
     document_id: Optional[str] = None
     description_html: str = ""
+    label_ids: List[str] = []
     status: str
     created_at: datetime
     updated_at: datetime
@@ -76,3 +83,6 @@ class GuitarSongChordResponse(BaseModel):
 
 class GuitarSongDetailResponse(GuitarSongResponse):
     chords: List[GuitarSongChordResponse]
+    sections: List[GuitarSongSectionResponse]
+    videos: List[GuitarSongVideoResponse]
+    layout: GuitarSongLayoutResponse

@@ -1,3 +1,4 @@
+import { useProjectPermissions } from '@/app/features/tribes-projects/projects/useProjectPermissions.ts';
 import { useProject } from '@/app/features/tribes-projects/projects/useProjects.ts';
 import { useTribeWithPositions } from '@/app/features/tribes-projects/tribes/useTribesWithPositions.ts';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
@@ -14,6 +15,7 @@ import { guitarSongsService } from './service.ts';
 import { SongForm } from './SongForm.tsx';
 import { GuitarSongCreate } from './types.ts';
 import { useGuitarSong } from './useGuitarSong.ts';
+import { useGuitarSongLabels } from './useGuitarSongLabels.ts';
 
 const SongFormPageContent: React.FC = () => {
   const { t } = useTranslation();
@@ -27,7 +29,10 @@ const SongFormPageContent: React.FC = () => {
 
   const { tribe } = useTribeWithPositions(tribeId || null);
   const { project } = useProject(projectId || null);
-  const { song, loading: loadingSong } = useGuitarSong(isEdit ? songId || null : null);
+  const { isManager } = useProjectPermissions(tribeId || null, projectId || null);
+  const hook = useGuitarSong(isEdit ? songId || null : null);
+  const { song, loading: loadingSong } = hook;
+  const labelsHook = useGuitarSongLabels(projectId || null);
 
   const viewPath = songId ? `/app/tribes/${tribeId}/projects/${projectId}/songs/${songId}` : null;
   const cancelPath = viewPath || `/app/tribes/${tribeId}/projects/${projectId}`;
@@ -51,7 +56,7 @@ const SongFormPageContent: React.FC = () => {
     }
   };
 
-  if (isEdit && loadingSong) {
+  if (isEdit && loadingSong && !song) {
     return (
       <AppLayout breadcrumbs={breadcrumbs}>
         <div style={{ display: 'flex', justifyContent: 'center', padding: '48px' }}>
@@ -76,7 +81,15 @@ const SongFormPageContent: React.FC = () => {
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <div style={formContainerStyle}>
-        <SongForm song={isEdit ? song ?? undefined : undefined} onSubmit={handleSubmit} onCancel={() => navigate(cancelPath)} />
+        <SongForm
+          song={isEdit ? song ?? undefined : undefined}
+          projectId={projectId || null}
+          isManager={isManager}
+          hook={isEdit ? hook : undefined}
+          labelsHook={isEdit ? labelsHook : undefined}
+          onSubmit={handleSubmit}
+          onCancel={() => navigate(cancelPath)}
+        />
       </div>
     </AppLayout>
   );

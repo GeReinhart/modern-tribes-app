@@ -356,3 +356,148 @@ Feature: Create a guitar song
     Then the response status code is 422
     And the guitar_songs table contains:
       | id | project_id | title | author | tempo_bpm | beats_per_bar | capo | status |
+
+  Scenario: POST a song — it is seeded with the default presentation layout template
+    Given I am authenticated as a regular user: user.id 0002
+    And the persons table contains:
+      | id   | first_name | last_name | status |
+      | 0030 | Mia        | Member    | active |
+    And the users table contains:
+      | id   | email         | person_id | status |
+      | 0002 | user@test.com | 0030      | active |
+    And the tribes table contains:
+      | id   | name | status |
+      | 0010 | Band | active |
+    And the projects table contains:
+      | id   | name      | status |
+      | 0020 | Rehearsal | active |
+    And the tribes_projects table contains:
+      | tribe_id | project_id | relation |
+      | 0010     | 0020       | manager  |
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs table contains:
+      | id | project_id | title | author | tempo_bpm | beats_per_bar | capo | status |
+    And the guitar_songs_layout_rows table contains:
+      | id | song_id | position | page_break_before | status |
+    When I POST /api/features/tasks/guitar-songs/projects/0020/songs with body:
+      """
+      {"title": "Wonderwall", "author": "Oasis", "tempo_bpm": 87, "beats_per_bar": 4}
+      """
+    Then the response status code is 201
+    And the guitar_songs_layout_rows table contains:
+      | position | page_break_before | status |
+      | 1        | false              | active |
+      | 2        | false              | active |
+      | 3        | false              | active |
+      | 4        | false              | active |
+      | 5        | false              | active |
+      | 6        | false              | active |
+    And the guitar_songs_layout_columns table contains:
+      | position | width_eighths | align | status |
+      | 1        | 8              | left  | active |
+      | 1        | 2              | left  | active |
+      | 2        | 6              | left  | active |
+      | 1        | 8              | left  | active |
+      | 1        | 8              | left  | active |
+      | 1        | 8              | left  | active |
+      | 1        | 8              | left  | active |
+    And the guitar_songs_layout_column_blocks table contains:
+      | position | block_type     | status |
+      | 1        | title          | active |
+      | 1        | author         | active |
+      | 1        | tempo          | active |
+      | 2        | time_signature | active |
+      | 3        | capo           | active |
+      | 1        | description    | active |
+      | 1        | chords         | active |
+      | 1        | sections       | active |
+      | 1        | videos         | active |
+
+  Scenario: POST a song with a template_song_id — the template's layout is copied instead of the default
+    Given I am authenticated as a regular user: user.id 0002
+    And the persons table contains:
+      | id   | first_name | last_name | status |
+      | 0030 | Mia        | Member    | active |
+    And the users table contains:
+      | id   | email         | person_id | status |
+      | 0002 | user@test.com | 0030      | active |
+    And the tribes table contains:
+      | id   | name | status |
+      | 0010 | Band | active |
+    And the projects table contains:
+      | id   | name      | status |
+      | 0020 | Rehearsal | active |
+    And the tribes_projects table contains:
+      | tribe_id | project_id | relation |
+      | 0010     | 0020       | manager  |
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs table contains:
+      | id   | project_id | title      | author | status |
+      | 0201 | 0020       | Wonderwall | Oasis  | active |
+    And the guitar_songs_layout_settings table contains:
+      | id   | song_id | margin_top_mm | status |
+      | 0910 | 0201    | 20.0           | active |
+    And the guitar_songs_layout_rows table contains:
+      | id   | song_id | position | page_break_before | status |
+      | 0710 | 0201    | 1        | true               | active |
+    And the guitar_songs_layout_columns table contains:
+      | id   | row_id | song_id | position | width_eighths | align | status |
+      | 0720 | 0710   | 0201    | 1        | 8              | left  | active |
+    And the guitar_songs_layout_column_blocks table contains:
+      | id   | column_id | song_id | position | block_type | status |
+      | 0730 | 0720      | 0201    | 1        | title      | active |
+    When I POST /api/features/tasks/guitar-songs/projects/0020/songs with body:
+      """
+      {"title": "New Song", "template_song_id": "0201"}
+      """
+    Then the response status code is 201
+    And the guitar_songs_layout_settings table contains:
+      | margin_top_mm | status |
+      | 20.0           | active |
+      | 20.0           | active |
+    And the guitar_songs_layout_rows table contains:
+      | position | page_break_before | status |
+      | 1        | true               | active |
+      | 1        | true               | active |
+    And the guitar_songs_layout_column_blocks table contains:
+      | position | block_type | status |
+      | 1        | title      | active |
+      | 1        | title      | active |
+
+  @error_case
+  Scenario: POST a song with a template_song_id from another project — 404 and no song is created
+    Given I am authenticated as a regular user: user.id 0002
+    And the persons table contains:
+      | id   | first_name | last_name | status |
+      | 0030 | Mia        | Member    | active |
+    And the users table contains:
+      | id   | email         | person_id | status |
+      | 0002 | user@test.com | 0030      | active |
+    And the tribes table contains:
+      | id   | name | status |
+      | 0010 | Band | active |
+    And the projects table contains:
+      | id   | name      | status |
+      | 0020 | Rehearsal | active |
+      | 0021 | Other     | active |
+    And the tribes_projects table contains:
+      | tribe_id | project_id | relation |
+      | 0010     | 0020       | manager  |
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs table contains:
+      | id   | project_id | title       | author | status |
+      | 0202 | 0021       | Other Song  | Nobody | active |
+    When I POST /api/features/tasks/guitar-songs/projects/0020/songs with body:
+      """
+      {"title": "New Song", "template_song_id": "0202"}
+      """
+    Then the response status code is 404
+    And the guitar_songs table contains:
+      | id   | project_id | title       | author | status |
+      | 0202 | 0021       | Other Song  | Nobody | active |

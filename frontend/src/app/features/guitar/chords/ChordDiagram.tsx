@@ -7,7 +7,7 @@ import { IntervalMarker, MutedMarker } from './IntervalMarker.tsx';
 import { FretValue } from './types.ts';
 
 export type ChordDiagramStyle = 'full' | 'simple';
-export type ChordDiagramSize = 'small' | 'medium' | 'large';
+export type ChordDiagramSize = 'very_small' | 'small' | 'medium' | 'large';
 
 const BASE_CELL_W = 28;
 const BASE_ROW_H = 28;
@@ -15,12 +15,20 @@ const BASE_NUT_H = 4;
 const BASE_MARKER_SIZE = 20;
 
 const SIZE_SCALE: Record<ChordDiagramSize, number> = {
+  very_small: 0.5,
   small: 0.7,
   medium: 1,
   large: 1.3,
 };
 
 const MARKER_FRETS = new Set([3, 5, 7, 10, 12, 15]);
+
+// Total rendered width of a diagram (6-string grid + the fret-number column beside it, which
+// doesn't scale with diagramSize). Callers that give a diagram a fixed-width container (e.g. a
+// card centered in a flex-wrap row) must size it with this, or a "medium"/"large" diagram
+// overflows a container sized for "small" and visually overlaps its neighbors.
+export const diagramPixelWidth = (diagramSize: ChordDiagramSize): number =>
+  BASE_CELL_W * 6 * SIZE_SCALE[diagramSize] + 20;
 
 interface ChordDiagramProps {
   frets: FretValue[];
