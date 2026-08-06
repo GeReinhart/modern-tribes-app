@@ -34,10 +34,25 @@ export const ROW_WIDTH_EIGHTHS = 8;
 export const DEFAULT_ZOOM_PERCENT = 100;
 const DEFAULT_CARD_BLOCK_TYPES = new Set<LayoutBlockType>(['description', 'chords', 'videos', 'custom']);
 
+// A sensible starting width per element, so a freshly added block doesn't always claim the
+// whole row — the user can still resize it afterward from its own presentation menu.
+const DEFAULT_BLOCK_WIDTH_EIGHTHS: Partial<Record<LayoutBlockType, number>> = {
+  title: 3,
+  author: 3,
+  tempo: 2,
+  time_signature: 1,
+  capo: 1,
+  description: 6,
+  chords: 6,
+  sections: 8,
+  videos: 4,
+  labels: 4,
+};
+
 export const emptyDraftBlock = (blockType: LayoutBlockType): DraftBlock => ({
   key: crypto.randomUUID(),
   block_type: blockType,
-  width_eighths: ROW_WIDTH_EIGHTHS,
+  width_eighths: DEFAULT_BLOCK_WIDTH_EIGHTHS[blockType] ?? ROW_WIDTH_EIGHTHS,
   zoom_percent: DEFAULT_ZOOM_PERCENT,
   show_card: DEFAULT_CARD_BLOCK_TYPES.has(blockType),
   custom_title: '',
@@ -47,6 +62,19 @@ export const emptyDraftBlock = (blockType: LayoutBlockType): DraftBlock => ({
 export const emptyDraftColumn = (blockType: LayoutBlockType, widthEighths: number): DraftColumn => ({
   key: crypto.randomUUID(),
   blocks: [emptyDraftBlock(blockType)],
+  width_eighths: widthEighths,
+  align: 'left',
+  padding_top_mm: 0,
+  padding_right_mm: 0,
+  padding_bottom_mm: 0,
+  padding_left_mm: 0,
+});
+
+// A column with no blocks at all -- a plain spacer that just claims some of the row's width.
+// Elements can still be added to it later from its own "add element" picker.
+export const emptyDraftSpacerColumn = (widthEighths: number): DraftColumn => ({
+  key: crypto.randomUUID(),
+  blocks: [],
   width_eighths: widthEighths,
   align: 'left',
   padding_top_mm: 0,
@@ -75,9 +103,6 @@ export const draftColumnsFromRow = (row: GuitarSongLayoutRow): DraftColumn[] =>
     padding_left_mm: column.padding_left_mm,
   }));
 
-export const draftColumnsWidthSum = (columns: DraftColumn[]): number =>
-  columns.reduce((sum, column) => sum + column.width_eighths, 0);
-
 export const draftColumnsToInput = (
   pageBreakBefore: boolean, columns: DraftColumn[],
 ): GuitarSongLayoutRowInput => ({
@@ -85,7 +110,7 @@ export const draftColumnsToInput = (
   columns: columns.map((column): GuitarSongLayoutColumnInput => ({
     blocks: column.blocks.map((block): GuitarSongLayoutBlockInput => ({
       block_type: block.block_type,
-      width_eighths: block.block_type === CUSTOM_BLOCK_TYPE ? block.width_eighths : ROW_WIDTH_EIGHTHS,
+      width_eighths: block.width_eighths,
       zoom_percent: block.zoom_percent,
       show_card: block.show_card,
       custom_title: block.block_type === CUSTOM_BLOCK_TYPE ? block.custom_title : null,

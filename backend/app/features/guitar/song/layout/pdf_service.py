@@ -83,19 +83,22 @@ def _wrap_in_card(content: str, zoom: float) -> str:
     return f'<div style="border:1px solid #ccc;border-radius:{8 * zoom}px;padding:{12 * zoom}px;">{content}</div>'
 
 
-def _render_block_wrapper(block, song, label_details: dict) -> str:
+def _render_block_wrapper(block, song, label_details: dict, column_width_eighths: int) -> str:
     zoom = block.zoom_percent / 100
     content = _render_block(block, song, label_details, zoom)
     if block.show_card:
         content = _wrap_in_card(content, zoom)
+    width_style = ""
+    if block.width_eighths < 8:
+        # block.width_eighths is on the same 0-8 scale as a row's columns ("3/8" of the page),
+        # not of whichever column it sits in — rescale to a column-relative percentage so a
+        # narrow block inside an already-narrow column isn't narrowed twice.
+        width_pct = min(100, block.width_eighths / column_width_eighths * 100)
+        width_style = f"width:{width_pct}%;box-sizing:border-box;"
     if block.block_type in _COMPACT_BLOCK_TYPES:
-        return f'<div style="display:inline-block;vertical-align:top;margin:0 {16 * zoom}px {8 * zoom}px 0;">{content}</div>'
-    if block.block_type == "custom" and block.width_eighths < 8:
-        width_pct = block.width_eighths / 8 * 100
-        return (
-            f'<div style="display:inline-block;vertical-align:top;width:{width_pct}%;box-sizing:border-box;'
-            f'margin-bottom:{8 * zoom}px;">{content}</div>'
-        )
+        return f'<div style="display:inline-block;vertical-align:bottom;{width_style}margin:0 {16 * zoom}px {8 * zoom}px 0;">{content}</div>'
+    if width_style:
+        return f'<div style="display:inline-block;vertical-align:bottom;{width_style}margin-bottom:{8 * zoom}px;">{content}</div>'
     return f'<div style="margin-bottom:{8 * zoom}px;">{content}</div>'
 
 
@@ -105,7 +108,9 @@ def _render_column(column, song, label_details: dict) -> str:
         f"{column.padding_top_mm}mm {column.padding_right_mm}mm "
         f"{column.padding_bottom_mm}mm {column.padding_left_mm}mm"
     )
-    blocks_html = "".join(_render_block_wrapper(block, song, label_details) for block in column.blocks)
+    blocks_html = "".join(
+        _render_block_wrapper(block, song, label_details, column.width_eighths) for block in column.blocks
+    )
     return (
         f'<div style="width:{width_pct}%;text-align:{column.align};padding:{padding};box-sizing:border-box;">'
         f"{blocks_html}</div>"

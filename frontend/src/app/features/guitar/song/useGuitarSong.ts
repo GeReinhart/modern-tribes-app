@@ -17,6 +17,7 @@ import {
   GuitarSongSectionLyricsUpdate,
   GuitarSongSectionUpdate,
   GuitarSongSectionWordChordUpdate,
+  GuitarSongUpdate,
   GuitarSongVideoCreate,
   GuitarSongVideoUpdate,
   MoveDirection,
@@ -43,6 +44,12 @@ export const useGuitarSong = (songId: string | null) => {
   };
 
   useEffect(() => { reload(); }, [songId]);
+
+  const updateSongFields = async (data: GuitarSongUpdate) => {
+    if (!songId) return;
+    await guitarSongsService.updateSong(songId, data);
+    await reload();
+  };
 
   const addChord = async (data: GuitarSongChordCreate) => {
     if (!songId) return;
@@ -183,6 +190,7 @@ export const useGuitarSong = (songId: string | null) => {
 
   return {
     song, loading, error, reload,
+    updateSongFields,
     addChord, updateComment, moveChord, removeChord,
     addSection, updateSection, moveSection, removeSection, duplicateSection, updateSectionLyrics,
     setWordChord, addChordToSection, moveSectionChord, removeSectionChord,

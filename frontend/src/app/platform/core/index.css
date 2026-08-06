@@ -110,6 +110,17 @@
     .song-layout-page-break {
         page-break-before: always;
     }
+    .song-layout-page-break-indicator {
+        display: none;
+    }
+}
+
+/* On screen, a page break shows as a dashed rule instead of an actual break */
+.song-layout-page-break-indicator {
+    border: none;
+    border-top: 2px dashed currentColor;
+    opacity: 0.4;
+    margin: 0 0 16px 0;
 }
 
 /* Custom animations */

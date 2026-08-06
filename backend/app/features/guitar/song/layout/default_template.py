@@ -2,6 +2,22 @@
 dependencies, so it can be imported both by the layout service and by the dev
 database seed script (backend/scripts/init_db.py)."""
 
+# A sensible starting width (out of 8) per element, matching the same defaults used when
+# adding an element from the song's own page, so a fresh block never starts by claiming the
+# whole row unless that's genuinely its natural size.
+DEFAULT_BLOCK_WIDTH_EIGHTHS = {
+    "title": 3,
+    "author": 3,
+    "tempo": 2,
+    "time_signature": 1,
+    "capo": 1,
+    "description": 6,
+    "chords": 6,
+    "sections": 8,
+    "videos": 4,
+    "labels": 4,
+}
+
 DEFAULT_LAYOUT_ROWS = [
     {
         "page_break_before": False,

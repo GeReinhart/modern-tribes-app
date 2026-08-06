@@ -25,13 +25,15 @@ export interface GuitarSong {
 export interface GuitarSongCreate {
   title: string;
   author?: string | null;
-  tempo_bpm: number;
-  beats_per_bar: number;
+  tempo_bpm?: number;
+  beats_per_bar?: number;
   capo?: number;
   chord_diagram_style?: ChordDiagramStyle;
   chord_diagram_size?: ChordDiagramSize;
   description_html?: string | null;
   template_song_id?: string | null;
+  copy_from_song_id?: string | null;
+  blank_layout?: boolean;
 }
 
 export interface GuitarSongUpdate {

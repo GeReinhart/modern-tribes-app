@@ -19,6 +19,11 @@ def test_replace_layout_row():
     pass
 
 
+@scenario(FEATURE, "PUT a row's columns with one column having no blocks — it is added as a plain spacer")
+def test_replace_layout_row_with_empty_column():
+    pass
+
+
 @scenario(FEATURE, "Manager moves the second row up — it swaps position with the first")
 def test_move_layout_row():
     pass

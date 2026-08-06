@@ -52,7 +52,12 @@ def test_add_second_layout_row():
     pass
 
 
-@scenario(FEATURE, "POST a row whose column widths don't sum to 8/8 — 422 and the database is not modified")
+@scenario(FEATURE, "POST a row whose column widths sum to less than 8/8 — it is added with room left unused")
+def test_add_layout_row_partial_width_sum():
+    pass
+
+
+@scenario(FEATURE, "POST a row whose column widths sum to more than 8/8 — 422 and the database is not modified")
 def test_add_layout_row_invalid_width_sum():
     pass
 

@@ -5,9 +5,16 @@ import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedT
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { GuitarSongLayoutSettingsUpdate } from './types.ts';
+import { GuitarSongDetail, GuitarSongLayoutSettingsUpdate } from './types.ts';
 
 export type MarginsDraft = Required<GuitarSongLayoutSettingsUpdate>;
+
+export const marginsDraftFromSettings = (song: GuitarSongDetail): MarginsDraft => ({
+  margin_top_mm: song.layout.settings.margin_top_mm,
+  margin_right_mm: song.layout.settings.margin_right_mm,
+  margin_bottom_mm: song.layout.settings.margin_bottom_mm,
+  margin_left_mm: song.layout.settings.margin_left_mm,
+});
 
 interface SongLayoutMarginsFormProps {
   value: MarginsDraft;

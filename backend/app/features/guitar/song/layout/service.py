@@ -5,7 +5,7 @@ from app.platform.core.uploads.helpers import create_document_with_attachments, 
 from app.platform.core.utils.document_helpers import update_document_content_with_revision
 from app.features.guitar.song import position_utils, song_lookup
 from app.features.guitar.song.layout import repository as repo
-from app.features.guitar.song.layout.default_template import DEFAULT_LAYOUT_ROWS
+from app.features.guitar.song.layout.default_template import DEFAULT_BLOCK_WIDTH_EIGHTHS, DEFAULT_LAYOUT_ROWS
 from app.features.guitar.song.layout.models import (
     CUSTOM_BLOCK_TYPE,
     ROW_WIDTH_EIGHTHS,
@@ -74,7 +74,8 @@ async def seed_default_layout(pool, song_id: str, user_id: str) -> None:
         columns = [
             {**_PADDING_DEFAULTS, **column, "blocks": [
                 {
-                    "block_type": bt, "width_eighths": ROW_WIDTH_EIGHTHS, "zoom_percent": 100,
+                    "block_type": bt, "width_eighths": DEFAULT_BLOCK_WIDTH_EIGHTHS.get(bt, ROW_WIDTH_EIGHTHS),
+                    "zoom_percent": 100,
                     "show_card": bt in _DEFAULT_CARD_BLOCK_TYPES, "custom_title": None, "custom_document_id": None,
                 }
                 for bt in column["block_types"]

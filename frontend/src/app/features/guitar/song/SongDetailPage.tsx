@@ -6,7 +6,6 @@ import { useTribeWithPositions } from '@/app/features/tribes-projects/tribes/use
 import { useDocumentTitle } from '@/app/platform/core/browser/useDocumentTitle.ts';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
 import { ThemedConfirmDialog } from '@/app/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
-import { ThemedIconButton } from '@/app/platform/core/layout/themes/components/ThemedIconButton.tsx';
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemedSection } from '@/app/platform/core/layout/themes/components/ThemedSection.tsx';
 import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
@@ -18,9 +17,9 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { guitarSongsService } from './service.ts';
 import { SongDetailBody } from './SongDetailBody.tsx';
+import { songDocumentTitle } from './songDocumentTitle.ts';
 import { useGuitarSong } from './useGuitarSong.ts';
 import { useGuitarSongLabels } from './useGuitarSongLabels.ts';
-import { useSongPdfDownload } from './useSongPdfDownload.ts';
 
 const SongDetailPageContent: React.FC = () => {
   const { t } = useTranslation();
@@ -34,12 +33,10 @@ const SongDetailPageContent: React.FC = () => {
   const hook = useGuitarSong(songId || null);
   const { song, loading, error } = hook;
   const labelsHook = useGuitarSongLabels(projectId || null);
-  useDocumentTitle(song ? (song.author ? `${song.title} - ${song.author}` : song.title) : undefined);
+  useDocumentTitle(song ? songDocumentTitle(song, t('common.edit')) : undefined);
 
-  const [writeMode, setWriteMode] = useState(false);
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
   const [archiving, setArchiving] = useState(false);
-  const { download: downloadPdf, downloading: downloadingPdf } = useSongPdfDownload(song?.id || '', song?.title || '');
 
   const breadcrumbs = useMemo(
     () => [
@@ -47,9 +44,9 @@ const SongDetailPageContent: React.FC = () => {
       { label: t('tribes.title'), path: '/app/tribes' },
       { label: tribe?.name || t('common.loading'), path: `/app/tribes/${tribeId}` },
       { label: project?.name || t('common.loading'), path: `/app/tribes/${tribeId}/projects/${projectId}` },
-      { label: song?.title || t('common.loading') },
+      { label: song ? songDocumentTitle(song, t('common.edit')) : t('common.loading') },
     ],
-    [tribe?.name, project?.name, song?.title, tribeId, projectId, t],
+    [tribe?.name, project?.name, song, tribeId, projectId, t],
   );
 
   const bookmarkSlot = song?.title ? (
@@ -75,31 +72,16 @@ const SongDetailPageContent: React.FC = () => {
   const menuActions = useMemo(() => {
     if (!song) return [];
     return [
-      ...(canEdit
-        ? [{
-            icon: 'pencil' as const,
-            label: t('common.edit'),
-            path: `/app/tribes/${tribeId}/projects/${projectId}/songs/${songId}/edit`,
-          }]
-        : []),
-      ...(canEdit
-        ? [{
-            icon: 'list' as const,
-            label: t('guitarSong.layout.title'),
-            path: `/app/tribes/${tribeId}/projects/${projectId}/songs/${songId}/layout`,
-          }]
-        : []),
       {
-        icon: 'download' as const,
-        label: downloadingPdf ? t('common.loading') : t('guitarSong.layout.downloadPdf'),
-        onClick: downloadPdf,
-        disabled: downloadingPdf,
+        icon: 'eye' as const,
+        label: t('guitarSong.layout.presentationMode'),
+        path: `/app/tribes/${tribeId}/projects/${projectId}/songs/${songId}/present`,
       },
       ...(isManager
         ? [{ icon: 'trash' as const, label: t('guitarSong.detail.archive'), onClick: () => setArchiveConfirmOpen(true) }]
         : []),
     ];
-  }, [song, canEdit, isManager, t, tribeId, projectId, songId, downloadingPdf, downloadPdf]);
+  }, [song, isManager, t, tribeId, projectId, songId]);
 
   if (loading && !song) {
     return (
@@ -123,18 +105,7 @@ const SongDetailPageContent: React.FC = () => {
   return (
     <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions} bookmarkSlot={bookmarkSlot}>
       <ThemedSection themeId="main_1">
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
-          {canEdit && (
-            <ThemedIconButton
-              action={{
-                icon: writeMode ? 'eye' : 'pencil',
-                label: writeMode ? t('guitarSong.detail.readMode') : t('guitarSong.detail.writeMode'),
-                onClick: () => setWriteMode(!writeMode),
-              }}
-            />
-          )}
-        </div>
-        <SongDetailBody song={song} writeMode={writeMode} canEdit={canEdit} isManager={isManager} hook={hook} labelsHook={labelsHook} />
+        <SongDetailBody song={song} canEdit={canEdit} isManager={isManager} hook={hook} labelsHook={labelsHook} />
       </ThemedSection>
       <ThemedConfirmDialog
         isOpen={archiveConfirmOpen}

@@ -415,6 +415,38 @@ Feature: Create a guitar song
       | 1        | sections       | active |
       | 1        | videos         | active |
 
+  Scenario: POST a song with blank_layout — no rows are seeded, ready to be built from scratch
+    Given I am authenticated as a regular user: user.id 0002
+    And the persons table contains:
+      | id   | first_name | last_name | status |
+      | 0030 | Mia        | Member    | active |
+    And the users table contains:
+      | id   | email         | person_id | status |
+      | 0002 | user@test.com | 0030      | active |
+    And the tribes table contains:
+      | id   | name | status |
+      | 0010 | Band | active |
+    And the projects table contains:
+      | id   | name      | status |
+      | 0020 | Rehearsal | active |
+    And the tribes_projects table contains:
+      | tribe_id | project_id | relation |
+      | 0010     | 0020       | manager  |
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs table contains:
+      | id | project_id | title | author | tempo_bpm | beats_per_bar | capo | status |
+    And the guitar_songs_layout_rows table contains:
+      | id | song_id | position | page_break_before | status |
+    When I POST /api/features/tasks/guitar-songs/projects/0020/songs with body:
+      """
+      {"title": "Wonderwall", "author": "Oasis", "blank_layout": true}
+      """
+    Then the response status code is 201
+    And the guitar_songs_layout_rows table contains:
+      | id | song_id | position | page_break_before | status |
+
   Scenario: POST a song with a template_song_id — the template's layout is copied instead of the default
     Given I am authenticated as a regular user: user.id 0002
     And the persons table contains:
@@ -467,6 +499,125 @@ Feature: Create a guitar song
       | position | block_type | status |
       | 1        | title      | active |
       | 1        | title      | active |
+
+  Scenario: POST a song with a copy_from_song_id — content and layout are copied, but title/author stay the request's own
+    Given I am authenticated as a regular user: user.id 0002
+    And the persons table contains:
+      | id   | first_name | last_name | status |
+      | 0030 | Mia        | Member    | active |
+    And the users table contains:
+      | id   | email         | person_id | status |
+      | 0002 | user@test.com | 0030      | active |
+    And the tribes table contains:
+      | id   | name | status |
+      | 0010 | Band | active |
+    And the projects table contains:
+      | id   | name      | status |
+      | 0020 | Rehearsal | active |
+    And the tribes_projects table contains:
+      | tribe_id | project_id | relation |
+      | 0010     | 0020       | manager  |
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs table contains:
+      | id   | project_id | title      | author | tempo_bpm | beats_per_bar | capo | chord_diagram_style | chord_diagram_size | status |
+      | 0203 | 0020       | Wonderwall | Oasis  | 87        | 4              | 2    | simple               | large               | active |
+    And the guitar_chords table contains:
+      | id   | name | root_note | frets         | status |
+      | 0301 | Em7  | E         | [0,2,0,0,0,0] | active |
+    And the guitar_songs_chords table contains:
+      | id   | song_id | chord_id | position | comment     | status |
+      | 0701 | 0203    | 0301     | 1        | Play softly | active |
+    And the guitar_songs_videos table contains:
+      | id   | song_id | title       | url                            | position | status |
+      | 0711 | 0203    | Live at BBC | https://example.com/video.mp4 | 1        | active |
+    And the guitar_songs_sections table contains:
+      | id   | song_id | position | type_label | content_mode | lyrics_text | status |
+      | 0721 | 0203    | 1        | Couplet    | lyrics       | Twinkle     | active |
+    And the guitar_songs_layout_settings table contains:
+      | id   | song_id | status |
+      | 0731 | 0203    | active |
+    And the guitar_songs_layout_rows table contains:
+      | id   | song_id | position | page_break_before | status |
+      | 0741 | 0203    | 1        | false              | active |
+    And the guitar_songs_layout_columns table contains:
+      | id   | row_id | song_id | position | width_eighths | align | status |
+      | 0751 | 0741   | 0203    | 1        | 8              | left  | active |
+    And the guitar_songs_layout_column_blocks table contains:
+      | id   | column_id | song_id | position | block_type | status |
+      | 0761 | 0751      | 0203    | 1        | title      | active |
+    When I POST /api/features/tasks/guitar-songs/projects/0020/songs with body:
+      """
+      {"title": "Wonderwall - Cover", "author": "My Band", "copy_from_song_id": "0203"}
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "title": "Wonderwall - Cover",
+        "author": "My Band",
+        "tempo_bpm": 87,
+        "beats_per_bar": 4,
+        "capo": 2,
+        "chord_diagram_style": "simple",
+        "chord_diagram_size": "large"
+      }
+      """
+    And the guitar_songs table contains:
+      | project_id | title              | author  | tempo_bpm | beats_per_bar | capo | chord_diagram_style | chord_diagram_size | status |
+      | 0020       | Wonderwall         | Oasis   | 87        | 4              | 2    | simple               | large               | active |
+      | 0020       | Wonderwall - Cover | My Band | 87        | 4              | 2    | simple               | large               | active |
+    And the guitar_songs_chords table contains:
+      | chord_id | position | comment     | status |
+      | 0301     | 1        | Play softly | active |
+      | 0301     | 1        | Play softly | active |
+    And the guitar_songs_videos table contains:
+      | title       | url                            | position | status |
+      | Live at BBC | https://example.com/video.mp4 | 1        | active |
+      | Live at BBC | https://example.com/video.mp4 | 1        | active |
+    And the guitar_songs_sections table contains:
+      | position | type_label | content_mode | lyrics_text | status |
+      | 1        | Couplet    | lyrics       | Twinkle     | active |
+      | 1        | Couplet    | lyrics       | Twinkle     | active |
+    And the guitar_songs_layout_column_blocks table contains:
+      | block_type | status |
+      | title      | active |
+      | title      | active |
+
+  @error_case
+  Scenario: POST a song with a copy_from_song_id from another project — 404 and no song is created
+    Given I am authenticated as a regular user: user.id 0002
+    And the persons table contains:
+      | id   | first_name | last_name | status |
+      | 0030 | Mia        | Member    | active |
+    And the users table contains:
+      | id   | email         | person_id | status |
+      | 0002 | user@test.com | 0030      | active |
+    And the tribes table contains:
+      | id   | name | status |
+      | 0010 | Band | active |
+    And the projects table contains:
+      | id   | name      | status |
+      | 0020 | Rehearsal | active |
+      | 0021 | Other     | active |
+    And the tribes_projects table contains:
+      | tribe_id | project_id | relation |
+      | 0010     | 0020       | manager  |
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs table contains:
+      | id   | project_id | title      | author | status |
+      | 0204 | 0021       | Other Song | Nobody | active |
+    When I POST /api/features/tasks/guitar-songs/projects/0020/songs with body:
+      """
+      {"title": "New Song", "copy_from_song_id": "0204"}
+      """
+    Then the response status code is 404
+    And the guitar_songs table contains:
+      | id   | project_id | title      | author | status |
+      | 0204 | 0021       | Other Song | Nobody | active |
 
   @error_case
   Scenario: POST a song with a template_song_id from another project — 404 and no song is created

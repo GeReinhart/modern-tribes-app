@@ -178,8 +178,7 @@ Feature: Add a row to a guitar song's presentation layout
       | 0200    | 1        | false              | active |
       | 0200    | 2        | false              | active |
 
-  @error_case
-  Scenario: POST a row whose column widths don't sum to 8/8 — 422 and the database is not modified
+  Scenario: POST a row whose column widths sum to less than 8/8 — it is added with room left unused
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:
       | id   | tribe_id | person_id | position | status |
@@ -189,6 +188,29 @@ Feature: Add a row to a guitar song's presentation layout
     When I POST /api/features/tasks/guitar-songs/songs/0200/layout/rows with body:
       """
       {"page_break_before": false, "columns": [{"blocks": [{"block_type": "author"}], "width_eighths": 2, "align": "left"}]}
+      """
+    Then the response status code is 201
+    And the guitar_songs_layout_columns table contains:
+      | song_id | position | width_eighths | align | status |
+      | 0200    | 1        | 2              | left  | active |
+
+  @error_case
+  Scenario: POST a row whose column widths sum to more than 8/8 — 422 and the database is not modified
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs_layout_rows table contains:
+      | id | song_id | position | page_break_before | status |
+    When I POST /api/features/tasks/guitar-songs/songs/0200/layout/rows with body:
+      """
+      {
+        "page_break_before": false,
+        "columns": [
+          {"blocks": [{"block_type": "author"}], "width_eighths": 6, "align": "left"},
+          {"blocks": [{"block_type": "tempo"}], "width_eighths": 4, "align": "left"}
+        ]
+      }
       """
     Then the response status code is 422
     And the guitar_songs_layout_rows table contains:

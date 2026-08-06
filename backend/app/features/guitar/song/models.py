@@ -21,6 +21,8 @@ class GuitarSongCreate(BaseModel):
     chord_diagram_size: ChordDiagramSize = "medium"
     description_html: Optional[str] = None
     template_song_id: Optional[str] = None
+    copy_from_song_id: Optional[str] = None
+    blank_layout: bool = False
 
 
 class GuitarSongUpdate(BaseModel):

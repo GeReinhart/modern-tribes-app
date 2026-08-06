@@ -69,6 +69,11 @@ def test_create_song_seeds_default_layout():
     pass
 
 
+@scenario(FEATURE, "POST a song with blank_layout — no rows are seeded, ready to be built from scratch")
+def test_create_song_blank_layout():
+    pass
+
+
 @scenario(FEATURE, "POST a song with a template_song_id — the template's layout is copied instead of the default")
 def test_create_song_with_layout_template():
     pass
@@ -76,6 +81,19 @@ def test_create_song_with_layout_template():
 
 @scenario(FEATURE, "POST a song with a template_song_id from another project — 404 and no song is created")
 def test_create_song_with_cross_project_template():
+    pass
+
+
+@scenario(
+    FEATURE,
+    "POST a song with a copy_from_song_id — content and layout are copied, but title/author stay the request's own",
+)
+def test_create_song_with_copy_from_song():
+    pass
+
+
+@scenario(FEATURE, "POST a song with a copy_from_song_id from another project — 404 and no song is created")
+def test_create_song_with_cross_project_copy_from_song():
     pass
 
 

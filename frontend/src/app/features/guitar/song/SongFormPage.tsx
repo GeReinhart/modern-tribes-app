@@ -1,11 +1,8 @@
-import { useProjectPermissions } from '@/app/features/tribes-projects/projects/useProjectPermissions.ts';
 import { useProject } from '@/app/features/tribes-projects/projects/useProjects.ts';
 import { useTribeWithPositions } from '@/app/features/tribes-projects/tribes/useTribesWithPositions.ts';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
-import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
-import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
-import { errorStyle, formContainerStyle } from '@/app/platform/core/layout/themes/theme.styles.tsx';
+import { formContainerStyle } from '@/app/platform/core/layout/themes/theme.styles.tsx';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,82 +11,35 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { guitarSongsService } from './service.ts';
 import { SongForm } from './SongForm.tsx';
 import { GuitarSongCreate } from './types.ts';
-import { useGuitarSong } from './useGuitarSong.ts';
-import { useGuitarSongLabels } from './useGuitarSongLabels.ts';
 
 const SongFormPageContent: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { tribeId, projectId, songId } = useParams<{
-    tribeId: string;
-    projectId: string;
-    songId?: string;
-  }>();
-  const isEdit = !!songId;
+  const { tribeId, projectId } = useParams<{ tribeId: string; projectId: string }>();
 
   const { tribe } = useTribeWithPositions(tribeId || null);
   const { project } = useProject(projectId || null);
-  const { isManager } = useProjectPermissions(tribeId || null, projectId || null);
-  const hook = useGuitarSong(isEdit ? songId || null : null);
-  const { song, loading: loadingSong } = hook;
-  const labelsHook = useGuitarSongLabels(projectId || null);
 
-  const viewPath = songId ? `/app/tribes/${tribeId}/projects/${projectId}/songs/${songId}` : null;
-  const cancelPath = viewPath || `/app/tribes/${tribeId}/projects/${projectId}`;
+  const cancelPath = `/app/tribes/${tribeId}/projects/${projectId}`;
 
   const breadcrumbs = [
     { label: t('common.home'), path: '/app' },
     { label: t('tribes.title'), path: '/app/tribes' },
     { label: tribe?.name || t('common.loading'), path: `/app/tribes/${tribeId}` },
     { label: project?.name || t('common.loading'), path: `/app/tribes/${tribeId}/projects/${projectId}` },
-    { label: isEdit ? song?.title || t('common.loading') : t('guitarSong.form.addTitle') },
+    { label: t('guitarSong.form.addTitle') },
   ];
 
   const handleSubmit = async (data: GuitarSongCreate) => {
     if (!projectId) return;
-    if (isEdit && songId) {
-      await guitarSongsService.updateSong(songId, data);
-      navigate(`/app/tribes/${tribeId}/projects/${projectId}/songs/${songId}`);
-    } else {
-      const created = await guitarSongsService.createSong(projectId, data);
-      navigate(`/app/tribes/${tribeId}/projects/${projectId}/songs/${created.url_param_id}`);
-    }
+    const created = await guitarSongsService.createSong(projectId, data);
+    navigate(`/app/tribes/${tribeId}/projects/${projectId}/songs/${created.url_param_id}`);
   };
-
-  if (isEdit && loadingSong && !song) {
-    return (
-      <AppLayout breadcrumbs={breadcrumbs}>
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '48px' }}>
-          <ThemedLoadingSpinner size="sm" />
-        </div>
-      </AppLayout>
-    );
-  }
-
-  if (isEdit && !loadingSong && !song) {
-    return (
-      <AppLayout breadcrumbs={breadcrumbs}>
-        <ThemedCard>
-          <div style={errorStyle}>
-            <strong>{t('common.error')}</strong> {t('guitarSong.detail.loadError')}
-          </div>
-        </ThemedCard>
-      </AppLayout>
-    );
-  }
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <div style={formContainerStyle}>
-        <SongForm
-          song={isEdit ? song ?? undefined : undefined}
-          projectId={projectId || null}
-          isManager={isManager}
-          hook={isEdit ? hook : undefined}
-          labelsHook={isEdit ? labelsHook : undefined}
-          onSubmit={handleSubmit}
-          onCancel={() => navigate(cancelPath)}
-        />
+        <SongForm projectId={projectId || null} onSubmit={handleSubmit} onCancel={() => navigate(cancelPath)} />
       </div>
     </AppLayout>
   );

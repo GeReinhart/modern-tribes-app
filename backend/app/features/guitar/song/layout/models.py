@@ -35,7 +35,9 @@ def _non_custom_block_types(blocks: List[GuitarSongLayoutBlockInput]) -> List[Bl
 
 
 class GuitarSongLayoutColumnInput(BaseModel):
-    blocks: List[GuitarSongLayoutBlockInput] = Field(min_length=1)
+    # A column may have no blocks at all -- it still occupies its share of the row's width, so
+    # it works as a plain spacer that elements can be added to later.
+    blocks: List[GuitarSongLayoutBlockInput] = Field(default_factory=list)
     width_eighths: int = Field(ge=1, le=ROW_WIDTH_EIGHTHS)
     align: Align = "left"
     padding_top_mm: float = Field(default=0, ge=0, le=100)
@@ -60,10 +62,13 @@ class GuitarSongLayoutRowInput(BaseModel):
 
     @field_validator("columns")
     @classmethod
-    def _check_widths_sum_to_row(cls, columns: List[GuitarSongLayoutColumnInput]) -> List[GuitarSongLayoutColumnInput]:
+    def _check_widths_fit_in_row(cls, columns: List[GuitarSongLayoutColumnInput]) -> List[GuitarSongLayoutColumnInput]:
+        # Columns don't have to fill the row -- leftover width is left blank on purpose, so a
+        # user can free up room now and add another column later without every existing column
+        # having to shrink to make space.
         total = sum(c.width_eighths for c in columns)
-        if total != ROW_WIDTH_EIGHTHS:
-            raise ValueError(f"column widths in a row must sum to exactly {ROW_WIDTH_EIGHTHS}/8, got {total}/8")
+        if total > ROW_WIDTH_EIGHTHS:
+            raise ValueError(f"column widths in a row must not exceed {ROW_WIDTH_EIGHTHS}/8, got {total}/8")
         all_non_custom = [block_type for c in columns for block_type in _non_custom_block_types(c.blocks)]
         if len(all_non_custom) != len(set(all_non_custom)):
             raise ValueError("a block type cannot be used twice in the same row")

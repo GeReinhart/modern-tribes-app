@@ -50,8 +50,10 @@ async def list_songs(pool, project_id: str, user: dict) -> list[GuitarSongRespon
 
 async def create_song(pool, project_id: str, data: GuitarSongCreate, user: dict) -> GuitarSongResponse:
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
+    if data.copy_from_song_id:
+        return await _create_song_from_copy(pool, project_id, data, user)
     if data.template_song_id:
-        await _require_template_in_project(pool, project_id, data.template_song_id)
+        await _require_song_in_project(pool, project_id, data.template_song_id)
     document_id = None
     if data.description_html:
         document = await create_document_with_attachments(pool, data.description_html, [], user["id"])
@@ -64,18 +66,35 @@ async def create_song(pool, project_id: str, data: GuitarSongCreate, user: dict)
     )
     if data.template_song_id:
         await copy_layout_from(pool, data.template_song_id, row["id"], user["id"])
-    else:
+    elif not data.blank_layout:
         await seed_default_layout(pool, row["id"], user["id"])
     return await _build_song_response(pool, row)
 
 
-async def _require_template_in_project(pool, project_id: str, template_song_id: str) -> None:
-    """The template song must belong to the same project — otherwise a member could pull in a
-    layout from a song they can't see. Checked before any writes, so a bad template_song_id
-    never leaves a half-created song behind."""
-    template_project_id = await repo.get_project_id_for_song(pool, template_song_id)
-    if template_project_id != project_id:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Template song not found in this project.")
+async def _create_song_from_copy(pool, project_id: str, data: GuitarSongCreate, user: dict) -> GuitarSongResponse:
+    """'copy_from_song_id' brings over everything from the source song -- description, chords,
+    sections, videos, labels and layout -- except title/author, which stay whatever the caller
+    provided (unlike duplicate_song's auto '<title> - COPIE')."""
+    await _require_song_in_project(pool, project_id, data.copy_from_song_id)
+    source_row = await repo.fetch_song(pool, data.copy_from_song_id)
+    document_id = await _duplicate_song_description(pool, source_row.get("document_id"), user["id"])
+    author_id = await resolve_or_create_author(pool, project_id, data.author, user["id"])
+    row = await repo.insert_song(
+        pool, project_id, generate_url_param_id(), data.title, author_id,
+        source_row["tempo_bpm"], source_row["beats_per_bar"], source_row["capo"],
+        source_row["chord_diagram_style"], source_row["chord_diagram_size"], document_id, user["id"],
+    )
+    await _copy_song_content(pool, data.copy_from_song_id, row["id"], user["id"])
+    return await _build_song_response(pool, row)
+
+
+async def _require_song_in_project(pool, project_id: str, other_song_id: str) -> None:
+    """The referenced song (template or copy source) must belong to the same project --
+    otherwise a member could pull in content from a song they can't see. Checked before any
+    writes, so a bad reference never leaves a half-created song behind."""
+    other_project_id = await repo.get_project_id_for_song(pool, other_song_id)
+    if other_project_id != project_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Song not found in this project.")
 
 
 async def get_song(pool, song_id: str, user: dict) -> GuitarSongDetailResponse:
@@ -206,13 +225,16 @@ async def duplicate_song(pool, song_id: str, user: dict) -> GuitarSongDetailResp
         source_row["tempo_bpm"], source_row["beats_per_bar"], source_row["capo"],
         source_row["chord_diagram_style"], source_row["chord_diagram_size"], document_id, user["id"],
     )
-    new_song_id = new_row["id"]
-    await _duplicate_song_chords(pool, song_id, new_song_id, user["id"])
-    await duplicate_sections_for_song(pool, song_id, new_song_id, user["id"])
-    await _duplicate_song_videos(pool, song_id, new_song_id, user["id"])
-    await _duplicate_song_labels(pool, song_id, new_song_id)
-    await copy_layout_from(pool, song_id, new_song_id, user["id"])
-    return await get_song(pool, new_song_id, user)
+    await _copy_song_content(pool, song_id, new_row["id"], user["id"])
+    return await get_song(pool, new_row["id"], user)
+
+
+async def _copy_song_content(pool, source_song_id: str, target_song_id: str, user_id: str) -> None:
+    await _duplicate_song_chords(pool, source_song_id, target_song_id, user_id)
+    await duplicate_sections_for_song(pool, source_song_id, target_song_id, user_id)
+    await _duplicate_song_videos(pool, source_song_id, target_song_id, user_id)
+    await _duplicate_song_labels(pool, source_song_id, target_song_id)
+    await copy_layout_from(pool, source_song_id, target_song_id, user_id)
 
 
 async def _duplicate_song_description(pool, source_document_id: str | None, user_id: str) -> str | None:
