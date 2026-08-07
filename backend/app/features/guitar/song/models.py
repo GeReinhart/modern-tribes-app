@@ -19,6 +19,9 @@ class GuitarSongCreate(BaseModel):
     capo: int = Field(default=0, ge=0, le=12)
     chord_diagram_style: Literal["full", "simple"] = "full"
     chord_diagram_size: ChordDiagramSize = "medium"
+    lyrics_line_spacing_px: int = Field(default=10, ge=0, le=60)
+    lyrics_text_size_px: int = Field(default=16, ge=8, le=40)
+    lyrics_chord_size_px: int = Field(default=18, ge=8, le=40)
     description_html: Optional[str] = None
     template_song_id: Optional[str] = None
     copy_from_song_id: Optional[str] = None
@@ -33,6 +36,9 @@ class GuitarSongUpdate(BaseModel):
     capo: Optional[int] = Field(default=None, ge=0, le=12)
     chord_diagram_style: Optional[Literal["full", "simple"]] = None
     chord_diagram_size: Optional[ChordDiagramSize] = None
+    lyrics_line_spacing_px: Optional[int] = Field(default=None, ge=0, le=60)
+    lyrics_text_size_px: Optional[int] = Field(default=None, ge=8, le=40)
+    lyrics_chord_size_px: Optional[int] = Field(default=None, ge=8, le=40)
     description_html: Optional[str] = None
 
 
@@ -47,6 +53,9 @@ class GuitarSongResponse(BaseModel):
     capo: int
     chord_diagram_style: str
     chord_diagram_size: str
+    lyrics_line_spacing_px: int
+    lyrics_text_size_px: int
+    lyrics_chord_size_px: int
     document_id: Optional[str] = None
     description_html: str = ""
     label_ids: List[str] = []

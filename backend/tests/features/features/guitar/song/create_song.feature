@@ -125,6 +125,109 @@ Feature: Create a guitar song
       }
       """
 
+  Scenario: POST a song with lyrics presentation settings — they are saved
+    Given I am authenticated as a regular user: user.id 0002
+    And the persons table contains:
+      | id   | first_name | last_name | status |
+      | 0030 | Mia        | Member    | active |
+    And the users table contains:
+      | id   | email         | person_id | status |
+      | 0002 | user@test.com | 0030      | active |
+    And the tribes table contains:
+      | id   | name | status |
+      | 0010 | Band | active |
+    And the projects table contains:
+      | id   | name      | status |
+      | 0020 | Rehearsal | active |
+    And the tribes_projects table contains:
+      | tribe_id | project_id | relation |
+      | 0010     | 0020       | manager  |
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs table contains:
+      | id | project_id | title | author | tempo_bpm | beats_per_bar | capo | status |
+    When I POST /api/features/tasks/guitar-songs/projects/0020/songs with body:
+      """
+      {"title": "Zombie", "author": "The Cranberries", "tempo_bpm": 84, "beats_per_bar": 4, "lyrics_line_spacing_px": 14, "lyrics_text_size_px": 20, "lyrics_chord_size_px": 22}
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "lyrics_line_spacing_px": 14,
+        "lyrics_text_size_px": 20,
+        "lyrics_chord_size_px": 22
+      }
+      """
+
+  Scenario: POST a song without lyrics presentation settings — they default to 10/16/18
+    Given I am authenticated as a regular user: user.id 0002
+    And the persons table contains:
+      | id   | first_name | last_name | status |
+      | 0030 | Mia        | Member    | active |
+    And the users table contains:
+      | id   | email         | person_id | status |
+      | 0002 | user@test.com | 0030      | active |
+    And the tribes table contains:
+      | id   | name | status |
+      | 0010 | Band | active |
+    And the projects table contains:
+      | id   | name      | status |
+      | 0020 | Rehearsal | active |
+    And the tribes_projects table contains:
+      | tribe_id | project_id | relation |
+      | 0010     | 0020       | manager  |
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs table contains:
+      | id | project_id | title | author | tempo_bpm | beats_per_bar | capo | status |
+    When I POST /api/features/tasks/guitar-songs/projects/0020/songs with body:
+      """
+      {"title": "Ho Hey", "author": "The Lumineers", "tempo_bpm": 138, "beats_per_bar": 4}
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "lyrics_line_spacing_px": 10,
+        "lyrics_text_size_px": 16,
+        "lyrics_chord_size_px": 18
+      }
+      """
+
+  @error_case
+  Scenario: POST a song with a lyrics text size out of range — 422 error and the database is not modified
+    Given I am authenticated as a regular user: user.id 0002
+    And the persons table contains:
+      | id   | first_name | last_name | status |
+      | 0030 | Mia        | Member    | active |
+    And the users table contains:
+      | id   | email         | person_id | status |
+      | 0002 | user@test.com | 0030      | active |
+    And the tribes table contains:
+      | id   | name | status |
+      | 0010 | Band | active |
+    And the projects table contains:
+      | id   | name      | status |
+      | 0020 | Rehearsal | active |
+    And the tribes_projects table contains:
+      | tribe_id | project_id | relation |
+      | 0010     | 0020       | manager  |
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs table contains:
+      | id | project_id | title | author | tempo_bpm | beats_per_bar | capo | status |
+    When I POST /api/features/tasks/guitar-songs/projects/0020/songs with body:
+      """
+      {"title": "Zombie", "author": "The Cranberries", "tempo_bpm": 84, "beats_per_bar": 4, "lyrics_text_size_px": 100}
+      """
+    Then the response status code is 422
+    And the guitar_songs table contains:
+      | id | project_id | title | author | tempo_bpm | beats_per_bar | capo | status |
+
   Scenario: POST a song with a description — a document is created for it
     Given I am authenticated as a regular user: user.id 0002
     And the persons table contains:

@@ -19,6 +19,11 @@ def test_archive_section():
     pass
 
 
+@scenario(FEATURE, "Manager tries to remove a section that another section is linked to — 409 and it stays active")
+def test_archive_section_with_active_links():
+    pass
+
+
 @scenario(FEATURE, "Member (not manager) tries to remove a section — 403 error and it stays active")
 def test_archive_section_forbidden():
     pass

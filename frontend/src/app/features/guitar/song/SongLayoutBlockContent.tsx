@@ -7,9 +7,13 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SongBlockMenu } from './SongBlockMenu.tsx';
+import { SongEditableBlockTitle } from './SongEditableBlockTitle.tsx';
 import { SongFormCustomBlockCard } from './SongFormCustomBlockCard.tsx';
 import { SongInlineEditableNumber, SongInlineEditableText } from './SongInlineEditableField.tsx';
+import { SongLayoutMoveButton } from './SongLayoutMoveButton.tsx';
 import { SongStatCard } from './SongStatCard.tsx';
+import * as layoutMutations from './layoutMutations.ts';
+import { TITLE_HEADING_SIZES_PX } from './layoutBlockOptions.ts';
 import { renderChordsBlock, renderLabelsBlock, renderSectionsBlock, renderVideosBlock } from './songLayoutCollectionBlocks.tsx';
 import { MAX_BEATS_PER_BAR, MAX_CAPO, MAX_TEMPO_BPM, MIN_BEATS_PER_BAR, MIN_CAPO, MIN_TEMPO_BPM } from './songLimits.ts';
 import { GuitarSongDetail, GuitarSongLayoutBlock, GuitarSongLayoutRow } from './types.ts';
@@ -21,6 +25,8 @@ interface SongLayoutBlockContentProps {
   row: GuitarSongLayoutRow;
   columnId: string;
   blockIndex: number;
+  isFirstBlock: boolean;
+  isLastBlock: boolean;
   openUpward: boolean;
   song: GuitarSongDetail;
   labelsHook: ReturnType<typeof useGuitarSongLabels>;
@@ -32,6 +38,7 @@ interface SongLayoutBlockContentProps {
 const renderScalarBlock = (
   block: GuitarSongLayoutBlock, song: GuitarSongDetail, canEdit: boolean, hook: ReturnType<typeof useGuitarSong>,
   theme: ReturnType<typeof useTheme>['theme'], t: (key: string) => string,
+  onSaveTitle: (customTitle: string | null) => Promise<void>,
 ): React.ReactNode => {
   switch (block.block_type) {
     case 'title':
@@ -91,24 +98,40 @@ const renderScalarBlock = (
     case 'description':
       if (canEdit) {
         return (
-          <div className="border border-gray-300 rounded-lg overflow-hidden">
-            <EditorJoditComponent
-              content={song.description_html} onChange={(description_html) => hook.updateSongFields({ description_html })}
-              compact minHeight={150}
-            />
-          </div>
+          <>
+            <SongEditableBlockTitle block={block} defaultTitle="" canEdit={canEdit} onSave={onSaveTitle} />
+            <div className="border border-gray-300 rounded-lg overflow-hidden">
+              <EditorJoditComponent
+                content={song.description_html} onChange={(description_html) => hook.updateSongFields({ description_html })}
+                compact minHeight={150}
+              />
+            </div>
+          </>
         );
       }
-      return song.description_html ? (
-        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: song.description_html }} />
-      ) : null;
+      if (!song.description_html && !block.custom_title) return null;
+      return (
+        <>
+          <SongEditableBlockTitle block={block} defaultTitle="" canEdit={false} onSave={onSaveTitle} />
+          {song.description_html && (
+            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: song.description_html }} />
+          )}
+        </>
+      );
 
     case 'custom':
       if (canEdit) return <SongFormCustomBlockCard block={block} onUpdate={(data) => hook.updateLayoutBlockContent(block.id, data)} />;
       return block.custom_title || block.custom_content_html ? (
         <>
           {block.custom_title && (
-            <div style={{ fontWeight: 600, color: theme.colors.text, marginBottom: '8px' }}>{block.custom_title}</div>
+            <div
+              style={{
+                fontWeight: 700, color: theme.colors.text, marginBottom: '8px',
+                fontSize: `${TITLE_HEADING_SIZES_PX[block.title_heading_level]}px`,
+              }}
+            >
+              {block.custom_title}
+            </div>
           )}
           {block.custom_content_html && (
             <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: block.custom_content_html }} />
@@ -124,30 +147,36 @@ const renderScalarBlock = (
 const renderBlockContent = (
   block: GuitarSongLayoutBlock, song: GuitarSongDetail, labelsHook: ReturnType<typeof useGuitarSongLabels>,
   canEdit: boolean, canManage: boolean, hook: ReturnType<typeof useGuitarSong>,
-  theme: ReturnType<typeof useTheme>['theme'], t: (key: string) => string,
+  theme: ReturnType<typeof useTheme>['theme'], t: (key: string) => string, onSaveTitle: (customTitle: string | null) => Promise<void>,
 ): React.ReactNode => {
   switch (block.block_type) {
     case 'chords':
-      return renderChordsBlock(song, canEdit, canManage, hook, t);
+      return renderChordsBlock(block, song, canEdit, canManage, hook, t, onSaveTitle);
     case 'sections':
-      return renderSectionsBlock(song, canManage, hook, t);
+      return renderSectionsBlock(block, song, canManage, hook, t, onSaveTitle);
     case 'videos':
-      return renderVideosBlock(song, canEdit, canManage, hook, t);
+      return renderVideosBlock(block, song, canEdit, canManage, hook, t, onSaveTitle);
     case 'labels':
-      return renderLabelsBlock(song, canManage, hook, labelsHook);
+      return renderLabelsBlock(block, song, canManage, hook, labelsHook, onSaveTitle);
     default:
-      return renderScalarBlock(block, song, canEdit, hook, theme, t);
+      return renderScalarBlock(block, song, canEdit, hook, theme, t, onSaveTitle);
   }
 };
 
 export const SongLayoutBlockContent: React.FC<SongLayoutBlockContentProps> = ({
-  block, row, columnId, blockIndex, openUpward, song, labelsHook, canEdit, canManage, hook,
+  block, row, columnId, blockIndex, isFirstBlock, isLastBlock, openUpward, song, labelsHook, canEdit, canManage, hook,
 }) => {
   const themeCtx = useTheme();
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const content = renderBlockContent(block, song, labelsHook, canEdit, canManage, hook, themeCtx.theme, t);
+  const saveBlockTitle = (customTitle: string | null) =>
+    hook.replaceLayoutRow(row.id, (latestRow) =>
+      layoutMutations.updateBlockPresentation(latestRow, columnId, blockIndex, { custom_title: customTitle }));
+  const moveBlock = (direction: 'prev' | 'next') =>
+    hook.replaceLayoutRow(row.id, (latestRow) => layoutMutations.moveBlock(latestRow, columnId, blockIndex, direction));
+
+  const content = renderBlockContent(block, song, labelsHook, canEdit, canManage, hook, themeCtx.theme, t, saveBlockTitle);
   if (content === null) return null;
 
   // CSS zoom (not transform:scale) reflows the whole subtree at the block's own scale, so the
@@ -166,10 +195,20 @@ export const SongLayoutBlockContent: React.FC<SongLayoutBlockContentProps> = ({
     >
       {inner}
       {canEdit && (
-        <div style={{ position: 'absolute', bottom: '-14px', left: '50%', transform: 'translateX(-50%)', zIndex: 2 }}>
+        <div style={{
+          position: 'absolute', bottom: '-14px', left: '50%', transform: 'translateX(-50%)', zIndex: 2,
+          display: 'flex', alignItems: 'center', gap: '2px',
+        }}
+        >
+          <SongLayoutMoveButton
+            icon="arrow-left" label={t('guitarSong.layout.moveBlockLeft')} onClick={() => moveBlock('prev')} disabled={isFirstBlock}
+          />
           <SongBlockMenu
             row={row} columnId={columnId} blockIndex={blockIndex} block={block} hook={hook} onOpenChange={setMenuOpen}
             direction={openUpward ? 'up' : 'down'}
+          />
+          <SongLayoutMoveButton
+            icon="arrow-right" label={t('guitarSong.layout.moveBlockRight')} onClick={() => moveBlock('next')} disabled={isLastBlock}
           />
         </div>
       )}

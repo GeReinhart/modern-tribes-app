@@ -1,3 +1,4 @@
+import { isTitleEditableBlockType } from './layoutBlockOptions.ts';
 import {
   GuitarSongLayoutBlockInput,
   GuitarSongLayoutColumnInput,
@@ -5,6 +6,7 @@ import {
   GuitarSongLayoutRowInput,
   LayoutAlign,
   LayoutBlockType,
+  TitleHeadingLevel,
 } from './types.ts';
 
 export const CUSTOM_BLOCK_TYPE: LayoutBlockType = 'custom';
@@ -15,7 +17,12 @@ export interface DraftBlock {
   width_eighths: number;
   zoom_percent: number;
   show_card: boolean;
-  custom_title: string;
+  title_heading_level: TitleHeadingLevel;
+  // null means "use the block type's default label/no title"; '' means explicitly removed
+  // (only meaningful for title-editable and custom block types) -- these must stay distinct,
+  // never collapsed into each other, or clearing a title would look identical to never having
+  // set one and vice versa.
+  custom_title: string | null;
   custom_content_html: string;
 }
 
@@ -55,7 +62,8 @@ export const emptyDraftBlock = (blockType: LayoutBlockType): DraftBlock => ({
   width_eighths: DEFAULT_BLOCK_WIDTH_EIGHTHS[blockType] ?? ROW_WIDTH_EIGHTHS,
   zoom_percent: DEFAULT_ZOOM_PERCENT,
   show_card: DEFAULT_CARD_BLOCK_TYPES.has(blockType),
-  custom_title: '',
+  title_heading_level: 'h3',
+  custom_title: null,
   custom_content_html: '',
 });
 
@@ -92,7 +100,8 @@ export const draftColumnsFromRow = (row: GuitarSongLayoutRow): DraftColumn[] =>
       width_eighths: block.width_eighths,
       zoom_percent: block.zoom_percent,
       show_card: block.show_card,
-      custom_title: block.custom_title ?? '',
+      title_heading_level: block.title_heading_level,
+      custom_title: block.custom_title,
       custom_content_html: block.custom_content_html ?? '',
     })),
     width_eighths: column.width_eighths,
@@ -113,7 +122,8 @@ export const draftColumnsToInput = (
       width_eighths: block.width_eighths,
       zoom_percent: block.zoom_percent,
       show_card: block.show_card,
-      custom_title: block.block_type === CUSTOM_BLOCK_TYPE ? block.custom_title : null,
+      title_heading_level: block.title_heading_level,
+      custom_title: block.block_type === CUSTOM_BLOCK_TYPE || isTitleEditableBlockType(block.block_type) ? block.custom_title : null,
       custom_content_html: block.block_type === CUSTOM_BLOCK_TYPE ? block.custom_content_html : null,
     })),
     width_eighths: column.width_eighths,

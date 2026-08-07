@@ -24,22 +24,33 @@ export const SongDetailBody: React.FC<SongDetailBodyProps> = ({ song, canEdit, i
   return (
     <>
       {sortedRows.map((row, index) => (
-        <SongLayoutRow
-          key={row.id}
-          row={row}
-          song={song}
-          labelsHook={labelsHook}
-          canEdit={canEdit}
-          canManage={canManage}
-          hook={hook}
-          isFirst={index === 0}
-          isLast={index === sortedRows.length - 1}
-        />
+        <React.Fragment key={row.id}>
+          <SongLayoutRow
+            row={row}
+            song={song}
+            labelsHook={labelsHook}
+            canEdit={canEdit}
+            canManage={canManage}
+            hook={hook}
+            isFirst={index === 0}
+            isLast={index === sortedRows.length - 1}
+          />
+          {canEdit && index < sortedRows.length - 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', margin: '-8px 0 8px' }}>
+              <SongAddRowButton rows={song.layout.rows} hook={hook} insertBeforeRowId={sortedRows[index + 1].id} />
+            </div>
+          )}
+        </React.Fragment>
       ))}
       {canEdit && (
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <SongAddRowButton rows={song.layout.rows} hook={hook} />
         </div>
+      )}
+      {canManage && (
+        // Dropdowns on the last rows/blocks open downward and get cut off if there's nothing to
+        // scroll to below them -- this keeps them reachable in edit mode.
+        <div style={{ height: '75vh' }} aria-hidden="true" />
       )}
       {hasTempoBlock && (
         // A playback tool, not printable page content -- floats outside the page itself rather

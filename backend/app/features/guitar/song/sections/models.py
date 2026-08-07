@@ -13,11 +13,19 @@ class GuitarSongSectionCreate(BaseModel):
     type_label: str
     custom_label: Optional[str] = None
     content_mode: ContentMode = "lyrics"
+    # Which "Lyrics & Chords" layout block this section belongs to -- only meaningful once a
+    # song has more than one; left None it's simply unassigned.
+    layout_block_id: Optional[str] = None
+    # Makes this section a live mirror of another (non-linked) section of the same song -- its
+    # lyrics/chords are always read from, and edited through to, the linked section, so several
+    # identical refrains only need typing once. Only settable at creation time.
+    linked_to_section_id: Optional[str] = None
 
 
 class GuitarSongSectionUpdate(BaseModel):
     type_label: Optional[str] = None
     custom_label: Optional[str] = None
+    layout_block_id: Optional[str] = None
 
 
 class GuitarSongSectionLyricsUpdate(BaseModel):
@@ -60,6 +68,8 @@ class GuitarSongSectionResponse(BaseModel):
     display_label: str
     content_mode: ContentMode
     lyrics_text: Optional[str] = None
+    layout_block_id: Optional[str] = None
+    linked_to_section_id: Optional[str] = None
     status: str
     created_at: datetime
     updated_at: datetime

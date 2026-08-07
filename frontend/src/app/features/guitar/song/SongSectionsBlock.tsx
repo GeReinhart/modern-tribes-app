@@ -9,12 +9,25 @@ interface SongSectionsBlockProps {
   sections: GuitarSongSection[];
   diagramStyle: ChordDiagramStyle;
   diagramSize: ChordDiagramSize;
+  lineSpacingPx: number;
+  textSizePx: number;
+  chordSizePx: number;
 }
 
-export const SongSectionsBlock: React.FC<SongSectionsBlockProps> = ({ sections, diagramStyle, diagramSize }) => (
+export const SongSectionsBlock: React.FC<SongSectionsBlockProps> = ({
+  sections, diagramStyle, diagramSize, lineSpacingPx, textSizePx, chordSizePx,
+}) => (
   <div>
     {sections.map((section) => (
-      <SongSectionReadView key={section.id} section={section} diagramStyle={diagramStyle} diagramSize={diagramSize} />
+      <SongSectionReadView
+        key={section.id}
+        section={section}
+        diagramStyle={diagramStyle}
+        diagramSize={diagramSize}
+        lineSpacingPx={lineSpacingPx}
+        textSizePx={textSizePx}
+        chordSizePx={chordSizePx}
+      />
     ))}
   </div>
 );

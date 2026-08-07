@@ -17,23 +17,25 @@ interface SongRowMenuProps {
   row: GuitarSongLayoutRow;
   hook: ReturnType<typeof useGuitarSong>;
   onOpenChange?: (open: boolean) => void;
+  direction?: 'up' | 'down';
 }
 
-export const SongRowMenu: React.FC<SongRowMenuProps> = ({ rows, row, hook, onOpenChange }) => {
+export const SongRowMenu: React.FC<SongRowMenuProps> = ({ rows, row, hook, onOpenChange, direction }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const columnOptions = unusedBlockTypes(rows, row.id);
 
-  const handleAddColumn = (blockType: LayoutBlockType) => hook.replaceLayoutRow(row.id, layoutMutations.addColumn(row, blockType));
-  const handleAddColumnFreeText = () => hook.replaceLayoutRow(row.id, layoutMutations.addColumn(row, 'custom'));
-  const handleAddEmptyColumn = () => hook.replaceLayoutRow(row.id, layoutMutations.addEmptyColumn(row));
-  const handleTogglePageBreak = () => hook.replaceLayoutRow(row.id, layoutMutations.togglePageBreak(row));
+  const handleAddColumn = (blockType: LayoutBlockType) =>
+    hook.replaceLayoutRow(row.id, (latestRow) => layoutMutations.addColumn(latestRow, blockType));
+  const handleAddColumnFreeText = () => hook.replaceLayoutRow(row.id, (latestRow) => layoutMutations.addColumn(latestRow, 'custom'));
+  const handleAddEmptyColumn = () => hook.replaceLayoutRow(row.id, (latestRow) => layoutMutations.addEmptyColumn(latestRow));
+  const handleTogglePageBreak = () => hook.replaceLayoutRow(row.id, (latestRow) => layoutMutations.togglePageBreak(latestRow));
   const hasRoomForNewColumn = layoutMutations.remainingRowWidthEighths(row) >= 1;
 
   return (
     <ThemedPopover
       triggerIcon="list" triggerLabel={t('guitarSong.layout.rowMenu')} closeLabel={t('common.close')}
-      triggerIconSize={12} onOpenChange={onOpenChange}
+      triggerIconSize={12} onOpenChange={onOpenChange} direction={direction}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '200px' }}>
         {hasRoomForNewColumn ? (

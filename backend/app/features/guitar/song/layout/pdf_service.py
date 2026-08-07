@@ -1,10 +1,18 @@
 import hashlib
+from pathlib import Path
 
 from weasyprint import HTML
 
+from app.platform.core.config import settings
 from app.platform.functions.labels.repository import fetch_label_details
 from app.features.guitar.song.layout import pdf_cache_repository as pdf_cache_repo
-from app.features.guitar.song.layout.pdf_blocks import BLOCK_RENDERERS, render_custom_block, render_labels_block
+from app.features.guitar.song.layout.pdf_blocks import (
+    BLOCK_RENDERERS,
+    render_block_title,
+    render_custom_block,
+    render_labels_block,
+    render_sections_block,
+)
 
 # Compact blocks (small stat blocks) flow side by side within a column instead of each
 # claiming a full row — e.g. tempo, time signature and capo sit together like the old
@@ -12,12 +20,25 @@ from app.features.guitar.song.layout.pdf_blocks import BLOCK_RENDERERS, render_c
 _COMPACT_BLOCK_TYPES = {"tempo", "time_signature", "capo"}
 
 
+def _localize_upload_urls(html: str) -> str:
+    """WeasyPrint fetches every <img src> itself, with no browser session and (for locally
+    stored uploads) no guarantee the backend can reach its own public BASE_URL at render time --
+    a failed fetch is only logged, never raised, so the image just silently vanishes from the
+    PDF. Locally stored uploads are served straight off disk from UPLOAD_DIR (see the /uploads
+    StaticFiles mount in main.py), so rewriting their URL to a file:// path lets WeasyPrint read
+    the bytes directly instead of round-tripping over HTTP. Cellar-hosted uploads use a
+    different host entirely and are left untouched -- WeasyPrint fetches those over the network."""
+    upload_url_prefix = f"{settings.BASE_URL}/uploads/"
+    upload_dir = Path(settings.UPLOAD_DIR).resolve()
+    return html.replace(upload_url_prefix, f"file://{upload_dir}/")
+
+
 async def render_song_pdf(pool, song, user_id: str) -> bytes:
     """Only one rendered PDF is kept per song. The HTML that would be rendered is hashed and
     compared against the stored hash, so an unchanged song skips WeasyPrint entirely and is
     served its already-rendered copy instead of regenerating it on every download."""
     label_details = await _fetch_label_details_if_needed(pool, song)
-    html_document = _build_html_document(song, label_details)
+    html_document = _localize_upload_urls(_build_html_document(song, label_details))
     content_hash = hashlib.sha256(html_document.encode("utf-8")).hexdigest()
     cached = await pdf_cache_repo.fetch_cached_pdf(pool, song.id)
     if cached and cached["content_hash"] == content_hash:
@@ -58,7 +79,8 @@ def _build_html_document(song, label_details: dict) -> str:
         "<!doctype html><html><head><meta charset=\"utf-8\" />"
         f"<style>@page {{ size: A4 portrait; margin: {margin}; {_footer_css(song)} }} "
         "body { font-family: Helvetica, Arial, sans-serif; color: #1a1a1a; margin: 0; } "
-        ".layout-row { display: flex; width: 100%; }</style>"
+        ".layout-row { display: flex; width: 100%; } "
+        ".freeform img { max-width: 100%; height: auto; }</style>"
         f"</head><body>{rows_html}</body></html>"
     )
 
@@ -71,11 +93,26 @@ def _render_row(row, song, label_details: dict) -> str:
     return f'<div class="layout-row" style="{break_style}">{columns_html}</div>'
 
 
+def _first_sections_block_id(song) -> str | None:
+    """A 'sections' block can repeat now, each showing only the sections explicitly assigned to
+    it -- except an unassigned section, which always falls back to whichever 'sections' block
+    comes first in the layout (row, then column, then block order), never to nowhere."""
+    for row in sorted(song.layout.rows, key=lambda r: r.position):
+        for column in sorted(row.columns, key=lambda c: c.position):
+            for block in column.blocks:
+                if block.block_type == "sections":
+                    return block.id
+    return None
+
+
 def _render_block(block, song, label_details: dict, zoom: float) -> str:
     if block.block_type == "custom":
         return render_custom_block(block, zoom)
     if block.block_type == "labels":
         return render_labels_block(song, label_details, zoom)
+    if block.block_type == "sections":
+        is_first = block.id == _first_sections_block_id(song)
+        return render_sections_block(song, block, is_first, zoom)
     return BLOCK_RENDERERS[block.block_type](song, zoom)
 
 
@@ -85,7 +122,13 @@ def _wrap_in_card(content: str, zoom: float) -> str:
 
 def _render_block_wrapper(block, song, label_details: dict, column_width_eighths: int) -> str:
     zoom = block.zoom_percent / 100
-    content = _render_block(block, song, label_details, zoom)
+    body = _render_block(block, song, label_details, zoom)
+    # Mirrors the web read view's rule (songLayoutCollectionBlocks.tsx returning null for an
+    # empty chords/videos/sections block): an empty block shows no title either, so a default
+    # label like "Chords" never prints above nothing.
+    if not body:
+        return ""
+    content = render_block_title(block, zoom) + body
     if block.show_card:
         content = _wrap_in_card(content, zoom)
     width_style = ""

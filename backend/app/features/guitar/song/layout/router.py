@@ -31,16 +31,18 @@ def _safe_pdf_filename(title: str) -> str:
 @router.post("/songs/{song_id}/layout/rows", response_model=GuitarSongLayoutResponse, status_code=status.HTTP_201_CREATED)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def add_layout_row(
-    song_id: str, data: GuitarSongLayoutRowInput, current_user: dict = Depends(get_current_user)
+    song_id: str, data: GuitarSongLayoutRowInput, insert_before_row_id: str | None = None,
+    current_user: dict = Depends(get_current_user),
 ):
-    """Add a row to a song's presentation/print layout, at the end.
+    """Add a row to a song's presentation/print layout -- at the end, or immediately before
+    insert_before_row_id (a row of the same song) if given.
 
     **Permissions:** admin | can_access_attached_tribes
     **Project access:** minimum position ≥ member
     """
     pool = get_database()
     song_id = await resolve_url_param_id(pool, "guitar_songs", song_id)
-    return await layout_service.add_row(pool, song_id, data, current_user)
+    return await layout_service.add_row(pool, song_id, data, current_user, insert_before_row_id)
 
 
 @router.put("/layout/rows/{row_id}", response_model=GuitarSongLayoutResponse)

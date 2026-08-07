@@ -39,6 +39,19 @@ Feature: Remove a section from a guitar song
       | 0500 | 0200    | 1        | Bridge     | archived |
 
   @error_case
+  Scenario: Manager tries to remove a section that another section is linked to — 409 and it stays active
+    Given I am authenticated as an administrator: user.id 0001
+    And the guitar_songs_sections table contains:
+      | id   | song_id | position | type_label | content_mode | linked_to_section_id | status |
+      | 0510 | 0200    | 2        | Refrain    | lyrics       | 0500                  | active |
+    When I DELETE /api/features/tasks/guitar-songs/sections/0500
+    Then the response status code is 409
+    And the guitar_songs_sections table contains:
+      | id   | song_id | position | type_label | linked_to_section_id | status |
+      | 0500 | 0200    | 1        | Bridge     |                       | active |
+      | 0510 | 0200    | 2        | Refrain    | 0500                  | active |
+
+  @error_case
   Scenario: Member (not manager) tries to remove a section — 403 error and it stays active
     Given I am authenticated as a regular user: user.id 0002
     And the persons table contains:

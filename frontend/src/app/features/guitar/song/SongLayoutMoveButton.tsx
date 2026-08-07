@@ -3,16 +3,17 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React from 'react';
 
-interface SongLayoutMoveColumnButtonProps {
+interface SongLayoutMoveButtonProps {
   icon: IconName;
   label: string;
   onClick: () => void;
   disabled: boolean;
 }
 
-// Sized and styled to match the small circular trigger button ThemedPopover renders (used by
-// the column's own menu icon right next to this one), so the two sit flush at the same size.
-export const SongLayoutMoveColumnButton: React.FC<SongLayoutMoveColumnButtonProps> = ({ icon, label, onClick, disabled }) => {
+// Sized and styled to match the small circular trigger button ThemedPopover renders (used by a
+// column's or block's own menu icon right next to this one), so the two sit flush at the same
+// size. Shared by column reordering (left/right) and block reordering within a column.
+export const SongLayoutMoveButton: React.FC<SongLayoutMoveButtonProps> = ({ icon, label, onClick, disabled }) => {
   const { theme } = useTheme();
 
   return (

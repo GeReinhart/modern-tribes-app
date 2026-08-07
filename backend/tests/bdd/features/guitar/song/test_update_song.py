@@ -19,6 +19,16 @@ def test_update_song_tempo():
     pass
 
 
+@scenario(FEATURE, "PATCH a song's lyrics presentation settings — they are updated")
+def test_update_song_lyrics_presentation_prefs():
+    pass
+
+
+@scenario(FEATURE, "PATCH a song's lyrics chord size out of range — 422 error and the database is not modified")
+def test_update_song_lyrics_chord_size_out_of_range():
+    pass
+
+
 @scenario(FEATURE, "PATCH a description onto a song with none yet — a document is created and linked")
 def test_update_song_description_lazy_create():
     pass

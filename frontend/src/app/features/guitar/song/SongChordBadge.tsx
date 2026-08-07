@@ -12,10 +12,13 @@ interface SongChordBadgeProps {
   chord: GuitarChord;
   diagramStyle: ChordDiagramStyle;
   diagramSize: ChordDiagramSize;
+  fontSizePx?: number;
   onRemove?: () => Promise<void>;
 }
 
-export const SongChordBadge: React.FC<SongChordBadgeProps> = ({ chord, diagramStyle, diagramSize, onRemove }) => {
+export const SongChordBadge: React.FC<SongChordBadgeProps> = ({
+  chord, diagramStyle, diagramSize, fontSizePx = 18, onRemove,
+}) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -44,7 +47,7 @@ export const SongChordBadge: React.FC<SongChordBadgeProps> = ({ chord, diagramSt
           background: 'transparent',
           padding: 0,
           cursor: 'pointer',
-          fontSize: '18px',
+          fontSize: `${fontSizePx}px`,
           fontWeight: 700,
           color: theme.colors.primary,
         }}

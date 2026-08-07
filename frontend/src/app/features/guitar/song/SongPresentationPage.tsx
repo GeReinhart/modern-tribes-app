@@ -45,9 +45,9 @@ const SongPresentationPageContent: React.FC = () => {
       { label: tribe?.name || t('common.loading'), path: `/app/tribes/${tribeId}` },
       { label: project?.name || t('common.loading'), path: `/app/tribes/${tribeId}/projects/${projectId}` },
       { label: song?.title || t('common.loading'), path: songPath },
-      { label: t('guitarSong.layout.presentationMode') },
+      { label: song ? songDocumentTitle(song) : t('common.loading') },
     ],
-    [tribe?.name, project?.name, song?.title, tribeId, projectId, songPath, t],
+    [tribe?.name, project?.name, song, tribeId, projectId, songPath, t],
   );
 
   const menuActions = useMemo(

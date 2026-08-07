@@ -52,6 +52,11 @@ def test_add_second_layout_row():
     pass
 
 
+@scenario(FEATURE, "POST a row with insert_before_row_id — it lands before that row, pushing it down")
+def test_add_layout_row_insert_before():
+    pass
+
+
 @scenario(FEATURE, "POST a row whose column widths sum to less than 8/8 — it is added with room left unused")
 def test_add_layout_row_partial_width_sum():
     pass
@@ -79,6 +84,21 @@ def test_add_layout_row_block_zoom_and_card():
 
 @scenario(FEATURE, "POST a row with a block's zoom outside 30-200 — 422 and the database is not modified")
 def test_add_layout_row_block_invalid_zoom():
+    pass
+
+
+@scenario(FEATURE, "POST a row with a block's title heading level set — it is saved")
+def test_add_layout_row_block_title_heading_level():
+    pass
+
+
+@scenario(FEATURE, "POST a row without a title heading level for a block — it defaults to h3")
+def test_add_layout_row_block_default_title_heading_level():
+    pass
+
+
+@scenario(FEATURE, "POST a row with an invalid title heading level for a block — 422 and the database is not modified")
+def test_add_layout_row_block_invalid_title_heading_level():
     pass
 
 

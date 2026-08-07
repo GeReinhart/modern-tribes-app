@@ -8,9 +8,13 @@ BlockType = Literal[
     "custom",
 ]
 Align = Literal["left", "center", "right"]
+TitleHeadingLevel = Literal["h1", "h2", "h3", "h4"]
 
 ROW_WIDTH_EIGHTHS = 8
 CUSTOM_BLOCK_TYPE = "custom"
+# Unlike every other non-custom block type, a song's sections are split across its own
+# "Lyrics & Chords" blocks (each section picks which one it belongs to), so several may coexist.
+REPEATABLE_BLOCK_TYPES = {CUSTOM_BLOCK_TYPE, "sections"}
 
 
 class GuitarSongLayoutBlockInput(BaseModel):
@@ -21,6 +25,7 @@ class GuitarSongLayoutBlockInput(BaseModel):
     width_eighths: int = Field(default=ROW_WIDTH_EIGHTHS, ge=1, le=ROW_WIDTH_EIGHTHS)
     zoom_percent: int = Field(default=100, ge=30, le=200)
     show_card: bool = False
+    title_heading_level: TitleHeadingLevel = "h3"
     custom_title: Optional[str] = None
     custom_content_html: Optional[str] = None
 
@@ -30,8 +35,8 @@ class GuitarSongLayoutBlockContentUpdate(BaseModel):
     custom_content_html: Optional[str] = None
 
 
-def _non_custom_block_types(blocks: List[GuitarSongLayoutBlockInput]) -> List[BlockType]:
-    return [b.block_type for b in blocks if b.block_type != CUSTOM_BLOCK_TYPE]
+def _uniqueness_constrained_block_types(blocks: List[GuitarSongLayoutBlockInput]) -> List[BlockType]:
+    return [b.block_type for b in blocks if b.block_type not in REPEATABLE_BLOCK_TYPES]
 
 
 class GuitarSongLayoutColumnInput(BaseModel):
@@ -50,8 +55,8 @@ class GuitarSongLayoutColumnInput(BaseModel):
     def _check_no_duplicate_blocks_in_column(
         cls, blocks: List[GuitarSongLayoutBlockInput]
     ) -> List[GuitarSongLayoutBlockInput]:
-        non_custom = _non_custom_block_types(blocks)
-        if len(non_custom) != len(set(non_custom)):
+        constrained = _uniqueness_constrained_block_types(blocks)
+        if len(constrained) != len(set(constrained)):
             raise ValueError("a block type cannot be used twice in the same column")
         return blocks
 
@@ -69,8 +74,8 @@ class GuitarSongLayoutRowInput(BaseModel):
         total = sum(c.width_eighths for c in columns)
         if total > ROW_WIDTH_EIGHTHS:
             raise ValueError(f"column widths in a row must not exceed {ROW_WIDTH_EIGHTHS}/8, got {total}/8")
-        all_non_custom = [block_type for c in columns for block_type in _non_custom_block_types(c.blocks)]
-        if len(all_non_custom) != len(set(all_non_custom)):
+        all_constrained = [block_type for c in columns for block_type in _uniqueness_constrained_block_types(c.blocks)]
+        if len(all_constrained) != len(set(all_constrained)):
             raise ValueError("a block type cannot be used twice in the same row")
         return columns
 
@@ -81,6 +86,7 @@ class GuitarSongLayoutBlockResponse(BaseModel):
     width_eighths: int
     zoom_percent: int
     show_card: bool
+    title_heading_level: TitleHeadingLevel
     custom_title: Optional[str] = None
     custom_content_html: Optional[str] = None
 

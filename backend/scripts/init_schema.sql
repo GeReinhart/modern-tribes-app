@@ -745,6 +745,9 @@ CREATE TABLE IF NOT EXISTS guitar_songs (
     capo INTEGER NOT NULL DEFAULT 0 CHECK (capo BETWEEN 0 AND 12),
     chord_diagram_style VARCHAR(20) NOT NULL DEFAULT 'full' CHECK (chord_diagram_style IN ('full', 'simple')),
     chord_diagram_size VARCHAR(20) NOT NULL DEFAULT 'medium' CHECK (chord_diagram_size IN ('very_small', 'small', 'medium', 'large')),
+    lyrics_line_spacing_px INTEGER NOT NULL DEFAULT 10 CHECK (lyrics_line_spacing_px BETWEEN 0 AND 60),
+    lyrics_text_size_px INTEGER NOT NULL DEFAULT 16 CHECK (lyrics_text_size_px BETWEEN 8 AND 40),
+    lyrics_chord_size_px INTEGER NOT NULL DEFAULT 18 CHECK (lyrics_chord_size_px BETWEEN 8 AND 40),
     document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CHECK (status IN ('pending', 'active', 'archived')),
@@ -800,6 +803,8 @@ CREATE TABLE IF NOT EXISTS guitar_songs_sections (
     custom_label VARCHAR(200),
     content_mode VARCHAR(20) NOT NULL DEFAULT 'lyrics' CHECK (content_mode IN ('lyrics', 'chords_only')),
     lyrics_text TEXT,
+    layout_block_id UUID, -- FK to guitar_songs_layout_column_blocks added further below, once that table exists
+    linked_to_section_id UUID REFERENCES guitar_songs_sections(id) ON DELETE SET NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -809,6 +814,7 @@ CREATE TABLE IF NOT EXISTS guitar_songs_sections (
 );
 CREATE OR REPLACE TRIGGER update_guitar_songs_sections_updated_at BEFORE UPDATE ON guitar_songs_sections FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE INDEX IF NOT EXISTS idx_guitar_songs_sections_song ON guitar_songs_sections(song_id);
+CREATE INDEX IF NOT EXISTS idx_guitar_songs_sections_linked_to ON guitar_songs_sections(linked_to_section_id);
 
 -- Words of a lyrics-mode section. A word_text of '' is an empty slot the user created on purpose
 -- by typing 3+ consecutive spaces (or leading/trailing spaces) -- a place to hang a chord with no
@@ -930,6 +936,7 @@ CREATE TABLE IF NOT EXISTS guitar_songs_layout_column_blocks (
     width_eighths SMALLINT NOT NULL DEFAULT 8 CHECK (width_eighths BETWEEN 1 AND 8),
     zoom_percent SMALLINT NOT NULL DEFAULT 100 CHECK (zoom_percent BETWEEN 30 AND 200),
     show_card BOOLEAN NOT NULL DEFAULT FALSE,
+    title_heading_level VARCHAR(2) NOT NULL DEFAULT 'h3' CHECK (title_heading_level IN ('h1', 'h2', 'h3', 'h4')),
     custom_title VARCHAR(255),
     custom_document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'active'
@@ -941,7 +948,11 @@ CREATE TABLE IF NOT EXISTS guitar_songs_layout_column_blocks (
 );
 CREATE OR REPLACE TRIGGER update_guitar_songs_layout_column_blocks_updated_at BEFORE UPDATE ON guitar_songs_layout_column_blocks FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE INDEX IF NOT EXISTS idx_guitar_songs_layout_column_blocks_column ON guitar_songs_layout_column_blocks(column_id);
-CREATE UNIQUE INDEX IF NOT EXISTS guitar_songs_layout_column_blocks_unique ON guitar_songs_layout_column_blocks (song_id, block_type) WHERE status = 'active' AND block_type != 'custom';
+CREATE UNIQUE INDEX IF NOT EXISTS guitar_songs_layout_column_blocks_unique ON guitar_songs_layout_column_blocks (song_id, block_type) WHERE status = 'active' AND block_type NOT IN ('custom', 'sections');
+
+ALTER TABLE guitar_songs_sections ADD CONSTRAINT guitar_songs_sections_layout_block_id_fkey
+    FOREIGN KEY (layout_block_id) REFERENCES guitar_songs_layout_column_blocks(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_guitar_songs_sections_layout_block ON guitar_songs_sections(layout_block_id);
 
 -- One rendered PDF kept per song, regenerated only when its content_hash no longer matches
 -- the currently-resolved layout HTML (migration 015)

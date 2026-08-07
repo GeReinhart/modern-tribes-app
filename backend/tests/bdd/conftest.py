@@ -876,6 +876,29 @@ def check_pdf_cache_exists(song_id):
     _run(_check())
 
 
+@then(parsers.parse("section {section_id} is assigned to an active 'sections' block"))
+def check_section_assigned_to_active_sections_block(section_id):
+    """The new block a section is remapped to on a row replace has a server-generated id that
+    can't be known ahead of time, so this checks the relationship holds rather than a literal id."""
+    async def _check():
+        conn = await _conn()
+        try:
+            row = await conn.fetchrow(
+                """SELECT sec.layout_block_id, b.status AS block_status, b.block_type
+                   FROM guitar_songs_sections sec
+                   LEFT JOIN guitar_songs_layout_column_blocks b ON b.id = sec.layout_block_id
+                   WHERE sec.id = $1""",
+                UUID(expand_id(section_id)),
+            )
+            assert row is not None, f"section {section_id} not found"
+            assert row["layout_block_id"] is not None, f"section {section_id} has no layout_block_id"
+            assert row["block_status"] == "active", f"section {section_id}'s block is not active: {row['block_status']}"
+            assert row["block_type"] == "sections", f"section {section_id}'s block is not a 'sections' block"
+        finally:
+            await conn.close()
+    _run(_check())
+
+
 @then("the response body is:")
 def check_response_body(context, docstring):
     expected = expand_json_ids(json.loads(docstring))
@@ -1276,9 +1299,11 @@ def given_guitar_songs_table(datatable):
                 await conn.execute(
                     """INSERT INTO guitar_songs(
                            id, url_param_id, project_id, title, author_id, tempo_bpm, beats_per_bar, capo,
-                           chord_diagram_style, chord_diagram_size, document_id, status
+                           chord_diagram_style, chord_diagram_size,
+                           lyrics_line_spacing_px, lyrics_text_size_px, lyrics_chord_size_px,
+                           document_id, status
                        )
-                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(uid),
                     rec.get("url_param_id", url_param_id_from_uuid(uid)),
@@ -1290,6 +1315,9 @@ def given_guitar_songs_table(datatable):
                     coerce("capo", rec.get("capo", "0")),
                     rec.get("chord_diagram_style", "full"),
                     rec.get("chord_diagram_size", "medium"),
+                    coerce("lyrics_line_spacing_px", rec.get("lyrics_line_spacing_px", "10")),
+                    coerce("lyrics_text_size_px", rec.get("lyrics_text_size_px", "16")),
+                    coerce("lyrics_chord_size_px", rec.get("lyrics_chord_size_px", "18")),
                     UUID(document_id) if document_id else None,
                     rec.get("status", "active"),
                 )
@@ -1432,11 +1460,14 @@ def given_guitar_songs_sections_table(datatable):
                     for i in range(len(headers))
                 }
                 uid = rec.get("id")
+                layout_block_id = rec.get("layout_block_id")
+                linked_to_section_id = rec.get("linked_to_section_id")
                 await conn.execute(
                     """INSERT INTO guitar_songs_sections(
-                           id, song_id, position, type_label, custom_label, content_mode, lyrics_text, status
+                           id, song_id, position, type_label, custom_label, content_mode, lyrics_text,
+                           layout_block_id, linked_to_section_id, status
                        )
-                       VALUES(COALESCE($1, gen_random_uuid()), $2, $3, $4, $5, $6, $7, $8)
+                       VALUES(COALESCE($1, gen_random_uuid()), $2, $3, $4, $5, $6, $7, $8, $9, $10)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(uid) if uid else None,
                     UUID(rec["song_id"]),
@@ -1445,6 +1476,8 @@ def given_guitar_songs_sections_table(datatable):
                     rec.get("custom_label") or None,
                     rec.get("content_mode", "lyrics"),
                     rec.get("lyrics_text") or None,
+                    UUID(layout_block_id) if layout_block_id else None,
+                    UUID(linked_to_section_id) if linked_to_section_id else None,
                     rec.get("status", "active"),
                 )
         finally:

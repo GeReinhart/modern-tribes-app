@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SongColumnMenu } from './SongColumnMenu.tsx';
-import { SongLayoutMoveColumnButton } from './SongLayoutMoveColumnButton.tsx';
+import { SongLayoutMoveButton } from './SongLayoutMoveButton.tsx';
 import { SongLayoutBlockContent } from './SongLayoutBlockContent.tsx';
 import { isCompactBlockType } from './layoutBlockOptions.ts';
 import * as layoutMutations from './layoutMutations.ts';
@@ -57,7 +57,7 @@ export const SongLayoutColumn: React.FC<SongLayoutColumnProps> = ({
   const widthPercent = (column.width_eighths / LAYOUT_ROW_WIDTH_EIGHTHS) * 100;
   const padding = `${column.padding_top_mm}mm ${column.padding_right_mm}mm ${column.padding_bottom_mm}mm ${column.padding_left_mm}mm`;
   const moveColumn = (direction: 'prev' | 'next') =>
-    hook.replaceLayoutRow(row.id, layoutMutations.moveColumn(row, column.id, direction));
+    hook.replaceLayoutRow(row.id, (latestRow) => layoutMutations.moveColumn(latestRow, column.id, direction));
 
   return (
     <div
@@ -76,11 +76,14 @@ export const SongLayoutColumn: React.FC<SongLayoutColumnProps> = ({
           display: 'flex', alignItems: 'center', gap: '2px',
         }}
         >
-          <SongLayoutMoveColumnButton
+          <SongLayoutMoveButton
             icon="arrow-left" label={t('guitarSong.layout.moveColumnLeft')} onClick={() => moveColumn('prev')} disabled={isFirstColumn}
           />
-          <SongColumnMenu rows={rows} row={row} column={column} hook={hook} onOpenChange={setMenuOpen} />
-          <SongLayoutMoveColumnButton
+          <SongColumnMenu
+            rows={rows} row={row} column={column} hook={hook} onOpenChange={setMenuOpen}
+            direction={isLastRow ? 'up' : 'down'}
+          />
+          <SongLayoutMoveButton
             icon="arrow-right" label={t('guitarSong.layout.moveColumnRight')} onClick={() => moveColumn('next')} disabled={isLastColumn}
           />
         </div>
@@ -96,6 +99,8 @@ export const SongLayoutColumn: React.FC<SongLayoutColumnProps> = ({
               row={row}
               columnId={column.id}
               blockIndex={index}
+              isFirstBlock={index === 0}
+              isLastBlock={index === column.blocks.length - 1}
               openUpward={isLastRow && index === column.blocks.length - 1}
               song={song}
               labelsHook={labelsHook}

@@ -62,7 +62,9 @@ async def create_song(pool, project_id: str, data: GuitarSongCreate, user: dict)
     row = await repo.insert_song(
         pool, project_id, generate_url_param_id(), data.title, author_id,
         data.tempo_bpm, data.beats_per_bar, data.capo,
-        data.chord_diagram_style, data.chord_diagram_size, document_id, user["id"],
+        data.chord_diagram_style, data.chord_diagram_size,
+        data.lyrics_line_spacing_px, data.lyrics_text_size_px, data.lyrics_chord_size_px,
+        document_id, user["id"],
     )
     if data.template_song_id:
         await copy_layout_from(pool, data.template_song_id, row["id"], user["id"])
@@ -82,7 +84,9 @@ async def _create_song_from_copy(pool, project_id: str, data: GuitarSongCreate, 
     row = await repo.insert_song(
         pool, project_id, generate_url_param_id(), data.title, author_id,
         source_row["tempo_bpm"], source_row["beats_per_bar"], source_row["capo"],
-        source_row["chord_diagram_style"], source_row["chord_diagram_size"], document_id, user["id"],
+        source_row["chord_diagram_style"], source_row["chord_diagram_size"],
+        source_row["lyrics_line_spacing_px"], source_row["lyrics_text_size_px"], source_row["lyrics_chord_size_px"],
+        document_id, user["id"],
     )
     await _copy_song_content(pool, data.copy_from_song_id, row["id"], user["id"])
     return await _build_song_response(pool, row)
@@ -223,7 +227,9 @@ async def duplicate_song(pool, song_id: str, user: dict) -> GuitarSongDetailResp
     new_row = await repo.insert_song(
         pool, project_id, generate_url_param_id(), f'{source_row["title"]} - COPIE', source_row.get("author_id"),
         source_row["tempo_bpm"], source_row["beats_per_bar"], source_row["capo"],
-        source_row["chord_diagram_style"], source_row["chord_diagram_size"], document_id, user["id"],
+        source_row["chord_diagram_style"], source_row["chord_diagram_size"],
+        source_row["lyrics_line_spacing_px"], source_row["lyrics_text_size_px"], source_row["lyrics_chord_size_px"],
+        document_id, user["id"],
     )
     await _copy_song_content(pool, song_id, new_row["id"], user["id"])
     return await get_song(pool, new_row["id"], user)

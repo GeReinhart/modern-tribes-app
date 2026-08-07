@@ -178,6 +178,39 @@ Feature: Add a row to a guitar song's presentation layout
       | 0200    | 1        | false              | active |
       | 0200    | 2        | false              | active |
 
+  Scenario: POST a row with insert_before_row_id — it lands before that row, pushing it down
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs_layout_rows table contains:
+      | id   | song_id | position | page_break_before | status |
+      | 0700 | 0200    | 1        | false              | active |
+      | 0701 | 0200    | 2        | false              | active |
+    And the guitar_songs_layout_columns table contains:
+      | id   | row_id | song_id | position | width_eighths | align | status |
+      | 0710 | 0700   | 0200    | 1        | 8              | left  | active |
+      | 0720 | 0701   | 0200    | 1        | 8              | left  | active |
+    And the guitar_songs_layout_column_blocks table contains:
+      | id   | column_id | song_id | position | block_type | status |
+      | 0711 | 0710      | 0200    | 1        | title      | active |
+      | 0721 | 0720      | 0200    | 1        | description | active |
+    When I POST /api/features/tasks/guitar-songs/songs/0200/layout/rows?insert_before_row_id=00000000-0000-0000-0000-000000000701 with body:
+      """
+      {"page_break_before": false, "columns": [{"blocks": [{"block_type": "chords"}], "width_eighths": 8, "align": "left"}]}
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "rows": [
+          {"position": 1, "columns": [{"blocks": [{"block_type": "title"}]}]},
+          {"position": 2, "columns": [{"blocks": [{"block_type": "chords"}]}]},
+          {"position": 3, "columns": [{"blocks": [{"block_type": "description"}]}]}
+        ]
+      }
+      """
+
   Scenario: POST a row whose column widths sum to less than 8/8 — it is added with room left unused
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:
@@ -240,6 +273,30 @@ Feature: Add a row to a guitar song's presentation layout
       | song_id | position | page_break_before | status |
       | 0200    | 1        | false              | active |
 
+  Scenario: POST a row reusing a 'sections' block already used elsewhere — it's added anyway, since Lyrics & Chords may repeat
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs_layout_rows table contains:
+      | id   | song_id | position | page_break_before | status |
+      | 0700 | 0200    | 1        | false              | active |
+    And the guitar_songs_layout_columns table contains:
+      | id   | row_id | song_id | position | width_eighths | align | status |
+      | 0710 | 0700   | 0200    | 1        | 8              | left  | active |
+    And the guitar_songs_layout_column_blocks table contains:
+      | id   | column_id | song_id | position | block_type | status |
+      | 0711 | 0710      | 0200    | 1        | sections   | active |
+    When I POST /api/features/tasks/guitar-songs/songs/0200/layout/rows with body:
+      """
+      {"page_break_before": false, "columns": [{"blocks": [{"block_type": "sections"}], "width_eighths": 8, "align": "left"}]}
+      """
+    Then the response status code is 201
+    And the guitar_songs_layout_column_blocks table contains:
+      | song_id | block_type | status |
+      | 0200    | sections   | active |
+      | 0200    | sections   | active |
+
   @error_case
   Scenario: POST a row using the same block twice in one column — 422 and the database is not modified
     Given I am authenticated as a regular user: user.id 0002
@@ -271,6 +328,54 @@ Feature: Add a row to a guitar song's presentation layout
     And the guitar_songs_layout_column_blocks table contains:
       | song_id | position | block_type | zoom_percent | show_card | status |
       | 0200    | 1        | title      | 150          | true      | active |
+
+  Scenario: POST a row with a block's title heading level set — it is saved
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs_layout_rows table contains:
+      | id | song_id | position | page_break_before | status |
+    When I POST /api/features/tasks/guitar-songs/songs/0200/layout/rows with body:
+      """
+      {"page_break_before": false, "columns": [{"blocks": [{"block_type": "title", "title_heading_level": "h1"}], "width_eighths": 8, "align": "left"}]}
+      """
+    Then the response status code is 201
+    And the guitar_songs_layout_column_blocks table contains:
+      | song_id | position | block_type | title_heading_level | status |
+      | 0200    | 1        | title      | h1                   | active |
+
+  Scenario: POST a row without a title heading level for a block — it defaults to h3
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs_layout_rows table contains:
+      | id | song_id | position | page_break_before | status |
+    When I POST /api/features/tasks/guitar-songs/songs/0200/layout/rows with body:
+      """
+      {"page_break_before": false, "columns": [{"blocks": [{"block_type": "title"}], "width_eighths": 8, "align": "left"}]}
+      """
+    Then the response status code is 201
+    And the guitar_songs_layout_column_blocks table contains:
+      | song_id | position | block_type | title_heading_level | status |
+      | 0200    | 1        | title      | h3                   | active |
+
+  @error_case
+  Scenario: POST a row with an invalid title heading level for a block — 422 and the database is not modified
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs_layout_rows table contains:
+      | id | song_id | position | page_break_before | status |
+    When I POST /api/features/tasks/guitar-songs/songs/0200/layout/rows with body:
+      """
+      {"page_break_before": false, "columns": [{"blocks": [{"block_type": "title", "title_heading_level": "h5"}], "width_eighths": 8, "align": "left"}]}
+      """
+    Then the response status code is 422
+    And the guitar_songs_layout_rows table contains:
+      | id | song_id | position | page_break_before | status |
 
   @error_case
   Scenario: POST a row with a block's zoom outside 30-200 — 422 and the database is not modified

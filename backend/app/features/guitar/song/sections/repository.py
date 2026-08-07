@@ -4,8 +4,9 @@ from uuid import UUID
 from app.features.guitar.song import position_utils
 
 _SECTION_SELECT_FIELDS = (
-    "id::text, song_id::text, position, type_label, custom_label, content_mode, lyrics_text, status, "
-    "created_at, updated_at, created_by::text, updated_by::text"
+    "id::text, song_id::text, position, type_label, custom_label, content_mode, lyrics_text, "
+    "layout_block_id::text, linked_to_section_id::text, status, created_at, updated_at, "
+    "created_by::text, updated_by::text"
 )
 
 _SECTION_CHORD_JOIN_SELECT = """
@@ -22,7 +23,7 @@ async def fetch_section_context(pool, section_id: str) -> dict | None:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """SELECT sec.id::text, sec.song_id::text, sec.content_mode, sec.status,
-                      s.project_id::text AS project_id
+                      sec.linked_to_section_id::text, s.project_id::text AS project_id
                FROM guitar_songs_sections sec JOIN guitar_songs s ON s.id = sec.song_id
                WHERE sec.id = $1""",
             UUID(section_id),
@@ -70,21 +71,45 @@ async def next_section_position(pool, song_id: str) -> int:
 
 
 async def insert_section(
-    pool, song_id: str, position: int, type_label: str, custom_label: str | None, content_mode: str, user_id: str
+    pool, song_id: str, position: int, type_label: str, custom_label: str | None, content_mode: str,
+    layout_block_id: str | None, linked_to_section_id: str | None, user_id: str,
 ) -> str:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """INSERT INTO guitar_songs_sections (song_id, position, type_label, custom_label, content_mode,
-                                                   created_by, updated_by)
-               VALUES ($1, $2, $3, $4, $5, $6::uuid, $6::uuid) RETURNING id::text""",
-            UUID(song_id), position, type_label, custom_label, content_mode, UUID(user_id),
+                                                   layout_block_id, linked_to_section_id, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8::uuid, $8::uuid) RETURNING id::text""",
+            UUID(song_id), position, type_label, custom_label, content_mode,
+            UUID(layout_block_id) if layout_block_id else None,
+            UUID(linked_to_section_id) if linked_to_section_id else None, UUID(user_id),
         )
     return row["id"]
+
+
+async def has_active_links_to(pool, section_id: str) -> bool:
+    async with pool.acquire() as conn:
+        exists = await conn.fetchval(
+            "SELECT 1 FROM guitar_songs_sections WHERE linked_to_section_id = $1 AND status = 'active'",
+            UUID(section_id),
+        )
+    return exists is not None
+
+
+async def sections_block_exists(pool, song_id: str, layout_block_id: str) -> bool:
+    async with pool.acquire() as conn:
+        exists = await conn.fetchval(
+            """SELECT 1 FROM guitar_songs_layout_column_blocks
+               WHERE id = $1 AND song_id = $2 AND block_type = 'sections' AND status = 'active'""",
+            UUID(layout_block_id), UUID(song_id),
+        )
+    return exists is not None
 
 
 async def update_section(pool, section_id: str, updates: dict, user_id: str) -> None:
     if not updates:
         return
+    if "layout_block_id" in updates and updates["layout_block_id"] is not None:
+        updates = {**updates, "layout_block_id": UUID(updates["layout_block_id"])}
     fields = {**updates, "updated_by": UUID(user_id)}
     set_clauses = []
     params: list = []

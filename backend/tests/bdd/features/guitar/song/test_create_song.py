@@ -34,6 +34,21 @@ def test_create_song_invalid_chord_diagram_style():
     pass
 
 
+@scenario(FEATURE, "POST a song with lyrics presentation settings — they are saved")
+def test_create_song_lyrics_presentation_prefs():
+    pass
+
+
+@scenario(FEATURE, "POST a song without lyrics presentation settings — they default to 10/16/18")
+def test_create_song_default_lyrics_presentation_prefs():
+    pass
+
+
+@scenario(FEATURE, "POST a song with a lyrics text size out of range — 422 error and the database is not modified")
+def test_create_song_lyrics_text_size_out_of_range():
+    pass
+
+
 @scenario(FEATURE, "POST a song with a description — a document is created for it")
 def test_create_song_with_description():
     pass

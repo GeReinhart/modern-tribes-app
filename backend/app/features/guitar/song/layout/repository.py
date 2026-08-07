@@ -43,7 +43,7 @@ async def _fetch_blocks_by_column(pool, song_id: str) -> dict[str, list[dict]]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             """SELECT id::text, column_id::text, block_type, width_eighths, zoom_percent, show_card,
-                      custom_title, custom_document_id::text
+                      title_heading_level, custom_title, custom_document_id::text
                FROM guitar_songs_layout_column_blocks
                WHERE song_id = $1 AND status = 'active' ORDER BY column_id, position ASC""",
             UUID(song_id),
@@ -141,6 +141,23 @@ async def next_row_position(pool, song_id: str) -> int:
         )
 
 
+async def row_position_before(pool, song_id: str, before_row_id: str, user_id: str) -> int:
+    """Frees up `before_row_id`'s own position for a new row by pushing it and every row after
+    it one slot further down -- position has no uniqueness constraint, so a single bulk shift
+    is safe regardless of row processing order."""
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            target_position = await conn.fetchval(
+                "SELECT position FROM guitar_songs_layout_rows WHERE id = $1", UUID(before_row_id),
+            )
+            await conn.execute(
+                """UPDATE guitar_songs_layout_rows SET position = position + 1, updated_by = $1::uuid, updated_at = NOW()
+                   WHERE song_id = $2 AND status = 'active' AND position >= $3""",
+                UUID(user_id), UUID(song_id), target_position,
+            )
+    return target_position
+
+
 async def insert_row_with_columns(
     pool, song_id: str, position: int, page_break_before: bool, columns: list[dict], user_id: str
 ) -> str:
@@ -154,6 +171,55 @@ async def insert_row_with_columns(
             row_id = row["id"]
             await _insert_columns(conn, row_id, song_id, columns, user_id)
     return row_id
+
+
+async def _unassign_sections_from_archived_blocks(conn, row_id: str, user_id: str) -> None:
+    """A section that pointed at one of this row's now-archived 'sections' blocks becomes
+    unassigned rather than left dangling -- it's not deleted, just needs re-assigning (or, if
+    the song is back down to a single sections block, it shows up there automatically). Must run
+    AFTER _remap_sections_across_replace, so only a block that's genuinely gone (not just
+    recreated with a new id by this same replace) ends up unassigned."""
+    await conn.execute(
+        """UPDATE guitar_songs_sections SET layout_block_id = NULL, updated_by = $1::uuid, updated_at = NOW()
+           WHERE layout_block_id IN (
+               SELECT b.id FROM guitar_songs_layout_column_blocks b
+               JOIN guitar_songs_layout_columns c ON c.id = b.column_id
+               WHERE c.row_id = $2 AND b.status = 'archived'
+           )""",
+        UUID(user_id), UUID(row_id),
+    )
+
+
+async def _sections_blocks_for_row(conn, row_id: str, status: str) -> list[str]:
+    rows = await conn.fetch(
+        """SELECT b.id::text AS id FROM guitar_songs_layout_column_blocks b
+           JOIN guitar_songs_layout_columns c ON c.id = b.column_id
+           WHERE c.row_id = $1 AND b.status = $2 AND b.block_type = 'sections'
+           ORDER BY c.position, b.position""",
+        UUID(row_id), status,
+    )
+    return [row["id"] for row in rows]
+
+
+async def _remap_sections_across_replace(conn, row_id: str, user_id: str) -> None:
+    """replace_row archives and recreates EVERY block in the row on ANY edit to it, even one
+    that has nothing to do with an existing 'sections' block (e.g. just adding a sibling
+    column) -- so that block's id would otherwise churn on every unrelated edit, and
+    _unassign_sections_from_archived_blocks would silently unassign every section pointing at
+    it. This carries a section over from the old 'sections' block at a given ordinal position
+    (1st, 2nd, ...) in the row to whichever new 'sections' block now occupies that same
+    position -- only a position with no successor (fewer 'sections' blocks after the edit)
+    is left for _unassign_sections_from_archived_blocks to actually unassign."""
+    old_ids = await _sections_blocks_for_row(conn, row_id, "archived")
+    if not old_ids:
+        return
+    new_ids = await _sections_blocks_for_row(conn, row_id, "active")
+    for old_id, new_id in zip(old_ids, new_ids):
+        await conn.execute(
+            """UPDATE guitar_songs_sections SET layout_block_id = $1::uuid, updated_by = $2::uuid, updated_at = NOW()
+               WHERE layout_block_id = $3::uuid""",
+            UUID(new_id), UUID(user_id), UUID(old_id),
+        )
 
 
 async def replace_row(pool, row_id: str, song_id: str, page_break_before: bool, columns: list[dict], user_id: str) -> None:
@@ -175,6 +241,8 @@ async def replace_row(pool, row_id: str, song_id: str, page_break_before: bool, 
                 UUID(user_id), UUID(row_id),
             )
             await _insert_columns(conn, row_id, song_id, columns, user_id)
+            await _remap_sections_across_replace(conn, row_id, user_id)
+            await _unassign_sections_from_archived_blocks(conn, row_id, user_id)
 
 
 async def _insert_columns(conn, row_id: str, song_id: str, columns: list[dict], user_id: str) -> None:
@@ -195,10 +263,10 @@ async def _insert_columns(conn, row_id: str, song_id: str, columns: list[dict], 
             await conn.execute(
                 """INSERT INTO guitar_songs_layout_column_blocks
                        (column_id, song_id, position, block_type, width_eighths, zoom_percent, show_card,
-                        custom_title, custom_document_id, created_by, updated_by)
-                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::uuid, $10::uuid)""",
+                        title_heading_level, custom_title, custom_document_id, created_by, updated_by)
+                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::uuid, $11::uuid)""",
                 UUID(column_id), UUID(song_id), block_position, block["block_type"], block["width_eighths"],
-                block["zoom_percent"], block["show_card"], block.get("custom_title"),
+                block["zoom_percent"], block["show_card"], block["title_heading_level"], block.get("custom_title"),
                 UUID(custom_document_id) if custom_document_id else None, UUID(user_id),
             )
 
@@ -221,13 +289,14 @@ async def archive_row(pool, row_id: str, user_id: str) -> None:
                    WHERE status = 'active' AND column_id IN (SELECT id FROM guitar_songs_layout_columns WHERE row_id = $2)""",
                 UUID(user_id), UUID(row_id),
             )
+            await _unassign_sections_from_archived_blocks(conn, row_id, user_id)
 
 
 async def fetch_block(pool, block_id: str) -> dict | None:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """SELECT id::text, column_id::text, block_type, width_eighths, zoom_percent, show_card,
-                      custom_title, custom_document_id::text
+                      title_heading_level, custom_title, custom_document_id::text
                FROM guitar_songs_layout_column_blocks WHERE id = $1""",
             UUID(block_id),
         )

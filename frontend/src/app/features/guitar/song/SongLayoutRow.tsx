@@ -35,7 +35,7 @@ export const SongLayoutRow: React.FC<SongLayoutRowProps> = ({
       <div
         className={row.page_break_before ? 'song-layout-page-break' : undefined}
         style={{
-          width: '100%', marginBottom: '16px', position: 'relative', borderRadius: 'var(--radius-md)',
+          width: '100%', marginBottom: canEdit ? '16px' : '0', position: 'relative', borderRadius: 'var(--radius-md)',
           border: canEdit ? `1px dotted ${theme.colors.border}` : 'none',
           outline: menuOpen ? `3px solid ${theme.colors.primary}` : 'none',
           boxShadow: menuOpen ? `0 0 0 6px ${theme.colors.primary}30` : 'none',
@@ -53,7 +53,7 @@ export const SongLayoutRow: React.FC<SongLayoutRowProps> = ({
               />
             </div>
             <div style={{ position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}>
-              <SongRowMenu rows={song.layout.rows} row={row} hook={hook} onOpenChange={setMenuOpen} />
+              <SongRowMenu rows={song.layout.rows} row={row} hook={hook} onOpenChange={setMenuOpen} direction={isLast ? 'up' : 'down'} />
             </div>
           </>
         )}

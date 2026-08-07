@@ -126,6 +126,48 @@ Feature: Edit, reorder and remove a guitar song's layout rows
       | author         | active   |
       | description    | active   |
 
+  Scenario: PUT a row's columns adding a sibling column — its existing Lyrics & Chords block keeps its sections assigned
+    Given I am authenticated as a regular user: user.id 0002
+    And the persons table contains:
+      | id   | first_name | last_name | status |
+      | 0030 | Mia        | Member    | active |
+    And the users table contains:
+      | id   | email         | person_id | status |
+      | 0002 | user@test.com | 0030      | active |
+    And the tribes table contains:
+      | id   | name | status |
+      | 0010 | Band | active |
+    And the tribes_projects table contains:
+      | tribe_id | project_id | relation |
+      | 0010     | 0020       | manager  |
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs_layout_rows table contains:
+      | id   | song_id | position | page_break_before | status |
+      | 0703 | 0200    | 3        | false              | active |
+    And the guitar_songs_layout_columns table contains:
+      | id   | row_id | song_id | position | width_eighths | align | status |
+      | 0740 | 0703   | 0200    | 1        | 4              | left  | active |
+    And the guitar_songs_layout_column_blocks table contains:
+      | id   | column_id | song_id | position | block_type | status |
+      | 0741 | 0740      | 0200    | 1        | sections   | active |
+    And the guitar_songs_sections table contains:
+      | id   | song_id | position | type_label | content_mode | layout_block_id | status |
+      | 0520 | 0200    | 1        | Couplet    | lyrics       | 0741             | active |
+    When I PUT /api/features/tasks/guitar-songs/layout/rows/0703 with body:
+      """
+      {
+        "page_break_before": false,
+        "columns": [
+          {"blocks": [{"block_type": "sections"}], "width_eighths": 4, "align": "left"},
+          {"blocks": [{"block_type": "chords"}], "width_eighths": 4, "align": "left"}
+        ]
+      }
+      """
+    Then the response status code is 200
+    And section 0520 is assigned to an active 'sections' block
+
   Scenario: Manager moves the second row up — it swaps position with the first
     Given I am authenticated as an administrator: user.id 0001
     When I POST /api/features/tasks/guitar-songs/layout/rows/0701/move with body:
@@ -154,6 +196,31 @@ Feature: Edit, reorder and remove a guitar song's layout rows
       | id   | column_id | block_type  | status   |
       | 0711 | 0710      | title       | active   |
       | 0721 | 0720      | description | archived |
+
+  Scenario: Manager removes a row holding a Lyrics & Chords block — its sections become unassigned, not deleted
+    Given I am authenticated as an administrator: user.id 0001
+    And the guitar_songs_layout_rows table contains:
+      | id   | song_id | position | page_break_before | status |
+      | 0702 | 0200    | 3        | false              | active |
+    And the guitar_songs_layout_columns table contains:
+      | id   | row_id | song_id | position | width_eighths | align | status |
+      | 0730 | 0702   | 0200    | 1        | 8              | left  | active |
+    And the guitar_songs_layout_column_blocks table contains:
+      | id   | column_id | song_id | position | block_type | status |
+      | 0731 | 0730      | 0200    | 1        | sections   | active |
+    And the guitar_songs_sections table contains:
+      | id   | song_id | position | type_label | content_mode | layout_block_id | status |
+      | 0510 | 0200    | 1        | Couplet    | lyrics       | 0731             | active |
+    When I DELETE /api/features/tasks/guitar-songs/layout/rows/0702
+    Then the response status code is 204
+    And the guitar_songs_layout_column_blocks table contains:
+      | id   | column_id | block_type  | status   |
+      | 0711 | 0710      | title       | active   |
+      | 0721 | 0720      | description | active   |
+      | 0731 | 0730      | sections    | archived |
+    And the guitar_songs_sections table contains:
+      | id   | song_id | position | type_label | layout_block_id | status |
+      | 0510 | 0200    | 1        | Couplet    |                  | active |
 
   @error_case
   Scenario: Member (not manager) tries to remove a row — 403 error and it stays active

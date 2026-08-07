@@ -13,8 +13,11 @@ import {
 const BASE = '/features/tasks/guitar-songs';
 
 export const guitarSongLayoutService = {
-  addRow: (songId: string, data: GuitarSongLayoutRowInput): Promise<GuitarSongLayout> =>
-    apiService.post<GuitarSongLayout>(`${BASE}/songs/${songId}/layout/rows`, data),
+  addRow: (songId: string, data: GuitarSongLayoutRowInput, insertBeforeRowId?: string): Promise<GuitarSongLayout> =>
+    apiService.post<GuitarSongLayout>(
+      `${BASE}/songs/${songId}/layout/rows${insertBeforeRowId ? `?insert_before_row_id=${insertBeforeRowId}` : ''}`,
+      data,
+    ),
 
   replaceRow: (rowId: string, data: GuitarSongLayoutRowInput): Promise<GuitarSongLayout> =>
     apiService.put<GuitarSongLayout>(`${BASE}/layout/rows/${rowId}`, data),

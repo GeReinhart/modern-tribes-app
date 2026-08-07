@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { guitarSongsService } from './service.ts';
 import { guitarSongLayoutService } from './layoutService.ts';
@@ -10,6 +10,7 @@ import {
   GuitarSongChordUpdate,
   GuitarSongDetail,
   GuitarSongLayoutBlockContentUpdate,
+  GuitarSongLayoutRow,
   GuitarSongLayoutRowInput,
   GuitarSongLayoutSettingsUpdate,
   GuitarSongSectionChordCreate,
@@ -28,13 +29,25 @@ export const useGuitarSong = (songId: string | null) => {
   const [song, setSong] = useState<GuitarSongDetail | null>(null);
   const [loading, setLoading] = useState(!!songId);
   const [error, setError] = useState<string | null>(null);
+  // Mirrors `song` synchronously (state updates only take effect on the next render), so a
+  // layout mutation queued right after another one's response lands still builds its payload
+  // from that fresh row -- not from the stale prop closure it was originally called with.
+  const songRef = useRef<GuitarSongDetail | null>(null);
+  // Layout row replacements fully replace a row's columns/blocks server-side (see
+  // repository.replace_row), so two fired back-to-back from the same stale row snapshot (e.g.
+  // tabbing through several padding fields before the first save's reload finishes) would have
+  // the later one silently overwrite the earlier one's change. Queuing them lets each one start
+  // from the previous one's already-reloaded result.
+  const layoutMutationQueueRef = useRef<Promise<void>>(Promise.resolve());
 
   const reload = async () => {
     if (!songId) return;
     setLoading(true);
     setError(null);
     try {
-      setSong(await guitarSongsService.getSong(songId));
+      const freshSong = await guitarSongsService.getSong(songId);
+      songRef.current = freshSong;
+      setSong(freshSong);
     } catch (err) {
       console.error('Failed to reload guitar song', err);
       setError('error');
@@ -146,15 +159,22 @@ export const useGuitarSong = (songId: string | null) => {
     await reload();
   };
 
-  const addLayoutRow = async (data: GuitarSongLayoutRowInput) => {
+  const addLayoutRow = async (data: GuitarSongLayoutRowInput, insertBeforeRowId?: string) => {
     if (!songId) return;
-    await guitarSongLayoutService.addRow(songId, data);
+    await guitarSongLayoutService.addRow(songId, data, insertBeforeRowId);
     await reload();
   };
 
-  const replaceLayoutRow = async (rowId: string, data: GuitarSongLayoutRowInput) => {
-    await guitarSongLayoutService.replaceRow(rowId, data);
-    await reload();
+  const replaceLayoutRow = (rowId: string, buildInput: (latestRow: GuitarSongLayoutRow) => GuitarSongLayoutRowInput) => {
+    const run = async () => {
+      const latestRow = songRef.current?.layout.rows.find((row) => row.id === rowId);
+      if (!latestRow) return;
+      await guitarSongLayoutService.replaceRow(rowId, buildInput(latestRow));
+      await reload();
+    };
+    const next = layoutMutationQueueRef.current.then(run, run);
+    layoutMutationQueueRef.current = next;
+    return next;
   };
 
   const moveLayoutRow = async (rowId: string, direction: MoveDirection) => {

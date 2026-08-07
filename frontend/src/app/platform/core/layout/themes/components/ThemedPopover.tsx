@@ -10,7 +10,10 @@ interface ThemedPopoverProps {
   triggerIconSize?: number;
   direction?: 'up' | 'down';
   onOpenChange?: (open: boolean) => void;
-  children: React.ReactNode;
+  // A plain node, or a render function handed a `close` callback -- for content with its own
+  // explicit "save and close" action (see ColumnPresentationFields/BlockPresentationFields),
+  // since the panel otherwise only closes via its own trigger/close button.
+  children: React.ReactNode | ((close: () => void) => React.ReactNode);
 }
 
 // A small trigger button that reveals arbitrary content (form controls, not just a list of
@@ -67,7 +70,7 @@ export const ThemedPopover: React.FC<ThemedPopoverProps> = ({
               <ThemedSvgIcon name="x" color={theme.colors.text} size={14} />
             </button>
           </div>
-          {children}
+          {typeof children === 'function' ? children(() => setOpen(false)) : children}
         </div>
       )}
     </div>

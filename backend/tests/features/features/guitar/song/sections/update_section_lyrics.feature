@@ -41,6 +41,23 @@ Feature: Edit a lyrics-mode section's text
       | id   | tribe_id | person_id | position | status |
       | 1001 | 0010     | 0030      | member   | active |
 
+  Scenario: PATCH lyrics on a section linked to another — the linked (source) section's words are updated instead
+    Given I am authenticated as a regular user: user.id 0002
+    And the guitar_songs_sections table contains:
+      | id   | song_id | position | type_label | content_mode | linked_to_section_id | status |
+      | 0510 | 0200    | 2        | Refrain    | lyrics       | 0500                  | active |
+    And the guitar_songs_section_words table contains:
+      | id | section_id | line_index | word_index | word_text | status |
+    When I PATCH /api/features/tasks/guitar-songs/sections/0510/lyrics with body:
+      """
+      {"text": "Shine on"}
+      """
+    Then the response status code is 200
+    And the guitar_songs_section_words table contains:
+      | section_id | line_index | word_index | word_text | status |
+      | 0500       | 0          | 0          | Shine     | active |
+      | 0500       | 0          | 1          | on        | active |
+
   Scenario: PATCH lyrics text onto a section with no words yet — the text is tokenized into words
     Given I am authenticated as a regular user: user.id 0002
     And the guitar_songs_section_words table contains:

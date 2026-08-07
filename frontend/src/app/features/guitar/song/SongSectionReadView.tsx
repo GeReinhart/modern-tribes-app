@@ -11,34 +11,43 @@ interface WordWithChordsProps {
   word: GuitarSongSectionWord;
   diagramStyle: ChordDiagramStyle;
   diagramSize: ChordDiagramSize;
+  textSizePx: number;
+  chordSizePx: number;
 }
 
-const WordWithChords: React.FC<WordWithChordsProps> = ({ word, diagramStyle, diagramSize }) => {
+const WordWithChords: React.FC<WordWithChordsProps> = ({ word, diagramStyle, diagramSize, textSizePx, chordSizePx }) => {
   const { theme } = useTheme();
   const before = chordAtPosition(word, 'before');
   const start = chordAtPosition(word, 'start');
   const middle = chordAtPosition(word, 'middle');
   const end = chordAtPosition(word, 'end');
   const after = chordAtPosition(word, 'after');
+  const badgeRowHeight = chordSizePx + 2;
 
   const badge = (chord: typeof before) =>
-    chord && <SongChordBadge chord={chord} diagramStyle={diagramStyle} diagramSize={diagramSize} />;
+    chord && (
+      <SongChordBadge chord={chord} diagramStyle={diagramStyle} diagramSize={diagramSize} fontSizePx={chordSizePx} />
+    );
 
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2px' }}>
-      {before && <div style={{ height: '20px', display: 'flex', alignItems: 'flex-start' }}>{badge(before)}</div>}
+      {before && (
+        <div style={{ height: `${badgeRowHeight}px`, display: 'flex', alignItems: 'flex-start' }}>{badge(before)}</div>
+      )}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         {/* Fixed height even when empty, so every word's text aligns at the same baseline;
             normal flow (not absolute) so wide chord names grow the line's spacing instead of
             overlapping the next word. */}
-        <div style={{ display: 'flex', gap: '4px', height: '20px', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', gap: '4px', height: `${badgeRowHeight}px`, alignItems: 'flex-start' }}>
           {badge(start)}
           {badge(middle)}
           {badge(end)}
         </div>
-        {word.text && <div style={{ color: theme.colors.text }}>{word.text}</div>}
+        {word.text && <div style={{ color: theme.colors.text, fontSize: `${textSizePx}px` }}>{word.text}</div>}
       </div>
-      {after && <div style={{ height: '20px', display: 'flex', alignItems: 'flex-start' }}>{badge(after)}</div>}
+      {after && (
+        <div style={{ height: `${badgeRowHeight}px`, display: 'flex', alignItems: 'flex-start' }}>{badge(after)}</div>
+      )}
     </div>
   );
 };
@@ -47,9 +56,14 @@ interface SongSectionReadViewProps {
   section: GuitarSongSection;
   diagramStyle: ChordDiagramStyle;
   diagramSize: ChordDiagramSize;
+  lineSpacingPx: number;
+  textSizePx: number;
+  chordSizePx: number;
 }
 
-export const SongSectionReadView: React.FC<SongSectionReadViewProps> = ({ section, diagramStyle, diagramSize }) => {
+export const SongSectionReadView: React.FC<SongSectionReadViewProps> = ({
+  section, diagramStyle, diagramSize, lineSpacingPx, textSizePx, chordSizePx,
+}) => {
   const { theme } = useTheme();
   const lines = section.content_mode === 'lyrics' ? groupWordsByLine(section.words) : [];
 
@@ -59,11 +73,18 @@ export const SongSectionReadView: React.FC<SongSectionReadViewProps> = ({ sectio
         {section.display_label}
       </div>
       {section.content_mode === 'lyrics' ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: `${lineSpacingPx}px` }}>
           {lines.map((line, lineIndex) => (
             <div key={lineIndex} style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
               {line.map((word) => (
-                <WordWithChords key={word.id} word={word} diagramStyle={diagramStyle} diagramSize={diagramSize} />
+                <WordWithChords
+                  key={word.id}
+                  word={word}
+                  diagramStyle={diagramStyle}
+                  diagramSize={diagramSize}
+                  textSizePx={textSizePx}
+                  chordSizePx={chordSizePx}
+                />
               ))}
             </div>
           ))}
@@ -76,6 +97,7 @@ export const SongSectionReadView: React.FC<SongSectionReadViewProps> = ({ sectio
               chord={sectionChord.chord}
               diagramStyle={diagramStyle}
               diagramSize={diagramSize}
+              fontSizePx={chordSizePx}
             />
           ))}
         </div>

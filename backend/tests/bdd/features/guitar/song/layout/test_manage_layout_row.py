@@ -24,6 +24,11 @@ def test_replace_layout_row_with_empty_column():
     pass
 
 
+@scenario(FEATURE, "PUT a row's columns adding a sibling column — its existing Lyrics & Chords block keeps its sections assigned")
+def test_replace_layout_row_preserves_sections_assignment():
+    pass
+
+
 @scenario(FEATURE, "Manager moves the second row up — it swaps position with the first")
 def test_move_layout_row():
     pass
@@ -31,6 +36,11 @@ def test_move_layout_row():
 
 @scenario(FEATURE, "Manager removes a row — it and its columns and blocks are archived")
 def test_remove_layout_row():
+    pass
+
+
+@scenario(FEATURE, "Manager removes a row holding a Lyrics & Chords block — its sections become unassigned, not deleted")
+def test_remove_layout_row_unassigns_sections():
     pass
 
 

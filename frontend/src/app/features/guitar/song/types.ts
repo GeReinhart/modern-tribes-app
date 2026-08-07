@@ -12,6 +12,9 @@ export interface GuitarSong {
   capo: number;
   chord_diagram_style: ChordDiagramStyle;
   chord_diagram_size: ChordDiagramSize;
+  lyrics_line_spacing_px: number;
+  lyrics_text_size_px: number;
+  lyrics_chord_size_px: number;
   document_id: string | null;
   description_html: string;
   label_ids: string[];
@@ -30,6 +33,9 @@ export interface GuitarSongCreate {
   capo?: number;
   chord_diagram_style?: ChordDiagramStyle;
   chord_diagram_size?: ChordDiagramSize;
+  lyrics_line_spacing_px?: number;
+  lyrics_text_size_px?: number;
+  lyrics_chord_size_px?: number;
   description_html?: string | null;
   template_song_id?: string | null;
   copy_from_song_id?: string | null;
@@ -44,6 +50,9 @@ export interface GuitarSongUpdate {
   capo?: number;
   chord_diagram_style?: ChordDiagramStyle;
   chord_diagram_size?: ChordDiagramSize;
+  lyrics_line_spacing_px?: number;
+  lyrics_text_size_px?: number;
+  lyrics_chord_size_px?: number;
   description_html?: string | null;
 }
 
@@ -81,6 +90,7 @@ export type LayoutBlockType =
   | 'custom';
 
 export type LayoutAlign = 'left' | 'center' | 'right';
+export type TitleHeadingLevel = 'h1' | 'h2' | 'h3' | 'h4';
 
 export const LAYOUT_ROW_WIDTH_EIGHTHS = 8;
 
@@ -90,6 +100,7 @@ export interface GuitarSongLayoutBlock {
   width_eighths: number;
   zoom_percent: number;
   show_card: boolean;
+  title_heading_level: TitleHeadingLevel;
   custom_title: string | null;
   custom_content_html: string | null;
 }
@@ -154,6 +165,7 @@ export interface GuitarSongLayoutBlockInput {
   width_eighths?: number;
   zoom_percent?: number;
   show_card?: boolean;
+  title_heading_level?: TitleHeadingLevel;
   custom_title?: string | null;
   custom_content_html?: string | null;
 }
@@ -223,6 +235,8 @@ export interface GuitarSongSection {
   display_label: string;
   content_mode: SectionContentMode;
   lyrics_text: string | null;
+  layout_block_id: string | null;
+  linked_to_section_id: string | null;
   status: string;
   created_at: string;
   updated_at: string;
@@ -236,11 +250,14 @@ export interface GuitarSongSectionCreate {
   type_label: string;
   custom_label?: string | null;
   content_mode: SectionContentMode;
+  layout_block_id?: string | null;
+  linked_to_section_id?: string | null;
 }
 
 export interface GuitarSongSectionUpdate {
   type_label?: string;
   custom_label?: string | null;
+  layout_block_id?: string | null;
 }
 
 export interface GuitarSongSectionLyricsUpdate {

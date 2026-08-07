@@ -24,6 +24,26 @@ def test_create_second_section_same_type():
     pass
 
 
+@scenario(FEATURE, "POST a section with a layout_block_id pointing at a Lyrics & Chords block — it's assigned to that block")
+def test_create_section_with_layout_block_id():
+    pass
+
+
+@scenario(FEATURE, "POST a section with a layout_block_id that isn't a Lyrics & Chords block — 422 and the database is not modified")
+def test_create_section_with_invalid_layout_block_id():
+    pass
+
+
+@scenario(FEATURE, "POST a section linked to another — its content resolves from the linked section")
+def test_create_section_linked_to_another():
+    pass
+
+
+@scenario(FEATURE, "POST a section linked to a section that is itself a link — 422 and the database is not modified")
+def test_create_section_linked_to_a_link():
+    pass
+
+
 @scenario(FEATURE, "POST a section as a guest — 403 and the database is not modified")
 def test_create_section_as_guest():
     pass

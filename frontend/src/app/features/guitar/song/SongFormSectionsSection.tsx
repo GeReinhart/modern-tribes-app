@@ -1,15 +1,14 @@
 import { ChordDiagramSize, ChordDiagramStyle } from '@/app/features/guitar/chords/ChordDiagram.tsx';
 import { GuitarChord } from '@/app/features/guitar/chords/types.ts';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
-import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { sectionTypeSuggestions } from './sectionWords.ts';
 import { SongSectionAddControl } from './SongSectionAddControl.tsx';
 import { SongSectionEditCard } from './SongSectionEditCard.tsx';
 import {
+  GuitarSongLayoutBlock,
   GuitarSongSection,
   GuitarSongSectionChordCreate,
   GuitarSongSectionCreate,
@@ -22,6 +21,8 @@ import {
 
 interface SongFormSectionsSectionProps {
   sections: GuitarSongSection[];
+  allSections: GuitarSongSection[];
+  sectionsBlocks: GuitarSongLayoutBlock[];
   canManage: boolean;
   diagramStyle: ChordDiagramStyle;
   diagramSize: ChordDiagramSize;
@@ -40,6 +41,8 @@ interface SongFormSectionsSectionProps {
 
 export const SongFormSectionsSection: React.FC<SongFormSectionsSectionProps> = ({
   sections,
+  allSections,
+  sectionsBlocks,
   canManage,
   diagramStyle,
   diagramSize,
@@ -55,20 +58,20 @@ export const SongFormSectionsSection: React.FC<SongFormSectionsSectionProps> = (
   onMoveSectionChord,
   onRemoveSectionChord,
 }) => {
-  const { t } = useTranslation();
   const typeSuggestions = sectionTypeSuggestions(sections);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      <ThemedText size="medium" as="h3">{t('guitarSong.sections.title')}</ThemedText>
       {sections.map((section, index) => (
         <SongSectionEditCard
           key={section.id}
           section={section}
+          allSections={allSections}
           isFirst={index === 0}
           isLast={index === sections.length - 1}
           canManage={canManage}
           typeSuggestions={typeSuggestions}
+          sectionsBlocks={sectionsBlocks}
           diagramStyle={diagramStyle}
           diagramSize={diagramSize}
           songChords={songChords}
@@ -84,7 +87,7 @@ export const SongFormSectionsSection: React.FC<SongFormSectionsSectionProps> = (
         />
       ))}
       <ThemedCard bordered className="p-3">
-        <SongSectionAddControl typeSuggestions={typeSuggestions} onAdd={onAddSection} />
+        <SongSectionAddControl typeSuggestions={typeSuggestions} allSections={allSections} onAdd={onAddSection} />
       </ThemedCard>
     </div>
   );

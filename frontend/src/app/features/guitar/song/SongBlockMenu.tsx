@@ -31,9 +31,9 @@ export const SongBlockMenu: React.FC<SongBlockMenuProps> = ({
   const handleRemove = () => {
     if (column && column.blocks.length <= 1) {
       if (row.columns.length <= 1) return hook.removeLayoutRow(row.id);
-      return hook.replaceLayoutRow(row.id, layoutMutations.removeColumn(row, columnId));
+      return hook.replaceLayoutRow(row.id, (latestRow) => layoutMutations.removeColumn(latestRow, columnId));
     }
-    return hook.replaceLayoutRow(row.id, layoutMutations.removeBlock(row, columnId, blockIndex));
+    return hook.replaceLayoutRow(row.id, (latestRow) => layoutMutations.removeBlock(latestRow, columnId, blockIndex));
   };
 
   return (
@@ -41,13 +41,15 @@ export const SongBlockMenu: React.FC<SongBlockMenuProps> = ({
       triggerIcon="maximize" triggerLabel={t('guitarSong.layout.blockMenu')} closeLabel={t('common.close')}
       triggerIconSize={12} onOpenChange={onOpenChange} direction={direction}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '160px' }}>
-        <BlockPresentationFields
-          row={row} columnId={columnId} columnWidthEighths={column?.width_eighths ?? LAYOUT_ROW_WIDTH_EIGHTHS}
-          blockIndex={blockIndex} block={block} hook={hook}
-        />
-        <ThemedIconButton action={{ icon: 'trash', label: t('guitarSong.layout.removeBlock'), onClick: handleRemove, variant: 'danger' }} />
-      </div>
+      {(close) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '160px' }}>
+          <BlockPresentationFields
+            row={row} columnId={columnId} columnWidthEighths={column?.width_eighths ?? LAYOUT_ROW_WIDTH_EIGHTHS}
+            blockIndex={blockIndex} block={block} hook={hook} onRequestClose={close}
+          />
+          <ThemedIconButton action={{ icon: 'trash', label: t('guitarSong.layout.removeBlock'), onClick: handleRemove, variant: 'danger' }} />
+        </div>
+      )}
     </ThemedPopover>
   );
 };

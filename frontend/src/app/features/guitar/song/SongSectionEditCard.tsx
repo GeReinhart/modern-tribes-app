@@ -3,7 +3,9 @@ import { GuitarChord } from '@/app/features/guitar/chords/types.ts';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
 import { ThemedIconButton } from '@/app/platform/core/layout/themes/components/ThemedIconButton.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
+import { ThemedSelect } from '@/app/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { SongSectionChordsOnlyEditor } from './SongSectionChordsOnlyEditor.tsx';
 import { SongSectionLyricsEditor } from './SongSectionLyricsEditor.tsx';
 import {
+  GuitarSongLayoutBlock,
   GuitarSongSection,
   GuitarSongSectionChordCreate,
   GuitarSongSectionUpdate,
@@ -21,10 +24,12 @@ import {
 
 interface SongSectionEditCardProps {
   section: GuitarSongSection;
+  allSections: GuitarSongSection[];
   isFirst: boolean;
   isLast: boolean;
   canManage: boolean;
   typeSuggestions: string[];
+  sectionsBlocks: GuitarSongLayoutBlock[];
   diagramStyle: ChordDiagramStyle;
   diagramSize: ChordDiagramSize;
   songChords: GuitarChord[];
@@ -41,10 +46,12 @@ interface SongSectionEditCardProps {
 
 export const SongSectionEditCard: React.FC<SongSectionEditCardProps> = ({
   section,
+  allSections,
   isFirst,
   isLast,
   canManage,
   typeSuggestions,
+  sectionsBlocks,
   diagramStyle,
   diagramSize,
   songChords,
@@ -63,6 +70,9 @@ export const SongSectionEditCard: React.FC<SongSectionEditCardProps> = ({
   const [typeLabel, setTypeLabel] = useState(section.type_label);
   const [customLabel, setCustomLabel] = useState(section.custom_label ?? '');
   const datalistId = `section-type-suggestions-${section.id}`;
+  const linkedSource = section.linked_to_section_id
+    ? allSections.find((candidate) => candidate.id === section.linked_to_section_id)
+    : undefined;
 
   const saveTypeLabel = () => {
     if (typeLabel.trim() && typeLabel !== section.type_label) onUpdate({ type_label: typeLabel.trim() });
@@ -93,6 +103,21 @@ export const SongSectionEditCard: React.FC<SongSectionEditCardProps> = ({
             onBlur={saveCustomLabel}
             placeholder={t('guitarSong.sections.customLabelPlaceholder')}
           />
+          {sectionsBlocks.length > 1 && (
+            <div style={{ minWidth: '160px' }}>
+              <ThemedSelect
+                label={t('guitarSong.sections.blockAssignment')}
+                options={sectionsBlocks.map((sectionsBlock, index) => ({
+                  value: sectionsBlock.id,
+                  label: sectionsBlock.custom_title || t('guitarSong.sections.blockOption', { index: index + 1 }),
+                }))}
+                value={section.layout_block_id ?? ''}
+                onChange={(value) => onUpdate({ layout_block_id: value || null })}
+                placeholder={t('guitarSong.sections.blockUnassigned')}
+                allowEmpty
+              />
+            </div>
+          )}
         </div>
         {canManage && (
           <div style={{ display: 'flex', gap: '2px' }}>
@@ -114,6 +139,12 @@ export const SongSectionEditCard: React.FC<SongSectionEditCardProps> = ({
       <div style={{ fontSize: '15px', fontWeight: 600, color: theme.colors.text, marginBottom: '8px' }}>
         {t('guitarSong.sections.displayLabel', { label: section.display_label })}
       </div>
+      {linkedSource && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: theme.colors.secondary, fontSize: '13px', marginBottom: '8px' }}>
+          <ThemedSvgIcon name="link" size={12} color={theme.colors.secondary} />
+          {t('guitarSong.sections.linkedTo')} {linkedSource.display_label}
+        </div>
+      )}
       {section.content_mode === 'lyrics' ? (
         <SongSectionLyricsEditor
           section={section}

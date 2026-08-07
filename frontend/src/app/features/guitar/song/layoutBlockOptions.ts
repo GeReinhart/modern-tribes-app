@@ -1,7 +1,7 @@
 import { IconName } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { TFunction } from 'i18next';
 
-import { GuitarSongLayoutRow, LayoutAlign, LayoutBlockType } from './types.ts';
+import { GuitarSongLayoutBlock, GuitarSongLayoutRow, LayoutAlign, LayoutBlockType, TitleHeadingLevel } from './types.ts';
 
 export const ALL_BLOCK_TYPES: LayoutBlockType[] = [
   'title', 'author', 'tempo', 'time_signature', 'capo', 'description', 'chords', 'sections', 'videos', 'labels',
@@ -15,6 +15,24 @@ export const ALL_ALIGNS: LayoutAlign[] = ['left', 'center', 'right'];
 const COMPACT_BLOCK_TYPES = new Set<LayoutBlockType>(['tempo', 'time_signature', 'capo']);
 
 export const isCompactBlockType = (blockType: LayoutBlockType): boolean => COMPACT_BLOCK_TYPES.has(blockType);
+
+// These block types show an editable title above their content, via the block's own
+// custom_title (same field a custom/free-text block uses for its title) -- chords/videos
+// default to a translated heading (e.g. "Chords") when unset, the others default to no title
+// at all until the user names them. title/author/tempo/time_signature/capo show the song's own
+// value instead of a separate label, so they're never title-editable.
+const TITLE_EDITABLE_BLOCK_TYPES = new Set<LayoutBlockType>(['chords', 'sections', 'videos', 'labels', 'description']);
+
+export const isTitleEditableBlockType = (blockType: LayoutBlockType): boolean => TITLE_EDITABLE_BLOCK_TYPES.has(blockType);
+
+export const ALL_TITLE_HEADING_LEVELS: TitleHeadingLevel[] = ['h1', 'h2', 'h3', 'h4'];
+
+// Mirrors the backend's _HEADING_SIZES_PX in pdf_blocks.py -- keep both in sync.
+export const TITLE_HEADING_SIZES_PX: Record<TitleHeadingLevel, number> = { h1: 24, h2: 20, h3: 16, h4: 13 };
+
+// Unlike every other non-custom block type, a song's sections are split across its own "Lyrics
+// & Chords" blocks (each section picks which one it belongs to), so several may coexist.
+const REPEATABLE_BLOCK_TYPES = new Set<LayoutBlockType>(['sections']);
 
 const ALIGN_ICONS: Record<LayoutAlign, IconName> = {
   left: 'align-left',
@@ -44,5 +62,17 @@ export const unusedBlockTypes = (rows: GuitarSongLayoutRow[], rowId: string): La
   const row = rows.find((r) => r.id === rowId);
   const inRow = row ? row.columns.flatMap((column) => column.blocks.map((block) => block.block_type)) : [];
   const used = new Set([...usedBlockTypesExcludingRow(rows, rowId), ...inRow]);
-  return ALL_BLOCK_TYPES.filter((blockType) => !used.has(blockType));
+  return ALL_BLOCK_TYPES.filter((blockType) => REPEATABLE_BLOCK_TYPES.has(blockType) || !used.has(blockType));
 };
+
+// A repeatable block type (currently just 'sections') may be added to the SAME column/row it
+// already appears in too, unlike unusedBlockTypes' one-and-done non-custom types.
+export const isRepeatableBlockType = (blockType: LayoutBlockType): boolean => REPEATABLE_BLOCK_TYPES.has(blockType);
+
+// Every block of a given type across the whole layout, in row/column/position order -- stable
+// enough to number them ("Lyrics & Chords #1/#2") for a repeatable type like 'sections'.
+export const findBlocksOfType = (rows: GuitarSongLayoutRow[], blockType: LayoutBlockType): GuitarSongLayoutBlock[] =>
+  [...rows]
+    .sort((a, b) => a.position - b.position)
+    .flatMap((row) => [...row.columns].sort((a, b) => a.position - b.position).flatMap((column) => column.blocks))
+    .filter((block) => block.block_type === blockType);

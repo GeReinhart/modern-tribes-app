@@ -8,6 +8,7 @@ from app.features.guitar.song.layout import repository as repo
 from app.features.guitar.song.layout.default_template import DEFAULT_BLOCK_WIDTH_EIGHTHS, DEFAULT_LAYOUT_ROWS
 from app.features.guitar.song.layout.models import (
     CUSTOM_BLOCK_TYPE,
+    REPEATABLE_BLOCK_TYPES,
     ROW_WIDTH_EIGHTHS,
     GuitarSongLayoutBlockContentUpdate,
     GuitarSongLayoutBlockResponse,
@@ -32,7 +33,8 @@ async def _resolve_block_input(pool, block, user_id: str) -> dict:
         custom_document_id = str(document["id"])
     return {
         "block_type": block.block_type, "width_eighths": block.width_eighths, "zoom_percent": block.zoom_percent,
-        "show_card": block.show_card, "custom_title": block.custom_title, "custom_document_id": custom_document_id,
+        "show_card": block.show_card, "title_heading_level": block.title_heading_level,
+        "custom_title": block.custom_title, "custom_document_id": custom_document_id,
     }
 
 
@@ -55,7 +57,7 @@ async def _require_row_context(pool, row_id: str) -> dict:
 async def _require_no_block_conflict(pool, song_id: str, columns: list, exclude_row_id: str | None = None) -> None:
     used = await repo.fetch_active_block_types(pool, song_id, exclude_row_id)
     requested = {
-        block.block_type for c in columns for block in c.blocks if block.block_type != CUSTOM_BLOCK_TYPE
+        block.block_type for c in columns for block in c.blocks if block.block_type not in REPEATABLE_BLOCK_TYPES
     }
     conflict = used & requested
     if conflict:
@@ -75,7 +77,7 @@ async def seed_default_layout(pool, song_id: str, user_id: str) -> None:
             {**_PADDING_DEFAULTS, **column, "blocks": [
                 {
                     "block_type": bt, "width_eighths": DEFAULT_BLOCK_WIDTH_EIGHTHS.get(bt, ROW_WIDTH_EIGHTHS),
-                    "zoom_percent": 100,
+                    "zoom_percent": 100, "title_heading_level": "h3",
                     "show_card": bt in _DEFAULT_CARD_BLOCK_TYPES, "custom_title": None, "custom_document_id": None,
                 }
                 for bt in column["block_types"]
@@ -101,6 +103,7 @@ async def _duplicate_block_for_copy(pool, block: dict, user_id: str) -> dict:
     return {
         "block_type": block["block_type"], "width_eighths": block["width_eighths"],
         "zoom_percent": block["zoom_percent"], "show_card": block["show_card"],
+        "title_heading_level": block["title_heading_level"],
         "custom_title": block.get("custom_title"), "custom_document_id": custom_document_id,
     }
 
@@ -140,6 +143,7 @@ async def _resolve_block_response(pool, block: dict) -> GuitarSongLayoutBlockRes
     return GuitarSongLayoutBlockResponse(
         id=block["id"], block_type=block["block_type"], width_eighths=block["width_eighths"],
         zoom_percent=block["zoom_percent"], show_card=block["show_card"],
+        title_heading_level=block["title_heading_level"],
         custom_title=block.get("custom_title"), custom_content_html=custom_content_html,
     )
 
@@ -164,11 +168,19 @@ async def get_layout(pool, song_id: str) -> GuitarSongLayoutResponse:
     return GuitarSongLayoutResponse(settings=GuitarSongLayoutSettingsResponse(**settings), rows=row_responses)
 
 
-async def add_row(pool, song_id: str, data: GuitarSongLayoutRowInput, user: dict) -> GuitarSongLayoutResponse:
+async def add_row(
+    pool, song_id: str, data: GuitarSongLayoutRowInput, user: dict, insert_before_row_id: str | None = None,
+) -> GuitarSongLayoutResponse:
     project_id = await song_lookup.require_song_project(pool, song_id)
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
     await _require_no_block_conflict(pool, song_id, data.columns)
-    position = await repo.next_row_position(pool, song_id)
+    if insert_before_row_id:
+        before_context = await _require_row_context(pool, insert_before_row_id)
+        if before_context["song_id"] != song_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Layout row not found.")
+        position = await repo.row_position_before(pool, song_id, insert_before_row_id, user["id"])
+    else:
+        position = await repo.next_row_position(pool, song_id)
     columns = [await _resolve_column_input(pool, c, user["id"]) for c in data.columns]
     await repo.insert_row_with_columns(pool, song_id, position, data.page_break_before, columns, user["id"])
     return await get_layout(pool, song_id)

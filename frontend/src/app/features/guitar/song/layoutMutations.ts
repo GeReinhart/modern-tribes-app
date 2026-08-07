@@ -71,6 +71,17 @@ export const addBlock = (
 ): GuitarSongLayoutRowInput =>
   mapColumn(row, columnId, (column) => ({ ...column, blocks: [...column.blocks, emptyDraftBlock(blockType)] }));
 
+export const moveBlock = (
+  row: GuitarSongLayoutRow, columnId: string, blockIndex: number, direction: MoveDirection,
+): GuitarSongLayoutRowInput =>
+  mapColumn(row, columnId, (column) => {
+    const targetIndex = direction === 'prev' ? blockIndex - 1 : blockIndex + 1;
+    if (targetIndex < 0 || targetIndex >= column.blocks.length) return column;
+    const blocks = [...column.blocks];
+    [blocks[blockIndex], blocks[targetIndex]] = [blocks[targetIndex], blocks[blockIndex]];
+    return { ...column, blocks };
+  });
+
 export const removeBlock = (row: GuitarSongLayoutRow, columnId: string, blockIndex: number): GuitarSongLayoutRowInput =>
   mapColumn(row, columnId, (column) => ({ ...column, blocks: column.blocks.filter((_, i) => i !== blockIndex) }));
 
@@ -95,7 +106,7 @@ export const resizeColumnWidth = (
 
 export const updateBlockPresentation = (
   row: GuitarSongLayoutRow, columnId: string, blockIndex: number,
-  patch: Partial<Pick<DraftBlock, 'zoom_percent' | 'show_card' | 'width_eighths'>>,
+  patch: Partial<Pick<DraftBlock, 'zoom_percent' | 'show_card' | 'width_eighths' | 'title_heading_level' | 'custom_title'>>,
 ): GuitarSongLayoutRowInput =>
   mapColumn(row, columnId, (column) => ({
     ...column,

@@ -14,6 +14,11 @@ _test_app.include_router(router, prefix="/api/features/tasks")
 FEATURE = "../../../../../features/features/guitar/song/sections/update_section_lyrics.feature"
 
 
+@scenario(FEATURE, "PATCH lyrics on a section linked to another — the linked (source) section's words are updated instead")
+def test_update_lyrics_on_linked_section():
+    pass
+
+
 @scenario(FEATURE, "PATCH lyrics text onto a section with no words yet — the text is tokenized into words")
 def test_update_lyrics_tokenizes():
     pass
