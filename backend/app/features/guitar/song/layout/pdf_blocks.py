@@ -18,19 +18,18 @@ from app.features.guitar.song.layout.chord_diagram_html import (
     render_chord_diagram_html,
 )
 from app.features.guitar.song.layout.models import TITLE_EDITABLE_BLOCK_TYPES
-from app.features.guitar.song.layout.qr_code import qr_code_data_uri
 
 _LABEL_COLOR = "#1a1a1a"
 _SECONDARY_COLOR = "#666666"
 _BASE_FONT_SIZE = 16
 
-# Chords, videos and chord grids show a default label out of the box; custom/labels/description/
+# Chords and chord grids show a default label out of the box; custom/labels/description/
 # sections default to no title at all (block.custom_title stays None) until the user names them --
 # a 'sections' block used to also show a second, section-owned title beneath this one, which is
 # why it needed a generic default; now the block's own title is the only one, so an unnamed block
 # prints nothing rather than a generic "Lyrics & Chords" heading above blank content.
 _DEFAULT_BLOCK_TITLES = {
-    "chords": "Chords", "videos": "Videos", "chord_grid": "Chord Grid",
+    "chords": "Chords", "chord_grid": "Chord Grid",
 }
 _HEADING_SIZES_PX = {"h1": 24, "h2": 20, "h3": 16, "h4": 13, "h5": 12}
 
@@ -39,12 +38,25 @@ _HEADING_SIZES_PX = {"h1": 24, "h2": 20, "h3": 16, "h4": 13, "h5": 12}
 # own font-size (already scaled by that block's zoom), so it stays correct at any zoom without
 # needing its own per-instance style tag (see pdf_service._build_html_document, where this is
 # spliced into the single page-wide stylesheet). H5 is non-bold and italic instead of bold,
-# same toned-down treatment as a block's own h5 title in render_block_title below.
+# same toned-down treatment as a block's own h5 title in render_block_title below -- the explicit
+# "font-weight: 400" is required because WeasyPrint's own default stylesheet makes every <h5>
+# bold, and a class selector only overrides properties it actually sets.
 FREEFORM_HEADING_CSS = "".join(
     f".freeform {level} {{ font-size: {size / _BASE_FONT_SIZE}em; "
-    f"{'font-style: italic;' if level == 'h5' else 'font-weight: 700;'} color: {_LABEL_COLOR}; "
+    f"{'font-weight: 400; font-style: italic;' if level == 'h5' else 'font-weight: 700;'} color: {_LABEL_COLOR}; "
     "margin: 0 0 8px; } "
     for level, size in _HEADING_SIZES_PX.items()
+)
+
+# WeasyPrint's own bullet marker renders visibly higher than the text baseline (confirmed by
+# rendering a sample list and comparing pixel positions) -- a plain Unicode bullet drawn as
+# generated content, nudged down by 0.1em, sits centered against the text the way it does in a
+# browser. Sizes are in em (relative to .freeform's own font-size) so this stays correct at any
+# zoom, same reasoning as FREEFORM_HEADING_CSS above.
+FREEFORM_LIST_CSS = (
+    ".freeform ul { list-style: none; padding-left: 1.3em; } "
+    ".freeform ul li { position: relative; } "
+    '.freeform ul li::before { content: "\\2022"; position: absolute; left: -1em; top: 0.1em; }'
 )
 
 
@@ -59,9 +71,13 @@ def render_block_title(block, zoom: float) -> str:
     # block type) -- non-bold and italic, unlike H1-H4 (mirrors the on-screen
     # SongEditableBlockTitle styling). 'sections' ("Lyrics & Chords") blocks default to it.
     weight_style = "font-style:italic;" if block.title_heading_level == "h5" else "font-weight:700;"
+    # Free text is the one block type whose title sits directly above its own author-written
+    # content rather than above a self-contained widget (a chord grid, a QR code strip...), so a
+    # tighter title-to-content gap reads as one unit there in a way it wouldn't elsewhere.
+    title_content_gap = 3 if block.block_type == "custom" else 6
     return (
         f'<div style="{weight_style}font-size:{size_px * zoom}px;color:{_LABEL_COLOR};'
-        f'margin-bottom:{6 * zoom}px;">{escape(title)}</div>'
+        f'margin-bottom:{title_content_gap * zoom}px;">{escape(title)}</div>'
     )
 
 
@@ -265,22 +281,6 @@ def render_sections_block(block, song, zoom: float) -> str:
     )
 
 
-def render_videos_block(song, zoom: float) -> str:
-    if not song.videos:
-        return ""
-    items = []
-    for index, video in enumerate(song.videos, start=1):
-        title = escape(video.title or f"Video {index}")
-        items.append(
-            f'<div style="display:inline-block;vertical-align:top;text-align:center;width:{100 * zoom}px;'
-            f'margin:0 {16 * zoom}px {12 * zoom}px 0;">'
-            f'<img src="{qr_code_data_uri(video.url)}" style="width:{80 * zoom}px;height:{80 * zoom}px;" />'
-            f'<div style="font-size:{11 * zoom}px;color:{_LABEL_COLOR};">{title}</div>'
-            '</div>'
-        )
-    return f'<div>{"".join(items)}</div>'
-
-
 def render_labels_block(song, label_details: dict, zoom: float) -> str:
     if not song.label_ids:
         return ""
@@ -304,5 +304,4 @@ BLOCK_RENDERERS = {
     "time_signature": render_time_signature_block,
     "capo": render_capo_block,
     "description": render_description_block,
-    "videos": render_videos_block,
 }

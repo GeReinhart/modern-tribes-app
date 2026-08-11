@@ -7,7 +7,9 @@ from types import SimpleNamespace
 from app.features.guitar.song.layout.pdf_blocks import FREEFORM_HEADING_CSS, _HEADING_SIZES_PX, _LABEL_COLOR, _BASE_FONT_SIZE
 from app.features.guitar.song.layout.pdf_service import _build_html_document
 
-_SETTINGS = SimpleNamespace(margin_top_mm=10, margin_right_mm=10, margin_bottom_mm=10, margin_left_mm=10)
+_SETTINGS = SimpleNamespace(
+    margin_top_mm=10, margin_right_mm=10, margin_bottom_mm=10, margin_left_mm=10, footer_spacing_mm=5,
+)
 _SONG = SimpleNamespace(title="Wonderwall", author="Oasis", layout=SimpleNamespace(settings=_SETTINGS, rows=[]))
 
 
@@ -18,8 +20,12 @@ def test_freeform_heading_css_matches_block_title_sizes_in_em():
     assert FREEFORM_HEADING_CSS.count(f"color: {_LABEL_COLOR}") == len(_HEADING_SIZES_PX)
     # H5 is non-bold and italic instead of bold, same toned-down treatment as a block's own h5
     # title (render_block_title) -- so it's excluded from the bold count and included in italic.
+    # It also needs an explicit "font-weight: 400" to override WeasyPrint's own default
+    # stylesheet, which makes every <h5> bold regardless of what .freeform h5 itself sets.
     assert FREEFORM_HEADING_CSS.count("font-weight: 700") == len(_HEADING_SIZES_PX) - 1
+    assert FREEFORM_HEADING_CSS.count("font-weight: 400") == 1
     assert FREEFORM_HEADING_CSS.count("font-style: italic;") == 1
+    assert ".freeform h5 { font-size: 0.75em; font-weight: 400; font-style: italic;" in FREEFORM_HEADING_CSS
 
 
 def test_build_html_document_includes_the_freeform_heading_stylesheet():

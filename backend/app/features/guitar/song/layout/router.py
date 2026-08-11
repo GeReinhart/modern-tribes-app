@@ -85,7 +85,7 @@ async def remove_layout_row(row_id: str, current_user: dict = Depends(get_curren
 async def update_layout_settings(
     song_id: str, data: GuitarSongLayoutSettingsUpdate, current_user: dict = Depends(get_current_user)
 ):
-    """Update a song's print page margins.
+    """Update a song's print page margins and footer spacing.
 
     **Permissions:** admin | can_access_attached_tribes
     **Project access:** minimum position ≥ member

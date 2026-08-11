@@ -51,6 +51,15 @@ const blockFlexBasis = (block: GuitarSongLayoutBlock, columnWidthTwelfths: numbe
   return '100%';
 };
 
+// A free-text block cancels the standard gap (flex `gap` + the previous block's own
+// marginBottom, 8px + 8px) coming from whatever precedes it, so its content butts up directly
+// against the block above -- but only when something actually precedes it, since the flex `gap`
+// never applies before the column's first item anyway.
+const CUSTOM_BLOCK_TOP_GAP_CANCEL = '-16px';
+
+const blockMarginTop = (block: GuitarSongLayoutBlock, index: number): string | undefined =>
+  index > 0 && block.block_type === 'custom' ? CUSTOM_BLOCK_TOP_GAP_CANCEL : undefined;
+
 export const SongLayoutColumn: React.FC<SongLayoutColumnProps> = ({
   column, row, rows, isLastRow, isFirstColumn, isLastColumn, song, labelsHook, canEdit, canManage, hook, clipboardHook,
   showStructureOutlines = false,
@@ -117,11 +126,15 @@ export const SongLayoutColumn: React.FC<SongLayoutColumnProps> = ({
         {column.blocks.map((block, index) => (
           <div
             key={`${block.block_type}-${index}`}
-            style={{ flexBasis: blockFlexBasis(block, column.width_twelfths), flexShrink: 0, minWidth: 0, marginBottom: '8px' }}
+            style={{
+              flexBasis: blockFlexBasis(block, column.width_twelfths), flexShrink: 0, minWidth: 0, marginBottom: '8px',
+              marginTop: blockMarginTop(block, index),
+            }}
           >
             <SongLayoutBlockContent
               block={block}
               row={row}
+              rows={rows}
               columnId={column.id}
               blockIndex={index}
               isFirstBlock={index === 0}

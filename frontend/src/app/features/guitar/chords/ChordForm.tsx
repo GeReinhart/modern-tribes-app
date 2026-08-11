@@ -1,16 +1,19 @@
+import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
-import { ThemedSelect } from '@/app/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { ThemedSubmitButton } from '@/app/platform/core/layout/themes/components/ThemedSubmitButton.tsx';
 import { ThemedTextarea } from '@/app/platform/core/layout/themes/components/ThemedTextarea.tsx';
 
+import { Wand2 } from 'lucide-react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ChordDiagram } from './ChordDiagram.tsx';
 import { ChordDifficultyPicker } from './ChordDifficultyPicker.tsx';
+import { suggestChordName } from './chordNaming.ts';
 import { proposeRootNote } from './chordTheory.ts';
-import { DEFAULT_FRETS, ROOT_NOTE_OPTIONS } from './fretOptions.ts';
+import { DEFAULT_FRETS } from './fretOptions.ts';
 import { FretSelectors } from './FretSelectors.tsx';
+import { RootNotePicker } from './RootNotePicker.tsx';
 import { FretValue, GuitarChord, GuitarChordCreate } from './types.ts';
 
 interface ChordFormProps {
@@ -46,6 +49,9 @@ export const ChordForm: React.FC<ChordFormProps> = ({ chord, onSubmit, onCancel 
     setFrets((prev) => prev.map((f, i) => (i === stringIndex ? value : f)));
   };
 
+  const suggestedName = rootNote ? suggestChordName(rootNote, toFretValues(frets)) : null;
+  const showSuggestedName = suggestedName !== null && suggestedName !== name.trim();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !rootNote) return;
@@ -65,18 +71,30 @@ export const ChordForm: React.FC<ChordFormProps> = ({ chord, onSubmit, onCancel 
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <ThemedInput
-        label={t('guitarChords.form.name')}
-        value={name}
-        onChange={(e) => handleNameChange(e.target.value)}
-        maxLength={50}
-        required
-      />
-      <ThemedSelect
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+        <div style={{ flex: 1 }}>
+          <ThemedInput
+            label={t('guitarChords.form.name')}
+            value={name}
+            onChange={(e) => handleNameChange(e.target.value)}
+            maxLength={50}
+            required
+          />
+        </div>
+        {showSuggestedName && (
+          <ThemedButton
+            type="button"
+            variant="ghost"
+            onClick={() => setName(suggestedName)}
+            title={t('guitarChords.form.suggestName', { name: suggestedName })}
+          >
+            <Wand2 size={18} />
+          </ThemedButton>
+        )}
+      </div>
+      <RootNotePicker
         label={t('guitarChords.form.rootNote')}
-        options={ROOT_NOTE_OPTIONS}
         value={rootNote}
-        allowEmpty={false}
         onChange={(value) => { setRootNote(value); setRootTouched(true); }}
       />
       <ThemedTextarea

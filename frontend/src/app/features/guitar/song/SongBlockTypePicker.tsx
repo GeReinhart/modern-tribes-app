@@ -11,27 +11,44 @@ interface SongBlockTypePickerProps {
   options: LayoutBlockType[];
   onAdd: (blockType: LayoutBlockType) => void;
   onAddFreeText: () => void;
+  // Overrides the free-text choice's label -- same underlying 'custom' block, but "add block
+  // after a given block" reads better as "Bloc vide" than the default "+ Texte libre".
+  freeTextLabel?: string;
+  // Folds the free-text choice into the same select as the block types, as one more pickable
+  // option, instead of showing it as its own separate button below -- "add block after" wants
+  // a single dropdown listing every choice (types + "Bloc vide"), not two separate controls.
+  freeTextInDropdown?: boolean;
 }
 
 // Lets the user explicitly choose which element to add — never auto-picks one — reused by
 // "add row", "add column" and "add element" since all three need the same choice.
-export const SongBlockTypePicker: React.FC<SongBlockTypePickerProps> = ({ options, onAdd, onAddFreeText }) => {
+export const SongBlockTypePicker: React.FC<SongBlockTypePickerProps> = ({
+  options, onAdd, onAddFreeText, freeTextLabel, freeTextInDropdown = false,
+}) => {
   const { t } = useTranslation();
   const [pending, setPending] = useState('');
+  const freeTextChoiceLabel = freeTextLabel ?? t('guitarSong.layout.addCustomBlock');
+
+  const selectOptions = [
+    ...options.map((bt) => ({ value: bt, label: blockTypeLabel(t, bt) })),
+    ...(freeTextInDropdown ? [{ value: 'custom', label: freeTextChoiceLabel }] : []),
+  ];
 
   const handleAdd = () => {
     if (!pending) return;
-    onAdd(pending as LayoutBlockType);
+    if (pending === 'custom' && freeTextInDropdown) onAddFreeText(); else onAdd(pending as LayoutBlockType);
     setPending('');
   };
 
+  const showSelect = freeTextInDropdown || options.length > 0;
+
   return (
     <>
-      {options.length > 0 && (
+      {showSelect && (
         <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-end' }}>
           <div style={{ flex: 1 }}>
             <ThemedSelect
-              options={options.map((bt) => ({ value: bt, label: blockTypeLabel(t, bt) }))}
+              options={selectOptions}
               value={pending}
               onChange={setPending}
               allowEmpty
@@ -41,7 +58,9 @@ export const SongBlockTypePicker: React.FC<SongBlockTypePickerProps> = ({ option
           <ThemedIconButton action={{ icon: 'plus', label: t('guitarSong.layout.addElementConfirm'), onClick: handleAdd, disabled: !pending }} />
         </div>
       )}
-      <ThemedIconButton action={{ icon: 'file-text', label: t('guitarSong.layout.addCustomBlock'), onClick: onAddFreeText }} />
+      {!freeTextInDropdown && (
+        <ThemedIconButton action={{ icon: 'file-text', label: freeTextChoiceLabel, onClick: onAddFreeText }} />
+      )}
     </>
   );
 };

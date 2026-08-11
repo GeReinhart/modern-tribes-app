@@ -34,7 +34,6 @@ _COLUMN_STYLE_DEFAULTS = {
     "padding_top_mm": 0, "padding_right_mm": 0, "padding_bottom_mm": 0, "padding_left_mm": 0,
     "separator_left": False, "separator_right": False,
 }
-_DEFAULT_CARD_BLOCK_TYPES = {"description", "chords", "videos", "custom"}
 # These block types edit their title/body from the song's own page via update_block_content,
 # independent of row/column structure -- a chord grid's title and comment reuse the exact same
 # custom_title/custom_content_html fields a custom block's title and body already use.
@@ -133,7 +132,7 @@ async def seed_default_layout(pool, song_id: str, user_id: str) -> None:
                     # 'sections' ("Lyrics & Chords") parts default to the toned-down H5 (non-bold,
                     # italic) instead of every other type's H3 -- see render_block_title.
                     "title_heading_level": "h5" if bt == SECTIONS_BLOCK_TYPE else "h3",
-                    "show_card": bt in _DEFAULT_CARD_BLOCK_TYPES, "custom_title": None, "custom_document_id": None,
+                    "show_card": False, "custom_title": None, "custom_document_id": None,
                 }
                 for bt in column["block_types"]
             ]}
@@ -465,6 +464,23 @@ async def set_lyrics_word_chord(
     return await _resolve_block_response(pool, block, chords_by_id)
 
 
+async def _require_footer_spacing_fits_margin(pool, song_id: str, updates: dict) -> None:
+    """The footer lives inside margin_bottom_mm's own band (see pdf_service._footer_css), so it
+    must stay strictly smaller than it -- checked against the EFFECTIVE values (this update's own
+    fields, falling back to what's already stored) so patching either field alone still validates
+    against the other's real, current value."""
+    if "footer_spacing_mm" not in updates and "margin_bottom_mm" not in updates:
+        return
+    current = await repo.fetch_settings(pool, song_id)
+    footer_spacing_mm = updates.get("footer_spacing_mm", current["footer_spacing_mm"])
+    margin_bottom_mm = updates.get("margin_bottom_mm", current["margin_bottom_mm"])
+    if footer_spacing_mm >= margin_bottom_mm:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Footer spacing must be smaller than the bottom margin.",
+        )
+
+
 async def update_settings(
     pool, song_id: str, data: GuitarSongLayoutSettingsUpdate, user: dict
 ) -> GuitarSongLayoutSettingsResponse:
@@ -474,5 +490,6 @@ async def update_settings(
     project_id = await song_lookup.require_song_project(pool, song_id)
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
     updates = data.model_dump(exclude_unset=True)
+    await _require_footer_spacing_fits_margin(pool, song_id, updates)
     row = await repo.update_settings(pool, song_id, updates, user["id"])
     return GuitarSongLayoutSettingsResponse(**row)

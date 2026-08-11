@@ -19,6 +19,11 @@ def test_update_layout_settings():
     pass
 
 
+@scenario(FEATURE, "PATCH the footer spacing — it is updated, margins stay the same")
+def test_update_layout_settings_footer_spacing():
+    pass
+
+
 @scenario(FEATURE, "PATCH the page margins as a project guest — 403 and the database is not modified")
 def test_update_layout_settings_as_guest():
     pass
@@ -26,6 +31,19 @@ def test_update_layout_settings_as_guest():
 
 @scenario(FEATURE, "PATCH a margin out of range — 422 and the database is not modified")
 def test_update_layout_settings_out_of_range():
+    pass
+
+
+@scenario(FEATURE, "PATCH a footer spacing greater than or equal to the bottom margin — 422 and the database is not modified")
+def test_update_layout_settings_footer_spacing_too_large():
+    pass
+
+
+@scenario(
+    FEATURE,
+    "PATCH both the bottom margin and the footer spacing in the same request, spacing left too large for the new margin — 422 and the database is not modified",
+)
+def test_update_layout_settings_footer_spacing_vs_new_margin():
     pass
 
 

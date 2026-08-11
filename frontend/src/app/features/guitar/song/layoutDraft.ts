@@ -80,7 +80,6 @@ export interface DraftColumn {
 
 export const ROW_WIDTH_TWELFTHS = 12;
 export const DEFAULT_ZOOM_PERCENT = 100;
-const DEFAULT_CARD_BLOCK_TYPES = new Set<LayoutBlockType>(['description', 'chords', 'videos', 'custom', 'chord_grid']);
 
 // A sensible starting width per element, so a freshly added block doesn't always claim the
 // whole row — the user can still resize it afterward from its own presentation menu.
@@ -93,7 +92,6 @@ const DEFAULT_BLOCK_WIDTH_TWELFTHS: Partial<Record<LayoutBlockType, number>> = {
   description: 9,
   chords: 9,
   sections: 12,
-  videos: 6,
   labels: 6,
   chord_grid: 12,
 };
@@ -103,7 +101,7 @@ export const emptyDraftBlock = (blockType: LayoutBlockType): DraftBlock => ({
   block_type: blockType,
   width_twelfths: DEFAULT_BLOCK_WIDTH_TWELFTHS[blockType] ?? ROW_WIDTH_TWELFTHS,
   zoom_percent: DEFAULT_ZOOM_PERCENT,
-  show_card: DEFAULT_CARD_BLOCK_TYPES.has(blockType),
+  show_card: false,
   // 'sections' ("Lyrics & Chords") parts default to the toned-down H5 (non-bold, italic)
   // instead of every other type's H3 -- see SongEditableBlockTitle.
   title_heading_level: blockType === SECTIONS_BLOCK_TYPE ? 'h5' : 'h3',

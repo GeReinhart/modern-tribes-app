@@ -4,6 +4,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { SongAddBlockAfterMenu } from './SongAddBlockAfterMenu.tsx';
 import { SongBlockEditorModal } from './SongBlockEditorModal.tsx';
 import { SongBlockMenu } from './SongBlockMenu.tsx';
 import { SongEmptyBlockPlaceholder } from './SongEmptyBlockPlaceholder.tsx';
@@ -19,6 +20,7 @@ import { buildCopiedBlock, CopyableBlockType, useSongBlockClipboard } from './us
 interface SongLayoutBlockContentProps {
   block: GuitarSongLayoutBlock;
   row: GuitarSongLayoutRow;
+  rows: GuitarSongLayoutRow[];
   columnId: string;
   blockIndex: number;
   isFirstBlock: boolean;
@@ -34,7 +36,7 @@ interface SongLayoutBlockContentProps {
 }
 
 export const SongLayoutBlockContent: React.FC<SongLayoutBlockContentProps> = ({
-  block, row, columnId, blockIndex, isFirstBlock, isLastBlock, openUpward, song, labelsHook, canEdit, canManage, hook,
+  block, row, rows, columnId, blockIndex, isFirstBlock, isLastBlock, openUpward, song, labelsHook, canEdit, canManage, hook,
   clipboardHook, showStructureOutlines = false,
 }) => {
   const themeCtx = useTheme();
@@ -100,6 +102,10 @@ export const SongLayoutBlockContent: React.FC<SongLayoutBlockContentProps> = ({
           <SongBlockMenu
             row={row} columnId={columnId} blockIndex={blockIndex} hook={hook} onOpenChange={setMenuOpen}
             direction={openUpward ? 'up' : 'down'} onEdit={() => setEditorOpen(true)} onCopy={onCopy}
+          />
+          <SongAddBlockAfterMenu
+            rows={rows} row={row} columnId={columnId} blockIndex={blockIndex} song={song} hook={hook}
+            clipboardHook={clipboardHook} onOpenChange={setMenuOpen} direction={openUpward ? 'up' : 'down'}
           />
           <SongLayoutMoveButton
             icon="arrow-right" label={t('guitarSong.layout.moveBlockRight')} onClick={() => moveBlock('next')} disabled={isLastBlock}

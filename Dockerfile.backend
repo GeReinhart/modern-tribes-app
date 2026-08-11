@@ -2,9 +2,12 @@ FROM python:3.11-slim
 
 WORKDIR /code
 
-# libpango/libharfbuzz/fontconfig are required by WeasyPrint (song PDF export) to render text
+# libpango/libharfbuzz/fontconfig are required by WeasyPrint (song PDF export) to render text.
+# fonts-liberation is metric-compatible with the "Helvetica, Arial, sans-serif" stack used by
+# the PDF template, and (unlike fonts-dejavu-core) ships Italic/Bold-Italic faces, which the
+# H5 block-title style relies on for the italic rendering to actually show up in the PDF.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b fonts-dejavu-core \
+    libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
 COPY backend/requirements.txt .

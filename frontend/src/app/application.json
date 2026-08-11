@@ -3,13 +3,13 @@
   "description": {
     "en": [
       "- Modern Tribes is a collaboration platform for teams (tribes) and their projects",
-      "- Organize work into projects with customizable tabs for tasks, documents and more",
-      "- Collaborate with your team, track progress, share knowledge and stay informed through notifications"
+      "- Organize work into projects with customizable feature tabs — tasks, documents, events and more",
+      "- Track your own tasks and events from a personal dashboard, collaborate with your team, and stay informed through notifications"
     ],
     "fr": [
       "- Modern Tribes est une plateforme de collaboration pour les équipes (tribus) et leurs projets",
-      "- Organisez votre travail en projets avec des onglets personnalisables pour les tâches, documents et plus",
-      "- Collaborez avec votre équipe, suivez l'avancement, partagez des connaissances et restez informé"
+      "- Organisez votre travail en projets avec des onglets personnalisables — tâches, documents, événements et plus",
+      "- Suivez vos propres tâches et événements depuis un tableau de bord personnel, collaborez avec votre équipe et restez informé"
     ]
   },
   "backend": {
@@ -119,12 +119,14 @@
           "en": [
             "- the app's visual structure: header, navigation menus and breadcrumbs",
             "- shared UI controls used throughout the app: buttons, text fields, modals, tables and icons",
-            "- an optional icon-only toolbar for the current page's actions, so they don't require opening the menu; from your profile you can choose to show it in the header, in the footer, or keep it hidden"
+            "- an optional icon-only toolbar for the current page's actions, so they don't require opening the menu; from your profile you can choose to show it in the header, in the footer, or keep it hidden",
+            "- a single icon on the footer hides the header, the toolbar and the footer all together, leaving only that icon behind to bring them all back — remembered on this device"
           ],
           "fr": [
             "- la structure visuelle de l'app : en-tête, menus de navigation et fil d'Ariane",
             "- contrôles partagés utilisés dans toute l'app : boutons, champs, modales, tableaux et icônes",
-            "- une barre d'outils optionnelle avec des icônes pour les actions de la page en cours, sans avoir à ouvrir le menu ; depuis votre profil, vous pouvez choisir de l'afficher dans l'en-tête, dans le pied de page, ou de la garder masquée"
+            "- une barre d'outils optionnelle avec des icônes pour les actions de la page en cours, sans avoir à ouvrir le menu ; depuis votre profil, vous pouvez choisir de l'afficher dans l'en-tête, dans le pied de page, ou de la garder masquée",
+            "- une seule icône sur le pied de page masque l'en-tête, la barre d'outils et le pied de page tous ensemble, ne laissant que cette icône pour tout remettre en place — mémorisé sur cet appareil"
           ]
         },
         "frontend": {
@@ -634,18 +636,12 @@
         "package": "glue",
         "description": {
           "en": [
-            "- attach tools (task lists, kanban boards, guitar tools…) to a project as named tabs",
-            "- each user can show, hide and reorder their tabs to match their own workflow",
-            "- when adding or renaming a tab, pick an icon from the app's icon set to prefix it — once an icon is set, giving the tab a name becomes optional",
-            "- each user can also pick their own icon and their own name for any tab from the tab settings, overriding the tab's default icon and name just for themselves",
-            "- a personal tab name can be cleared to show only the icon, as long as an icon is set"
+            "- attach tools (task lists, kanban boards, guitar tools…) to a project as named tabs, each with its own icon",
+            "- each user can show, hide and reorder their own tabs, and personalize any tab's icon and name just for themselves"
           ],
           "fr": [
-            "- ajoutez des outils (listes de tâches, kanbans, outils guitare…) à un projet sous forme d'onglets nommés",
-            "- chaque utilisateur peut afficher, masquer et réorganiser ses onglets selon son usage",
-            "- lors de l'ajout ou du renommage d'un onglet, choisissez une icône parmi celles de l'application pour le préfixer — une fois une icône choisie, donner un nom à l'onglet devient facultatif",
-            "- chaque utilisateur peut aussi choisir sa propre icône et son propre nom pour n'importe quel onglet depuis les réglages des onglets, ce qui remplace l'icône et le nom par défaut uniquement pour lui",
-            "- un nom d'onglet personnel peut être vidé pour n'afficher que l'icône, à condition qu'une icône soit définie"
+            "- ajoutez des outils (listes de tâches, kanbans, outils guitare…) à un projet sous forme d'onglets nommés, chacun avec sa propre icône",
+            "- chaque utilisateur peut afficher, masquer et réorganiser ses onglets, et personnaliser l'icône et le nom de n'importe quel onglet, juste pour lui"
           ]
         },
         "backend": {
@@ -668,36 +664,20 @@
         "package": "dashboard",
         "description": {
           "en": [
-            "- personalized dashboard showing the user's tasks, tribes and bookmarks",
-            "- Planning tab: combined view of all events and tasks with due dates across all accessible projects, navigable day by day with label and project filters",
-            "- Planning tab: switch to a week view showing the 7 days side by side with the hours of the day as rows, from an action in the tab's menu or toolbar; the tasks due list below still follows the selected day",
-            "- My Tasks tab: add a new task or kanban card directly from the dashboard by picking a project and tab",
-            "- Planning tab: add a new event directly from the dashboard by picking a project and calendar tab",
-            "- each task or event shown on the dashboard has an \"Open in project\" button that jumps straight to its project tab and opens its details there",
-            "- pin any bookmarked feature tab (tasks, kanban, journal…) as a dashboard tab to view its content directly in the dashboard",
-            "- pinned tabs are shown alongside the standard tabs and can be reordered or removed from the tab configurator",
-            "- in the tab configurator, choose a default project/tab that quick-add pre-fills automatically when adding a task or an event, so you don't have to pick it every time",
-            "- Projects tab: browse every project you have access to, with its tribe and a count of its open tasks and upcoming events",
-            "- Tasks tab: browse every kanban board and to-do list you have access to, with a count of open items on each",
-            "- Events tab: browse every event calendar you have access to, with a count of upcoming events on each",
-            "- on the Projects, Tasks and Events tabs, tap one or more tribe badges at the top to narrow the list down to just those tribes",
-            "- clicking a project, task board, to-do list or event calendar opens it directly"
+            "- personalized dashboard showing your tasks, tribes and bookmarks",
+            "- Planning tab: a day-by-day (or week) view of all your events and tasks due, with filters, and quick-add for new tasks or events",
+            "- Projects, Tasks and Events tabs: browse everything you have access to across your tribes, with open/upcoming counts, filterable by tribe",
+            "- pin any feature tab (tasks, kanban, journal…) as a dashboard tab to view its content directly from the dashboard",
+            "- jump straight from any task or event shown here to its project",
+            "- customize which tabs appear and set default project/tab shortcuts for quick-add"
           ],
           "fr": [
-            "- tableau de bord personnalisé affichant les tâches, tribus et signets de l'utilisateur",
-            "- onglet Planning : vue combinée de tous les événements et tâches à rendre sur tous les projets accessibles, navigable jour par jour avec filtres par étiquette et projet",
-            "- onglet Planning : basculez vers une vue semaine affichant les 7 jours côte à côte avec les heures de la journée en lignes, depuis une action du menu ou de la barre d'outils de l'onglet ; la liste des tâches à rendre en dessous reste liée au jour sélectionné",
-            "- onglet Mes tâches : ajouter une tâche ou une carte kanban directement depuis le tableau de bord en choisissant un projet et un onglet",
-            "- onglet Planning : ajouter un événement directement depuis le tableau de bord en choisissant un projet et un onglet calendrier",
-            "- chaque tâche ou événement affiché sur le tableau de bord a un bouton \"Ouvrir dans le projet\" qui va directement à l'onglet du projet et ouvre ses détails",
-            "- épinglez n'importe quel favori pointant vers une fonctionnalité (tâches, kanban, journal…) comme onglet du tableau de bord pour en voir le contenu directement",
-            "- les onglets épinglés s'affichent avec les onglets standards et peuvent être réordonnés ou supprimés depuis le configurateur d'onglets",
-            "- dans le configurateur d'onglets, choisissez un projet/onglet par défaut que l'ajout rapide pré-remplit automatiquement lors de l'ajout d'une tâche ou d'un événement, pour ne pas avoir à le choisir à chaque fois",
-            "- onglet Projets : parcourez tous les projets auxquels vous avez accès, avec leur tribu et le nombre de tâches ouvertes et d'événements à venir",
-            "- onglet Tâches : parcourez tous les tableaux kanban et listes de tâches auxquels vous avez accès, avec le nombre d'éléments ouverts pour chacun",
-            "- onglet Événements : parcourez tous les calendriers d'événements auxquels vous avez accès, avec le nombre d'événements à venir pour chacun",
-            "- sur les onglets Projets, Tâches et Événements, appuyez sur une ou plusieurs tribus en haut pour limiter la liste à ces tribus",
-            "- cliquer sur un projet, un tableau de tâches, une liste ou un calendrier l'ouvre directement"
+            "- tableau de bord personnalisé affichant vos tâches, tribus et favoris",
+            "- onglet Planning : vue jour par jour (ou semaine) de tous vos événements et tâches à rendre, avec filtres, et ajout rapide de tâches ou d'événements",
+            "- onglets Projets, Tâches et Événements : parcourez tout ce à quoi vous avez accès dans vos tribus, avec le nombre d'éléments ouverts/à venir, filtrable par tribu",
+            "- épinglez n'importe quel onglet de fonctionnalité (tâches, kanban, journal…) comme onglet du tableau de bord pour en voir le contenu directement",
+            "- accédez directement depuis une tâche ou un événement affiché ici à son projet",
+            "- personnalisez les onglets affichés et définissez des raccourcis de projet/onglet par défaut pour l'ajout rapide"
           ]
         },
         "frontend": {
@@ -710,32 +690,20 @@
         "package": "events",
         "description": {
           "en": [
-            "- create and manage events within a project tab",
-            "- each event has a start and end time, or can span the whole day",
-            "- an event can also span several days with specific start and end times, by checking \"Multi-day\" instead of \"All day\"",
-            "- assign participants from the project tribe when creating or editing an event",
-            "- invite participants from the tribe, attach labels, set story points and add notes",
-            "- pick a color for each event from the app's theme colors when creating or editing it — the color is shown on the monthly calendar and in the day view",
+            "- create and manage events within a project tab, with a start/end time or spanning the whole day or several days",
+            "- assign participants from the project tribe, attach labels, story points and notes",
+            "- pick a color for each event, shown on the calendar and day view",
             "- set reminders that notify participants by in-app alert or email before the event",
-            "- view events on a monthly calendar",
-            "- the day view shows a visual timeline where overlapping events appear in side-by-side columns",
-            "- switch to a week view showing the 7 days of the week side by side with the hours of the day as rows, from an action in the tab's menu or toolbar; the choice is remembered next time",
-            "- the timeline spans from one hour before the first event to one hour after the last event",
-            "- the time picker uses a clock face with hour and minute selection, duration quick-adjust buttons, and adapts to mobile by hiding the day timeline"
+            "- view events on a monthly calendar, a day timeline with overlapping events side by side, or a week view",
+            "- pick times with a clock-face time picker and quick duration buttons"
           ],
           "fr": [
-            "- créez et gérez des événements dans un onglet de projet",
-            "- chaque événement a une heure de début et de fin, ou peut couvrir toute la journée",
-            "- un événement peut aussi s'étaler sur plusieurs jours avec des heures de début et de fin précises, en cochant \"Plusieurs jours\" au lieu de \"Toute la journée\"",
-            "- assignez des participants depuis la tribu du projet lors de la création ou de l'édition",
-            "- invitez des participants de la tribu, ajoutez des étiquettes, des points d'effort et des notes",
-            "- choisissez une couleur pour chaque événement parmi les couleurs du thème lors de sa création ou de sa modification — la couleur apparaît sur le calendrier mensuel et dans la vue du jour",
-            "- définissez des rappels qui notifient les participants par alerte dans l'app ou par email",
-            "- visualisez les événements dans un calendrier mensuel",
-            "- la vue du jour affiche une ligne de temps visuelle où les événements qui se chevauchent apparaissent en colonnes côte à côte",
-            "- basculez vers une vue semaine affichant les 7 jours côte à côte avec les heures de la journée en lignes, depuis une action du menu ou de la barre d'outils de l'onglet ; le choix est mémorisé pour la prochaine fois",
-            "- la ligne de temps s'étend d'une heure avant le premier événement à une heure après le dernier",
-            "- le sélecteur d'heure utilise un cadran d'horloge avec sélection heure/minute, des boutons de réglage rapide de la durée, et s'adapte au mobile en masquant la ligne de temps"
+            "- créez et gérez des événements dans un onglet de projet, avec une heure de début/fin ou sur une ou plusieurs journées entières",
+            "- assignez des participants depuis la tribu du projet, ajoutez des étiquettes, des points d'effort et des notes",
+            "- choisissez une couleur pour chaque événement, affichée sur le calendrier et dans la vue du jour",
+            "- définissez des rappels qui notifient les participants par alerte dans l'app ou par email avant l'événement",
+            "- visualisez les événements sur un calendrier mensuel, une ligne de temps du jour avec chevauchements côte à côte, ou une vue semaine",
+            "- choisissez les heures avec un cadran d'horloge et des boutons de réglage rapide de durée"
           ]
         },
         "backend": {
@@ -759,13 +727,11 @@
         "description": {
           "en": [
             "- a set of tools to support your guitar practice",
-            "- includes a note quiz, a chromatic tuner, a metronome, a chord inventory and a songbook",
-            "- shared: audioContext.ts (singleton Web Audio API context)"
+            "- includes a note quiz, a chromatic tuner, a metronome, a chord inventory and a songbook"
           ],
           "fr": [
             "- un ensemble d'outils pour soutenir votre pratique de la guitare",
-            "- comprend un quiz de notes, un accordeur chromatique, un métronome, un inventaire d'accords et un répertoire de morceaux",
-            "- partagé : audioContext.ts (contexte Web Audio API singleton)"
+            "- comprend un quiz de notes, un accordeur chromatique, un métronome, un inventaire d'accords et un répertoire de morceaux"
           ]
         },
         "sub_packages": [
@@ -773,17 +739,12 @@
             "package": "notes",
             "description": {
               "en": [
-                "- a random note is played and displayed — guess it before it's revealed",
-                "- the fretboard shows which string and fret to play; the note name is hidden until you reveal it",
-                "- customize the interval, sound length, octave range and which notes to include — saved per tab",
-                "- audio samples download automatically on first visit and refresh daily",
-                "- feature_type: guitar_notes"
+                "- a random note is played and displayed — guess it before it's revealed, using the fretboard to show which string and fret to play",
+                "- customize the interval, sound length, octave range and which notes to include — saved per tab"
               ],
               "fr": [
-                "- une note aléatoire est jouée et affichée — devinez-la avant qu'elle soit révélée",
-                "- le manche montre la corde et la frette à jouer ; le nom de la note est caché jusqu'à la révélation",
-                "- personnalisez l'intervalle, la durée du son, la plage d'octaves et les notes à inclure — sauvegardé par onglet",
-                "- les samples audio se téléchargent automatiquement à la première visite et se mettent à jour chaque jour"
+                "- une note aléatoire est jouée et affichée — devinez-la avant qu'elle soit révélée, le manche montre la corde et la frette à jouer",
+                "- personnalisez l'intervalle, la durée du son, la plage d'octaves et les notes à inclure — sauvegardé par onglet"
               ]
             },
             "backend": {
@@ -827,16 +788,12 @@
             "package": "metronome",
             "description": {
               "en": [
-                "- keep time during your practice with an adjustable click track (20–300 BPM)",
-                "- a visual indicator lights up on each beat; beat 1 is accented for easy counting",
-                "- set the time signature (2–8 beats per bar) and tap the button to find your tempo by feel",
-                "- your BPM and time signature are saved automatically for each tab"
+                "- keep time during your practice with an adjustable click track (20–300 BPM) and a visual beat indicator",
+                "- set the time signature (2–8 beats per bar) and tap to find your tempo by feel — saved automatically per tab"
               ],
               "fr": [
-                "- gardez le tempo pendant votre pratique avec un clic ajustable (20–300 BPM)",
-                "- un indicateur visuel s'allume sur chaque temps ; le premier temps est accentué pour compter facilement",
-                "- réglez la signature rythmique (2–8 temps par mesure) et tapotez pour trouver votre tempo à l'oreille",
-                "- votre BPM et signature rythmique sont sauvegardés automatiquement par onglet"
+                "- gardez le tempo pendant votre pratique avec un clic ajustable (20–300 BPM) et un indicateur visuel de temps",
+                "- réglez la signature rythmique (2–8 temps par mesure) et tapotez pour trouver votre tempo à l'oreille — sauvegardé automatiquement par onglet"
               ]
             },
             "backend": {
@@ -855,21 +812,17 @@
             "description": {
               "en": [
                 "- a shared inventory of guitar chord diagrams, built-in plus anything anyone adds",
-                "- each chord shows which fret to press on each string, with a muted-string marker for strings that shouldn't be played",
-                "- the root note, the fifth and every other interval each get their own distinct icon on the diagram, so you can see the chord's structure at a glance",
-                "- give a chord a name like a common chord name and the root note is suggested automatically — you can always correct it",
-                "- add a description to any chord, built-in or your own, and anyone can edit it",
-                "- search the inventory by name or by root note",
-                "- optionally rate how hard a chord shape is to play, from 0 (easiest) to 5 (hardest), shown with its own icon and color"
+                "- each chord shows which fret to press on each string, with icons marking the root, fifth and other intervals at a glance",
+                "- name a chord and its root note is suggested automatically, or get a name suggested from the notes you picked",
+                "- add a description to any chord, editable by anyone, and search the inventory by name, root note or the fret played on each string",
+                "- optionally rate how hard a chord is to play, from 0 (easiest) to 5 (hardest)"
               ],
               "fr": [
                 "- un inventaire d'accords de guitare partagé, avec des accords prédéfinis et ceux ajoutés par les utilisateurs",
-                "- chaque accord indique la frette à presser sur chaque corde, avec un repère pour les cordes à ne pas jouer",
-                "- la fondamentale, la quinte et chaque autre intervalle ont leur propre icône sur le schéma, pour visualiser la structure de l'accord en un coup d'œil",
-                "- donnez un nom courant à l'accord et la fondamentale est proposée automatiquement — vous pouvez toujours la corriger",
-                "- ajoutez une description à n'importe quel accord, prédéfini ou personnel, modifiable par tous",
-                "- recherchez dans l'inventaire par nom ou par fondamentale",
-                "- notez, si vous le souhaitez, la difficulté d'un accord à jouer, de 0 (le plus facile) à 5 (le plus difficile), avec sa propre icône et sa couleur"
+                "- chaque accord indique la frette à presser sur chaque corde, avec des icônes marquant la fondamentale, la quinte et les autres intervalles en un coup d'œil",
+                "- donnez un nom à un accord et sa fondamentale est suggérée automatiquement, ou obtenez un nom suggéré à partir des notes choisies",
+                "- ajoutez une description à n'importe quel accord, modifiable par tous, et recherchez l'inventaire par nom, fondamentale ou frette jouée sur chaque corde",
+                "- notez, si vous le souhaitez, la difficulté d'un accord à jouer, de 0 (le plus facile) à 5 (le plus difficile)"
               ]
             },
             "backend": {
@@ -890,102 +843,24 @@
             "package": "song",
             "description": {
               "en": [
-                "- keep a songbook of the songs your group is practicing, shared by every song tab attached to the same project",
-                "- search the songbook by title, author or lyrics, and narrow it down further with a label filter, a draft/completed filter, a song difficulty filter or your own mastery filter — every one of these filters accepts more than one value at once (e.g. \"Easy\" and \"Moderate\" together)",
-                "- each song in the songbook shows its title, author, tempo in BPM, its chord count, how many of those chords are rated difficult, its own difficulty rating if set, and your own mastery rating if set, right on its card — a song without a difficulty or mastery rating yet still shows up under any of those filters, it just has nothing to show there",
-                "- rate your own mastery of a song, from 0 (unknown) to 5 (perfectly mastered), from its editing page or its presentation view — this rating is private to you, nobody else sees it, though it does show on your own view of the song's card",
-                "- optionally rate how hard a song is to play, from 0 (very easy) to 5 (very hard), from its editing page — independent of how hard any of its individual chords are rated",
-                "- a song has a title, an author, a tempo in BPM, a time signature and a capo position",
-                "- add as many \"Chords\" pieces to a song as you like, each with its own name (e.g. \"Main chords\", \"Alternative chords\", \"Outro chords\") and its own chord list",
-                "- build each Chords piece's own list by searching the shared chord inventory, or add a brand new chord on the spot without leaving the song; reorder its chords and leave a comment on any of them just for that piece (e.g. a playing tip) — the same chord can appear in more than one Chords piece, each keeping its own comment",
-                "- removing a chord from a Chords piece only removes it from that piece — it stays in the shared inventory, and in any other Chords piece that also lists it",
-                "- a song's overall chord list — offered when picking a chord for a chord grid or a lyrics word — is simply every chord that appears in any of its Chords pieces, with duplicates removed",
-                "- play a metronome at the song's own tempo and time signature, with the first beat of each bar highlighted",
-                "- each song has its own page with a short, shareable link, so you can bookmark it or send it directly to a bandmate",
-                "- the browser tab shows the song's title and author, so it's easy to find among several open songs",
-                "- adding a song is a short first step: give it a title and author, then optionally copy everything from another song (its chords, lyrics, videos, labels and presentation — you keep the title and author you just typed), start from another song's presentation layout with nothing else copied, or start from a completely blank page and build it yourself",
-                "- everything about a song — its title, author, tempo, time signature, capo, description, chords, parts and lyrics, videos and labels — lives in a row, in a column, in a piece on the song's own page, exactly like any other piece; the page always looks exactly like the finished result, so what you see is always what the presentation view and the printed PDF will show",
-                "- the same song page is also where you arrange its presentation: add a row, split a row into side-by-side columns, add a page break, or add any piece of the song (or a free-form block of your own) to a column — you always pick which piece goes in, nothing is added for you — small icons that stay out of the way until you need them",
-                "- open a piece's \"Edit\" action to change it in a popup — its content and its presentation together: zoom it from 30% to 200%, frame it in a card or leave it plain, pick its title's size, and set its own padding on each side; closing the popup shows the piece exactly as it will look everywhere else; a column's own menu handles resizing, aligning and padding the whole column",
-                "- a column's own menu can also add a thin, discreet vertical line on its left edge, its right edge, or both — a subtle way to visually separate side-by-side columns without drawing attention to it; shown identically in the presentation view and the printed PDF",
-                "- pieces with their own title (Chords, Lyrics & Chords, Videos, Labels, Description, a chord grid, free-form blocks) let you pick that title's size from the same edit popup, from H1 (the largest) down to H5 — shown at that size on screen, in the presentation view and in the printed PDF; leaving a title blank shows nothing at all, taking up no space",
-                "- H5 is a deliberately toned-down title size: unlike H1 through H4, it shows without bold and in italics, for a title that should read as a light label rather than a heading; a \"Lyrics & Chords\" part starts on H5 by default (it's naming one of the song's own parts, not a page heading), but you can pick any size for it, and any other piece with a title can pick H5 too",
-                "- copy a piece (Lyrics & Chords, a chord grid, or a free-form block) and paste it into any column of the same song to reuse it — the pasted copy is independent, so editing one afterwards never changes the other; see what's currently copied before you paste it",
-                "- stack more than one piece in the same column, e.g. title and author together, or tempo and capo side by side with the description",
-                "- choose how chord diagrams look for each song: a full labeled view or a simplified dots-only view, in one of seven sizes from extra-extra-small to extra-extra-large — saved with the song",
-                "- add a rich-text description to a song (practice notes, links, formatting) shown in its own card above the chords",
-                "- break a song down into its parts — intro, verse, chorus, bridge and so on — by adding one \"Lyrics & Chords\" piece per part, each with its own title; add as many side by side or one under another as your song needs",
-                "- starting a \"Lyrics & Chords\" piece asks you what goes in it: type a new part's lyrics, or link it to a part you've already written elsewhere in the song",
-                "- give a part its own short, free-form title (e.g. \"Solo\") if you like — entirely optional, shown above that part wherever it appears",
-                "- type out a song's lyrics freely, then attach a chord before, at the start, in the middle, at the end of, or right after any word — several chords can change around the very same word",
-                "- typing 3 or more spaces in a row (or a few extra spaces at the start or end of a line) leaves a gap with no lyric where you can still hang a chord — handy for a chord change between two words or a final strum after the last word of a line",
-                "- editing the lyrics afterwards never disturbs chords you've already placed elsewhere in the same part",
-                "- when a chorus repeats identically, link a new part to an existing one instead of retyping it — they always show the same lyrics and chords, and editing either one updates both everywhere they appear; copy and paste a part instead when you want an independent starting point, like another verse that reuses a chord pattern",
-                "- adjust how a song's lyrics and chords are shown — the space between lines, the lyrics' own text size, and the chord names' size — each set as an exact pixel value, saved with the song and applied everywhere it's shown, including the printed PDF",
-                "- add a chord grid to a song: a simple table you build yourself, with as many rows and columns as you like, to lay out the order and repeats of a song's chords at a glance (e.g. \"Intro: Em G x2\")",
-                "- each cell of a chord grid can hold any mix of chords and short text (e.g. \"x4\") in any order, and you can turn each of its four borders on or off individually to group cells together visually",
-                "- add a chord to a chord grid cell from the song's own overall chord list — as long as the song has at least one Chords piece with something in it",
-                "- a chord grid can have its own comment underneath, and like every other piece of a song, its title can be resized from H1 to H5",
-                "- adjust the size of the chord names shown in a chord grid's own cells — set per chord grid, so different chord grids in the same song can each use their own size, independent of every other chord grid and of the song's own chord diagram size",
-                "- every change you make while editing a chord grid's cells (adding or moving a chord or a bit of text, turning a border on or off) applies right away — there's no separate save step",
-                "- an author's name is remembered and suggested the next time you add a song, so the same artist stays spelled consistently across the songbook",
-                "- attach one or more videos to a song — an official clip, a tutorial, a live version — and open them straight from the song page",
-                "- tag songs with your own labels (e.g. \"set list\", \"needs practice\"), shared across every song tab in the project — a song's own labels are shown together above its page, and a \"manage labels\" action in the page's own menu lets you attach, detach, rename, recolor, reorder or delete them, on both the editing page and the presentation view",
-                "- mark a song as completed once it's ready — a completed song only offers its presentation view from then on, keeping it safe from accidental changes; reopen it as a draft any time, right from that presentation view, to edit it again",
-                "- switch to the song's presentation view to see it exactly as it will read or print, with none of the editing icons in the way",
-                "- one \"page settings\" action on the presentation view covers both the page size and the print margins together: the page normally shows at the same size it will actually print at (A4 or US Letter), so what you see matches the PDF; switch to full width instead if you'd rather see it stretch to your screen, or type your own custom width, and adjust each print margin right below it — your choices are remembered on this device",
-                "- the presentation view is also where you download the song as a ready-to-print PDF — each video becomes a scannable QR code since a PDF can't play video, and the file is opened for you to view right away",
-                "- toggle dotted outlines around every row, column and piece from the presentation view, to see how the page is put together without switching back to editing — your choice is remembered on this device",
-                "- every printed page shows the song's title and author centered at the bottom, with the page number out of the total page count"
+                "- keep a shared songbook of the songs your group is practicing, searchable by title, author, lyrics, labels, difficulty and your own mastery level",
+                "- each song has a title, author, tempo, time signature, capo and chord list, plus a rich-text description",
+                "- lay out a song's page freely — chords, lyrics, chord grids, videos — arranged in rows and columns exactly as it will read or print",
+                "- switch to a clean presentation view for reading, printing or sharing, with a downloadable PDF",
+                "- rate your own mastery of a song privately, and optionally rate its overall difficulty",
+                "- mark a song as completed to lock it from accidental edits, or keep it as a draft while you build it",
+                "- attach learning videos and a tempo-matched metronome to help you practice",
+                "- tag songs with labels shared across the project's songbook"
               ],
               "fr": [
-                "- tenez un répertoire des morceaux que votre groupe travaille, partagé par tous les onglets morceaux d'un même projet",
-                "- recherchez dans le répertoire par titre, auteur ou paroles, et affinez avec un filtre par label, par état brouillon/terminé, par difficulté du morceau ou par votre propre niveau de maîtrise — chacun de ces filtres accepte plusieurs valeurs à la fois (ex : « Facile » et « Modéré » ensemble)",
-                "- chaque morceau du répertoire affiche son titre, son auteur, son tempo en BPM, son nombre d'accords, combien de ces accords sont notés difficiles, sa propre note de difficulté si elle est renseignée, et votre propre note de maîtrise si elle est renseignée, directement sur sa carte — un morceau sans note de difficulté ou de maîtrise reste visible avec n'importe lequel de ces filtres, il n'a simplement rien à afficher à cet endroit",
-                "- notez votre propre maîtrise d'un morceau, de 0 (inconnu) à 5 (parfaitement acquis), depuis sa page d'édition ou sa vue présentation — cette note est privée, personne d'autre ne la voit, mais elle s'affiche bien sur votre propre vue de la carte du morceau",
-                "- notez, si vous le souhaitez, la difficulté d'un morceau à jouer, de 0 (très facile) à 5 (très difficile), depuis sa page d'édition — indépendamment de la difficulté de chacun de ses accords",
-                "- un morceau a un titre, un auteur, un tempo en BPM, une signature rythmique et une position de capo",
-                "- ajoutez autant d'éléments « Accords » que vous voulez à un morceau, chacun avec son propre nom (ex : « Accords principaux », « Accords alternatifs », « Accords de l'outro ») et sa propre liste d'accords",
-                "- construisez la liste de chaque élément Accords en cherchant dans l'inventaire partagé, ou ajoutez un nouvel accord sans quitter le morceau ; réorganisez ses accords et laissez un commentaire sur l'un d'eux propre à cet élément (ex : une astuce de jeu) — un même accord peut figurer dans plusieurs éléments Accords, chacun gardant son propre commentaire",
-                "- retirer un accord d'un élément Accords ne le retire que de cet élément — il reste dans l'inventaire partagé, et dans tout autre élément Accords qui le liste aussi",
-                "- la liste d'accords globale d'un morceau — proposée pour choisir un accord dans un tableau d'accords ou sur un mot des paroles — regroupe simplement tous les accords présents dans ses éléments Accords, sans doublon",
-                "- lancez un métronome au tempo et à la signature rythmique du morceau, avec le premier temps de chaque mesure mis en valeur",
-                "- chaque morceau a sa propre page avec un lien court et partageable, pour le mettre en favori ou l'envoyer directement à un musicien du groupe",
-                "- l'onglet du navigateur affiche le titre et l'auteur du morceau, pour le retrouver facilement parmi plusieurs morceaux ouverts",
-                "- ajouter un morceau ne demande qu'une courte première étape : un titre et un auteur, puis, si besoin, copier tout d'un autre morceau (ses accords, paroles, vidéos, labels et présentation — vous gardez le titre et l'auteur que vous venez de saisir), partir de la présentation d'un autre morceau sans rien copier d'autre, ou partir d'une page complètement blanche à construire vous-même",
-                "- tout ce qui compose un morceau — son titre, son auteur, son tempo, sa signature rythmique, son capo, sa description, ses accords, ses parties et paroles, ses vidéos et ses labels — vit dans une ligne, dans une colonne, dans un élément de la page du morceau, exactement comme n'importe quel autre ; la page ressemble toujours exactement au résultat final, donc ce que vous voyez correspond toujours à la vue présentation et au PDF imprimé",
-                "- cette même page du morceau sert aussi à organiser sa présentation : ajoutez une ligne, découpez une ligne en colonnes côte à côte, ajoutez un saut de page, ou ajoutez à une colonne n'importe quel élément du morceau (ou un bloc libre à vous) — vous choisissez toujours quel élément placer, rien n'est ajouté à votre place — de petites icônes qui restent discrètes jusqu'à ce que vous en ayez besoin",
-                "- ouvrez l'action « Modifier » d'un élément pour le changer dans une popup — son contenu et sa présentation ensemble : zoomez-le de 30 % à 200 %, encadrez-le dans une carte ou affichez-le sans cadre, choisissez la taille de son titre, et réglez ses propres marges sur chaque côté ; fermer la popup montre l'élément exactement comme il apparaîtra partout ailleurs ; le menu propre à une colonne gère le redimensionnement, l'alignement et les marges de toute la colonne",
-                "- le menu propre à une colonne peut aussi ajouter un fin trait vertical discret sur son bord gauche, son bord droit, ou les deux — une façon subtile de séparer visuellement des colonnes côte à côte sans attirer l'attention ; affiché à l'identique dans la vue présentation et dans le PDF imprimé",
-                "- les éléments ayant leur propre titre (Accords, Paroles & Accords, Vidéos, Labels, Description, un tableau d'accords, blocs libres) permettent de choisir la taille de ce titre depuis cette même popup de modification, de H1 (la plus grande) jusqu'à H5 — affichée à cette taille à l'écran, dans la vue présentation et dans le PDF imprimé ; laisser un titre vide n'affiche rien du tout, sans prendre de place",
-                "- H5 est une taille de titre volontairement discrète : contrairement à H1 à H4, elle s'affiche sans gras et en italique, pour un titre qui doit se lire comme une étiquette légère plutôt qu'un titre de section ; une partie « Paroles & Accords » démarre en H5 par défaut (elle nomme une partie du morceau, pas un titre de page), mais vous pouvez choisir n'importe quelle taille pour elle, et tout autre élément ayant un titre peut aussi choisir H5",
-                "- copiez un élément (Paroles & Accords, un tableau d'accords, ou un bloc libre) et collez-le dans n'importe quelle colonne du même morceau pour le réutiliser — la copie collée est indépendante, donc modifier l'une ne change jamais l'autre ; consultez ce qui est actuellement copié avant de le coller",
-                "- empilez plusieurs éléments dans une même colonne, par exemple le titre et l'auteur ensemble, ou le tempo et le capo côte à côte avec la description",
-                "- choisissez l'apparence des diagrammes d'accords pour chaque morceau : vue complète étiquetée ou simplifiée avec juste des points, en une de sept tailles allant de très très petit à très très grand — enregistré avec le morceau",
-                "- ajoutez une description enrichie à un morceau (notes de répétition, liens, mise en forme), affichée dans sa propre carte au-dessus des accords",
-                "- découpez un morceau en parties — intro, couplet, refrain, pont... — en ajoutant un bloc « Paroles & Accords » par partie, chacun avec son propre titre ; ajoutez-en autant côte à côte ou l'un sous l'autre que votre morceau en a besoin",
-                "- démarrer un bloc « Paroles & Accords » vous demande ce qu'il doit contenir : taper les paroles d'une nouvelle partie, ou le lier à une partie déjà écrite ailleurs dans le morceau",
-                "- donnez à une partie un court titre libre (ex : « Solo ») si vous voulez — entièrement facultatif, affiché au-dessus de cette partie partout où elle apparaît",
-                "- tapez librement les paroles d'un morceau, puis attachez un accord avant, au début, au milieu, à la fin ou juste après n'importe quel mot — plusieurs accords peuvent changer autour d'un même mot",
-                "- taper 3 espaces ou plus d'affilée (ou quelques espaces en début/fin de ligne) laisse un espace sans parole où accrocher un accord — utile pour un changement d'accord entre deux mots ou un dernier gratté après le dernier mot d'une ligne",
-                "- modifier les paroles ensuite ne touche jamais aux accords déjà placés ailleurs dans la même partie",
-                "- quand un refrain se répète à l'identique, liez une nouvelle partie à une partie existante plutôt que de la retaper — elles affichent toujours les mêmes paroles et accords, et modifier l'une met à jour l'autre partout où elle apparaît ; copiez et collez une partie à la place quand vous voulez un point de départ indépendant, comme un autre couplet qui reprend une grille d'accords",
-                "- réglez l'affichage des paroles et des accords d'un morceau — l'espace entre les lignes, la taille du texte des paroles, et la taille des noms d'accords — chacun en une valeur exacte en pixels, enregistré avec le morceau et appliqué partout où il s'affiche, y compris dans le PDF imprimé",
-                "- ajoutez un tableau d'accords à un morceau : un tableau libre que vous construisez vous-même, avec autant de lignes et de colonnes que vous voulez, pour visualiser d'un coup d'œil l'ordre et les répétitions des accords d'un morceau (ex : « Intro : Em G x2 »)",
-                "- chaque cellule d'un tableau d'accords peut contenir un mélange libre d'accords et de texte court (ex : « x4 ») dans n'importe quel ordre, et vous pouvez activer ou désactiver individuellement chacune de ses quatre bordures pour regrouper visuellement des cellules ensemble",
-                "- ajoutez un accord à une cellule depuis la liste d'accords globale du morceau — à condition que le morceau ait au moins un élément Accords contenant quelque chose",
-                "- un tableau d'accords peut avoir son propre commentaire en dessous, et comme tout autre élément d'un morceau, son titre peut être redimensionné de H1 à H5",
-                "- réglez la taille des noms d'accords affichés dans les cellules d'un tableau d'accords — réglage propre à chaque tableau, si bien que deux tableaux d'accords du même morceau peuvent chacun avoir leur propre taille, indépendamment l'un de l'autre et du réglage global de taille des diagrammes d'accords du morceau",
-                "- chaque modification apportée en éditant les cellules d'un tableau d'accords (ajouter ou déplacer un accord ou un bout de texte, activer ou désactiver une bordure) s'applique immédiatement — il n'y a pas d'étape d'enregistrement séparée",
-                "- le nom d'un auteur est mémorisé et suggéré la prochaine fois que vous ajoutez un morceau, pour garder une orthographe cohérente dans tout le répertoire",
-                "- attachez une ou plusieurs vidéos à un morceau — clip officiel, tutoriel, version live — et ouvrez-les directement depuis la page du morceau",
-                "- étiquetez les morceaux avec vos propres labels (ex : « liste du concert », « à retravailler »), partagés par tous les onglets morceaux du projet — les labels d'un morceau sont affichés ensemble au-dessus de sa page, et une action « gérer les labels » dans le menu de la page permet de les attacher, les détacher, les renommer, changer leur couleur, les réordonner ou les supprimer, aussi bien sur la page d'édition que sur la vue présentation",
-                "- marquez un morceau comme terminé une fois qu'il est prêt — un morceau terminé ne propose plus que sa vue présentation, à l'abri des modifications accidentelles ; repassez-le en brouillon à tout moment, directement depuis cette vue présentation, pour le modifier à nouveau",
-                "- passez à la vue présentation du morceau pour le voir exactement comme il sera lu ou imprimé, sans aucune icône de modification",
-                "- une seule action « mise en page » sur la vue présentation regroupe la taille de la page et les marges d'impression : la page s'affiche normalement à la même taille qu'à l'impression (A4 ou US Letter), pour que ce que vous voyez corresponde au PDF ; passez en pleine largeur si vous préférez qu'elle s'étire à votre écran, ou saisissez votre propre largeur personnalisée, et réglez juste en dessous chaque marge d'impression — vos choix sont mémorisés sur cet appareil",
-                "- la vue présentation est aussi là où vous téléchargez le morceau en PDF prêt à imprimer — chaque vidéo devient un QR code à scanner puisqu'un PDF ne peut pas jouer de vidéo, et le fichier s'ouvre aussitôt pour consultation",
-                "- affichez depuis la vue présentation les contours en pointillés de chaque ligne, colonne et élément, pour voir comment la page est construite sans repasser en modification — votre choix est mémorisé sur cet appareil",
-                "- chaque page imprimée affiche le titre et l'auteur du morceau centrés en bas de page, avec le numéro de page sur le nombre total de pages"
+                "- tenez un répertoire partagé des morceaux que votre groupe travaille, cherchable par titre, auteur, paroles, labels, difficulté et votre propre niveau de maîtrise",
+                "- un morceau a un titre, un auteur, un tempo, une signature rythmique, un capo et une liste d'accords, avec une description enrichie",
+                "- composez librement la page d'un morceau — accords, paroles, tableaux d'accords, vidéos — organisés en lignes et colonnes exactement comme il sera lu ou imprimé",
+                "- passez à une vue présentation épurée pour la lecture, l'impression ou le partage, avec un PDF téléchargeable",
+                "- notez votre propre maîtrise d'un morceau en privé, et notez si vous le souhaitez sa difficulté globale",
+                "- marquez un morceau comme terminé pour le protéger des modifications accidentelles, ou gardez-le en brouillon pendant que vous le construisez",
+                "- attachez des vidéos d'apprentissage et un métronome au tempo du morceau pour vous entraîner",
+                "- étiquetez les morceaux avec des labels partagés dans tout le répertoire du projet"
               ]
             },
             "backend": {
@@ -1017,18 +892,14 @@
           "en": [
             "- add a daily journal to any project, shared with all tribe members",
             "- write rich-text blocks for each day and label them to organize your notes",
-            "- navigate between days that have content, or browse all entries by label",
-            "- blocks appear in the global search",
-            "- the planning dashboard shows the number of journal entries for the selected day and highlights days with content on the calendar",
-            "- click a journal entry on the dashboard to jump straight to that day's journal in its project"
+            "- navigate between days with content, or browse all entries by label — blocks also appear in the global search",
+            "- the planning dashboard shows journal activity and lets you jump straight to a day's journal"
           ],
           "fr": [
             "- ajoutez un journal quotidien à n'importe quel projet, partagé avec tous les membres de la tribu",
             "- rédigez des blocs de texte enrichi pour chaque jour et étiquetez-les pour organiser vos notes",
-            "- naviguez entre les jours qui ont du contenu ou parcourez toutes les entrées par étiquette",
-            "- les blocs apparaissent dans la recherche globale",
-            "- le tableau de bord planning indique le nombre d'entrées de journal pour le jour sélectionné et met en valeur les jours avec du contenu sur le calendrier",
-            "- cliquez sur une entrée de journal du tableau de bord pour accéder directement au journal de ce jour dans son projet"
+            "- naviguez entre les jours avec du contenu, ou parcourez toutes les entrées par étiquette — les blocs apparaissent aussi dans la recherche globale",
+            "- le tableau de bord planning affiche l'activité du journal et permet d'accéder directement au journal d'un jour"
           ]
         },
         "backend": {

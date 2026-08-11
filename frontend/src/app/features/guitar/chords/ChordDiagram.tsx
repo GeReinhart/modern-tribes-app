@@ -3,6 +3,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React from 'react';
 
 import { computeFretWindow, intervalSemitoneFromRoot } from './chordTheory.ts';
+import { matchChordQuality, presentSemitones } from './chordNaming.ts';
 import { IntervalMarker, MutedMarker } from './IntervalMarker.tsx';
 import { FretValue } from './types.ts';
 
@@ -52,16 +53,23 @@ interface ChordDiagramProps {
   diagramSize?: ChordDiagramSize;
 }
 
+const degreeLabelsFor = (rootNote: string, frets: FretValue[]): Partial<Record<number, string>> => {
+  const present = presentSemitones(rootNote, frets);
+  const match = present.has(0) ? matchChordQuality(present) : null;
+  return match?.degreeLabels ?? {};
+};
+
 const StringMarker: React.FC<{
   stringIndex: number;
   fret: number;
   rootNote: string;
   simple: boolean;
   markerSize: number;
-}> = ({ stringIndex, fret, rootNote, simple, markerSize }) => {
+  degreeLabels: Partial<Record<number, string>>;
+}> = ({ stringIndex, fret, rootNote, simple, markerSize, degreeLabels }) => {
   const semitone = intervalSemitoneFromRoot(rootNote, stringIndex, fret);
   if (semitone === null) return null;
-  return <IntervalMarker semitone={semitone} size={markerSize} simple={simple} />;
+  return <IntervalMarker semitone={semitone} size={markerSize} simple={simple} label={degreeLabels[semitone]} />;
 };
 
 export const ChordDiagram: React.FC<ChordDiagramProps> = ({
@@ -79,6 +87,7 @@ export const ChordDiagram: React.FC<ChordDiagramProps> = ({
   const markerSize = BASE_MARKER_SIZE * scale;
   const { baseFret, windowSize } = computeFretWindow(frets);
   const rows = Array.from({ length: windowSize }, (_, i) => baseFret + i);
+  const degreeLabels = degreeLabelsFor(rootNote, frets);
 
   return (
     <div style={{ display: 'inline-flex', userSelect: 'none', color: theme.colors.text }}>
@@ -86,7 +95,15 @@ export const ChordDiagram: React.FC<ChordDiagramProps> = ({
         <div style={{ height: '14px', fontSize: '11px', color: theme.colors.secondary }}>
           {baseFret > 1 ? `${baseFret}fr` : ''}
         </div>
-        <OpenMuteRow frets={frets} rootNote={rootNote} simple={simple} cellW={cellW} rowH={rowH} markerSize={markerSize} />
+        <OpenMuteRow
+          frets={frets}
+          rootNote={rootNote}
+          simple={simple}
+          cellW={cellW}
+          rowH={rowH}
+          markerSize={markerSize}
+          degreeLabels={degreeLabels}
+        />
         {baseFret === 1 && (
           <div style={{ width: cellW * 6, height: nutH, backgroundColor: theme.colors.text }} />
         )}
@@ -101,6 +118,7 @@ export const ChordDiagram: React.FC<ChordDiagramProps> = ({
             cellW={cellW}
             rowH={rowH}
             markerSize={markerSize}
+            degreeLabels={degreeLabels}
           />
         ))}
       </div>
@@ -139,14 +157,24 @@ interface OpenMuteRowProps {
   cellW: number;
   rowH: number;
   markerSize: number;
+  degreeLabels: Partial<Record<number, string>>;
 }
 
-const OpenMuteRow: React.FC<OpenMuteRowProps> = ({ frets, rootNote, simple, cellW, rowH, markerSize }) => (
+const OpenMuteRow: React.FC<OpenMuteRowProps> = ({ frets, rootNote, simple, cellW, rowH, markerSize, degreeLabels }) => (
   <div style={{ display: 'flex' }}>
     {frets.map((fret, stringIndex) => (
       <div key={stringIndex} style={{ width: cellW, height: rowH, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {fret === 'X' && <MutedMarker size={markerSize} />}
-        {fret === 0 && <StringMarker stringIndex={stringIndex} fret={0} rootNote={rootNote} simple={simple} markerSize={markerSize} />}
+        {fret === 0 && (
+          <StringMarker
+            stringIndex={stringIndex}
+            fret={0}
+            rootNote={rootNote}
+            simple={simple}
+            markerSize={markerSize}
+            degreeLabels={degreeLabels}
+          />
+        )}
       </div>
     ))}
   </div>
@@ -161,9 +189,10 @@ interface FretRowProps {
   cellW: number;
   rowH: number;
   markerSize: number;
+  degreeLabels: Partial<Record<number, string>>;
 }
 
-const FretRow: React.FC<FretRowProps> = ({ fret, frets, rootNote, borderColor, simple, cellW, rowH, markerSize }) => (
+const FretRow: React.FC<FretRowProps> = ({ fret, frets, rootNote, borderColor, simple, cellW, rowH, markerSize, degreeLabels }) => (
   <div style={{ display: 'flex', borderBottom: `1px solid ${borderColor}` }}>
     {frets.map((stringFret, stringIndex) => (
       <div
@@ -178,7 +207,14 @@ const FretRow: React.FC<FretRowProps> = ({ fret, frets, rootNote, borderColor, s
         }}
       >
         {stringFret === fret && (
-          <StringMarker stringIndex={stringIndex} fret={fret} rootNote={rootNote} simple={simple} markerSize={markerSize} />
+          <StringMarker
+            stringIndex={stringIndex}
+            fret={fret}
+            rootNote={rootNote}
+            simple={simple}
+            markerSize={markerSize}
+            degreeLabels={degreeLabels}
+          />
         )}
       </div>
     ))}

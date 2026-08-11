@@ -105,7 +105,6 @@ export type LayoutBlockType =
   | 'description'
   | 'chords'
   | 'sections'
-  | 'videos'
   | 'labels'
   | 'custom'
   | 'chord_grid';
@@ -233,6 +232,7 @@ export interface GuitarSongLayoutSettings {
   margin_right_mm: number;
   margin_bottom_mm: number;
   margin_left_mm: number;
+  footer_spacing_mm: number;
   status: string;
   created_at: string;
   updated_at: string;
@@ -289,6 +289,7 @@ export interface GuitarSongLayoutSettingsUpdate {
   margin_right_mm?: number;
   margin_bottom_mm?: number;
   margin_left_mm?: number;
+  footer_spacing_mm?: number;
 }
 
 export type MoveDirection = 'prev' | 'next';

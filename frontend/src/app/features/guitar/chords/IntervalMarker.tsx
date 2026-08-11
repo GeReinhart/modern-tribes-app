@@ -8,9 +8,10 @@ interface IntervalMarkerProps {
   semitone: number;
   size?: number;
   simple?: boolean;
+  label?: string;
 }
 
-export const IntervalMarker: React.FC<IntervalMarkerProps> = ({ semitone, size = 26, simple = false }) => {
+export const IntervalMarker: React.FC<IntervalMarkerProps> = ({ semitone, size = 26, simple = false, label }) => {
   const { theme } = useTheme();
 
   if (simple) {
@@ -28,7 +29,8 @@ export const IntervalMarker: React.FC<IntervalMarkerProps> = ({ semitone, size =
   }
 
   const isRoot = semitone === 0;
-  const fontSize = INTERVAL_LABELS[semitone].length > 2 ? size * 0.34 : size * 0.4;
+  const displayLabel = label ?? INTERVAL_LABELS[semitone];
+  const fontSize = displayLabel.length > 2 ? size * 0.34 : size * 0.4;
 
   return (
     <div
@@ -48,7 +50,7 @@ export const IntervalMarker: React.FC<IntervalMarkerProps> = ({ semitone, size =
         flexShrink: 0,
       }}
     >
-      {INTERVAL_LABELS[semitone]}
+      {displayLabel}
     </div>
   );
 };

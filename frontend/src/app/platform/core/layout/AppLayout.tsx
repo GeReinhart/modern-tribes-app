@@ -8,7 +8,7 @@ import React from 'react';
 import { AppFooter } from './AppFooter.tsx';
 import { AppHeader } from './AppHeader.tsx';
 import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb.tsx';
-import { HeaderVisibilityProvider } from './HeaderVisibilityContext.tsx';
+import { ChromeVisibilityProvider } from './ChromeVisibilityContext.tsx';
 import { ToolbarPlacementProvider } from './ToolbarPlacementContext.tsx';
 
 interface AppLayoutProps {
@@ -66,9 +66,9 @@ const AppLayoutInner: React.FC<AppLayoutProps> = ({
 };
 
 export const AppLayout: React.FC<AppLayoutProps> = (props) => (
-  <HeaderVisibilityProvider>
-    <ToolbarPlacementProvider>
+  <ToolbarPlacementProvider>
+    <ChromeVisibilityProvider>
       <AppLayoutInner {...props} />
-    </ToolbarPlacementProvider>
-  </HeaderVisibilityProvider>
+    </ChromeVisibilityProvider>
+  </ToolbarPlacementProvider>
 );

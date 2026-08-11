@@ -19,7 +19,6 @@ export default defineConfig({
         theme_color: '#4f46e5',
         background_color: '#ffffff',
         display: 'standalone',
-        orientation: 'portrait-primary',
         start_url: '/',
         icons: [
           {
@@ -50,6 +49,8 @@ export default defineConfig({
       },
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        // Default is 2 MiB; the single main JS bundle (no code-splitting) already exceeds that.
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
     }),
   ],

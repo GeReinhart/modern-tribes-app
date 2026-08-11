@@ -496,13 +496,11 @@ Feature: Create a guitar song
       | 3        | false              | active |
       | 4        | false              | active |
       | 5        | false              | active |
-      | 6        | false              | active |
     And the guitar_songs_layout_columns table contains:
       | position | width_twelfths | align | status |
       | 1        | 12             | left  | active |
       | 1        | 3              | left  | active |
       | 2        | 9              | left  | active |
-      | 1        | 12             | left  | active |
       | 1        | 12             | left  | active |
       | 1        | 12             | left  | active |
       | 1        | 12             | left  | active |
@@ -516,7 +514,6 @@ Feature: Create a guitar song
       | 1        | description    | active |
       | 1        | chords         | active |
       | 1        | sections       | active |
-      | 1        | videos         | active |
 
   Scenario: POST a song with blank_layout — no rows are seeded, ready to be built from scratch
     Given I am authenticated as a regular user: user.id 0002

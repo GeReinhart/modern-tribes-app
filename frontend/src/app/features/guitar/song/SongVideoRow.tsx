@@ -1,10 +1,10 @@
 import { ThemedIconButton } from '@/app/platform/core/layout/themes/components/ThemedIconButton.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
-import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { SongVideoPlayer } from './SongVideoPlayer.tsx';
 import { GuitarSongVideo, GuitarSongVideoUpdate, MoveDirection } from './types.ts';
 
 interface SongVideoRowProps {
@@ -21,7 +21,6 @@ interface SongVideoRowProps {
 export const SongVideoRow: React.FC<SongVideoRowProps> = ({
   video, isFirst, isLast, canEdit, canManage, onUpdate, onMove, onRemove,
 }) => {
-  const { theme } = useTheme();
   const { t } = useTranslation();
   const [title, setTitle] = useState(video.title ?? '');
   const [url, setUrl] = useState(video.url);
@@ -34,11 +33,7 @@ export const SongVideoRow: React.FC<SongVideoRowProps> = ({
   };
 
   if (!canEdit) {
-    return (
-      <a href={video.url} target="_blank" rel="noreferrer" style={{ color: theme.colors.primary }}>
-        {video.title || video.url}
-      </a>
-    );
+    return <SongVideoPlayer video={video} />;
   }
 
   return (

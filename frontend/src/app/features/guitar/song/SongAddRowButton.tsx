@@ -30,7 +30,7 @@ export const SongAddRowButton: React.FC<SongAddRowButtonProps> = ({ rows, hook, 
 
   return (
     <ThemedPopover
-      triggerIcon="plus" triggerLabel={triggerLabel} closeLabel={t('common.close')}
+      triggerIcon="layers" triggerLabel={triggerLabel} closeLabel={t('common.close')}
       triggerIconSize={insertBeforeRowId ? 12 : 14}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '200px' }}>

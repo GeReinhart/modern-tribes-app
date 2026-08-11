@@ -28,6 +28,13 @@ export const SongFreeformHtml: React.FC<SongFreeformHtmlProps> = ({ html, style 
         .song-freeform-html :where(h2) { font-size: ${TITLE_HEADING_SIZES_PX.h2}px; }
         .song-freeform-html :where(h3) { font-size: ${TITLE_HEADING_SIZES_PX.h3}px; }
         .song-freeform-html :where(h4) { font-size: ${TITLE_HEADING_SIZES_PX.h4}px; }
+        .song-freeform-html :where(h5) {
+          font-weight: 400;
+          font-style: italic;
+          color: ${theme.colors.text};
+          font-size: ${TITLE_HEADING_SIZES_PX.h5}px;
+          margin: 0 0 8px;
+        }
       `}
       </style>
       <div dangerouslySetInnerHTML={{ __html: html }} />

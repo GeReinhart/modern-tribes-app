@@ -1,13 +1,13 @@
 import { ChordDiagramSize, ChordDiagramStyle } from '@/app/features/guitar/chords/ChordDiagram.tsx';
 import { ChordFormModal } from '@/app/features/guitar/chords/ChordFormModal.tsx';
 import { ChordsFilterBar } from '@/app/features/guitar/chords/ChordsFilterBar.tsx';
-import { filterGuitarChords } from '@/app/features/guitar/chords/filterChords.ts';
 import { guitarChordsService } from '@/app/features/guitar/chords/service.ts';
 import { GuitarChordCreate } from '@/app/features/guitar/chords/types.ts';
+import { useChordsFilter } from '@/app/features/guitar/chords/useChordsFilter.ts';
 import { useGuitarChords } from '@/app/features/guitar/chords/useGuitarChords.ts';
 import { ModalBody, ThemedModal } from '@/app/platform/core/layout/themes/components/ThemedModal.tsx';
 
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SongChordPickerCard } from './SongChordPickerCard.tsx';
@@ -34,14 +34,10 @@ export const AddChordToSongModal: React.FC<AddChordToSongModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const { chords, reload } = useGuitarChords();
-  const [search, setSearch] = useState('');
-  const [rootFilter, setRootFilter] = useState('');
+  const {
+    search, setSearch, rootFilter, setRootFilter, fretFilter, onFretFilterChange, filteredChords,
+  } = useChordsFilter(chords);
   const [createFormOpen, setCreateFormOpen] = useState(false);
-
-  const filteredChords = useMemo(
-    () => filterGuitarChords(chords, search, rootFilter),
-    [chords, search, rootFilter],
-  );
 
   const handleCreateChord = async (data: GuitarChordCreate) => {
     const created = await guitarChordsService.createChord(data);
@@ -58,6 +54,8 @@ export const AddChordToSongModal: React.FC<AddChordToSongModalProps> = ({
             onSearchChange={setSearch}
             rootFilter={rootFilter}
             onRootFilterChange={setRootFilter}
+            fretFilter={fretFilter}
+            onFretFilterChange={onFretFilterChange}
             onAdd={() => setCreateFormOpen(true)}
           />
           <div

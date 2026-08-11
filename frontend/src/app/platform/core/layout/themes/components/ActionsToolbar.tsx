@@ -11,7 +11,7 @@ interface ActionsToolbarProps {
 
 // A fixed cap keeps the toolbar's height predictable without measuring layout;
 // anything beyond it is still reachable through the overflow menu.
-const VISIBLE_LIMIT = 6;
+const VISIBLE_LIMIT = 10;
 
 export const ActionsToolbar: React.FC<ActionsToolbarProps> = ({ actions, menuDirection = 'down' }) => {
   if (actions.length === 0) return null;

@@ -1,7 +1,8 @@
 import { LevelOption } from '@/app/platform/core/layout/themes/components/ThemedLevelPicker.tsx';
+import { IconName } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 
 // Icon+color only -- captions are resolved by callers via guitarSong.mastery.level0..5.
-export const MASTERY_LEVEL_STYLES: Omit<LevelOption, 'caption'>[] = [
+export const MASTERY_LEVEL_STYLES: (Omit<LevelOption, 'caption'> & { icon: IconName })[] = [
   { value: 0, icon: 'star', color: '#9ca3af' },
   { value: 1, icon: 'star', color: '#f97316' },
   { value: 2, icon: 'star', color: '#eab308' },

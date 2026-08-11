@@ -1,4 +1,5 @@
 const en: Record<string, string> = {
+  'features.guitarMetronome.title': 'Metronome',
   'features.guitarMetronome.start': 'Start',
   'features.guitarMetronome.stop': 'Stop',
   'features.guitarMetronome.tap': 'Tap',

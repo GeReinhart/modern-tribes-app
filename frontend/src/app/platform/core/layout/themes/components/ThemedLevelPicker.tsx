@@ -1,30 +1,35 @@
 import { IconName, ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
-import React from 'react';
-
-export interface LevelOption {
-  value: number;
-  icon: IconName;
+export interface LevelOption<T extends string | number = number> {
+  value: T;
+  icon?: IconName;
   color: string;
   caption: string;
 }
 
-interface ThemedLevelPickerProps {
-  options: LevelOption[];
-  value: number | null;
-  onChange: (value: number) => void;
+interface ThemedLevelPickerProps<T extends string | number> {
+  options: LevelOption<T>[];
+  value: T | null;
+  onChange: (value: T) => void;
+  onDeselect?: () => void;
   ariaLabelPrefix: string;
   disabled?: boolean;
 }
 
-// A 0..N rating widget (difficulty, mastery...) -- each level gets its own icon color and short
-// caption, since a single repeated glyph with no other distinction reads as "all the same" once
-// two levels share a shape.
-export const ThemedLevelPicker: React.FC<ThemedLevelPickerProps> = ({
-  options, value, onChange, ariaLabelPrefix, disabled = false,
-}) => {
+// A 0..N rating widget (difficulty, mastery...) or a single-pick card grid (root note...) -- each
+// option gets its own accent color and short caption, since a single repeated glyph with no other
+// distinction reads as "all the same" once two options share a shape. `onDeselect`, when provided,
+// lets clicking the already-selected card clear the selection instead of re-selecting it.
+export function ThemedLevelPicker<T extends string | number>({
+  options, value, onChange, onDeselect, ariaLabelPrefix, disabled = false,
+}: ThemedLevelPickerProps<T>) {
   const { theme } = useTheme();
+
+  const handleClick = (option: LevelOption<T>) => {
+    if (value === option.value && onDeselect) onDeselect();
+    else onChange(option.value);
+  };
 
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
@@ -35,7 +40,7 @@ export const ThemedLevelPicker: React.FC<ThemedLevelPickerProps> = ({
             key={option.value}
             type="button"
             disabled={disabled}
-            onClick={() => onChange(option.value)}
+            onClick={() => handleClick(option)}
             aria-label={`${ariaLabelPrefix}: ${option.caption}`}
             title={option.caption}
             style={{
@@ -47,7 +52,7 @@ export const ThemedLevelPicker: React.FC<ThemedLevelPickerProps> = ({
               backgroundColor: selected ? `${option.color}25` : 'transparent',
             }}
           >
-            <ThemedSvgIcon name={option.icon} color={option.color} size={18} />
+            {option.icon && <ThemedSvgIcon name={option.icon} color={option.color} size={18} />}
             <span style={{ fontSize: '10px', color: theme.colors.text, whiteSpace: 'nowrap' }}>
               {option.caption}
             </span>
@@ -56,4 +61,4 @@ export const ThemedLevelPicker: React.FC<ThemedLevelPickerProps> = ({
       })}
     </div>
   );
-};
+}

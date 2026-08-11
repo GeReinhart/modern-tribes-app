@@ -2,15 +2,15 @@ import { ThemedConfirmDialog } from '@/app/platform/core/layout/themes/component
 import { ThemedErrorMessage } from '@/app/platform/core/layout/themes/components/ThemedErrorMessage.tsx';
 import { ThemedLoadingSpinner } from '@/app/platform/core/layout/themes/components/ThemedLoadingSpinner.tsx';
 
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ChordCard } from './ChordCard.tsx';
 import { ChordsFilterBar } from './ChordsFilterBar.tsx';
 import { ChordFormModal } from './ChordFormModal.tsx';
-import { filterGuitarChords } from './filterChords.ts';
 import { guitarChordsService } from './service.ts';
 import { GuitarChord, GuitarChordCreate } from './types.ts';
+import { useChordsFilter } from './useChordsFilter.ts';
 import { useGuitarChords } from './useGuitarChords.ts';
 
 interface Props {
@@ -22,16 +22,12 @@ interface Props {
 const ChordsTab: React.FC<Props> = () => {
   const { t } = useTranslation();
   const { chords, loading, error, reload } = useGuitarChords();
-  const [search, setSearch] = useState('');
-  const [rootFilter, setRootFilter] = useState('');
+  const {
+    search, setSearch, rootFilter, setRootFilter, fretFilter, onFretFilterChange, filteredChords,
+  } = useChordsFilter(chords);
   const [editingChord, setEditingChord] = useState<GuitarChord | undefined>(undefined);
   const [formOpen, setFormOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<GuitarChord | null>(null);
-
-  const filteredChords = useMemo(
-    () => filterGuitarChords(chords, search, rootFilter),
-    [chords, search, rootFilter],
-  );
 
   const openAddForm = () => { setEditingChord(undefined); setFormOpen(true); };
   const openEditForm = (chord: GuitarChord) => { setEditingChord(chord); setFormOpen(true); };
@@ -59,6 +55,8 @@ const ChordsTab: React.FC<Props> = () => {
         onSearchChange={setSearch}
         rootFilter={rootFilter}
         onRootFilterChange={setRootFilter}
+        fretFilter={fretFilter}
+        onFretFilterChange={onFretFilterChange}
         onAdd={openAddForm}
       />
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>

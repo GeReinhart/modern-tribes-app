@@ -1,6 +1,6 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
-import { useHeaderVisibility } from '@/app/platform/core/layout/HeaderVisibilityContext.tsx';
+import { useChromeVisibility } from '@/app/platform/core/layout/ChromeVisibilityContext.tsx';
 import { useTabActionsContext } from '@/app/platform/core/layout/TabActionsContext.tsx';
 import { useToolbarPlacement } from '@/app/platform/core/layout/ToolbarPlacementContext.tsx';
 
@@ -13,7 +13,8 @@ interface UseAppLayoutStateParams {
 
 export const useAppLayoutState = ({ menuActions, tabActions }: UseAppLayoutStateParams) => {
   const { theme } = useTheme();
-  const { headerVisible } = useHeaderVisibility();
+  const { chromeHidden } = useChromeVisibility();
+  const headerVisible = !chromeHidden;
   const { toolbarPlacement } = useToolbarPlacement();
   const { tabActionsFromTab } = useTabActionsContext();
 

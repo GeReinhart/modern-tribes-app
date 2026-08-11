@@ -5,7 +5,8 @@ import { SongInlineEditableNumber } from './SongInlineEditableField.tsx';
 import { GuitarSongLayoutSettings, GuitarSongLayoutSettingsUpdate } from './types.ts';
 
 type MarginField = keyof Pick<
-  GuitarSongLayoutSettings, 'margin_top_mm' | 'margin_right_mm' | 'margin_bottom_mm' | 'margin_left_mm'
+  GuitarSongLayoutSettings,
+  'margin_top_mm' | 'margin_right_mm' | 'margin_bottom_mm' | 'margin_left_mm' | 'footer_spacing_mm'
 >;
 
 const MARGIN_FIELDS: Array<[MarginField, string]> = [
@@ -13,6 +14,7 @@ const MARGIN_FIELDS: Array<[MarginField, string]> = [
   ['margin_right_mm', 'guitarSong.layout.marginRight'],
   ['margin_bottom_mm', 'guitarSong.layout.marginBottom'],
   ['margin_left_mm', 'guitarSong.layout.marginLeft'],
+  ['footer_spacing_mm', 'guitarSong.layout.footerSpacing'],
 ];
 
 interface SongLayoutMarginsFormProps {

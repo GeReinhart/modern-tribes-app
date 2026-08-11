@@ -233,6 +233,22 @@ Feature: Add a row to a guitar song's presentation layout
     And the guitar_songs_layout_rows table contains:
       | id | song_id | position | page_break_before | status |
 
+  @error_case
+  Scenario: POST a row with a "videos" block — 422, videos are metadata only and no longer placeable in the layout
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the guitar_songs_layout_rows table contains:
+      | id | song_id | position | page_break_before | status |
+    When I POST /api/features/tasks/guitar-songs/songs/0200/layout/rows with body:
+      """
+      {"page_break_before": false, "columns": [{"blocks": [{"block_type": "videos"}], "width_twelfths": 8, "align": "left"}]}
+      """
+    Then the response status code is 422
+    And the guitar_songs_layout_rows table contains:
+      | id | song_id | position | page_break_before | status |
+
   Scenario: POST a second row — it lands after the first
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:

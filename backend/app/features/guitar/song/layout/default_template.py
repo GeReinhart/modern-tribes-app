@@ -14,7 +14,6 @@ DEFAULT_BLOCK_WIDTH_TWELFTHS = {
     "description": 9,
     "chords": 9,
     "sections": 12,
-    "videos": 6,
     "labels": 6,
 }
 
@@ -48,12 +47,6 @@ DEFAULT_LAYOUT_ROWS = [
         "page_break_before": False,
         "columns": [
             {"block_types": ["sections"], "width_twelfths": 12, "align": "left"},
-        ],
-    },
-    {
-        "page_break_before": False,
-        "columns": [
-            {"block_types": ["videos"], "width_twelfths": 12, "align": "left"},
         ],
     },
 ]

@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 from app.features.guitar.chords.models import GuitarChordResponse
 
 BlockType = Literal[
-    "title", "author", "tempo", "time_signature", "capo", "description", "chords", "sections", "videos", "labels",
+    "title", "author", "tempo", "time_signature", "capo", "description", "chords", "sections", "labels",
     "custom", "chord_grid",
 ]
 Align = Literal["left", "center", "right"]
@@ -27,11 +27,11 @@ CHORDS_BLOCK_TYPE = "chords"
 REPEATABLE_BLOCK_TYPES = {CUSTOM_BLOCK_TYPE, SECTIONS_BLOCK_TYPE, CHORD_GRID_BLOCK_TYPE, CHORDS_BLOCK_TYPE}
 # title/author/tempo/time_signature/capo show the song's own value instead of a separate label,
 # so they're the only block types with no editable title at all -- every other type shown here
-# defaults to no title (or, for chords/videos/chord_grid, a translated heading) until named.
+# defaults to no title (or, for chords/chord_grid, a translated heading) until named.
 # Shared with pdf_blocks.py (its rendering needs the exact same set) and the frontend's
 # layoutBlockOptions.ts (kept in sync by hand, same as every other backend/frontend enum pair).
 TITLE_EDITABLE_BLOCK_TYPES = {
-    CHORDS_BLOCK_TYPE, SECTIONS_BLOCK_TYPE, "videos", "labels", "description", CHORD_GRID_BLOCK_TYPE, CUSTOM_BLOCK_TYPE,
+    CHORDS_BLOCK_TYPE, SECTIONS_BLOCK_TYPE, "labels", "description", CHORD_GRID_BLOCK_TYPE, CUSTOM_BLOCK_TYPE,
 }
 MAX_CHORD_GRID_ROWS = 30
 MAX_CHORD_GRID_COLUMNS = 15
@@ -333,6 +333,10 @@ class GuitarSongLayoutSettingsUpdate(BaseModel):
     margin_right_mm: Optional[float] = Field(default=None, ge=0, le=100)
     margin_bottom_mm: Optional[float] = Field(default=None, ge=0, le=100)
     margin_left_mm: Optional[float] = Field(default=None, ge=0, le=100)
+    # Distance between the printed footer (title/author + page number) and the page's true
+    # bottom edge -- lives inside margin_bottom_mm's own band, so it must stay strictly smaller
+    # than the (possibly also-updated) bottom margin; see layout/service.py's cross-field check.
+    footer_spacing_mm: Optional[float] = Field(default=None, ge=0, le=100)
 
 
 class GuitarSongLayoutSettingsResponse(BaseModel):
@@ -342,6 +346,7 @@ class GuitarSongLayoutSettingsResponse(BaseModel):
     margin_right_mm: float
     margin_bottom_mm: float
     margin_left_mm: float
+    footer_spacing_mm: float
     status: str
     created_at: datetime
     updated_at: datetime

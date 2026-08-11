@@ -3,8 +3,6 @@ import React from 'react';
 import { ActiveLayoutMenuProvider } from './ActiveLayoutMenuContext.tsx';
 import { SongAddRowButton } from './SongAddRowButton.tsx';
 import { SongLayoutRow } from './SongLayoutRow.tsx';
-import { SongMetronomeControls } from './SongMetronomeControls.tsx';
-import { usedBlockTypesExcludingRow } from './layoutBlockOptions.ts';
 import { GuitarSongDetail } from './types.ts';
 import { useGuitarSong } from './useGuitarSong.ts';
 import { useGuitarSongLabels } from './useGuitarSongLabels.ts';
@@ -30,7 +28,6 @@ export const SongDetailBody: React.FC<SongDetailBodyProps> = ({
 }) => {
   const canManage = canEdit && isManager;
   const sortedRows = [...song.layout.rows].sort((a, b) => a.position - b.position);
-  const hasTempoBlock = usedBlockTypesExcludingRow(song.layout.rows).has('tempo');
 
   return (
     <ActiveLayoutMenuProvider>
@@ -64,13 +61,6 @@ export const SongDetailBody: React.FC<SongDetailBodyProps> = ({
         // Dropdowns on the last rows/blocks open downward and get cut off if there's nothing to
         // scroll to below them -- this keeps them reachable in edit mode.
         <div style={{ height: '75vh' }} aria-hidden="true" />
-      )}
-      {hasTempoBlock && (
-        // A playback tool, not printable page content -- floats outside the page itself rather
-        // than occupying row/column space, and stays put on screen as the page scrolls.
-        <div style={{ position: 'fixed', right: '16px', top: '50%', transform: 'translateY(-50%)', zIndex: 10 }}>
-          <SongMetronomeControls tempoBpm={song.tempo_bpm} beatsPerBar={song.beats_per_bar} />
-        </div>
       )}
     </ActiveLayoutMenuProvider>
   );

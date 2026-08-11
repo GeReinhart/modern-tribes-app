@@ -10,6 +10,7 @@ from app.features.guitar.song.layout.models import ROW_WIDTH_TWELFTHS
 from app.features.guitar.song.layout.pdf_blocks import (
     BLOCK_RENDERERS,
     FREEFORM_HEADING_CSS,
+    FREEFORM_LIST_CSS,
     render_block_title,
     render_chord_grid_block,
     render_chords_block,
@@ -65,11 +66,16 @@ def _css_string_escape(value: str) -> str:
     return value.replace("\\", "\\\\").replace('"', '\\"')
 
 
-def _footer_css(song) -> str:
+def _footer_css(song, footer_spacing_mm: float) -> str:
     footer_text = _css_string_escape(f"{song.title} - {song.author}" if song.author else song.title)
+    # A page-margin box (@bottom-center/@bottom-right) sits inside margin_bottom_mm's own band by
+    # definition -- this padding is what actually pushes the footer text up, away from the page's
+    # true bottom edge, independent of margin_bottom_mm itself (which stays the content's own
+    # clearance above the footer).
+    padding = f"padding-bottom: {footer_spacing_mm}mm;"
     return (
-        f'@bottom-center {{ content: "{footer_text}"; font-size: 9px; color: #666666; }} '
-        '@bottom-right { content: counter(page) " / " counter(pages); font-size: 9px; color: #666666; }'
+        f'@bottom-center {{ content: "{footer_text}"; font-size: 9px; color: #666666; {padding} }} '
+        f'@bottom-right {{ content: counter(page) " / " counter(pages); font-size: 9px; color: #666666; {padding} }}'
     )
 
 
@@ -81,10 +87,10 @@ def _build_html_document(song, label_details: dict) -> str:
     margin = f"{settings.margin_top_mm}mm {settings.margin_right_mm}mm {settings.margin_bottom_mm}mm {settings.margin_left_mm}mm"
     return (
         "<!doctype html><html><head><meta charset=\"utf-8\" />"
-        f"<style>@page {{ size: A4 portrait; margin: {margin}; {_footer_css(song)} }} "
+        f"<style>@page {{ size: A4 portrait; margin: {margin}; {_footer_css(song, settings.footer_spacing_mm)} }} "
         "body { font-family: Helvetica, Arial, sans-serif; color: #1a1a1a; margin: 0; } "
         ".layout-row { display: flex; width: 100%; } "
-        f".freeform img {{ max-width: 100%; height: auto; }} {FREEFORM_HEADING_CSS}</style>"
+        f".freeform img {{ max-width: 100%; height: auto; }} {FREEFORM_HEADING_CSS}{FREEFORM_LIST_CSS}</style>"
         f"</head><body>{rows_html}</body></html>"
     )
 
@@ -115,12 +121,12 @@ def _wrap_in_card(content: str, zoom: float) -> str:
     return f'<div style="border:1px solid #ccc;border-radius:{8 * zoom}px;padding:{12 * zoom}px;">{content}</div>'
 
 
-def _render_block_wrapper(block, song, label_details: dict, column_width_twelfths: int) -> str:
+def _render_block_wrapper(block, song, label_details: dict, column_width_twelfths: int, is_first: bool = True) -> str:
     zoom = block.zoom_percent / 100
     body = _render_block(block, song, label_details, zoom)
     title_html = render_block_title(block, zoom)
     # Mirrors the web read view's rule (songLayoutCollectionBlocks.tsx returning null for an
-    # empty chords/videos/sections/chord_grid block): an empty block shows no title either, so a
+    # empty chords/sections/chord_grid block): an empty block shows no title either, so a
     # default label like "Chords" never prints above nothing. A 'custom' ("free text") block is
     # the one exception -- songLayoutBlockContentDispatch.tsx's 'custom' case shows its title and
     # body independently, so a title-only custom block (no body at all) is a valid, meaningful
@@ -144,11 +150,14 @@ def _render_block_wrapper(block, song, label_details: dict, column_width_twelfth
         # narrow block inside an already-narrow column isn't narrowed twice.
         width_pct = min(100, block.width_twelfths / column_width_twelfths * 100)
         width_style = f"width:{width_pct}%;box-sizing:border-box;"
+    # A free-text block cancels the previous block's own trailing margin-bottom so its content
+    # butts up directly against the block above -- but only when something actually precedes it.
+    top_cancel = f"margin-top:{-8 * zoom}px;" if block.block_type == "custom" and not is_first else ""
     if block.block_type in _COMPACT_BLOCK_TYPES:
         return f'<div style="display:inline-block;vertical-align:bottom;{width_style}{padding}margin:0 {16 * zoom}px {8 * zoom}px 0;">{content}</div>'
     if width_style:
-        return f'<div style="display:inline-block;vertical-align:bottom;{width_style}{padding}margin-bottom:{8 * zoom}px;">{content}</div>'
-    return f'<div style="{padding}margin-bottom:{8 * zoom}px;">{content}</div>'
+        return f'<div style="display:inline-block;vertical-align:bottom;{width_style}{padding}{top_cancel}margin-bottom:{8 * zoom}px;">{content}</div>'
+    return f'<div style="{padding}{top_cancel}margin-bottom:{8 * zoom}px;">{content}</div>'
 
 
 # Same subtle, low-opacity solid line as the web read view's separatorBorder -- deliberately
@@ -165,7 +174,8 @@ def _render_column(column, song, label_details: dict) -> str:
     border_left = f"border-left:{_COLUMN_SEPARATOR_BORDER};" if column.separator_left else ""
     border_right = f"border-right:{_COLUMN_SEPARATOR_BORDER};" if column.separator_right else ""
     blocks_html = "".join(
-        _render_block_wrapper(block, song, label_details, column.width_twelfths) for block in column.blocks
+        _render_block_wrapper(block, song, label_details, column.width_twelfths, index == 0)
+        for index, block in enumerate(column.blocks)
     )
     return (
         f'<div style="width:{width_pct}%;text-align:{column.align};padding:{padding};'

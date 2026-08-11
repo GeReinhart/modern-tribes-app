@@ -6,7 +6,7 @@ import {
 } from './types.ts';
 
 export const ALL_BLOCK_TYPES: LayoutBlockType[] = [
-  'title', 'author', 'tempo', 'time_signature', 'capo', 'description', 'chords', 'sections', 'videos', 'labels',
+  'title', 'author', 'tempo', 'time_signature', 'capo', 'description', 'chords', 'sections', 'labels',
   'chord_grid',
 ];
 
@@ -20,12 +20,12 @@ const COMPACT_BLOCK_TYPES = new Set<LayoutBlockType>(['tempo', 'time_signature',
 export const isCompactBlockType = (blockType: LayoutBlockType): boolean => COMPACT_BLOCK_TYPES.has(blockType);
 
 // These block types show an editable title above their content, via the block's own
-// custom_title (same field a custom/free-text block uses for its title) -- chords/videos/
-// chord_grid default to a translated heading (e.g. "Chords") when unset, the others default to
+// custom_title (same field a custom/free-text block uses for its title) -- chords/chord_grid
+// default to a translated heading (e.g. "Chords") when unset, the others default to
 // no title at all until the user names them. title/author/tempo/time_signature/capo show the
 // song's own value instead of a separate label, so they're never title-editable.
 const TITLE_EDITABLE_BLOCK_TYPES = new Set<LayoutBlockType>([
-  'chords', 'sections', 'videos', 'labels', 'description', 'chord_grid',
+  'chords', 'sections', 'labels', 'description', 'chord_grid',
 ]);
 
 export const isTitleEditableBlockType = (blockType: LayoutBlockType): boolean => TITLE_EDITABLE_BLOCK_TYPES.has(blockType);

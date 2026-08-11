@@ -38,9 +38,9 @@ export const SongSearchFilters: React.FC<SongSearchFiltersProps> = ({
 
   const chipStyle = (active: boolean, color?: string): React.CSSProperties => ({
     display: 'flex', alignItems: 'center', gap: '4px',
-    padding: '4px 12px',
+    padding: '3px 10px',
     borderRadius: '16px',
-    fontSize: 'var(--font-xs)',
+    fontSize: 'var(--font-xxs)',
     fontWeight: 500,
     cursor: 'pointer',
     border: `1px solid ${active ? (color || theme.colors.primary) : theme.colors.border}`,
@@ -49,24 +49,20 @@ export const SongSearchFilters: React.FC<SongSearchFiltersProps> = ({
     whiteSpace: 'nowrap',
   });
 
-  const renderLevelFilterRow = (
+  const renderLevelChips = (
     levelLabelKeyPrefix: string,
     styles: typeof DIFFICULTY_LEVEL_STYLES,
     selected: number[],
     onToggle: (value: number) => void,
-  ) => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-      {styles.map((style) => {
-        const active = selected.includes(style.value);
-        return (
-          <button key={style.value} type="button" style={chipStyle(active, style.color)} onClick={() => onToggle(style.value)}>
-            <ThemedSvgIcon name={style.icon} color={active ? style.color : theme.colors.secondary} size={12} />
-            {t(`${levelLabelKeyPrefix}${style.value}`)}
-          </button>
-        );
-      })}
-    </div>
-  );
+  ) => styles.map((style) => {
+    const active = selected.includes(style.value);
+    return (
+      <button key={`${levelLabelKeyPrefix}${style.value}`} type="button" style={chipStyle(active, style.color)} onClick={() => onToggle(style.value)}>
+        <ThemedSvgIcon name={style.icon} color={active ? style.color : theme.colors.secondary} size={11} />
+        {t(`${levelLabelKeyPrefix}${style.value}`)}
+      </button>
+    );
+  });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -75,7 +71,7 @@ export const SongSearchFilters: React.FC<SongSearchFiltersProps> = ({
         onChange={(e) => onSearchInputChange(e.target.value)}
         placeholder={t('guitarSong.list.searchPlaceholder')}
       />
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
         <button type="button" style={chipStyle(false)} onClick={onClearAll}>
           {t('guitarSong.list.clearFilters')}
         </button>
@@ -89,23 +85,19 @@ export const SongSearchFilters: React.FC<SongSearchFiltersProps> = ({
             {t(option.labelKey)}
           </button>
         ))}
+        {renderLevelChips('guitarSong.difficulty.level', DIFFICULTY_LEVEL_STYLES, selectedDifficulties, onToggleDifficulty)}
+        {renderLevelChips('guitarSong.mastery.level', MASTERY_LEVEL_STYLES, selectedMasteries, onToggleMastery)}
+        {labels.map((label) => (
+          <button
+            key={label.id}
+            type="button"
+            style={chipStyle(selectedLabelIds.includes(label.id))}
+            onClick={() => onToggleLabel(label.id)}
+          >
+            {label.name}
+          </button>
+        ))}
       </div>
-      {renderLevelFilterRow('guitarSong.difficulty.level', DIFFICULTY_LEVEL_STYLES, selectedDifficulties, onToggleDifficulty)}
-      {renderLevelFilterRow('guitarSong.mastery.level', MASTERY_LEVEL_STYLES, selectedMasteries, onToggleMastery)}
-      {labels.length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-          {labels.map((label) => (
-            <button
-              key={label.id}
-              type="button"
-              style={chipStyle(selectedLabelIds.includes(label.id))}
-              onClick={() => onToggleLabel(label.id)}
-            >
-              {label.name}
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 };

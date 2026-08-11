@@ -20,11 +20,13 @@ import { SongBlockClipboardPreviewModal } from './SongBlockClipboardPreviewModal
 import { SongDetailBody } from './SongDetailBody.tsx';
 import { SongDifficultyBand } from './SongDifficultyBand.tsx';
 import { SongLabelsBand } from './SongLabelsBand.tsx';
+import { SongLearningToolsPanel } from './SongLearningToolsPanel.tsx';
 import { SongMasteryBand } from './SongMasteryBand.tsx';
 import { songDocumentTitle } from './songDocumentTitle.ts';
 import { GuitarSongState } from './types.ts';
 import { useGuitarSong } from './useGuitarSong.ts';
 import { useGuitarSongLabels } from './useGuitarSongLabels.ts';
+import { usePresentationPageSize } from './usePresentationPageSize.ts';
 import { useSongBlockClipboard } from './useSongBlockClipboard.ts';
 import { useSongListPath } from './useSongListPath.ts';
 
@@ -41,12 +43,14 @@ const SongDetailPageContent: React.FC = () => {
   const { song, loading, error } = hook;
   const labelsHook = useGuitarSongLabels(projectId || null);
   const clipboardHook = useSongBlockClipboard();
+  const { maxWidth } = usePresentationPageSize();
   useDocumentTitle(song ? songDocumentTitle(song, t('common.edit')) : undefined);
 
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
   const [archiving, setArchiving] = useState(false);
   const [clipboardPreviewOpen, setClipboardPreviewOpen] = useState(false);
   const [labelsModalOpen, setLabelsModalOpen] = useState(false);
+  const [learningToolsOpen, setLearningToolsOpen] = useState(false);
   const presentPath = `/app/tribes/${tribeId}/projects/${projectId}/songs/${songId}/present`;
 
   // A completed song only offers the presentation screen -- redirect away from the edit URL
@@ -106,6 +110,11 @@ const SongDetailPageContent: React.FC = () => {
         label: t('guitarSong.layout.presentationMode'),
         path: presentPath,
       },
+      {
+        icon: 'headphones' as const,
+        label: t('guitarSong.learningTools.title'),
+        onClick: () => setLearningToolsOpen(true),
+      },
       ...(canEdit
         ? [{
             icon: 'check-circle' as const, label: t('guitarSong.detail.markCompleted'),
@@ -152,7 +161,7 @@ const SongDetailPageContent: React.FC = () => {
   return (
     <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions} bookmarkSlot={bookmarkSlot}>
       <ThemedSection themeId="main_1">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
           <SongLabelsBand
             song={song} hook={hook} labelsHook={labelsHook} canManage={canEdit && isManager}
             isManageOpen={labelsModalOpen} onCloseManage={() => setLabelsModalOpen(false)}
@@ -160,10 +169,12 @@ const SongDetailPageContent: React.FC = () => {
           <SongDifficultyBand song={song} hook={hook} canEdit={canEdit} />
           <SongMasteryBand song={song} hook={hook} />
         </div>
-        <SongDetailBody
-          song={song} canEdit={canEdit} isManager={isManager} hook={hook} labelsHook={labelsHook}
-          clipboardHook={clipboardHook}
-        />
+        <div style={{ maxWidth, margin: maxWidth ? '0 auto' : undefined }}>
+          <SongDetailBody
+            song={song} canEdit={canEdit} isManager={isManager} hook={hook} labelsHook={labelsHook}
+            clipboardHook={clipboardHook}
+          />
+        </div>
       </ThemedSection>
       <ThemedConfirmDialog
         isOpen={archiveConfirmOpen}
@@ -177,6 +188,10 @@ const SongDetailPageContent: React.FC = () => {
       <SongBlockClipboardPreviewModal
         isOpen={clipboardPreviewOpen} onClose={() => setClipboardPreviewOpen(false)}
         copied={clipboardHook.clipboard} song={song}
+      />
+      <SongLearningToolsPanel
+        song={song} hook={hook} canManage={canEdit && isManager}
+        isOpen={learningToolsOpen} onClose={() => setLearningToolsOpen(false)}
       />
     </AppLayout>
   );

@@ -11,7 +11,7 @@ import { SongInlineEditableNumber, SongInlineEditableText } from './SongInlineEd
 import { SongStatCard } from './SongStatCard.tsx';
 import { TITLE_HEADING_SIZES_PX } from './layoutBlockOptions.ts';
 import {
-  renderChordGridBlock, renderChordsBlock, renderLabelsBlock, renderSectionsBlock, renderVideosBlock,
+  renderChordGridBlock, renderChordsBlock, renderLabelsBlock, renderSectionsBlock,
 } from './songLayoutCollectionBlocks.tsx';
 import { MAX_BEATS_PER_BAR, MAX_CAPO, MAX_TEMPO_BPM, MIN_BEATS_PER_BAR, MIN_CAPO, MIN_TEMPO_BPM } from './songLimits.ts';
 import { GuitarSongDetail, GuitarSongLayoutBlock } from './types.ts';
@@ -111,7 +111,7 @@ const renderScalarBlock = (
           {block.custom_title && (
             <div
               style={{
-                color: theme.colors.text, marginBottom: '8px',
+                color: theme.colors.text, marginBottom: '4px',
                 fontSize: `${TITLE_HEADING_SIZES_PX[block.title_heading_level]}px`,
                 ...(block.title_heading_level === 'h5'
                   ? { fontWeight: 400, fontStyle: 'italic' }
@@ -140,8 +140,6 @@ export const renderBlockContent = (
       return renderChordsBlock(block, song, canEdit, canManage, hook, t, onSaveTitle);
     case 'sections':
       return renderSectionsBlock(block, song, canManage, hook, t, onSaveTitle);
-    case 'videos':
-      return renderVideosBlock(block, song, canEdit, canManage, hook, t, onSaveTitle);
     case 'labels':
       return renderLabelsBlock(block, song, canManage, hook, labelsHook, onSaveTitle);
     case 'chord_grid':

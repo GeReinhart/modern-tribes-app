@@ -804,7 +804,8 @@ CREATE TABLE IF NOT EXISTS guitar_songs_videos (
 CREATE OR REPLACE TRIGGER update_guitar_songs_videos_updated_at BEFORE UPDATE ON guitar_songs_videos FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE INDEX IF NOT EXISTS idx_guitar_songs_videos_song ON guitar_songs_videos(song_id);
 
--- Page margins for a song's presentation/print layout, one row per song (migration 015)
+-- Page margins for a song's presentation/print layout, one row per song (migration 015,
+-- footer_spacing_mm added in migration 035)
 CREATE TABLE IF NOT EXISTS guitar_songs_layout_settings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     song_id UUID REFERENCES guitar_songs(id) ON DELETE CASCADE NOT NULL UNIQUE,
@@ -812,6 +813,10 @@ CREATE TABLE IF NOT EXISTS guitar_songs_layout_settings (
     margin_right_mm NUMERIC(5,1) NOT NULL DEFAULT 15.0 CHECK (margin_right_mm BETWEEN 0 AND 100),
     margin_bottom_mm NUMERIC(5,1) NOT NULL DEFAULT 15.0 CHECK (margin_bottom_mm BETWEEN 0 AND 100),
     margin_left_mm NUMERIC(5,1) NOT NULL DEFAULT 15.0 CHECK (margin_left_mm BETWEEN 0 AND 100),
+    -- Distance between the printed footer and the page's true bottom edge, independent of
+    -- margin_bottom_mm (the content's own clearance above the footer) -- must stay smaller than
+    -- margin_bottom_mm, enforced at the application layer (the footer lives inside that band).
+    footer_spacing_mm NUMERIC(5,1) NOT NULL DEFAULT 5.0 CHECK (footer_spacing_mm BETWEEN 0 AND 100),
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -866,14 +871,15 @@ CREATE INDEX IF NOT EXISTS idx_guitar_songs_layout_columns_row ON guitar_songs_l
 -- One or more stacked content blocks within a column, e.g. Title + Author. A 'custom' block
 -- carries its own title + rich-text document, a 'chord_grid' block its own grid, and a 'sections'
 -- block its own lyrics/chords -- each unlike every other block type may repeat within the same
--- song (migration 015, sections content folded in at migration 024)
+-- song (migration 015, sections content folded in at migration 024, 'videos' dropped at
+-- migration 034 -- videos are pure metadata now, never placeable in the layout)
 CREATE TABLE IF NOT EXISTS guitar_songs_layout_column_blocks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     column_id UUID REFERENCES guitar_songs_layout_columns(id) ON DELETE CASCADE NOT NULL,
     song_id UUID REFERENCES guitar_songs(id) ON DELETE CASCADE NOT NULL,
     position INTEGER NOT NULL DEFAULT 1,
     block_type VARCHAR(20) NOT NULL CHECK (block_type IN (
-        'title', 'author', 'tempo', 'time_signature', 'capo', 'description', 'chords', 'sections', 'videos',
+        'title', 'author', 'tempo', 'time_signature', 'capo', 'description', 'chords', 'sections',
         'labels', 'custom', 'chord_grid'
     )),
     width_twelfths SMALLINT NOT NULL DEFAULT 12 CHECK (width_twelfths BETWEEN 1 AND 12),

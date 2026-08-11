@@ -34,8 +34,6 @@ export const SongFormCustomBlockCard: React.FC<SongFormCustomBlockCardProps> = (
           <EditorJoditComponent
             content={block.custom_content_html ?? ''}
             onChange={(value) => onUpdate({ custom_content_html: value })}
-            compact
-            allowFullscreen
             minHeight={150}
           />
         </div>

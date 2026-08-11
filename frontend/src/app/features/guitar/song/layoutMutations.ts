@@ -72,15 +72,32 @@ const mapColumn = (
   return draftColumnsToInput(row.page_break_before, columns);
 };
 
+// Shared by every "add a block" mutation -- only where the new block lands (end of column, or
+// right after a given index) differs between them.
+const insertBlock = (
+  row: GuitarSongLayoutRow, columnId: string, index: number | 'end', block: DraftBlock,
+): GuitarSongLayoutRowInput =>
+  mapColumn(row, columnId, (column) => {
+    const blocks = [...column.blocks];
+    blocks.splice(index === 'end' ? blocks.length : index, 0, block);
+    return { ...column, blocks };
+  });
+
 export const addBlock = (
   row: GuitarSongLayoutRow, columnId: string, blockType: LayoutBlockType,
-): GuitarSongLayoutRowInput =>
-  mapColumn(row, columnId, (column) => ({ ...column, blocks: [...column.blocks, emptyDraftBlock(blockType)] }));
+): GuitarSongLayoutRowInput => insertBlock(row, columnId, 'end', emptyDraftBlock(blockType));
 
 export const pasteBlock = (
   row: GuitarSongLayoutRow, columnId: string, copied: CopiedBlock,
-): GuitarSongLayoutRowInput =>
-  mapColumn(row, columnId, (column) => ({ ...column, blocks: [...column.blocks, draftBlockFromCopy(copied)] }));
+): GuitarSongLayoutRowInput => insertBlock(row, columnId, 'end', draftBlockFromCopy(copied));
+
+export const insertBlockAfter = (
+  row: GuitarSongLayoutRow, columnId: string, blockIndex: number, blockType: LayoutBlockType,
+): GuitarSongLayoutRowInput => insertBlock(row, columnId, blockIndex + 1, emptyDraftBlock(blockType));
+
+export const insertPastedBlockAfter = (
+  row: GuitarSongLayoutRow, columnId: string, blockIndex: number, copied: CopiedBlock,
+): GuitarSongLayoutRowInput => insertBlock(row, columnId, blockIndex + 1, draftBlockFromCopy(copied));
 
 export const moveBlock = (
   row: GuitarSongLayoutRow, columnId: string, blockIndex: number, direction: MoveDirection,

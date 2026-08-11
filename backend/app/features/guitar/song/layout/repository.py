@@ -33,8 +33,8 @@ _COLUMN_FIELDS = (
     "created_at, updated_at, created_by::text, updated_by::text"
 )
 _SETTINGS_FIELDS = (
-    "id::text, song_id::text, margin_top_mm, margin_right_mm, margin_bottom_mm, margin_left_mm, status, "
-    "created_at, updated_at, created_by::text, updated_by::text"
+    "id::text, song_id::text, margin_top_mm, margin_right_mm, margin_bottom_mm, margin_left_mm, "
+    "footer_spacing_mm, status, created_at, updated_at, created_by::text, updated_by::text"
 )
 
 
@@ -112,10 +112,11 @@ async def insert_settings_with_margins(pool, song_id: str, margins: dict, user_i
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             f"""INSERT INTO guitar_songs_layout_settings
-                    (song_id, margin_top_mm, margin_right_mm, margin_bottom_mm, margin_left_mm, created_by, updated_by)
-                VALUES ($1, $2, $3, $4, $5, $6::uuid, $6::uuid) RETURNING {_SETTINGS_FIELDS}""",
+                    (song_id, margin_top_mm, margin_right_mm, margin_bottom_mm, margin_left_mm, footer_spacing_mm,
+                     created_by, updated_by)
+                VALUES ($1, $2, $3, $4, $5, $6, $7::uuid, $7::uuid) RETURNING {_SETTINGS_FIELDS}""",
             UUID(song_id), margins["margin_top_mm"], margins["margin_right_mm"],
-            margins["margin_bottom_mm"], margins["margin_left_mm"], UUID(user_id),
+            margins["margin_bottom_mm"], margins["margin_left_mm"], margins["footer_spacing_mm"], UUID(user_id),
         )
     return dict(row)
 

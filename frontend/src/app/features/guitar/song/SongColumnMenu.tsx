@@ -73,7 +73,10 @@ export const SongColumnMenu: React.FC<SongColumnMenuProps> = ({
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, ...dividerStyle }}>
             <ThemedText size="small">{t('guitarSong.layout.addToThisColumn')}</ThemedText>
-            <SongBlockTypePicker options={options} onAdd={handleAddElement} onAddFreeText={handleAddFreeText} />
+            <SongBlockTypePicker
+              options={options} onAdd={handleAddElement} onAddFreeText={handleAddFreeText}
+              freeTextLabel={t('guitarSong.layout.addEmptyBlockOption')} freeTextInDropdown
+            />
             {clipboard && (
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <ThemedIconButton

@@ -1,5 +1,5 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
-import { useHeaderVisibility } from '@/app/platform/core/layout/HeaderVisibilityContext.tsx';
+import { useChromeVisibility } from '@/app/platform/core/layout/ChromeVisibilityContext.tsx';
 import { IconName, ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 
 import React from 'react';
@@ -25,9 +25,9 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({
   onTabChange,
 }) => {
   const { theme } = useTheme();
-  const { headerVisible } = useHeaderVisibility();
+  const { chromeHidden } = useChromeVisibility();
 
-  if (!headerVisible) return null;
+  if (chromeHidden) return null;
 
   return (
     <div

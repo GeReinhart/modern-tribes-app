@@ -15,6 +15,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { SongDetailBody } from './SongDetailBody.tsx';
 import { SongDifficultyBand } from './SongDifficultyBand.tsx';
 import { SongLabelsBand } from './SongLabelsBand.tsx';
+import { SongLearningToolsPanel } from './SongLearningToolsPanel.tsx';
 import { SongMasteryBand } from './SongMasteryBand.tsx';
 import { SongPageSettings } from './SongPageSettings.tsx';
 import { songDocumentTitle } from './songDocumentTitle.ts';
@@ -47,6 +48,7 @@ const SongPresentationPageContent: React.FC = () => {
   const clipboardHook = useSongBlockClipboard();
   const [pageSettingsModalOpen, setPageSettingsModalOpen] = useState(false);
   const [labelsModalOpen, setLabelsModalOpen] = useState(false);
+  const [learningToolsOpen, setLearningToolsOpen] = useState(false);
   useDocumentTitle(song ? songDocumentTitle(song) : undefined);
 
   const songPath = `/app/tribes/${tribeId}/projects/${projectId}/songs/${songId}`;
@@ -77,6 +79,9 @@ const SongPresentationPageContent: React.FC = () => {
         ? (canEdit ? [{ icon: 'pencil' as const, label: t('guitarSong.detail.backToDraft'), onClick: handleBackToDraft }] : [])
         : [{ icon: 'arrow-left' as const, label: t('guitarSong.layout.backToSong'), path: songPath }]),
       { icon: 'printer' as const, label: t('guitarSong.layout.pageSettingsLabel'), onClick: () => setPageSettingsModalOpen(true) },
+      {
+        icon: 'headphones' as const, label: t('guitarSong.learningTools.title'), onClick: () => setLearningToolsOpen(true),
+      },
       ...(canEdit
         ? [{
             icon: 'tag' as const, label: t('guitarSong.labels.manageLabels'),
@@ -150,6 +155,14 @@ const SongPresentationPageContent: React.FC = () => {
         song={song} hook={hook}
         pageSize={pageSize} onChangePageSize={setPageSize} customWidthMm={customWidthMm} onChangeCustomWidthMm={setCustomWidthMm}
         isOpen={pageSettingsModalOpen} onClose={() => setPageSettingsModalOpen(false)}
+      />
+      <SongLearningToolsPanel
+        // Read-only here, unlike SongDetailPage's edit screen -- the presentation view only ever
+        // shows the finished result, never editing controls, so watching a video (not a form to
+        // manage it) is the only thing this modal offers here, matching SongDetailBody's own
+        // hardcoded canEdit=false just above.
+        song={song} hook={hook} canManage={false}
+        isOpen={learningToolsOpen} onClose={() => setLearningToolsOpen(false)}
       />
     </AppLayout>
   );

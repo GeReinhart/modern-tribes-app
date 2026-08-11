@@ -62,6 +62,11 @@ def test_add_layout_row_custom_block_invalid_width():
     pass
 
 
+@scenario(FEATURE, 'POST a row with a "videos" block — 422, videos are metadata only and no longer placeable in the layout')
+def test_add_layout_row_videos_block_rejected():
+    pass
+
+
 @scenario(FEATURE, "POST a second row — it lands after the first")
 def test_add_second_layout_row():
     pass

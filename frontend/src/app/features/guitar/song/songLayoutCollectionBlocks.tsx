@@ -9,13 +9,11 @@ import { SongEditableBlockTitle } from './SongEditableBlockTitle.tsx';
 import { SongFormChordGridSection } from './SongFormChordGridSection.tsx';
 import { SongFormChordsSection } from './SongFormChordsSection.tsx';
 import { SongFormLabelsSection } from './SongFormLabelsSection.tsx';
-import { SongFormVideosSection } from './SongFormVideosSection.tsx';
 import { SongLabelChips } from './SongLabelChips.tsx';
 import { SongLyricsBlockEditor } from './SongLyricsBlockEditor.tsx';
 import { SongLyricsBlockReadView } from './SongLyricsBlockReadView.tsx';
 import { SongLyricsBlockSetup } from './SongLyricsBlockSetup.tsx';
 import { SongLyricsPresentationPrefs } from './SongLyricsPresentationPrefs.tsx';
-import { SongVideoList } from './SongVideoList.tsx';
 import { swapAdjacent } from './arrayMutations.ts';
 import { findBlocksOfType } from './layoutBlockOptions.ts';
 import { BlockChordInput, GuitarSongChord, GuitarSongDetail, GuitarSongLayoutBlock, GuitarSongLayoutBlockContentUpdate } from './types.ts';
@@ -175,33 +173,6 @@ export const renderSectionsBlock = (
         lineSpacingPx={song.lyrics_line_spacing_px}
         textSizePx={song.lyrics_text_size_px}
         chordSizePx={song.lyrics_chord_size_px}
-      />
-    </>
-  );
-};
-
-export const renderVideosBlock = (
-  block: GuitarSongLayoutBlock, song: GuitarSongDetail, canEdit: boolean, canManage: boolean,
-  hook: ReturnType<typeof useGuitarSong>, t: (key: string) => string, onSaveTitle: (customTitle: string | null) => Promise<void>,
-): React.ReactNode => {
-  if (!canEdit && song.videos.length === 0) return null;
-  if (canEdit) {
-    return (
-      <>
-        <SongEditableBlockTitle block={block} defaultTitle={t('guitarSong.videos.title')} canEdit={canManage} onSave={onSaveTitle} />
-        <SongFormVideosSection
-          videos={song.videos} canManage={canManage}
-          onAdd={hook.addVideo} onUpdate={hook.updateVideo} onMove={hook.moveVideo} onRemove={hook.removeVideo}
-        />
-      </>
-    );
-  }
-  return (
-    <>
-      <SongEditableBlockTitle block={block} defaultTitle={t('guitarSong.videos.title')} canEdit={false} onSave={onSaveTitle} />
-      <SongVideoList
-        videos={song.videos} canEdit={false} canManage={false}
-        onAdd={hook.addVideo} onUpdate={hook.updateVideo} onMove={hook.moveVideo} onRemove={hook.removeVideo}
       />
     </>
   );

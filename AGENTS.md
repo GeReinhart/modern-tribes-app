@@ -13,6 +13,7 @@
    - Add screnario first and THEN ask me to check the scenario before you start coding.
    - Don't forget to change the application.json file if there some changes on the files structure, new features, new tools, new functions.
    - When writing descriptions in application.json: write from the **user's perspective** — describe what users see and experience, not how it is implemented. Avoid API endpoint paths, library names, env var names, architecture terms and any other developer-facing details. Ask: "would a non-technical user of the app understand this line?"
+   - Keep descriptions **high-level**: 3-8 short bullets per package (or sub_package) covering what the feature does, not an exhaustive list of every option, setting or edge case. Do not grow a description every time a small feature is added — fold new capabilities into an existing high-level bullet, or add at most one new bullet, rather than detailing them line by line.
 - 3 - **Check** the produced code is still a good status.
   - ./scripts/check-application.json.sh
   - ./scripts/check-backend.sh
