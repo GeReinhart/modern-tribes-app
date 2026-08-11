@@ -151,16 +151,24 @@ def _render_block_wrapper(block, song, label_details: dict, column_width_twelfth
     return f'<div style="{padding}margin-bottom:{8 * zoom}px;">{content}</div>'
 
 
+# Same subtle, low-opacity solid line as the web read view's separatorBorder -- deliberately
+# distinct from any structural aid, since this is real presentation content shown on both.
+_COLUMN_SEPARATOR_BORDER = "1px solid rgba(26,26,26,0.19)"
+
+
 def _render_column(column, song, label_details: dict) -> str:
     width_pct = column.width_twelfths / ROW_WIDTH_TWELFTHS * 100
     padding = (
         f"{column.padding_top_mm}mm {column.padding_right_mm}mm "
         f"{column.padding_bottom_mm}mm {column.padding_left_mm}mm"
     )
+    border_left = f"border-left:{_COLUMN_SEPARATOR_BORDER};" if column.separator_left else ""
+    border_right = f"border-right:{_COLUMN_SEPARATOR_BORDER};" if column.separator_right else ""
     blocks_html = "".join(
         _render_block_wrapper(block, song, label_details, column.width_twelfths) for block in column.blocks
     )
     return (
-        f'<div style="width:{width_pct}%;text-align:{column.align};padding:{padding};box-sizing:border-box;">'
+        f'<div style="width:{width_pct}%;text-align:{column.align};padding:{padding};'
+        f'{border_left}{border_right}box-sizing:border-box;">'
         f"{blocks_html}</div>"
     )

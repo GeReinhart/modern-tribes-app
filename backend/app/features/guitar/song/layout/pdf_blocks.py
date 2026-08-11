@@ -38,9 +38,11 @@ _HEADING_SIZES_PX = {"h1": 24, "h2": 20, "h3": 16, "h4": 13, "h5": 12}
 # at the exact same size as a block's own title at that level -- in em, relative to .freeform's
 # own font-size (already scaled by that block's zoom), so it stays correct at any zoom without
 # needing its own per-instance style tag (see pdf_service._build_html_document, where this is
-# spliced into the single page-wide stylesheet).
+# spliced into the single page-wide stylesheet). H5 is non-bold and italic instead of bold,
+# same toned-down treatment as a block's own h5 title in render_block_title below.
 FREEFORM_HEADING_CSS = "".join(
-    f".freeform {level} {{ font-size: {size / _BASE_FONT_SIZE}em; font-weight: 700; color: {_LABEL_COLOR}; "
+    f".freeform {level} {{ font-size: {size / _BASE_FONT_SIZE}em; "
+    f"{'font-style: italic;' if level == 'h5' else 'font-weight: 700;'} color: {_LABEL_COLOR}; "
     "margin: 0 0 8px; } "
     for level, size in _HEADING_SIZES_PX.items()
 )
@@ -135,6 +137,17 @@ def _render_chord_grid_cell_item(item, chords_by_id: dict, zoom: float, chord_si
     )
 
 
+def _chord_grid_row_style(item_count: int) -> str:
+    """Same positioning rule as the on-screen grid: one chord at the cell's left; two chords as
+    if the cell were split into two identical halves, each at the left of its own half; three or
+    more justified across the full width. Flex-basis wrappers (not CSS grid) for the two-item
+    case, since WeasyPrint's flexbox support is solid but its grid support is not."""
+    if item_count == 2:
+        return "display:flex;width:100%;"
+    justify = "space-between" if item_count > 2 else "flex-start"
+    return f"display:flex;gap:2px;align-items:center;width:100%;justify-content:{justify};"
+
+
 def _render_chord_grid_cell(cell, chords_by_id: dict, zoom: float, chord_size_px: int) -> str:
     border_style = "".join(
         f"border-{side}:1px solid {_LABEL_COLOR};"
@@ -144,10 +157,15 @@ def _render_chord_grid_cell(cell, chords_by_id: dict, zoom: float, chord_size_px
         )
         if enabled
     )
-    items_html = " ".join(_render_chord_grid_cell_item(item, chords_by_id, zoom, chord_size_px) for item in cell.items)
+    item_count = len(cell.items)
+    item_wrapper_style = "flex:1 1 0%;text-align:left;" if item_count == 2 else ""
+    items_html = "".join(
+        f'<div style="{item_wrapper_style}">{_render_chord_grid_cell_item(item, chords_by_id, zoom, chord_size_px)}</div>'
+        for item in cell.items
+    )
     return (
-        f'<td style="{border_style}padding:{6 * zoom}px;text-align:center;vertical-align:middle;">'
-        f'{items_html}</td>'
+        f'<td style="{border_style}padding:{6 * zoom}px;vertical-align:middle;">'
+        f'<div style="{_chord_grid_row_style(item_count)}">{items_html}</div></td>'
     )
 
 
@@ -161,7 +179,7 @@ def render_chord_grid_block(block, song, zoom: float) -> str:
         f'<tr>{"".join(_render_chord_grid_cell(cell, chords_by_id, zoom, chord_size_px) for cell in row)}</tr>'
         for row in rows
     )
-    table_html = f'<table style="border-collapse:collapse;width:100%;">{rows_html}</table>'
+    table_html = f'<table style="border-collapse:collapse;width:100%;table-layout:fixed;">{rows_html}</table>'
     return f"{table_html}{_wrap_freeform_html(block.custom_content_html, zoom)}"
 
 

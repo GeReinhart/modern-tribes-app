@@ -26,7 +26,11 @@ echo "==> Check code..."
 ./scripts/check-backend.sh || { echo "✗ Backend checks failed. Aborting."; exit 1; }
 ./scripts/check-frontend.sh || { echo "✗ Frontend checks failed. Aborting."; exit 1; }
 echo "==> Test code..."
-./scripts/run-backend-tests.sh || { echo "✗ Backend checks failed. Aborting."; exit 1; }
+if git diff --quiet main -- backend/ && [ -z "$(git status --porcelain -- backend/)" ]; then
+    echo "==> Backend unchanged vs main — skipping run-backend-tests.sh."
+else
+    ./scripts/run-backend-tests.sh || { echo "✗ Backend checks failed. Aborting."; exit 1; }
+fi
 
 
 cd $ROOT_DIR

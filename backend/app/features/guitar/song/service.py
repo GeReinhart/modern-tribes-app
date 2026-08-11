@@ -6,7 +6,7 @@ from app.platform.core.utils.db_helpers import generate_url_param_id
 from app.platform.core.utils.document_helpers import update_document_content_with_revision
 from app.platform.functions.labels import repository as labels_repo
 from app.platform.functions.labels.repository import fetch_label_ids_for_entity
-from app.features.guitar.song import song_lookup
+from app.features.guitar.song import mastery_repository as mastery_repo, song_lookup
 from app.features.guitar.song.label_service import ENTITY_TYPE as SONG_LABEL_ENTITY_TYPE
 from app.features.guitar.song import repository as repo
 from app.features.guitar.song.author import repository as author_repo
@@ -24,14 +24,18 @@ from app.features.guitar.song.models import (
 _require_song_project = song_lookup.require_song_project
 
 
-async def list_songs(pool, project_id: str, user: dict) -> list[GuitarSongResponse]:
+async def list_songs(
+    pool, project_id: str, user: dict, q: str | None = None, label_ids: list[str] | None = None,
+    song_states: list[str] | None = None, difficulties: list[int] | None = None,
+    masteries: list[int] | None = None,
+) -> list[GuitarSongResponse]:
     await check_project_access_or_admin(project_id, user, pool, min_position="guest")
-    rows = await repo.fetch_songs(pool, project_id)
+    rows = await repo.fetch_songs(pool, project_id, user["id"], q, label_ids, song_states, difficulties, masteries)
     responses = []
     for row in rows:
-        label_ids = await fetch_label_ids_for_entity(pool, SONG_LABEL_ENTITY_TYPE, row["id"])
+        song_label_ids = await fetch_label_ids_for_entity(pool, SONG_LABEL_ENTITY_TYPE, row["id"])
         responses.append(GuitarSongResponse(
-            **{**row, "author": row.get("author_name")}, description_html="", label_ids=label_ids,
+            **{**row, "author": row.get("author_name")}, description_html="", label_ids=song_label_ids,
         ))
     return responses
 
@@ -96,16 +100,25 @@ async def get_song(pool, song_id: str, user: dict) -> GuitarSongDetailResponse:
     song_row = await repo.fetch_song(pool, song_id)
     videos = await list_videos(pool, song_id)
     layout = await get_layout(pool, song_id)
+    chords = collect_song_chords_union(layout)
+    my_mastery = await mastery_repo.fetch_my_mastery(pool, song_id, user["id"])
     song_response = await _build_song_response(pool, song_row)
     return GuitarSongDetailResponse(
-        **song_response.model_dump(), chords=collect_song_chords_union(layout),
-        videos=videos, layout=layout,
+        **{
+            **song_response.model_dump(),
+            "chord_count": len(chords),
+            "difficult_chord_count": sum(1 for c in chords if (c.chord.difficulty or 0) >= 4),
+            "my_mastery": my_mastery,
+        },
+        chords=chords, videos=videos, layout=layout,
     )
 
 
 async def update_song(pool, song_id: str, data: GuitarSongUpdate, user: dict) -> GuitarSongResponse:
     project_id = await _require_song_project(pool, song_id)
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
+    if data.model_fields_set - {"song_state"}:
+        await song_lookup.require_song_editable(pool, song_id)
     updates = data.model_dump(exclude_unset=True, exclude={"description_html", "author"})
     await repo.update_song(pool, song_id, updates, user["id"])
     if "description_html" in data.model_fields_set:

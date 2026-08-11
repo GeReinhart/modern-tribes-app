@@ -22,10 +22,11 @@ interface SongLabelPickerProps {
   onCreate: (data: GuitarSongLabelCreate) => Promise<void>;
   onUpdate: (labelId: string, data: GuitarSongLabelUpdate) => Promise<void>;
   onDelete: (labelId: string) => Promise<void>;
+  onReorder?: (orderedIds: string[]) => Promise<void>;
 }
 
 export const SongLabelPicker: React.FC<SongLabelPickerProps> = ({
-  labels, attachedLabelIds, canEdit, canManage, onToggle, onCreate, onUpdate, onDelete,
+  labels, attachedLabelIds, canEdit, canManage, onToggle, onCreate, onUpdate, onDelete, onReorder,
 }) => {
   const { t } = useTranslation();
   const [newName, setNewName] = useState('');
@@ -43,10 +44,19 @@ export const SongLabelPicker: React.FC<SongLabelPickerProps> = ({
     }
   };
 
+  const moveLabel = (index: number, direction: -1 | 1) => {
+    if (!onReorder) return;
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= labels.length) return;
+    const orderedIds = labels.map((label) => label.id);
+    [orderedIds[index], orderedIds[targetIndex]] = [orderedIds[targetIndex], orderedIds[index]];
+    onReorder(orderedIds);
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-        {labels.map((label) => (
+        {labels.map((label, index) => (
           <SongLabelChip
             key={label.id}
             label={label}
@@ -56,6 +66,8 @@ export const SongLabelPicker: React.FC<SongLabelPickerProps> = ({
             onToggle={() => onToggle(label.id)}
             onUpdate={(data) => onUpdate(label.id, data)}
             onDelete={() => onDelete(label.id)}
+            onMoveLeft={onReorder && index > 0 ? () => moveLabel(index, -1) : undefined}
+            onMoveRight={onReorder && index < labels.length - 1 ? () => moveLabel(index, 1) : undefined}
           />
         ))}
       </div>

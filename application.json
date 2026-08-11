@@ -859,7 +859,8 @@
                 "- the root note, the fifth and every other interval each get their own distinct icon on the diagram, so you can see the chord's structure at a glance",
                 "- give a chord a name like a common chord name and the root note is suggested automatically — you can always correct it",
                 "- add a description to any chord, built-in or your own, and anyone can edit it",
-                "- search the inventory by name or by root note"
+                "- search the inventory by name or by root note",
+                "- optionally rate how hard a chord shape is to play, from 0 (easiest) to 5 (hardest), shown with its own icon and color"
               ],
               "fr": [
                 "- un inventaire d'accords de guitare partagé, avec des accords prédéfinis et ceux ajoutés par les utilisateurs",
@@ -867,7 +868,8 @@
                 "- la fondamentale, la quinte et chaque autre intervalle ont leur propre icône sur le schéma, pour visualiser la structure de l'accord en un coup d'œil",
                 "- donnez un nom courant à l'accord et la fondamentale est proposée automatiquement — vous pouvez toujours la corriger",
                 "- ajoutez une description à n'importe quel accord, prédéfini ou personnel, modifiable par tous",
-                "- recherchez dans l'inventaire par nom ou par fondamentale"
+                "- recherchez dans l'inventaire par nom ou par fondamentale",
+                "- notez, si vous le souhaitez, la difficulté d'un accord à jouer, de 0 (le plus facile) à 5 (le plus difficile), avec sa propre icône et sa couleur"
               ]
             },
             "backend": {
@@ -889,6 +891,10 @@
             "description": {
               "en": [
                 "- keep a songbook of the songs your group is practicing, shared by every song tab attached to the same project",
+                "- search the songbook by title, author or lyrics, and narrow it down further with a label filter, a draft/completed filter, a song difficulty filter or your own mastery filter — every one of these filters accepts more than one value at once (e.g. \"Easy\" and \"Moderate\" together)",
+                "- each song in the songbook shows its title, author, tempo in BPM, its chord count, how many of those chords are rated difficult, its own difficulty rating if set, and your own mastery rating if set, right on its card — a song without a difficulty or mastery rating yet still shows up under any of those filters, it just has nothing to show there",
+                "- rate your own mastery of a song, from 0 (unknown) to 5 (perfectly mastered), from its editing page or its presentation view — this rating is private to you, nobody else sees it, though it does show on your own view of the song's card",
+                "- optionally rate how hard a song is to play, from 0 (very easy) to 5 (very hard), from its editing page — independent of how hard any of its individual chords are rated",
                 "- a song has a title, an author, a tempo in BPM, a time signature and a capo position",
                 "- add as many \"Chords\" pieces to a song as you like, each with its own name (e.g. \"Main chords\", \"Alternative chords\", \"Outro chords\") and its own chord list",
                 "- build each Chords piece's own list by searching the shared chord inventory, or add a brand new chord on the spot without leaving the song; reorder its chords and leave a comment on any of them just for that piece (e.g. a playing tip) — the same chord can appear in more than one Chords piece, each keeping its own comment",
@@ -901,6 +907,7 @@
                 "- everything about a song — its title, author, tempo, time signature, capo, description, chords, parts and lyrics, videos and labels — lives in a row, in a column, in a piece on the song's own page, exactly like any other piece; the page always looks exactly like the finished result, so what you see is always what the presentation view and the printed PDF will show",
                 "- the same song page is also where you arrange its presentation: add a row, split a row into side-by-side columns, add a page break, or add any piece of the song (or a free-form block of your own) to a column — you always pick which piece goes in, nothing is added for you — small icons that stay out of the way until you need them",
                 "- open a piece's \"Edit\" action to change it in a popup — its content and its presentation together: zoom it from 30% to 200%, frame it in a card or leave it plain, pick its title's size, and set its own padding on each side; closing the popup shows the piece exactly as it will look everywhere else; a column's own menu handles resizing, aligning and padding the whole column",
+                "- a column's own menu can also add a thin, discreet vertical line on its left edge, its right edge, or both — a subtle way to visually separate side-by-side columns without drawing attention to it; shown identically in the presentation view and the printed PDF",
                 "- pieces with their own title (Chords, Lyrics & Chords, Videos, Labels, Description, a chord grid, free-form blocks) let you pick that title's size from the same edit popup, from H1 (the largest) down to H5 — shown at that size on screen, in the presentation view and in the printed PDF; leaving a title blank shows nothing at all, taking up no space",
                 "- H5 is a deliberately toned-down title size: unlike H1 through H4, it shows without bold and in italics, for a title that should read as a light label rather than a heading; a \"Lyrics & Chords\" part starts on H5 by default (it's naming one of the song's own parts, not a page heading), but you can pick any size for it, and any other piece with a title can pick H5 too",
                 "- copy a piece (Lyrics & Chords, a chord grid, or a free-form block) and paste it into any column of the same song to reuse it — the pasted copy is independent, so editing one afterwards never changes the other; see what's currently copied before you paste it",
@@ -923,15 +930,20 @@
                 "- every change you make while editing a chord grid's cells (adding or moving a chord or a bit of text, turning a border on or off) applies right away — there's no separate save step",
                 "- an author's name is remembered and suggested the next time you add a song, so the same artist stays spelled consistently across the songbook",
                 "- attach one or more videos to a song — an official clip, a tutorial, a live version — and open them straight from the song page",
-                "- tag songs with your own labels (e.g. \"set list\", \"needs practice\"), shared across every song tab in the project",
+                "- tag songs with your own labels (e.g. \"set list\", \"needs practice\"), shared across every song tab in the project — a song's own labels are shown together above its page, and a \"manage labels\" action in the page's own menu lets you attach, detach, rename, recolor, reorder or delete them, on both the editing page and the presentation view",
+                "- mark a song as completed once it's ready — a completed song only offers its presentation view from then on, keeping it safe from accidental changes; reopen it as a draft any time, right from that presentation view, to edit it again",
                 "- switch to the song's presentation view to see it exactly as it will read or print, with none of the editing icons in the way",
-                "- the presentation view shows the page at the same size it will actually print at (A4 or US Letter), so what you see matches the PDF; switch to full width instead if you'd rather see it stretch to your screen, or type your own custom width — your choice is remembered on this device",
-                "- the presentation view is also where you adjust the song's print page margins and download it as a ready-to-print PDF — each video becomes a scannable QR code since a PDF can't play video, and the file is opened for you to view right away",
+                "- one \"page settings\" action on the presentation view covers both the page size and the print margins together: the page normally shows at the same size it will actually print at (A4 or US Letter), so what you see matches the PDF; switch to full width instead if you'd rather see it stretch to your screen, or type your own custom width, and adjust each print margin right below it — your choices are remembered on this device",
+                "- the presentation view is also where you download the song as a ready-to-print PDF — each video becomes a scannable QR code since a PDF can't play video, and the file is opened for you to view right away",
                 "- toggle dotted outlines around every row, column and piece from the presentation view, to see how the page is put together without switching back to editing — your choice is remembered on this device",
                 "- every printed page shows the song's title and author centered at the bottom, with the page number out of the total page count"
               ],
               "fr": [
                 "- tenez un répertoire des morceaux que votre groupe travaille, partagé par tous les onglets morceaux d'un même projet",
+                "- recherchez dans le répertoire par titre, auteur ou paroles, et affinez avec un filtre par label, par état brouillon/terminé, par difficulté du morceau ou par votre propre niveau de maîtrise — chacun de ces filtres accepte plusieurs valeurs à la fois (ex : « Facile » et « Modéré » ensemble)",
+                "- chaque morceau du répertoire affiche son titre, son auteur, son tempo en BPM, son nombre d'accords, combien de ces accords sont notés difficiles, sa propre note de difficulté si elle est renseignée, et votre propre note de maîtrise si elle est renseignée, directement sur sa carte — un morceau sans note de difficulté ou de maîtrise reste visible avec n'importe lequel de ces filtres, il n'a simplement rien à afficher à cet endroit",
+                "- notez votre propre maîtrise d'un morceau, de 0 (inconnu) à 5 (parfaitement acquis), depuis sa page d'édition ou sa vue présentation — cette note est privée, personne d'autre ne la voit, mais elle s'affiche bien sur votre propre vue de la carte du morceau",
+                "- notez, si vous le souhaitez, la difficulté d'un morceau à jouer, de 0 (très facile) à 5 (très difficile), depuis sa page d'édition — indépendamment de la difficulté de chacun de ses accords",
                 "- un morceau a un titre, un auteur, un tempo en BPM, une signature rythmique et une position de capo",
                 "- ajoutez autant d'éléments « Accords » que vous voulez à un morceau, chacun avec son propre nom (ex : « Accords principaux », « Accords alternatifs », « Accords de l'outro ») et sa propre liste d'accords",
                 "- construisez la liste de chaque élément Accords en cherchant dans l'inventaire partagé, ou ajoutez un nouvel accord sans quitter le morceau ; réorganisez ses accords et laissez un commentaire sur l'un d'eux propre à cet élément (ex : une astuce de jeu) — un même accord peut figurer dans plusieurs éléments Accords, chacun gardant son propre commentaire",
@@ -944,6 +956,7 @@
                 "- tout ce qui compose un morceau — son titre, son auteur, son tempo, sa signature rythmique, son capo, sa description, ses accords, ses parties et paroles, ses vidéos et ses labels — vit dans une ligne, dans une colonne, dans un élément de la page du morceau, exactement comme n'importe quel autre ; la page ressemble toujours exactement au résultat final, donc ce que vous voyez correspond toujours à la vue présentation et au PDF imprimé",
                 "- cette même page du morceau sert aussi à organiser sa présentation : ajoutez une ligne, découpez une ligne en colonnes côte à côte, ajoutez un saut de page, ou ajoutez à une colonne n'importe quel élément du morceau (ou un bloc libre à vous) — vous choisissez toujours quel élément placer, rien n'est ajouté à votre place — de petites icônes qui restent discrètes jusqu'à ce que vous en ayez besoin",
                 "- ouvrez l'action « Modifier » d'un élément pour le changer dans une popup — son contenu et sa présentation ensemble : zoomez-le de 30 % à 200 %, encadrez-le dans une carte ou affichez-le sans cadre, choisissez la taille de son titre, et réglez ses propres marges sur chaque côté ; fermer la popup montre l'élément exactement comme il apparaîtra partout ailleurs ; le menu propre à une colonne gère le redimensionnement, l'alignement et les marges de toute la colonne",
+                "- le menu propre à une colonne peut aussi ajouter un fin trait vertical discret sur son bord gauche, son bord droit, ou les deux — une façon subtile de séparer visuellement des colonnes côte à côte sans attirer l'attention ; affiché à l'identique dans la vue présentation et dans le PDF imprimé",
                 "- les éléments ayant leur propre titre (Accords, Paroles & Accords, Vidéos, Labels, Description, un tableau d'accords, blocs libres) permettent de choisir la taille de ce titre depuis cette même popup de modification, de H1 (la plus grande) jusqu'à H5 — affichée à cette taille à l'écran, dans la vue présentation et dans le PDF imprimé ; laisser un titre vide n'affiche rien du tout, sans prendre de place",
                 "- H5 est une taille de titre volontairement discrète : contrairement à H1 à H4, elle s'affiche sans gras et en italique, pour un titre qui doit se lire comme une étiquette légère plutôt qu'un titre de section ; une partie « Paroles & Accords » démarre en H5 par défaut (elle nomme une partie du morceau, pas un titre de page), mais vous pouvez choisir n'importe quelle taille pour elle, et tout autre élément ayant un titre peut aussi choisir H5",
                 "- copiez un élément (Paroles & Accords, un tableau d'accords, ou un bloc libre) et collez-le dans n'importe quelle colonne du même morceau pour le réutiliser — la copie collée est indépendante, donc modifier l'une ne change jamais l'autre ; consultez ce qui est actuellement copié avant de le coller",
@@ -966,10 +979,11 @@
                 "- chaque modification apportée en éditant les cellules d'un tableau d'accords (ajouter ou déplacer un accord ou un bout de texte, activer ou désactiver une bordure) s'applique immédiatement — il n'y a pas d'étape d'enregistrement séparée",
                 "- le nom d'un auteur est mémorisé et suggéré la prochaine fois que vous ajoutez un morceau, pour garder une orthographe cohérente dans tout le répertoire",
                 "- attachez une ou plusieurs vidéos à un morceau — clip officiel, tutoriel, version live — et ouvrez-les directement depuis la page du morceau",
-                "- étiquetez les morceaux avec vos propres labels (ex : « liste du concert », « à retravailler »), partagés par tous les onglets morceaux du projet",
+                "- étiquetez les morceaux avec vos propres labels (ex : « liste du concert », « à retravailler »), partagés par tous les onglets morceaux du projet — les labels d'un morceau sont affichés ensemble au-dessus de sa page, et une action « gérer les labels » dans le menu de la page permet de les attacher, les détacher, les renommer, changer leur couleur, les réordonner ou les supprimer, aussi bien sur la page d'édition que sur la vue présentation",
+                "- marquez un morceau comme terminé une fois qu'il est prêt — un morceau terminé ne propose plus que sa vue présentation, à l'abri des modifications accidentelles ; repassez-le en brouillon à tout moment, directement depuis cette vue présentation, pour le modifier à nouveau",
                 "- passez à la vue présentation du morceau pour le voir exactement comme il sera lu ou imprimé, sans aucune icône de modification",
-                "- la vue présentation affiche la page à la même taille qu'à l'impression (A4 ou US Letter), pour que ce que vous voyez corresponde au PDF ; passez en pleine largeur si vous préférez qu'elle s'étire à votre écran, ou saisissez votre propre largeur personnalisée — votre choix est mémorisé sur cet appareil",
-                "- la vue présentation est aussi là où vous ajustez les marges d'impression du morceau et téléchargez son PDF prêt à imprimer — chaque vidéo devient un QR code à scanner puisqu'un PDF ne peut pas jouer de vidéo, et le fichier s'ouvre aussitôt pour consultation",
+                "- une seule action « mise en page » sur la vue présentation regroupe la taille de la page et les marges d'impression : la page s'affiche normalement à la même taille qu'à l'impression (A4 ou US Letter), pour que ce que vous voyez corresponde au PDF ; passez en pleine largeur si vous préférez qu'elle s'étire à votre écran, ou saisissez votre propre largeur personnalisée, et réglez juste en dessous chaque marge d'impression — vos choix sont mémorisés sur cet appareil",
+                "- la vue présentation est aussi là où vous téléchargez le morceau en PDF prêt à imprimer — chaque vidéo devient un QR code à scanner puisqu'un PDF ne peut pas jouer de vidéo, et le fichier s'ouvre aussitôt pour consultation",
                 "- affichez depuis la vue présentation les contours en pointillés de chaque ligne, colonne et élément, pour voir comment la page est construite sans repasser en modification — votre choix est mémorisé sur cet appareil",
                 "- chaque page imprimée affiche le titre et l'auteur du morceau centrés en bas de page, avec le numéro de page sur le nombre total de pages"
               ]
@@ -981,6 +995,7 @@
               "schema": [
                 "guitar_songs",
                 "guitar_song_author",
+                "guitar_songs_mastery",
                 "guitar_songs_videos",
                 "guitar_songs_layout_settings",
                 "guitar_songs_layout_rows",

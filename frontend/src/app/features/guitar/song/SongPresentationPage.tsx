@@ -1,3 +1,4 @@
+import { useProjectPermissions } from '@/app/features/tribes-projects/projects/useProjectPermissions.ts';
 import { useProject } from '@/app/features/tribes-projects/projects/useProjects.ts';
 import { useTribeWithPositions } from '@/app/features/tribes-projects/tribes/useTribesWithPositions.ts';
 import { useDocumentTitle } from '@/app/platform/core/browser/useDocumentTitle.ts';
@@ -9,37 +10,43 @@ import { errorStyle } from '@/app/platform/core/layout/themes/theme.styles.tsx';
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { SongDetailBody } from './SongDetailBody.tsx';
-import { SongPageSizeControl } from './SongPageSizeControl.tsx';
-import { SongPresentationSettings } from './SongPresentationSettings.tsx';
+import { SongDifficultyBand } from './SongDifficultyBand.tsx';
+import { SongLabelsBand } from './SongLabelsBand.tsx';
+import { SongMasteryBand } from './SongMasteryBand.tsx';
+import { SongPageSettings } from './SongPageSettings.tsx';
 import { songDocumentTitle } from './songDocumentTitle.ts';
+import { GuitarSongState } from './types.ts';
 import { useGuitarSong } from './useGuitarSong.ts';
 import { useGuitarSongLabels } from './useGuitarSongLabels.ts';
 import { usePresentationPageSize } from './usePresentationPageSize.ts';
 import { useShowLayoutOutlines } from './useShowLayoutOutlines.ts';
 import { useSongBlockClipboard } from './useSongBlockClipboard.ts';
+import { useSongListPath } from './useSongListPath.ts';
 import { useSongPdfDownload } from './useSongPdfDownload.ts';
 
 const SongPresentationPageContent: React.FC = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const { tribeId, projectId, songId } = useParams<{ tribeId: string; projectId: string; songId: string }>();
+  const navigate = useNavigate();
 
   const { tribe } = useTribeWithPositions(tribeId || null);
   const { project } = useProject(projectId || null);
+  const { canEdit, isManager } = useProjectPermissions(tribeId || null, projectId || null);
   const hook = useGuitarSong(songId || null);
   const { song, loading, error } = hook;
   const labelsHook = useGuitarSongLabels(projectId || null);
   const { download: downloadPdf, downloading: downloadingPdf } = useSongPdfDownload(song?.id || '', song?.title || '');
   const { pageSize, setPageSize, customWidthMm, setCustomWidthMm, maxWidth } = usePresentationPageSize();
   const { showOutlines, setShowOutlines } = useShowLayoutOutlines();
-  // canEdit is always false in presentation mode, so no copy/paste UI ever renders here -- this
-  // only exists to satisfy SongDetailBody's shared clipboardHook prop.
+  // SongDetailBody is always rendered read-only here regardless of canEdit -- this clipboardHook
+  // only exists to satisfy its shared prop signature, never actually used for copy/paste.
   const clipboardHook = useSongBlockClipboard();
-  const [pageSizeModalOpen, setPageSizeModalOpen] = useState(false);
-  const [marginsModalOpen, setMarginsModalOpen] = useState(false);
+  const [pageSettingsModalOpen, setPageSettingsModalOpen] = useState(false);
+  const [labelsModalOpen, setLabelsModalOpen] = useState(false);
   useDocumentTitle(song ? songDocumentTitle(song) : undefined);
 
   const songPath = `/app/tribes/${tribeId}/projects/${projectId}/songs/${songId}`;
@@ -56,11 +63,26 @@ const SongPresentationPageContent: React.FC = () => {
     [tribe?.name, project?.name, song, tribeId, projectId, songPath, t],
   );
 
+  const isCompleted = song?.song_state === GuitarSongState.completed;
+  const songListPath = useSongListPath(tribeId || null, projectId || null);
+  const handleBackToDraft = async () => {
+    await hook.updateSongFields({ song_state: GuitarSongState.draft });
+    navigate(songPath);
+  };
+
   const menuActions = useMemo(
     () => [
-      { icon: 'arrow-left' as const, label: t('guitarSong.layout.backToSong'), path: songPath },
-      { icon: 'printer' as const, label: t('guitarSong.layout.pageSizeLabel'), onClick: () => setPageSizeModalOpen(true) },
-      { icon: 'layout' as const, label: t('guitarSong.layout.openMarginsMenu'), onClick: () => setMarginsModalOpen(true) },
+      { icon: 'search' as const, label: t('guitarSong.detail.backToList'), path: songListPath },
+      ...(isCompleted
+        ? (canEdit ? [{ icon: 'pencil' as const, label: t('guitarSong.detail.backToDraft'), onClick: handleBackToDraft }] : [])
+        : [{ icon: 'arrow-left' as const, label: t('guitarSong.layout.backToSong'), path: songPath }]),
+      { icon: 'printer' as const, label: t('guitarSong.layout.pageSettingsLabel'), onClick: () => setPageSettingsModalOpen(true) },
+      ...(canEdit
+        ? [{
+            icon: 'tag' as const, label: t('guitarSong.labels.manageLabels'),
+            onClick: () => setLabelsModalOpen(true),
+          }]
+        : []),
       {
         icon: 'grid' as const,
         label: showOutlines ? t('guitarSong.layout.hideStructureOutlines') : t('guitarSong.layout.showStructureOutlines'),
@@ -71,7 +93,7 @@ const SongPresentationPageContent: React.FC = () => {
         disabled: downloadingPdf,
       },
     ],
-    [songPath, t, downloadPdf, downloadingPdf, showOutlines, setShowOutlines],
+    [songPath, songListPath, t, downloadPdf, downloadingPdf, showOutlines, setShowOutlines, isCompleted, canEdit],
   );
 
   if (loading && !song) {
@@ -107,6 +129,16 @@ const SongPresentationPageContent: React.FC = () => {
   return (
     <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions}>
       <ThemedSection themeId="main_1">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <SongDifficultyBand song={song} hook={hook} canEdit={false} />
+            <SongLabelsBand
+              song={song} hook={hook} labelsHook={labelsHook} canManage={canEdit && isManager}
+              isManageOpen={labelsModalOpen} onCloseManage={() => setLabelsModalOpen(false)}
+            />
+          </div>
+          <SongMasteryBand song={song} hook={hook} />
+        </div>
         <div style={pageFrameStyle}>
           <SongDetailBody
             song={song} canEdit={false} isManager={false} hook={hook} labelsHook={labelsHook}
@@ -114,11 +146,11 @@ const SongPresentationPageContent: React.FC = () => {
           />
         </div>
       </ThemedSection>
-      <SongPageSizeControl
-        pageSize={pageSize} onChange={setPageSize} customWidthMm={customWidthMm} onChangeCustomWidthMm={setCustomWidthMm}
-        isOpen={pageSizeModalOpen} onClose={() => setPageSizeModalOpen(false)}
+      <SongPageSettings
+        song={song} hook={hook}
+        pageSize={pageSize} onChangePageSize={setPageSize} customWidthMm={customWidthMm} onChangeCustomWidthMm={setCustomWidthMm}
+        isOpen={pageSettingsModalOpen} onClose={() => setPageSettingsModalOpen(false)}
       />
-      <SongPresentationSettings song={song} hook={hook} isOpen={marginsModalOpen} onClose={() => setMarginsModalOpen(false)} />
     </AppLayout>
   );
 };

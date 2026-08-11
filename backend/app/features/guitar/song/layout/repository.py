@@ -28,7 +28,8 @@ _ROW_FIELDS = (
 )
 _COLUMN_FIELDS = (
     "id::text, row_id::text, position, width_twelfths, align, "
-    "padding_top_mm, padding_right_mm, padding_bottom_mm, padding_left_mm, status, "
+    "padding_top_mm, padding_right_mm, padding_bottom_mm, padding_left_mm, "
+    "separator_left, separator_right, status, "
     "created_at, updated_at, created_by::text, updated_by::text"
 )
 _SETTINGS_FIELDS = (
@@ -286,10 +287,12 @@ async def _insert_columns(conn, row_id: str, song_id: str, columns: list[dict], 
             """INSERT INTO guitar_songs_layout_columns (
                    row_id, song_id, position, width_twelfths, align,
                    padding_top_mm, padding_right_mm, padding_bottom_mm, padding_left_mm,
+                   separator_left, separator_right,
                    created_by, updated_by
-               ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::uuid, $10::uuid) RETURNING id::text""",
+               ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::uuid, $12::uuid) RETURNING id::text""",
             UUID(row_id), UUID(song_id), position, column["width_twelfths"], column["align"],
             column["padding_top_mm"], column["padding_right_mm"], column["padding_bottom_mm"], column["padding_left_mm"],
+            column["separator_left"], column["separator_right"],
             UUID(user_id),
         )
         column_id = column_row["id"]

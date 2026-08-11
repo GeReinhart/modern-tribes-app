@@ -6,7 +6,12 @@ from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.database import get_database
 from app.platform.core.utils.db_helpers import resolve_url_param_id
 from app.features.guitar.song import label_service
-from app.features.guitar.song.label_models import GuitarSongLabel, GuitarSongLabelCreate, GuitarSongLabelUpdate
+from app.features.guitar.song.label_models import (
+    GuitarSongLabel,
+    GuitarSongLabelCreate,
+    GuitarSongLabelUpdate,
+    GuitarSongLabelsReorderRequest,
+)
 
 router = APIRouter(prefix="/guitar-songs", tags=["features_guitar_song_labels"])
 
@@ -39,6 +44,21 @@ async def create_song_label(
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     return await label_service.create_project_label(pool, project_id, data, current_user)
+
+
+@router.put("/projects/{project_id}/song-labels/reorder", response_model=list[GuitarSongLabel])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def reorder_song_labels(
+    project_id: str, data: GuitarSongLabelsReorderRequest, current_user: dict = Depends(get_current_user)
+):
+    """Reorder the labels available for songs in this project.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ manager
+    """
+    pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    return await label_service.reorder_project_labels(pool, project_id, data, current_user)
 
 
 @router.patch("/song-labels/{label_id}", response_model=GuitarSongLabel)

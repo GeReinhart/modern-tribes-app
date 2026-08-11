@@ -29,6 +29,21 @@ def test_attach_song_label():
     pass
 
 
+@scenario(FEATURE, "Manager deletes a label that is still attached to a song — it succeeds and the attachment is removed too")
+def test_delete_attached_song_label():
+    pass
+
+
+@scenario(FEATURE, "Manager reorders a project's song labels")
+def test_reorder_song_labels():
+    pass
+
+
+@scenario(FEATURE, "Member (not manager) tries to reorder song labels — 403 error and positions stay unchanged")
+def test_reorder_song_labels_forbidden():
+    pass
+
+
 @scenario(FEATURE, "Member (not manager) tries to create a song label — 403 error and nothing is created")
 def test_create_song_label_forbidden():
     pass

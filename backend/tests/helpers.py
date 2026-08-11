@@ -18,8 +18,16 @@ def expand_id(value: str) -> str:
 
 
 def expand_path_ids(path: str) -> str:
-    """Expand short IDs in URL path segments (e.g. /persons/0010 → /persons/00000000-...-000000000010)."""
-    return '/'.join(expand_id(segment) for segment in path.split('/'))
+    """Expand short IDs in URL path segments and query string values
+    (e.g. /persons/0010?label_id=0400 → .../00000000-...-000000000010?label_id=00000000-...-000000000400)."""
+    base, _, query = path.partition('?')
+    expanded_base = '/'.join(expand_id(segment) for segment in base.split('/'))
+    if not query:
+        return expanded_base
+    expanded_query = '&'.join(
+        '='.join(expand_id(part) for part in pair.split('=')) for pair in query.split('&')
+    )
+    return f"{expanded_base}?{expanded_query}"
 
 
 def expand_json_ids(data: object) -> object:

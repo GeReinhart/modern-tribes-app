@@ -2,7 +2,7 @@ import re
 from datetime import datetime
 from typing import List, Optional, Union
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 _ROOT_NOTE_RE = re.compile(r'^[A-G][#b]?$')
 
@@ -41,6 +41,7 @@ class GuitarChordCreate(BaseModel):
     root_note: Optional[str] = None
     description: Optional[str] = None
     frets: List[Union[int, str]]
+    difficulty: Optional[int] = Field(default=None, ge=0, le=5)
 
     _check_frets = field_validator("frets")(_validate_frets)
     _check_root_note = field_validator("root_note")(_validate_root_note)
@@ -51,6 +52,7 @@ class GuitarChordUpdate(BaseModel):
     root_note: Optional[str] = None
     description: Optional[str] = None
     frets: Optional[List[Union[int, str]]] = None
+    difficulty: Optional[int] = Field(default=None, ge=0, le=5)
     status: Optional[str] = None
 
     _check_frets = field_validator("frets")(_validate_frets)
@@ -63,6 +65,7 @@ class GuitarChordResponse(BaseModel):
     root_note: str
     description: Optional[str] = None
     frets: List[Union[int, str]]
+    difficulty: Optional[int] = None
     status: str
     created_at: datetime
     updated_at: datetime

@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ChordDiagram } from './ChordDiagram.tsx';
+import { ChordDifficultyPicker } from './ChordDifficultyPicker.tsx';
 import { proposeRootNote } from './chordTheory.ts';
 import { DEFAULT_FRETS, ROOT_NOTE_OPTIONS } from './fretOptions.ts';
 import { FretSelectors } from './FretSelectors.tsx';
@@ -29,6 +30,7 @@ export const ChordForm: React.FC<ChordFormProps> = ({ chord, onSubmit, onCancel 
   const [rootNote, setRootNote] = useState(chord?.root_note ?? '');
   const [description, setDescription] = useState(chord?.description ?? '');
   const [frets, setFrets] = useState<string[]>(chord ? toFretStrings(chord.frets) : DEFAULT_FRETS);
+  const [difficulty, setDifficulty] = useState<number | null>(chord?.difficulty ?? null);
   const [rootTouched, setRootTouched] = useState(Boolean(chord));
   const [saving, setSaving] = useState(false);
 
@@ -54,6 +56,7 @@ export const ChordForm: React.FC<ChordFormProps> = ({ chord, onSubmit, onCancel 
         root_note: rootNote,
         description: description.trim() || null,
         frets: toFretValues(frets),
+        difficulty,
       });
     } finally {
       setSaving(false);
@@ -84,6 +87,10 @@ export const ChordForm: React.FC<ChordFormProps> = ({ chord, onSubmit, onCancel 
       />
       <FretSelectors frets={frets} onChange={handleFretChange} />
       {rootNote && <ChordDiagram frets={toFretValues(frets)} rootNote={rootNote} />}
+      <div>
+        <div style={{ fontSize: 'var(--font-sm)', marginBottom: '6px' }}>{t('guitarChords.difficulty.label')}</div>
+        <ChordDifficultyPicker value={difficulty} onChange={setDifficulty} />
+      </div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
         <ThemedSubmitButton type="button" variant="ghost" fullWidth={false} onClick={onCancel}>
           {t('common.cancel')}

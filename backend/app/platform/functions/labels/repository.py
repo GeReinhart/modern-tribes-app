@@ -42,6 +42,25 @@ async def insert_project_label(pool, project_id: str, name: str, color: str, use
     return {"id": str(row["id"]), "name": row["name"], "color": row["color"], "position": row["position"]}
 
 
+async def reorder_project_labels(pool, project_id: str, ordered_ids: list[str], user_id: str) -> list[dict]:
+    async with pool.acquire() as conn:
+        for position, label_id in enumerate(ordered_ids):
+            await conn.execute(
+                "UPDATE labels SET position = $1, updated_by = $2 WHERE id = $3 AND project_id = $4",
+                position,
+                UUID(user_id),
+                UUID(label_id),
+                UUID(project_id),
+            )
+        rows = await conn.fetch(
+            "SELECT id, name, color, position FROM labels WHERE project_id = $1 AND status = 'active' ORDER BY position ASC",
+            UUID(project_id),
+        )
+    return [
+        {"id": str(r["id"]), "name": r["name"], "color": r["color"], "position": r["position"]} for r in rows
+    ]
+
+
 async def fetch_label_ids_for_entity(pool, entity_type: str, entity_id: str) -> list[str]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(

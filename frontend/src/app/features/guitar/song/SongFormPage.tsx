@@ -11,6 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { guitarSongsService } from './service.ts';
 import { SongForm } from './SongForm.tsx';
 import { GuitarSongCreate } from './types.ts';
+import { useSongListPath } from './useSongListPath.ts';
 
 const SongFormPageContent: React.FC = () => {
   const { t } = useTranslation();
@@ -20,7 +21,7 @@ const SongFormPageContent: React.FC = () => {
   const { tribe } = useTribeWithPositions(tribeId || null);
   const { project } = useProject(projectId || null);
 
-  const cancelPath = `/app/tribes/${tribeId}/projects/${projectId}`;
+  const cancelPath = useSongListPath(tribeId || null, projectId || null);
 
   const breadcrumbs = [
     { label: t('common.home'), path: '/app' },

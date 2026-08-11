@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -18,3 +18,7 @@ class GuitarSongLabelCreate(BaseModel):
 class GuitarSongLabelUpdate(BaseModel):
     name: Optional[str] = None
     color: Optional[str] = None
+
+
+class GuitarSongLabelsReorderRequest(BaseModel):
+    ordered_ids: List[str]

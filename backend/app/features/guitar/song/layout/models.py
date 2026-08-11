@@ -233,6 +233,8 @@ class GuitarSongLayoutColumnInput(BaseModel):
     padding_right_mm: float = Field(default=0, ge=0, le=100)
     padding_bottom_mm: float = Field(default=0, ge=0, le=100)
     padding_left_mm: float = Field(default=0, ge=0, le=100)
+    separator_left: bool = False
+    separator_right: bool = False
 
     @field_validator("blocks")
     @classmethod
@@ -304,6 +306,8 @@ class GuitarSongLayoutColumnResponse(BaseModel):
     padding_right_mm: float
     padding_bottom_mm: float
     padding_left_mm: float
+    separator_left: bool
+    separator_right: bool
     status: str
     created_at: datetime
     updated_at: datetime

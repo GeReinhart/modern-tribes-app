@@ -458,16 +458,19 @@ class DatabaseInitializer:
                     document_id = str(doc_r["id"])
                 project_id = project_ids[row["project"]]
                 author_id = await self._find_or_create_guitar_song_author(conn, project_id, row.get("author") or None)
+                difficulty = row.get("difficulty")
                 r = await conn.fetchrow(
                     """INSERT INTO guitar_songs (
                            project_id, url_param_id, title, author_id, tempo_bpm, beats_per_bar, capo,
-                           chord_diagram_style, chord_diagram_size, document_id, created_by, updated_by
+                           chord_diagram_style, chord_diagram_size, document_id, song_state, difficulty,
+                           created_by, updated_by
                        )
-                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $11) RETURNING id""",
+                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $13) RETURNING id""",
                     project_id, _generate_url_param_id(), row["title"], author_id,
                     int(row.get("tempo_bpm") or 120), int(row.get("beats_per_bar") or 4),
                     int(row.get("capo") or 0), row.get("chord_diagram_style") or "full",
-                    row.get("chord_diagram_size") or "m", document_id, admin_id,
+                    row.get("chord_diagram_size") or "m", document_id, row.get("song_state") or "draft",
+                    int(difficulty) if difficulty else None, admin_id,
                 )
                 ids[f"{row['project']}|{row['title']}"] = str(r["id"])
         print(f"✓ Created {len(ids)} guitar songs")

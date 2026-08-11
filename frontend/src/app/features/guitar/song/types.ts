@@ -1,6 +1,11 @@
 import { ChordDiagramSize, ChordDiagramStyle } from '../chords/ChordDiagram.tsx';
 import { GuitarChord } from '../chords/types.ts';
 
+export enum GuitarSongState {
+  draft = 'draft',
+  completed = 'completed',
+}
+
 export interface GuitarSong {
   id: string;
   url_param_id: string;
@@ -18,11 +23,24 @@ export interface GuitarSong {
   document_id: string | null;
   description_html: string;
   label_ids: string[];
+  song_state: GuitarSongState;
+  difficulty: number | null;
+  chord_count: number;
+  difficult_chord_count: number;
+  my_mastery: number | null;
   status: string;
   created_at: string;
   updated_at: string;
   created_by: string | null;
   updated_by: string | null;
+}
+
+export interface GuitarSongListFilters {
+  q?: string;
+  labelIds?: string[];
+  songStates?: GuitarSongState[];
+  difficulties?: number[];
+  masteries?: number[];
 }
 
 export interface GuitarSongCreate {
@@ -54,6 +72,8 @@ export interface GuitarSongUpdate {
   lyrics_text_size_px?: number;
   lyrics_chord_size_px?: number;
   description_html?: string | null;
+  song_state?: GuitarSongState;
+  difficulty?: number | null;
 }
 
 // One entry of a 'chords' block's own chord list (or, for GuitarSongDetail.chords, the
@@ -184,6 +204,8 @@ export interface GuitarSongLayoutColumn {
   padding_right_mm: number;
   padding_bottom_mm: number;
   padding_left_mm: number;
+  separator_left: boolean;
+  separator_right: boolean;
   status: string;
   created_at: string;
   updated_at: string;
@@ -253,6 +275,8 @@ export interface GuitarSongLayoutColumnInput {
   padding_right_mm?: number;
   padding_bottom_mm?: number;
   padding_left_mm?: number;
+  separator_left?: boolean;
+  separator_right?: boolean;
 }
 
 export interface GuitarSongLayoutRowInput {

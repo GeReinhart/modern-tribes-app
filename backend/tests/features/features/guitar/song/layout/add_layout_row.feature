@@ -450,7 +450,7 @@ Feature: Add a row to a guitar song's presentation layout
       | id | song_id | position | page_break_before | status |
     When I POST /api/features/tasks/guitar-songs/songs/0200/layout/rows with body:
       """
-      {"page_break_before": false, "columns": [{"blocks": [{"block_type": "title", "title_heading_level": "h5"}], "width_twelfths": 8, "align": "left"}]}
+      {"page_break_before": false, "columns": [{"blocks": [{"block_type": "title", "title_heading_level": "h6"}], "width_twelfths": 8, "align": "left"}]}
       """
     Then the response status code is 422
     And the guitar_songs_layout_rows table contains:

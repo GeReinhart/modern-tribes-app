@@ -30,7 +30,10 @@ from app.features.guitar.song.layout.models import (
 )
 from app.features.guitar.song.models import GuitarSongChordMove
 
-_PADDING_DEFAULTS = {"padding_top_mm": 0, "padding_right_mm": 0, "padding_bottom_mm": 0, "padding_left_mm": 0}
+_COLUMN_STYLE_DEFAULTS = {
+    "padding_top_mm": 0, "padding_right_mm": 0, "padding_bottom_mm": 0, "padding_left_mm": 0,
+    "separator_left": False, "separator_right": False,
+}
 _DEFAULT_CARD_BLOCK_TYPES = {"description", "chords", "videos", "custom"}
 # These block types edit their title/body from the song's own page via update_block_content,
 # independent of row/column structure -- a chord grid's title and comment reuse the exact same
@@ -92,6 +95,7 @@ async def _resolve_column_input(pool, column, user_id: str) -> dict:
         "blocks": blocks, "width_twelfths": column.width_twelfths, "align": column.align,
         "padding_top_mm": column.padding_top_mm, "padding_right_mm": column.padding_right_mm,
         "padding_bottom_mm": column.padding_bottom_mm, "padding_left_mm": column.padding_left_mm,
+        "separator_left": column.separator_left, "separator_right": column.separator_right,
     }
 
 
@@ -122,7 +126,7 @@ async def seed_default_layout(pool, song_id: str, user_id: str) -> None:
     for row in DEFAULT_LAYOUT_ROWS:
         position = await repo.next_row_position(pool, song_id)
         columns = [
-            {**_PADDING_DEFAULTS, **column, "blocks": [
+            {**_COLUMN_STYLE_DEFAULTS, **column, "blocks": [
                 {
                     "block_type": bt, "width_twelfths": DEFAULT_BLOCK_WIDTH_TWELFTHS.get(bt, ROW_WIDTH_TWELFTHS),
                     "zoom_percent": 100,
@@ -204,6 +208,7 @@ async def copy_layout_from(pool, source_song_id: str, target_song_id: str, user_
                 "blocks": blocks, "width_twelfths": column["width_twelfths"], "align": column["align"],
                 "padding_top_mm": column["padding_top_mm"], "padding_right_mm": column["padding_right_mm"],
                 "padding_bottom_mm": column["padding_bottom_mm"], "padding_left_mm": column["padding_left_mm"],
+                "separator_left": column["separator_left"], "separator_right": column["separator_right"],
             })
         if not columns:
             continue
@@ -337,6 +342,7 @@ async def add_row(
 ) -> GuitarSongLayoutResponse:
     project_id = await song_lookup.require_song_project(pool, song_id)
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
+    await song_lookup.require_song_editable(pool, song_id)
     await _require_no_block_conflict(pool, song_id, data.columns)
     if insert_before_row_id:
         before_context = await _require_row_context(pool, insert_before_row_id)
@@ -353,6 +359,7 @@ async def add_row(
 async def replace_row(pool, row_id: str, data: GuitarSongLayoutRowInput, user: dict) -> GuitarSongLayoutResponse:
     context = await _require_row_context(pool, row_id)
     await check_project_access_or_admin(context["project_id"], user, pool, min_position="member")
+    await song_lookup.require_song_editable(pool, context["song_id"])
     await _require_no_block_conflict(pool, context["song_id"], data.columns, exclude_row_id=row_id)
     columns = [await _resolve_column_input(pool, c, user["id"]) for c in data.columns]
     await repo.replace_row(pool, row_id, context["song_id"], data.page_break_before, columns, user["id"])
@@ -362,6 +369,7 @@ async def replace_row(pool, row_id: str, data: GuitarSongLayoutRowInput, user: d
 async def move_row(pool, row_id: str, data: GuitarSongChordMove, user: dict) -> GuitarSongLayoutResponse:
     context = await _require_row_context(pool, row_id)
     await check_project_access_or_admin(context["project_id"], user, pool, min_position="manager")
+    await song_lookup.require_song_editable(pool, context["song_id"])
     ordered = await repo.fetch_rows_sorted(pool, context["song_id"])
     target_id = position_utils.find_move_target_id(ordered, row_id, data.direction)
     if target_id:
@@ -372,6 +380,7 @@ async def move_row(pool, row_id: str, data: GuitarSongChordMove, user: dict) -> 
 async def remove_row(pool, row_id: str, user: dict) -> None:
     context = await _require_row_context(pool, row_id)
     await check_project_access_or_admin(context["project_id"], user, pool, min_position="manager")
+    await song_lookup.require_song_editable(pool, context["song_id"])
     await repo.archive_row(pool, row_id, user["id"])
 
 
@@ -412,6 +421,7 @@ async def update_block_content(
     if "chord_grid_chord_size_px" in fields_sent and context["block_type"] != CHORD_GRID_BLOCK_TYPE:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Only chord grids have a chord size.")
     await check_project_access_or_admin(context["project_id"], user, pool, min_position="member")
+    await song_lookup.require_song_editable(pool, context["song_id"])
     if "custom_title" in fields_sent:
         await repo.update_block_title(pool, block_id, data.custom_title, user["id"])
     if "custom_content_html" in fields_sent:
@@ -447,6 +457,7 @@ async def set_lyrics_word_chord(
             status_code=status.HTTP_409_CONFLICT, detail="Only 'Lyrics & Chords' blocks have words."
         )
     await check_project_access_or_admin(context["project_id"], user, pool, min_position="member")
+    await song_lookup.require_song_editable(pool, context["song_id"])
     block = await block_content_service.set_lyrics_word_chord(
         pool, block_id, line_index, word_index, position, chord_id, user["id"],
     )
@@ -457,6 +468,9 @@ async def set_lyrics_word_chord(
 async def update_settings(
     pool, song_id: str, data: GuitarSongLayoutSettingsUpdate, user: dict
 ) -> GuitarSongLayoutSettingsResponse:
+    """Deliberately exempt from the completed-song content lock -- margins/page defaults are
+    print/presentation preferences reachable from the read-only presentation screen itself, not
+    editorial content."""
     project_id = await song_lookup.require_song_project(pool, song_id)
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
     updates = data.model_dump(exclude_unset=True)

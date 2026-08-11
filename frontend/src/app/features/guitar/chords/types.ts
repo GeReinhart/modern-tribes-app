@@ -6,6 +6,7 @@ export interface GuitarChord {
   root_note: string;
   description: string | null;
   frets: FretValue[];
+  difficulty: number | null;
   status: string;
   created_at: string;
   updated_at: string;
@@ -18,6 +19,7 @@ export interface GuitarChordCreate {
   root_note: string;
   description?: string | null;
   frets: FretValue[];
+  difficulty?: number | null;
 }
 
 export interface GuitarChordUpdate {
@@ -25,4 +27,5 @@ export interface GuitarChordUpdate {
   root_note?: string;
   description?: string | null;
   frets?: FretValue[];
+  difficulty?: number | null;
 }

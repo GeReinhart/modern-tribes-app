@@ -122,6 +122,46 @@ Feature: Edit, reorder and remove a guitar song's layout rows
       | author         | 5.0            | 0.0               | 0.0                | 3.5              | active   |
       | description    | 0.0            | 0.0               | 0.0                | 0.0              | active   |
 
+  Scenario: PUT a row's columns with separator flags set — it keeps them
+    Given I am authenticated as a regular user: user.id 0002
+    And the persons table contains:
+      | id   | first_name | last_name | status |
+      | 0030 | Mia        | Member    | active |
+    And the users table contains:
+      | id   | email         | person_id | status |
+      | 0002 | user@test.com | 0030      | active |
+    And the tribes table contains:
+      | id   | name | status |
+      | 0010 | Band | active |
+    And the tribes_projects table contains:
+      | tribe_id | project_id | relation |
+      | 0010     | 0020       | manager  |
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    When I PUT /api/features/tasks/guitar-songs/layout/rows/0700 with body:
+      """
+      {
+        "page_break_before": false,
+        "columns": [
+          {
+            "blocks": [{"block_type": "author"}], "width_twelfths": 4, "align": "left",
+            "separator_left": false, "separator_right": true
+          },
+          {
+            "blocks": [{"block_type": "description"}], "width_twelfths": 4, "align": "left",
+            "separator_left": true, "separator_right": false
+          }
+        ]
+      }
+      """
+    Then the response status code is 200
+    And the guitar_songs_layout_columns table contains:
+      | row_id | width_twelfths | separator_left | separator_right | status   |
+      | 0700   | 8               | false           | false            | archived |
+      | 0700   | 4               | false           | true             | active   |
+      | 0700   | 4               | true            | false            | active   |
+
   Scenario: PUT a row's columns with one column having no blocks — it is added as a plain spacer
     Given I am authenticated as a regular user: user.id 0002
     And the persons table contains:

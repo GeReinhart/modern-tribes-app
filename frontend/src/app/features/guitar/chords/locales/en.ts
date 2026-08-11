@@ -12,6 +12,13 @@ const en: Record<string, string> = {
   'guitarChords.form.description': 'Description',
   'guitarChords.form.addTitle': 'Add a chord',
   'guitarChords.form.editTitle': 'Edit chord',
+  'guitarChords.difficulty.label': 'Difficulty',
+  'guitarChords.difficulty.level0': 'Easy',
+  'guitarChords.difficulty.level1': 'Simple',
+  'guitarChords.difficulty.level2': 'Moderate',
+  'guitarChords.difficulty.level3': 'Intermediate',
+  'guitarChords.difficulty.level4': 'Hard',
+  'guitarChords.difficulty.level5': 'Very hard',
 };
 
 export default en;

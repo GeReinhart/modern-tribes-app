@@ -14,10 +14,11 @@ interface SongFormLabelsSectionProps {
   onCreate: (data: GuitarSongLabelCreate) => Promise<void>;
   onUpdate: (labelId: string, data: GuitarSongLabelUpdate) => Promise<void>;
   onDelete: (labelId: string) => Promise<void>;
+  onReorder?: (orderedIds: string[]) => Promise<void>;
 }
 
 export const SongFormLabelsSection: React.FC<SongFormLabelsSectionProps> = ({
-  labels, attachedLabelIds, canManage, onToggle, onCreate, onUpdate, onDelete,
+  labels, attachedLabelIds, canManage, onToggle, onCreate, onUpdate, onDelete, onReorder,
 }) => {
   const { t } = useTranslation();
 
@@ -35,6 +36,7 @@ export const SongFormLabelsSection: React.FC<SongFormLabelsSectionProps> = ({
         onCreate={onCreate}
         onUpdate={onUpdate}
         onDelete={onDelete}
+        onReorder={onReorder}
       />
     </div>
   );

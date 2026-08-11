@@ -39,6 +39,16 @@ def test_create_chord_wrong_string_count():
     pass
 
 
+@scenario(FEATURE, "POST /guitar/chords/ with a difficulty level — it is stored")
+def test_create_chord_with_difficulty():
+    pass
+
+
+@scenario(FEATURE, "POST /guitar/chords/ with a difficulty out of range — 422 error and the database is not modified")
+def test_create_chord_difficulty_out_of_range():
+    pass
+
+
 @pytest.fixture
 def admin_client():
     _test_app.dependency_overrides[get_current_user] = lambda: _ADMIN_USER

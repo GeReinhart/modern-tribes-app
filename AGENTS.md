@@ -19,6 +19,8 @@
   - ./scripts/run-backend-tests.sh
   - ./scripts/check-frontend.sh
 
+Note on `scripts/merge-deploy.sh`: that script skips `run-backend-tests.sh` automatically when the backend hasn't changed relative to `main` (no diff and no untracked files under `backend/`). This is a deploy-time optimization only — during active development (steps 1 and 3 above), still run `run-backend-tests.sh` yourself whenever backend files changed that round.
+
 ## Testing the changes
 
 - You **MUST NOT** try to launch neither the backend nor the frontend. To test anything.

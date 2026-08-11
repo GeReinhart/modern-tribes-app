@@ -11,17 +11,22 @@ import { ThemedSection } from '@/app/platform/core/layout/themes/components/Them
 import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { errorStyle } from '@/app/platform/core/layout/themes/theme.styles.tsx';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { guitarSongsService } from './service.ts';
 import { SongBlockClipboardPreviewModal } from './SongBlockClipboardPreviewModal.tsx';
 import { SongDetailBody } from './SongDetailBody.tsx';
+import { SongDifficultyBand } from './SongDifficultyBand.tsx';
+import { SongLabelsBand } from './SongLabelsBand.tsx';
+import { SongMasteryBand } from './SongMasteryBand.tsx';
 import { songDocumentTitle } from './songDocumentTitle.ts';
+import { GuitarSongState } from './types.ts';
 import { useGuitarSong } from './useGuitarSong.ts';
 import { useGuitarSongLabels } from './useGuitarSongLabels.ts';
 import { useSongBlockClipboard } from './useSongBlockClipboard.ts';
+import { useSongListPath } from './useSongListPath.ts';
 
 const SongDetailPageContent: React.FC = () => {
   const { t } = useTranslation();
@@ -41,6 +46,14 @@ const SongDetailPageContent: React.FC = () => {
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
   const [archiving, setArchiving] = useState(false);
   const [clipboardPreviewOpen, setClipboardPreviewOpen] = useState(false);
+  const [labelsModalOpen, setLabelsModalOpen] = useState(false);
+  const presentPath = `/app/tribes/${tribeId}/projects/${projectId}/songs/${songId}/present`;
+
+  // A completed song only offers the presentation screen -- redirect away from the edit URL
+  // if it's reached directly (e.g. a bookmark or a stale link).
+  useEffect(() => {
+    if (song?.song_state === GuitarSongState.completed) navigate(presentPath, { replace: true });
+  }, [song?.song_state, presentPath, navigate]);
 
   const breadcrumbs = useMemo(
     () => [
@@ -61,26 +74,50 @@ const SongDetailPageContent: React.FC = () => {
     />
   ) : null;
 
+  const songListPath = useSongListPath(tribeId || null, projectId || null);
+
   const handleArchive = async () => {
     if (!song) return;
     setArchiving(true);
     try {
       await guitarSongsService.archiveSong(song.id);
-      navigate(`/app/tribes/${tribeId}/projects/${projectId}`);
+      navigate(songListPath);
     } finally {
       setArchiving(false);
       setArchiveConfirmOpen(false);
     }
   };
 
+  const handleMarkCompleted = async () => {
+    await hook.updateSongFields({ song_state: GuitarSongState.completed });
+    navigate(presentPath);
+  };
+
   const menuActions = useMemo(() => {
     if (!song) return [];
     return [
       {
+        icon: 'search' as const,
+        label: t('guitarSong.detail.backToList'),
+        path: songListPath,
+      },
+      {
         icon: 'eye' as const,
         label: t('guitarSong.layout.presentationMode'),
-        path: `/app/tribes/${tribeId}/projects/${projectId}/songs/${songId}/present`,
+        path: presentPath,
       },
+      ...(canEdit
+        ? [{
+            icon: 'check-circle' as const, label: t('guitarSong.detail.markCompleted'),
+            onClick: handleMarkCompleted,
+          }]
+        : []),
+      ...(canEdit
+        ? [{
+            icon: 'tag' as const, label: t('guitarSong.labels.manageLabels'),
+            onClick: () => setLabelsModalOpen(true),
+          }]
+        : []),
       ...(canEdit && clipboardHook.clipboard
         ? [{
             icon: 'clipboard' as const, label: t('guitarSong.layout.previewClipboard'),
@@ -91,7 +128,7 @@ const SongDetailPageContent: React.FC = () => {
         ? [{ icon: 'trash' as const, label: t('guitarSong.detail.archive'), onClick: () => setArchiveConfirmOpen(true) }]
         : []),
     ];
-  }, [song, isManager, canEdit, clipboardHook.clipboard, t, tribeId, projectId, songId]);
+  }, [song, isManager, canEdit, clipboardHook.clipboard, t, presentPath, songListPath]);
 
   if (loading && !song) {
     return (
@@ -115,6 +152,14 @@ const SongDetailPageContent: React.FC = () => {
   return (
     <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions} bookmarkSlot={bookmarkSlot}>
       <ThemedSection themeId="main_1">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
+          <SongLabelsBand
+            song={song} hook={hook} labelsHook={labelsHook} canManage={canEdit && isManager}
+            isManageOpen={labelsModalOpen} onCloseManage={() => setLabelsModalOpen(false)}
+          />
+          <SongDifficultyBand song={song} hook={hook} canEdit={canEdit} />
+          <SongMasteryBand song={song} hook={hook} />
+        </div>
         <SongDetailBody
           song={song} canEdit={canEdit} isManager={isManager} hook={hook} labelsHook={labelsHook}
           clipboardHook={clipboardHook}

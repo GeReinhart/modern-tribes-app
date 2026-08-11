@@ -17,6 +17,9 @@ export const guitarSongLabelsService = {
   deleteLabel: (labelId: string): Promise<void> =>
     apiService.delete<void>(`${BASE}/song-labels/${labelId}`),
 
+  reorderLabels: (projectId: string, orderedIds: string[]): Promise<GuitarSongLabel[]> =>
+    apiService.put<GuitarSongLabel[]>(`${BASE}/projects/${projectId}/song-labels/reorder`, { ordered_ids: orderedIds }),
+
   addLabelToSong: (songId: string, labelId: string): Promise<void> =>
     apiService.post<void>(`${BASE}/songs/${songId}/labels/${labelId}`, {}),
 

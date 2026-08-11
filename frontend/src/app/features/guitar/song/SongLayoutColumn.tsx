@@ -65,13 +65,21 @@ export const SongLayoutColumn: React.FC<SongLayoutColumnProps> = ({
   const resizeColumn = (deltaTwelfths: number) =>
     hook.replaceLayoutRow(row.id, (latestRow) => layoutMutations.resizeColumnWidth(latestRow, column.id, deltaTwelfths));
   const showOutline = canEdit || showStructureOutlines;
+  const outlineBorder = showOutline ? `1px dotted ${theme.colors.border}` : 'none';
+  // A subtle, low-opacity solid line -- deliberately distinct from the dotted structural outline
+  // above, since this one is real presentation content and must render identically whether or
+  // not showOutline is on (edit mode vs. presentation/PDF).
+  const separatorBorder = `1px solid ${theme.colors.text}30`;
 
   return (
     <div
       style={{
         width: `${widthPercent}%`, minWidth: 0, textAlign: column.align, padding, boxSizing: 'border-box', position: 'relative',
         borderRadius: 'var(--radius-md)',
-        border: showOutline ? `1px dotted ${theme.colors.border}` : 'none',
+        borderTop: outlineBorder,
+        borderBottom: outlineBorder,
+        borderLeft: column.separator_left ? separatorBorder : outlineBorder,
+        borderRight: column.separator_right ? separatorBorder : outlineBorder,
         outline: menuOpen ? `3px solid ${theme.colors.primary}` : 'none',
         boxShadow: menuOpen ? `0 0 0 6px ${theme.colors.primary}30` : 'none',
         backgroundColor: menuOpen ? `${theme.colors.primary}10` : 'transparent',

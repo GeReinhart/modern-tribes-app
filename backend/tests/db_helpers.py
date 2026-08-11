@@ -20,6 +20,7 @@ _INT_COLS = {
     "position", "size", "toc_depth", "order_index", "display_order", "tempo_bpm", "beats_per_bar", "capo",
     "width_twelfths",
     "lyrics_line_spacing_px", "lyrics_text_size_px", "lyrics_chord_size_px",
+    "difficulty", "mastery_level",
 }
 
 

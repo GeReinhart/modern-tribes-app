@@ -230,6 +230,7 @@ export const renderLabelsBlock = (
         onCreate={labelsHook.createLabel}
         onUpdate={labelsHook.updateLabel}
         onDelete={labelsHook.deleteLabel}
+        onReorder={labelsHook.reorderLabels}
       />
     </>
   );

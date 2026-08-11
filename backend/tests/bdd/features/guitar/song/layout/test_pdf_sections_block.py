@@ -33,6 +33,7 @@ def _row(blocks: list) -> SimpleNamespace:
     column = SimpleNamespace(
         position=1, width_twelfths=12, align="left", blocks=blocks,
         padding_top_mm=0, padding_right_mm=0, padding_bottom_mm=0, padding_left_mm=0,
+        separator_left=False, separator_right=False,
     )
     return SimpleNamespace(position=1, page_break_before=False, columns=[column])
 

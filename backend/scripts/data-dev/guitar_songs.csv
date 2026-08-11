@@ -1,4 +1,4 @@
-project,title,author,tempo_bpm,beats_per_bar,capo,chord_diagram_style,chord_diagram_size,description_html
-Summer BBQ,Wonderwall,Oasis,87,4,2,full,m,"<p>Strum pattern: down, down-up, up-down-up. Keep the capo at fret 2 all the way through.</p>"
-Summer BBQ,Knockin' on Heaven's Door,Bob Dylan,72,4,0,full,m,
-Summer BBQ,Ho Hey,The Lumineers,138,4,0,simple,l,
+project,title,author,tempo_bpm,beats_per_bar,capo,chord_diagram_style,chord_diagram_size,description_html,song_state,difficulty
+Summer BBQ,Wonderwall,Oasis,87,4,2,full,m,"<p>Strum pattern: down, down-up, up-down-up. Keep the capo at fret 2 all the way through.</p>",draft,1
+Summer BBQ,Knockin' on Heaven's Door,Bob Dylan,72,4,0,full,m,,draft,
+Summer BBQ,Ho Hey,The Lumineers,138,4,0,simple,l,,completed,2

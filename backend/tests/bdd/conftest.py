@@ -271,37 +271,41 @@ def given_labels_table(datatable):
                 uid = rec["id"]
                 fi_id = rec.get("feature_instance_id")
                 project_id = rec.get("project_id")
+                position = int(rec.get("position") or 0)
                 if fi_id:
                     await conn.execute(
-                        """INSERT INTO labels(id, name, color, status, feature_instance_id)
-                           VALUES($1, $2, $3, $4, $5)
+                        """INSERT INTO labels(id, name, color, status, feature_instance_id, position)
+                           VALUES($1, $2, $3, $4, $5, $6)
                            ON CONFLICT (id) DO NOTHING""",
                         UUID(uid),
                         rec.get("name", ""),
                         rec.get("color", "#000000"),
                         rec.get("status", "active"),
                         UUID(fi_id),
+                        position,
                     )
                 elif project_id:
                     await conn.execute(
-                        """INSERT INTO labels(id, name, color, status, project_id)
-                           VALUES($1, $2, $3, $4, $5)
+                        """INSERT INTO labels(id, name, color, status, project_id, position)
+                           VALUES($1, $2, $3, $4, $5, $6)
                            ON CONFLICT (id) DO NOTHING""",
                         UUID(uid),
                         rec.get("name", ""),
                         rec.get("color", "#000000"),
                         rec.get("status", "active"),
                         UUID(project_id),
+                        position,
                     )
                 else:
                     await conn.execute(
-                        """INSERT INTO labels(id, name, color, status)
-                           VALUES($1, $2, $3, $4)
+                        """INSERT INTO labels(id, name, color, status, position)
+                           VALUES($1, $2, $3, $4, $5)
                            ON CONFLICT (id) DO NOTHING""",
                         UUID(uid),
                         rec.get("name", ""),
                         rec.get("color", "#000000"),
                         rec.get("status", "active"),
+                        position,
                     )
         finally:
             await conn.close()
@@ -1295,14 +1299,15 @@ def given_guitar_chords_table(datatable):
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
                 uid = rec.get("id")
                 await conn.execute(
-                    """INSERT INTO guitar_chords(id, name, root_note, description, frets, status)
-                       VALUES(COALESCE($1, gen_random_uuid()), $2, $3, $4, $5::jsonb, $6)
+                    """INSERT INTO guitar_chords(id, name, root_note, description, frets, difficulty, status)
+                       VALUES(COALESCE($1, gen_random_uuid()), $2, $3, $4, $5::jsonb, $6, $7)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(uid) if uid else None,
                     rec.get("name", "Chord"),
                     rec.get("root_note", "C"),
                     rec.get("description") or None,
                     rec.get("frets", "[]"),
+                    coerce("difficulty", rec.get("difficulty", "")),
                     rec.get("status", "active"),
                 )
         finally:
@@ -1353,9 +1358,9 @@ def given_guitar_songs_table(datatable):
                            id, url_param_id, project_id, title, author_id, tempo_bpm, beats_per_bar, capo,
                            chord_diagram_style, chord_diagram_size,
                            lyrics_line_spacing_px, lyrics_text_size_px, lyrics_chord_size_px,
-                           document_id, status
+                           document_id, difficulty, song_state, status
                        )
-                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(uid),
                     rec.get("url_param_id", url_param_id_from_uuid(uid)),
@@ -1371,6 +1376,8 @@ def given_guitar_songs_table(datatable):
                     coerce("lyrics_text_size_px", rec.get("lyrics_text_size_px", "16")),
                     coerce("lyrics_chord_size_px", rec.get("lyrics_chord_size_px", "18")),
                     UUID(document_id) if document_id else None,
+                    coerce("difficulty", rec.get("difficulty", "")),
+                    rec.get("song_state", "draft"),
                     rec.get("status", "active"),
                 )
         finally:
@@ -1401,6 +1408,38 @@ def then_guitar_songs_table(datatable):
     expected_rows = datatable[1:]
     actual_rows = _run(_query_guitar_songs(headers))
     _compare_rows("guitar_songs", headers, expected_rows, actual_rows)
+
+
+@given("the guitar_songs_mastery table contains:")
+def given_guitar_songs_mastery_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {
+                    headers[i]: (row[i] if is_int_column(headers[i]) else expand_id(row[i]))
+                    for i in range(len(headers))
+                }
+                uid = rec.get("id")
+                await conn.execute(
+                    """INSERT INTO guitar_songs_mastery(id, song_id, user_id, mastery_level, status)
+                       VALUES(COALESCE($1, gen_random_uuid()), $2, $3, $4, $5)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid) if uid else None,
+                    UUID(rec["song_id"]),
+                    UUID(rec["user_id"]),
+                    coerce("mastery_level", rec.get("mastery_level", "")),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the guitar_songs_mastery table contains:")
+def then_guitar_songs_mastery_table(datatable):
+    _assert_db("guitar_songs_mastery", datatable)
 
 
 @given("the guitar_song_author table contains:")

@@ -35,5 +35,10 @@ export const useGuitarSongLabels = (projectId: string | null) => {
     await reload();
   };
 
-  return { labels, loading, reload, createLabel, updateLabel, deleteLabel };
+  const reorderLabels = async (orderedIds: string[]) => {
+    if (!projectId) return;
+    setLabels(await guitarSongLabelsService.reorderLabels(projectId, orderedIds));
+  };
+
+  return { labels, loading, reload, createLabel, updateLabel, deleteLabel, reorderLabels };
 };

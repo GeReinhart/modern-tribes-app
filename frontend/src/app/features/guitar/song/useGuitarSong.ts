@@ -174,6 +174,12 @@ export const useGuitarSong = (songId: string | null) => {
     await reload();
   };
 
+  const setMyMastery = async (masteryLevel: number) => {
+    if (!songId) return;
+    await guitarSongsService.setMyMastery(songId, masteryLevel);
+    await reload();
+  };
+
   return {
     song, loading, error, reload,
     updateSongFields,
@@ -182,5 +188,6 @@ export const useGuitarSong = (songId: string | null) => {
     addLayoutRow, replaceLayoutRow, pasteBlock, pasteBlockToNewColumn, moveLayoutRow, removeLayoutRow, updateLayoutSettings,
     updateLayoutBlockContent,
     toggleLabel,
+    setMyMastery,
   };
 };

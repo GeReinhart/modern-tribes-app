@@ -7,6 +7,7 @@ from app.features.guitar.song.layout.models import BlockChordResponse, GuitarSon
 from app.features.guitar.song.video.models import GuitarSongVideoResponse
 
 ChordDiagramSize = Literal["xxs", "xs", "s", "m", "l", "xl", "xxl"]
+GuitarSongState = Literal["draft", "completed"]
 
 
 class GuitarSongCreate(BaseModel):
@@ -38,6 +39,8 @@ class GuitarSongUpdate(BaseModel):
     lyrics_text_size_px: Optional[int] = Field(default=None, ge=8, le=40)
     lyrics_chord_size_px: Optional[int] = Field(default=None, ge=8, le=40)
     description_html: Optional[str] = None
+    song_state: Optional[GuitarSongState] = None
+    difficulty: Optional[int] = Field(default=None, ge=0, le=5)
 
 
 class GuitarSongResponse(BaseModel):
@@ -57,6 +60,16 @@ class GuitarSongResponse(BaseModel):
     document_id: Optional[str] = None
     description_html: str = ""
     label_ids: List[str] = []
+    song_state: GuitarSongState
+    difficulty: Optional[int] = None
+    # The song's own deduplicated chord list's size, and how many of those chords are rated
+    # difficult (4 or 5) -- computed, not stored. A chord with no difficulty rating counts
+    # toward chord_count but not difficult_chord_count.
+    chord_count: int = 0
+    difficult_chord_count: int = 0
+    # The current user's own private mastery rating for this song (see guitar_songs_mastery) --
+    # null if they have never rated it. Never another user's rating.
+    my_mastery: Optional[int] = None
     status: str
     created_at: datetime
     updated_at: datetime

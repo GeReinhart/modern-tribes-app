@@ -2,7 +2,7 @@ import json
 from uuid import UUID
 
 _SELECT_FIELDS = (
-    "id::text, name, root_note, description, frets, status, "
+    "id::text, name, root_note, description, frets, difficulty, status, "
     "created_at, updated_at, created_by::text, updated_by::text"
 )
 
@@ -49,16 +49,16 @@ async def fetch_chords_by_ids(pool, chord_ids: set[str]) -> dict[str, dict]:
 
 
 async def insert_chord(
-    pool, name: str, root_note: str, description: str | None, frets: list, user_id: str
+    pool, name: str, root_note: str, description: str | None, frets: list, difficulty: int | None, user_id: str
 ) -> dict:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             f"""
-            INSERT INTO guitar_chords (name, root_note, description, frets, created_by, updated_by)
-            VALUES ($1, $2, $3, $4::jsonb, $5::uuid, $5::uuid)
+            INSERT INTO guitar_chords (name, root_note, description, frets, difficulty, created_by, updated_by)
+            VALUES ($1, $2, $3, $4::jsonb, $5, $6::uuid, $6::uuid)
             RETURNING {_SELECT_FIELDS}
             """,
-            name, root_note, description, json.dumps(frets), UUID(user_id),
+            name, root_note, description, json.dumps(frets), difficulty, UUID(user_id),
         )
     return _row_to_dict(row)
 

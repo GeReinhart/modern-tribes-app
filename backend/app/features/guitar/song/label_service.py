@@ -3,7 +3,12 @@ from fastapi import HTTPException, status
 from app.platform.core.authorization.project_access import check_project_access_or_admin
 from app.platform.functions.labels import repository as labels_repo
 from app.features.guitar.song.song_lookup import require_song_project
-from app.features.guitar.song.label_models import GuitarSongLabel, GuitarSongLabelCreate, GuitarSongLabelUpdate
+from app.features.guitar.song.label_models import (
+    GuitarSongLabel,
+    GuitarSongLabelCreate,
+    GuitarSongLabelUpdate,
+    GuitarSongLabelsReorderRequest,
+)
 
 ENTITY_TYPE = "guitar_song"
 
@@ -22,6 +27,14 @@ async def create_project_label(pool, project_id: str, data: GuitarSongLabelCreat
     await check_project_access_or_admin(project_id, user, pool, min_position="manager")
     row = await labels_repo.insert_project_label(pool, project_id, data.name, data.color, str(user["id"]))
     return _to_label(row)
+
+
+async def reorder_project_labels(
+    pool, project_id: str, data: GuitarSongLabelsReorderRequest, user: dict
+) -> list[GuitarSongLabel]:
+    await check_project_access_or_admin(project_id, user, pool, min_position="manager")
+    rows = await labels_repo.reorder_project_labels(pool, project_id, data.ordered_ids, str(user["id"]))
+    return [_to_label(r) for r in rows]
 
 
 async def _require_label(pool, label_id: str) -> dict:

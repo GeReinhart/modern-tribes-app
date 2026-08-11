@@ -160,6 +160,24 @@ export const ColumnPresentationFields: React.FC<ColumnPresentationFieldsProps> =
         <ThemedIconButton action={{ icon: 'chevron-up', label: t('guitarSong.layout.widthWider'), onClick: () => resizeWidth(1) }} />
       </div>
       <PaddingFieldsGrid titleKey="guitarSong.layout.columnMarginsTitle" value={column} onUpdate={updateColumn} />
+      <div style={{ display: 'flex', gap: '2px' }}>
+        <div style={{ backgroundColor: column.separator_left ? `${theme.colors.primary}25` : 'transparent', borderRadius: 'var(--radius-md)' }}>
+          <ThemedIconButton
+            action={{
+              icon: 'separator-vertical', label: t('guitarSong.layout.separatorLeft'),
+              onClick: () => updateColumn({ separator_left: !column.separator_left }),
+            }}
+          />
+        </div>
+        <div style={{ backgroundColor: column.separator_right ? `${theme.colors.primary}25` : 'transparent', borderRadius: 'var(--radius-md)' }}>
+          <ThemedIconButton
+            action={{
+              icon: 'separator-vertical', label: t('guitarSong.layout.separatorRight'),
+              onClick: () => updateColumn({ separator_right: !column.separator_right }),
+            }}
+          />
+        </div>
+      </div>
     </>
   );
 };

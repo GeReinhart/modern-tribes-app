@@ -702,13 +702,15 @@ CREATE TABLE IF NOT EXISTS user_quick_add_defaults (
 );
 CREATE OR REPLACE TRIGGER update_user_quick_add_defaults_updated_at BEFORE UPDATE ON user_quick_add_defaults FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Guitar chords inventory (migration 012)
+-- Guitar chords inventory (migration 012, difficulty added in 031)
 CREATE TABLE IF NOT EXISTS guitar_chords (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(50) NOT NULL,
     root_note VARCHAR(3) NOT NULL,
     description TEXT,
     frets JSONB NOT NULL,
+    -- How hard this chord shape is to play: 0 (easiest) to 5 (hardest), optional.
+    difficulty SMALLINT NULL CHECK (difficulty BETWEEN 0 AND 5),
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -733,7 +735,7 @@ CREATE TABLE IF NOT EXISTS guitar_song_author (
 CREATE OR REPLACE TRIGGER update_guitar_song_author_updated_at BEFORE UPDATE ON guitar_song_author FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE INDEX IF NOT EXISTS idx_guitar_song_author_project ON guitar_song_author(project_id);
 
--- Guitar songs, scoped to a project and shared by every guitar_song tab of that project (migrations 014, 015, 016, 017, 018)
+-- Guitar songs, scoped to a project and shared by every guitar_song tab of that project (migrations 014, 015, 016, 017, 018, 030, 031)
 CREATE TABLE IF NOT EXISTS guitar_songs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     url_param_id VARCHAR(6) UNIQUE NOT NULL,
@@ -749,6 +751,12 @@ CREATE TABLE IF NOT EXISTS guitar_songs (
     lyrics_text_size_px INTEGER NOT NULL DEFAULT 16 CHECK (lyrics_text_size_px BETWEEN 8 AND 40),
     lyrics_chord_size_px INTEGER NOT NULL DEFAULT 18 CHECK (lyrics_chord_size_px BETWEEN 8 AND 40),
     document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
+    -- Editorial state (migration 030): a completed song locks its content and only shows the
+    -- read-only presentation screen, distinct from the generic status column below.
+    song_state VARCHAR(20) NOT NULL DEFAULT 'draft' CHECK (song_state IN ('draft', 'completed')),
+    -- How hard the song is to play: 0 (easiest) to 5 (hardest), optional (migration 031).
+    -- Independent of any of its chords' own difficulty.
+    difficulty SMALLINT NULL CHECK (difficulty BETWEEN 0 AND 5),
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
@@ -758,6 +766,25 @@ CREATE TABLE IF NOT EXISTS guitar_songs (
 );
 CREATE OR REPLACE TRIGGER update_guitar_songs_updated_at BEFORE UPDATE ON guitar_songs FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE INDEX IF NOT EXISTS idx_guitar_songs_project ON guitar_songs(project_id);
+
+-- Each user's own private rating of how well they personally know a song: 0 (unknown) to 5
+-- (perfectly mastered), one row per (song, user) pair (migration 032)
+CREATE TABLE IF NOT EXISTS guitar_songs_mastery (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    song_id UUID REFERENCES guitar_songs(id) ON DELETE CASCADE NOT NULL,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    mastery_level SMALLINT NOT NULL CHECK (mastery_level BETWEEN 0 AND 5),
+    status VARCHAR(20) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    UNIQUE (song_id, user_id)
+);
+CREATE OR REPLACE TRIGGER update_guitar_songs_mastery_updated_at BEFORE UPDATE ON guitar_songs_mastery FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE INDEX IF NOT EXISTS idx_guitar_songs_mastery_song ON guitar_songs_mastery(song_id);
+CREATE INDEX IF NOT EXISTS idx_guitar_songs_mastery_user ON guitar_songs_mastery(user_id);
 
 -- Chords used in a guitar song, in order, with an optional per-song comment (migration 014)
 -- Ordered list of videos attached to a song (migration 015)
@@ -810,7 +837,8 @@ CREATE TABLE IF NOT EXISTS guitar_songs_layout_rows (
 CREATE OR REPLACE TRIGGER update_guitar_songs_layout_rows_updated_at BEFORE UPDATE ON guitar_songs_layout_rows FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE INDEX IF NOT EXISTS idx_guitar_songs_layout_rows_song ON guitar_songs_layout_rows(song_id);
 
--- Columns within a layout row; widths in twelfths of the row (migration 015, renamed in 023)
+-- Columns within a layout row; widths in twelfths of the row (migration 015, renamed in 023,
+-- separators added in 033)
 CREATE TABLE IF NOT EXISTS guitar_songs_layout_columns (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     row_id UUID REFERENCES guitar_songs_layout_rows(id) ON DELETE CASCADE NOT NULL,
@@ -822,6 +850,9 @@ CREATE TABLE IF NOT EXISTS guitar_songs_layout_columns (
     padding_right_mm NUMERIC(5,1) NOT NULL DEFAULT 0 CHECK (padding_right_mm BETWEEN 0 AND 100),
     padding_bottom_mm NUMERIC(5,1) NOT NULL DEFAULT 0 CHECK (padding_bottom_mm BETWEEN 0 AND 100),
     padding_left_mm NUMERIC(5,1) NOT NULL DEFAULT 0 CHECK (padding_left_mm BETWEEN 0 AND 100),
+    -- A subtle vertical rule on either edge of the column, independent of padding/align.
+    separator_left BOOLEAN NOT NULL DEFAULT FALSE,
+    separator_right BOOLEAN NOT NULL DEFAULT FALSE,
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),

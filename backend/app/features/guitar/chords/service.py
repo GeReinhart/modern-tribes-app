@@ -32,7 +32,9 @@ async def create_chord(pool, data: GuitarChordCreate, user_id: str) -> GuitarCho
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Could not derive a root note from the chord name; please provide root_note explicitly.",
         )
-    row = await chords_repository.insert_chord(pool, data.name, root_note, data.description, data.frets, user_id)
+    row = await chords_repository.insert_chord(
+        pool, data.name, root_note, data.description, data.frets, data.difficulty, user_id
+    )
     return GuitarChordResponse(**row)
 
 

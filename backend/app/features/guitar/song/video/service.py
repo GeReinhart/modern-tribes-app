@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 
 from app.platform.core.authorization.project_access import check_project_access_or_admin
-from app.features.guitar.song import position_utils
+from app.features.guitar.song import position_utils, song_lookup
 from app.features.guitar.song.models import GuitarSongChordMove
 from app.features.guitar.song.video import repository as repo
 from app.features.guitar.song.video.models import (
@@ -29,6 +29,7 @@ async def add_video_to_song(
     pool, song_id: str, project_id: str, data: GuitarSongVideoCreate, user: dict
 ) -> GuitarSongVideoResponse:
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
+    await song_lookup.require_song_editable(pool, song_id)
     position = await repo.next_video_position(pool, song_id)
     video_id = await repo.insert_video(pool, song_id, data.title, data.url, position, user["id"])
     row = await repo.fetch_video(pool, video_id)
@@ -38,6 +39,7 @@ async def add_video_to_song(
 async def update_video(pool, video_id: str, data: GuitarSongVideoUpdate, user: dict) -> GuitarSongVideoResponse:
     context = await _require_video_context(pool, video_id)
     await check_project_access_or_admin(context["project_id"], user, pool, min_position="member")
+    await song_lookup.require_song_editable(pool, context["song_id"])
     updates = data.model_dump(exclude_unset=True)
     await repo.update_video(pool, video_id, updates, user["id"])
     row = await repo.fetch_video(pool, video_id)
@@ -47,6 +49,7 @@ async def update_video(pool, video_id: str, data: GuitarSongVideoUpdate, user: d
 async def move_video(pool, video_id: str, data: GuitarSongChordMove, user: dict) -> list[GuitarSongVideoResponse]:
     context = await _require_video_context(pool, video_id)
     await check_project_access_or_admin(context["project_id"], user, pool, min_position="manager")
+    await song_lookup.require_song_editable(pool, context["song_id"])
     ordered = await repo.fetch_videos_sorted(pool, context["song_id"])
     target_id = position_utils.find_move_target_id(ordered, video_id, data.direction)
     if target_id:
@@ -57,4 +60,5 @@ async def move_video(pool, video_id: str, data: GuitarSongChordMove, user: dict)
 async def remove_video_from_song(pool, video_id: str, user: dict) -> None:
     context = await _require_video_context(pool, video_id)
     await check_project_access_or_admin(context["project_id"], user, pool, min_position="manager")
+    await song_lookup.require_song_editable(pool, context["song_id"])
     await repo.archive_video(pool, video_id, user["id"])

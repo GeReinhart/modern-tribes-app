@@ -1,11 +1,14 @@
-from fastapi import APIRouter, Depends, status
+from typing import List, Optional
+
+from fastapi import APIRouter, Depends, Query, status
 
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.database import get_database
 from app.platform.core.utils.db_helpers import resolve_url_param_id
-from app.features.guitar.song import service as song_service
+from app.features.guitar.song import mastery_service, service as song_service
+from app.features.guitar.song.mastery_models import GuitarSongMasterySet, GuitarSongMasteryResponse
 from app.features.guitar.song.models import (
     GuitarSongCreate,
     GuitarSongDetailResponse,
@@ -18,15 +21,27 @@ router = APIRouter(prefix="/guitar-songs", tags=["features_guitar_song"])
 
 @router.get("/projects/{project_id}/songs", response_model=list[GuitarSongResponse])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
-async def list_songs(project_id: str, current_user: dict = Depends(get_current_user)):
-    """List the songs in a project's shared songbook.
+async def list_songs(
+    project_id: str,
+    q: Optional[str] = Query(None),
+    label_id: Optional[List[str]] = Query(None),
+    song_state: Optional[List[str]] = Query(None),
+    difficulty: Optional[List[int]] = Query(None),
+    mastery: Optional[List[int]] = Query(None),
+    current_user: dict = Depends(get_current_user),
+):
+    """List the songs in a project's shared songbook, optionally searched by title/author/lyrics
+    and filtered by one or more labels, editorial states, difficulties, or the current user's own
+    mastery levels -- each filter accepts multiple values (e.g. ?difficulty=1&difficulty=2).
 
     **Permissions:** admin | can_access_attached_tribes
     **Project access:** minimum position ≥ guest
     """
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
-    return await song_service.list_songs(pool, project_id, current_user)
+    return await song_service.list_songs(
+        pool, project_id, current_user, q, label_id, song_state, difficulty, mastery
+    )
 
 
 @router.post(
@@ -70,6 +85,19 @@ async def update_song(song_id: str, data: GuitarSongUpdate, current_user: dict =
     pool = get_database()
     song_id = await resolve_url_param_id(pool, "guitar_songs", song_id)
     return await song_service.update_song(pool, song_id, data, current_user)
+
+
+@router.put("/songs/{song_id}/mastery", response_model=GuitarSongMasteryResponse)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def set_my_mastery(song_id: str, data: GuitarSongMasterySet, current_user: dict = Depends(get_current_user)):
+    """Rate your own mastery of a song -- private to you, never visible to other members.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ guest
+    """
+    pool = get_database()
+    song_id = await resolve_url_param_id(pool, "guitar_songs", song_id)
+    return await mastery_service.set_my_mastery(pool, song_id, data.mastery_level, current_user)
 
 
 @router.post(

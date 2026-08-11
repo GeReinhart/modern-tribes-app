@@ -21,10 +21,12 @@ interface SongLabelChipProps {
   onToggle: () => void;
   onUpdate: (data: { name?: string; color?: string }) => Promise<void>;
   onDelete: () => Promise<void>;
+  onMoveLeft?: () => void;
+  onMoveRight?: () => void;
 }
 
 export const SongLabelChip: React.FC<SongLabelChipProps> = ({
-  label, attached, clickable, canManage, onToggle, onUpdate, onDelete,
+  label, attached, clickable, canManage, onToggle, onUpdate, onDelete, onMoveLeft, onMoveRight,
 }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -73,6 +75,12 @@ export const SongLabelChip: React.FC<SongLabelChipProps> = ({
       </button>
       {canManage && (
         <>
+          <ThemedIconButton
+            action={{ icon: 'arrow-left', label: t('guitarSong.labels.moveLeft'), onClick: onMoveLeft, disabled: !onMoveLeft }}
+          />
+          <ThemedIconButton
+            action={{ icon: 'arrow-right', label: t('guitarSong.labels.moveRight'), onClick: onMoveRight, disabled: !onMoveRight }}
+          />
           <ThemedIconButton action={{ icon: 'pencil', label: t('common.edit'), onClick: () => setEditing(true) }} />
           <ThemedIconButton action={{ icon: 'trash', label: t('common.delete'), onClick: onDelete, variant: 'danger' }} />
         </>

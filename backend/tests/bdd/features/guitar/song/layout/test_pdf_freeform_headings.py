@@ -16,7 +16,10 @@ def test_freeform_heading_css_matches_block_title_sizes_in_em():
         assert f".freeform {level} {{ font-size: {size_px / _BASE_FONT_SIZE}em;" in FREEFORM_HEADING_CSS
         assert f".freeform {level} {{" in FREEFORM_HEADING_CSS
     assert FREEFORM_HEADING_CSS.count(f"color: {_LABEL_COLOR}") == len(_HEADING_SIZES_PX)
-    assert FREEFORM_HEADING_CSS.count("font-weight: 700") == len(_HEADING_SIZES_PX)
+    # H5 is non-bold and italic instead of bold, same toned-down treatment as a block's own h5
+    # title (render_block_title) -- so it's excluded from the bold count and included in italic.
+    assert FREEFORM_HEADING_CSS.count("font-weight: 700") == len(_HEADING_SIZES_PX) - 1
+    assert FREEFORM_HEADING_CSS.count("font-style: italic;") == 1
 
 
 def test_build_html_document_includes_the_freeform_heading_stylesheet():

@@ -91,3 +91,33 @@ Feature: Add a chord to the guitar chords inventory
     Then the response status code is 422
     And the guitar_chords table contains:
       | id | name | root_note | description | frets | status |
+
+  Scenario: POST /guitar/chords/ with a difficulty level — it is stored
+    Given I am authenticated as a regular user: user.id 0002
+    And the guitar_chords table contains:
+      | id | name | root_note | description | frets | difficulty | status |
+    When I POST /api/features/tasks/guitar-chords/ with body:
+      """
+      {"name": "Fmaj7#11", "frets": ["X", 0, 3, 2, 1, 0], "difficulty": 5}
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {"name": "Fmaj7#11", "difficulty": 5}
+      """
+    And the guitar_chords table contains:
+      | name       | difficulty | status |
+      | Fmaj7#11   | 5          | active |
+
+  @error_case
+  Scenario: POST /guitar/chords/ with a difficulty out of range — 422 error and the database is not modified
+    Given I am authenticated as a regular user: user.id 0002
+    And the guitar_chords table contains:
+      | id | name | root_note | description | frets | difficulty | status |
+    When I POST /api/features/tasks/guitar-chords/ with body:
+      """
+      {"name": "Weird", "frets": [0, 0, 0, 0, 0, 0], "difficulty": 6}
+      """
+    Then the response status code is 422
+    And the guitar_chords table contains:
+      | id | name | root_note | description | frets | difficulty | status |

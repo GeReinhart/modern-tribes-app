@@ -42,8 +42,19 @@ const ChordGridCellItemView: React.FC<{ item: ChordGridCellItem; chordsById: Cho
   return <span style={{ color: theme.colors.text, fontSize: `${chordSizePx}px` }}>{item.text}</span>;
 };
 
+// Positioning rule for a cell's items: one chord sits at the cell's left; two chords behave as
+// if the cell were split into two identical halves, each chord at the left of its own half;
+// three or more are justified across the full width. Using flex-basis wrappers (not CSS grid)
+// for the two-item case so the exact same layout renders in the PDF (WeasyPrint's flexbox
+// support is solid, its grid support is not).
+const chordGridRowStyle = (itemCount: number): React.CSSProperties => {
+  if (itemCount === 2) return { display: 'flex', width: '100%' };
+  return { display: 'flex', gap: '2px', alignItems: 'center', width: '100%', justifyContent: itemCount > 2 ? 'space-between' : 'flex-start' };
+};
+
 const ChordGridCellView: React.FC<ChordGridCellViewProps> = ({ cell, chordsById, diagramStyle, diagramSize, chordSizePx }) => {
   const { theme } = useTheme();
+  const itemCount = cell.items.length;
   return (
     <td
       style={{
@@ -51,15 +62,17 @@ const ChordGridCellView: React.FC<ChordGridCellViewProps> = ({ cell, chordsById,
         borderRight: cell.border_right ? `${CELL_BORDER_STYLE} ${theme.colors.text}` : 'none',
         borderBottom: cell.border_bottom ? `${CELL_BORDER_STYLE} ${theme.colors.text}` : 'none',
         borderLeft: cell.border_left ? `${CELL_BORDER_STYLE} ${theme.colors.text}` : 'none',
-        padding: '8px', textAlign: 'center', verticalAlign: 'middle',
+        padding: '8px', verticalAlign: 'middle',
       }}
     >
-      <div style={{ display: 'flex', gap: '2px', justifyContent: 'center', flexWrap: 'wrap', alignItems: 'center' }}>
+      <div style={chordGridRowStyle(itemCount)}>
         {cell.items.map((item, index) => (
-          <ChordGridCellItemView
-            key={index} item={item} chordsById={chordsById}
-            diagramStyle={diagramStyle} diagramSize={diagramSize} chordSizePx={chordSizePx}
-          />
+          <div key={index} style={itemCount === 2 ? { flex: '1 1 0%', textAlign: 'left' } : undefined}>
+            <ChordGridCellItemView
+              item={item} chordsById={chordsById}
+              diagramStyle={diagramStyle} diagramSize={diagramSize} chordSizePx={chordSizePx}
+            />
+          </div>
         ))}
       </div>
     </td>
@@ -83,7 +96,7 @@ export const SongChordGridBlock: React.FC<SongChordGridBlockProps> = ({
   return (
     <div>
       {rows.length > 0 && (
-        <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+        <table style={{ borderCollapse: 'collapse', width: '100%', tableLayout: 'fixed' }}>
           <tbody>
             {rows.map((row, rowIndex) => (
               <tr key={rowIndex}>

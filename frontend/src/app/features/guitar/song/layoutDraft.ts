@@ -74,6 +74,8 @@ export interface DraftColumn {
   padding_right_mm: number;
   padding_bottom_mm: number;
   padding_left_mm: number;
+  separator_left: boolean;
+  separator_right: boolean;
 }
 
 export const ROW_WIDTH_TWELFTHS = 12;
@@ -153,6 +155,8 @@ export const emptyDraftColumn = (blockType: LayoutBlockType, widthTwelfths: numb
   padding_right_mm: 0,
   padding_bottom_mm: 0,
   padding_left_mm: 0,
+  separator_left: false,
+  separator_right: false,
 });
 
 // A brand new column pre-filled with a pasted block, instead of an empty one of a chosen type.
@@ -165,6 +169,8 @@ export const draftColumnFromCopy = (copied: CopiedBlock, widthTwelfths: number):
   padding_right_mm: 0,
   padding_bottom_mm: 0,
   padding_left_mm: 0,
+  separator_left: false,
+  separator_right: false,
 });
 
 // A column with no blocks at all -- a plain spacer that just claims some of the row's width.
@@ -178,6 +184,8 @@ export const emptyDraftSpacerColumn = (widthTwelfths: number): DraftColumn => ({
   padding_right_mm: 0,
   padding_bottom_mm: 0,
   padding_left_mm: 0,
+  separator_left: false,
+  separator_right: false,
 });
 
 const draftLyricsWords = (block: GuitarSongLayoutRow['columns'][number]['blocks'][number]): GuitarSongLyricsWordInput[][] | null =>
@@ -218,6 +226,8 @@ export const draftColumnsFromRow = (row: GuitarSongLayoutRow): DraftColumn[] =>
     padding_right_mm: column.padding_right_mm,
     padding_bottom_mm: column.padding_bottom_mm,
     padding_left_mm: column.padding_left_mm,
+    separator_left: column.separator_left,
+    separator_right: column.separator_right,
   }));
 
 export const draftColumnsToInput = (
@@ -250,5 +260,7 @@ export const draftColumnsToInput = (
     padding_right_mm: column.padding_right_mm,
     padding_bottom_mm: column.padding_bottom_mm,
     padding_left_mm: column.padding_left_mm,
+    separator_left: column.separator_left,
+    separator_right: column.separator_right,
   })),
 });

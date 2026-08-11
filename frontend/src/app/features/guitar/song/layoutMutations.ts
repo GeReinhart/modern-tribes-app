@@ -98,7 +98,7 @@ export const removeBlock = (row: GuitarSongLayoutRow, columnId: string, blockInd
 
 export const updateColumnPresentation = (
   row: GuitarSongLayoutRow, columnId: string, patch: Partial<Pick<DraftColumn,
-    'align' | 'padding_top_mm' | 'padding_right_mm' | 'padding_bottom_mm' | 'padding_left_mm'>>,
+    'align' | 'padding_top_mm' | 'padding_right_mm' | 'padding_bottom_mm' | 'padding_left_mm' | 'separator_left' | 'separator_right'>>,
 ): GuitarSongLayoutRowInput =>
   mapColumn(row, columnId, (column) => ({ ...column, ...patch }));
 
