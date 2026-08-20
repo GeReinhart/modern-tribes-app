@@ -628,6 +628,11 @@
           "path": [
             "backend/app/features/groceries/**"
           ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/features/groceries/**"
+          ]
         }
       },
       {

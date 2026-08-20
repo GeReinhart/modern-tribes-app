@@ -7,9 +7,11 @@ from app.platform.core.database import get_database
 from app.features.groceries import access
 from app.features.groceries.catalog import repository as catalog_repository
 from app.features.groceries.lists import repository as lists_repository
+from app.platform.functions.people.persons import repository as persons_repository
 from app.features.groceries.lists.models import (
     GroceriesListCreate, GroceriesListResponse, GroceriesListItemCreate, GroceriesListItemUpdate,
     GroceriesListItemResponse, GroceriesListDetailResponse, GroceriesListItemDetail, GroceriesSuggestionResponse,
+    PersonOption,
 )
 
 lists_router = APIRouter(prefix="/groceries-lists", tags=["features_groceries_lists"])
@@ -47,6 +49,14 @@ async def _require_list(pool, list_id: str) -> dict:
     return row
 
 
+def _require_divisible_quantity(item: dict, quantity: float) -> None:
+    if not item.get("is_divisible", True) and quantity != int(quantity):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="This item can only be taken in whole quantities.",
+        )
+
+
 @lists_router.post("/", response_model=GroceriesListResponse, status_code=status.HTTP_201_CREATED)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def create_groceries_list(data: GroceriesListCreate, current_user: dict = Depends(get_current_user)):
@@ -62,6 +72,34 @@ async def create_groceries_list(data: GroceriesListCreate, current_user: dict = 
         data.assigned_person_id, data.force_on_dashboard, str(current_user["id"]),
     )
     return _row_to_list(row)
+
+
+@lists_router.get("/by-instance/{feature_instance_id}", response_model=list[GroceriesListResponse])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def list_groceries_lists(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
+    """List all grocery lists for a feature instance.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ guest
+    """
+    pool = get_database()
+    await access.require_feature_access(pool, feature_instance_id, current_user, "guest")
+    rows = await lists_repository.fetch_lists_for_instance(pool, feature_instance_id)
+    return [_row_to_list(r) for r in rows]
+
+
+@lists_router.get("/persons/{feature_instance_id}", response_model=list[PersonOption])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def list_persons(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
+    """List persons available for assignment on a grocery list.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ guest
+    """
+    pool = get_database()
+    await access.require_feature_access(pool, feature_instance_id, current_user, "guest")
+    rows = await persons_repository.fetch_persons_for_feature(pool, feature_instance_id, str(current_user["id"]))
+    return [PersonOption(id=str(r["id"]), name=r["name"]) for r in rows]
 
 
 @lists_router.get("/by-instance/{feature_instance_id}/suggestions", response_model=list[GroceriesSuggestionResponse])
@@ -80,6 +118,7 @@ async def get_suggested_items(feature_instance_id: str, current_user: dict = Dep
             groceries_item_id=str(r["groceries_item_id"]),
             name=r["name"],
             unit=r["unit"],
+            icon=r.get("icon"),
             renewal_duration_days=r["renewal_duration_days"],
         )
         for r in rows
@@ -106,8 +145,11 @@ async def get_groceries_list(list_id: str, current_user: dict = Depends(get_curr
                 groceries_item_id=str(i["groceries_item_id"]),
                 name=i["name"],
                 unit=i["unit"],
+                icon=i.get("icon"),
+                is_divisible=i.get("is_divisible", True),
                 quantity=float(i["quantity"]),
                 picked_up=i["picked_up"],
+                section_ids=list(i.get("section_ids") or []),
             )
             for i in items
         ],
@@ -128,6 +170,7 @@ async def add_list_item(list_id: str, data: GroceriesListItemCreate, current_use
     item = await catalog_repository.fetch_item(pool, data.groceries_item_id)
     if not item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grocery item not found.")
+    _require_divisible_quantity(item, data.quantity)
     row = await lists_repository.insert_list_item(
         pool, list_id, data.groceries_item_id, data.quantity, str(current_user["id"]),
     )
@@ -150,7 +193,27 @@ async def update_list_item(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grocery list item not found.")
     list_row = await _require_list(pool, str(item_row["groceries_list_id"]))
     await access.require_feature_access(pool, str(list_row["feature_instance_id"]), current_user, "member")
+    if data.quantity is not None:
+        catalog_item = await catalog_repository.fetch_item(pool, str(item_row["groceries_item_id"]))
+        _require_divisible_quantity(catalog_item, data.quantity)
     row = await lists_repository.update_list_item(
         pool, list_item_id, data.quantity, data.picked_up, str(current_user["id"]),
     )
     return _row_to_list_item(row)
+
+
+@list_items_router.delete("/{list_item_id}", status_code=status.HTTP_204_NO_CONTENT)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def delete_list_item(list_item_id: str, current_user: dict = Depends(get_current_user)):
+    """Remove an item from a grocery list.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
+    pool = get_database()
+    item_row = await lists_repository.fetch_list_item(pool, list_item_id)
+    if not item_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grocery list item not found.")
+    list_row = await _require_list(pool, str(item_row["groceries_list_id"]))
+    await access.require_feature_access(pool, str(list_row["feature_instance_id"]), current_user, "member")
+    await lists_repository.delete_list_item(pool, list_item_id)

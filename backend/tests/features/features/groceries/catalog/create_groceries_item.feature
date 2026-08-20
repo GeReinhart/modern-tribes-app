@@ -65,6 +65,29 @@ Feature: Add a new item to the shared groceries catalog
       | name     | description       | unit | status |
       | Tomatoes | Ripe red tomatoes | kg   | active |
 
+  Scenario: POST /groceries-items/ marked as not divisible — it is stored as such
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the groceries_items table contains:
+      | id | name | description | unit | status |
+    When I POST /api/features/tasks/groceries-items/ with body:
+      """
+      {"feature_instance_id": "0100", "name": "Yogurt", "unit": "piece", "is_divisible": false}
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "name": "Yogurt",
+        "is_divisible": false
+      }
+      """
+    And the groceries_items table contains:
+      | name   | unit  | is_divisible | status |
+      | Yogurt | piece | false        | active |
+
   Scenario: POST /groceries-items/ without a description — it defaults to empty
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:

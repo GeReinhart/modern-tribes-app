@@ -32,6 +32,15 @@ def test_update_quantity_success():
     pass
 
 
+@scenario(
+    FEATURE,
+    "PATCH /groceries-list-items/4002 with a fractional quantity for a non-divisible item — "
+    "422 error and the item is not modified",
+)
+def test_update_quantity_indivisible_fractional():
+    pass
+
+
 @scenario(FEATURE, "PATCH /groceries-list-items/4001 as a project guest — 403 error and the item is not modified")
 def test_toggle_picked_up_guest_forbidden():
     pass

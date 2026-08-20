@@ -22,6 +22,8 @@ import dailyJournalEn from '@/app/features/daily-journal/locales/en.ts';
 import dailyJournalFr from '@/app/features/daily-journal/locales/fr.ts';
 import tasksEn from '@/app/features/tasks/locales/en.ts';
 import tasksFr from '@/app/features/tasks/locales/fr.ts';
+import groceriesEn from '@/app/features/groceries/locales/en.ts';
+import groceriesFr from '@/app/features/groceries/locales/fr.ts';
 import tribesProjectsEn from '@/app/features/tribes-projects/locales/en.ts';
 import tribesProjectsFr from '@/app/features/tribes-projects/locales/fr.ts';
 import en from './locales/en.ts';
@@ -39,6 +41,7 @@ i18n.use(initReactI18next).init({
         ...eventsEn,
         ...bookmarksEn,
         ...tasksEn,
+        ...groceriesEn,
         ...glueEn,
         ...tribesProjectsEn,
         ...guitarNotesEn,
@@ -55,6 +58,7 @@ i18n.use(initReactI18next).init({
         ...eventsFr,
         ...bookmarksFr,
         ...tasksFr,
+        ...groceriesFr,
         ...glueFr,
         ...tribesProjectsFr,
         ...guitarNotesFr,

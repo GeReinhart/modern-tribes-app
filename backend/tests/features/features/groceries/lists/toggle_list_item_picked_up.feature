@@ -40,8 +40,9 @@ Feature: Mark a grocery list item as picked up
       | id   | project_id | name      | feature_type | status |
       | 0100 | 0100       | Groceries | groceries    | active |
     And the groceries_items table contains:
-      | id   | name     | description | unit | status |
-      | 3001 | Tomatoes |             | kg   | active |
+      | id   | name     | description | unit  | is_divisible | status |
+      | 3001 | Tomatoes |             | kg    | true         | active |
+      | 3002 | Yogurt   |             | piece | false        | active |
     And the groceries_lists table contains:
       | id   | feature_instance_id | name        | scheduled_date | list_status | status |
       | 0201 | 0100                | Weekly shop | 2026-08-22      | planned     | active |
@@ -90,6 +91,24 @@ Feature: Mark a grocery list item as picked up
     And the groceries_list_items table contains:
       | id   | groceries_list_id | groceries_item_id | quantity | picked_up | status |
       | 4001 | 0201               | 3001               | 3.50      | false     | active |
+
+  @error_case
+  Scenario: PATCH /groceries-list-items/4002 with a fractional quantity for a non-divisible item — 422 error and the item is not modified
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the groceries_list_items table contains:
+      | id   | groceries_list_id | groceries_item_id | quantity | picked_up | position | status |
+      | 4002 | 0201               | 3002               | 1.00      | false     | 1        | active |
+    When I PATCH /api/features/tasks/groceries-list-items/4002 with body:
+      """
+      {"quantity": 1.5}
+      """
+    Then the response status code is 422
+    And the groceries_list_items table contains:
+      | id   | groceries_list_id | groceries_item_id | quantity | picked_up | status |
+      | 4002 | 0201               | 3002               | 1.00      | false     | active |
 
   @error_case
   Scenario: PATCH /groceries-list-items/4001 as a project guest — 403 error and the item is not modified

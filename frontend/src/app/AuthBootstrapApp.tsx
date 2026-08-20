@@ -32,6 +32,8 @@ import { ProjectDocumentViewPage } from '@/app/features/tribes-projects/projects
 import { ProjectsPage } from '@/app/features/tribes-projects/projects/ProjectsPage.tsx';
 import { SearchPage } from '@/app/platform/functions/search/SearchPage.tsx';
 import ShowProjectPage from '@/app/features/tribes-projects/projects/ShowProjectPage.tsx';
+import { GroceriesListEditPage } from '@/app/features/groceries/GroceriesListEditPage.tsx';
+import { GroceriesListShoppingPage } from '@/app/features/groceries/GroceriesListShoppingPage.tsx';
 import { SongDetailPage } from '@/app/features/guitar/song/SongDetailPage.tsx';
 import { SongFormPage } from '@/app/features/guitar/song/SongFormPage.tsx';
 import { SongPresentationPage } from '@/app/features/guitar/song/SongPresentationPage.tsx';
@@ -223,6 +225,14 @@ function AuthBootstrapApp() {
                       <Route
                         path="/app/tribes/:tribeId/projects/:projectId/documents/:projectDocumentId/pages/:pageId/edit"
                         element={<DocumentPageFormPage />}
+                      />
+                      <Route
+                        path="/app/tribes/:tribeId/projects/:projectId/groceries/:listId"
+                        element={<GroceriesListShoppingPage />}
+                      />
+                      <Route
+                        path="/app/tribes/:tribeId/projects/:projectId/groceries/:listId/edit"
+                        element={<GroceriesListEditPage />}
                       />
                       <Route
                         path="/app/tribes/:tribeId/projects/:projectId/songs/new"

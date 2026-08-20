@@ -4,6 +4,7 @@ import { iconPathsCore } from './iconPathsCore.tsx';
 import { iconPathsExtra1 } from './iconPathsExtra1.tsx';
 import { iconPathsExtra2 } from './iconPathsExtra2.tsx';
 import { iconPathsExtra3 } from './iconPathsExtra3.tsx';
+import { iconPathsGroceries } from './iconPathsGroceries.tsx';
 import { IconName } from './iconTypes.ts';
 
 export type { IconName } from './iconTypes.ts';
@@ -14,6 +15,7 @@ const paths: Record<IconName, React.ReactNode> = {
   ...iconPathsExtra1,
   ...iconPathsExtra2,
   ...iconPathsExtra3,
+  ...iconPathsGroceries,
 } as Record<IconName, React.ReactNode>;
 
 interface ThemedSvgIconProps {

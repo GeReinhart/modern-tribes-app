@@ -75,16 +75,22 @@ Feature: View a grocery list
             "groceries_item_id": "3001",
             "name": "Tomatoes",
             "unit": "kg",
+            "icon": null,
+            "is_divisible": true,
             "quantity": 2.0,
-            "picked_up": false
+            "picked_up": false,
+            "section_ids": []
           },
           {
             "id": "4002",
             "groceries_item_id": "3002",
             "name": "Bread",
             "unit": "piece",
+            "icon": null,
+            "is_divisible": true,
             "quantity": 1.0,
-            "picked_up": true
+            "picked_up": true,
+            "section_ids": []
           }
         ]
       }

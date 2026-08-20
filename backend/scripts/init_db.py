@@ -438,9 +438,9 @@ class DatabaseInitializer:
         async with self.pool.acquire() as conn:
             for row in rows:
                 r = await conn.fetchrow(
-                    """INSERT INTO groceries_items (name, description, unit)
-                       VALUES ($1, $2, $3) RETURNING id""",
-                    row["name"], row.get("description") or "", row["unit"],
+                    """INSERT INTO groceries_items (name, description, unit, icon)
+                       VALUES ($1, $2, $3, $4) RETURNING id""",
+                    row["name"], row.get("description") or "", row["unit"], row.get("icon") or None,
                 )
                 ids[row["name"]] = str(r["id"])
         print(f"✓ Created {len(ids)} groceries items")
@@ -452,7 +452,8 @@ class DatabaseInitializer:
         async with self.pool.acquire() as conn:
             for row in rows:
                 r = await conn.fetchrow(
-                    "INSERT INTO groceries_sections (name) VALUES ($1) RETURNING id", row["name"],
+                    "INSERT INTO groceries_sections (name, icon) VALUES ($1, $2) RETURNING id",
+                    row["name"], row.get("icon") or None,
                 )
                 ids[row["name"]] = str(r["id"])
         print(f"✓ Created {len(ids)} groceries sections")

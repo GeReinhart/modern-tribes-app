@@ -35,6 +35,11 @@ def test_create_groceries_item_success():
     pass
 
 
+@scenario(FEATURE, "POST /groceries-items/ marked as not divisible — it is stored as such")
+def test_create_groceries_item_not_divisible():
+    pass
+
+
 @scenario(FEATURE, "POST /groceries-items/ without a description — it defaults to empty")
 def test_create_groceries_item_no_description():
     pass

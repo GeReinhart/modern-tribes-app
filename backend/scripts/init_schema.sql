@@ -325,6 +325,8 @@ CREATE TABLE IF NOT EXISTS groceries_items (
     name VARCHAR(255) NOT NULL,
     description TEXT NOT NULL DEFAULT '',
     unit VARCHAR(20) NOT NULL CHECK (unit IN ('gram', 'kg', 'piece')),
+    icon VARCHAR(50),
+    is_divisible BOOLEAN NOT NULL DEFAULT TRUE,
     status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -335,6 +337,7 @@ CREATE TABLE IF NOT EXISTS groceries_items (
 CREATE TABLE IF NOT EXISTS groceries_sections (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
+    icon VARCHAR(50),
     status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

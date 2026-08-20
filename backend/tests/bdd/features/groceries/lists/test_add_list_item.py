@@ -40,3 +40,12 @@ def test_add_list_item_unknown_item():
 @scenario(FEATURE, "POST /groceries-lists/0201/items with a missing quantity — 422 error and the list is not modified")
 def test_add_list_item_missing_quantity():
     pass
+
+
+@scenario(
+    FEATURE,
+    "POST /groceries-lists/0201/items with a fractional quantity for a non-divisible item — "
+    "422 error and the list is not modified",
+)
+def test_add_list_item_indivisible_fractional():
+    pass

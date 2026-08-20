@@ -1,0 +1,122 @@
+import { BookmarkToggle } from '@/app/features/bookmarks/BookmarkToggle.tsx';
+import { buildBookmarkDescription } from '@/app/features/bookmarks/types.ts';
+import { useProjectPermissions } from '@/app/features/tribes-projects/projects/useProjectPermissions.ts';
+import { useProject } from '@/app/features/tribes-projects/projects/useProjects.ts';
+import { useTribeWithPositions } from '@/app/features/tribes-projects/tribes/useTribesWithPositions.ts';
+import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
+import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation, useParams } from 'react-router-dom';
+
+import GroceriesCatalogColumn from './GroceriesCatalogColumn.tsx';
+import GroceriesListColumn from './GroceriesListColumn.tsx';
+import { useGroceriesCatalog, useGroceriesListDetail } from './hooks.ts';
+
+const GroceriesListEditPageContent: React.FC = () => {
+  const { t } = useTranslation();
+  const location = useLocation();
+  const { tribeId, projectId, listId } = useParams<{ tribeId: string; projectId: string; listId: string }>();
+
+  const { tribe } = useTribeWithPositions(tribeId || null);
+  const { project } = useProject(projectId || null);
+  const { canEdit } = useProjectPermissions(tribeId || null, projectId || null);
+  const { detail, error: detailError, addItem, updateQuantity, removeItem } = useGroceriesListDetail(listId || null);
+  const catalog = useGroceriesCatalog(detail?.feature_instance_id ?? null);
+  const [focusItemId, setFocusItemId] = useState<string | null>(null);
+
+  const listItemCatalogIds = useMemo(
+    () => new Set(detail?.items.map((i) => i.groceries_item_id) ?? []),
+    [detail?.items],
+  );
+
+  const handleAddItem = async (itemId: string) => {
+    const newId = await addItem(itemId, 1);
+    setFocusItemId(newId);
+  };
+
+  const backPath = `/app/tribes/${tribeId}/projects/${projectId}${
+    detail ? `/${detail.feature_instance_id}` : ''
+  }`;
+
+  const breadcrumbs = useMemo(
+    () => [
+      { label: t('common.home'), path: '/app' },
+      { label: t('tribes.title'), path: '/app/tribes' },
+      { label: tribe?.name || t('common.loading'), path: `/app/tribes/${tribeId}` },
+      { label: project?.name || t('common.loading'), path: `/app/tribes/${tribeId}/projects/${projectId}` },
+      { label: detail ? detail.name || detail.scheduled_date : t('common.loading') },
+    ],
+    [tribe?.name, project?.name, detail, tribeId, projectId, t],
+  );
+
+  const bookmarkSlot = detail ? (
+    <BookmarkToggle
+      pagePath={location.pathname}
+      pageTitle={detail.name || detail.scheduled_date}
+      pageDescription={buildBookmarkDescription(breadcrumbs)}
+    />
+  ) : null;
+
+  const shoppingPath = `/app/tribes/${tribeId}/projects/${projectId}/groceries/${listId}`;
+
+  const menuActions = useMemo(
+    () => [
+      { icon: 'arrow-left' as const, label: t('features.groceries.backToList'), path: backPath },
+      { icon: 'check-square' as const, label: t('features.groceries.shoppingMode'), path: shoppingPath },
+    ],
+    [backPath, shoppingPath, t],
+  );
+
+  if (!detail) {
+    return (
+      <AppLayout breadcrumbs={breadcrumbs}>
+        {detailError && <div>{detailError}</div>}
+      </AppLayout>
+    );
+  }
+
+  return (
+    <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions} bookmarkSlot={bookmarkSlot}>
+      {(detailError || catalog.error) && <div>{detailError || catalog.error}</div>}
+      <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <div style={{ flex: '1 1 320px', minWidth: '280px' }}>
+          <GroceriesCatalogColumn
+            featureInstanceId={detail.feature_instance_id}
+            items={catalog.items}
+            sections={catalog.sections}
+            suggestions={catalog.suggestions}
+            excludeItemIds={listItemCatalogIds}
+            canEdit={canEdit}
+            onAddItem={handleAddItem}
+            onCreateSection={catalog.createSection}
+            onUpdateSection={catalog.updateSection}
+            onDeleteSection={catalog.deleteSection}
+            onCreateItem={catalog.createItem}
+            onLinkItemToSection={catalog.linkItemToSection}
+            onUpdateItem={catalog.updateItem}
+            onSetItemRenewal={catalog.setItemRenewal}
+          />
+        </div>
+        <div style={{ flex: '1 1 320px', minWidth: '280px' }}>
+          <GroceriesListColumn
+            items={detail.items}
+            sections={catalog.sections}
+            canEdit={canEdit}
+            onUpdateQuantity={updateQuantity}
+            onRemove={removeItem}
+            focusItemId={focusItemId}
+            onFocused={() => setFocusItemId(null)}
+          />
+        </div>
+      </div>
+    </AppLayout>
+  );
+};
+
+export const GroceriesListEditPage: React.FC = () => (
+  <ThemeProvider defaultTheme="default">
+    <GroceriesListEditPageContent />
+  </ThemeProvider>
+);

@@ -710,13 +710,14 @@ def given_groceries_items_table(datatable):
             for row in datatable[1:]:
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
                 await conn.execute(
-                    """INSERT INTO groceries_items(id, name, description, unit, status)
-                       VALUES($1, $2, $3, $4, $5)
+                    """INSERT INTO groceries_items(id, name, description, unit, is_divisible, status)
+                       VALUES($1, $2, $3, $4, $5, $6)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(rec["id"]),
                     rec.get("name", "Item"),
                     rec.get("description") or "",
                     rec.get("unit", "piece"),
+                    (rec.get("is_divisible") or "true").lower() == "true",
                     rec.get("status", "active"),
                 )
         finally:
@@ -739,6 +740,26 @@ def given_groceries_sections_table(datatable):
                     UUID(rec["id"]),
                     rec.get("name", "Section"),
                     rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@given("the groceries_item_sections table contains:")
+def given_groceries_item_sections_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                await conn.execute(
+                    """INSERT INTO groceries_item_sections(groceries_item_id, groceries_section_id)
+                       VALUES($1, $2)
+                       ON CONFLICT DO NOTHING""",
+                    UUID(rec["groceries_item_id"]),
+                    UUID(rec["groceries_section_id"]),
                 )
         finally:
             await conn.close()
@@ -1301,6 +1322,11 @@ def then_groceries_items_table(datatable):
 @then("the groceries_sections table contains:")
 def then_groceries_sections_table(datatable):
     _assert_db("groceries_sections", datatable)
+
+
+@then("the groceries_item_sections table contains:")
+def then_groceries_item_sections_table(datatable):
+    _assert_db("groceries_item_sections", datatable)
 
 
 @then("the groceries_instance_items table contains:")

@@ -40,8 +40,9 @@ Feature: Add an item to a grocery list
       | id   | project_id | name      | feature_type | status |
       | 0100 | 0100       | Groceries | groceries    | active |
     And the groceries_items table contains:
-      | id   | name     | description | unit | status |
-      | 3001 | Tomatoes |             | kg   | active |
+      | id   | name     | description | unit  | is_divisible | status |
+      | 3001 | Tomatoes |             | kg    | true         | active |
+      | 3002 | Yogurt   |             | piece | false        | active |
     And the groceries_lists table contains:
       | id   | feature_instance_id | name        | scheduled_date | list_status | status |
       | 0201 | 0100                | Weekly shop | 2026-08-22      | planned     | active |
@@ -115,6 +116,22 @@ Feature: Add an item to a grocery list
     When I POST /api/features/tasks/groceries-lists/0201/items with body:
       """
       {"groceries_item_id": "3001"}
+      """
+    Then the response status code is 422
+    And the groceries_list_items table contains:
+      | id | groceries_list_id | groceries_item_id | quantity | picked_up | position | status |
+
+  @error_case
+  Scenario: POST /groceries-lists/0201/items with a fractional quantity for a non-divisible item — 422 error and the list is not modified
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the groceries_list_items table contains:
+      | id | groceries_list_id | groceries_item_id | quantity | picked_up | position | status |
+    When I POST /api/features/tasks/groceries-lists/0201/items with body:
+      """
+      {"groceries_item_id": "3002", "quantity": 1.5}
       """
     Then the response status code is 422
     And the groceries_list_items table contains:

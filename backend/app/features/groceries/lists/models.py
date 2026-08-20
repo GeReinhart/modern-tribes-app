@@ -47,8 +47,11 @@ class GroceriesListItemDetail(BaseModel):
     groceries_item_id: str
     name: str
     unit: str
+    icon: Optional[str] = None
+    is_divisible: bool = True
     quantity: float
     picked_up: bool
+    section_ids: list[str] = []
 
 
 class GroceriesListDetailResponse(GroceriesListResponse):
@@ -59,4 +62,10 @@ class GroceriesSuggestionResponse(BaseModel):
     groceries_item_id: str
     name: str
     unit: str
+    icon: Optional[str] = None
     renewal_duration_days: int
+
+
+class PersonOption(BaseModel):
+    id: str
+    name: str

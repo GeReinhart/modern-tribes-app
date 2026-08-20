@@ -102,7 +102,46 @@ export type IconName =
   | 'align-left'
   | 'align-center'
   | 'align-right'
-  | 'separator-vertical';
+  | 'separator-vertical'
+  | 'apple'
+  | 'carrot'
+  | 'bread'
+  | 'milk'
+  | 'meat'
+  | 'fish'
+  | 'cheese'
+  | 'egg'
+  | 'banana'
+  | 'orange'
+  | 'lemon'
+  | 'grape'
+  | 'strawberry'
+  | 'watermelon'
+  | 'pepper'
+  | 'onion'
+  | 'potato'
+  | 'mushroom'
+  | 'broccoli'
+  | 'corn'
+  | 'pineapple'
+  | 'avocado'
+  | 'cherry'
+  | 'croissant'
+  | 'donut'
+  | 'cupcake'
+  | 'cookie'
+  | 'cake'
+  | 'butter'
+  | 'yogurt'
+  | 'ice-cream'
+  | 'bacon'
+  | 'sausage'
+  | 'shrimp'
+  | 'bottle'
+  | 'wine-glass'
+  | 'jar'
+  | 'basket'
+  | 'pumpkin';
 
 export const ICON_NAMES: IconName[] = [
   'plus', 'minus', 'trash', 'pencil', 'eye', 'arrow-left', 'arrow-right',
@@ -122,4 +161,9 @@ export const ICON_NAMES: IconName[] = [
   'coffee', 'headphones', 'mic', 'volume-2', 'disc', 'dumbbell', 'ball',
   'watch', 'trending-up', 'compass', 'shield', 'columns', 'check-square',
   'file', 'maximize', 'align-left', 'align-center', 'align-right', 'separator-vertical',
+  'apple', 'carrot', 'bread', 'milk', 'meat', 'fish', 'cheese', 'egg',
+  'banana', 'orange', 'lemon', 'grape', 'strawberry', 'watermelon', 'pepper', 'onion',
+  'potato', 'mushroom', 'broccoli', 'corn', 'pineapple', 'avocado', 'cherry', 'croissant',
+  'donut', 'cupcake', 'cookie', 'cake', 'butter', 'yogurt', 'ice-cream', 'bacon',
+  'sausage', 'shrimp', 'bottle', 'wine-glass', 'jar', 'basket', 'pumpkin',
 ];

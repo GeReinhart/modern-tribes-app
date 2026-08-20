@@ -72,12 +72,14 @@ Feature: Get suggested items for a new grocery list
           "groceries_item_id": "3001",
           "name": "Milk",
           "unit": "piece",
+          "icon": null,
           "renewal_duration_days": 1
         },
         {
           "groceries_item_id": "3002",
           "name": "Rice",
           "unit": "kg",
+          "icon": null,
           "renewal_duration_days": 7
         }
       ]
@@ -94,12 +96,14 @@ Feature: Get suggested items for a new grocery list
           "groceries_item_id": "3001",
           "name": "Milk",
           "unit": "piece",
+          "icon": null,
           "renewal_duration_days": 1
         },
         {
           "groceries_item_id": "3002",
           "name": "Rice",
           "unit": "kg",
+          "icon": null,
           "renewal_duration_days": 7
         }
       ]

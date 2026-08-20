@@ -28,10 +28,27 @@ async def fetch_list(pool, list_id: str) -> Optional[dict]:
     return dict(row) if row else None
 
 
+async def fetch_lists_for_instance(pool, feature_instance_id: str) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """SELECT * FROM groceries_lists
+               WHERE feature_instance_id = $1
+               ORDER BY scheduled_date ASC, created_at ASC""",
+            UUID(feature_instance_id),
+        )
+    return [dict(r) for r in rows]
+
+
 async def fetch_list_items_detail(pool, list_id: str) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            """SELECT gli.id, gli.groceries_item_id, gi.name, gi.unit, gli.quantity, gli.picked_up
+            """SELECT gli.id, gli.groceries_item_id, gi.name, gi.unit, gi.icon, gi.is_divisible,
+                      gli.quantity, gli.picked_up,
+                      ARRAY(
+                          SELECT gis.groceries_section_id::text
+                          FROM groceries_item_sections gis
+                          WHERE gis.groceries_item_id = gi.id
+                      ) AS section_ids
                FROM groceries_list_items gli
                JOIN groceries_items gi ON gi.id = gli.groceries_item_id
                WHERE gli.groceries_list_id = $1
@@ -81,10 +98,15 @@ async def update_list_item(
     return dict(row)
 
 
+async def delete_list_item(pool, list_item_id: str) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute("DELETE FROM groceries_list_items WHERE id = $1", UUID(list_item_id))
+
+
 async def fetch_suggestions(pool, feature_instance_id: str) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            """SELECT gi.id AS groceries_item_id, gi.name, gi.unit, gii.renewal_duration_days
+            """SELECT gi.id AS groceries_item_id, gi.name, gi.unit, gi.icon, gii.renewal_duration_days
                FROM groceries_instance_items gii
                JOIN groceries_items gi ON gi.id = gii.groceries_item_id
                LEFT JOIN LATERAL (

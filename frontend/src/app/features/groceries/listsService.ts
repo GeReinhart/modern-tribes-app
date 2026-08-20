@@ -1,0 +1,56 @@
+import { apiService } from '@/app/platform/core/api/api.service.ts';
+
+import {
+  GroceriesList,
+  GroceriesListCreate,
+  GroceriesListDetail,
+  GroceriesListItem,
+  GroceriesListItemUpdate,
+  GroceriesSuggestion,
+  PersonOption,
+} from './types.ts';
+
+class GroceriesListsService {
+  async listByInstance(featureInstanceId: string): Promise<GroceriesList[]> {
+    return apiService.get<GroceriesList[]>(
+      `/features/tasks/groceries-lists/by-instance/${featureInstanceId}`,
+    );
+  }
+
+  async create(data: GroceriesListCreate): Promise<GroceriesList> {
+    return apiService.post<GroceriesList>('/features/tasks/groceries-lists/', data);
+  }
+
+  async getDetail(listId: string): Promise<GroceriesListDetail> {
+    return apiService.get<GroceriesListDetail>(`/features/tasks/groceries-lists/${listId}`);
+  }
+
+  async listSuggestions(featureInstanceId: string): Promise<GroceriesSuggestion[]> {
+    return apiService.get<GroceriesSuggestion[]>(
+      `/features/tasks/groceries-lists/by-instance/${featureInstanceId}/suggestions`,
+    );
+  }
+
+  async listPersons(featureInstanceId: string): Promise<PersonOption[]> {
+    return apiService.get<PersonOption[]>(
+      `/features/tasks/groceries-lists/persons/${featureInstanceId}`,
+    );
+  }
+
+  async addItem(listId: string, groceriesItemId: string, quantity: number): Promise<GroceriesListItem> {
+    return apiService.post<GroceriesListItem>(`/features/tasks/groceries-lists/${listId}/items`, {
+      groceries_item_id: groceriesItemId,
+      quantity,
+    });
+  }
+
+  async updateItem(listItemId: string, data: GroceriesListItemUpdate): Promise<GroceriesListItem> {
+    return apiService.patch<GroceriesListItem>(`/features/tasks/groceries-list-items/${listItemId}`, data);
+  }
+
+  async deleteItem(listItemId: string): Promise<void> {
+    return apiService.delete<void>(`/features/tasks/groceries-list-items/${listItemId}`);
+  }
+}
+
+export const groceriesListsService = new GroceriesListsService();
