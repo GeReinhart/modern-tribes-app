@@ -111,6 +111,12 @@ class DatabaseInitializer:
             "guitar_songs_videos",
             "guitar_songs",
             "guitar_song_author",
+            "groceries_list_items",
+            "groceries_lists",
+            "groceries_instance_items",
+            "groceries_item_sections",
+            "groceries_sections",
+            "groceries_items",
             "projects_features",
             "document_entities",
             "label_entities",
@@ -424,6 +430,131 @@ class DatabaseInitializer:
                 )
                 count += 1
         print(f"✓ Created {count} todo items")
+        return count
+
+    async def create_groceries_items(self) -> Dict[str, str]:
+        rows = self.load_csv("groceries_items.csv")
+        ids: Dict[str, str] = {}
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                r = await conn.fetchrow(
+                    """INSERT INTO groceries_items (name, description, unit)
+                       VALUES ($1, $2, $3) RETURNING id""",
+                    row["name"], row.get("description") or "", row["unit"],
+                )
+                ids[row["name"]] = str(r["id"])
+        print(f"✓ Created {len(ids)} groceries items")
+        return ids
+
+    async def create_groceries_sections(self) -> Dict[str, str]:
+        rows = self.load_csv("groceries_sections.csv")
+        ids: Dict[str, str] = {}
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                r = await conn.fetchrow(
+                    "INSERT INTO groceries_sections (name) VALUES ($1) RETURNING id", row["name"],
+                )
+                ids[row["name"]] = str(r["id"])
+        print(f"✓ Created {len(ids)} groceries sections")
+        return ids
+
+    async def create_groceries_item_sections(
+        self, groceries_item_ids: Dict[str, str], groceries_section_ids: Dict[str, str]
+    ) -> int:
+        rows = self.load_csv("groceries_item_sections.csv")
+        count = 0
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                if row["item"] not in groceries_item_ids:
+                    print(f"✗ Unknown item '{row['item']}' in groceries_item_sections.csv")
+                    sys.exit(1)
+                if row["section"] not in groceries_section_ids:
+                    print(f"✗ Unknown section '{row['section']}' in groceries_item_sections.csv")
+                    sys.exit(1)
+                await conn.execute(
+                    """INSERT INTO groceries_item_sections (groceries_item_id, groceries_section_id)
+                       VALUES ($1, $2)""",
+                    groceries_item_ids[row["item"]], groceries_section_ids[row["section"]],
+                )
+                count += 1
+        print(f"✓ Created {count} groceries item-section links")
+        return count
+
+    async def create_groceries_instance_items(
+        self, feature_ids: Dict[str, str], groceries_item_ids: Dict[str, str]
+    ) -> int:
+        rows = self.load_csv("groceries_instance_items.csv")
+        count = 0
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                key = f"{row['project']}|{row['feature_name']}"
+                if key not in feature_ids:
+                    print(f"✗ Unknown feature '{key}' in groceries_instance_items.csv")
+                    sys.exit(1)
+                if row["item"] not in groceries_item_ids:
+                    print(f"✗ Unknown item '{row['item']}' in groceries_instance_items.csv")
+                    sys.exit(1)
+                await conn.execute(
+                    """INSERT INTO groceries_instance_items (feature_instance_id, groceries_item_id, renewal_duration_days)
+                       VALUES ($1, $2, $3)""",
+                    feature_ids[key], groceries_item_ids[row["item"]], int(row["renewal_duration_days"]),
+                )
+                count += 1
+        print(f"✓ Created {count} groceries instance items")
+        return count
+
+    async def create_groceries_lists(
+        self, feature_ids: Dict[str, str], person_ids: Dict[str, str], user_ids: Dict[str, str]
+    ) -> Dict[str, str]:
+        rows = self.load_csv("groceries_lists.csv")
+        ids: Dict[str, str] = {}
+        admin_id = user_ids.get("admin")
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                key = f"{row['project']}|{row['feature_name']}"
+                if key not in feature_ids:
+                    print(f"✗ Unknown feature '{key}' in groceries_lists.csv")
+                    sys.exit(1)
+                assigned_person = row.get("assigned_person")
+                if assigned_person and assigned_person not in person_ids:
+                    print(f"✗ Unknown person '{assigned_person}' in groceries_lists.csv")
+                    sys.exit(1)
+                r = await conn.fetchrow(
+                    """INSERT INTO groceries_lists
+                           (feature_instance_id, name, scheduled_date, list_status, assigned_person_id, force_on_dashboard, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $5, $6, $7, $7) RETURNING id""",
+                    feature_ids[key], row.get("name") or None, row["scheduled_date"],
+                    row.get("list_status") or "planned",
+                    person_ids[assigned_person] if assigned_person else None,
+                    (row.get("force_on_dashboard") or "false").lower() == "true",
+                    admin_id,
+                )
+                ids[f"{key}|{row['name']}"] = str(r["id"])
+        print(f"✓ Created {len(ids)} groceries lists")
+        return ids
+
+    async def create_groceries_list_items(
+        self, groceries_list_ids: Dict[str, str], groceries_item_ids: Dict[str, str]
+    ) -> int:
+        rows = self.load_csv("groceries_list_items.csv")
+        count = 0
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                list_key = f"{row['project']}|{row['feature_name']}|{row['list_name']}"
+                if list_key not in groceries_list_ids:
+                    print(f"✗ Unknown list '{list_key}' in groceries_list_items.csv")
+                    sys.exit(1)
+                if row["item"] not in groceries_item_ids:
+                    print(f"✗ Unknown item '{row['item']}' in groceries_list_items.csv")
+                    sys.exit(1)
+                await conn.execute(
+                    """INSERT INTO groceries_list_items (groceries_list_id, groceries_item_id, quantity, picked_up, position)
+                       VALUES ($1, $2, $3, $4, $5)""",
+                    groceries_list_ids[list_key], groceries_item_ids[row["item"]],
+                    row["quantity"], row.get("picked_up", "false").lower() == "true", int(row.get("position") or 0),
+                )
+                count += 1
+        print(f"✓ Created {count} groceries list items")
         return count
 
     async def _find_or_create_guitar_song_author(self, conn, project_id: str, name: str | None) -> str | None:
@@ -786,6 +917,12 @@ class DatabaseInitializer:
             pages_count = await self.create_document_pages(pd_ids, user_ids)
             feature_ids = await self.create_projects_features(project_ids)
             todo_count = await self.create_todo_items(feature_ids, user_ids)
+            groceries_item_ids = await self.create_groceries_items()
+            groceries_section_ids = await self.create_groceries_sections()
+            groceries_item_sections_count = await self.create_groceries_item_sections(groceries_item_ids, groceries_section_ids)
+            groceries_instance_items_count = await self.create_groceries_instance_items(feature_ids, groceries_item_ids)
+            groceries_list_ids = await self.create_groceries_lists(feature_ids, person_ids, user_ids)
+            groceries_list_items_count = await self.create_groceries_list_items(groceries_list_ids, groceries_item_ids)
             song_ids = await self.create_guitar_songs(project_ids, user_ids)
             video_count = await self.create_guitar_song_videos(song_ids, user_ids)
             layout_row_count = await self.create_guitar_song_layouts(song_ids, user_ids)
@@ -810,6 +947,12 @@ class DatabaseInitializer:
             print(f"   • Document pages:           {pages_count}")
             print(f"   • Project features:         {len(feature_ids)}")
             print(f"   • Todo items:               {todo_count}")
+            print(f"   • Groceries items:          {len(groceries_item_ids)}")
+            print(f"   • Groceries sections:       {len(groceries_section_ids)}")
+            print(f"   • Groceries item-sections:  {groceries_item_sections_count}")
+            print(f"   • Groceries instance items: {groceries_instance_items_count}")
+            print(f"   • Groceries lists:          {len(groceries_list_ids)}")
+            print(f"   • Groceries list items:     {groceries_list_items_count}")
             print(f"   • Guitar songs:             {len(song_ids)}")
             print(f"   • Guitar song videos:       {video_count}")
             print(f"   • Guitar song layout rows:  {layout_row_count}")

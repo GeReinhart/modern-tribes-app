@@ -34,6 +34,7 @@ Feature: List feature types
       [
         {"feature_type": "kanban", "label": "Kanban"},
         {"feature_type": "todo_list", "label": "Todo List"},
+        {"feature_type": "groceries", "label": "Groceries"},
         {"feature_type": "guitar_notes", "label": "Guitar - Notes"},
         {"feature_type": "guitar_tuner", "label": "Guitar - Tuner"},
         {"feature_type": "guitar_metronome", "label": "Guitar - Metronome"},
