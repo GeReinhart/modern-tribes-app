@@ -12,6 +12,7 @@ import {
   GroceriesListCreate,
   GroceriesListDetail,
   GroceriesListItemCreate,
+  GroceriesListUpdate,
   GroceriesSection,
   GroceriesSectionUpdate,
   GroceriesSuggestion,
@@ -63,7 +64,31 @@ export function useGroceriesLists(featureInstanceId: string | null) {
     [],
   );
 
-  return { lists, persons, error, createList, refetch: fetchLists };
+  const updateList = useCallback(
+    async (listId: string, data: GroceriesListUpdate): Promise<boolean> => {
+      try {
+        const updated = await groceriesListsService.update(listId, data);
+        setLists((prev) => prev.map((l) => (l.id === listId ? updated : l)));
+        return true;
+      } catch (e: unknown) {
+        setError(errorMessage(e));
+        return false;
+      }
+    },
+    [],
+  );
+
+  const toggleFavorite = useCallback(
+    (listId: string, isFavorite: boolean) => updateList(listId, { is_favorite: isFavorite }),
+    [updateList],
+  );
+
+  const setArchived = useCallback(
+    (listId: string, archived: boolean) => updateList(listId, { status: archived ? 'archived' : 'active' }),
+    [updateList],
+  );
+
+  return { lists, persons, error, createList, toggleFavorite, setArchived, refetch: fetchLists };
 }
 
 export function useGroceriesListDetail(listId: string | null) {

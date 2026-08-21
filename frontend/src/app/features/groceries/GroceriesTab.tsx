@@ -20,12 +20,18 @@ const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit }) => {
   const { theme } = useTheme();
   const navigate = useNavigate();
   const { tribeId, projectId } = useParams<{ tribeId: string; projectId: string }>();
-  const { lists, persons, error, createList } = useGroceriesLists(featureInstanceId);
+  const { lists, persons, error, createList, toggleFavorite, setArchived } = useGroceriesLists(featureInstanceId);
   const [creating, setCreating] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
+
+  const activeLists = lists.filter((l) => l.status !== 'archived');
+  const archivedLists = lists.filter((l) => l.status === 'archived');
+  const favoriteLists = activeLists.filter((l) => l.is_favorite);
+  const visibleLists = showArchived ? [...activeLists, ...archivedLists] : activeLists;
 
   const tabActions = useMemo(
-    () =>
-      canEdit
+    () => [
+      ...(canEdit
         ? [
             {
               icon: 'plus' as const,
@@ -33,8 +39,20 @@ const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit }) => {
               onClick: () => setCreating(true),
             },
           ]
-        : [],
-    [canEdit, t],
+        : []),
+      ...(archivedLists.length > 0
+        ? [
+            {
+              icon: (showArchived ? 'eye-off' as const : 'eye' as const),
+              label: showArchived
+                ? t('features.groceries.hideArchivedLists')
+                : t('features.groceries.showArchivedLists', { count: archivedLists.length }),
+              onClick: () => setShowArchived((v) => !v),
+            },
+          ]
+        : []),
+    ],
+    [canEdit, archivedLists.length, showArchived, t],
   );
   useRegisterTabActions(tabActions);
 
@@ -59,12 +77,15 @@ const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit }) => {
         </span>
       )}
 
-      {lists.map((list) => (
+      {visibleLists.map((list) => (
         <GroceriesListRow
           key={list.id}
           list={list}
           persons={persons}
+          canEdit={canEdit}
           onOpen={() => navigate(`/app/tribes/${tribeId}/projects/${projectId}/groceries/${list.id}`)}
+          onToggleFavorite={() => toggleFavorite(list.id, !list.is_favorite)}
+          onToggleArchived={() => setArchived(list.id, list.status !== 'archived')}
         />
       ))}
 
@@ -72,6 +93,7 @@ const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit }) => {
         <CreateGroceriesListModal
           featureInstanceId={featureInstanceId}
           persons={persons}
+          favoriteLists={favoriteLists}
           onClose={() => setCreating(false)}
           onCreate={async (data) => {
             const created = await createList(data);

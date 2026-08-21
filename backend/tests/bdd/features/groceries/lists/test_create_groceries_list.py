@@ -40,3 +40,15 @@ def test_create_groceries_list_missing_date():
 @scenario(FEATURE, "POST /groceries-lists/ as a project guest — 403 error and the database is not modified")
 def test_create_groceries_list_guest_forbidden():
     pass
+
+
+@scenario(FEATURE, "POST /groceries-lists/ with copy_from_list_id — the favorite list's items are copied to the new list")
+def test_create_groceries_list_copy_from_favorite():
+    pass
+
+
+@scenario(
+    FEATURE, "POST /groceries-lists/ with a copy_from_list_id from another feature instance — 404 error and no list is created"
+)
+def test_create_groceries_list_copy_from_other_instance_forbidden():
+    pass

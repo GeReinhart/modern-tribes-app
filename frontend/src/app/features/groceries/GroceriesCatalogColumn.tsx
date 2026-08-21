@@ -20,6 +20,7 @@ interface Props {
   suggestions: GroceriesSuggestion[];
   excludeItemIds: Set<string>;
   canEdit: boolean;
+  configuring: boolean;
   onAddItem: (itemId: string) => Promise<void>;
   onCreateSection: (name: string, icon?: string) => Promise<GroceriesSection | null>;
   onUpdateSection: (sectionId: string, data: Omit<GroceriesSectionUpdate, 'feature_instance_id'>) => Promise<boolean>;
@@ -32,7 +33,7 @@ interface Props {
 }
 
 const GroceriesCatalogColumn: React.FC<Props> = ({
-  featureInstanceId, items, sections, suggestions, excludeItemIds, canEdit,
+  featureInstanceId, items, sections, suggestions, excludeItemIds, canEdit, configuring,
   onAddItem, onCreateSection, onUpdateSection, onReorderSections, onDeleteSection,
   onCreateItem, onLinkItemToSection, onUpdateItem, onSetItemRenewal,
 }) => {
@@ -137,15 +138,23 @@ const GroceriesCatalogColumn: React.FC<Props> = ({
               canEdit={canEdit}
               onAddItem={handleSelectItem}
               onAddNewItem={group.id ? () => setAddingItemToSectionId(group.id) : undefined}
-              onRenameSection={group.id ? () => setRenamingSection(sections.find((s) => s.id === group.id) ?? null) : undefined}
-              onMoveUp={group.id && sectionIndex(group.id) > 0 ? () => moveSection(group.id as string, -1) : undefined}
+              onRenameSection={
+                configuring && group.id
+                  ? () => setRenamingSection(sections.find((s) => s.id === group.id) ?? null)
+                  : undefined
+              }
+              onMoveUp={
+                configuring && group.id && sectionIndex(group.id) > 0
+                  ? () => moveSection(group.id as string, -1)
+                  : undefined
+              }
               onMoveDown={
-                group.id && sectionIndex(group.id) < sections.length - 1
+                configuring && group.id && sectionIndex(group.id) < sections.length - 1
                   ? () => moveSection(group.id as string, 1)
                   : undefined
               }
               onDeleteSection={
-                group.id && isSectionEmpty(group.id)
+                configuring && group.id && isSectionEmpty(group.id)
                   ? () => setDeletingSection(sections.find((s) => s.id === group.id) ?? null)
                   : undefined
               }

@@ -37,8 +37,9 @@ Feature: Create a grocery list
       | tribe_id | project_id | relation |
       | 0010     | 0100       | manager  |
     And the projects_features table contains:
-      | id   | project_id | name      | feature_type | status |
-      | 0100 | 0100       | Groceries | groceries    | active |
+      | id   | project_id | name        | feature_type | status |
+      | 0100 | 0100       | Groceries   | groceries    | active |
+      | 0101 | 0100       | Groceries 2 | groceries    | active |
 
   Scenario: POST /groceries-lists/ as a project member — the list is created
     Given I am authenticated as a regular user: user.id 0002
@@ -127,3 +128,52 @@ Feature: Create a grocery list
     Then the response status code is 403
     And the groceries_lists table contains:
       | id | feature_instance_id | name | scheduled_date | list_status | assigned_person_id | force_on_dashboard | status |
+
+  Scenario: POST /groceries-lists/ with copy_from_list_id — the favorite list's items are copied to the new list
+    Given the groceries_lists table contains:
+      | id   | feature_instance_id | name        | scheduled_date | is_favorite | status |
+      | 0201 | 0100                | Weekly shop | 2026-08-15      | true        | active |
+    And the groceries_list_items table contains:
+      | id   | groceries_list_id | custom_name | custom_unit | comment           | quantity | picked_up | position | status |
+      | 5001 | 0201               | Trash bags  | rolls       | Get eco-friendly | 2        | true      | 0        | active |
+    And I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    When I POST /api/features/tasks/groceries-lists/ with body:
+      """
+      {"feature_instance_id": "0100", "scheduled_date": "2026-08-29", "copy_from_list_id": "0201"}
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "feature_instance_id": "0100",
+        "scheduled_date": "2026-08-29",
+        "list_status": "planned",
+        "is_favorite": false,
+        "status": "active"
+      }
+      """
+    And the groceries_list_items table contains:
+      | custom_name | custom_unit | comment           | quantity | picked_up | status |
+      | Trash bags  | rolls       | Get eco-friendly | 2.00      | true      | active |
+      | Trash bags  | rolls       | Get eco-friendly | 2.00      | false     | active |
+
+  @error_case
+  Scenario: POST /groceries-lists/ with a copy_from_list_id from another feature instance — 404 error and no list is created
+    Given the groceries_lists table contains:
+      | id   | feature_instance_id | name       | scheduled_date | status |
+      | 0202 | 0101                | Other shop | 2026-08-15      | active |
+    And I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    When I POST /api/features/tasks/groceries-lists/ with body:
+      """
+      {"feature_instance_id": "0100", "scheduled_date": "2026-08-29", "copy_from_list_id": "0202"}
+      """
+    Then the response status code is 404
+    And the groceries_lists table contains:
+      | id   | feature_instance_id | name       | scheduled_date | status |
+      | 0202 | 0101                | Other shop | 2026-08-15      | active |

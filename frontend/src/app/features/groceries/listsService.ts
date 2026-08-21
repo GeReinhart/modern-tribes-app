@@ -7,6 +7,7 @@ import {
   GroceriesListItem,
   GroceriesListItemCreate,
   GroceriesListItemUpdate,
+  GroceriesListUpdate,
   GroceriesSuggestion,
   PersonOption,
 } from './types.ts';
@@ -24,6 +25,10 @@ class GroceriesListsService {
 
   async getDetail(listId: string): Promise<GroceriesListDetail> {
     return apiService.get<GroceriesListDetail>(`/features/tasks/groceries-lists/${listId}`);
+  }
+
+  async update(listId: string, data: GroceriesListUpdate): Promise<GroceriesList> {
+    return apiService.patch<GroceriesList>(`/features/tasks/groceries-lists/${listId}`, data);
   }
 
   async listSuggestions(featureInstanceId: string): Promise<GroceriesSuggestion[]> {

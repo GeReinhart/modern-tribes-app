@@ -1,2 +1,4 @@
-project,feature_name,name,scheduled_date,list_status,assigned_person,force_on_dashboard
-Summer BBQ,Shopping List,BBQ Supplies Run,2026-08-22,planned,John Smith,true
+project,feature_name,name,scheduled_date,list_status,assigned_person,force_on_dashboard,is_favorite,status
+Summer BBQ,Shopping List,BBQ Supplies Run,2026-08-22,planned,John Smith,true,false,active
+Summer BBQ,Shopping List,Weekly Staples,2026-08-15,planned,,false,true,active
+Summer BBQ,Shopping List,Last Month's Shop,2026-07-20,done,,false,false,archived

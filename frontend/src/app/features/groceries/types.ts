@@ -68,6 +68,7 @@ export interface GroceriesList {
   list_status: 'planned' | 'done';
   assigned_person_id: string | null;
   force_on_dashboard: boolean;
+  is_favorite: boolean;
   status: string;
 }
 
@@ -77,6 +78,12 @@ export interface GroceriesListCreate {
   scheduled_date: string;
   assigned_person_id?: string;
   force_on_dashboard?: boolean;
+  copy_from_list_id?: string;
+}
+
+export interface GroceriesListUpdate {
+  status?: 'active' | 'archived';
+  is_favorite?: boolean;
 }
 
 export interface GroceriesListItemDetail {

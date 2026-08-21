@@ -522,12 +522,15 @@ class DatabaseInitializer:
                     sys.exit(1)
                 r = await conn.fetchrow(
                     """INSERT INTO groceries_lists
-                           (feature_instance_id, name, scheduled_date, list_status, assigned_person_id, force_on_dashboard, created_by, updated_by)
-                       VALUES ($1, $2, $3, $4, $5, $6, $7, $7) RETURNING id""",
+                           (feature_instance_id, name, scheduled_date, list_status, assigned_person_id,
+                            force_on_dashboard, is_favorite, status, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9) RETURNING id""",
                     feature_ids[key], row.get("name") or None, row["scheduled_date"],
                     row.get("list_status") or "planned",
                     person_ids[assigned_person] if assigned_person else None,
                     (row.get("force_on_dashboard") or "false").lower() == "true",
+                    (row.get("is_favorite") or "false").lower() == "true",
+                    row.get("status") or "active",
                     admin_id,
                 )
                 ids[f"{key}|{row['name']}"] = str(r["id"])

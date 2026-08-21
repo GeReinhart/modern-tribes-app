@@ -26,6 +26,7 @@ const GroceriesListEditPageContent: React.FC = () => {
     useGroceriesListDetail(listId || null);
   const catalog = useGroceriesCatalog(detail?.feature_instance_id ?? null);
   const [focusItemId, setFocusItemId] = useState<string | null>(null);
+  const [configuringSections, setConfiguringSections] = useState(false);
 
   const listItemCatalogIds = useMemo(
     () => new Set(detail?.items.map((i) => i.groceries_item_id).filter((id): id is string => id !== null) ?? []),
@@ -71,8 +72,20 @@ const GroceriesListEditPageContent: React.FC = () => {
     () => [
       { icon: 'arrow-left' as const, label: t('features.groceries.backToList'), path: backPath },
       { icon: 'check-square' as const, label: t('features.groceries.shoppingMode'), path: shoppingPath },
+      ...(canEdit
+        ? [
+            {
+              icon: 'settings' as const,
+              badgeIcon: 'layers' as const,
+              label: configuringSections
+                ? t('features.groceries.doneConfiguringSections')
+                : t('features.groceries.configureSections'),
+              onClick: () => setConfiguringSections((v) => !v),
+            },
+          ]
+        : []),
     ],
-    [backPath, shoppingPath, t],
+    [backPath, shoppingPath, canEdit, configuringSections, t],
   );
 
   if (!detail) {
@@ -95,6 +108,7 @@ const GroceriesListEditPageContent: React.FC = () => {
             suggestions={catalog.suggestions}
             excludeItemIds={listItemCatalogIds}
             canEdit={canEdit}
+            configuring={configuringSections}
             onAddItem={handleAddItem}
             onCreateSection={catalog.createSection}
             onUpdateSection={catalog.updateSection}

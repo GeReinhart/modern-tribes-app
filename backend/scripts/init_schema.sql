@@ -379,6 +379,7 @@ CREATE TABLE IF NOT EXISTS groceries_lists (
     list_status VARCHAR(20) NOT NULL DEFAULT 'planned' CHECK (list_status IN ('planned', 'done')),
     assigned_person_id UUID REFERENCES persons(id) ON DELETE SET NULL,
     force_on_dashboard BOOLEAN NOT NULL DEFAULT FALSE,
+    is_favorite BOOLEAN NOT NULL DEFAULT FALSE,
     status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,

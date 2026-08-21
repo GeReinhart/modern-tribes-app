@@ -9,11 +9,12 @@ import { SelectOption } from '@/app/platform/core/common.types.ts';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { GroceriesListCreate, PersonOption } from './types.ts';
+import { GroceriesList, GroceriesListCreate, PersonOption } from './types.ts';
 
 interface Props {
   featureInstanceId: string;
   persons: PersonOption[];
+  favoriteLists: GroceriesList[];
   onClose: () => void;
   onCreate: (data: GroceriesListCreate) => Promise<void>;
 }
@@ -23,15 +24,21 @@ function todayIsoDate(): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 }
 
-const CreateGroceriesListModal: React.FC<Props> = ({ featureInstanceId, persons, onClose, onCreate }) => {
+const CreateGroceriesListModal: React.FC<Props> = ({
+  featureInstanceId, persons, favoriteLists, onClose, onCreate,
+}) => {
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const [scheduledDate, setScheduledDate] = useState(todayIsoDate());
   const [assignedPersonId, setAssignedPersonId] = useState('');
   const [forceOnDashboard, setForceOnDashboard] = useState(false);
+  const [copyFromListId, setCopyFromListId] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const personOptions: SelectOption[] = persons.map((p) => ({ value: p.id, label: p.name }));
+  const favoriteListOptions: SelectOption[] = favoriteLists.map((l) => ({
+    value: l.id, label: l.name || l.scheduled_date,
+  }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +49,7 @@ const CreateGroceriesListModal: React.FC<Props> = ({ featureInstanceId, persons,
       scheduled_date: scheduledDate,
       assigned_person_id: assignedPersonId || undefined,
       force_on_dashboard: forceOnDashboard,
+      copy_from_list_id: copyFromListId || undefined,
     });
     setSubmitting(false);
   };
@@ -74,6 +82,15 @@ const CreateGroceriesListModal: React.FC<Props> = ({ featureInstanceId, persons,
               checked={forceOnDashboard}
               onChange={setForceOnDashboard}
             />
+            {favoriteListOptions.length > 0 && (
+              <ThemedSelect
+                label={t('features.groceries.copyFromFavorite')}
+                options={favoriteListOptions}
+                value={copyFromListId}
+                placeholder={t('features.groceries.copyFromFavoriteNone')}
+                onChange={setCopyFromListId}
+              />
+            )}
           </div>
         </ThemedModalBody>
         <ThemedModalFooter>

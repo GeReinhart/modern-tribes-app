@@ -22,18 +22,20 @@ interface ThemedSvgIconProps {
   name: IconName;
   color: string;
   size?: number;
+  filled?: boolean;
 }
 
 export const ThemedSvgIcon: React.FC<ThemedSvgIconProps> = ({
   name,
   color,
   size = 20,
+  filled = false,
 }) => (
   <svg
     width={size}
     height={size}
     viewBox="0 0 24 24"
-    fill="none"
+    fill={filled ? color : 'none'}
     stroke={color}
     strokeWidth={2}
     strokeLinecap="round"

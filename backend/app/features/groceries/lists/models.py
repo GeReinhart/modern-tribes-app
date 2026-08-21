@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, model_validator
 
@@ -10,6 +10,12 @@ class GroceriesListCreate(BaseModel):
     scheduled_date: date
     assigned_person_id: Optional[str] = None
     force_on_dashboard: bool = False
+    copy_from_list_id: Optional[str] = None
+
+
+class GroceriesListUpdate(BaseModel):
+    status: Optional[Literal["active", "archived"]] = None
+    is_favorite: Optional[bool] = None
 
 
 class GroceriesListResponse(BaseModel):
@@ -20,6 +26,7 @@ class GroceriesListResponse(BaseModel):
     list_status: str
     assigned_person_id: Optional[str] = None
     force_on_dashboard: bool
+    is_favorite: bool
     status: str
 
 

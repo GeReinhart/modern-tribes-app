@@ -68,6 +68,7 @@ Feature: View a grocery list
         "list_status": "planned",
         "assigned_person_id": null,
         "force_on_dashboard": false,
+        "is_favorite": false,
         "status": "active",
         "items": [
           {

@@ -111,7 +111,7 @@ const ManageItemModal: React.FC<Props> = ({ item, sections, onClose, onUpdate, o
                 {t('features.groceries.noSectionsYet')}
               </span>
             )}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
               {sections.map((section) => (
                 <ThemedCheckbox
                   key={section.id}
@@ -125,10 +125,17 @@ const ManageItemModal: React.FC<Props> = ({ item, sections, onClose, onUpdate, o
         </div>
       </ThemedModalBody>
       <ThemedModalFooter>
-        <ThemedButton variant="danger" type="button" onClick={handleArchive} isLoading={archiving}>
+        <ThemedButton
+          variant="danger"
+          type="button"
+          onClick={handleArchive}
+          isLoading={archiving}
+          icon="archive"
+          iconOnly
+        >
           {t('features.groceries.archiveItem')}
         </ThemedButton>
-        <ThemedButton variant="ghost" type="button" onClick={onClose}>
+        <ThemedButton variant="ghost" type="button" onClick={onClose} icon="x" iconOnly>
           {t('features.groceries.cancel')}
         </ThemedButton>
         <ThemedButton
@@ -137,6 +144,8 @@ const ManageItemModal: React.FC<Props> = ({ item, sections, onClose, onUpdate, o
           onClick={handleSave}
           isLoading={submitting}
           disabled={!name.trim() || !hasChanges}
+          icon="save"
+          iconOnly
         >
           {t('features.groceries.save')}
         </ThemedButton>

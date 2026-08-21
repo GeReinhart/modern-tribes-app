@@ -801,8 +801,8 @@ def given_groceries_lists_table(datatable):
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
                 assigned = rec.get("assigned_person_id")
                 await conn.execute(
-                    """INSERT INTO groceries_lists(id, feature_instance_id, name, scheduled_date, list_status, assigned_person_id, force_on_dashboard, status)
-                       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+                    """INSERT INTO groceries_lists(id, feature_instance_id, name, scheduled_date, list_status, assigned_person_id, force_on_dashboard, is_favorite, status)
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(rec["id"]),
                     UUID(rec["feature_instance_id"]),
@@ -811,6 +811,7 @@ def given_groceries_lists_table(datatable):
                     rec.get("list_status", "planned"),
                     UUID(assigned) if assigned else None,
                     (rec.get("force_on_dashboard") or "false").lower() == "true",
+                    (rec.get("is_favorite") or "false").lower() == "true",
                     rec.get("status", "active"),
                 )
         finally:

@@ -26,7 +26,8 @@ interface ThemedButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   requiredPermissions?: string[];
-  mobileIcon?: IconName;
+  icon?: IconName;
+  iconOnly?: boolean;
 }
 
 export const ThemedButton: React.FC<ThemedButtonProps> = ({
@@ -44,7 +45,8 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
   type = 'button',
   style: customStyle,
   requiredPermissions,
-  mobileIcon,
+  icon,
+  iconOnly = false,
   ...props
 }) => {
   const { theme: contextTheme } = useTheme();
@@ -61,7 +63,7 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
   }
 
   const isDisabled = disabled || isLoading;
-  const showIconOnly = isMobile && !!mobileIcon && !isLoading;
+  const showIconOnly = (isMobile || iconOnly) && !!icon && !isLoading;
 
   const style: CSSProperties = {
     backgroundColor: isDisabled ? '#cccccc' : theme.colors[variant],
@@ -128,7 +130,7 @@ export const ThemedButton: React.FC<ThemedButtonProps> = ({
       )}
       {showIconOnly ? (
         <ThemedSvgIcon
-          name={mobileIcon!}
+          name={icon!}
           color={isDisabled ? '#666666' : 'white'}
           size={18}
         />

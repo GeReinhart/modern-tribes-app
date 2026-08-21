@@ -9,9 +9,9 @@ from app.features.groceries.catalog import repository as catalog_repository
 from app.features.groceries.lists import repository as lists_repository
 from app.platform.functions.people.persons import repository as persons_repository
 from app.features.groceries.lists.models import (
-    GroceriesListCreate, GroceriesListResponse, GroceriesListItemCreate, GroceriesListItemUpdate,
-    GroceriesListItemResponse, GroceriesListDetailResponse, GroceriesListItemDetail, GroceriesSuggestionResponse,
-    PersonOption,
+    GroceriesListCreate, GroceriesListUpdate, GroceriesListResponse, GroceriesListItemCreate,
+    GroceriesListItemUpdate, GroceriesListItemResponse, GroceriesListDetailResponse, GroceriesListItemDetail,
+    GroceriesSuggestionResponse, PersonOption,
 )
 
 lists_router = APIRouter(prefix="/groceries-lists", tags=["features_groceries_lists"])
@@ -27,6 +27,7 @@ def _row_to_list(row: dict) -> GroceriesListResponse:
         list_status=row["list_status"],
         assigned_person_id=str(row["assigned_person_id"]) if row.get("assigned_person_id") else None,
         force_on_dashboard=row["force_on_dashboard"],
+        is_favorite=row["is_favorite"],
         status=row["status"],
     )
 
@@ -70,10 +71,33 @@ async def create_groceries_list(data: GroceriesListCreate, current_user: dict = 
     """
     pool = get_database()
     await access.require_feature_access(pool, data.feature_instance_id, current_user, "member")
+    if data.copy_from_list_id:
+        source_row = await _require_list(pool, data.copy_from_list_id)
+        if str(source_row["feature_instance_id"]) != data.feature_instance_id:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grocery list not found.")
     row = await lists_repository.insert_list(
         pool, data.feature_instance_id, data.name, data.scheduled_date,
         data.assigned_person_id, data.force_on_dashboard, str(current_user["id"]),
     )
+    if data.copy_from_list_id:
+        await lists_repository.copy_list_items(pool, data.copy_from_list_id, str(row["id"]), str(current_user["id"]))
+    return _row_to_list(row)
+
+
+@lists_router.patch("/{list_id}", response_model=GroceriesListResponse)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def update_groceries_list(
+    list_id: str, data: GroceriesListUpdate, current_user: dict = Depends(get_current_user)
+):
+    """Archive, restore or (un)mark a grocery list as favorite.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
+    pool = get_database()
+    list_row = await _require_list(pool, list_id)
+    await access.require_feature_access(pool, str(list_row["feature_instance_id"]), current_user, "member")
+    row = await lists_repository.update_list(pool, list_id, data.status, data.is_favorite, str(current_user["id"]))
     return _row_to_list(row)
 
 

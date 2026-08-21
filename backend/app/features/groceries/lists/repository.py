@@ -28,6 +28,37 @@ async def fetch_list(pool, list_id: str) -> Optional[dict]:
     return dict(row) if row else None
 
 
+async def update_list(
+    pool, list_id: str, status: Optional[str], is_favorite: Optional[bool], user_id: str,
+) -> dict:
+    fields: dict = {"updated_by": UUID(user_id)}
+    if status is not None:
+        fields["status"] = status
+    if is_favorite is not None:
+        fields["is_favorite"] = is_favorite
+    set_clauses = ", ".join(f"{k} = ${i + 2}" for i, k in enumerate(fields.keys()))
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            f"UPDATE groceries_lists SET {set_clauses} WHERE id = $1 RETURNING *",
+            UUID(list_id),
+            *fields.values(),
+        )
+    return dict(row)
+
+
+async def copy_list_items(pool, source_list_id: str, target_list_id: str, user_id: str) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute(
+            """INSERT INTO groceries_list_items
+                   (groceries_list_id, groceries_item_id, custom_name, custom_unit, comment, quantity, position,
+                    created_by, updated_by)
+               SELECT $2, groceries_item_id, custom_name, custom_unit, comment, quantity, position, $3, $3
+               FROM groceries_list_items
+               WHERE groceries_list_id = $1 AND status = 'active'""",
+            UUID(source_list_id), UUID(target_list_id), UUID(user_id),
+        )
+
+
 async def fetch_lists_for_instance(pool, feature_instance_id: str) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(

@@ -259,7 +259,7 @@ function ProfilePageContent() {
           onClick={handleLogout}
           variant="danger"
           fullWidth
-          mobileIcon="logout"
+          icon="logout"
           leftIcon={
             <ThemedSvgIcon name="logout" color="currentColor" size={16} />
           }
