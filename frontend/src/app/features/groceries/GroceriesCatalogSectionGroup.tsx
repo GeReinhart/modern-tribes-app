@@ -16,11 +16,13 @@ interface Props {
   onAddNewItem?: () => void;
   onRenameSection?: () => void;
   onDeleteSection?: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
   onManageItem: (item: GroceriesItem) => void;
 }
 
 const GroceriesCatalogSectionGroup: React.FC<Props> = ({
-  group, canEdit, onAddItem, onAddNewItem, onRenameSection, onDeleteSection, onManageItem,
+  group, canEdit, onAddItem, onAddNewItem, onRenameSection, onDeleteSection, onMoveUp, onMoveDown, onManageItem,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -29,6 +31,26 @@ const GroceriesCatalogSectionGroup: React.FC<Props> = ({
 
   const headerActions = canEdit && isRealSection && (
     <div style={{ display: 'flex', gap: '4px' }}>
+      {onMoveUp && (
+        <button
+          type="button"
+          onClick={onMoveUp}
+          title={t('features.groceries.moveSectionUp')}
+          style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: theme.colors.secondary, display: 'flex' }}
+        >
+          <ThemedSvgIcon name="arrow-up" color="currentColor" size={14} />
+        </button>
+      )}
+      {onMoveDown && (
+        <button
+          type="button"
+          onClick={onMoveDown}
+          title={t('features.groceries.moveSectionDown')}
+          style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: theme.colors.secondary, display: 'flex' }}
+        >
+          <ThemedSvgIcon name="arrow-down" color="currentColor" size={14} />
+        </button>
+      )}
       {onRenameSection && (
         <button
           type="button"
@@ -54,9 +76,21 @@ const GroceriesCatalogSectionGroup: React.FC<Props> = ({
           type="button"
           onClick={onAddNewItem}
           title={t('features.groceries.addItemToSection')}
-          style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: theme.colors.primary, display: 'flex' }}
+          style={{
+            border: 'none',
+            background: `${theme.colors.primary}15`,
+            borderRadius: '6px',
+            cursor: 'pointer',
+            color: theme.colors.primary,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '22px',
+            height: '22px',
+            marginLeft: '8px',
+          }}
         >
-          <ThemedSvgIcon name="plus" color="currentColor" size={14} />
+          <ThemedSvgIcon name="plus" color="currentColor" size={16} />
         </button>
       )}
     </div>

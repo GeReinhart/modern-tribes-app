@@ -10,7 +10,7 @@ import { GROCERIES_UNITS, GroceriesUnit } from '@/types/groceries.ts';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import GroceriesIconPicker from './GroceriesIconPicker.tsx';
+import GroceriesIconPickerField from './GroceriesIconPickerField.tsx';
 import { GroceriesItem, GroceriesItemUpdate, GroceriesSection } from './types.ts';
 
 interface Props {
@@ -89,7 +89,6 @@ const ManageItemModal: React.FC<Props> = ({ item, sections, onClose, onUpdate, o
           />
           <ThemedCheckbox
             label={t('features.groceries.isDivisible')}
-            helperText={t('features.groceries.isDivisibleHelp')}
             checked={isDivisible}
             onChange={setIsDivisible}
           />
@@ -102,12 +101,7 @@ const ManageItemModal: React.FC<Props> = ({ item, sections, onClose, onUpdate, o
             onChange={(e) => setRenewal(e.target.value)}
             placeholder={t('features.groceries.renewalDaysPlaceholder')}
           />
-          <div>
-            <div style={{ fontSize: 'var(--font-sm)', fontWeight: 500, marginBottom: '8px' }}>
-              {t('features.groceries.iconLabel')}
-            </div>
-            <GroceriesIconPicker value={icon} onChange={setIcon} />
-          </div>
+          <GroceriesIconPickerField value={icon} onChange={setIcon} />
           <div>
             <div style={{ fontSize: 'var(--font-sm)', fontWeight: 500, marginBottom: '8px' }}>
               {t('features.groceries.sectionsLabel')}

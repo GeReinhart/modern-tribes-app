@@ -734,11 +734,13 @@ def given_groceries_sections_table(datatable):
             for row in datatable[1:]:
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
                 await conn.execute(
-                    """INSERT INTO groceries_sections(id, name, status)
-                       VALUES($1, $2, $3)
+                    """INSERT INTO groceries_sections(id, name, icon, position, status)
+                       VALUES($1, $2, $3, $4, $5)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(rec["id"]),
                     rec.get("name", "Section"),
+                    rec.get("icon") or None,
+                    int(rec.get("position") or 0),
                     rec.get("status", "active"),
                 )
         finally:

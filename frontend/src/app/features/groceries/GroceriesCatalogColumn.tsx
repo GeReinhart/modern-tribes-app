@@ -1,3 +1,4 @@
+import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
@@ -22,6 +23,7 @@ interface Props {
   onAddItem: (itemId: string) => Promise<void>;
   onCreateSection: (name: string, icon?: string) => Promise<GroceriesSection | null>;
   onUpdateSection: (sectionId: string, data: Omit<GroceriesSectionUpdate, 'feature_instance_id'>) => Promise<boolean>;
+  onReorderSections: (orderedIds: string[]) => Promise<boolean>;
   onDeleteSection: (sectionId: string) => Promise<boolean>;
   onCreateItem: (data: GroceriesItemCreate) => Promise<GroceriesItem | null>;
   onLinkItemToSection: (itemId: string, sectionId: string) => Promise<void>;
@@ -31,7 +33,7 @@ interface Props {
 
 const GroceriesCatalogColumn: React.FC<Props> = ({
   featureInstanceId, items, sections, suggestions, excludeItemIds, canEdit,
-  onAddItem, onCreateSection, onUpdateSection, onDeleteSection,
+  onAddItem, onCreateSection, onUpdateSection, onReorderSections, onDeleteSection,
   onCreateItem, onLinkItemToSection, onUpdateItem, onSetItemRenewal,
 }) => {
   const { t } = useTranslation();
@@ -42,16 +44,38 @@ const GroceriesCatalogColumn: React.FC<Props> = ({
   const [deletingSection, setDeletingSection] = useState<GroceriesSection | null>(null);
   const [managingItemId, setManagingItemId] = useState<string | null>(null);
   const [catalogExpanded, setCatalogExpanded] = useState(true);
+  const [filter, setFilter] = useState('');
 
-  const availableItems = items.filter((i) => !excludeItemIds.has(i.id));
-  const groups = groupBySections(availableItems, sections, t('features.groceries.uncategorized'), true);
+  const normalizedFilter = filter.trim().toLowerCase();
+  const matchesFilter = (name: string) => name.toLowerCase().includes(normalizedFilter);
+
+  const availableItems = items.filter((i) => !excludeItemIds.has(i.id) && matchesFilter(i.name));
+  const groups = groupBySections(
+    availableItems, sections, t('features.groceries.uncategorized'), normalizedFilter === '',
+  );
   const availableSuggestions = suggestions.filter((s) => !excludeItemIds.has(s.groceries_item_id));
   const suggestionItems = availableSuggestions
     .map((s) => items.find((i) => i.id === s.groceries_item_id))
-    .filter((i): i is GroceriesItem => !!i);
+    .filter((i): i is GroceriesItem => !!i)
+    .filter((i) => matchesFilter(i.name));
   const managingItem = items.find((i) => i.id === managingItemId) ?? null;
 
   const isSectionEmpty = (sectionId: string) => !items.some((i) => i.section_ids.includes(sectionId));
+  const sectionIndex = (sectionId: string) => sections.findIndex((s) => s.id === sectionId);
+
+  const handleSelectItem = async (itemId: string) => {
+    await onAddItem(itemId);
+    setFilter('');
+  };
+
+  const moveSection = (sectionId: string, direction: -1 | 1) => {
+    const index = sections.findIndex((s) => s.id === sectionId);
+    const targetIndex = index + direction;
+    if (index === -1 || targetIndex < 0 || targetIndex >= sections.length) return;
+    const orderedIds = sections.map((s) => s.id);
+    [orderedIds[index], orderedIds[targetIndex]] = [orderedIds[targetIndex], orderedIds[index]];
+    onReorderSections(orderedIds);
+  };
 
   return (
     <div>
@@ -83,18 +107,26 @@ const GroceriesCatalogColumn: React.FC<Props> = ({
 
       {catalogExpanded && (
         <>
+          <div style={{ marginBottom: '10px' }}>
+            <ThemedInput
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              placeholder={t('features.groceries.filterItemsPlaceholder')}
+            />
+          </div>
+
           {suggestionItems.length > 0 && (
             <GroceriesCatalogSectionGroup
               group={{ id: null, name: t('features.groceries.suggestions'), icon: null, items: suggestionItems }}
               canEdit={canEdit}
-              onAddItem={onAddItem}
+              onAddItem={handleSelectItem}
               onManageItem={(item) => setManagingItemId(item.id)}
             />
           )}
 
-          {groups.length === 0 && (
+          {groups.length === 0 && suggestionItems.length === 0 && (
             <span style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary }}>
-              {t('features.groceries.catalogEmpty')}
+              {normalizedFilter === '' ? t('features.groceries.catalogEmpty') : t('features.groceries.filterNoResults')}
             </span>
           )}
 
@@ -103,9 +135,15 @@ const GroceriesCatalogColumn: React.FC<Props> = ({
               key={group.id ?? 'uncategorized'}
               group={group}
               canEdit={canEdit}
-              onAddItem={onAddItem}
+              onAddItem={handleSelectItem}
               onAddNewItem={group.id ? () => setAddingItemToSectionId(group.id) : undefined}
               onRenameSection={group.id ? () => setRenamingSection(sections.find((s) => s.id === group.id) ?? null) : undefined}
+              onMoveUp={group.id && sectionIndex(group.id) > 0 ? () => moveSection(group.id as string, -1) : undefined}
+              onMoveDown={
+                group.id && sectionIndex(group.id) < sections.length - 1
+                  ? () => moveSection(group.id as string, 1)
+                  : undefined
+              }
               onDeleteSection={
                 group.id && isSectionEmpty(group.id)
                   ? () => setDeletingSection(sections.find((s) => s.id === group.id) ?? null)

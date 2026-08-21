@@ -98,6 +98,7 @@ const GroceriesListEditPageContent: React.FC = () => {
             onAddItem={handleAddItem}
             onCreateSection={catalog.createSection}
             onUpdateSection={catalog.updateSection}
+            onReorderSections={catalog.reorderSections}
             onDeleteSection={catalog.deleteSection}
             onCreateItem={catalog.createItem}
             onLinkItemToSection={catalog.linkItemToSection}

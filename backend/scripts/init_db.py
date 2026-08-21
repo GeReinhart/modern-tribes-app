@@ -450,10 +450,10 @@ class DatabaseInitializer:
         rows = self.load_csv("groceries_sections.csv")
         ids: Dict[str, str] = {}
         async with self.pool.acquire() as conn:
-            for row in rows:
+            for position, row in enumerate(rows):
                 r = await conn.fetchrow(
-                    "INSERT INTO groceries_sections (name, icon) VALUES ($1, $2) RETURNING id",
-                    row["name"], row.get("icon") or None,
+                    "INSERT INTO groceries_sections (name, icon, position) VALUES ($1, $2, $3) RETURNING id",
+                    row["name"], row.get("icon") or None, position,
                 )
                 ids[row["name"]] = str(r["id"])
         print(f"✓ Created {len(ids)} groceries sections")

@@ -57,6 +57,11 @@ class GroceriesSectionUpdate(BaseModel):
     icon: Optional[str] = None
 
 
+class GroceriesSectionsReorderRequest(BaseModel):
+    feature_instance_id: str
+    ordered_ids: list[str]
+
+
 class GroceriesSectionResponse(BaseModel):
     id: str
     name: str

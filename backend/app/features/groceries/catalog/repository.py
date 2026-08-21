@@ -16,10 +16,13 @@ async def insert_item(
 
 async def insert_section(pool, name: str, icon: Optional[str], user_id: str) -> dict:
     async with pool.acquire() as conn:
+        position = await conn.fetchval(
+            "SELECT COALESCE(MAX(position), -1) + 1 FROM groceries_sections",
+        )
         row = await conn.fetchrow(
-            """INSERT INTO groceries_sections (name, icon, created_by, updated_by)
-               VALUES ($1, $2, $3, $3) RETURNING *""",
-            name, icon, UUID(user_id),
+            """INSERT INTO groceries_sections (name, icon, position, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $4) RETURNING *""",
+            name, icon, position, UUID(user_id),
         )
     return dict(row)
 
@@ -123,7 +126,18 @@ async def delete_instance_item(pool, feature_instance_id: str, item_id: str) -> 
 
 async def fetch_sections(pool) -> list[dict]:
     async with pool.acquire() as conn:
-        rows = await conn.fetch("SELECT * FROM groceries_sections WHERE status = 'active' ORDER BY name ASC")
+        rows = await conn.fetch("SELECT * FROM groceries_sections WHERE status = 'active' ORDER BY position ASC")
+    return [dict(r) for r in rows]
+
+
+async def reorder_sections(pool, ordered_ids: list[str], user_id: str) -> list[dict]:
+    async with pool.acquire() as conn:
+        for position, section_id in enumerate(ordered_ids):
+            await conn.execute(
+                "UPDATE groceries_sections SET position = $1, updated_by = $2 WHERE id = $3",
+                position, UUID(user_id), UUID(section_id),
+            )
+        rows = await conn.fetch("SELECT * FROM groceries_sections WHERE status = 'active' ORDER BY position ASC")
     return [dict(r) for r in rows]
 
 

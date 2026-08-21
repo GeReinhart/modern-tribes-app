@@ -52,6 +52,12 @@ class GroceriesCatalogService {
     );
   }
 
+  async reorderSections(orderedIds: string[], featureInstanceId: string): Promise<GroceriesSection[]> {
+    return apiService.put<GroceriesSection[]>('/features/tasks/groceries-sections/reorder', {
+      feature_instance_id: featureInstanceId, ordered_ids: orderedIds,
+    });
+  }
+
   async setItemRenewal(itemId: string, data: GroceriesItemRenewalUpdate): Promise<GroceriesItem> {
     return apiService.put<GroceriesItem>(`/features/tasks/groceries-items/${itemId}/renewal`, data);
   }

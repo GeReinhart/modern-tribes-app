@@ -85,7 +85,6 @@ const AddCatalogItemModal: React.FC<Props> = ({ featureInstanceId, section, onCl
             />
             <ThemedCheckbox
               label={t('features.groceries.isDivisible')}
-              helperText={t('features.groceries.isDivisibleHelp')}
               checked={isDivisible}
               onChange={setIsDivisible}
             />

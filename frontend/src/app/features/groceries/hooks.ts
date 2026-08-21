@@ -1,3 +1,5 @@
+import { usePolling } from '@/app/platform/core/polling/usePolling.ts';
+
 import { useCallback, useEffect, useState } from 'react';
 
 import { groceriesCatalogService } from './catalogService.ts';
@@ -15,6 +17,8 @@ import {
   GroceriesSuggestion,
   PersonOption,
 } from './types.ts';
+
+const POLL_INTERVAL_MS = 10_000;
 
 function errorMessage(e: unknown): string {
   return e instanceof Error ? e.message : 'Error';
@@ -75,9 +79,7 @@ export function useGroceriesListDetail(listId: string | null) {
     }
   }, [listId]);
 
-  useEffect(() => {
-    fetchDetail();
-  }, [fetchDetail]);
+  usePolling(fetchDetail, POLL_INTERVAL_MS, !!listId);
 
   const addItem = useCallback(
     async (data: GroceriesListItemCreate): Promise<string | null> => {
@@ -191,7 +193,7 @@ export function useGroceriesCatalog(featureInstanceId: string | null) {
         const created = await groceriesCatalogService.createSection({
           feature_instance_id: featureInstanceId, name, icon,
         });
-        setSections((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
+        setSections((prev) => [...prev, created]);
         return created;
       } catch (e: unknown) {
         setError(errorMessage(e));
@@ -208,9 +210,21 @@ export function useGroceriesCatalog(featureInstanceId: string | null) {
         const updated = await groceriesCatalogService.updateSection(sectionId, {
           feature_instance_id: featureInstanceId, ...data,
         });
-        setSections((prev) =>
-          prev.map((s) => (s.id === sectionId ? updated : s)).sort((a, b) => a.name.localeCompare(b.name)),
-        );
+        setSections((prev) => prev.map((s) => (s.id === sectionId ? updated : s)));
+        return true;
+      } catch (e: unknown) {
+        setError(errorMessage(e));
+        return false;
+      }
+    },
+    [featureInstanceId],
+  );
+
+  const reorderSections = useCallback(
+    async (orderedIds: string[]): Promise<boolean> => {
+      if (!featureInstanceId) return false;
+      try {
+        setSections(await groceriesCatalogService.reorderSections(orderedIds, featureInstanceId));
         return true;
       } catch (e: unknown) {
         setError(errorMessage(e));
@@ -288,7 +302,8 @@ export function useGroceriesCatalog(featureInstanceId: string | null) {
 
   return {
     items, sections, suggestions, error,
-    createItem, createSection, updateSection, deleteSection, linkItemToSection, updateItem, setItemRenewal,
+    createItem, createSection, updateSection, reorderSections, deleteSection, linkItemToSection, updateItem,
+    setItemRenewal,
     refetch: fetchAll,
   };
 }

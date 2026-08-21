@@ -8,7 +8,7 @@ from app.features.groceries import access
 from app.features.groceries.catalog import repository as catalog_repository
 from app.features.groceries.catalog.models import (
     GroceriesItemCreate, GroceriesItemRenewalUpdate, GroceriesItemResponse, GroceriesItemUpdate,
-    GroceriesSectionCreate, GroceriesSectionResponse, GroceriesSectionUpdate,
+    GroceriesSectionCreate, GroceriesSectionResponse, GroceriesSectionsReorderRequest, GroceriesSectionUpdate,
 )
 
 items_router = APIRouter(prefix="/groceries-items", tags=["features_groceries_catalog"])
@@ -159,6 +159,22 @@ async def create_groceries_section(data: GroceriesSectionCreate, current_user: d
     await access.require_feature_access(pool, data.feature_instance_id, current_user, "member")
     row = await catalog_repository.insert_section(pool, data.name, data.icon, str(current_user["id"]))
     return _row_to_section(row)
+
+
+@sections_router.put("/reorder", response_model=list[GroceriesSectionResponse])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def reorder_groceries_sections(
+    data: GroceriesSectionsReorderRequest, current_user: dict = Depends(get_current_user)
+):
+    """Reorder the shared groceries catalog sections.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
+    pool = get_database()
+    await access.require_feature_access(pool, data.feature_instance_id, current_user, "member")
+    rows = await catalog_repository.reorder_sections(pool, data.ordered_ids, str(current_user["id"]))
+    return [_row_to_section(r) for r in rows]
 
 
 @sections_router.patch("/{section_id}", response_model=GroceriesSectionResponse)
