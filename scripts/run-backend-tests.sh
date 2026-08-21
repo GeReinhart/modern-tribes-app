@@ -24,21 +24,57 @@ if ! venv/bin/python -m pytest --co -q --no-header 2>/dev/null | grep -q "pytest
     venv/bin/pip install pytest-cov==6.1.0 &>/dev/null || true
 fi
 
+FORCE_ALL=false
+MARKER=""
+for arg in "$@"; do
+    if [[ "$arg" == "--force-all" ]]; then
+        FORCE_ALL=true
+    else
+        MARKER="${arg#@}"
+    fi
+done
+
 PYTEST_ARGS=(
-    "tests/bdd"
     "--verbose"
     "--tb=short"
     "--no-header"
 )
 
-if [[ -n "${1:-}" ]]; then
-    MARKER="${1#@}"
+if [[ -n "$MARKER" ]]; then
     echo "Running tests tagged: @${MARKER}"
-    PYTEST_ARGS+=("-m" "$MARKER")
+    PYTEST_ARGS=("tests/bdd" "${PYTEST_ARGS[@]}" "-m" "$MARKER")
     echo ""
     venv/bin/python -m pytest "${PYTEST_ARGS[@]}"
     exit 0
 fi
+
+if [[ "$FORCE_ALL" != true ]]; then
+    CHANGED_FILES=$(
+        cd "$ROOT_DIR" && {
+            git diff --name-only main -- backend/
+            git status --porcelain -- backend/ | cut -c4- | sed -E 's/.* -> //'
+        } | sort -u
+    )
+    SCOPE=$(echo "$CHANGED_FILES" | venv/bin/python scripts/select_test_scope.py)
+
+    if [[ "$SCOPE" == "NONE" ]]; then
+        echo "No backend files changed vs main — skipping tests. Use --force-all to run everything anyway."
+        exit 0
+    fi
+
+    if [[ "$SCOPE" != "FULL" ]]; then
+        echo "Backend changes vs main map to these test suites:"
+        echo "$SCOPE" | sed 's/^/  - /'
+        echo ""
+        PYTEST_ARGS=($SCOPE "${PYTEST_ARGS[@]}")
+        venv/bin/python -m pytest "${PYTEST_ARGS[@]}"
+        exit 0
+    fi
+    echo "Backend changes vs main can't be scoped down confidently — running the full suite."
+    echo ""
+fi
+
+PYTEST_ARGS=("tests/bdd" "${PYTEST_ARGS[@]}")
 
 echo "Running all backend BDD tests"
 echo ""
