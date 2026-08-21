@@ -736,6 +736,8 @@ const ShowProjectPageContent: React.FC = () => {
                   featureInstanceId={activeFeature.id}
                   canEdit={canEdit}
                   isManager={isManager}
+                  tribeId={tribeId ?? ''}
+                  projectId={projectId ?? ''}
                 />
               </ThemedSection>
             ) : (
@@ -743,6 +745,8 @@ const ShowProjectPageContent: React.FC = () => {
                 featureInstanceId={activeFeature.id}
                 canEdit={canEdit}
                 isManager={isManager}
+                tribeId={tribeId ?? ''}
+                projectId={projectId ?? ''}
               />
             )
           )}

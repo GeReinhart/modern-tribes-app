@@ -3,7 +3,7 @@ import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTab
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import CreateGroceriesListModal from './CreateGroceriesListModal.tsx';
 import GroceriesListRow from './GroceriesListRow.tsx';
@@ -13,13 +13,14 @@ interface Props {
   featureInstanceId: string;
   canEdit: boolean;
   isManager: boolean;
+  tribeId: string;
+  projectId: string;
 }
 
-const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit }) => {
+const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, projectId }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const { tribeId, projectId } = useParams<{ tribeId: string; projectId: string }>();
   const { lists, persons, error, createList, toggleFavorite, setArchived } = useGroceriesLists(featureInstanceId);
   const [creating, setCreating] = useState(false);
   const [showArchived, setShowArchived] = useState(false);

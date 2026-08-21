@@ -4,6 +4,8 @@ export interface FeatureTabProps {
   featureInstanceId: string;
   canEdit: boolean;
   isManager: boolean;
+  tribeId: string;
+  projectId: string;
 }
 
 export interface FeatureDefinition {

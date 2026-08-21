@@ -100,6 +100,8 @@ export const PinnedBookmarkTab: React.FC<PinnedBookmarkTabProps> = ({
       featureInstanceId={featureInstanceId}
       canEdit={canEdit}
       isManager={isManager}
+      tribeId={tribeId}
+      projectId={projectId}
     />
   );
 };
