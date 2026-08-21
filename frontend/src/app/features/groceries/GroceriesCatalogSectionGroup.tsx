@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { formatUnitSuffix } from './formatQuantity.ts';
+import GroceriesSectionToggleHeader from './GroceriesSectionToggleHeader.tsx';
 import { SectionGroup } from './sectionGrouping.ts';
 import { GroceriesItem } from './types.ts';
 
@@ -26,68 +27,53 @@ const GroceriesCatalogSectionGroup: React.FC<Props> = ({
   const [expanded, setExpanded] = useState(true);
   const isRealSection = group.id !== null;
 
-  return (
-    <div style={{ marginBottom: '10px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+  const headerActions = canEdit && isRealSection && (
+    <div style={{ display: 'flex', gap: '4px' }}>
+      {onRenameSection && (
         <button
           type="button"
-          onClick={() => setExpanded((v) => !v)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            border: 'none',
-            background: 'transparent',
-            cursor: 'pointer',
-            padding: 0,
-            fontSize: 'var(--font-xs)',
-            fontWeight: 700,
-            color: theme.colors.secondary,
-            textTransform: 'uppercase',
-          }}
+          onClick={onRenameSection}
+          title={t('features.groceries.renameSection')}
+          style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: theme.colors.secondary, display: 'flex' }}
         >
-          <ThemedSvgIcon name={expanded ? 'chevron-down' : 'chevron-up'} color={theme.colors.secondary} size={12} />
-          {group.icon && <ThemedSvgIcon name={group.icon as IconName} color={theme.colors.secondary} size={14} />}
-          {group.name}
-          <span style={{ fontWeight: 500 }}>({group.items.length})</span>
+          <ThemedSvgIcon name="pencil" color="currentColor" size={14} />
         </button>
-        {canEdit && isRealSection && (
-          <div style={{ display: 'flex', gap: '4px' }}>
-            {onRenameSection && (
-              <button
-                type="button"
-                onClick={onRenameSection}
-                title={t('features.groceries.renameSection')}
-                style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: theme.colors.secondary, display: 'flex' }}
-              >
-                <ThemedSvgIcon name="pencil" color="currentColor" size={14} />
-              </button>
-            )}
-            {onDeleteSection && (
-              <button
-                type="button"
-                onClick={onDeleteSection}
-                title={t('features.groceries.deleteSection')}
-                style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: theme.colors.danger, display: 'flex' }}
-              >
-                <ThemedSvgIcon name="trash" color="currentColor" size={14} />
-              </button>
-            )}
-            {onAddNewItem && (
-              <button
-                type="button"
-                onClick={onAddNewItem}
-                title={t('features.groceries.addItemToSection')}
-                style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: theme.colors.primary, display: 'flex' }}
-              >
-                <ThemedSvgIcon name="plus" color="currentColor" size={14} />
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+      )}
+      {onDeleteSection && (
+        <button
+          type="button"
+          onClick={onDeleteSection}
+          title={t('features.groceries.deleteSection')}
+          style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: theme.colors.danger, display: 'flex' }}
+        >
+          <ThemedSvgIcon name="trash" color="currentColor" size={14} />
+        </button>
+      )}
+      {onAddNewItem && (
+        <button
+          type="button"
+          onClick={onAddNewItem}
+          title={t('features.groceries.addItemToSection')}
+          style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: theme.colors.primary, display: 'flex' }}
+        >
+          <ThemedSvgIcon name="plus" color="currentColor" size={14} />
+        </button>
+      )}
+    </div>
+  );
+
+  return (
+    <div style={{ marginBottom: '10px' }}>
+      <GroceriesSectionToggleHeader
+        icon={group.icon}
+        name={group.name}
+        count={group.items.length}
+        expanded={expanded}
+        onToggle={() => setExpanded((v) => !v)}
+        actions={headerActions}
+      />
       {expanded && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '18px' }}>
           {group.items.map((item) => (
             <div
               key={item.id}

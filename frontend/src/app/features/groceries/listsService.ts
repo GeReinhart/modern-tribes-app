@@ -5,6 +5,7 @@ import {
   GroceriesListCreate,
   GroceriesListDetail,
   GroceriesListItem,
+  GroceriesListItemCreate,
   GroceriesListItemUpdate,
   GroceriesSuggestion,
   PersonOption,
@@ -37,11 +38,8 @@ class GroceriesListsService {
     );
   }
 
-  async addItem(listId: string, groceriesItemId: string, quantity: number): Promise<GroceriesListItem> {
-    return apiService.post<GroceriesListItem>(`/features/tasks/groceries-lists/${listId}/items`, {
-      groceries_item_id: groceriesItemId,
-      quantity,
-    });
+  async addItem(listId: string, data: GroceriesListItemCreate): Promise<GroceriesListItem> {
+    return apiService.post<GroceriesListItem>(`/features/tasks/groceries-lists/${listId}/items`, data);
   }
 
   async updateItem(listItemId: string, data: GroceriesListItemUpdate): Promise<GroceriesListItem> {

@@ -136,3 +136,63 @@ Feature: Add an item to a grocery list
     Then the response status code is 422
     And the groceries_list_items table contains:
       | id | groceries_list_id | groceries_item_id | quantity | picked_up | position | status |
+
+  Scenario: POST /groceries-lists/0201/items with a custom item not in the catalog — the item is added to the list
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the groceries_list_items table contains:
+      | id | groceries_list_id | groceries_item_id | custom_name | custom_unit | quantity | picked_up | position | status |
+    When I POST /api/features/tasks/groceries-lists/0201/items with body:
+      """
+      {"custom_name": "Trash bags", "custom_unit": "rolls", "quantity": 2}
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "groceries_list_id": "0201",
+        "groceries_item_id": null,
+        "custom_name": "Trash bags",
+        "custom_unit": "rolls",
+        "quantity": 2.0,
+        "picked_up": false,
+        "status": "active"
+      }
+      """
+    And the groceries_list_items table contains:
+      | groceries_list_id | groceries_item_id | custom_name | custom_unit | quantity | picked_up | status |
+      | 0201               |                    | Trash bags  | rolls       | 2.00      | false     | active |
+
+  @error_case
+  Scenario: POST /groceries-lists/0201/items with neither a catalog item nor a custom name — 422 error and the list is not modified
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the groceries_list_items table contains:
+      | id | groceries_list_id | groceries_item_id | custom_name | quantity | picked_up | position | status |
+    When I POST /api/features/tasks/groceries-lists/0201/items with body:
+      """
+      {"quantity": 2}
+      """
+    Then the response status code is 422
+    And the groceries_list_items table contains:
+      | id | groceries_list_id | groceries_item_id | custom_name | quantity | picked_up | position | status |
+
+  @error_case
+  Scenario: POST /groceries-lists/0201/items with a fractional quantity for a custom item — 422 error and the list is not modified
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the groceries_list_items table contains:
+      | id | groceries_list_id | groceries_item_id | custom_name | quantity | picked_up | position | status |
+    When I POST /api/features/tasks/groceries-lists/0201/items with body:
+      """
+      {"custom_name": "Trash bags", "quantity": 1.5}
+      """
+    Then the response status code is 422
+    And the groceries_list_items table contains:
+      | id | groceries_list_id | groceries_item_id | custom_name | quantity | picked_up | position | status |

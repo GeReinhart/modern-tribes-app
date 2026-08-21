@@ -5,44 +5,43 @@ import { ThemedModal, ThemedModalBody, ThemedModalFooter } from '@/app/platform/
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import GroceriesIconPickerField from './GroceriesIconPickerField.tsx';
-
 interface Props {
-  title: string;
-  submitLabel: string;
-  initialName?: string;
-  initialIcon?: string | null;
   onClose: () => void;
-  onSubmit: (name: string, icon: string | null) => Promise<void>;
+  onSubmit: (name: string, unit: string) => Promise<void>;
 }
 
-const AddSectionModal: React.FC<Props> = ({ title, submitLabel, initialName, initialIcon, onClose, onSubmit }) => {
+const AddCustomListItemModal: React.FC<Props> = ({ onClose, onSubmit }) => {
   const { t } = useTranslation();
-  const [name, setName] = useState(initialName ?? '');
-  const [icon, setIcon] = useState<string | null>(initialIcon ?? null);
+  const [name, setName] = useState('');
+  const [unit, setUnit] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
     setSubmitting(true);
-    await onSubmit(name.trim(), icon);
+    await onSubmit(name.trim(), unit.trim());
     setSubmitting(false);
   };
 
   return (
-    <ThemedModal isOpen onClose={onClose} title={title}>
+    <ThemedModal isOpen onClose={onClose} title={t('features.groceries.addCustomItem')}>
       <form onSubmit={handleSubmit}>
         <ThemedModalBody>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <ThemedInput
-              label={t('features.groceries.sectionName')}
+              label={t('features.groceries.customItemName')}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder={t('features.groceries.sectionNamePlaceholder')}
+              placeholder={t('features.groceries.customItemNamePlaceholder')}
               autoFocus
             />
-            <GroceriesIconPickerField value={icon} onChange={setIcon} />
+            <ThemedInput
+              label={t('features.groceries.customItemUnit')}
+              value={unit}
+              onChange={(e) => setUnit(e.target.value)}
+              placeholder={t('features.groceries.customItemUnitPlaceholder')}
+            />
           </div>
         </ThemedModalBody>
         <ThemedModalFooter>
@@ -50,7 +49,7 @@ const AddSectionModal: React.FC<Props> = ({ title, submitLabel, initialName, ini
             {t('features.groceries.cancel')}
           </ThemedButton>
           <ThemedButton variant="primary" type="submit" isLoading={submitting} disabled={!name.trim()}>
-            {submitLabel}
+            {t('features.groceries.create')}
           </ThemedButton>
         </ThemedModalFooter>
       </form>
@@ -58,4 +57,4 @@ const AddSectionModal: React.FC<Props> = ({ title, submitLabel, initialName, ini
   );
 };
 
-export default AddSectionModal;
+export default AddCustomListItemModal;

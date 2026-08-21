@@ -386,10 +386,15 @@ CREATE TABLE IF NOT EXISTS groceries_lists (
 );
 CREATE INDEX IF NOT EXISTS idx_groceries_lists_feature_instance_id ON groceries_lists (feature_instance_id);
 
+-- groceries_item_id is NULL for a one-off item that only exists on this list (not in the shared
+-- catalog); such rows carry their own custom_name/custom_unit instead.
 CREATE TABLE IF NOT EXISTS groceries_list_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     groceries_list_id UUID REFERENCES groceries_lists(id) ON DELETE CASCADE NOT NULL,
-    groceries_item_id UUID REFERENCES groceries_items(id) ON DELETE CASCADE NOT NULL,
+    groceries_item_id UUID REFERENCES groceries_items(id) ON DELETE CASCADE,
+    custom_name VARCHAR(255),
+    custom_unit VARCHAR(50),
+    comment TEXT,
     quantity NUMERIC(10, 2) NOT NULL,
     picked_up BOOLEAN NOT NULL DEFAULT FALSE,
     picked_up_at TIMESTAMP WITH TIME ZONE,
@@ -398,7 +403,8 @@ CREATE TABLE IF NOT EXISTS groceries_list_items (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,
-    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT groceries_list_items_source_check CHECK (groceries_item_id IS NOT NULL OR custom_name IS NOT NULL)
 );
 CREATE INDEX IF NOT EXISTS idx_groceries_list_items_list_id ON groceries_list_items (groceries_list_id);
 

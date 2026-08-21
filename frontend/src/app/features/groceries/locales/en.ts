@@ -47,6 +47,13 @@ const en: Record<string, string> = {
   'features.groceries.renewalDays': 'Restock frequency (days)',
   'features.groceries.renewalDaysHelp': 'How often you typically restock this — used to suggest it again on future lists.',
   'features.groceries.renewalDaysPlaceholder': 'Not tracked',
+  'features.groceries.itemComment': 'Comment',
+  'features.groceries.itemCommentPlaceholder': 'Add a note for this item…',
+  'features.groceries.addCustomItem': 'Add a one-off item',
+  'features.groceries.customItemName': 'Item name',
+  'features.groceries.customItemNamePlaceholder': 'e.g. Trash bags',
+  'features.groceries.customItemUnit': 'Unit (optional)',
+  'features.groceries.customItemUnitPlaceholder': 'e.g. rolls',
 };
 
 export default en;

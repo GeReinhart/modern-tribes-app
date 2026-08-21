@@ -81,11 +81,12 @@ export interface GroceriesListCreate {
 
 export interface GroceriesListItemDetail {
   id: string;
-  groceries_item_id: string;
+  groceries_item_id: string | null;
   name: string;
-  unit: GroceriesUnit;
+  unit: string | null;
   icon: string | null;
   is_divisible: boolean;
+  comment: string | null;
   quantity: number;
   picked_up: boolean;
   section_ids: string[];
@@ -98,15 +99,26 @@ export interface GroceriesListDetail extends GroceriesList {
 export interface GroceriesListItem {
   id: string;
   groceries_list_id: string;
-  groceries_item_id: string;
+  groceries_item_id: string | null;
+  custom_name: string | null;
+  custom_unit: string | null;
+  comment: string | null;
   quantity: number;
   picked_up: boolean;
   status: string;
 }
 
+export interface GroceriesListItemCreate {
+  groceries_item_id?: string;
+  custom_name?: string;
+  custom_unit?: string;
+  quantity: number;
+}
+
 export interface GroceriesListItemUpdate {
   quantity?: number;
   picked_up?: boolean;
+  comment?: string;
 }
 
 export interface GroceriesSuggestion {

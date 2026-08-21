@@ -607,13 +607,15 @@
             "- keep a shared shopping catalog of items (with a unit and how often you typically restock them) and reusable aisle sections like \"Butchery\" or \"Produce\"",
             "- schedule shopping lists to a date so they show up in your dashboard planning",
             "- check items off as you put them in your cart, and see at a glance what's left to buy",
-            "- get suggestions for items you're due to restock when starting a new list"
+            "- get suggestions for items you're due to restock when starting a new list",
+            "- add a note to any item, and add one-off items just for a single list without putting them in the shared catalog"
           ],
           "fr": [
             "- gérez un catalogue d'articles partagé (avec une unité et une fréquence de réapprovisionnement habituelle) et des rayons réutilisables comme « Boucherie » ou « Fruits & Légumes »",
             "- programmez vos listes de courses à une date pour qu'elles apparaissent dans la planification de votre tableau de bord",
             "- cochez les articles au fur et à mesure que vous les mettez dans votre panier, et voyez en un coup d'œil ce qu'il reste à acheter",
-            "- recevez des suggestions d'articles à racheter lorsque vous créez une nouvelle liste"
+            "- recevez des suggestions d'articles à racheter lorsque vous créez une nouvelle liste",
+            "- ajoutez une note à n'importe quel article, et ajoutez des articles ponctuels propres à une seule liste sans les mettre dans le catalogue partagé"
           ]
         },
         "backend": {

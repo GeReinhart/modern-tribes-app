@@ -35,7 +35,10 @@ def _row_to_list_item(row: dict) -> GroceriesListItemResponse:
     return GroceriesListItemResponse(
         id=str(row["id"]),
         groceries_list_id=str(row["groceries_list_id"]),
-        groceries_item_id=str(row["groceries_item_id"]),
+        groceries_item_id=str(row["groceries_item_id"]) if row.get("groceries_item_id") else None,
+        custom_name=row.get("custom_name"),
+        custom_unit=row.get("custom_unit"),
+        comment=row.get("comment"),
         quantity=float(row["quantity"]),
         picked_up=row["picked_up"],
         status=row["status"],
@@ -49,8 +52,8 @@ async def _require_list(pool, list_id: str) -> dict:
     return row
 
 
-def _require_divisible_quantity(item: dict, quantity: float) -> None:
-    if not item.get("is_divisible", True) and quantity != int(quantity):
+def _require_divisible_quantity(is_divisible: bool, quantity: float) -> None:
+    if not is_divisible and quantity != int(quantity):
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="This item can only be taken in whole quantities.",
@@ -142,11 +145,12 @@ async def get_groceries_list(list_id: str, current_user: dict = Depends(get_curr
         items=[
             GroceriesListItemDetail(
                 id=str(i["id"]),
-                groceries_item_id=str(i["groceries_item_id"]),
+                groceries_item_id=str(i["groceries_item_id"]) if i.get("groceries_item_id") else None,
                 name=i["name"],
-                unit=i["unit"],
+                unit=i.get("unit"),
                 icon=i.get("icon"),
                 is_divisible=i.get("is_divisible", True),
+                comment=i.get("comment"),
                 quantity=float(i["quantity"]),
                 picked_up=i["picked_up"],
                 section_ids=list(i.get("section_ids") or []),
@@ -159,7 +163,7 @@ async def get_groceries_list(list_id: str, current_user: dict = Depends(get_curr
 @lists_router.post("/{list_id}/items", response_model=GroceriesListItemResponse, status_code=status.HTTP_201_CREATED)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def add_list_item(list_id: str, data: GroceriesListItemCreate, current_user: dict = Depends(get_current_user)):
-    """Add a catalog item with a quantity to a grocery list.
+    """Add an item to a grocery list, either a catalog item or a one-off item just for this list.
 
     **Permissions:** admin | can_access_attached_tribes
     **Feature access:** minimum position ≥ member
@@ -167,12 +171,16 @@ async def add_list_item(list_id: str, data: GroceriesListItemCreate, current_use
     pool = get_database()
     list_row = await _require_list(pool, list_id)
     await access.require_feature_access(pool, str(list_row["feature_instance_id"]), current_user, "member")
-    item = await catalog_repository.fetch_item(pool, data.groceries_item_id)
-    if not item:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grocery item not found.")
-    _require_divisible_quantity(item, data.quantity)
+    is_divisible = False
+    if data.groceries_item_id:
+        item = await catalog_repository.fetch_item(pool, data.groceries_item_id)
+        if not item:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grocery item not found.")
+        is_divisible = item.get("is_divisible", True)
+    _require_divisible_quantity(is_divisible, data.quantity)
     row = await lists_repository.insert_list_item(
-        pool, list_id, data.groceries_item_id, data.quantity, str(current_user["id"]),
+        pool, list_id, data.groceries_item_id, data.custom_name, data.custom_unit, data.quantity,
+        str(current_user["id"]),
     )
     return _row_to_list_item(row)
 
@@ -182,7 +190,7 @@ async def add_list_item(list_id: str, data: GroceriesListItemCreate, current_use
 async def update_list_item(
     list_item_id: str, data: GroceriesListItemUpdate, current_user: dict = Depends(get_current_user)
 ):
-    """Update a grocery list item's quantity, or check it off as picked up.
+    """Update a grocery list item's quantity or comment, or check it off as picked up.
 
     **Permissions:** admin | can_access_attached_tribes
     **Feature access:** minimum position ≥ member
@@ -194,10 +202,13 @@ async def update_list_item(
     list_row = await _require_list(pool, str(item_row["groceries_list_id"]))
     await access.require_feature_access(pool, str(list_row["feature_instance_id"]), current_user, "member")
     if data.quantity is not None:
-        catalog_item = await catalog_repository.fetch_item(pool, str(item_row["groceries_item_id"]))
-        _require_divisible_quantity(catalog_item, data.quantity)
+        is_divisible = False
+        if item_row.get("groceries_item_id"):
+            catalog_item = await catalog_repository.fetch_item(pool, str(item_row["groceries_item_id"]))
+            is_divisible = catalog_item.get("is_divisible", True)
+        _require_divisible_quantity(is_divisible, data.quantity)
     row = await lists_repository.update_list_item(
-        pool, list_item_id, data.quantity, data.picked_up, str(current_user["id"]),
+        pool, list_item_id, data.quantity, data.picked_up, data.comment, str(current_user["id"]),
     )
     return _row_to_list_item(row)
 

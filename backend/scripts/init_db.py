@@ -545,13 +545,21 @@ class DatabaseInitializer:
                 if list_key not in groceries_list_ids:
                     print(f"✗ Unknown list '{list_key}' in groceries_list_items.csv")
                     sys.exit(1)
-                if row["item"] not in groceries_item_ids:
-                    print(f"✗ Unknown item '{row['item']}' in groceries_list_items.csv")
+                item_name = row.get("item")
+                custom_name = row.get("custom_name")
+                if item_name and item_name not in groceries_item_ids:
+                    print(f"✗ Unknown item '{item_name}' in groceries_list_items.csv")
+                    sys.exit(1)
+                if not item_name and not custom_name:
+                    print(f"✗ Row in groceries_list_items.csv has neither 'item' nor 'custom_name'")
                     sys.exit(1)
                 await conn.execute(
-                    """INSERT INTO groceries_list_items (groceries_list_id, groceries_item_id, quantity, picked_up, position)
-                       VALUES ($1, $2, $3, $4, $5)""",
-                    groceries_list_ids[list_key], groceries_item_ids[row["item"]],
+                    """INSERT INTO groceries_list_items
+                           (groceries_list_id, groceries_item_id, custom_name, custom_unit, comment, quantity,
+                            picked_up, position)
+                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)""",
+                    groceries_list_ids[list_key], groceries_item_ids[item_name] if item_name else None,
+                    custom_name or None, row.get("custom_unit") or None, row.get("comment") or None,
                     row["quantity"], row.get("picked_up", "false").lower() == "true", int(row.get("position") or 0),
                 )
                 count += 1

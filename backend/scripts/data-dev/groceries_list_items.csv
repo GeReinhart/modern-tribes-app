@@ -1,5 +1,6 @@
-project,feature_name,list_name,item,quantity,picked_up,position
-Summer BBQ,Shopping List,BBQ Supplies Run,Ground Beef,2,false,0
-Summer BBQ,Shopping List,BBQ Supplies Run,Burger Buns,12,false,1
-Summer BBQ,Shopping List,BBQ Supplies Run,Ketchup,1,true,2
-Summer BBQ,Shopping List,BBQ Supplies Run,Charcoal,5,false,3
+project,feature_name,list_name,item,custom_name,custom_unit,comment,quantity,picked_up,position
+Summer BBQ,Shopping List,BBQ Supplies Run,Ground Beef,,,Get the 80/20 blend if they have it,2,false,0
+Summer BBQ,Shopping List,BBQ Supplies Run,Burger Buns,,,,12,false,1
+Summer BBQ,Shopping List,BBQ Supplies Run,Ketchup,,,,1,true,2
+Summer BBQ,Shopping List,BBQ Supplies Run,Charcoal,,,,5,false,3
+Summer BBQ,Shopping List,BBQ Supplies Run,,Citronella candles,,Only needed for this cookout,2,false,4

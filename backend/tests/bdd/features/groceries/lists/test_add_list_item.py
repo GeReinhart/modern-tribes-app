@@ -49,3 +49,26 @@ def test_add_list_item_missing_quantity():
 )
 def test_add_list_item_indivisible_fractional():
     pass
+
+
+@scenario(FEATURE, "POST /groceries-lists/0201/items with a custom item not in the catalog — the item is added to the list")
+def test_add_list_item_custom():
+    pass
+
+
+@scenario(
+    FEATURE,
+    "POST /groceries-lists/0201/items with neither a catalog item nor a custom name — "
+    "422 error and the list is not modified",
+)
+def test_add_list_item_missing_source():
+    pass
+
+
+@scenario(
+    FEATURE,
+    "POST /groceries-lists/0201/items with a fractional quantity for a custom item — "
+    "422 error and the list is not modified",
+)
+def test_add_list_item_custom_fractional():
+    pass

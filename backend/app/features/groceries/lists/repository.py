@@ -42,15 +42,18 @@ async def fetch_lists_for_instance(pool, feature_instance_id: str) -> list[dict]
 async def fetch_list_items_detail(pool, list_id: str) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            """SELECT gli.id, gli.groceries_item_id, gi.name, gi.unit, gi.icon, gi.is_divisible,
-                      gli.quantity, gli.picked_up,
+            """SELECT gli.id, gli.groceries_item_id,
+                      COALESCE(gi.name, gli.custom_name) AS name,
+                      COALESCE(gi.unit, gli.custom_unit) AS unit,
+                      gi.icon, COALESCE(gi.is_divisible, FALSE) AS is_divisible,
+                      gli.comment, gli.quantity, gli.picked_up,
                       ARRAY(
                           SELECT gis.groceries_section_id::text
                           FROM groceries_item_sections gis
                           WHERE gis.groceries_item_id = gi.id
                       ) AS section_ids
                FROM groceries_list_items gli
-               JOIN groceries_items gi ON gi.id = gli.groceries_item_id
+               LEFT JOIN groceries_items gi ON gi.id = gli.groceries_item_id
                WHERE gli.groceries_list_id = $1
                ORDER BY gli.position ASC""",
             UUID(list_id),
@@ -58,7 +61,10 @@ async def fetch_list_items_detail(pool, list_id: str) -> list[dict]:
     return [dict(r) for r in rows]
 
 
-async def insert_list_item(pool, list_id: str, item_id: str, quantity: float, user_id: str) -> dict:
+async def insert_list_item(
+    pool, list_id: str, item_id: Optional[str], custom_name: Optional[str], custom_unit: Optional[str],
+    quantity: float, user_id: str,
+) -> dict:
     async with pool.acquire() as conn:
         position = await conn.fetchval(
             "SELECT COALESCE(MAX(position), -1) + 1 FROM groceries_list_items WHERE groceries_list_id = $1",
@@ -66,9 +72,11 @@ async def insert_list_item(pool, list_id: str, item_id: str, quantity: float, us
         )
         row = await conn.fetchrow(
             """INSERT INTO groceries_list_items
-                   (groceries_list_id, groceries_item_id, quantity, position, created_by, updated_by)
-               VALUES ($1, $2, $3, $4, $5, $5) RETURNING *""",
-            UUID(list_id), UUID(item_id), quantity, position, UUID(user_id),
+                   (groceries_list_id, groceries_item_id, custom_name, custom_unit, quantity, position,
+                    created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $7) RETURNING *""",
+            UUID(list_id), UUID(item_id) if item_id else None, custom_name, custom_unit, quantity, position,
+            UUID(user_id),
         )
     return dict(row)
 
@@ -80,7 +88,8 @@ async def fetch_list_item(pool, list_item_id: str) -> Optional[dict]:
 
 
 async def update_list_item(
-    pool, list_item_id: str, quantity: Optional[float], picked_up: Optional[bool], user_id: str
+    pool, list_item_id: str, quantity: Optional[float], picked_up: Optional[bool],
+    comment: Optional[str], user_id: str,
 ) -> dict:
     fields: dict = {"updated_by": UUID(user_id)}
     if quantity is not None:
@@ -88,6 +97,8 @@ async def update_list_item(
     if picked_up is not None:
         fields["picked_up"] = picked_up
         fields["picked_up_at"] = datetime.now(timezone.utc) if picked_up else None
+    if comment is not None:
+        fields["comment"] = comment
     set_clauses = ", ".join(f"{k} = ${i + 2}" for i, k in enumerate(fields.keys()))
     async with pool.acquire() as conn:
         row = await conn.fetchrow(

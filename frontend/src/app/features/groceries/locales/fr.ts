@@ -47,6 +47,13 @@ const fr: Record<string, string> = {
   'features.groceries.renewalDays': 'Fréquence de réapprovisionnement (jours)',
   'features.groceries.renewalDaysHelp': "À quelle fréquence vous rachetez cet article — sert à vous le suggérer dans vos prochaines listes.",
   'features.groceries.renewalDaysPlaceholder': 'Non suivi',
+  'features.groceries.itemComment': 'Commentaire',
+  'features.groceries.itemCommentPlaceholder': 'Ajouter une note pour cet article…',
+  'features.groceries.addCustomItem': 'Ajouter un article ponctuel',
+  'features.groceries.customItemName': "Nom de l'article",
+  'features.groceries.customItemNamePlaceholder': 'ex. Sacs poubelle',
+  'features.groceries.customItemUnit': 'Unité (optionnel)',
+  'features.groceries.customItemUnitPlaceholder': 'ex. rouleaux',
 };
 
 export default fr;

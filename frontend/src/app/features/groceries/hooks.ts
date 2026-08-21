@@ -9,6 +9,7 @@ import {
   GroceriesList,
   GroceriesListCreate,
   GroceriesListDetail,
+  GroceriesListItemCreate,
   GroceriesSection,
   GroceriesSectionUpdate,
   GroceriesSuggestion,
@@ -79,10 +80,10 @@ export function useGroceriesListDetail(listId: string | null) {
   }, [fetchDetail]);
 
   const addItem = useCallback(
-    async (groceriesItemId: string, quantity: number): Promise<string | null> => {
+    async (data: GroceriesListItemCreate): Promise<string | null> => {
       if (!listId) return null;
       try {
-        const created = await groceriesListsService.addItem(listId, groceriesItemId, quantity);
+        const created = await groceriesListsService.addItem(listId, data);
         await fetchDetail();
         return created.id;
       } catch (e: unknown) {
@@ -129,7 +130,18 @@ export function useGroceriesListDetail(listId: string | null) {
     }
   }, []);
 
-  return { detail, error, addItem, togglePickedUp, updateQuantity, removeItem, refetch: fetchDetail };
+  const updateComment = useCallback(async (listItemId: string, comment: string): Promise<void> => {
+    try {
+      await groceriesListsService.updateItem(listItemId, { comment });
+      setDetail((prev) =>
+        prev ? { ...prev, items: prev.items.map((i) => (i.id === listItemId ? { ...i, comment } : i)) } : prev,
+      );
+    } catch (e: unknown) {
+      setError(errorMessage(e));
+    }
+  }, []);
+
+  return { detail, error, addItem, togglePickedUp, updateQuantity, updateComment, removeItem, refetch: fetchDetail };
 }
 
 export function useGroceriesCatalog(featureInstanceId: string | null) {

@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 
 
 class GroceriesListCreate(BaseModel):
@@ -24,19 +24,31 @@ class GroceriesListResponse(BaseModel):
 
 
 class GroceriesListItemCreate(BaseModel):
-    groceries_item_id: str
+    groceries_item_id: Optional[str] = None
+    custom_name: Optional[str] = None
+    custom_unit: Optional[str] = None
     quantity: float
+
+    @model_validator(mode="after")
+    def _require_one_source(self) -> "GroceriesListItemCreate":
+        if bool(self.groceries_item_id) == bool(self.custom_name and self.custom_name.strip()):
+            raise ValueError("Provide either groceries_item_id or a non-empty custom_name, not both.")
+        return self
 
 
 class GroceriesListItemUpdate(BaseModel):
     quantity: Optional[float] = None
     picked_up: Optional[bool] = None
+    comment: Optional[str] = None
 
 
 class GroceriesListItemResponse(BaseModel):
     id: str
     groceries_list_id: str
-    groceries_item_id: str
+    groceries_item_id: Optional[str] = None
+    custom_name: Optional[str] = None
+    custom_unit: Optional[str] = None
+    comment: Optional[str] = None
     quantity: float
     picked_up: bool
     status: str
@@ -44,11 +56,12 @@ class GroceriesListItemResponse(BaseModel):
 
 class GroceriesListItemDetail(BaseModel):
     id: str
-    groceries_item_id: str
+    groceries_item_id: Optional[str] = None
     name: str
-    unit: str
+    unit: Optional[str] = None
     icon: Optional[str] = None
     is_divisible: bool = True
+    comment: Optional[str] = None
     quantity: float
     picked_up: bool
     section_ids: list[str] = []

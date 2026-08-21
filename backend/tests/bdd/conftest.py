@@ -825,13 +825,19 @@ def given_groceries_list_items_table(datatable):
             for row in datatable[1:]:
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
                 picked_up_at = rec.get("picked_up_at")
+                groceries_item_id = rec.get("groceries_item_id")
                 await conn.execute(
-                    """INSERT INTO groceries_list_items(id, groceries_list_id, groceries_item_id, quantity, picked_up, picked_up_at, position, status)
-                       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+                    """INSERT INTO groceries_list_items(id, groceries_list_id, groceries_item_id, custom_name,
+                                                          custom_unit, comment, quantity, picked_up, picked_up_at,
+                                                          position, status)
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(rec["id"]),
                     UUID(rec["groceries_list_id"]),
-                    UUID(rec["groceries_item_id"]),
+                    UUID(groceries_item_id) if groceries_item_id else None,
+                    rec.get("custom_name") or None,
+                    rec.get("custom_unit") or None,
+                    rec.get("comment") or None,
                     float(rec.get("quantity", "0")),
                     (rec.get("picked_up") or "false").lower() == "true",
                     datetime.fromisoformat(picked_up_at) if picked_up_at else None,

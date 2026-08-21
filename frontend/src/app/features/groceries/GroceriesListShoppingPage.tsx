@@ -4,8 +4,6 @@ import { useProjectPermissions } from '@/app/features/tribes-projects/projects/u
 import { useProject } from '@/app/features/tribes-projects/projects/useProjects.ts';
 import { useTribeWithPositions } from '@/app/features/tribes-projects/tribes/useTribesWithPositions.ts';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
-import { ThemedCheckbox } from '@/app/platform/core/layout/themes/components/ThemedCheckbox.tsx';
-import { IconName, ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
@@ -13,7 +11,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router-dom';
 
-import { formatQuantityUnit } from './formatQuantity.ts';
+import GroceriesShoppingSectionGroup from './GroceriesShoppingSectionGroup.tsx';
 import { useGroceriesCatalog, useGroceriesListDetail } from './hooks.ts';
 import { groupBySections } from './sectionGrouping.ts';
 
@@ -83,28 +81,12 @@ const GroceriesListShoppingPageContent: React.FC = () => {
       )}
 
       {groups.map((group) => (
-        <div key={group.id ?? 'uncategorized'} style={{ marginBottom: '16px' }}>
-          <div
-            style={{
-              display: 'flex', alignItems: 'center', gap: '6px', fontSize: 'var(--font-xs)', fontWeight: 700,
-              color: theme.colors.secondary, textTransform: 'uppercase', marginBottom: '4px',
-            }}
-          >
-            {group.icon && <ThemedSvgIcon name={group.icon as IconName} color={theme.colors.secondary} size={14} />}
-            {group.name}
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {group.items.map((item) => (
-              <div key={item.id} style={{ opacity: canEdit ? 1 : 0.6, pointerEvents: canEdit ? 'auto' : 'none' }}>
-                <ThemedCheckbox
-                  label={`${item.name} — ${formatQuantityUnit(item.quantity, item.unit)}`}
-                  checked={item.picked_up}
-                  onChange={(checked) => togglePickedUp(item.id, checked)}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+        <GroceriesShoppingSectionGroup
+          key={group.id ?? 'uncategorized'}
+          group={group}
+          canEdit={canEdit}
+          onTogglePickedUp={togglePickedUp}
+        />
       ))}
     </AppLayout>
   );

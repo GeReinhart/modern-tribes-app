@@ -77,6 +77,7 @@ Feature: View a grocery list
             "unit": "kg",
             "icon": null,
             "is_divisible": true,
+            "comment": null,
             "quantity": 2.0,
             "picked_up": false,
             "section_ids": []
@@ -88,6 +89,7 @@ Feature: View a grocery list
             "unit": "piece",
             "icon": null,
             "is_divisible": true,
+            "comment": null,
             "quantity": 1.0,
             "picked_up": true,
             "section_ids": []

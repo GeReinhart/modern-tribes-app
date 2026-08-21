@@ -22,17 +22,23 @@ const GroceriesListEditPageContent: React.FC = () => {
   const { tribe } = useTribeWithPositions(tribeId || null);
   const { project } = useProject(projectId || null);
   const { canEdit } = useProjectPermissions(tribeId || null, projectId || null);
-  const { detail, error: detailError, addItem, updateQuantity, removeItem } = useGroceriesListDetail(listId || null);
+  const { detail, error: detailError, addItem, updateQuantity, updateComment, removeItem } =
+    useGroceriesListDetail(listId || null);
   const catalog = useGroceriesCatalog(detail?.feature_instance_id ?? null);
   const [focusItemId, setFocusItemId] = useState<string | null>(null);
 
   const listItemCatalogIds = useMemo(
-    () => new Set(detail?.items.map((i) => i.groceries_item_id) ?? []),
+    () => new Set(detail?.items.map((i) => i.groceries_item_id).filter((id): id is string => id !== null) ?? []),
     [detail?.items],
   );
 
   const handleAddItem = async (itemId: string) => {
-    const newId = await addItem(itemId, 1);
+    const newId = await addItem({ groceries_item_id: itemId, quantity: 1 });
+    setFocusItemId(newId);
+  };
+
+  const handleAddCustomItem = async (name: string, unit: string) => {
+    const newId = await addItem({ custom_name: name, custom_unit: unit || undefined, quantity: 1 });
     setFocusItemId(newId);
   };
 
@@ -102,10 +108,16 @@ const GroceriesListEditPageContent: React.FC = () => {
         <div style={{ flex: '1 1 320px', minWidth: '280px' }}>
           <GroceriesListColumn
             items={detail.items}
+            catalogItems={catalog.items}
             sections={catalog.sections}
             canEdit={canEdit}
             onUpdateQuantity={updateQuantity}
+            onUpdateComment={updateComment}
             onRemove={removeItem}
+            onAddCustomItem={handleAddCustomItem}
+            onUpdateCatalogItem={catalog.updateItem}
+            onSetCatalogItemRenewal={catalog.setItemRenewal}
+            onToggleCatalogItemSection={catalog.linkItemToSection}
             focusItemId={focusItemId}
             onFocused={() => setFocusItemId(null)}
           />
