@@ -11,6 +11,8 @@ const en: Record<string, string> = {
   'features.groceries.create': 'Create',
   'features.groceries.planned': 'Planned',
   'features.groceries.done': 'Done',
+  'features.groceries.passed': 'Passed',
+  'features.groceries.renameList': 'Rename list',
   'features.groceries.remainingCount': '{{count}} of {{total}} items left to pick up',
   'features.groceries.noItems': 'No items yet.',
   'features.groceries.editItems': 'Edit items',

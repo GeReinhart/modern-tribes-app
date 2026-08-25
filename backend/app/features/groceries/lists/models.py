@@ -14,6 +14,7 @@ class GroceriesListCreate(BaseModel):
 
 
 class GroceriesListUpdate(BaseModel):
+    name: Optional[str] = None
     status: Optional[Literal["active", "archived"]] = None
     is_favorite: Optional[bool] = None
 
@@ -28,6 +29,8 @@ class GroceriesListResponse(BaseModel):
     force_on_dashboard: bool
     is_favorite: bool
     status: str
+    items_count: int
+    picked_up_count: int
 
 
 class GroceriesListItemCreate(BaseModel):

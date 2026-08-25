@@ -19,25 +19,35 @@ const GroceriesShoppingSectionGroup: React.FC<Props> = ({ group, canEdit, onTogg
   const [expanded, setExpanded] = useState(true);
 
   return (
-    <div style={{ marginBottom: '16px' }}>
+    <div style={{ marginBottom: '24px' }}>
       <GroceriesSectionToggleHeader
         icon={group.icon}
         name={group.name}
         count={group.items.length}
         expanded={expanded}
         onToggle={() => setExpanded((v) => !v)}
+        size="lg"
       />
       {expanded && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', paddingLeft: '18px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            columnGap: '20px',
+            rowGap: '14px',
+            paddingLeft: '24px',
+          }}
+        >
           {group.items.map((item) => (
             <div key={item.id} style={{ opacity: canEdit ? 1 : 0.6, pointerEvents: canEdit ? 'auto' : 'none' }}>
               <ThemedCheckbox
                 label={`${item.name} — ${formatQuantityUnit(item.quantity, item.unit, item.is_divisible)}`}
                 checked={item.picked_up}
                 onChange={(checked) => onTogglePickedUp(item.id, checked)}
+                size="lg"
               />
               {item.comment && (
-                <div style={{ fontSize: 'var(--font-xs)', color: theme.colors.secondary, marginLeft: '28px' }}>
+                <div style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary, marginLeft: '32px' }}>
                   {item.comment}
                 </div>
               )}

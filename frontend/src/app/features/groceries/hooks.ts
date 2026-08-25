@@ -168,7 +168,22 @@ export function useGroceriesListDetail(listId: string | null) {
     }
   }, []);
 
-  return { detail, error, addItem, togglePickedUp, updateQuantity, updateComment, removeItem, refetch: fetchDetail };
+  const renameList = useCallback(async (name: string): Promise<boolean> => {
+    if (!listId) return false;
+    try {
+      const updated = await groceriesListsService.update(listId, { name });
+      setDetail((prev) => (prev ? { ...prev, name: updated.name } : prev));
+      return true;
+    } catch (e: unknown) {
+      setError(errorMessage(e));
+      return false;
+    }
+  }, [listId]);
+
+  return {
+    detail, error, addItem, togglePickedUp, updateQuantity, updateComment, renameList, removeItem,
+    refetch: fetchDetail,
+  };
 }
 
 export function useGroceriesCatalog(featureInstanceId: string | null) {

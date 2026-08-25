@@ -23,7 +23,14 @@ const GroceriesListRow: React.FC<Props> = ({
   const { t } = useTranslation();
   const assignee = persons.find((p) => p.id === list.assigned_person_id);
   const isDone = list.list_status === 'done';
+  const isPassed = list.list_status === 'passed';
   const isArchived = list.status === 'archived';
+  const statusLabel = isDone
+    ? t('features.groceries.done')
+    : isPassed
+      ? t('features.groceries.passed')
+      : t('features.groceries.planned');
+  const statusColor = isDone ? theme.colors.success : isPassed ? theme.colors.danger : theme.colors.primary;
 
   const stopAnd = (fn: () => void) => (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -33,7 +40,7 @@ const GroceriesListRow: React.FC<Props> = ({
   return (
     <ThemedCard
       onClick={onOpen}
-      variant={isArchived ? 'secondary' : isDone ? 'success' : 'primary'}
+      variant={isArchived ? 'secondary' : isDone ? 'success' : isPassed ? 'danger' : 'primary'}
       className={isArchived ? 'mb-2 cursor-pointer opacity-60' : 'mb-2 cursor-pointer'}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -44,6 +51,7 @@ const GroceriesListRow: React.FC<Props> = ({
           <div style={{ fontSize: 'var(--font-xs)', color: theme.colors.secondary }}>
             {list.scheduled_date}
             {assignee ? ` · ${assignee.name}` : ''}
+            {` · ${list.picked_up_count}/${list.items_count}`}
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -76,10 +84,10 @@ const GroceriesListRow: React.FC<Props> = ({
             style={{
               fontSize: 'var(--font-xs)',
               fontWeight: 700,
-              color: isDone ? theme.colors.success : theme.colors.primary,
+              color: statusColor,
             }}
           >
-            {isDone ? t('features.groceries.done') : t('features.groceries.planned')}
+            {statusLabel}
           </span>
         </div>
       </div>

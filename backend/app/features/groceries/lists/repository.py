@@ -2,6 +2,11 @@ from datetime import date, datetime, timezone
 from typing import Optional
 from uuid import UUID
 
+_ITEM_COUNTS_SQL = """(SELECT COUNT(*) FROM groceries_list_items
+                        WHERE groceries_list_id = groceries_lists.id AND status = 'active') AS items_count,
+       (SELECT COUNT(*) FROM groceries_list_items
+        WHERE groceries_list_id = groceries_lists.id AND status = 'active' AND picked_up = TRUE) AS picked_up_count"""
+
 
 async def insert_list(
     pool, feature_instance_id: str, name: Optional[str], scheduled_date: date,
@@ -9,9 +14,9 @@ async def insert_list(
 ) -> dict:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            """INSERT INTO groceries_lists
+            f"""INSERT INTO groceries_lists
                    (feature_instance_id, name, scheduled_date, assigned_person_id, force_on_dashboard, created_by, updated_by)
-               VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING *""",
+               VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING *, {_ITEM_COUNTS_SQL}""",
             UUID(feature_instance_id),
             name,
             scheduled_date,
@@ -24,14 +29,16 @@ async def insert_list(
 
 async def fetch_list(pool, list_id: str) -> Optional[dict]:
     async with pool.acquire() as conn:
-        row = await conn.fetchrow("SELECT * FROM groceries_lists WHERE id = $1", UUID(list_id))
+        row = await conn.fetchrow(f"SELECT *, {_ITEM_COUNTS_SQL} FROM groceries_lists WHERE id = $1", UUID(list_id))
     return dict(row) if row else None
 
 
 async def update_list(
-    pool, list_id: str, status: Optional[str], is_favorite: Optional[bool], user_id: str,
+    pool, list_id: str, name: Optional[str], status: Optional[str], is_favorite: Optional[bool], user_id: str,
 ) -> dict:
     fields: dict = {"updated_by": UUID(user_id)}
+    if name is not None:
+        fields["name"] = name
     if status is not None:
         fields["status"] = status
     if is_favorite is not None:
@@ -39,7 +46,7 @@ async def update_list(
     set_clauses = ", ".join(f"{k} = ${i + 2}" for i, k in enumerate(fields.keys()))
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            f"UPDATE groceries_lists SET {set_clauses} WHERE id = $1 RETURNING *",
+            f"UPDATE groceries_lists SET {set_clauses} WHERE id = $1 RETURNING *, {_ITEM_COUNTS_SQL}",
             UUID(list_id),
             *fields.values(),
         )
@@ -62,7 +69,7 @@ async def copy_list_items(pool, source_list_id: str, target_list_id: str, user_i
 async def fetch_lists_for_instance(pool, feature_instance_id: str) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            """SELECT * FROM groceries_lists
+            f"""SELECT *, {_ITEM_COUNTS_SQL} FROM groceries_lists
                WHERE feature_instance_id = $1
                ORDER BY scheduled_date ASC, created_at ASC""",
             UUID(feature_instance_id),

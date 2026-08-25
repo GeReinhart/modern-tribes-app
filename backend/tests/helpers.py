@@ -1,7 +1,22 @@
 import re
+from datetime import date, timedelta
 from enum import Enum
+from typing import Optional
 
 _SHORT_ID_RE = re.compile(r'^\d{4}$')
+_RELATIVE_DATE_RE = re.compile(r'^([+-]?\d+)d$')
+
+
+def resolve_relative_date(value: str) -> Optional[date]:
+    """Resolve a relative-day token ('-5d' = 5 days ago, '0d' = today, '+3d' = 3 days from now)
+    to a real date relative to whenever the test actually runs. A fixed date baked into a fixture
+    drifts stale as real time passes it (e.g. a "still planned" list scheduled for a fixed date
+    eventually becomes "passed" for no reason related to the test), so any fixture or expected
+    response value that depends on being before/after "today" must use this instead."""
+    match = _RELATIVE_DATE_RE.match(value)
+    if not match:
+        return None
+    return date.today() + timedelta(days=int(match.group(1)))
 
 
 def expand_id(value: str) -> str:
@@ -31,13 +46,17 @@ def expand_path_ids(path: str) -> str:
 
 
 def expand_json_ids(data: object) -> object:
-    """Recursively expand short IDs in parsed JSON values."""
+    """Recursively expand short IDs and relative-date tokens in parsed JSON values."""
     if isinstance(data, dict):
         return {k: expand_json_ids(v) for k, v in data.items()}
     if isinstance(data, list):
         return [expand_json_ids(v) for v in data]
     if isinstance(data, str) and _SHORT_ID_RE.match(data):
         return expand_id(data)
+    if isinstance(data, str):
+        relative_date = resolve_relative_date(data)
+        if relative_date is not None:
+            return relative_date.isoformat()
     return data
 
 

@@ -13,6 +13,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import GroceriesCatalogColumn from './GroceriesCatalogColumn.tsx';
 import GroceriesListColumn from './GroceriesListColumn.tsx';
 import { useGroceriesCatalog, useGroceriesListDetail } from './hooks.ts';
+import RenameListModal from './RenameListModal.tsx';
 
 const GroceriesListEditPageContent: React.FC = () => {
   const { t } = useTranslation();
@@ -22,11 +23,12 @@ const GroceriesListEditPageContent: React.FC = () => {
   const { tribe } = useTribeWithPositions(tribeId || null);
   const { project } = useProject(projectId || null);
   const { canEdit } = useProjectPermissions(tribeId || null, projectId || null);
-  const { detail, error: detailError, addItem, updateQuantity, updateComment, removeItem } =
+  const { detail, error: detailError, addItem, updateQuantity, updateComment, renameList, removeItem } =
     useGroceriesListDetail(listId || null);
   const catalog = useGroceriesCatalog(detail?.feature_instance_id ?? null);
   const [focusItemId, setFocusItemId] = useState<string | null>(null);
   const [configuringSections, setConfiguringSections] = useState(false);
+  const [renamingList, setRenamingList] = useState(false);
 
   const listItemCatalogIds = useMemo(
     () => new Set(detail?.items.map((i) => i.groceries_item_id).filter((id): id is string => id !== null) ?? []),
@@ -75,6 +77,11 @@ const GroceriesListEditPageContent: React.FC = () => {
       ...(canEdit
         ? [
             {
+              icon: 'pencil' as const,
+              label: t('features.groceries.renameList'),
+              onClick: () => setRenamingList(true),
+            },
+            {
               icon: 'settings' as const,
               badgeIcon: 'layers' as const,
               label: configuringSections
@@ -98,6 +105,13 @@ const GroceriesListEditPageContent: React.FC = () => {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions} bookmarkSlot={bookmarkSlot}>
+      {renamingList && (
+        <RenameListModal
+          initialName={detail.name ?? ''}
+          onClose={() => setRenamingList(false)}
+          onSubmit={renameList}
+        />
+      )}
       {(detailError || catalog.error) && <div>{detailError || catalog.error}</div>}
       <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 320px', minWidth: '280px' }}>

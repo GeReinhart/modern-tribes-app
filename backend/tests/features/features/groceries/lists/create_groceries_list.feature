@@ -50,7 +50,7 @@ Feature: Create a grocery list
       | id | feature_instance_id | name | scheduled_date | list_status | assigned_person_id | force_on_dashboard | status |
     When I POST /api/features/tasks/groceries-lists/ with body:
       """
-      {"feature_instance_id": "0100", "name": "Weekly shop", "scheduled_date": "2026-08-22", "assigned_person_id": "0030"}
+      {"feature_instance_id": "0100", "name": "Weekly shop", "scheduled_date": "+3d", "assigned_person_id": "0030"}
       """
     Then the response status code is 201
     And the response body includes:
@@ -58,7 +58,7 @@ Feature: Create a grocery list
       {
         "feature_instance_id": "0100",
         "name": "Weekly shop",
-        "scheduled_date": "2026-08-22",
+        "scheduled_date": "+3d",
         "list_status": "planned",
         "assigned_person_id": "0030",
         "force_on_dashboard": false,
@@ -67,7 +67,7 @@ Feature: Create a grocery list
       """
     And the groceries_lists table contains:
       | feature_instance_id | name        | scheduled_date | list_status | assigned_person_id | force_on_dashboard | status |
-      | 0100                | Weekly shop | 2026-08-22      | planned     | 0030                | false               | active |
+      | 0100                | Weekly shop | +3d             | planned     | 0030                | false               | active |
 
   Scenario: POST /groceries-lists/ without a name or assignee — they default to empty
     Given I am authenticated as a regular user: user.id 0002
@@ -78,7 +78,7 @@ Feature: Create a grocery list
       | id | feature_instance_id | name | scheduled_date | list_status | assigned_person_id | force_on_dashboard | status |
     When I POST /api/features/tasks/groceries-lists/ with body:
       """
-      {"feature_instance_id": "0100", "scheduled_date": "2026-08-22"}
+      {"feature_instance_id": "0100", "scheduled_date": "+3d"}
       """
     Then the response status code is 201
     And the response body includes:
@@ -86,7 +86,7 @@ Feature: Create a grocery list
       {
         "feature_instance_id": "0100",
         "name": null,
-        "scheduled_date": "2026-08-22",
+        "scheduled_date": "+3d",
         "list_status": "planned",
         "assigned_person_id": null,
         "force_on_dashboard": false,
@@ -95,7 +95,7 @@ Feature: Create a grocery list
       """
     And the groceries_lists table contains:
       | feature_instance_id | name | scheduled_date | list_status | assigned_person_id | force_on_dashboard | status |
-      | 0100                |      | 2026-08-22      | planned     |                     | false               | active |
+      | 0100                |      | +3d             | planned     |                     | false               | active |
 
   @error_case
   Scenario: POST /groceries-lists/ without a scheduled_date — 422 error and the database is not modified
@@ -142,17 +142,19 @@ Feature: Create a grocery list
       | 1001 | 0010     | 0030      | member   | active |
     When I POST /api/features/tasks/groceries-lists/ with body:
       """
-      {"feature_instance_id": "0100", "scheduled_date": "2026-08-29", "copy_from_list_id": "0201"}
+      {"feature_instance_id": "0100", "scheduled_date": "+7d", "copy_from_list_id": "0201"}
       """
     Then the response status code is 201
     And the response body includes:
       """
       {
         "feature_instance_id": "0100",
-        "scheduled_date": "2026-08-29",
+        "scheduled_date": "+7d",
         "list_status": "planned",
         "is_favorite": false,
-        "status": "active"
+        "status": "active",
+        "items_count": 1,
+        "picked_up_count": 0
       }
       """
     And the groceries_list_items table contains:

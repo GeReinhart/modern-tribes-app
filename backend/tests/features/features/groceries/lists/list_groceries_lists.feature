@@ -41,8 +41,8 @@ Feature: List grocery lists for a feature instance
       | 0100 | 0100       | Groceries | groceries    | active |
     And the groceries_lists table contains:
       | id   | feature_instance_id | name        | scheduled_date | list_status | status |
-      | 0201 | 0100                | First shop  | 2026-08-15      | done        | active |
-      | 0202 | 0100                | Weekly shop | 2026-08-22      | planned     | active |
+      | 0201 | 0100                | First shop  | -10d            | done        | active |
+      | 0202 | 0100                | Weekly shop | +3d             | planned     | active |
 
   Scenario: GET /groceries-lists/by-instance/0100 as a project member — lists are returned ordered by date
     Given I am authenticated as a regular user: user.id 0002
@@ -54,8 +54,8 @@ Feature: List grocery lists for a feature instance
     And the response body includes:
       """
       [
-        {"id": "0201", "name": "First shop", "scheduled_date": "2026-08-15", "list_status": "done"},
-        {"id": "0202", "name": "Weekly shop", "scheduled_date": "2026-08-22", "list_status": "planned"}
+        {"id": "0201", "name": "First shop", "scheduled_date": "-10d", "list_status": "done"},
+        {"id": "0202", "name": "Weekly shop", "scheduled_date": "+3d", "list_status": "planned"}
       ]
       """
 
@@ -64,3 +64,41 @@ Feature: List grocery lists for a feature instance
     Given I am authenticated as a regular user: user.id 0002
     When I GET /api/features/tasks/groceries-lists/by-instance/0100
     Then the response status code is 403
+
+  Scenario: GET /groceries-lists/by-instance/0100 as a project member — items_count and picked_up_count reflect the list's items
+    Given the groceries_list_items table contains:
+      | id   | groceries_list_id | custom_name | custom_unit | quantity | picked_up | position | status |
+      | 5001 | 0202               | Milk        | piece       | 1         | true      | 0        | active |
+      | 5002 | 0202               | Bread       | piece       | 1         | false     | 1        | active |
+    And I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | guest    | active |
+    When I GET /api/features/tasks/groceries-lists/by-instance/0100
+    Then the response status code is 200
+    And the response body includes:
+      """
+      [
+        {"id": "0201", "items_count": 0, "picked_up_count": 0},
+        {"id": "0202", "items_count": 2, "picked_up_count": 1}
+      ]
+      """
+
+  Scenario: GET /groceries-lists/by-instance/0100 as a project member — a passed list is shown alongside a still-planned one
+    Given the groceries_lists table contains:
+      | id   | feature_instance_id | name     | scheduled_date | list_status | status |
+      | 0203 | 0100                | Old shop | -5d             | planned     | active |
+    And I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | guest    | active |
+    When I GET /api/features/tasks/groceries-lists/by-instance/0100
+    Then the response status code is 200
+    And the response body includes:
+      """
+      [
+        {"id": "0201", "list_status": "done"},
+        {"id": "0203", "list_status": "passed"},
+        {"id": "0202", "list_status": "planned"}
+      ]
+      """

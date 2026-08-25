@@ -30,3 +30,19 @@ def test_list_groceries_lists_success():
 @scenario(FEATURE, "GET /groceries-lists/by-instance/0100 without project access — 403 error")
 def test_list_groceries_lists_forbidden():
     pass
+
+
+@scenario(
+    FEATURE,
+    "GET /groceries-lists/by-instance/0100 as a project member — a passed list is shown alongside a still-planned one",
+)
+def test_list_groceries_lists_shows_passed():
+    pass
+
+
+@scenario(
+    FEATURE,
+    "GET /groceries-lists/by-instance/0100 as a project member — items_count and picked_up_count reflect the list's items",
+)
+def test_list_groceries_lists_shows_item_counts():
+    pass

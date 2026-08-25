@@ -65,11 +65,13 @@ export interface GroceriesList {
   feature_instance_id: string;
   name: string | null;
   scheduled_date: string;
-  list_status: 'planned' | 'done';
+  list_status: 'planned' | 'done' | 'passed';
   assigned_person_id: string | null;
   force_on_dashboard: boolean;
   is_favorite: boolean;
   status: string;
+  items_count: number;
+  picked_up_count: number;
 }
 
 export interface GroceriesListCreate {
@@ -82,6 +84,7 @@ export interface GroceriesListCreate {
 }
 
 export interface GroceriesListUpdate {
+  name?: string;
   status?: 'active' | 'archived';
   is_favorite?: boolean;
 }

@@ -9,7 +9,7 @@ import pytest
 from pytest_bdd import given, parsers, then, when
 
 from tests.db_helpers import TEST_DB_DSN, coerce, is_int_column, url_param_id_from_uuid
-from tests.helpers import assert_table, expand_id, expand_json_ids, expand_path_ids
+from tests.helpers import assert_table, expand_id, expand_json_ids, expand_path_ids, resolve_relative_date
 
 _RELATIVE_DAYS_PATTERN = re.compile(r"^-(\d+)d$")
 
@@ -1170,6 +1170,9 @@ def _compare_rows(table: str, headers: list, expected_rows: list, actual_rows: l
                 else:
                     act_str = str(act_val)
                 exp_val = expand_id(exp[j])
+                relative_date = resolve_relative_date(exp_val)
+                if relative_date is not None:
+                    exp_val = relative_date.isoformat()
             assert act_str == exp_val, f"{table}[{i}].{col}: expected {exp_val!r}, got {act_str!r}"
 
 

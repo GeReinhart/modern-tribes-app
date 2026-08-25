@@ -7,6 +7,7 @@ from app.platform.core.database import get_database
 from app.features.groceries import access
 from app.features.groceries.catalog import repository as catalog_repository
 from app.features.groceries.lists import repository as lists_repository
+from app.features.groceries.lists.status import effective_list_status
 from app.platform.functions.people.persons import repository as persons_repository
 from app.features.groceries.lists.models import (
     GroceriesListCreate, GroceriesListUpdate, GroceriesListResponse, GroceriesListItemCreate,
@@ -24,11 +25,13 @@ def _row_to_list(row: dict) -> GroceriesListResponse:
         feature_instance_id=str(row["feature_instance_id"]),
         name=row.get("name"),
         scheduled_date=row["scheduled_date"],
-        list_status=row["list_status"],
+        list_status=effective_list_status(row["list_status"], row["scheduled_date"]),
         assigned_person_id=str(row["assigned_person_id"]) if row.get("assigned_person_id") else None,
         force_on_dashboard=row["force_on_dashboard"],
         is_favorite=row["is_favorite"],
         status=row["status"],
+        items_count=row["items_count"],
+        picked_up_count=row["picked_up_count"],
     )
 
 
@@ -81,6 +84,7 @@ async def create_groceries_list(data: GroceriesListCreate, current_user: dict = 
     )
     if data.copy_from_list_id:
         await lists_repository.copy_list_items(pool, data.copy_from_list_id, str(row["id"]), str(current_user["id"]))
+        row = await lists_repository.fetch_list(pool, str(row["id"]))
     return _row_to_list(row)
 
 
@@ -89,7 +93,7 @@ async def create_groceries_list(data: GroceriesListCreate, current_user: dict = 
 async def update_groceries_list(
     list_id: str, data: GroceriesListUpdate, current_user: dict = Depends(get_current_user)
 ):
-    """Archive, restore or (un)mark a grocery list as favorite.
+    """Rename a grocery list, archive/restore it, or (un)mark it as favorite.
 
     **Permissions:** admin | can_access_attached_tribes
     **Feature access:** minimum position ≥ member
@@ -97,7 +101,9 @@ async def update_groceries_list(
     pool = get_database()
     list_row = await _require_list(pool, list_id)
     await access.require_feature_access(pool, str(list_row["feature_instance_id"]), current_user, "member")
-    row = await lists_repository.update_list(pool, list_id, data.status, data.is_favorite, str(current_user["id"]))
+    row = await lists_repository.update_list(
+        pool, list_id, data.name, data.status, data.is_favorite, str(current_user["id"]),
+    )
     return _row_to_list(row)
 
 

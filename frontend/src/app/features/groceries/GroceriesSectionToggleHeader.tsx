@@ -10,10 +10,15 @@ interface Props {
   expanded: boolean;
   onToggle: () => void;
   actions?: React.ReactNode;
+  size?: 'md' | 'lg';
 }
 
-const GroceriesSectionToggleHeader: React.FC<Props> = ({ icon, name, count, expanded, onToggle, actions }) => {
+const GroceriesSectionToggleHeader: React.FC<Props> = ({
+  icon, name, count, expanded, onToggle, actions, size = 'md',
+}) => {
   const { theme } = useTheme();
+  const iconSize = size === 'lg' ? 18 : 12;
+  const sectionIconSize = size === 'lg' ? 22 : 14;
 
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
@@ -28,14 +33,14 @@ const GroceriesSectionToggleHeader: React.FC<Props> = ({ icon, name, count, expa
           background: 'transparent',
           cursor: 'pointer',
           padding: 0,
-          fontSize: 'var(--font-xs)',
+          fontSize: size === 'lg' ? 'var(--font-md)' : 'var(--font-xs)',
           fontWeight: 700,
           color: theme.colors.secondary,
           textTransform: 'uppercase',
         }}
       >
-        <ThemedSvgIcon name={expanded ? 'chevron-down' : 'chevron-up'} color={theme.colors.secondary} size={12} />
-        {icon && <ThemedSvgIcon name={icon as IconName} color={theme.colors.secondary} size={14} />}
+        <ThemedSvgIcon name={expanded ? 'chevron-down' : 'chevron-up'} color={theme.colors.secondary} size={iconSize} />
+        {icon && <ThemedSvgIcon name={icon as IconName} color={theme.colors.secondary} size={sectionIconSize} />}
         {name}
         <span style={{ fontWeight: 500 }}>({count})</span>
       </button>

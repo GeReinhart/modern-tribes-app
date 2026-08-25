@@ -45,3 +45,8 @@ def test_update_list_forbidden():
 @scenario(FEATURE, "PATCH /groceries-lists/9999 on a non-existent list — 404 error")
 def test_update_list_not_found():
     pass
+
+
+@scenario(FEATURE, "PATCH /groceries-lists/4001 as a project member — the list is renamed")
+def test_update_list_rename():
+    pass

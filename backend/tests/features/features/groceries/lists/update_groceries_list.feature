@@ -144,3 +144,29 @@ Feature: Archive, restore or favorite a grocery list
       {"status": "archived"}
       """
     Then the response status code is 404
+
+  Scenario: PATCH /groceries-lists/4001 as a project member — the list is renamed
+    Given the groceries_lists table contains:
+      | id   | feature_instance_id | name        | scheduled_date | is_favorite | status |
+      | 4001 | 0100                | Weekly shop | 2026-08-22      | false       | active |
+    And I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    When I PATCH /api/features/tasks/groceries-lists/4001 with body:
+      """
+      {"name": "Sunday big shop"}
+      """
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "4001",
+        "name": "Sunday big shop",
+        "is_favorite": false,
+        "status": "active"
+      }
+      """
+    And the groceries_lists table contains:
+      | id   | feature_instance_id | name             | is_favorite | status |
+      | 4001 | 0100                | Sunday big shop  | false       | active |

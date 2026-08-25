@@ -9,6 +9,8 @@ from uuid import UUID
 
 import asyncpg
 
+from tests.helpers import resolve_relative_date
+
 TEST_DB_NAME = "modern_tribes_test"
 TEST_DB_PORT = 5433
 TEST_DB_DSN = f"postgresql://admin:password123@localhost:{TEST_DB_PORT}/{TEST_DB_NAME}"
@@ -46,6 +48,9 @@ def coerce(col: str, val: str):
     if col in _INT_COLS and isinstance(val, str) and val.lstrip('-').isdigit():
         return int(val)
     if isinstance(val, str):
+        relative_date = resolve_relative_date(val)
+        if relative_date is not None:
+            return relative_date
         if _UUID_RE.match(val):
             return UUID(val)
         if _DATE_RE.match(val):

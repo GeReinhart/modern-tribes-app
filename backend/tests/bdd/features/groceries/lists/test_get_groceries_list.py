@@ -48,3 +48,18 @@ def test_get_groceries_list_forbidden():
 @scenario(FEATURE, "GET /groceries-lists/9999 on a non-existent list — 404 error")
 def test_get_groceries_list_not_found():
     pass
+
+
+@scenario(FEATURE, "GET /groceries-lists/0202 — a planned list past its date is shown as passed")
+def test_get_groceries_list_planned_becomes_passed():
+    pass
+
+
+@scenario(FEATURE, "GET /groceries-lists/0203 — a done list past its date still shows as done")
+def test_get_groceries_list_done_stays_done():
+    pass
+
+
+@scenario(FEATURE, "GET /groceries-lists/0204 — a list scheduled for today is still planned")
+def test_get_groceries_list_today_still_planned():
+    pass

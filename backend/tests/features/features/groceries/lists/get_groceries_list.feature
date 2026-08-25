@@ -45,7 +45,7 @@ Feature: View a grocery list
       | 3002 | Bread    |             | piece | active |
     And the groceries_lists table contains:
       | id   | feature_instance_id | name        | scheduled_date | list_status | status |
-      | 0201 | 0100                | Weekly shop | 2026-08-22      | planned     | active |
+      | 0201 | 0100                | Weekly shop | +3d             | planned     | active |
     And the groceries_list_items table contains:
       | id   | groceries_list_id | groceries_item_id | quantity | picked_up | position | status |
       | 4001 | 0201               | 3001               | 2.00      | false     | 1        | active |
@@ -64,12 +64,14 @@ Feature: View a grocery list
         "id": "0201",
         "feature_instance_id": "0100",
         "name": "Weekly shop",
-        "scheduled_date": "2026-08-22",
+        "scheduled_date": "+3d",
         "list_status": "planned",
         "assigned_person_id": null,
         "force_on_dashboard": false,
         "is_favorite": false,
         "status": "active",
+        "items_count": 2,
+        "picked_up_count": 1,
         "items": [
           {
             "id": "4001",
@@ -122,3 +124,61 @@ Feature: View a grocery list
     Given I am authenticated as an administrator: user.id 0001
     When I GET /api/features/tasks/groceries-lists/9999
     Then the response status code is 404
+
+  Scenario: GET /groceries-lists/0202 — a planned list past its date is shown as passed
+    Given the groceries_lists table contains:
+      | id   | feature_instance_id | name     | scheduled_date | list_status | status |
+      | 0202 | 0100                | Old shop | -5d             | planned     | active |
+    And I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | guest    | active |
+    When I GET /api/features/tasks/groceries-lists/0202
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "0202",
+        "list_status": "passed"
+      }
+      """
+    And the groceries_lists table contains:
+      | id   | list_status |
+      | 0201 | planned     |
+      | 0202 | planned     |
+
+  Scenario: GET /groceries-lists/0203 — a done list past its date still shows as done
+    Given the groceries_lists table contains:
+      | id   | feature_instance_id | name      | scheduled_date | list_status | status |
+      | 0203 | 0100                | Past shop | -5d             | done        | active |
+    And I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | guest    | active |
+    When I GET /api/features/tasks/groceries-lists/0203
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "0203",
+        "list_status": "done"
+      }
+      """
+
+  Scenario: GET /groceries-lists/0204 — a list scheduled for today is still planned
+    Given the groceries_lists table contains:
+      | id   | feature_instance_id | name       | scheduled_date | list_status | status |
+      | 0204 | 0100                | Today shop | 0d              | planned     | active |
+    And I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | guest    | active |
+    When I GET /api/features/tasks/groceries-lists/0204
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "0204",
+        "list_status": "planned"
+      }
+      """
