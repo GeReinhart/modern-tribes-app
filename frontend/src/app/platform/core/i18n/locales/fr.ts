@@ -299,6 +299,11 @@ const fr: Record<string, string> = {
 
   'theme.selectTheme': 'Thème',
 
+  'calendar.allDay': 'Toute la journée',
+  'calendar.midnight': 'Minuit',
+  'calendar.noItemsDay': 'Rien ce jour.',
+  'calendar.noItemsWeek': 'Rien cette semaine.',
+
   'about.title': 'À propos',
   'about.subtitle':
     'Modern Tribes — un outil léger pour organiser les groupes auxquels vous appartenez.',

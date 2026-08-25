@@ -138,3 +138,20 @@ export interface GroceriesSuggestion {
   icon: string | null;
   renewal_duration_days: number;
 }
+
+export interface MealSuggestionIngredient {
+  groceries_item_id: string | null;
+  name: string;
+  unit: string | null;
+  quantity: number;
+}
+
+export interface MealSuggestion {
+  meal_id: string;
+  meal_title: string;
+  meal_start_at: string;
+  recipe_id: string;
+  recipe_name: string;
+  headcount: number;
+  ingredients: MealSuggestionIngredient[];
+}

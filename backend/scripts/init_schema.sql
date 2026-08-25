@@ -416,6 +416,89 @@ CREATE OR REPLACE TRIGGER update_groceries_instance_items_updated_at BEFORE UPDA
 CREATE OR REPLACE TRIGGER update_groceries_lists_updated_at BEFORE UPDATE ON groceries_lists FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE OR REPLACE TRIGGER update_groceries_list_items_updated_at BEFORE UPDATE ON groceries_list_items FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- Recipes: per-project-tab recipe book with a serving count and an ingredient list
+-- (migration 008). groceries_item_id is NULL for a one-off ingredient not in the
+-- shared catalog; such rows carry their own custom_name/custom_unit instead.
+CREATE TABLE IF NOT EXISTS recipes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    feature_instance_id UUID REFERENCES projects_features(id) ON DELETE CASCADE NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
+    servings INTEGER NOT NULL CHECK (servings > 0),
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_recipes_feature_instance ON recipes (feature_instance_id);
+
+CREATE TABLE IF NOT EXISTS recipe_ingredients (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    recipe_id UUID REFERENCES recipes(id) ON DELETE CASCADE NOT NULL,
+    groceries_item_id UUID REFERENCES groceries_items(id) ON DELETE CASCADE,
+    custom_name VARCHAR(255),
+    custom_unit VARCHAR(50),
+    quantity NUMERIC(10, 2) NOT NULL,
+    position INTEGER NOT NULL DEFAULT 0,
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT recipe_ingredients_source_check CHECK (groceries_item_id IS NOT NULL OR custom_name IS NOT NULL)
+);
+CREATE INDEX IF NOT EXISTS idx_recipe_ingredients_recipe ON recipe_ingredients (recipe_id);
+
+CREATE OR REPLACE TRIGGER update_recipes_updated_at BEFORE UPDATE ON recipes FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_recipe_ingredients_updated_at BEFORE UPDATE ON recipe_ingredients FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Meals: per-project-tab planning entry linking recipes, a date range and named
+-- participants (migration 008). headcount drives ingredient-quantity scaling
+-- independently of how many named persons are linked. meal_recipes is a pure
+-- join (0..N recipes per meal, each optional).
+CREATE TABLE IF NOT EXISTS meals (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    feature_instance_id UUID REFERENCES projects_features(id) ON DELETE CASCADE NOT NULL,
+    title VARCHAR(500) NOT NULL,
+    start_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    end_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    headcount INTEGER NOT NULL CHECK (headcount >= 0),
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_meals_feature_instance ON meals (feature_instance_id);
+CREATE INDEX IF NOT EXISTS idx_meals_start_at ON meals (start_at);
+
+CREATE TABLE IF NOT EXISTS meal_participants (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    meal_id UUID REFERENCES meals(id) ON DELETE CASCADE NOT NULL,
+    person_id UUID REFERENCES persons(id) ON DELETE CASCADE NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    UNIQUE (meal_id, person_id)
+);
+CREATE INDEX IF NOT EXISTS idx_meal_participants_meal ON meal_participants (meal_id);
+
+CREATE TABLE IF NOT EXISTS meal_recipes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    meal_id UUID REFERENCES meals(id) ON DELETE CASCADE NOT NULL,
+    recipe_id UUID REFERENCES recipes(id) ON DELETE CASCADE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (meal_id, recipe_id)
+);
+CREATE INDEX IF NOT EXISTS idx_meal_recipes_meal ON meal_recipes (meal_id);
+CREATE INDEX IF NOT EXISTS idx_meal_recipes_recipe ON meal_recipes (recipe_id);
+
+CREATE OR REPLACE TRIGGER update_meals_updated_at BEFORE UPDATE ON meals FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_meal_participants_updated_at BEFORE UPDATE ON meal_participants FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 -- Todo items table (final structure from migrations 018+020+021+004)
 CREATE TABLE IF NOT EXISTS todo_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

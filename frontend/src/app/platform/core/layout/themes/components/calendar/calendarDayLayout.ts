@@ -1,8 +1,8 @@
-import { isoToLocalDt } from './dateUtils.ts';
-import type { CalendarEvent } from './types.ts';
+import { isoToLocalDt } from './calendarDateUtils.ts';
+import type { CalendarItem } from './types.ts';
 
-export interface LayoutItem {
-  event: CalendarEvent;
+export interface CalendarLayoutItem<T extends CalendarItem> {
+  item: T;
   col: number;
   totalCols: number;
 }
@@ -21,10 +21,10 @@ export interface ClippedRange {
   endIsMidnight: boolean;
 }
 
-// A timed event fully spans this day when it neither starts nor ends on it.
-export function spansFullDay(event: CalendarEvent, selectedDate: string): boolean {
-  const startDate = isoToLocalDt(event.start_at).slice(0, 10);
-  const endDate = isoToLocalDt(event.end_at).slice(0, 10);
+// A timed item fully spans this day when it neither starts nor ends on it.
+export function spansFullDay(item: CalendarItem, selectedDate: string): boolean {
+  const startDate = isoToLocalDt(item.start_at).slice(0, 10);
+  const endDate = isoToLocalDt(item.end_at).slice(0, 10);
   return startDate < selectedDate && endDate > selectedDate;
 }
 
@@ -41,11 +41,11 @@ function fmtHm(ms: number): string {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 }
 
-// Clips an event's start/end to the boundaries of the viewed day, e.g. a
-// multi-day event only shows "actual start → 24:00" on its first day.
-export function clipToDay(event: CalendarEvent, bounds: DayBounds): ClippedRange {
-  const startMs = new Date(event.start_at).getTime();
-  const endMs = new Date(event.end_at).getTime();
+// Clips an item's start/end to the boundaries of the viewed day, e.g. a
+// multi-day item only shows "actual start → 24:00" on its first day.
+export function clipToDay(item: CalendarItem, bounds: DayBounds): ClippedRange {
+  const startMs = new Date(item.start_at).getTime();
+  const endMs = new Date(item.end_at).getTime();
   const clampedStart = Math.min(Math.max(startMs, bounds.start), bounds.end);
   const clampedEnd = Math.min(Math.max(endMs, bounds.start), bounds.end);
   const startIsMidnight = startMs < bounds.start;
@@ -69,7 +69,7 @@ export interface HourRange {
   endH: number;
 }
 
-// Widens the default 8-20h window to fit every clipped event range, with a 1h margin.
+// Widens the default 8-20h window to fit every clipped item range, with a 1h margin.
 export function computeRange(ranges: ClippedRange[]): HourRange {
   if (!ranges.length) return { startH: DEFAULT_START_H, endH: DEFAULT_END_H };
   return {
@@ -78,19 +78,19 @@ export function computeRange(ranges: ClippedRange[]): HourRange {
   };
 }
 
-export function buildDayLayout(events: CalendarEvent[]): LayoutItem[] {
-  if (!events.length) return [];
+export function buildDayLayout<T extends CalendarItem>(items: T[]): CalendarLayoutItem<T>[] {
+  if (!items.length) return [];
 
-  const withTime = events.map(ev => ({
-    ev,
-    start: new Date(ev.start_at).getTime(),
-    end: new Date(ev.end_at).getTime(),
+  const withTime = items.map(item => ({
+    item,
+    start: new Date(item.start_at).getTime(),
+    end: new Date(item.end_at).getTime(),
   }));
 
   const sorted = [...withTime].sort((a, b) => a.start - b.start);
   const colEnds: number[] = [];
 
-  const items = sorted.map(({ ev, start, end }) => {
+  const laidOut = sorted.map(({ item, start, end }) => {
     let col = colEnds.findIndex(colEnd => colEnd <= start);
     if (col === -1) {
       col = colEnds.length;
@@ -98,18 +98,18 @@ export function buildDayLayout(events: CalendarEvent[]): LayoutItem[] {
     } else {
       colEnds[col] = end;
     }
-    return { event: ev, start, end, col, totalCols: 1 };
+    return { item, start, end, col, totalCols: 1 };
   });
 
-  for (const item of items) {
-    let maxCol = item.col;
-    for (const other of items) {
-      if (other.start < item.end && item.start < other.end) {
+  for (const entry of laidOut) {
+    let maxCol = entry.col;
+    for (const other of laidOut) {
+      if (other.start < entry.end && entry.start < other.end) {
         maxCol = Math.max(maxCol, other.col);
       }
     }
-    item.totalCols = maxCol + 1;
+    entry.totalCols = maxCol + 1;
   }
 
-  return items.map(({ event, col, totalCols }) => ({ event, col, totalCols }));
+  return laidOut.map(({ item, col, totalCols }) => ({ item, col, totalCols }));
 }

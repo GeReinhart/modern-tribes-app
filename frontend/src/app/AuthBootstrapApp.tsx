@@ -37,6 +37,8 @@ import { GroceriesListShoppingPage } from '@/app/features/groceries/GroceriesLis
 import { SongDetailPage } from '@/app/features/guitar/song/SongDetailPage.tsx';
 import { SongFormPage } from '@/app/features/guitar/song/SongFormPage.tsx';
 import { SongPresentationPage } from '@/app/features/guitar/song/SongPresentationPage.tsx';
+import { RecipeDetailPage } from '@/app/features/recipes/RecipeDetailPage.tsx';
+import { RecipePresentationPage } from '@/app/features/recipes/RecipePresentationPage.tsx';
 import ShowTribePage from '@/app/features/tribes-projects/tribes/ShowTribePage.tsx';
 import { TribesPage } from '@/app/features/tribes-projects/tribes/TribesPage.tsx';
 import UpdateTribePage from '@/app/features/tribes-projects/tribes/UpdateTribePage.tsx';
@@ -245,6 +247,14 @@ function AuthBootstrapApp() {
                       <Route
                         path="/app/tribes/:tribeId/projects/:projectId/songs/:songId/present"
                         element={<SongPresentationPage />}
+                      />
+                      <Route
+                        path="/app/tribes/:tribeId/projects/:projectId/recipes/:recipeId"
+                        element={<RecipeDetailPage />}
+                      />
+                      <Route
+                        path="/app/tribes/:tribeId/projects/:projectId/recipes/:recipeId/present"
+                        element={<RecipePresentationPage />}
                       />
                       <Route path="/app/projects" element={<ProjectsPage />} />
                       <Route path="/app/search" element={<SearchPage />} />

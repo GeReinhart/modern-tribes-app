@@ -26,6 +26,10 @@ import groceriesEn from '@/app/features/groceries/locales/en.ts';
 import groceriesFr from '@/app/features/groceries/locales/fr.ts';
 import tribesProjectsEn from '@/app/features/tribes-projects/locales/en.ts';
 import tribesProjectsFr from '@/app/features/tribes-projects/locales/fr.ts';
+import recipesEn from '@/app/features/recipes/locales/en.ts';
+import recipesFr from '@/app/features/recipes/locales/fr.ts';
+import mealsEn from '@/app/features/meals/locales/en.ts';
+import mealsFr from '@/app/features/meals/locales/fr.ts';
 import en from './locales/en.ts';
 import fr from './locales/fr.ts';
 
@@ -50,6 +54,8 @@ i18n.use(initReactI18next).init({
         ...guitarChordsEn,
         ...guitarSongEn,
         ...dailyJournalEn,
+        ...recipesEn,
+        ...mealsEn,
       },
     },
     fr: {
@@ -67,6 +73,8 @@ i18n.use(initReactI18next).init({
         ...guitarChordsFr,
         ...guitarSongFr,
         ...dailyJournalFr,
+        ...recipesFr,
+        ...mealsFr,
       },
     },
   },

@@ -1,5 +1,6 @@
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { DEFAULT_CALENDAR_ITEM_COLOR } from '@/app/platform/core/layout/themes/components/calendar/types.ts';
 
 import React from 'react';
 
@@ -7,13 +8,9 @@ import type { CalendarEvent, FeatureLabel, PersonOption } from './types.ts';
 
 interface Props {
   event: CalendarEvent;
-  color: string;
-  top: number;
-  height: number;
   startLabel: string;
   endLabel: string;
-  col: number;
-  totalCols: number;
+  heightPx: number;
   labels: FeatureLabel[];
   persons: PersonOption[];
   onView: (event: CalendarEvent) => void;
@@ -24,9 +21,13 @@ function initials(name: string): string {
   return name.split(' ').filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
 }
 
-const DayEventCard: React.FC<Props> = ({ event, color, top, height, startLabel, endLabel, col, totalCols, labels, persons, onView, onEdit }) => {
+// Fills the positioned slot the shared calendar timeline grid gives it
+// (see CalendarTimelineColumn's renderItem) with the events-specific look:
+// title, time range, label chips and participant initials — content the
+// generic DefaultCalendarItemCard doesn't know about.
+const DayEventCard: React.FC<Props> = ({ event, startLabel, endLabel, heightPx, labels, persons, onView, onEdit }) => {
   const { theme } = useTheme();
-  const colPct = 100 / totalCols;
+  const color = event.color ?? DEFAULT_CALENDAR_ITEM_COLOR;
 
   const eventLabels = labels.filter(l => event.label_ids.includes(l.id));
   const eventPersons = persons.filter(p => event.participant_ids.includes(p.id));
@@ -34,10 +35,8 @@ const DayEventCard: React.FC<Props> = ({ event, color, top, height, startLabel, 
   return (
     <div
       style={{
-        position: 'absolute',
-        top, height,
-        left: `${col * colPct}%`,
-        width: `calc(${colPct}% - 3px)`,
+        width: '100%',
+        height: '100%',
         backgroundColor: theme.colors.surface,
         borderLeft: `4px solid ${color}`,
         borderTop: `1px solid ${color}33`,
@@ -47,7 +46,6 @@ const DayEventCard: React.FC<Props> = ({ event, color, top, height, startLabel, 
         padding: '3px 5px 3px 6px',
         overflow: 'hidden',
         boxSizing: 'border-box',
-        zIndex: 1,
         display: 'flex',
         flexDirection: 'column',
         gap: '2px',
@@ -74,13 +72,13 @@ const DayEventCard: React.FC<Props> = ({ event, color, top, height, startLabel, 
           {event.title}
         </span>
       </div>
-      {height > 36 && (
+      {heightPx > 36 && (
         <span style={{ fontSize: '12px', color: theme.colors.secondary, display: 'block', whiteSpace: 'nowrap', fontWeight: 600 }}>
           {startLabel} → {endLabel}
         </span>
       )}
 
-      {height > 56 && (eventLabels.length > 0 || eventPersons.length > 0) && (
+      {heightPx > 56 && (eventLabels.length > 0 || eventPersons.length > 0) && (
         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', alignItems: 'center', marginTop: '2px' }}>
           {eventLabels.slice(0, 2).map(l => (
             <span key={l.id} style={{ padding: '2px 7px', borderRadius: '8px', backgroundColor: l.color + 'cc', color: 'white', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap' }}>

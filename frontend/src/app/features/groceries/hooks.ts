@@ -16,6 +16,7 @@ import {
   GroceriesSection,
   GroceriesSectionUpdate,
   GroceriesSuggestion,
+  MealSuggestion,
   PersonOption,
 } from './types.ts';
 
@@ -93,6 +94,7 @@ export function useGroceriesLists(featureInstanceId: string | null) {
 
 export function useGroceriesListDetail(listId: string | null) {
   const [detail, setDetail] = useState<GroceriesListDetail | null>(null);
+  const [mealSuggestions, setMealSuggestions] = useState<MealSuggestion[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const fetchDetail = useCallback(async () => {
@@ -102,6 +104,14 @@ export function useGroceriesListDetail(listId: string | null) {
     } catch (e: unknown) {
       setError(errorMessage(e));
     }
+  }, [listId]);
+
+  useEffect(() => {
+    if (!listId) return;
+    groceriesListsService
+      .listMealSuggestions(listId)
+      .then(setMealSuggestions)
+      .catch((e: unknown) => setError(errorMessage(e)));
   }, [listId]);
 
   usePolling(fetchDetail, POLL_INTERVAL_MS, !!listId);
@@ -181,7 +191,7 @@ export function useGroceriesListDetail(listId: string | null) {
   }, [listId]);
 
   return {
-    detail, error, addItem, togglePickedUp, updateQuantity, updateComment, renameList, removeItem,
+    detail, mealSuggestions, error, addItem, togglePickedUp, updateQuantity, updateComment, renameList, removeItem,
     refetch: fetchDetail,
   };
 }

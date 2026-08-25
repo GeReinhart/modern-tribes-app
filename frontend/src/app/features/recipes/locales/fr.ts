@@ -1,0 +1,28 @@
+const fr: Record<string, string> = {
+  'features.recipes.empty': 'Aucune recette pour le moment. Ajoutez-en une pour commencer.',
+  'features.recipes.newRecipe': 'Nouvelle recette',
+  'features.recipes.name': 'Nom',
+  'features.recipes.namePlaceholder': 'ex. Lasagnes',
+  'features.recipes.servings': 'Portions',
+  'features.recipes.servingsCount': '{{count}} portions',
+  'features.recipes.description': 'Description',
+  'features.recipes.labels': 'Étiquettes',
+  'features.recipes.newLabel': 'Nouvelle étiquette',
+  'features.recipes.ingredients': 'Ingrédients',
+  'features.recipes.noIngredients': "Aucun ingrédient pour le moment.",
+  'features.recipes.addIngredient': 'Ajouter un ingrédient',
+  'features.recipes.removeIngredient': "Retirer l'ingrédient",
+  'features.recipes.customIngredient': "Cet ingrédient n'est pas dans le catalogue",
+  'features.recipes.customIngredientName': "Nom de l'ingrédient",
+  'features.recipes.customIngredientUnit': 'Unité',
+  'features.recipes.catalogItem': 'Article du catalogue',
+  'features.recipes.quantity': 'Quantité',
+  'features.recipes.add': 'Ajouter',
+  'features.recipes.create': 'Créer',
+  'features.recipes.cancel': 'Annuler',
+  'features.recipes.backToList': 'Retour aux recettes',
+  'features.recipes.readMode': 'Mode lecture',
+  'features.recipes.editRecipe': 'Modifier la recette',
+};
+
+export default fr;

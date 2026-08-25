@@ -118,13 +118,13 @@
         "description": {
           "en": [
             "- the app's visual structure: header, navigation menus and breadcrumbs",
-            "- shared UI controls used throughout the app: buttons, text fields, modals, tables and icons",
+            "- shared UI controls used throughout the app: buttons, text fields, modals, tables, icons and calendars",
             "- an optional icon-only toolbar for the current page's actions, so they don't require opening the menu; from your profile you can choose to show it in the header, in the footer, or keep it hidden",
             "- a single icon on the footer hides the header, the toolbar and the footer all together, leaving only that icon behind to bring them all back — remembered on this device"
           ],
           "fr": [
             "- la structure visuelle de l'app : en-tête, menus de navigation et fil d'Ariane",
-            "- contrôles partagés utilisés dans toute l'app : boutons, champs, modales, tableaux et icônes",
+            "- contrôles partagés utilisés dans toute l'app : boutons, champs, modales, tableaux, icônes et calendriers",
             "- une barre d'outils optionnelle avec des icônes pour les actions de la page en cours, sans avoir à ouvrir le menu ; depuis votre profil, vous pouvez choisir de l'afficher dans l'en-tête, dans le pied de page, ou de la garder masquée",
             "- une seule icône sur le pied de page masque l'en-tête, la barre d'outils et le pied de page tous ensemble, ne laissant que cette icône pour tout remettre en place — mémorisé sur cet appareil"
           ]
@@ -607,14 +607,14 @@
             "- keep a shared shopping catalog of items (with a unit and how often you typically restock them) and reusable aisle sections like \"Butchery\" or \"Produce\", filterable by name and reorderable to match how you walk the aisles when building a list",
             "- schedule shopping lists to a date so they show up in your dashboard planning — a list you didn't get to in time shows as passed; rename, archive once it's done, mark a list as a favorite, and start a new list from a favorite's content",
             "- check items off as you put them in your cart, and see at a glance what's left to buy",
-            "- get suggestions for items you're due to restock when starting a new list",
+            "- get suggestions for items you're due to restock, and for ingredients needed by any meal planned after the list's date",
             "- add a note to any item, and add one-off items just for a single list without putting them in the shared catalog"
           ],
           "fr": [
             "- gérez un catalogue d'articles partagé (avec une unité et une fréquence de réapprovisionnement habituelle) et des rayons réutilisables comme « Boucherie » ou « Fruits & Légumes », filtrables par nom et réordonnables selon l'ordre dans lequel vous parcourez les rayons",
             "- programmez vos listes de courses à une date pour qu'elles apparaissent dans la planification de votre tableau de bord — une liste que vous n'avez pas traitée à temps apparaît comme passée ; renommez-la, archivez-la une fois terminée, marquez-la comme favorite, et repartez d'une liste favorite pour créer une nouvelle liste",
             "- cochez les articles au fur et à mesure que vous les mettez dans votre panier, et voyez en un coup d'œil ce qu'il reste à acheter",
-            "- recevez des suggestions d'articles à racheter lorsque vous créez une nouvelle liste",
+            "- recevez des suggestions d'articles à racheter, ainsi que des ingrédients nécessaires pour tout repas planifié après la date de la liste",
             "- ajoutez une note à n'importe quel article, et ajoutez des articles ponctuels propres à une seule liste sans les mettre dans le catalogue partagé"
           ]
         },
@@ -950,6 +950,69 @@
         "frontend": {
           "path": [
             "frontend/src/app/features/daily-journal/**"
+          ]
+        }
+      },
+      {
+        "package": "recipes",
+        "description": {
+          "en": [
+            "- keep a recipe book in a project tab, each recipe with a title, a base serving count and a rich-text description",
+            "- list ingredients from the shared groceries catalog with a quantity, or add one-off ingredients that aren't in the catalog",
+            "- tag recipes with labels shared within the tab to organize and filter your recipe book",
+            "- open a recipe in a clean read-only view, with a quick switch to an edit screen for the actual changes"
+          ],
+          "fr": [
+            "- tenez un répertoire de recettes dans un onglet de projet, chaque recette avec un titre, un nombre de portions de base et une description enrichie",
+            "- listez les ingrédients du catalogue de courses partagé avec une quantité, ou ajoutez des ingrédients ponctuels absents du catalogue",
+            "- étiquetez les recettes avec des labels partagés dans l'onglet pour organiser et filtrer votre répertoire",
+            "- ouvrez une recette dans une vue de lecture épurée, avec un accès rapide à un écran d'édition pour les modifications"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "recipes",
+            "recipe_ingredients"
+          ],
+          "path": [
+            "backend/app/features/recipes/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/features/recipes/**"
+          ]
+        }
+      },
+      {
+        "package": "meals",
+        "description": {
+          "en": [
+            "- plan meals on a calendar with a date range and how many people are eating",
+            "- name which team members are coming, independently of the headcount",
+            "- link one or more recipes to a meal to know what's being cooked",
+            "- when a meal is planned after a scheduled shopping list, its recipes' ingredients appear as suggestions on that list — scaled to the meal's headcount — so nothing gets forgotten"
+          ],
+          "fr": [
+            "- planifiez des repas sur un calendrier avec une plage horaire et le nombre de convives",
+            "- indiquez quels membres de l'équipe sont présents, indépendamment du nombre de convives",
+            "- reliez une ou plusieurs recettes à un repas pour savoir ce qui est cuisiné",
+            "- quand un repas est planifié après une liste de courses programmée, les ingrédients de ses recettes apparaissent en suggestion sur cette liste — proportionnels au nombre de convives — pour ne rien oublier"
+          ]
+        },
+        "backend": {
+          "schema": [
+            "meals",
+            "meal_participants",
+            "meal_recipes"
+          ],
+          "path": [
+            "backend/app/features/meals/**"
+          ]
+        },
+        "frontend": {
+          "path": [
+            "frontend/src/app/features/meals/**"
           ]
         }
       }

@@ -1,0 +1,28 @@
+const en: Record<string, string> = {
+  'features.recipes.empty': 'No recipes yet. Add one to get started.',
+  'features.recipes.newRecipe': 'New recipe',
+  'features.recipes.name': 'Name',
+  'features.recipes.namePlaceholder': 'e.g. Lasagna',
+  'features.recipes.servings': 'Servings',
+  'features.recipes.servingsCount': '{{count}} servings',
+  'features.recipes.description': 'Description',
+  'features.recipes.labels': 'Labels',
+  'features.recipes.newLabel': 'New label',
+  'features.recipes.ingredients': 'Ingredients',
+  'features.recipes.noIngredients': 'No ingredients yet.',
+  'features.recipes.addIngredient': 'Add ingredient',
+  'features.recipes.removeIngredient': 'Remove ingredient',
+  'features.recipes.customIngredient': "This ingredient isn't in the catalog",
+  'features.recipes.customIngredientName': 'Ingredient name',
+  'features.recipes.customIngredientUnit': 'Unit',
+  'features.recipes.catalogItem': 'Catalog item',
+  'features.recipes.quantity': 'Quantity',
+  'features.recipes.add': 'Add',
+  'features.recipes.create': 'Create',
+  'features.recipes.cancel': 'Cancel',
+  'features.recipes.backToList': 'Back to recipes',
+  'features.recipes.readMode': 'Read mode',
+  'features.recipes.editRecipe': 'Edit recipe',
+};
+
+export default en;

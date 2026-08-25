@@ -4,7 +4,7 @@ import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvg
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { isoDate } from './weekLayout.ts';
+import { isoDate } from './calendarDateUtils.ts';
 
 interface Props {
   weekDates: string[];
@@ -19,7 +19,7 @@ function fmtRangeBound(dateStr: string, locale: string, withYear: boolean): stri
   return d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: withYear ? 'numeric' : undefined });
 }
 
-const WeekViewHeader: React.FC<Props> = ({ weekDates, selectedDate, onSelectDate, onPrevWeek, onNextWeek }) => {
+const CalendarWeekHeader: React.FC<Props> = ({ weekDates, selectedDate, onSelectDate, onPrevWeek, onNextWeek }) => {
   const { theme } = useTheme();
   const { i18n } = useTranslation();
   const today = isoDate(new Date());
@@ -68,4 +68,4 @@ const WeekViewHeader: React.FC<Props> = ({ weekDates, selectedDate, onSelectDate
   );
 };
 
-export default WeekViewHeader;
+export default CalendarWeekHeader;

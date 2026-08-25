@@ -2156,6 +2156,164 @@ def given_reminders_table(datatable):
     _run(_insert())
 
 
+@given("the recipes table contains:")
+def given_recipes_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not uid:
+                    continue
+                document_id = rec.get("document_id")
+                await conn.execute(
+                    """INSERT INTO recipes(id, feature_instance_id, name, servings, document_id, status)
+                       VALUES($1, $2, $3, $4, $5, $6)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid),
+                    UUID(rec["feature_instance_id"]),
+                    rec.get("name", "Recipe"),
+                    int(rec.get("servings", "1")),
+                    UUID(document_id) if document_id else None,
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the recipes table contains:")
+def then_recipes_table(datatable):
+    _assert_db("recipes", datatable)
+
+
+@given("the recipe_ingredients table contains:")
+def given_recipe_ingredients_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not uid:
+                    continue
+                groceries_item_id = rec.get("groceries_item_id")
+                await conn.execute(
+                    """INSERT INTO recipe_ingredients(
+                           id, recipe_id, groceries_item_id, custom_name, custom_unit, quantity, position, status
+                       )
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid),
+                    UUID(rec["recipe_id"]),
+                    UUID(groceries_item_id) if groceries_item_id else None,
+                    rec.get("custom_name") or None,
+                    rec.get("custom_unit") or None,
+                    float(rec.get("quantity", "0")),
+                    coerce("position", rec.get("position", "0")),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the recipe_ingredients table contains:")
+def then_recipe_ingredients_table(datatable):
+    _assert_db("recipe_ingredients", datatable)
+
+
+@given("the meals table contains:")
+def given_meals_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not uid:
+                    continue
+                await conn.execute(
+                    """INSERT INTO meals(id, feature_instance_id, title, start_at, end_at, headcount, status)
+                       VALUES($1, $2, $3, $4, $5, $6, $7)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid),
+                    UUID(rec["feature_instance_id"]),
+                    rec.get("title", "Meal"),
+                    _parse_dt(rec.get("start_at")),
+                    _parse_dt(rec.get("end_at")),
+                    int(rec.get("headcount", "0")),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the meals table contains:")
+def then_meals_table(datatable):
+    _assert_db("meals", datatable)
+
+
+@given("the meal_participants table contains:")
+def given_meal_participants_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not uid:
+                    continue
+                await conn.execute(
+                    """INSERT INTO meal_participants(id, meal_id, person_id, status)
+                       VALUES($1, $2, $3, $4)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid),
+                    UUID(rec["meal_id"]),
+                    UUID(rec["person_id"]),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the meal_participants table contains:")
+def then_meal_participants_table(datatable):
+    _assert_db("meal_participants", datatable)
+
+
+@given("the meal_recipes table contains:")
+def given_meal_recipes_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                await conn.execute(
+                    """INSERT INTO meal_recipes(meal_id, recipe_id)
+                       VALUES($1, $2)
+                       ON CONFLICT (meal_id, recipe_id) DO NOTHING""",
+                    UUID(rec["meal_id"]),
+                    UUID(rec["recipe_id"]),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the meal_recipes table contains:")
+def then_meal_recipes_table(datatable):
+    _assert_db("meal_recipes", datatable)
+
+
 @then("the reminders table contains:")
 def then_reminders_table(datatable):
     async def _query_active_reminders(headers):

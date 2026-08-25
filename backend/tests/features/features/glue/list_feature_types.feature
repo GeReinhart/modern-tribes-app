@@ -41,7 +41,9 @@ Feature: List feature types
         {"feature_type": "guitar_chords", "label": "Guitar - Chords"},
         {"feature_type": "guitar_song", "label": "Guitar - Song"},
         {"feature_type": "events", "label": "Events"},
-        {"feature_type": "daily_journal", "label": "Daily Journal"}
+        {"feature_type": "daily_journal", "label": "Daily Journal"},
+        {"feature_type": "recipes", "label": "Recipes"},
+        {"feature_type": "meals", "label": "Meals"}
       ]
       """
 

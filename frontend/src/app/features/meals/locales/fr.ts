@@ -1,0 +1,23 @@
+const fr: Record<string, string> = {
+  'features.meals.empty': 'Aucun repas planifié pour le moment.',
+  'features.meals.newMeal': 'Nouveau repas',
+  'features.meals.title': 'Titre',
+  'features.meals.date': 'Date',
+  'features.meals.startTime': 'Heure de début',
+  'features.meals.endTime': 'Heure de fin',
+  'features.meals.headcount': 'Nombre de personnes',
+  'features.meals.headcountValue': '{{count}} personnes',
+  'features.meals.cancel': 'Annuler',
+  'features.meals.create': 'Créer',
+  'features.meals.delete': 'Supprimer le repas',
+  'features.meals.participants': 'Participants',
+  'features.meals.selectParticipants': 'Choisir les participants',
+  'features.meals.selectRecipes': 'Choisir les recettes',
+  'features.meals.recipes': 'Recettes',
+  'features.meals.noRecipes': "Aucune recette dans ce projet pour l'instant.",
+  'features.meals.view.month': 'Mois',
+  'features.meals.view.week': 'Semaine',
+  'features.meals.view.day': 'Jour',
+};
+
+export default fr;

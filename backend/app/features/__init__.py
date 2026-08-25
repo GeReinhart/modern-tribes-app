@@ -8,3 +8,5 @@ from app.features.guitar import chords     # noqa: F401 — triggers self-regist
 from app.features.guitar import song       # noqa: F401 — triggers self-registration
 from app.features import events            # noqa: F401 — triggers self-registration
 from app.features import daily_journal     # noqa: F401 — triggers self-registration
+from app.features import recipes           # noqa: F401 — triggers self-registration
+from app.features import meals             # noqa: F401 — triggers self-registration

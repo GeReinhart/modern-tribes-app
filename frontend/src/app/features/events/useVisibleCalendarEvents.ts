@@ -1,8 +1,9 @@
+import { getWeekDates } from '@/app/platform/core/layout/themes/components/calendar/calendarDateUtils.ts';
+
 import { useMemo } from 'react';
 
 import type { CalendarEvent, FeatureLabel, PersonOption } from './types.ts';
 import type { CalendarViewMode } from './useCalendarViewToggle.ts';
-import { getWeekDates } from './weekLayout.ts';
 
 export interface VisibleCalendarEvents<E extends CalendarEvent> {
   weekDates: string[];

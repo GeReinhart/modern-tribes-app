@@ -9,3 +9,5 @@ import '../guitar/chords';
 import '../guitar/song';
 import '../events';
 import '../daily-journal';
+import '../recipes';
+import '../meals';

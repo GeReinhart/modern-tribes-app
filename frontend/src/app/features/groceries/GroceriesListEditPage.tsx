@@ -13,6 +13,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import GroceriesCatalogColumn from './GroceriesCatalogColumn.tsx';
 import GroceriesListColumn from './GroceriesListColumn.tsx';
 import { useGroceriesCatalog, useGroceriesListDetail } from './hooks.ts';
+import MealSuggestionsPanel from './MealSuggestionsPanel.tsx';
 import RenameListModal from './RenameListModal.tsx';
 
 const GroceriesListEditPageContent: React.FC = () => {
@@ -23,7 +24,7 @@ const GroceriesListEditPageContent: React.FC = () => {
   const { tribe } = useTribeWithPositions(tribeId || null);
   const { project } = useProject(projectId || null);
   const { canEdit } = useProjectPermissions(tribeId || null, projectId || null);
-  const { detail, error: detailError, addItem, updateQuantity, updateComment, renameList, removeItem } =
+  const { detail, mealSuggestions, error: detailError, addItem, updateQuantity, updateComment, renameList, removeItem } =
     useGroceriesListDetail(listId || null);
   const catalog = useGroceriesCatalog(detail?.feature_instance_id ?? null);
   const [focusItemId, setFocusItemId] = useState<string | null>(null);
@@ -113,6 +114,7 @@ const GroceriesListEditPageContent: React.FC = () => {
         />
       )}
       {(detailError || catalog.error) && <div>{detailError || catalog.error}</div>}
+      <MealSuggestionsPanel suggestions={mealSuggestions} canEdit={canEdit} onAdd={addItem} />
       <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 320px', minWidth: '280px' }}>
           <GroceriesCatalogColumn

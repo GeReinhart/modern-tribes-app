@@ -9,6 +9,7 @@ import {
   GroceriesListItemUpdate,
   GroceriesListUpdate,
   GroceriesSuggestion,
+  MealSuggestion,
   PersonOption,
 } from './types.ts';
 
@@ -41,6 +42,12 @@ class GroceriesListsService {
     return apiService.get<PersonOption[]>(
       `/features/tasks/groceries-lists/persons/${featureInstanceId}`,
     );
+  }
+
+  // Reads the meals feature's suggestion endpoint by its stable HTTP contract, not by
+  // importing the meals feature package, so groceries stays decoupled from it.
+  async listMealSuggestions(listId: string): Promise<MealSuggestion[]> {
+    return apiService.get<MealSuggestion[]>(`/features/tasks/meals/grocery-suggestions/${listId}`);
   }
 
   async addItem(listId: string, data: GroceriesListItemCreate): Promise<GroceriesListItem> {
