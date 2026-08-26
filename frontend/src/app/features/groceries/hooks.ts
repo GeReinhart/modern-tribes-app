@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { groceriesCatalogService } from './catalogService.ts';
 import { groceriesListsService } from './listsService.ts';
 import {
+  AddedMeal,
   GroceriesItem,
   GroceriesItemCreate,
   GroceriesItemUpdate,
@@ -95,6 +96,7 @@ export function useGroceriesLists(featureInstanceId: string | null) {
 export function useGroceriesListDetail(listId: string | null) {
   const [detail, setDetail] = useState<GroceriesListDetail | null>(null);
   const [mealSuggestions, setMealSuggestions] = useState<MealSuggestion[]>([]);
+  const [addedMeals, setAddedMeals] = useState<AddedMeal[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const fetchDetail = useCallback(async () => {
@@ -106,15 +108,40 @@ export function useGroceriesListDetail(listId: string | null) {
     }
   }, [listId]);
 
-  useEffect(() => {
+  const fetchMealSuggestions = useCallback(async () => {
     if (!listId) return;
-    groceriesListsService
-      .listMealSuggestions(listId)
-      .then(setMealSuggestions)
-      .catch((e: unknown) => setError(errorMessage(e)));
+    try {
+      setMealSuggestions(await groceriesListsService.listMealSuggestions(listId));
+    } catch (e: unknown) {
+      setError(errorMessage(e));
+    }
   }, [listId]);
 
+  const fetchAddedMeals = useCallback(async () => {
+    if (!listId) return;
+    try {
+      setAddedMeals(await groceriesListsService.listAddedMeals(listId));
+    } catch (e: unknown) {
+      setError(errorMessage(e));
+    }
+  }, [listId]);
+
+  useEffect(() => {
+    fetchMealSuggestions();
+    fetchAddedMeals();
+  }, [fetchMealSuggestions, fetchAddedMeals]);
+
   usePolling(fetchDetail, POLL_INTERVAL_MS, !!listId);
+
+  const addMealSuggestion = useCallback(async (mealId: string): Promise<void> => {
+    if (!listId) return;
+    try {
+      await groceriesListsService.addMealToList(listId, mealId);
+      await Promise.all([fetchDetail(), fetchMealSuggestions(), fetchAddedMeals()]);
+    } catch (e: unknown) {
+      setError(errorMessage(e));
+    }
+  }, [listId, fetchDetail, fetchMealSuggestions, fetchAddedMeals]);
 
   const addItem = useCallback(
     async (data: GroceriesListItemCreate): Promise<string | null> => {
@@ -191,7 +218,8 @@ export function useGroceriesListDetail(listId: string | null) {
   }, [listId]);
 
   return {
-    detail, mealSuggestions, error, addItem, togglePickedUp, updateQuantity, updateComment, renameList, removeItem,
+    detail, mealSuggestions, addedMeals, error, addItem, addMealSuggestion, togglePickedUp, updateQuantity,
+    updateComment, renameList, removeItem,
     refetch: fetchDetail,
   };
 }

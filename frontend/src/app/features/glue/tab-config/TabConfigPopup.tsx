@@ -2,7 +2,7 @@ import { IconPicker } from '@/app/platform/core/layout/themes/components/IconPic
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { QuickAddDefaultsSection } from '@/app/features/glue/dashboard/QuickAddDefaultsSection.tsx';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { TabConfigFooter } from './TabConfigFooter.tsx';
@@ -53,10 +53,6 @@ function setIcon(tabs: TabWithConfig[], key: string, icon: string | null): TabWi
   return tabs.map((t) => (t.key === key ? { ...t, icon } : t));
 }
 
-function setName(tabs: TabWithConfig[], key: string, name: string): TabWithConfig[] {
-  return tabs.map((t) => (t.key === key ? { ...t, name: name === '' ? undefined : name } : t));
-}
-
 function toggleNameHidden(tabs: TabWithConfig[], key: string): TabWithConfig[] {
   return tabs.map((t) => (t.key === key ? { ...t, name: t.name === '' ? t.label : '' } : t));
 }
@@ -74,6 +70,11 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
   const [draft, setDraft] = useState<TabWithConfig[]>(tabsWithConfig);
   const [saving, setSaving] = useState(false);
   const [editingIconKey, setEditingIconKey] = useState<string | null>(null);
+  const activePickerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (editingIconKey) activePickerRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [editingIconKey]);
 
   const hasInvalidRow = draft.some(isNameInvalid);
 
@@ -166,17 +167,18 @@ export const TabConfigPopup: React.FC<TabConfigPopupProps> = ({
                 onToggleIconEditor={() =>
                   setEditingIconKey((prev) => (prev === tab.key ? null : tab.key))
                 }
-                onNameChange={(name) => setDraft((prev) => setName(prev, tab.key, name))}
                 onToggleHidden={() => setDraft((prev) => toggleNameHidden(prev, tab.key))}
               />
               {editingIconKey === tab.key && (
-                <IconPicker
-                  value={tab.icon}
-                  onChange={(icon) => {
-                    setDraft((prev) => setIcon(prev, tab.key, icon));
-                    setEditingIconKey(null);
-                  }}
-                />
+                <div ref={activePickerRef}>
+                  <IconPicker
+                    value={tab.icon}
+                    onChange={(icon) => {
+                      setDraft((prev) => setIcon(prev, tab.key, icon));
+                      setEditingIconKey(null);
+                    }}
+                  />
+                </div>
               )}
             </React.Fragment>
           ))}

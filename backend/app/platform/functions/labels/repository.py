@@ -96,7 +96,7 @@ async def insert_feature_label(pool, feature_instance_id: str, name: str, color:
 
 
 async def update_feature_label(
-    pool, label_id: str, name: Optional[str], color: Optional[str], user_id: str
+    pool, label_id: str, name: Optional[str], color: Optional[str], user_id: str, status: Optional[str] = None,
 ) -> Optional[dict]:
     async with pool.acquire() as conn:
         if name is not None:
@@ -113,6 +113,13 @@ async def update_feature_label(
                 UUID(user_id),
                 UUID(label_id),
             )
+        if status is not None:
+            await conn.execute(
+                "UPDATE labels SET status = $1, updated_by = $2 WHERE id = $3",
+                status,
+                UUID(user_id),
+                UUID(label_id),
+            )
         row = await conn.fetchrow(
             "SELECT id, name, color, position FROM labels WHERE id = $1", UUID(label_id)
         )
@@ -121,6 +128,25 @@ async def update_feature_label(
         if row
         else None
     )
+
+
+async def reorder_feature_labels(pool, feature_instance_id: str, ordered_ids: list[str], user_id: str) -> list[dict]:
+    async with pool.acquire() as conn:
+        for position, label_id in enumerate(ordered_ids):
+            await conn.execute(
+                "UPDATE labels SET position = $1, updated_by = $2 WHERE id = $3 AND feature_instance_id = $4",
+                position,
+                UUID(user_id),
+                UUID(label_id),
+                UUID(feature_instance_id),
+            )
+        rows = await conn.fetch(
+            "SELECT id, name, color, position FROM labels WHERE feature_instance_id = $1 AND status = 'active' ORDER BY position ASC",
+            UUID(feature_instance_id),
+        )
+    return [
+        {"id": str(r["id"]), "name": r["name"], "color": r["color"], "position": r["position"]} for r in rows
+    ]
 
 
 async def delete_feature_label(pool, label_id: str) -> None:

@@ -1,7 +1,3 @@
-import {
-  CalendarDayGrid, CalendarMonthGrid, CalendarWeekGrid,
-} from '@/app/platform/core/layout/themes/components/calendar/index.ts';
-import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 
@@ -11,7 +7,9 @@ import { useTranslation } from 'react-i18next';
 import CreateMealModal from './CreateMealModal.tsx';
 import { useMeals } from './hooks.ts';
 import { addDaysIso, todayIso } from './mealDateUtils.ts';
+import MealCalendarCard from './MealCalendarCard.tsx';
 import MealDetailModal from './MealDetailModal.tsx';
+import MealsWeekGrid from './MealsWeekGrid.tsx';
 import { Meal } from './types.ts';
 
 interface Props {
@@ -22,20 +20,13 @@ interface Props {
   projectId: string;
 }
 
-type ViewMode = 'month' | 'week' | 'day';
-
 const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, projectId }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const { meals, persons, recipes, error, createMeal, updateMeal, removeMeal, setParticipants, toggleRecipe } =
+  const { meals, persons, recipes, error, createMeal, updateMeal, archiveMeal, setParticipants, toggleRecipe } =
     useMeals(featureInstanceId, projectId);
 
-  const [view, setView] = useState<ViewMode>('month');
   const [selectedDate, setSelectedDate] = useState(todayIso());
-  const [monthCursor, setMonthCursor] = useState(() => {
-    const now = new Date();
-    return { year: now.getFullYear(), month: now.getMonth() };
-  });
   const [creating, setCreating] = useState(false);
   const [openMealId, setOpenMealId] = useState<string | null>(null);
 
@@ -49,7 +40,15 @@ const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, projectId }) =>
   useRegisterTabActions(tabActions);
 
   const openMeal = meals.find((m) => m.id === openMealId) || null;
-  const dayMeals = meals.filter((m) => m.start_at.slice(0, 10) === selectedDate);
+  const recipeNameById = useMemo(() => new Map(recipes.map((r) => [r.id, r.name])), [recipes]);
+
+  const renderMealCard = (meal: Meal) => (
+    <MealCalendarCard
+      item={meal}
+      recipeNames={meal.recipe_ids.map((id) => recipeNameById.get(id)).filter((n): n is string => !!n)}
+      onSelect={() => setOpenMealId(meal.id)}
+    />
+  );
 
   return (
     <div>
@@ -59,60 +58,14 @@ const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, projectId }) =>
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-        {(['month', 'week', 'day'] as ViewMode[]).map((mode) => (
-          <ThemedButton key={mode} variant={view === mode ? 'primary' : 'ghost'} onClick={() => setView(mode)}>
-            {t(`features.meals.view.${mode}`)}
-          </ThemedButton>
-        ))}
-      </div>
-
-      {view === 'month' && (
-        <CalendarMonthGrid<Meal>
-          year={monthCursor.year}
-          month={monthCursor.month}
-          items={meals}
-          selectedDate={selectedDate}
-          onSelectDate={(date) => {
-            setSelectedDate(date);
-            setView('day');
-          }}
-          onPrevMonth={() => setMonthCursor((c) => (c.month === 0 ? { year: c.year - 1, month: 11 } : { year: c.year, month: c.month - 1 }))}
-          onNextMonth={() => setMonthCursor((c) => (c.month === 11 ? { year: c.year + 1, month: 0 } : { year: c.year, month: c.month + 1 }))}
-        />
-      )}
-
-      {view === 'week' && (
-        <CalendarWeekGrid<Meal>
-          items={meals}
-          selectedDate={selectedDate}
-          onSelectDate={setSelectedDate}
-          onPrevWeek={() => setSelectedDate(addDaysIso(selectedDate, -7))}
-          onNextWeek={() => setSelectedDate(addDaysIso(selectedDate, 7))}
-          onSelectItem={(meal) => setOpenMealId(meal.id)}
-          onEditItem={canEdit ? (meal) => setOpenMealId(meal.id) : undefined}
-        />
-      )}
-
-      {view === 'day' && (
-        <>
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', alignItems: 'center' }}>
-            <ThemedButton variant="ghost" onClick={() => setSelectedDate(addDaysIso(selectedDate, -1))}>
-              {'<'}
-            </ThemedButton>
-            <span>{selectedDate}</span>
-            <ThemedButton variant="ghost" onClick={() => setSelectedDate(addDaysIso(selectedDate, 1))}>
-              {'>'}
-            </ThemedButton>
-          </div>
-          <CalendarDayGrid<Meal>
-            items={dayMeals}
-            selectedDate={selectedDate}
-            onSelectItem={(meal) => setOpenMealId(meal.id)}
-            onEditItem={canEdit ? (meal) => setOpenMealId(meal.id) : undefined}
-          />
-        </>
-      )}
+      <MealsWeekGrid
+        meals={meals}
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
+        onPrevWeek={() => setSelectedDate(addDaysIso(selectedDate, -7))}
+        onNextWeek={() => setSelectedDate(addDaysIso(selectedDate, 7))}
+        renderMeal={renderMealCard}
+      />
 
       {creating && (
         <CreateMealModal
@@ -140,7 +93,7 @@ const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, projectId }) =>
           onUpdate={(data) => updateMeal(openMeal.id, data).then(() => undefined)}
           onSetParticipants={(personIds) => setParticipants(openMeal.id, personIds)}
           onToggleRecipe={(recipeId) => toggleRecipe(openMeal.id, recipeId)}
-          onDelete={() => removeMeal(openMeal.id)}
+          onArchive={() => archiveMeal(openMeal.id)}
           onClose={() => setOpenMealId(null)}
         />
       )}

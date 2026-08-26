@@ -16,7 +16,7 @@ import { TabWithConfig } from './types.ts';
 type Theme = ReturnType<typeof useTheme>['theme'];
 
 function gridTemplateColumns(hasPinnedTabs: boolean): string {
-  return `auto 1fr 130px auto auto auto${hasPinnedTabs ? ' auto' : ''}`;
+  return `auto 1fr 56px auto auto auto${hasPinnedTabs ? ' auto' : ''}`;
 }
 
 export const MoveButtons: React.FC<{
@@ -120,7 +120,7 @@ export const TabConfigHeader: React.FC<TabConfigHeaderProps> = ({ theme, t, hasP
   >
     <span style={{ width: '32px' }} />
     <span>{t('tabConfig.tab')}</span>
-    <span style={{ width: '130px' }}>{t('tabConfig.name')}</span>
+    <span style={{ textAlign: 'center', width: '56px' }}>{t('tabConfig.name')}</span>
     <span style={{ textAlign: 'center', width: '72px' }}>
       {t('tabConfig.visible')}
     </span>
@@ -147,7 +147,6 @@ interface TabConfigRowProps {
   onSetDefault: () => void;
   onUnpin: () => void;
   onToggleIconEditor: () => void;
-  onNameChange: (name: string) => void;
   onToggleHidden: () => void;
 }
 
@@ -166,7 +165,6 @@ export const TabConfigRow: React.FC<TabConfigRowProps> = ({
   onSetDefault,
   onUnpin,
   onToggleIconEditor,
-  onNameChange,
   onToggleHidden,
 }) => {
   const rowStyle: React.CSSProperties = {
@@ -183,7 +181,7 @@ export const TabConfigRow: React.FC<TabConfigRowProps> = ({
     <div style={rowStyle}>
       <IconButton tab={tab} theme={theme} t={t} isEditing={isEditingIcon} onToggle={onToggleIconEditor} />
       <ReadOnlyName tab={tab} theme={theme} />
-      <NameInput tab={tab} theme={theme} t={t} onNameChange={onNameChange} onToggleHidden={onToggleHidden} />
+      <NameInput tab={tab} theme={theme} t={t} onToggleHidden={onToggleHidden} />
       <VisibilityCheckbox tab={tab} theme={theme} t={t} onToggle={onToggleVisible} />
       <DefaultRadio tab={tab} theme={theme} t={t} onSetDefault={onSetDefault} />
       <MoveButtons index={index} total={total} theme={theme} t={t} onMoveUp={onMoveUp} onMoveDown={onMoveDown} />

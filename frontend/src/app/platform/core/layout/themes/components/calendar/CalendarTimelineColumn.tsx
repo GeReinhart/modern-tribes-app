@@ -23,6 +23,10 @@ interface Props<T extends CalendarItem> {
   onSelectItem: (item: T) => void;
   onEditItem?: (item: T) => void;
   renderItem?: CalendarItemRenderer<T>;
+  // Opt-in: lets an item's rendered content grow past its time-slot height
+  // instead of being clipped. Off by default (events' dense calendar relies
+  // on clipping); a feature with few, content-heavy items per slot can opt in.
+  allowOverflow?: boolean;
 }
 
 // Renders one day's worth of the hourly grid: alternating hour bands, hour
@@ -30,7 +34,7 @@ interface Props<T extends CalendarItem> {
 // single-day timeline (CalendarDayGrid) and each column of the week grid
 // (CalendarWeekGrid) so the two views stay pixel-identical.
 function CalendarTimelineColumn<T extends CalendarItem>({
-  date, items, startH, endH, now, onSelectItem, onEditItem, renderItem,
+  date, items, startH, endH, now, onSelectItem, onEditItem, renderItem, allowOverflow = false,
 }: Props<T>) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -85,9 +89,9 @@ function CalendarTimelineColumn<T extends CalendarItem>({
           <div
             key={item.id}
             style={{
-              position: 'absolute', top, height,
+              position: 'absolute', top, height: allowOverflow ? undefined : height, minHeight: height,
               left: `${col * colPct}%`, width: `calc(${colPct}% - 3px)`,
-              boxSizing: 'border-box', overflow: 'hidden', zIndex: 1,
+              boxSizing: 'border-box', overflow: allowOverflow ? 'visible' : 'hidden', zIndex: 1,
             }}
           >
             {renderItem

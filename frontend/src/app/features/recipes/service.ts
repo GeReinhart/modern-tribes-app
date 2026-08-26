@@ -55,12 +55,18 @@ class RecipesService {
     });
   }
 
-  async updateLabel(labelId: string, data: { name?: string; color?: string }): Promise<RecipeLabel> {
+  async updateLabel(labelId: string, data: { name?: string; color?: string; status?: string }): Promise<RecipeLabel> {
     return apiService.patch<RecipeLabel>(`/features/tasks/recipe-labels/${labelId}`, data);
   }
 
   async deleteLabel(labelId: string): Promise<void> {
     return apiService.delete<void>(`/features/tasks/recipe-labels/${labelId}`);
+  }
+
+  async reorderLabels(featureInstanceId: string, orderedIds: string[]): Promise<RecipeLabel[]> {
+    return apiService.put<RecipeLabel[]>('/features/tasks/recipe-labels/reorder', {
+      feature_instance_id: featureInstanceId, ordered_ids: orderedIds,
+    });
   }
 
   async toggleLabel(recipeId: string, labelId: string): Promise<string[]> {

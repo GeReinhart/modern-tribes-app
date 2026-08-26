@@ -324,7 +324,7 @@ CREATE TABLE IF NOT EXISTS groceries_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
     description TEXT NOT NULL DEFAULT '',
-    unit VARCHAR(20) NOT NULL CHECK (unit IN ('gram', 'kg', 'piece')),
+    unit VARCHAR(20) NOT NULL CHECK (unit IN ('gram', 'kg', 'piece', 'liter')),
     icon VARCHAR(50),
     is_divisible BOOLEAN NOT NULL DEFAULT TRUE,
     status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
@@ -460,10 +460,11 @@ CREATE OR REPLACE TRIGGER update_recipe_ingredients_updated_at BEFORE UPDATE ON 
 CREATE TABLE IF NOT EXISTS meals (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     feature_instance_id UUID REFERENCES projects_features(id) ON DELETE CASCADE NOT NULL,
-    title VARCHAR(500) NOT NULL,
+    title VARCHAR(500),
     start_at TIMESTAMP WITH TIME ZONE NOT NULL,
     end_at TIMESTAMP WITH TIME ZONE NOT NULL,
     headcount INTEGER NOT NULL CHECK (headcount >= 0),
+    document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -498,6 +499,25 @@ CREATE INDEX IF NOT EXISTS idx_meal_recipes_recipe ON meal_recipes (recipe_id);
 
 CREATE OR REPLACE TRIGGER update_meals_updated_at BEFORE UPDATE ON meals FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE OR REPLACE TRIGGER update_meal_participants_updated_at BEFORE UPDATE ON meal_participants FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Tracks which meals already had their ingredients added to a groceries list, and for what
+-- headcount at the time (migration 009) -- lets the suggestions view grey out a meal that was
+-- already incorporated instead of suggesting it again.
+CREATE TABLE IF NOT EXISTS groceries_list_meals (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    groceries_list_id UUID REFERENCES groceries_lists(id) ON DELETE CASCADE NOT NULL,
+    meal_id UUID REFERENCES meals(id) ON DELETE CASCADE NOT NULL,
+    headcount INTEGER NOT NULL CHECK (headcount >= 0),
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    UNIQUE (groceries_list_id, meal_id)
+);
+CREATE INDEX IF NOT EXISTS idx_groceries_list_meals_list ON groceries_list_meals (groceries_list_id);
+CREATE INDEX IF NOT EXISTS idx_groceries_list_meals_meal ON groceries_list_meals (meal_id);
+CREATE OR REPLACE TRIGGER update_groceries_list_meals_updated_at BEFORE UPDATE ON groceries_list_meals FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Todo items table (final structure from migrations 018+020+021+004)
 CREATE TABLE IF NOT EXISTS todo_items (

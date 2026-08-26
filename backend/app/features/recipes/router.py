@@ -14,8 +14,11 @@ from app.features.recipes.label_service import (
     create_feature_label,
     update_feature_label,
     delete_feature_label,
+    reorder_feature_labels,
 )
-from app.features.tasks.models import FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate
+from app.features.tasks.models import (
+    FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate, FeatureLabelsReorderRequest,
+)
 from app.features.recipes.models import (
     RecipeCreate, RecipeUpdate, RecipeResponse, RecipeDetailResponse, RecipeIngredientDetail,
     RecipeIngredientCreate, RecipeIngredientUpdate, RecipeIngredientResponse,
@@ -283,6 +286,13 @@ async def update_label(label_id: str, data: FeatureLabelUpdate, current_user: di
 async def delete_label(label_id: str, current_user: dict = Depends(get_current_user)):
     """Delete a recipe label."""
     await delete_feature_label(get_database(), label_id, current_user)
+
+
+@label_router.put("/reorder", response_model=list[FeatureLabel])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def reorder_labels(data: FeatureLabelsReorderRequest, current_user: dict = Depends(get_current_user)):
+    """Reorder the labels of a recipes feature instance."""
+    return await reorder_feature_labels(get_database(), data, current_user)
 
 
 @router.post("/{recipe_id}/labels/{label_id}", response_model=list[str])

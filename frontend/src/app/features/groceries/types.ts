@@ -153,5 +153,14 @@ export interface MealSuggestion {
   recipe_id: string;
   recipe_name: string;
   headcount: number;
+  added: boolean;
   ingredients: MealSuggestionIngredient[];
+}
+
+export interface AddedMeal {
+  meal_id: string;
+  meal_title: string;
+  meal_start_at: string;
+  headcount: number;
+  recipe_names: string[];
 }

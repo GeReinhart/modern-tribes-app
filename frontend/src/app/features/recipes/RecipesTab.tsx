@@ -22,16 +22,28 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
   const { t } = useTranslation();
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const { recipes, labels, error, createRecipe, updateLabel, deleteLabel } = useRecipes(featureInstanceId);
+  const { recipes, labels, error, createRecipe, updateLabel, archiveLabel, reorderLabels } =
+    useRecipes(featureInstanceId);
   const [creating, setCreating] = useState(false);
   const [filterLabelId, setFilterLabelId] = useState<string | null>(null);
+  const [configuringLabels, setConfiguringLabels] = useState(false);
 
   const tabActions = useMemo(
     () =>
       canEdit
-        ? [{ icon: 'plus' as const, label: t('features.recipes.newRecipe'), onClick: () => setCreating(true) }]
+        ? [
+            { icon: 'plus' as const, label: t('features.recipes.newRecipe'), onClick: () => setCreating(true) },
+            {
+              icon: 'settings' as const,
+              badgeIcon: 'tag' as const,
+              label: configuringLabels
+                ? t('features.recipes.doneConfiguringLabels')
+                : t('features.recipes.configureLabels'),
+              onClick: () => setConfiguringLabels((v) => !v),
+            },
+          ]
         : [],
-    [canEdit, t],
+    [canEdit, configuringLabels, t],
   );
   useRegisterTabActions(tabActions);
 
@@ -62,9 +74,10 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
             activeLabelIds={activeLabelIds}
             filterLabelId={filterLabelId}
             onFilter={setFilterLabelId}
-            canEditLabels={canEdit}
+            canEditLabels={canEdit && configuringLabels}
             onUpdate={updateLabel}
-            onDelete={deleteLabel}
+            onDelete={archiveLabel}
+            onReorder={reorderLabels}
           />
         </div>
       )}

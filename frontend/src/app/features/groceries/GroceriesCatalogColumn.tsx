@@ -17,11 +17,11 @@ interface Props {
   featureInstanceId: string;
   items: GroceriesItem[];
   sections: GroceriesSection[];
-  suggestions: GroceriesSuggestion[];
-  excludeItemIds: Set<string>;
+  suggestions?: GroceriesSuggestion[];
+  excludeItemIds?: Set<string>;
   canEdit: boolean;
   configuring: boolean;
-  onAddItem: (itemId: string) => Promise<void>;
+  onAddItem?: (itemId: string) => Promise<void>;
   onCreateSection: (name: string, icon?: string) => Promise<GroceriesSection | null>;
   onUpdateSection: (sectionId: string, data: Omit<GroceriesSectionUpdate, 'feature_instance_id'>) => Promise<boolean>;
   onReorderSections: (orderedIds: string[]) => Promise<boolean>;
@@ -50,11 +50,11 @@ const GroceriesCatalogColumn: React.FC<Props> = ({
   const normalizedFilter = filter.trim().toLowerCase();
   const matchesFilter = (name: string) => name.toLowerCase().includes(normalizedFilter);
 
-  const availableItems = items.filter((i) => !excludeItemIds.has(i.id) && matchesFilter(i.name));
+  const availableItems = items.filter((i) => !excludeItemIds?.has(i.id) && matchesFilter(i.name));
   const groups = groupBySections(
     availableItems, sections, t('features.groceries.uncategorized'), normalizedFilter === '',
   );
-  const availableSuggestions = suggestions.filter((s) => !excludeItemIds.has(s.groceries_item_id));
+  const availableSuggestions = (suggestions ?? []).filter((s) => !excludeItemIds?.has(s.groceries_item_id));
   const suggestionItems = availableSuggestions
     .map((s) => items.find((i) => i.id === s.groceries_item_id))
     .filter((i): i is GroceriesItem => !!i)
@@ -64,10 +64,12 @@ const GroceriesCatalogColumn: React.FC<Props> = ({
   const isSectionEmpty = (sectionId: string) => !items.some((i) => i.section_ids.includes(sectionId));
   const sectionIndex = (sectionId: string) => sections.findIndex((s) => s.id === sectionId);
 
-  const handleSelectItem = async (itemId: string) => {
-    await onAddItem(itemId);
-    setFilter('');
-  };
+  const handleSelectItem = onAddItem
+    ? async (itemId: string) => {
+      await onAddItem(itemId);
+      setFilter('');
+    }
+    : undefined;
 
   const moveSection = (sectionId: string, direction: -1 | 1) => {
     const index = sections.findIndex((s) => s.id === sectionId);

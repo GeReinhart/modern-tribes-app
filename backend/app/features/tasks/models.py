@@ -24,6 +24,12 @@ class FeatureLabelCreate(BaseModel):
 class FeatureLabelUpdate(BaseModel):
     name: Optional[str] = None
     color: Optional[str] = None
+    status: Optional[str] = None
+
+
+class FeatureLabelsReorderRequest(BaseModel):
+    feature_instance_id: str
+    ordered_ids: list[str]
 
 
 class TaskReminderCreate(BaseModel):

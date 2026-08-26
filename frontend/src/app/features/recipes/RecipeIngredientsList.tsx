@@ -25,19 +25,19 @@ const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, o
           {t('features.recipes.noIngredients')}
         </div>
       )}
-      {ingredients.map((ingredient) => (
-        <div
-          key={ingredient.id}
-          style={{
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: '6px 0', borderBottom: `1px solid ${theme.colors.border}`,
-          }}
-        >
-          <span>
-            {ingredient.name}
-            {ingredient.unit ? ` — ${ingredient.quantity} ${ingredient.unit}` : ` — ${ingredient.quantity}`}
-          </span>
-          {canEdit && (
+      {canEdit ? (
+        ingredients.map((ingredient) => (
+          <div
+            key={ingredient.id}
+            style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              padding: '6px 0', borderBottom: `1px solid ${theme.colors.border}`,
+            }}
+          >
+            <span>
+              {ingredient.name}
+              {ingredient.unit ? ` — ${ingredient.quantity} ${ingredient.unit}` : ` — ${ingredient.quantity}`}
+            </span>
             <button
               type="button"
               onClick={() => onRemove(ingredient.id)}
@@ -45,9 +45,18 @@ const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, o
             >
               <ThemedSvgIcon name="x" color="currentColor" size={16} />
             </button>
-          )}
-        </div>
-      ))}
+          </div>
+        ))
+      ) : (
+        <ul style={{ margin: 0, paddingLeft: '20px' }}>
+          {ingredients.map((ingredient) => (
+            <li key={ingredient.id} style={{ padding: '2px 0' }}>
+              {ingredient.name}
+              {ingredient.unit ? ` — ${ingredient.quantity} ${ingredient.unit}` : ` — ${ingredient.quantity}`}
+            </li>
+          ))}
+        </ul>
+      )}
       {canEdit && (
         <button
           type="button"

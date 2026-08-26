@@ -3,7 +3,6 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React from 'react';
 
-import { isNameInvalid } from './TabConfigRow.tsx';
 import { TabWithConfig } from './types.ts';
 
 type Theme = ReturnType<typeof useTheme>['theme'];
@@ -61,35 +60,13 @@ export const NameInput: React.FC<{
   tab: TabWithConfig;
   theme: Theme;
   t: (k: string) => string;
-  onNameChange: (name: string) => void;
   onToggleHidden: () => void;
-}> = ({ tab, theme, t, onNameChange, onToggleHidden }) => {
-  const invalid = isNameInvalid(tab);
+}> = ({ tab, theme, t, onToggleHidden }) => {
   const hidden = tab.name === '';
   const canHide = Boolean(tab.icon);
   const toggleDisabled = !hidden && !canHide;
   return (
-    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '130px' }}>
-      <input
-        type="text"
-        value={hidden ? '' : tab.name ?? ''}
-        disabled={hidden}
-        onChange={(e) => onNameChange(e.target.value)}
-        aria-label={t('tabConfig.name')}
-        title={invalid ? t('tabConfig.nameOrIconRequired') : undefined}
-        style={{
-          width: '100%',
-          minWidth: 0,
-          padding: '4px 26px 4px 8px',
-          border: `1px solid ${invalid ? theme.colors.danger : theme.colors.border}`,
-          borderRadius: '6px',
-          fontSize: 'var(--font-sm)',
-          color: theme.colors.text,
-          backgroundColor: hidden ? `${theme.colors.border}30` : 'transparent',
-          outline: 'none',
-          opacity: hidden ? 0.6 : 1,
-        }}
-      />
+    <div style={{ display: 'flex', justifyContent: 'center', width: '56px' }}>
       <input
         type="checkbox"
         checked={!hidden}
@@ -104,10 +81,8 @@ export const NameInput: React.FC<{
         }
         aria-label={hidden ? t('tabConfig.showName') : t('tabConfig.hideName')}
         style={{
-          position: 'absolute',
-          right: '6px',
-          width: '14px',
-          height: '14px',
+          width: '16px',
+          height: '16px',
           cursor: toggleDisabled ? 'not-allowed' : 'pointer',
           opacity: toggleDisabled ? 0.4 : 1,
           accentColor: theme.colors.primary,

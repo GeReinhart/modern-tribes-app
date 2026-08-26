@@ -11,7 +11,7 @@ from app.features.meals import repository as meals_repository
 from app.features.meals import service as meals_service
 from app.features.meals.models import (
     MealCreate, MealUpdate, MealResponse, MealParticipantInfo,
-    MealGrocerySuggestion, MealGrocerySuggestionIngredient,
+    MealGrocerySuggestion, MealGrocerySuggestionIngredient, MealAddedToGroceriesList,
 )
 from app.features.tasks.models import PersonOption
 
@@ -26,6 +26,8 @@ def _row_to_meal(row: dict) -> MealResponse:
         start_at=row["start_at"],
         end_at=row["end_at"],
         headcount=row["headcount"],
+        document_id=str(row["document_id"]) if row.get("document_id") else None,
+        document_content_html=row.get("document_content_html"),
         status=row["status"],
         participant_ids=list(row.get("participant_ids") or []),
         participants=[MealParticipantInfo(**p) for p in (row.get("participants") or [])],
@@ -54,7 +56,10 @@ async def create_meal(data: MealCreate, current_user: dict = Depends(get_current
     row = await meals_repository.insert_meal(
         pool, data.feature_instance_id, data.title, data.start_at, data.end_at, data.headcount, user_id,
     )
-    full = await _require_meal(pool, str(row["id"]))
+    meal_id = str(row["id"])
+    if data.document_content_html:
+        await meals_repository.upsert_document(pool, meal_id, data.document_content_html, user_id)
+    full = await _require_meal(pool, meal_id)
     return _row_to_meal(full)
 
 
@@ -125,6 +130,9 @@ async def update_meal(meal_id: str, data: MealUpdate, current_user: dict = Depen
     if data.status is not None:
         basic["status"] = data.status
     await meals_repository.update_meal_basic(pool, meal_id, basic, user_id)
+
+    if data.document_content_html is not None:
+        await meals_repository.upsert_document(pool, meal_id, data.document_content_html, user_id)
 
     full = await _require_meal(pool, meal_id)
     return _row_to_meal(full)
@@ -203,7 +211,62 @@ async def get_grocery_suggestions(groceries_list_id: str, current_user: dict = D
             recipe_id=g["recipe_id"],
             recipe_name=g["recipe_name"],
             headcount=g["headcount"],
+            added=g["added"],
             ingredients=[MealGrocerySuggestionIngredient(**i) for i in g["ingredients"]],
         )
         for g in groups
+    ]
+
+
+@router.post("/grocery-suggestions/{groceries_list_id}/add/{meal_id}", status_code=status.HTTP_204_NO_CONTENT)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def add_meal_to_groceries_list(
+    groceries_list_id: str, meal_id: str, current_user: dict = Depends(get_current_user)
+):
+    """Add every ingredient of every recipe linked to this meal to the groceries list in
+    one action, scaled to the meal's headcount, then mark the meal as added so it stops
+    being suggested on this list.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position >= member, checked against the groceries list's project
+    """
+    pool = get_database()
+    async with pool.acquire() as conn:
+        list_row = await conn.fetchrow(
+            "SELECT feature_instance_id FROM groceries_lists WHERE id = $1 AND status = 'active'",
+            UUID(groceries_list_id),
+        )
+    if not list_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grocery list not found.")
+    await access.require_feature_access(pool, str(list_row["feature_instance_id"]), current_user, "member")
+    items = await meals_service.add_meal_to_groceries_list(pool, groceries_list_id, meal_id, str(current_user["id"]))
+    if items is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="This meal cannot be added to this list.")
+
+
+@router.get("/added-to-groceries-list/{groceries_list_id}", response_model=list[MealAddedToGroceriesList])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def list_meals_added_to_groceries_list(groceries_list_id: str, current_user: dict = Depends(get_current_user)):
+    """List the meals already added to this groceries list, with the headcount they were
+    added for — so shopping mode can show which meals this list already accounts for.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position >= guest, checked against the groceries list's project
+    """
+    pool = get_database()
+    async with pool.acquire() as conn:
+        list_row = await conn.fetchrow(
+            "SELECT feature_instance_id FROM groceries_lists WHERE id = $1 AND status = 'active'",
+            UUID(groceries_list_id),
+        )
+    if not list_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grocery list not found.")
+    await access.require_feature_access(pool, str(list_row["feature_instance_id"]), current_user, "guest")
+    rows = await meals_repository.fetch_added_meals_detail(pool, groceries_list_id)
+    return [
+        MealAddedToGroceriesList(
+            meal_id=str(r["meal_id"]), meal_title=r["meal_title"], meal_start_at=r["meal_start_at"],
+            headcount=r["headcount"], recipe_names=list(r.get("recipe_names") or []),
+        )
+        for r in rows
     ]

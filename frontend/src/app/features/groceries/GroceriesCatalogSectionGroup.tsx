@@ -12,7 +12,7 @@ import { GroceriesItem } from './types.ts';
 interface Props {
   group: SectionGroup<GroceriesItem>;
   canEdit: boolean;
-  onAddItem: (itemId: string) => Promise<void>;
+  onAddItem?: (itemId: string) => Promise<void>;
   onAddNewItem?: () => void;
   onRenameSection?: () => void;
   onDeleteSection?: () => void;
@@ -111,7 +111,7 @@ const GroceriesCatalogSectionGroup: React.FC<Props> = ({
           {group.items.map((item) => (
             <div
               key={item.id}
-              onClick={canEdit ? () => onAddItem(item.id) : undefined}
+              onClick={canEdit && onAddItem ? () => onAddItem(item.id) : undefined}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -120,7 +120,7 @@ const GroceriesCatalogSectionGroup: React.FC<Props> = ({
                 borderRadius: '6px',
                 border: `1px solid ${theme.colors.border}`,
                 backgroundColor: theme.colors.surface,
-                cursor: canEdit ? 'pointer' : 'default',
+                cursor: canEdit && onAddItem ? 'pointer' : 'default',
                 fontSize: 'var(--font-sm)',
               }}
             >

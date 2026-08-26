@@ -65,6 +65,13 @@ const RecipeDetailBody: React.FC<Props> = ({
         </div>
       )}
 
+      <RecipeIngredientsList
+        ingredients={recipe.ingredients}
+        canEdit={canEdit}
+        onAdd={() => setAddingIngredient(true)}
+        onRemove={onRemoveIngredient}
+      />
+
       <div>
         <div style={{ fontWeight: 600, marginBottom: '8px' }}>{t('features.recipes.description')}</div>
         {canEdit ? (
@@ -76,13 +83,6 @@ const RecipeDetailBody: React.FC<Props> = ({
           <div dangerouslySetInnerHTML={{ __html: recipe.document_content_html || '' }} />
         )}
       </div>
-
-      <RecipeIngredientsList
-        ingredients={recipe.ingredients}
-        canEdit={canEdit}
-        onAdd={() => setAddingIngredient(true)}
-        onRemove={onRemoveIngredient}
-      />
 
       <ThemedDivider variant="secondary" />
       {labelsSection}

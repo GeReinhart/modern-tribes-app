@@ -11,6 +11,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router-dom';
 
+import AddedMealsBanner from './AddedMealsBanner.tsx';
 import GroceriesShoppingSectionGroup from './GroceriesShoppingSectionGroup.tsx';
 import { useGroceriesCatalog, useGroceriesListDetail } from './hooks.ts';
 import { groupBySections } from './sectionGrouping.ts';
@@ -24,7 +25,7 @@ const GroceriesListShoppingPageContent: React.FC = () => {
   const { tribe } = useTribeWithPositions(tribeId || null);
   const { project } = useProject(projectId || null);
   const { canEdit } = useProjectPermissions(tribeId || null, projectId || null);
-  const { detail, error, togglePickedUp } = useGroceriesListDetail(listId || null);
+  const { detail, addedMeals, error, togglePickedUp } = useGroceriesListDetail(listId || null);
   const { sections } = useGroceriesCatalog(detail?.feature_instance_id ?? null);
 
   const editPath = `/app/tribes/${tribeId}/projects/${projectId}/groceries/${listId}/edit`;
@@ -73,6 +74,8 @@ const GroceriesListShoppingPageContent: React.FC = () => {
       <div style={{ fontSize: 'var(--font-xs)', color: theme.colors.secondary, marginBottom: '12px' }}>
         {t('features.groceries.remainingCount', { count: remaining, total: detail.items.length })}
       </div>
+
+      <AddedMealsBanner meals={addedMeals} />
 
       {detail.items.length === 0 && (
         <div style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary }}>

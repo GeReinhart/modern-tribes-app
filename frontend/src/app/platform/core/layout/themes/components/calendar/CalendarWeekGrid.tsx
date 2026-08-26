@@ -20,6 +20,7 @@ interface Props<T extends CalendarItem> {
   onSelectItem: (item: T) => void;
   onEditItem?: (item: T) => void;
   renderItem?: CalendarItemRenderer<T>;
+  allowOverflow?: boolean;
 }
 
 function timedItemsForDate<T extends CalendarItem>(items: T[], date: string): T[] {
@@ -32,7 +33,7 @@ function timedItemsForDate<T extends CalendarItem>(items: T[], date: string): T[
 // The week view: a 7-day header, an all-day banner, and an hourly grid with
 // one CalendarTimelineColumn per day. Generic over any feature's CalendarItem.
 function CalendarWeekGrid<T extends CalendarItem>({
-  items, selectedDate, onSelectDate, onPrevWeek, onNextWeek, onSelectItem, onEditItem, renderItem,
+  items, selectedDate, onSelectDate, onPrevWeek, onNextWeek, onSelectItem, onEditItem, renderItem, allowOverflow,
 }: Props<T>) {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -89,6 +90,7 @@ function CalendarWeekGrid<T extends CalendarItem>({
               onSelectItem={onSelectItem}
               onEditItem={onEditItem}
               renderItem={renderItem}
+              allowOverflow={allowOverflow}
             />
           ))}
         </div>

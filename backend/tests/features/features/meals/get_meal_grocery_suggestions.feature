@@ -81,6 +81,7 @@ Feature: Get grocery suggestions from planned meals
           "recipe_id": "6001",
           "recipe_name": "Lasagna",
           "headcount": 8,
+          "added": false,
           "ingredients": [
             {"groceries_item_id": "3001", "name": "Ground beef", "unit": "kg", "quantity": 1.6},
             {"groceries_item_id": null, "name": "Lasagna sheets", "unit": "packs", "quantity": 2.0}
@@ -118,6 +119,7 @@ Feature: Get grocery suggestions from planned meals
           "recipe_id": "6002",
           "recipe_name": "Omelette",
           "headcount": 6,
+          "added": false,
           "ingredients": [
             {"groceries_item_id": "3002", "name": "Eggs", "unit": "piece", "quantity": 5.0}
           ]

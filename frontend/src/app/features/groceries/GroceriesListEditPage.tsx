@@ -24,8 +24,10 @@ const GroceriesListEditPageContent: React.FC = () => {
   const { tribe } = useTribeWithPositions(tribeId || null);
   const { project } = useProject(projectId || null);
   const { canEdit } = useProjectPermissions(tribeId || null, projectId || null);
-  const { detail, mealSuggestions, error: detailError, addItem, updateQuantity, updateComment, renameList, removeItem } =
-    useGroceriesListDetail(listId || null);
+  const {
+    detail, mealSuggestions, error: detailError, addItem, addMealSuggestion, updateQuantity, updateComment,
+    renameList, removeItem,
+  } = useGroceriesListDetail(listId || null);
   const catalog = useGroceriesCatalog(detail?.feature_instance_id ?? null);
   const [focusItemId, setFocusItemId] = useState<string | null>(null);
   const [configuringSections, setConfiguringSections] = useState(false);
@@ -114,7 +116,7 @@ const GroceriesListEditPageContent: React.FC = () => {
         />
       )}
       {(detailError || catalog.error) && <div>{detailError || catalog.error}</div>}
-      <MealSuggestionsPanel suggestions={mealSuggestions} canEdit={canEdit} onAdd={addItem} />
+      <MealSuggestionsPanel suggestions={mealSuggestions} canEdit={canEdit} onAddAll={addMealSuggestion} />
       <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 320px', minWidth: '280px' }}>
           <GroceriesCatalogColumn

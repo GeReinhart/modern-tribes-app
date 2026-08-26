@@ -16,10 +16,12 @@ export interface MealParticipantInfo {
 export interface Meal {
   id: string;
   feature_instance_id: string;
-  title: string;
+  title: string | null;
   start_at: string;
   end_at: string;
   headcount: number;
+  document_id: string | null;
+  document_content_html: string | null;
   status: string;
   participant_ids: string[];
   participants: MealParticipantInfo[];
@@ -28,10 +30,11 @@ export interface Meal {
 
 export interface MealCreate {
   feature_instance_id: string;
-  title: string;
+  title?: string;
   start_at: string;
   end_at: string;
   headcount: number;
+  document_content_html?: string;
 }
 
 export interface MealUpdate {
@@ -40,6 +43,7 @@ export interface MealUpdate {
   end_at?: string;
   headcount?: number;
   status?: 'active' | 'archived';
+  document_content_html?: string;
 }
 
 export interface GrocerySuggestionIngredient {
@@ -51,7 +55,7 @@ export interface GrocerySuggestionIngredient {
 
 export interface GrocerySuggestion {
   meal_id: string;
-  meal_title: string;
+  meal_title: string | null;
   meal_start_at: string;
   recipe_id: string;
   recipe_name: string;

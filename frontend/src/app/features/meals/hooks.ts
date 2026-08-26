@@ -66,6 +66,15 @@ export function useMeals(featureInstanceId: string | null, projectId: string | n
     }
   }, []);
 
+  const archiveMeal = useCallback(async (mealId: string): Promise<void> => {
+    try {
+      await mealsService.update(mealId, { status: 'archived' });
+      setMeals((prev) => prev.filter((m) => m.id !== mealId));
+    } catch (e: unknown) {
+      setError(errorMessage(e));
+    }
+  }, []);
+
   const setParticipants = useCallback(async (mealId: string, personIds: string[]): Promise<void> => {
     try {
       await mealsService.setParticipants(mealId, personIds);
@@ -86,7 +95,7 @@ export function useMeals(featureInstanceId: string | null, projectId: string | n
 
   return {
     meals, persons, recipes, error,
-    createMeal, updateMeal, removeMeal, setParticipants, toggleRecipe,
+    createMeal, updateMeal, removeMeal, archiveMeal, setParticipants, toggleRecipe,
     refetch: fetchMeals,
   };
 }

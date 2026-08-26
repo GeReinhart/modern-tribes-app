@@ -66,6 +66,31 @@ Feature: Create a meal
       | title         | headcount | status |
       | Family dinner | 8         | active |
 
+  Scenario: POST /meals without a title — the meal is created with no title
+    Given I am authenticated as an administrator: user.id 0001
+    And the meals table contains:
+      | id | feature_instance_id | title | start_at | end_at | headcount | status |
+    When I POST /api/features/tasks/meals/ with body:
+      """
+      {
+        "feature_instance_id": "0041",
+        "start_at": "2026-09-05T19:00:00Z",
+        "end_at": "2026-09-05T20:30:00Z",
+        "headcount": 6
+      }
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "title": null,
+        "headcount": 6
+      }
+      """
+    And the meals table contains:
+      | title | headcount | status |
+      |       | 6         | active |
+
   @error_case
   Scenario: POST /meals with a missing headcount — 422 error and the database is not modified
     Given I am authenticated as an administrator: user.id 0001

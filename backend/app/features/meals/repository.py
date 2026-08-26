@@ -2,9 +2,14 @@ from datetime import date, datetime, timezone
 from typing import Optional
 from uuid import UUID
 
+from app.platform.core.utils.document_helpers import strip_html, extract_content_summary
+
+_DOCUMENT_SQL = "d.content_html AS document_content_html"
+
 
 async def insert_meal(
-    pool, feature_instance_id: str, title: str, start_at: datetime, end_at: datetime, headcount: int, user_id: str,
+    pool, feature_instance_id: str, title: Optional[str], start_at: datetime, end_at: datetime, headcount: int,
+    user_id: str,
 ) -> dict:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
@@ -17,7 +22,12 @@ async def insert_meal(
 
 async def fetch_meal(pool, meal_id: str) -> Optional[dict]:
     async with pool.acquire() as conn:
-        row = await conn.fetchrow("SELECT * FROM meals WHERE id = $1", UUID(meal_id))
+        row = await conn.fetchrow(
+            f"""SELECT m.*, {_DOCUMENT_SQL} FROM meals m
+               LEFT JOIN documents d ON d.id = m.document_id
+               WHERE m.id = $1""",
+            UUID(meal_id),
+        )
         if not row:
             return None
         participants_map = await _fetch_participants_map(conn, [row["id"]])
@@ -28,13 +38,38 @@ async def fetch_meal(pool, meal_id: str) -> Optional[dict]:
 async def fetch_meals_for_instance(pool, feature_instance_id: str) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            """SELECT * FROM meals WHERE feature_instance_id = $1 AND status = 'active' ORDER BY start_at ASC""",
+            f"""SELECT m.*, {_DOCUMENT_SQL} FROM meals m
+               LEFT JOIN documents d ON d.id = m.document_id
+               WHERE m.feature_instance_id = $1 AND m.status = 'active' ORDER BY m.start_at ASC""",
             UUID(feature_instance_id),
         )
         meal_ids = [r["id"] for r in rows]
         participants_map = await _fetch_participants_map(conn, meal_ids)
         recipe_ids_map = await _fetch_recipe_ids_map(conn, meal_ids)
     return [_enrich_row(dict(r), participants_map, recipe_ids_map) for r in rows]
+
+
+async def upsert_document(pool, meal_id: str, content_html: str, user_id: str) -> None:
+    uid = UUID(user_id)
+    mid = UUID(meal_id)
+    content_text = strip_html(content_html)
+    content_summary = extract_content_summary(content_html)
+    now = datetime.now(timezone.utc)
+    async with pool.acquire() as conn:
+        doc_id = await conn.fetchval("SELECT document_id FROM meals WHERE id = $1", mid)
+        if doc_id is None:
+            new_doc_id = await conn.fetchval(
+                """INSERT INTO documents (content_html, content_text, content_summary, created_by, updated_by)
+                   VALUES ($1, $2, $3, $4, $4) RETURNING id""",
+                content_html, content_text, content_summary, uid,
+            )
+            await conn.execute("UPDATE meals SET document_id = $1 WHERE id = $2", new_doc_id, mid)
+        else:
+            await conn.execute(
+                """UPDATE documents SET content_html=$1, content_text=$2, content_summary=$3,
+                   updated_at=$4, updated_by=$5 WHERE id=$6""",
+                content_html, content_text, content_summary, now, uid, doc_id,
+            )
 
 
 async def _fetch_participants_map(conn, meal_ids: list) -> dict:
@@ -161,3 +196,103 @@ async def fetch_grocery_suggestion_rows(pool, project_id: str, after_date: date)
             UUID(project_id), after_date,
         )
     return [dict(r) for r in rows]
+
+
+async def fetch_added_meal_ids(pool, groceries_list_id: str) -> set:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT meal_id FROM groceries_list_meals WHERE groceries_list_id = $1 AND status = 'active'",
+            UUID(groceries_list_id),
+        )
+    return {str(r["meal_id"]) for r in rows}
+
+
+async def fetch_meal_ingredient_rows(pool, meal_id: str) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """SELECT r.servings, ri.groceries_item_id, ri.custom_name, ri.custom_unit, ri.quantity,
+                      COALESCE(gi.is_divisible, TRUE) AS is_divisible
+               FROM meal_recipes mr
+               JOIN recipes r ON r.id = mr.recipe_id AND r.status = 'active'
+               JOIN recipe_ingredients ri ON ri.recipe_id = r.id AND ri.status = 'active'
+               LEFT JOIN groceries_items gi ON gi.id = ri.groceries_item_id
+               WHERE mr.meal_id = $1""",
+            UUID(meal_id),
+        )
+    return [dict(r) for r in rows]
+
+
+async def fetch_added_meals_detail(pool, groceries_list_id: str) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """SELECT glm.meal_id, glm.headcount, m.title AS meal_title, m.start_at AS meal_start_at,
+                      ARRAY(
+                          SELECT r.name
+                          FROM meal_recipes mr
+                          JOIN recipes r ON r.id = mr.recipe_id AND r.status = 'active'
+                          WHERE mr.meal_id = m.id
+                          ORDER BY r.name ASC
+                      ) AS recipe_names
+               FROM groceries_list_meals glm
+               JOIN meals m ON m.id = glm.meal_id AND m.status = 'active'
+               WHERE glm.groceries_list_id = $1 AND glm.status = 'active'
+               ORDER BY m.start_at ASC""",
+            UUID(groceries_list_id),
+        )
+    return [dict(r) for r in rows]
+
+
+async def mark_meal_added(pool, groceries_list_id: str, meal_id: str, headcount: int, user_id: str) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute(
+            """INSERT INTO groceries_list_meals (groceries_list_id, meal_id, headcount, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $4)
+               ON CONFLICT (groceries_list_id, meal_id) DO NOTHING""",
+            UUID(groceries_list_id), UUID(meal_id), headcount, UUID(user_id),
+        )
+
+
+async def _find_matching_list_item(conn, groceries_list_id: str, item: dict) -> Optional[dict]:
+    groceries_item_id = UUID(item["groceries_item_id"]) if item.get("groceries_item_id") else None
+    return await conn.fetchrow(
+        """SELECT id, quantity FROM groceries_list_items
+           WHERE groceries_list_id = $1
+             AND (
+                 (groceries_item_id IS NOT NULL AND groceries_item_id = $2)
+                 OR (
+                     $2 IS NULL AND groceries_item_id IS NULL
+                     AND lower(custom_name) = lower($3)
+                     AND lower(COALESCE(custom_unit, '')) = lower(COALESCE($4, ''))
+                 )
+             )
+           LIMIT 1""",
+        UUID(groceries_list_id), groceries_item_id, item.get("custom_name"), item.get("custom_unit"),
+    )
+
+
+async def insert_list_items_bulk(pool, groceries_list_id: str, items: list[dict], user_id: str) -> None:
+    async with pool.acquire() as conn:
+        position = await conn.fetchval(
+            "SELECT COALESCE(MAX(position), -1) + 1 FROM groceries_list_items WHERE groceries_list_id = $1",
+            UUID(groceries_list_id),
+        )
+        offset = 0
+        for item in items:
+            existing = await _find_matching_list_item(conn, groceries_list_id, item)
+            if existing:
+                await conn.execute(
+                    "UPDATE groceries_list_items SET quantity = quantity + $2, updated_by = $3 WHERE id = $1",
+                    existing["id"], item["quantity"], UUID(user_id),
+                )
+                continue
+            await conn.execute(
+                """INSERT INTO groceries_list_items
+                       (groceries_list_id, groceries_item_id, custom_name, custom_unit, quantity, position,
+                        created_by, updated_by)
+                   VALUES ($1, $2, $3, $4, $5, $6, $7, $7)""",
+                UUID(groceries_list_id),
+                UUID(item["groceries_item_id"]) if item.get("groceries_item_id") else None,
+                item.get("custom_name"), item.get("custom_unit"), item["quantity"], position + offset,
+                UUID(user_id),
+            )
+            offset += 1

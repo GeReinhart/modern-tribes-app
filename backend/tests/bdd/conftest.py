@@ -2314,6 +2314,37 @@ def then_meal_recipes_table(datatable):
     _assert_db("meal_recipes", datatable)
 
 
+@given("the groceries_list_meals table contains:")
+def given_groceries_list_meals_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not uid:
+                    continue
+                await conn.execute(
+                    """INSERT INTO groceries_list_meals(id, groceries_list_id, meal_id, headcount, status)
+                       VALUES($1, $2, $3, $4, $5)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid),
+                    UUID(rec["groceries_list_id"]),
+                    UUID(rec["meal_id"]),
+                    int(rec.get("headcount", "0")),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the groceries_list_meals table contains:")
+def then_groceries_list_meals_table(datatable):
+    _assert_db("groceries_list_meals", datatable)
+
+
 @then("the reminders table contains:")
 def then_reminders_table(datatable):
     async def _query_active_reminders(headers):

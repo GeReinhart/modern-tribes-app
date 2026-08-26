@@ -1,6 +1,7 @@
 import { apiService } from '@/app/platform/core/api/api.service.ts';
 
 import {
+  AddedMeal,
   GroceriesList,
   GroceriesListCreate,
   GroceriesListDetail,
@@ -44,10 +45,18 @@ class GroceriesListsService {
     );
   }
 
-  // Reads the meals feature's suggestion endpoint by its stable HTTP contract, not by
-  // importing the meals feature package, so groceries stays decoupled from it.
+  // Reads/writes the meals feature's suggestion endpoints by their stable HTTP contract,
+  // not by importing the meals feature package, so groceries stays decoupled from it.
   async listMealSuggestions(listId: string): Promise<MealSuggestion[]> {
     return apiService.get<MealSuggestion[]>(`/features/tasks/meals/grocery-suggestions/${listId}`);
+  }
+
+  async addMealToList(listId: string, mealId: string): Promise<void> {
+    return apiService.post<void>(`/features/tasks/meals/grocery-suggestions/${listId}/add/${mealId}`, {});
+  }
+
+  async listAddedMeals(listId: string): Promise<AddedMeal[]> {
+    return apiService.get<AddedMeal[]>(`/features/tasks/meals/added-to-groceries-list/${listId}`);
   }
 
   async addItem(listId: string, data: GroceriesListItemCreate): Promise<GroceriesListItem> {

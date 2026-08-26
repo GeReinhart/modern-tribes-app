@@ -2,7 +2,7 @@ from uuid import UUID
 from fastapi import HTTPException
 from app.platform.core.authorization.project_access import check_project_access_or_admin
 from app.platform.functions.labels import repository as labels_repo
-from app.features.tasks.models import FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate
+from app.features.tasks.models import FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate, FeatureLabelsReorderRequest
 
 
 async def _get_project_id(conn, feature_instance_id: str) -> str:
@@ -42,7 +42,7 @@ async def update_feature_label(pool, label_id: str, data: FeatureLabelUpdate, us
     if not lb:
         raise HTTPException(status_code=404, detail="Label not found.")
     await require_feature_access(pool, str(lb["feature_instance_id"]), user, "manager")
-    updated = await labels_repo.update_feature_label(pool, label_id, data.name, data.color, str(user["id"]))
+    updated = await labels_repo.update_feature_label(pool, label_id, data.name, data.color, str(user["id"]), data.status)
     return _to_label(updated)
 
 
@@ -52,3 +52,9 @@ async def delete_feature_label(pool, label_id: str, user: dict) -> None:
         raise HTTPException(status_code=404, detail="Label not found.")
     await require_feature_access(pool, str(lb["feature_instance_id"]), user, "manager")
     await labels_repo.delete_feature_label(pool, label_id)
+
+
+async def reorder_feature_labels(pool, data: FeatureLabelsReorderRequest, user: dict) -> list[FeatureLabel]:
+    await require_feature_access(pool, data.feature_instance_id, user, "manager")
+    rows = await labels_repo.reorder_feature_labels(pool, data.feature_instance_id, data.ordered_ids, str(user["id"]))
+    return [_to_label(r) for r in rows]

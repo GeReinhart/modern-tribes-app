@@ -296,6 +296,8 @@ const fr: Record<string, string> = {
 
   'labels.edit': 'label',
   'labels.delete': 'label',
+  'labels.moveUp': 'Monter',
+  'labels.moveDown': 'Descendre',
 
   'theme.selectTheme': 'Thème',
 

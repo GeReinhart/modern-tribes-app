@@ -4,14 +4,14 @@ from fastapi.testclient import TestClient
 from pytest_bdd import scenario
 
 from app.platform.core.authentication.router import get_current_user
-from app.features.meals.router import router
+from app.features.recipes.router import label_router
 from tests.conftest import _ADMIN_USER, _REGULAR_USER
 from tests.db_helpers import db_lifespan
 
 _test_app = FastAPI(lifespan=db_lifespan)
-_test_app.include_router(router, prefix="/api/features/tasks")
+_test_app.include_router(label_router, prefix="/api/features/tasks")
 
-FEATURE = "../../../features/features/meals/create_meal.feature"
+FEATURE = "../../../features/features/recipes/reorder_recipe_labels.feature"
 
 
 @pytest.fixture
@@ -30,21 +30,16 @@ def non_admin_client():
     _test_app.dependency_overrides.clear()
 
 
-@scenario(FEATURE, "POST /meals with valid body as admin — the meal is created")
-def test_create_meal_admin():
+@scenario(FEATURE, "PUT /recipe-labels/reorder as a manager — the labels are returned and stored in the new order")
+def test_reorder_labels_success():
     pass
 
 
-@scenario(FEATURE, "POST /meals without a title — the meal is created with no title")
-def test_create_meal_no_title():
+@scenario(FEATURE, "PUT /recipe-labels/reorder as a member (not a manager) — 403 error and the order is not changed")
+def test_reorder_labels_forbidden():
     pass
 
 
-@scenario(FEATURE, "POST /meals with a missing headcount — 422 error and the database is not modified")
-def test_create_meal_missing_headcount():
-    pass
-
-
-@scenario(FEATURE, "POST /meals as a user with no app access — 403 error and the database is not modified")
-def test_create_meal_forbidden():
+@scenario(FEATURE, "PATCH /recipe-labels/2001 with status archived — the label is archived and no longer listed")
+def test_archive_label_via_update():
     pass

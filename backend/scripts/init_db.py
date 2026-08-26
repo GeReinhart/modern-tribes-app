@@ -104,6 +104,7 @@ class DatabaseInitializer:
             "document_pages",
             "projects_documents",
             "todo_items",
+            "groceries_list_meals",
             "meal_recipes",
             "meal_participants",
             "meals",

@@ -29,7 +29,7 @@ const CreateMealModal: React.FC<Props> = ({ featureInstanceId, defaultDate, reci
   const [submitting, setSubmitting] = useState(false);
 
   const headcountValue = Number(headcount);
-  const isValid = title.trim().length > 0 && Number.isInteger(headcountValue) && headcountValue >= 0;
+  const isValid = Number.isInteger(headcountValue) && headcountValue >= 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +38,7 @@ const CreateMealModal: React.FC<Props> = ({ featureInstanceId, defaultDate, reci
     await onCreate(
       {
         feature_instance_id: featureInstanceId,
-        title: title.trim(),
+        title: title.trim() || undefined,
         start_at: new Date(`${date}T${startTime}`).toISOString(),
         end_at: new Date(`${date}T${endTime}`).toISOString(),
         headcount: headcountValue,
@@ -55,6 +55,7 @@ const CreateMealModal: React.FC<Props> = ({ featureInstanceId, defaultDate, reci
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <ThemedInput
               label={t('features.meals.title')}
+              placeholder={t('features.meals.titlePlaceholder')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               autoFocus

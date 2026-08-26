@@ -59,7 +59,27 @@ export function useRecipeLabels(featureInstanceId: string | null) {
     }
   }, []);
 
-  return { labels, error, createLabel, updateLabel, deleteLabel, refetch: fetchLabels };
+  const archiveLabel = useCallback(async (labelId: string): Promise<void> => {
+    try {
+      await recipesService.updateLabel(labelId, { status: 'archived' });
+      setLabels((prev) => prev.filter((l) => l.id !== labelId));
+    } catch (e: unknown) {
+      setError(errorMessage(e));
+    }
+  }, []);
+
+  const reorderLabels = useCallback(async (orderedIds: string[]): Promise<void> => {
+    if (!featureInstanceId) return;
+    try {
+      setLabels(await recipesService.reorderLabels(featureInstanceId, orderedIds));
+    } catch (e: unknown) {
+      setError(errorMessage(e));
+    }
+  }, [featureInstanceId]);
+
+  return {
+    labels, error, createLabel, updateLabel, deleteLabel, archiveLabel, reorderLabels, refetch: fetchLabels,
+  };
 }
 
 export function useRecipes(featureInstanceId: string | null) {
@@ -99,6 +119,8 @@ export function useRecipes(featureInstanceId: string | null) {
     createLabel: labelsHook.createLabel,
     updateLabel: labelsHook.updateLabel,
     deleteLabel: labelsHook.deleteLabel,
+    archiveLabel: labelsHook.archiveLabel,
+    reorderLabels: labelsHook.reorderLabels,
     refetch: fetchRecipes,
   };
 }

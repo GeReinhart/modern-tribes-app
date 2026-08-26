@@ -604,17 +604,17 @@
         "package": "groceries",
         "description": {
           "en": [
-            "- keep a shared shopping catalog of items (with a unit and how often you typically restock them) and reusable aisle sections like \"Butchery\" or \"Produce\", filterable by name and reorderable to match how you walk the aisles when building a list",
+            "- keep a shared shopping catalog of items (with a unit and how often you typically restock them) and reusable aisle sections like \"Butchery\" or \"Produce\", filterable by name and reorderable to match how you walk the aisles when building a list — browse and manage the catalog directly from the tab, without opening a list first",
             "- schedule shopping lists to a date so they show up in your dashboard planning — a list you didn't get to in time shows as passed; rename, archive once it's done, mark a list as a favorite, and start a new list from a favorite's content",
             "- check items off as you put them in your cart, and see at a glance what's left to buy",
-            "- get suggestions for items you're due to restock, and for ingredients needed by any meal planned after the list's date",
+            "- get suggestions for items you're due to restock, and for ingredients needed by any meal planned after the list's date, shown day by day in date order; adding a suggested ingredient tops up the quantity of a matching item already on your list instead of adding a duplicate line",
             "- add a note to any item, and add one-off items just for a single list without putting them in the shared catalog"
           ],
           "fr": [
-            "- gérez un catalogue d'articles partagé (avec une unité et une fréquence de réapprovisionnement habituelle) et des rayons réutilisables comme « Boucherie » ou « Fruits & Légumes », filtrables par nom et réordonnables selon l'ordre dans lequel vous parcourez les rayons",
+            "- gérez un catalogue d'articles partagé (avec une unité et une fréquence de réapprovisionnement habituelle) et des rayons réutilisables comme « Boucherie » ou « Fruits & Légumes », filtrables par nom et réordonnables selon l'ordre dans lequel vous parcourez les rayons — parcourez et gérez le catalogue directement depuis l'onglet, sans avoir à ouvrir une liste",
             "- programmez vos listes de courses à une date pour qu'elles apparaissent dans la planification de votre tableau de bord — une liste que vous n'avez pas traitée à temps apparaît comme passée ; renommez-la, archivez-la une fois terminée, marquez-la comme favorite, et repartez d'une liste favorite pour créer une nouvelle liste",
             "- cochez les articles au fur et à mesure que vous les mettez dans votre panier, et voyez en un coup d'œil ce qu'il reste à acheter",
-            "- recevez des suggestions d'articles à racheter, ainsi que des ingrédients nécessaires pour tout repas planifié après la date de la liste",
+            "- recevez des suggestions d'articles à racheter, ainsi que des ingrédients nécessaires pour tout repas planifié après la date de la liste, présentées jour par jour et triées par date ; ajouter un ingrédient suggéré augmente la quantité d'un article déjà présent sur votre liste au lieu d'en créer un doublon",
             "- ajoutez une note à n'importe quel article, et ajoutez des articles ponctuels propres à une seule liste sans les mettre dans le catalogue partagé"
           ]
         },
@@ -959,13 +959,13 @@
           "en": [
             "- keep a recipe book in a project tab, each recipe with a title, a base serving count and a rich-text description",
             "- list ingredients from the shared groceries catalog with a quantity, or add one-off ingredients that aren't in the catalog",
-            "- tag recipes with labels shared within the tab to organize and filter your recipe book",
+            "- tag recipes with labels shared within the tab to organize and filter your recipe book; a configuration mode lets you rename, reorder or archive labels",
             "- open a recipe in a clean read-only view, with a quick switch to an edit screen for the actual changes"
           ],
           "fr": [
             "- tenez un répertoire de recettes dans un onglet de projet, chaque recette avec un titre, un nombre de portions de base et une description enrichie",
             "- listez les ingrédients du catalogue de courses partagé avec une quantité, ou ajoutez des ingrédients ponctuels absents du catalogue",
-            "- étiquetez les recettes avec des labels partagés dans l'onglet pour organiser et filtrer votre répertoire",
+            "- étiquetez les recettes avec des labels partagés dans l'onglet pour organiser et filtrer votre répertoire ; un mode configuration permet de renommer, réordonner ou archiver les labels",
             "- ouvrez une recette dans une vue de lecture épurée, avec un accès rapide à un écran d'édition pour les modifications"
           ]
         },
@@ -988,23 +988,26 @@
         "package": "meals",
         "description": {
           "en": [
-            "- plan meals on a calendar with a date range and how many people are eating",
+            "- plan meals on a weekly view with a date range, an optional title, a description and how many people are eating",
             "- name which team members are coming, independently of the headcount",
             "- link one or more recipes to a meal to know what's being cooked",
-            "- when a meal is planned after a scheduled shopping list, its recipes' ingredients appear as suggestions on that list — scaled to the meal's headcount — so nothing gets forgotten"
+            "- when a meal is planned after a scheduled shopping list, its recipes' ingredients appear as suggestions on that list — scaled to the meal's headcount — so nothing gets forgotten",
+            "- add every ingredient of a suggested meal to the list in one click; the meal is remembered as added (with its headcount) and then shows greyed out among the suggestions — while shopping, see which meals this list already accounts for and for how many people"
           ],
           "fr": [
-            "- planifiez des repas sur un calendrier avec une plage horaire et le nombre de convives",
+            "- planifiez des repas sur une vue hebdomadaire avec une plage horaire, un titre optionnel, une description et le nombre de convives",
             "- indiquez quels membres de l'équipe sont présents, indépendamment du nombre de convives",
             "- reliez une ou plusieurs recettes à un repas pour savoir ce qui est cuisiné",
-            "- quand un repas est planifié après une liste de courses programmée, les ingrédients de ses recettes apparaissent en suggestion sur cette liste — proportionnels au nombre de convives — pour ne rien oublier"
+            "- quand un repas est planifié après une liste de courses programmée, les ingrédients de ses recettes apparaissent en suggestion sur cette liste — proportionnels au nombre de convives — pour ne rien oublier",
+            "- ajoutez en un clic tous les ingrédients d'un repas suggéré à la liste de courses ; le repas est mémorisé comme ajouté (avec le nombre de convives) et apparaît alors grisé dans les suggestions — en mode course, consultez quels repas sont déjà pris en compte dans cette liste et pour combien de personnes"
           ]
         },
         "backend": {
           "schema": [
             "meals",
             "meal_participants",
-            "meal_recipes"
+            "meal_recipes",
+            "groceries_list_meals"
           ],
           "path": [
             "backend/app/features/meals/**"

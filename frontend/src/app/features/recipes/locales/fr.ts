@@ -8,6 +8,8 @@ const fr: Record<string, string> = {
   'features.recipes.description': 'Description',
   'features.recipes.labels': 'Étiquettes',
   'features.recipes.newLabel': 'Nouvelle étiquette',
+  'features.recipes.configureLabels': 'Configurer les étiquettes',
+  'features.recipes.doneConfiguringLabels': 'Terminer la configuration',
   'features.recipes.ingredients': 'Ingrédients',
   'features.recipes.noIngredients': "Aucun ingrédient pour le moment.",
   'features.recipes.addIngredient': 'Ajouter un ingrédient',
