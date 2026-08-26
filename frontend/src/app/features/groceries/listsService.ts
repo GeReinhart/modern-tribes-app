@@ -55,6 +55,16 @@ class GroceriesListsService {
     return apiService.post<void>(`/features/tasks/meals/grocery-suggestions/${listId}/add/${mealId}`, {});
   }
 
+  async removeMealFromList(listId: string, mealId: string): Promise<void> {
+    return apiService.delete<void>(`/features/tasks/meals/grocery-suggestions/${listId}/add/${mealId}`);
+  }
+
+  async addSuggestedIngredient(listId: string, mealId: string, recipeIngredientId: string): Promise<void> {
+    return apiService.post<void>(
+      `/features/tasks/meals/grocery-suggestions/${listId}/add-ingredient/${mealId}/${recipeIngredientId}`, {},
+    );
+  }
+
   async listAddedMeals(listId: string): Promise<AddedMeal[]> {
     return apiService.get<AddedMeal[]>(`/features/tasks/meals/added-to-groceries-list/${listId}`);
   }

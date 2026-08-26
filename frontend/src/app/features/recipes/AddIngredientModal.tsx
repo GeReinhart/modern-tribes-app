@@ -24,6 +24,7 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
   const [customName, setCustomName] = useState('');
   const [customUnit, setCustomUnit] = useState('');
   const [quantity, setQuantity] = useState('1');
+  const [isAccompaniment, setIsAccompaniment] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -43,8 +44,11 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
     if (!isValid) return;
     setSubmitting(true);
     const data: RecipeIngredientCreate = useCustom
-      ? { custom_name: customName.trim(), custom_unit: customUnit.trim() || undefined, quantity: quantityValue }
-      : { groceries_item_id: catalogItemId, quantity: quantityValue };
+      ? {
+        custom_name: customName.trim(), custom_unit: customUnit.trim() || undefined, quantity: quantityValue,
+        is_accompaniment: isAccompaniment,
+      }
+      : { groceries_item_id: catalogItemId, quantity: quantityValue, is_accompaniment: isAccompaniment };
     const ok = await onSubmit(data);
     setSubmitting(false);
     if (ok) onClose();
@@ -90,6 +94,12 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
               min={isDivisible ? 0.01 : 1}
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
+            />
+            <ThemedCheckbox
+              label={t('features.recipes.isAccompaniment')}
+              helperText={t('features.recipes.isAccompanimentHelp')}
+              checked={isAccompaniment}
+              onChange={setIsAccompaniment}
             />
           </div>
         </ThemedModalBody>

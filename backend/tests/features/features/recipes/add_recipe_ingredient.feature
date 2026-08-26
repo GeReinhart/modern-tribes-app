@@ -99,6 +99,31 @@ Feature: Add an ingredient to a recipe
       | recipe_id | groceries_item_id | custom_name    | custom_unit | quantity | status |
       | 6001      |                    | Lasagna sheets | packs       | 1.00      | active |
 
+  Scenario: POST /recipes/6001/ingredients marked as an accompaniment — the ingredient is added flagged as such
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the recipe_ingredients table contains:
+      | id | recipe_id | groceries_item_id | custom_name | custom_unit | quantity | position | status |
+    When I POST /api/features/tasks/recipes/6001/ingredients with body:
+      """
+      {"custom_name": "Garlic bread", "custom_unit": "pieces", "quantity": 1, "is_accompaniment": true}
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "recipe_id": "6001",
+        "custom_name": "Garlic bread",
+        "is_accompaniment": true,
+        "status": "active"
+      }
+      """
+    And the recipe_ingredients table contains:
+      | recipe_id | custom_name  | quantity | is_accompaniment | status |
+      | 6001      | Garlic bread | 1.00      | true              | active |
+
   @error_case
   Scenario: POST /recipes/6001/ingredients with a fractional quantity for a non-divisible item — 422 error and the recipe is not modified
     Given I am authenticated as a regular user: user.id 0002

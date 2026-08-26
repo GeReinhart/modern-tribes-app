@@ -19,10 +19,13 @@ interface Props {
   onClose: () => void;
   onUpdate: (data: Omit<GroceriesItemUpdate, 'feature_instance_id'>) => Promise<boolean>;
   onSetRenewal: (renewalDurationDays: number | null) => Promise<boolean>;
+  onSetSuggestedQuantity: (suggestedQuantity: number | null) => Promise<boolean>;
   onToggleSection: (sectionId: string) => Promise<void>;
 }
 
-const ManageItemModal: React.FC<Props> = ({ item, sections, onClose, onUpdate, onSetRenewal, onToggleSection }) => {
+const ManageItemModal: React.FC<Props> = ({
+  item, sections, onClose, onUpdate, onSetRenewal, onSetSuggestedQuantity, onToggleSection,
+}) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const [name, setName] = useState(item.name);
@@ -31,6 +34,9 @@ const ManageItemModal: React.FC<Props> = ({ item, sections, onClose, onUpdate, o
   const [isDivisible, setIsDivisible] = useState(item.is_divisible);
   const [renewal, setRenewal] = useState(
     item.renewal_duration_days !== null ? String(item.renewal_duration_days) : '',
+  );
+  const [suggestedQuantity, setSuggestedQuantity] = useState(
+    item.suggested_quantity !== null ? String(item.suggested_quantity) : '',
   );
   const [submitting, setSubmitting] = useState(false);
   const [archiving, setArchiving] = useState(false);
@@ -48,12 +54,14 @@ const ManageItemModal: React.FC<Props> = ({ item, sections, onClose, onUpdate, o
   }));
 
   const renewalValue = renewal.trim() === '' ? null : Number(renewal);
+  const suggestedQuantityValue = suggestedQuantity.trim() === '' ? null : Number(suggestedQuantity);
   const hasChanges =
     name.trim() !== item.name ||
     unit !== item.unit ||
     icon !== item.icon ||
     isDivisible !== item.is_divisible ||
-    renewalValue !== item.renewal_duration_days;
+    renewalValue !== item.renewal_duration_days ||
+    suggestedQuantityValue !== item.suggested_quantity;
 
   const handleSave = async () => {
     if (!name.trim()) return;
@@ -66,6 +74,9 @@ const ManageItemModal: React.FC<Props> = ({ item, sections, onClose, onUpdate, o
     }
     if (ok && renewalValue !== item.renewal_duration_days) {
       ok = await onSetRenewal(renewalValue);
+    }
+    if (ok && suggestedQuantityValue !== item.suggested_quantity) {
+      ok = await onSetSuggestedQuantity(suggestedQuantityValue);
     }
     setSubmitting(false);
     if (ok) onClose();
@@ -100,6 +111,16 @@ const ManageItemModal: React.FC<Props> = ({ item, sections, onClose, onUpdate, o
             value={renewal}
             onChange={(e) => setRenewal(e.target.value)}
             placeholder={t('features.groceries.renewalDaysPlaceholder')}
+          />
+          <ThemedInput
+            label={t('features.groceries.suggestedQuantity')}
+            helperText={t('features.groceries.suggestedQuantityHelp')}
+            type="number"
+            min="0"
+            step={isDivisible ? '0.01' : '1'}
+            value={suggestedQuantity}
+            onChange={(e) => setSuggestedQuantity(e.target.value)}
+            placeholder={t('features.groceries.suggestedQuantityPlaceholder')}
           />
           <GroceriesIconPickerField value={icon} onChange={setIcon} />
           <div>

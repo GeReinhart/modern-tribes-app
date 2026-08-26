@@ -7,8 +7,9 @@ from app.platform.core.database import get_database
 from app.features.groceries import access
 from app.features.groceries.catalog import repository as catalog_repository
 from app.features.groceries.catalog.models import (
-    GroceriesItemCreate, GroceriesItemRenewalUpdate, GroceriesItemResponse, GroceriesItemUpdate,
-    GroceriesSectionCreate, GroceriesSectionResponse, GroceriesSectionsReorderRequest, GroceriesSectionUpdate,
+    GroceriesItemCreate, GroceriesItemRenewalUpdate, GroceriesItemResponse, GroceriesItemSuggestedQuantityUpdate,
+    GroceriesItemUpdate, GroceriesSectionCreate, GroceriesSectionResponse, GroceriesSectionsReorderRequest,
+    GroceriesSectionUpdate,
 )
 
 items_router = APIRouter(prefix="/groceries-items", tags=["features_groceries_catalog"])
@@ -26,6 +27,9 @@ def _row_to_item(row: dict) -> GroceriesItemResponse:
         status=row["status"],
         section_ids=list(row.get("section_ids") or []),
         renewal_duration_days=row.get("renewal_duration_days"),
+        suggested_quantity=(
+            float(row["suggested_quantity"]) if row.get("suggested_quantity") is not None else None
+        ),
         created_at=row["created_at"],
         updated_at=row["updated_at"],
     )
@@ -108,12 +112,32 @@ async def set_groceries_item_renewal(
     item = await catalog_repository.fetch_item(pool, item_id)
     if not item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found.")
-    if data.renewal_duration_days is not None:
-        await catalog_repository.upsert_instance_item(
-            pool, data.feature_instance_id, item_id, data.renewal_duration_days, str(current_user["id"]),
-        )
-    else:
-        await catalog_repository.delete_instance_item(pool, data.feature_instance_id, item_id)
+    await catalog_repository.upsert_instance_item_renewal(
+        pool, data.feature_instance_id, item_id, data.renewal_duration_days, str(current_user["id"]),
+    )
+    row = await catalog_repository.fetch_item_with_sections(pool, item_id, data.feature_instance_id)
+    return _row_to_item(row)
+
+
+@items_router.put("/{item_id}/suggested-quantity", response_model=GroceriesItemResponse)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def set_groceries_item_suggested_quantity(
+    item_id: str, data: GroceriesItemSuggestedQuantityUpdate, current_user: dict = Depends(get_current_user)
+):
+    """Set (or clear) the quantity pre-filled when this item is added to a list, for this
+    feature instance.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position ≥ member
+    """
+    pool = get_database()
+    await access.require_feature_access(pool, data.feature_instance_id, current_user, "member")
+    item = await catalog_repository.fetch_item(pool, item_id)
+    if not item:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found.")
+    await catalog_repository.upsert_instance_item_suggested_quantity(
+        pool, data.feature_instance_id, item_id, data.suggested_quantity, str(current_user["id"]),
+    )
     row = await catalog_repository.fetch_item_with_sections(pool, item_id, data.feature_instance_id)
     return _row_to_item(row)
 

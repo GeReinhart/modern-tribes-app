@@ -30,6 +30,7 @@ interface Props {
   onCloseManagingItem: () => void;
   onUpdateItem: (itemId: string, data: Omit<GroceriesItemUpdate, 'feature_instance_id'>) => Promise<boolean>;
   onSetItemRenewal: (itemId: string, renewalDurationDays: number | null) => Promise<boolean>;
+  onSetItemSuggestedQuantity: (itemId: string, suggestedQuantity: number | null) => Promise<boolean>;
 }
 
 const GroceriesCatalogModals: React.FC<Props> = ({
@@ -38,7 +39,7 @@ const GroceriesCatalogModals: React.FC<Props> = ({
   renamingSection, onCloseRenamingSection, onUpdateSection,
   deletingSection, onCloseDeletingSection, onDeleteSection,
   addingItemToSectionId, onCloseAddingItem, onCreateItem, onLinkItemToSection,
-  managingItem, onCloseManagingItem, onUpdateItem, onSetItemRenewal,
+  managingItem, onCloseManagingItem, onUpdateItem, onSetItemRenewal, onSetItemSuggestedQuantity,
 }) => {
   const { t } = useTranslation();
   const [deleting, setDeleting] = useState(false);
@@ -116,6 +117,9 @@ const GroceriesCatalogModals: React.FC<Props> = ({
           onClose={onCloseManagingItem}
           onUpdate={(data) => onUpdateItem(managingItem.id, data)}
           onSetRenewal={(renewalDurationDays) => onSetItemRenewal(managingItem.id, renewalDurationDays)}
+          onSetSuggestedQuantity={
+            (suggestedQuantity) => onSetItemSuggestedQuantity(managingItem.id, suggestedQuantity)
+          }
           onToggleSection={(sectionId) => onLinkItemToSection(managingItem.id, sectionId)}
         />
       )}

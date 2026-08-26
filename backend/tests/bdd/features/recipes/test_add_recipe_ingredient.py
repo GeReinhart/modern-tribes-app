@@ -37,6 +37,14 @@ def test_add_ingredient_custom():
 
 @scenario(
     FEATURE,
+    "POST /recipes/6001/ingredients marked as an accompaniment — the ingredient is added flagged as such",
+)
+def test_add_ingredient_accompaniment():
+    pass
+
+
+@scenario(
+    FEATURE,
     "POST /recipes/6001/ingredients with a fractional quantity for a non-divisible item — "
     "422 error and the recipe is not modified",
 )

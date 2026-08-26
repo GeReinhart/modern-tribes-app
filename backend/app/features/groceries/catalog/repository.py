@@ -41,7 +41,7 @@ async def fetch_item_with_sections(pool, item_id: str, feature_instance_id: str)
                    FROM groceries_item_sections gis
                    WHERE gis.groceries_item_id = gi.id
                ) AS section_ids,
-               gii.renewal_duration_days
+               gii.renewal_duration_days, gii.suggested_quantity
                FROM groceries_items gi
                LEFT JOIN groceries_instance_items gii
                    ON gii.groceries_item_id = gi.id AND gii.feature_instance_id = $2 AND gii.status = 'active'
@@ -93,7 +93,7 @@ async def fetch_items(pool, feature_instance_id: str) -> list[dict]:
                    FROM groceries_item_sections gis
                    WHERE gis.groceries_item_id = gi.id
                ) AS section_ids,
-               gii.renewal_duration_days
+               gii.renewal_duration_days, gii.suggested_quantity
                FROM groceries_items gi
                LEFT JOIN groceries_instance_items gii
                    ON gii.groceries_item_id = gi.id AND gii.feature_instance_id = $1 AND gii.status = 'active'
@@ -104,24 +104,44 @@ async def fetch_items(pool, feature_instance_id: str) -> list[dict]:
     return [dict(r) for r in rows]
 
 
-async def upsert_instance_item(pool, feature_instance_id: str, item_id: str, renewal_duration_days: int, user_id: str) -> None:
+async def _upsert_instance_item_field(
+    pool, feature_instance_id: str, item_id: str, field: str, value, user_id: str,
+) -> None:
+    """Sets a single per-instance tracking field (renewal_duration_days or
+    suggested_quantity), leaving the other field untouched. Drops the row entirely once
+    both tracking fields are empty, so an item with nothing tracked leaves no trace."""
     async with pool.acquire() as conn:
         await conn.execute(
-            """INSERT INTO groceries_instance_items
-                   (feature_instance_id, groceries_item_id, renewal_duration_days, created_by, updated_by)
+            f"""INSERT INTO groceries_instance_items
+                   (feature_instance_id, groceries_item_id, {field}, created_by, updated_by)
                VALUES ($1, $2, $3, $4, $4)
                ON CONFLICT (feature_instance_id, groceries_item_id)
-               DO UPDATE SET renewal_duration_days = $3, updated_by = $4, updated_at = CURRENT_TIMESTAMP, status = 'active'""",
-            UUID(feature_instance_id), UUID(item_id), renewal_duration_days, UUID(user_id),
+               DO UPDATE SET {field} = $3, updated_by = $4, updated_at = CURRENT_TIMESTAMP, status = 'active'""",
+            UUID(feature_instance_id), UUID(item_id), value, UUID(user_id),
         )
+        if value is None:
+            await conn.execute(
+                """DELETE FROM groceries_instance_items
+                   WHERE feature_instance_id = $1 AND groceries_item_id = $2
+                     AND renewal_duration_days IS NULL AND suggested_quantity IS NULL""",
+                UUID(feature_instance_id), UUID(item_id),
+            )
 
 
-async def delete_instance_item(pool, feature_instance_id: str, item_id: str) -> None:
-    async with pool.acquire() as conn:
-        await conn.execute(
-            "DELETE FROM groceries_instance_items WHERE feature_instance_id = $1 AND groceries_item_id = $2",
-            UUID(feature_instance_id), UUID(item_id),
-        )
+async def upsert_instance_item_renewal(
+    pool, feature_instance_id: str, item_id: str, renewal_duration_days: Optional[int], user_id: str,
+) -> None:
+    await _upsert_instance_item_field(
+        pool, feature_instance_id, item_id, "renewal_duration_days", renewal_duration_days, user_id,
+    )
+
+
+async def upsert_instance_item_suggested_quantity(
+    pool, feature_instance_id: str, item_id: str, suggested_quantity: Optional[float], user_id: str,
+) -> None:
+    await _upsert_instance_item_field(
+        pool, feature_instance_id, item_id, "suggested_quantity", suggested_quantity, user_id,
+    )
 
 
 async def fetch_sections(pool) -> list[dict]:

@@ -11,17 +11,26 @@ interface Props {
   onToggle: () => void;
   actions?: React.ReactNode;
   size?: 'md' | 'lg';
+  actionsAlign?: 'start' | 'end';
 }
 
 const GroceriesSectionToggleHeader: React.FC<Props> = ({
-  icon, name, count, expanded, onToggle, actions, size = 'md',
+  icon, name, count, expanded, onToggle, actions, size = 'md', actionsAlign = 'end',
 }) => {
   const { theme } = useTheme();
   const iconSize = size === 'lg' ? 18 : 12;
   const sectionIconSize = size === 'lg' ? 22 : 14;
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: actionsAlign === 'end' ? 'space-between' : 'flex-start',
+        alignItems: 'center',
+        gap: '8px',
+        marginBottom: '4px',
+      }}
+    >
       <button
         type="button"
         onClick={onToggle}

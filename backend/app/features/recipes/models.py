@@ -33,6 +33,7 @@ class RecipeIngredientCreate(BaseModel):
     custom_name: Optional[str] = None
     custom_unit: Optional[str] = None
     quantity: float
+    is_accompaniment: bool = False
 
     @model_validator(mode="after")
     def _require_one_source(self) -> "RecipeIngredientCreate":
@@ -44,6 +45,7 @@ class RecipeIngredientCreate(BaseModel):
 class RecipeIngredientUpdate(BaseModel):
     quantity: Optional[float] = None
     position: Optional[int] = None
+    is_accompaniment: Optional[bool] = None
 
 
 class RecipeIngredientResponse(BaseModel):
@@ -53,6 +55,7 @@ class RecipeIngredientResponse(BaseModel):
     custom_name: Optional[str] = None
     custom_unit: Optional[str] = None
     quantity: float
+    is_accompaniment: bool = False
     status: str
 
 
@@ -63,6 +66,7 @@ class RecipeIngredientDetail(BaseModel):
     unit: Optional[str] = None
     is_divisible: bool = True
     quantity: float
+    is_accompaniment: bool = False
 
 
 class RecipeDetailResponse(RecipeResponse):

@@ -4,6 +4,7 @@ import {
   GroceriesItem,
   GroceriesItemCreate,
   GroceriesItemRenewalUpdate,
+  GroceriesItemSuggestedQuantityUpdate,
   GroceriesItemUpdate,
   GroceriesSection,
   GroceriesSectionCreate,
@@ -60,6 +61,10 @@ class GroceriesCatalogService {
 
   async setItemRenewal(itemId: string, data: GroceriesItemRenewalUpdate): Promise<GroceriesItem> {
     return apiService.put<GroceriesItem>(`/features/tasks/groceries-items/${itemId}/renewal`, data);
+  }
+
+  async setItemSuggestedQuantity(itemId: string, data: GroceriesItemSuggestedQuantityUpdate): Promise<GroceriesItem> {
+    return apiService.put<GroceriesItem>(`/features/tasks/groceries-items/${itemId}/suggested-quantity`, data);
   }
 }
 

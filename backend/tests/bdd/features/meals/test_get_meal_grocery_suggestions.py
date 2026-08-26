@@ -36,6 +36,11 @@ def test_grocery_suggestions_rounded_up():
     pass
 
 
+@scenario(FEATURE, "GET /meals/grocery-suggestions/8001 — an accompaniment ingredient is flagged as such")
+def test_grocery_suggestions_accompaniment_flagged():
+    pass
+
+
 @scenario(FEATURE, "GET /meals/grocery-suggestions for a list already marked done — no suggestions are returned")
 def test_grocery_suggestions_done_list():
     pass

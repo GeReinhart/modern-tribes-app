@@ -244,6 +244,66 @@ async def add_meal_to_groceries_list(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="This meal cannot be added to this list.")
 
 
+@router.delete("/grocery-suggestions/{groceries_list_id}/add/{meal_id}", status_code=status.HTTP_204_NO_CONTENT)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def remove_meal_from_groceries_list(
+    groceries_list_id: str, meal_id: str, current_user: dict = Depends(get_current_user)
+):
+    """Un-mark a meal as added to this groceries list, so it's suggested again. The items
+    already added for it are left on the list untouched.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position >= member, checked against the groceries list's project
+    """
+    pool = get_database()
+    async with pool.acquire() as conn:
+        list_row = await conn.fetchrow(
+            "SELECT feature_instance_id FROM groceries_lists WHERE id = $1 AND status = 'active'",
+            UUID(groceries_list_id),
+        )
+    if not list_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grocery list not found.")
+    await access.require_feature_access(pool, str(list_row["feature_instance_id"]), current_user, "member")
+    removed = await meals_service.remove_meal_from_groceries_list(
+        pool, groceries_list_id, meal_id, str(current_user["id"]),
+    )
+    if not removed:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="This meal isn't added to this list.")
+
+
+@router.post(
+    "/grocery-suggestions/{groceries_list_id}/add-ingredient/{meal_id}/{recipe_ingredient_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def add_ingredient_to_groceries_list(
+    groceries_list_id: str, meal_id: str, recipe_ingredient_id: str, current_user: dict = Depends(get_current_user)
+):
+    """Add a single suggested ingredient (typically an accompaniment) to the groceries
+    list, scaled to the meal's headcount — unlike the bulk "add all" action, this doesn't
+    mark the whole meal as added.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position >= member, checked against the groceries list's project
+    """
+    pool = get_database()
+    async with pool.acquire() as conn:
+        list_row = await conn.fetchrow(
+            "SELECT feature_instance_id FROM groceries_lists WHERE id = $1 AND status = 'active'",
+            UUID(groceries_list_id),
+        )
+    if not list_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Grocery list not found.")
+    await access.require_feature_access(pool, str(list_row["feature_instance_id"]), current_user, "member")
+    item = await meals_service.add_ingredient_to_groceries_list(
+        pool, groceries_list_id, meal_id, recipe_ingredient_id, str(current_user["id"]),
+    )
+    if item is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="This ingredient cannot be added to this list.",
+        )
+
+
 @router.get("/added-to-groceries-list/{groceries_list_id}", response_model=list[MealAddedToGroceriesList])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def list_meals_added_to_groceries_list(groceries_list_id: str, current_user: dict = Depends(get_current_user)):

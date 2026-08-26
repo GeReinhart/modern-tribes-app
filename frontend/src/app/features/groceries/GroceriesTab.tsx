@@ -111,6 +111,7 @@ const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, pr
           onLinkItemToSection={catalog.linkItemToSection}
           onUpdateItem={catalog.updateItem}
           onSetItemRenewal={catalog.setItemRenewal}
+          onSetItemSuggestedQuantity={catalog.setItemSuggestedQuantity}
         />
       ) : (
         <>

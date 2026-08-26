@@ -155,7 +155,8 @@ async def delete_list_item(pool, list_item_id: str) -> None:
 async def fetch_suggestions(pool, feature_instance_id: str) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            """SELECT gi.id AS groceries_item_id, gi.name, gi.unit, gi.icon, gii.renewal_duration_days
+            """SELECT gi.id AS groceries_item_id, gi.name, gi.unit, gi.icon, gii.renewal_duration_days,
+                      gii.suggested_quantity
                FROM groceries_instance_items gii
                JOIN groceries_items gi ON gi.id = gii.groceries_item_id
                LEFT JOIN LATERAL (
@@ -168,6 +169,7 @@ async def fetch_suggestions(pool, feature_instance_id: str) -> list[dict]:
                ) last_pick ON TRUE
                WHERE gii.feature_instance_id = $1
                  AND gii.status = 'active'
+                 AND gii.renewal_duration_days IS NOT NULL
                  AND (
                      last_pick.last_picked_up_at IS NULL
                      OR last_pick.last_picked_up_at + (gii.renewal_duration_days || ' days')::interval <= NOW()

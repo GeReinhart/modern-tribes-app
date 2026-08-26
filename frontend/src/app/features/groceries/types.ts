@@ -15,6 +15,7 @@ export interface GroceriesItem {
   status: string;
   section_ids: string[];
   renewal_duration_days: number | null;
+  suggested_quantity: number | null;
 }
 
 export interface GroceriesItemCreate {
@@ -39,6 +40,11 @@ export interface GroceriesItemUpdate {
 export interface GroceriesItemRenewalUpdate {
   feature_instance_id: string;
   renewal_duration_days?: number | null;
+}
+
+export interface GroceriesItemSuggestedQuantityUpdate {
+  feature_instance_id: string;
+  suggested_quantity?: number | null;
 }
 
 export interface GroceriesSection {
@@ -137,18 +143,21 @@ export interface GroceriesSuggestion {
   unit: GroceriesUnit;
   icon: string | null;
   renewal_duration_days: number;
+  suggested_quantity: number | null;
 }
 
 export interface MealSuggestionIngredient {
+  recipe_ingredient_id: string;
   groceries_item_id: string | null;
   name: string;
   unit: string | null;
   quantity: number;
+  is_accompaniment: boolean;
 }
 
 export interface MealSuggestion {
   meal_id: string;
-  meal_title: string;
+  meal_title: string | null;
   meal_start_at: string;
   recipe_id: string;
   recipe_name: string;
@@ -159,7 +168,7 @@ export interface MealSuggestion {
 
 export interface AddedMeal {
   meal_id: string;
-  meal_title: string;
+  meal_title: string | null;
   meal_start_at: string;
   headcount: number;
   recipe_names: string[];

@@ -776,14 +776,18 @@ def given_groceries_instance_items_table(datatable):
             headers = datatable[0]
             for row in datatable[1:]:
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                renewal_days = rec.get("renewal_duration_days")
+                suggested_quantity = rec.get("suggested_quantity")
                 await conn.execute(
-                    """INSERT INTO groceries_instance_items(id, feature_instance_id, groceries_item_id, renewal_duration_days, status)
-                       VALUES($1, $2, $3, $4, $5)
+                    """INSERT INTO groceries_instance_items(id, feature_instance_id, groceries_item_id,
+                                                              renewal_duration_days, suggested_quantity, status)
+                       VALUES($1, $2, $3, $4, $5, $6)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(rec["id"]),
                     UUID(rec["feature_instance_id"]),
                     UUID(rec["groceries_item_id"]),
-                    int(rec.get("renewal_duration_days", "0")),
+                    int(renewal_days) if renewal_days else None,
+                    float(suggested_quantity) if suggested_quantity else None,
                     rec.get("status", "active"),
                 )
         finally:
@@ -2203,9 +2207,10 @@ def given_recipe_ingredients_table(datatable):
                 groceries_item_id = rec.get("groceries_item_id")
                 await conn.execute(
                     """INSERT INTO recipe_ingredients(
-                           id, recipe_id, groceries_item_id, custom_name, custom_unit, quantity, position, status
+                           id, recipe_id, groceries_item_id, custom_name, custom_unit, quantity, position,
+                           is_accompaniment, status
                        )
-                       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(uid),
                     UUID(rec["recipe_id"]),
@@ -2214,6 +2219,7 @@ def given_recipe_ingredients_table(datatable):
                     rec.get("custom_unit") or None,
                     float(rec.get("quantity", "0")),
                     coerce("position", rec.get("position", "0")),
+                    (rec.get("is_accompaniment") or "false").lower() == "true",
                     rec.get("status", "active"),
                 )
         finally:

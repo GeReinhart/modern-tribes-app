@@ -179,12 +179,13 @@ async def fetch_grocery_suggestion_rows(pool, project_id: str, after_date: date)
         rows = await conn.fetch(
             """SELECT m.id AS meal_id, m.title AS meal_title, m.start_at AS meal_start_at, m.headcount,
                       r.id AS recipe_id, r.name AS recipe_name, r.servings,
+                      ri.id AS recipe_ingredient_id,
                       ri.position,
                       ri.groceries_item_id,
                       COALESCE(gi.name, ri.custom_name) AS ingredient_name,
                       COALESCE(gi.unit, ri.custom_unit) AS ingredient_unit,
                       COALESCE(gi.is_divisible, TRUE) AS is_divisible,
-                      ri.quantity
+                      ri.quantity, ri.is_accompaniment
                FROM meals m
                JOIN projects_features pf ON pf.id = m.feature_instance_id AND pf.status = 'active'
                JOIN meal_recipes mr ON mr.meal_id = m.id
@@ -208,6 +209,8 @@ async def fetch_added_meal_ids(pool, groceries_list_id: str) -> set:
 
 
 async def fetch_meal_ingredient_rows(pool, meal_id: str) -> list[dict]:
+    """Core ingredients only — accompaniments are added to a groceries list one at a time,
+    not swept in by the bulk "add all" action."""
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             """SELECT r.servings, ri.groceries_item_id, ri.custom_name, ri.custom_unit, ri.quantity,
@@ -216,10 +219,25 @@ async def fetch_meal_ingredient_rows(pool, meal_id: str) -> list[dict]:
                JOIN recipes r ON r.id = mr.recipe_id AND r.status = 'active'
                JOIN recipe_ingredients ri ON ri.recipe_id = r.id AND ri.status = 'active'
                LEFT JOIN groceries_items gi ON gi.id = ri.groceries_item_id
-               WHERE mr.meal_id = $1""",
+               WHERE mr.meal_id = $1 AND ri.is_accompaniment = FALSE""",
             UUID(meal_id),
         )
     return [dict(r) for r in rows]
+
+
+async def fetch_single_recipe_ingredient_for_meal(pool, meal_id: str, recipe_ingredient_id: str) -> Optional[dict]:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            """SELECT r.servings, ri.groceries_item_id, ri.custom_name, ri.custom_unit, ri.quantity,
+                      COALESCE(gi.is_divisible, TRUE) AS is_divisible
+               FROM meal_recipes mr
+               JOIN recipes r ON r.id = mr.recipe_id AND r.status = 'active'
+               JOIN recipe_ingredients ri ON ri.recipe_id = r.id AND ri.status = 'active'
+               LEFT JOIN groceries_items gi ON gi.id = ri.groceries_item_id
+               WHERE mr.meal_id = $1 AND ri.id = $2""",
+            UUID(meal_id), UUID(recipe_ingredient_id),
+        )
+    return dict(row) if row else None
 
 
 async def fetch_added_meals_detail(pool, groceries_list_id: str) -> list[dict]:
@@ -247,8 +265,18 @@ async def mark_meal_added(pool, groceries_list_id: str, meal_id: str, headcount:
         await conn.execute(
             """INSERT INTO groceries_list_meals (groceries_list_id, meal_id, headcount, created_by, updated_by)
                VALUES ($1, $2, $3, $4, $4)
-               ON CONFLICT (groceries_list_id, meal_id) DO NOTHING""",
+               ON CONFLICT (groceries_list_id, meal_id)
+               DO UPDATE SET status = 'active', headcount = $3, updated_by = $4, updated_at = CURRENT_TIMESTAMP""",
             UUID(groceries_list_id), UUID(meal_id), headcount, UUID(user_id),
+        )
+
+
+async def unmark_meal_added(pool, groceries_list_id: str, meal_id: str, user_id: str) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute(
+            """UPDATE groceries_list_meals SET status = 'archived', updated_by = $3, updated_at = CURRENT_TIMESTAMP
+               WHERE groceries_list_id = $1 AND meal_id = $2 AND status = 'active'""",
+            UUID(groceries_list_id), UUID(meal_id), UUID(user_id),
         )
 
 

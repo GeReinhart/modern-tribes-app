@@ -87,6 +87,7 @@ class GroceriesSuggestionResponse(BaseModel):
     unit: str
     icon: Optional[str] = None
     renewal_duration_days: int
+    suggested_quantity: Optional[float] = None
 
 
 class PersonOption(BaseModel):

@@ -21,6 +21,7 @@ interface Props {
   onAddCustomItem: (name: string, unit: string) => Promise<void>;
   onUpdateCatalogItem: (itemId: string, data: Omit<GroceriesItemUpdate, 'feature_instance_id'>) => Promise<boolean>;
   onSetCatalogItemRenewal: (itemId: string, renewalDurationDays: number | null) => Promise<boolean>;
+  onSetCatalogItemSuggestedQuantity: (itemId: string, suggestedQuantity: number | null) => Promise<boolean>;
   onToggleCatalogItemSection: (itemId: string, sectionId: string) => Promise<void>;
   focusItemId: string | null;
   onFocused: () => void;
@@ -28,7 +29,8 @@ interface Props {
 
 const GroceriesListColumn: React.FC<Props> = ({
   items, catalogItems, sections, canEdit, onUpdateQuantity, onUpdateComment, onRemove, onAddCustomItem,
-  onUpdateCatalogItem, onSetCatalogItemRenewal, onToggleCatalogItemSection, focusItemId, onFocused,
+  onUpdateCatalogItem, onSetCatalogItemRenewal, onSetCatalogItemSuggestedQuantity, onToggleCatalogItemSection,
+  focusItemId, onFocused,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -105,6 +107,9 @@ const GroceriesListColumn: React.FC<Props> = ({
           onClose={() => setManagingCatalogItemId(null)}
           onUpdate={(data) => onUpdateCatalogItem(managingCatalogItem.id, data)}
           onSetRenewal={(renewalDurationDays) => onSetCatalogItemRenewal(managingCatalogItem.id, renewalDurationDays)}
+          onSetSuggestedQuantity={
+            (suggestedQuantity) => onSetCatalogItemSuggestedQuantity(managingCatalogItem.id, suggestedQuantity)
+          }
           onToggleSection={(sectionId) => onToggleCatalogItemSection(managingCatalogItem.id, sectionId)}
         />
       )}

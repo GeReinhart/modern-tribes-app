@@ -44,6 +44,7 @@ export interface RecipeIngredient {
   unit: string | null;
   is_divisible: boolean;
   quantity: number;
+  is_accompaniment: boolean;
 }
 
 export interface RecipeDetail extends Recipe {
@@ -55,9 +56,11 @@ export interface RecipeIngredientCreate {
   custom_name?: string;
   custom_unit?: string;
   quantity: number;
+  is_accompaniment?: boolean;
 }
 
 export interface RecipeIngredientUpdate {
   quantity?: number;
   position?: number;
+  is_accompaniment?: boolean;
 }

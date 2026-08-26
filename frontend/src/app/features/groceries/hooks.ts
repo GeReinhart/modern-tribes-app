@@ -143,6 +143,26 @@ export function useGroceriesListDetail(listId: string | null) {
     }
   }, [listId, fetchDetail, fetchMealSuggestions, fetchAddedMeals]);
 
+  const removeMealSuggestion = useCallback(async (mealId: string): Promise<void> => {
+    if (!listId) return;
+    try {
+      await groceriesListsService.removeMealFromList(listId, mealId);
+      await Promise.all([fetchMealSuggestions(), fetchAddedMeals()]);
+    } catch (e: unknown) {
+      setError(errorMessage(e));
+    }
+  }, [listId, fetchMealSuggestions, fetchAddedMeals]);
+
+  const addSuggestedIngredient = useCallback(async (mealId: string, recipeIngredientId: string): Promise<void> => {
+    if (!listId) return;
+    try {
+      await groceriesListsService.addSuggestedIngredient(listId, mealId, recipeIngredientId);
+      await fetchDetail();
+    } catch (e: unknown) {
+      setError(errorMessage(e));
+    }
+  }, [listId, fetchDetail]);
+
   const addItem = useCallback(
     async (data: GroceriesListItemCreate): Promise<string | null> => {
       if (!listId) return null;
@@ -218,7 +238,8 @@ export function useGroceriesListDetail(listId: string | null) {
   }, [listId]);
 
   return {
-    detail, mealSuggestions, addedMeals, error, addItem, addMealSuggestion, togglePickedUp, updateQuantity,
+    detail, mealSuggestions, addedMeals, error, addItem, addMealSuggestion, removeMealSuggestion,
+    addSuggestedIngredient, togglePickedUp, updateQuantity,
     updateComment, renameList, removeItem,
     refetch: fetchDetail,
   };
@@ -378,10 +399,27 @@ export function useGroceriesCatalog(featureInstanceId: string | null) {
     [featureInstanceId],
   );
 
+  const setItemSuggestedQuantity = useCallback(
+    async (itemId: string, suggestedQuantity: number | null): Promise<boolean> => {
+      if (!featureInstanceId) return false;
+      try {
+        const updated = await groceriesCatalogService.setItemSuggestedQuantity(itemId, {
+          feature_instance_id: featureInstanceId, suggested_quantity: suggestedQuantity,
+        });
+        setItems((prev) => prev.map((i) => (i.id === itemId ? updated : i)));
+        return true;
+      } catch (e: unknown) {
+        setError(errorMessage(e));
+        return false;
+      }
+    },
+    [featureInstanceId],
+  );
+
   return {
     items, sections, suggestions, error,
     createItem, createSection, updateSection, reorderSections, deleteSection, linkItemToSection, updateItem,
-    setItemRenewal,
+    setItemRenewal, setItemSuggestedQuantity,
     refetch: fetchAll,
   };
 }

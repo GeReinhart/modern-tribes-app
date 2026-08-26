@@ -36,6 +36,7 @@ class GroceriesItemResponse(BaseModel):
     status: str
     section_ids: list[str] = []
     renewal_duration_days: Optional[int] = None
+    suggested_quantity: Optional[float] = None
     created_at: datetime
     updated_at: datetime
 
@@ -43,6 +44,11 @@ class GroceriesItemResponse(BaseModel):
 class GroceriesItemRenewalUpdate(BaseModel):
     feature_instance_id: str
     renewal_duration_days: Optional[int] = None
+
+
+class GroceriesItemSuggestedQuantityUpdate(BaseModel):
+    feature_instance_id: str
+    suggested_quantity: Optional[float] = None
 
 
 class GroceriesSectionCreate(BaseModel):

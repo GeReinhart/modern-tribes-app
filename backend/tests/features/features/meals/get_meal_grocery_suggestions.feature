@@ -83,8 +83,14 @@ Feature: Get grocery suggestions from planned meals
           "headcount": 8,
           "added": false,
           "ingredients": [
-            {"groceries_item_id": "3001", "name": "Ground beef", "unit": "kg", "quantity": 1.6},
-            {"groceries_item_id": null, "name": "Lasagna sheets", "unit": "packs", "quantity": 2.0}
+            {
+              "recipe_ingredient_id": "9001", "groceries_item_id": "3001", "name": "Ground beef", "unit": "kg",
+              "quantity": 1.6, "is_accompaniment": false
+            },
+            {
+              "recipe_ingredient_id": "9002", "groceries_item_id": null, "name": "Lasagna sheets", "unit": "packs",
+              "quantity": 2.0, "is_accompaniment": false
+            }
           ]
         }
       ]
@@ -121,7 +127,55 @@ Feature: Get grocery suggestions from planned meals
           "headcount": 6,
           "added": false,
           "ingredients": [
-            {"groceries_item_id": "3002", "name": "Eggs", "unit": "piece", "quantity": 5.0}
+            {
+              "recipe_ingredient_id": "9003", "groceries_item_id": "3002", "name": "Eggs", "unit": "piece",
+              "quantity": 5.0, "is_accompaniment": false
+            }
+          ]
+        }
+      ]
+      """
+
+  Scenario: GET /meals/grocery-suggestions/8001 — an accompaniment ingredient is flagged as such
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the recipes table contains:
+      | id   | feature_instance_id | name    | servings | status |
+      | 6001 | 0040                | Lasagna | 4        | active |
+    And the recipe_ingredients table contains:
+      | id   | recipe_id | groceries_item_id | custom_name | custom_unit | quantity | is_accompaniment | status |
+      | 9001 | 6001      | 3001               |             |             | 0.8       | false             | active |
+      | 9004 | 6001      |                    | Garlic bread | pieces     | 1.0       | true              | active |
+    And the meals table contains:
+      | id   | feature_instance_id | title         | start_at             | end_at               | headcount | status |
+      | 7001 | 0041                | Family dinner | 2026-09-05T19:00:00Z | 2026-09-05T20:30:00Z | 8         | active |
+    And the meal_recipes table contains:
+      | meal_id | recipe_id |
+      | 7001    | 6001      |
+    When I GET /api/features/tasks/meals/grocery-suggestions/8001
+    Then the response status code is 200
+    And the response body is:
+      """
+      [
+        {
+          "meal_id": "7001",
+          "meal_title": "Family dinner",
+          "meal_start_at": "2026-09-05T19:00:00Z",
+          "recipe_id": "6001",
+          "recipe_name": "Lasagna",
+          "headcount": 8,
+          "added": false,
+          "ingredients": [
+            {
+              "recipe_ingredient_id": "9001", "groceries_item_id": "3001", "name": "Ground beef", "unit": "kg",
+              "quantity": 1.6, "is_accompaniment": false
+            },
+            {
+              "recipe_ingredient_id": "9004", "groceries_item_id": null, "name": "Garlic bread", "unit": "pieces",
+              "quantity": 2.0, "is_accompaniment": true
+            }
           ]
         }
       ]

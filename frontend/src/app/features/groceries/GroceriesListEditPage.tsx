@@ -25,7 +25,8 @@ const GroceriesListEditPageContent: React.FC = () => {
   const { project } = useProject(projectId || null);
   const { canEdit } = useProjectPermissions(tribeId || null, projectId || null);
   const {
-    detail, mealSuggestions, error: detailError, addItem, addMealSuggestion, updateQuantity, updateComment,
+    detail, mealSuggestions, error: detailError, addItem, addMealSuggestion, removeMealSuggestion,
+    addSuggestedIngredient, updateQuantity, updateComment,
     renameList, removeItem,
   } = useGroceriesListDetail(listId || null);
   const catalog = useGroceriesCatalog(detail?.feature_instance_id ?? null);
@@ -39,7 +40,8 @@ const GroceriesListEditPageContent: React.FC = () => {
   );
 
   const handleAddItem = async (itemId: string) => {
-    const newId = await addItem({ groceries_item_id: itemId, quantity: 1 });
+    const suggestedQuantity = catalog.items.find((i) => i.id === itemId)?.suggested_quantity;
+    const newId = await addItem({ groceries_item_id: itemId, quantity: suggestedQuantity ?? 1 });
     setFocusItemId(newId);
   };
 
@@ -116,7 +118,13 @@ const GroceriesListEditPageContent: React.FC = () => {
         />
       )}
       {(detailError || catalog.error) && <div>{detailError || catalog.error}</div>}
-      <MealSuggestionsPanel suggestions={mealSuggestions} canEdit={canEdit} onAddAll={addMealSuggestion} />
+      <MealSuggestionsPanel
+        suggestions={mealSuggestions}
+        canEdit={canEdit}
+        onAddAll={addMealSuggestion}
+        onRemoveAll={removeMealSuggestion}
+        onAddIngredient={addSuggestedIngredient}
+      />
       <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 320px', minWidth: '280px' }}>
           <GroceriesCatalogColumn
@@ -136,6 +144,7 @@ const GroceriesListEditPageContent: React.FC = () => {
             onLinkItemToSection={catalog.linkItemToSection}
             onUpdateItem={catalog.updateItem}
             onSetItemRenewal={catalog.setItemRenewal}
+            onSetItemSuggestedQuantity={catalog.setItemSuggestedQuantity}
           />
         </div>
         <div style={{ flex: '1 1 320px', minWidth: '280px' }}>
@@ -150,6 +159,7 @@ const GroceriesListEditPageContent: React.FC = () => {
             onAddCustomItem={handleAddCustomItem}
             onUpdateCatalogItem={catalog.updateItem}
             onSetCatalogItemRenewal={catalog.setItemRenewal}
+            onSetCatalogItemSuggestedQuantity={catalog.setItemSuggestedQuantity}
             onToggleCatalogItemSection={catalog.linkItemToSection}
             focusItemId={focusItemId}
             onFocused={() => setFocusItemId(null)}

@@ -50,6 +50,7 @@ def _row_to_ingredient_detail(row: dict) -> RecipeIngredientDetail:
         unit=row.get("unit"),
         is_divisible=row.get("is_divisible", True),
         quantity=float(row["quantity"]),
+        is_accompaniment=row.get("is_accompaniment", False),
     )
 
 
@@ -61,6 +62,7 @@ def _row_to_ingredient(row: dict) -> RecipeIngredientResponse:
         custom_name=row.get("custom_name"),
         custom_unit=row.get("custom_unit"),
         quantity=float(row["quantity"]),
+        is_accompaniment=row.get("is_accompaniment", False),
         status=row["status"],
     )
 
@@ -210,7 +212,7 @@ async def add_ingredient(recipe_id: str, data: RecipeIngredientCreate, current_u
     _require_divisible_quantity(is_divisible, data.quantity)
     row = await recipes_repository.insert_ingredient(
         pool, recipe_id, data.groceries_item_id, data.custom_name, data.custom_unit, data.quantity,
-        str(current_user["id"]),
+        data.is_accompaniment, str(current_user["id"]),
     )
     return _row_to_ingredient(row)
 
@@ -237,7 +239,9 @@ async def update_ingredient(
             item = await recipes_repository.fetch_catalog_item(pool, str(ingredient_row["groceries_item_id"]))
             is_divisible = item.get("is_divisible", True) if item else True
         _require_divisible_quantity(is_divisible, data.quantity)
-    row = await recipes_repository.update_ingredient(pool, ingredient_id, data.quantity, data.position, str(current_user["id"]))
+    row = await recipes_repository.update_ingredient(
+        pool, ingredient_id, data.quantity, data.position, data.is_accompaniment, str(current_user["id"]),
+    )
     return _row_to_ingredient(row)
 
 

@@ -43,10 +43,12 @@ class MealResponse(BaseModel):
 
 
 class MealGrocerySuggestionIngredient(BaseModel):
+    recipe_ingredient_id: str
     groceries_item_id: Optional[str] = None
     name: str
     unit: Optional[str] = None
     quantity: float
+    is_accompaniment: bool = False
 
 
 class MealGrocerySuggestion(BaseModel):

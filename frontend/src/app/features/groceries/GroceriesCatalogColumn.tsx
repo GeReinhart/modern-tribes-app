@@ -30,12 +30,13 @@ interface Props {
   onLinkItemToSection: (itemId: string, sectionId: string) => Promise<void>;
   onUpdateItem: (itemId: string, data: Omit<GroceriesItemUpdate, 'feature_instance_id'>) => Promise<boolean>;
   onSetItemRenewal: (itemId: string, renewalDurationDays: number | null) => Promise<boolean>;
+  onSetItemSuggestedQuantity: (itemId: string, suggestedQuantity: number | null) => Promise<boolean>;
 }
 
 const GroceriesCatalogColumn: React.FC<Props> = ({
   featureInstanceId, items, sections, suggestions, excludeItemIds, canEdit, configuring,
   onAddItem, onCreateSection, onUpdateSection, onReorderSections, onDeleteSection,
-  onCreateItem, onLinkItemToSection, onUpdateItem, onSetItemRenewal,
+  onCreateItem, onLinkItemToSection, onUpdateItem, onSetItemRenewal, onSetItemSuggestedQuantity,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -186,6 +187,7 @@ const GroceriesCatalogColumn: React.FC<Props> = ({
         onCloseManagingItem={() => setManagingItemId(null)}
         onUpdateItem={onUpdateItem}
         onSetItemRenewal={onSetItemRenewal}
+        onSetItemSuggestedQuantity={onSetItemSuggestedQuantity}
       />
     </div>
   );

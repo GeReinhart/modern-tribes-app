@@ -153,6 +153,9 @@ async def get_suggested_items(feature_instance_id: str, current_user: dict = Dep
             unit=r["unit"],
             icon=r.get("icon"),
             renewal_duration_days=r["renewal_duration_days"],
+            suggested_quantity=(
+                float(r["suggested_quantity"]) if r.get("suggested_quantity") is not None else None
+            ),
         )
         for r in rows
     ]

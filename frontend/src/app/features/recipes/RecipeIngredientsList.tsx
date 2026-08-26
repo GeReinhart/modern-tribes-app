@@ -4,6 +4,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import RecipeIngredientRow from './RecipeIngredientRow.tsx';
 import { RecipeIngredient } from './types.ts';
 
 interface Props {
@@ -13,9 +14,31 @@ interface Props {
   onRemove: (ingredientId: string) => void;
 }
 
+interface GroupProps {
+  title?: string;
+  ingredients: RecipeIngredient[];
+  canEdit: boolean;
+  onRemove: (ingredientId: string) => void;
+}
+
+const IngredientGroup: React.FC<GroupProps> = ({ title, ingredients, canEdit, onRemove }) => {
+  if (ingredients.length === 0) return null;
+  const rows = ingredients.map((ingredient) => (
+    <RecipeIngredientRow key={ingredient.id} ingredient={ingredient} canEdit={canEdit} onRemove={onRemove} />
+  ));
+  return (
+    <div>
+      {title && <div style={{ fontWeight: 600, fontSize: 'var(--font-sm)', margin: '10px 0 4px' }}>{title}</div>}
+      {canEdit ? rows : <ul style={{ margin: 0, paddingLeft: '20px' }}>{rows}</ul>}
+    </div>
+  );
+};
+
 const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, onRemove }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
+  const mainIngredients = ingredients.filter((i) => !i.is_accompaniment);
+  const accompaniments = ingredients.filter((i) => i.is_accompaniment);
 
   return (
     <div>
@@ -25,38 +48,13 @@ const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, o
           {t('features.recipes.noIngredients')}
         </div>
       )}
-      {canEdit ? (
-        ingredients.map((ingredient) => (
-          <div
-            key={ingredient.id}
-            style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '6px 0', borderBottom: `1px solid ${theme.colors.border}`,
-            }}
-          >
-            <span>
-              {ingredient.name}
-              {ingredient.unit ? ` — ${ingredient.quantity} ${ingredient.unit}` : ` — ${ingredient.quantity}`}
-            </span>
-            <button
-              type="button"
-              onClick={() => onRemove(ingredient.id)}
-              style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: theme.colors.danger, display: 'flex' }}
-            >
-              <ThemedSvgIcon name="x" color="currentColor" size={16} />
-            </button>
-          </div>
-        ))
-      ) : (
-        <ul style={{ margin: 0, paddingLeft: '20px' }}>
-          {ingredients.map((ingredient) => (
-            <li key={ingredient.id} style={{ padding: '2px 0' }}>
-              {ingredient.name}
-              {ingredient.unit ? ` — ${ingredient.quantity} ${ingredient.unit}` : ` — ${ingredient.quantity}`}
-            </li>
-          ))}
-        </ul>
-      )}
+      <IngredientGroup ingredients={mainIngredients} canEdit={canEdit} onRemove={onRemove} />
+      <IngredientGroup
+        title={t('features.recipes.accompaniments')}
+        ingredients={accompaniments}
+        canEdit={canEdit}
+        onRemove={onRemove}
+      />
       {canEdit && (
         <button
           type="button"
