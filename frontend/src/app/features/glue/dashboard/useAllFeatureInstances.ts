@@ -41,3 +41,24 @@ export function useAllFeatureInstances() {
 
   return { options, loading };
 }
+
+export function useInstanceOptions(projectId: string, featureTypes: string[]) {
+  const [instances, setInstances] = useState<ProjectFeatureInstance[]>([]);
+
+  useEffect(() => {
+    if (!projectId) {
+      setInstances([]);
+      return;
+    }
+    let cancelled = false;
+    projectFeaturesService.listByProject(projectId, 'active').then((all) => {
+      if (!cancelled) setInstances(all.filter((f) => featureTypes.includes(f.feature_type)));
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, featureTypes.join(',')]);
+
+  return instances;
+}

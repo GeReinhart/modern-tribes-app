@@ -9,8 +9,10 @@ import DashboardPlanningTab from '@/app/features/glue/dashboard/tabs/DashboardPl
 import DashboardProjectsTab from '@/app/features/glue/dashboard/tabs/DashboardProjectsTab.tsx';
 import DashboardTaskInstancesTab from '@/app/features/glue/dashboard/tabs/DashboardTaskInstancesTab.tsx';
 import DashboardEventInstancesTab from '@/app/features/glue/dashboard/tabs/DashboardEventInstancesTab.tsx';
-import { TabConfigPopup } from '@/app/features/glue/tab-config/TabConfigPopup.tsx';
+import { TabEditPopup } from '@/app/features/glue/tab-config/TabEditPopup.tsx';
 import { useTabConfig } from '@/app/features/glue/tab-config/useTabConfig.ts';
+import { useTabEditMode } from '@/app/features/glue/tab-config/useTabEditMode.ts';
+import { QuickAddDefaultsPopup } from '@/app/features/glue/dashboard/QuickAddDefaultsPopup.tsx';
 import { useUrlTab } from '@/app/features/glue/url-tab/useUrlTab.ts';
 import { authorizationHooks } from '@/app/platform/core/authorization/authorization-hooks.ts';
 import { useAdminAccess } from '@/app/platform/core/authorization/useAdminAccess.ts';
@@ -23,6 +25,7 @@ import { PinnedBookmarkTab } from '@/app/features/glue/dashboard/PinnedBookmarkT
 import { PinnedTabsProvider, usePinnedTabsContext } from '@/app/features/glue/dashboard/PinnedTabsContext.tsx';
 import {
   makePinnedTabKey,
+  makeUnpinHandler,
   parsePinnedTabKey,
   parseProjectFeaturePath,
 } from '@/app/features/glue/dashboard/pinnedTabs.types.ts';
@@ -50,7 +53,7 @@ const DashboardPageContent: React.FC = () => {
     verifyAuthorization,
   } = authorizationHooks();
   const { hasAdminAccess } = useAdminAccess();
-  const [showTabConfig, setShowTabConfig] = useState(false);
+  const [showQuickAddDefaults, setShowQuickAddDefaults] = useState(false);
   const { pinnedTabs, unpin } = usePinnedTabsContext();
 
   const allTabs = useMemo(() => {
@@ -70,6 +73,9 @@ const DashboardPageContent: React.FC = () => {
     defaultTabKey,
   );
 
+  const { tabEditMode, editingTabKey, setEditingTabKey, hiddenTabs, toggleTabEditMode } =
+    useTabEditMode(tabsWithConfig);
+
   const breadcrumbs = useMemo(() => [{ label: t('dashboard.title') }], [t]);
 
   useEffect(() => {
@@ -81,9 +87,14 @@ const DashboardPageContent: React.FC = () => {
   const menuActions = useMemo(
     (): MenuAction[] => [
       {
-        icon: 'settings' as const,
-        label: t('tabConfig.configure'),
-        onClick: () => setShowTabConfig(true),
+        icon: tabEditMode ? ('x' as const) : ('settings' as const),
+        label: tabEditMode ? t('tabConfig.finishConfigure') : t('tabConfig.configure'),
+        onClick: toggleTabEditMode,
+      },
+      {
+        icon: 'zap' as const,
+        label: t('dashboard.quickAddDefaults.menuLabel'),
+        onClick: () => setShowQuickAddDefaults(true),
       },
       ...(authorization?.authorized
         ? [{ icon: 'plus' as const, badgeIcon: 'users' as const, label: t('tribes.createTribe'), path: '/app/tribes/create' }]
@@ -92,7 +103,7 @@ const DashboardPageContent: React.FC = () => {
         ? [{ icon: 'shield' as const, label: t('common.admin'), path: '/admin' }]
         : []),
     ],
-    [authorization?.authorized, hasAdminAccess, t],
+    [authorization?.authorized, hasAdminAccess, tabEditMode, toggleTabEditMode, t],
   );
 
   const activeStaticTab = STATIC_TABS(t).find((tb) => tb.key === activeTab);
@@ -122,20 +133,19 @@ const DashboardPageContent: React.FC = () => {
         />
       }
     >
-      {showTabConfig && (
-        <TabConfigPopup
+      {editingTabKey && (
+        <TabEditPopup
+          tabKey={editingTabKey}
           tabsWithConfig={tabsWithConfig}
+          isPinned={pinnedTabKeySet.has(editingTabKey)}
           onSave={saveConfig}
-          onClose={() => setShowTabConfig(false)}
-          pinnedTabKeys={pinnedTabKeySet}
-          showQuickAddDefaults
-          onUnpinTab={async (key) => {
-            const bookmarkId = parsePinnedTabKey(key);
-            if (!bookmarkId) return;
-            const pt = pinnedTabs.find((p) => p.bookmark_id === bookmarkId);
-            if (pt) await unpin(pt.id);
-          }}
+          onUnpin={makeUnpinHandler(editingTabKey, pinnedTabs, unpin)}
+          onClose={() => setEditingTabKey(null)}
         />
+      )}
+
+      {showQuickAddDefaults && (
+        <QuickAddDefaultsPopup onClose={() => setShowQuickAddDefaults(false)} />
       )}
 
       {authorizationError && (
@@ -146,7 +156,14 @@ const DashboardPageContent: React.FC = () => {
         </ThemedCard>
       )}
 
-      <ThemedTabs tabs={navTabs} activeTab={activeTab} onTabChange={handleTabChange} />
+      <ThemedTabs
+        tabs={navTabs}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        editMode={tabEditMode}
+        hiddenTabs={hiddenTabs}
+        onEditTab={setEditingTabKey}
+      />
 
       {activeStaticTab && <activeStaticTab.Component />}
 

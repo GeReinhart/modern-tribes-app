@@ -39,6 +39,42 @@ export const IconButton: React.FC<{
   </button>
 );
 
+export const ColorButton: React.FC<{
+  tab: TabWithConfig;
+  theme: Theme;
+  t: (k: string) => string;
+  isEditing: boolean;
+  onToggle: () => void;
+}> = ({ tab, theme, t, isEditing, onToggle }) => (
+  <button
+    type="button"
+    onClick={onToggle}
+    title={t('tabConfig.color')}
+    aria-label={t('tabConfig.color')}
+    style={{
+      width: '32px',
+      height: '32px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      border: `1px solid ${isEditing ? theme.colors.primary : theme.colors.border}`,
+      borderRadius: '8px',
+      backgroundColor: 'transparent',
+      cursor: 'pointer',
+    }}
+  >
+    <span
+      style={{
+        width: '16px',
+        height: '16px',
+        borderRadius: '50%',
+        backgroundColor: tab.color ?? theme.colors.primary,
+        border: `1px solid ${theme.colors.border}`,
+      }}
+    />
+  </button>
+);
+
 export const ReadOnlyName: React.FC<{
   tab: TabWithConfig;
   theme: Theme;
@@ -91,43 +127,3 @@ export const NameInput: React.FC<{
     </div>
   );
 };
-
-export const VisibilityCheckbox: React.FC<{
-  tab: TabWithConfig;
-  theme: Theme;
-  t: (k: string) => string;
-  onToggle: () => void;
-}> = ({ tab, theme, t, onToggle }) => (
-  <div style={{ display: 'flex', justifyContent: 'center', width: '72px' }}>
-    <input
-      type="checkbox"
-      checked={tab.visible}
-      onChange={onToggle}
-      aria-label={t('tabConfig.toggleVisibility')}
-      style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: theme.colors.primary }}
-    />
-  </div>
-);
-
-export const DefaultRadio: React.FC<{
-  tab: TabWithConfig;
-  theme: Theme;
-  t: (k: string) => string;
-  onSetDefault: () => void;
-}> = ({ tab, theme, t, onSetDefault }) => (
-  <div style={{ display: 'flex', justifyContent: 'center', width: '64px' }}>
-    <input
-      type="radio"
-      checked={tab.is_default}
-      disabled={!tab.visible}
-      onChange={onSetDefault}
-      aria-label={t('tabConfig.setDefault')}
-      style={{
-        width: '16px',
-        height: '16px',
-        cursor: tab.visible ? 'pointer' : 'not-allowed',
-        accentColor: theme.colors.primary,
-      }}
-    />
-  </div>
-);

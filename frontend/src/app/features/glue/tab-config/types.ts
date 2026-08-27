@@ -5,6 +5,7 @@ export interface TabConfigItem {
   is_default: boolean;
   icon?: string | null;
   name?: string | null;
+  color?: string | null;
 }
 
 export interface TabWithConfig {

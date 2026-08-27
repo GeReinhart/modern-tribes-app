@@ -32,6 +32,10 @@ def test_update_tab_config_name_override():
 def test_update_tab_config_icon_only():
     pass
 
+@scenario(FEATURE, "PUT /tab-configs/my-context as viewer — a personal color override round-trips")
+def test_update_tab_config_color_override():
+    pass
+
 @scenario(FEATURE, "PUT /tab-configs/my-context — clearing the name with no icon set — 422 error")
 def test_update_tab_config_name_cleared_no_icon():
     pass

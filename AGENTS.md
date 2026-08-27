@@ -60,8 +60,15 @@ These rules apply to all code you write or modify, in any language or layer.
 
 - **Before building any UI element, check `frontend/src/app/platform/core/layout/themes/components/` for an existing themed component.**
 - **Never re-implement a UI control that already exists as a shared component.** Use the shared one and extend it if needed.
-- Known shared components include: `ThemedDateSelection` (date picker), `ThemePickerModal` (theme selector). Check the directory for the full list before coding.
+- Known shared components include: `ThemedDateSelection` (date picker), `ThemePickerModal` (theme selector), `IconSectionPicker` (icon selector, see Icons below). Check the directory for the full list before coding.
 - If a common component does not cover a new use case (e.g., datetime with time), extend or generalize it — do not create a parallel implementation.
+
+### Icons
+
+- All icons are defined once under `frontend/src/app/platform/core/layout/themes/icons/` (the `IconName` union in `iconTypes.ts`, rendered by `ThemedSvgIcon.tsx`). **Never add an icon set or icon picker inside a feature package.**
+- Icons are grouped into sections in `frontend/src/app/platform/core/layout/themes/icons/iconSections.ts` — one section per feature that has a real, coherent icon theme (e.g. `groceries`, `media`, `tasks`), plus a `general` catch-all for cross-cutting UI icons. An icon may belong to more than one section.
+- **Any UI that lets a user pick an icon MUST use the shared `IconSectionPicker` component** (`frontend/src/app/platform/core/layout/themes/components/IconSectionPicker.tsx`) — never build a bespoke icon grid. Pass `defaultOpenSection` set to the section matching the current feature/context so it opens pre-expanded, while every other section stays reachable (never restrict the user to one section).
+- When a new feature introduces genuinely new icons or a new coherent icon theme, add them to `iconTypes.ts`/the relevant `iconPaths*.tsx` file and add or extend a section in `iconSections.ts` — do not scatter feature-specific icon lists elsewhere.
 
 ### Refactoring Triggers
 

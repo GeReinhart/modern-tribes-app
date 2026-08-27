@@ -1,10 +1,9 @@
+import { IconSectionPicker } from '@/app/platform/core/layout/themes/components/IconSectionPicker.tsx';
 import { IconName, ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import GroceriesIconPicker from './GroceriesIconPicker.tsx';
 
 interface Props {
   value: string | null;
@@ -39,7 +38,9 @@ const GroceriesIconPickerField: React.FC<Props> = ({ value, onChange }) => {
         {value && <ThemedSvgIcon name={value as IconName} color={theme.colors.text} size={16} />}
         {t('features.groceries.iconLabel')}
       </button>
-      {expanded && <GroceriesIconPicker value={value} onChange={onChange} />}
+      {expanded && (
+        <IconSectionPicker value={value} onChange={onChange} defaultOpenSection="groceries" />
+      )}
     </div>
   );
 };

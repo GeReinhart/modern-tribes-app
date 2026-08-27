@@ -10,6 +10,7 @@ class TabConfigItem(BaseModel):
     is_default: bool = False
     icon: Optional[str] = None
     name: Optional[str] = None
+    color: Optional[str] = None
 
     @model_validator(mode="after")
     def validate_name_or_icon(self):

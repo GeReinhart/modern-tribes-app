@@ -32,6 +32,16 @@ const en: Record<string, string> = {
   'common.updatedBy': 'Updated',
   'common.forceOnDashboard': 'Force on Dashboard',
 
+  'iconPicker.searchPlaceholder': 'Search icons...',
+  'iconPicker.noResults': 'No matching icon',
+  'iconPicker.section.general': 'General',
+  'iconPicker.section.tasks': 'Tasks & tracking',
+  'iconPicker.section.calendar': 'Calendar & time',
+  'iconPicker.section.documents': 'Documents & files',
+  'iconPicker.section.media': 'Media & music',
+  'iconPicker.section.people': 'Communication & people',
+  'iconPicker.section.groceries': 'Groceries',
+
   'auth.signIn': 'Sign in to your account',
   'auth.magicLinkHint': "We'll send you a magic link to sign in",
   'auth.email': 'Email',

@@ -83,8 +83,8 @@ Feature: Update tab configuration
       }
       """
     And the user_tab_configs table contains:
-      | user_id | context_key | tab_configs                                                                                                  |
-      | 0002    | my-context  | [{"key": "bookmarks", "icon": null, "name": "Favourites", "order": 0, "visible": true, "is_default": true}] |
+      | user_id | context_key | tab_configs                                                                                                                 |
+      | 0002    | my-context  | [{"key": "bookmarks", "icon": null, "name": "Favourites", "color": null, "order": 0, "visible": true, "is_default": true}] |
 
   Scenario: PUT /tab-configs/my-context as viewer — clearing the name with an icon set makes the tab icon-only
     Given I am authenticated as a regular user: user.id 0002
@@ -105,8 +105,30 @@ Feature: Update tab configuration
       }
       """
     And the user_tab_configs table contains:
-      | user_id | context_key | tab_configs                                                                                        |
-      | 0002    | my-context  | [{"key": "bookmarks", "icon": "star", "name": "", "order": 0, "visible": true, "is_default": true}] |
+      | user_id | context_key | tab_configs                                                                                                       |
+      | 0002    | my-context  | [{"key": "bookmarks", "icon": "star", "name": "", "color": null, "order": 0, "visible": true, "is_default": true}] |
+
+  Scenario: PUT /tab-configs/my-context as viewer — a personal color override round-trips
+    Given I am authenticated as a regular user: user.id 0002
+    And the user_tab_configs table contains:
+      | id | user_id | context_key | tab_configs |
+    When I PUT /api/features/glue/tab-configs/my-context with body:
+      """
+      {"tab_configs": [{"key": "bookmarks", "visible": true, "order": 0, "is_default": true, "color": "#4287f5"}]}
+      """
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "context_key": "my-context",
+        "tab_configs": [
+          {"key": "bookmarks", "visible": true, "order": 0, "is_default": true, "color": "#4287f5"}
+        ]
+      }
+      """
+    And the user_tab_configs table contains:
+      | user_id | context_key | tab_configs                                                                                                             |
+      | 0002    | my-context  | [{"key": "bookmarks", "icon": null, "name": null, "color": "#4287f5", "order": 0, "visible": true, "is_default": true}] |
 
   @error_case
   Scenario: PUT /tab-configs/my-context — clearing the name with no icon set — 422 error

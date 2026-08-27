@@ -23,7 +23,7 @@ function mergeWithSaved(
     return {
       key: tab.key,
       label: tab.label,
-      color: tab.color,
+      color: (s ? s.color : undefined) ?? tab.color,
       icon: s ? s.icon : tab.icon,
       name: s ? s.name : undefined,
       visible: s ? s.visible : true,

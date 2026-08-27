@@ -7,8 +7,9 @@ import { ThemedTabs } from '@/app/platform/core/layout/themes/components/ThemedT
 import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
 import { ThemeProvider, useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
-import { TabConfigPopup } from '@/app/features/glue/tab-config/TabConfigPopup.tsx';
+import { TabEditPopup } from '@/app/features/glue/tab-config/TabEditPopup.tsx';
 import { useTabConfig } from '@/app/features/glue/tab-config/useTabConfig.ts';
+import { useTabEditMode } from '@/app/features/glue/tab-config/useTabEditMode.ts';
 import { useCurrentUserProfile } from '@/app/platform/functions/people/users/useCurrentUserProfile.ts';
 import {
   useArchivedProjectsByTribe,
@@ -62,7 +63,6 @@ const ShowTribePageContent: React.FC = () => {
   } = authorizationHooks();
   const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const [archiving, setArchiving] = useState(false);
-  const [showTabConfig, setShowTabConfig] = useState(false);
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [reorderingProjects, setReorderingProjects] = useState(false);
 
@@ -172,6 +172,9 @@ const ShowTribePageContent: React.FC = () => {
     defaultTabKey,
   );
 
+  const { tabEditMode, editingTabKey, setEditingTabKey, hiddenTabs, toggleTabEditMode } =
+    useTabEditMode(tabsWithConfig);
+
   // Check authorization when component mounts or tribeId changes
   useEffect(() => {
     if (tribeId) {
@@ -214,9 +217,9 @@ const ShowTribePageContent: React.FC = () => {
   const menuActions = useMemo(
     (): MenuAction[] => [
       {
-        icon: 'settings' as const,
-        label: t('tabConfig.configure'),
-        onClick: () => setShowTabConfig(true),
+        icon: tabEditMode ? ('x' as const) : ('settings' as const),
+        label: tabEditMode ? t('tabConfig.finishConfigure') : t('tabConfig.configure'),
+        onClick: toggleTabEditMode,
       },
       ...(searchHighlight
         ? [
@@ -276,7 +279,7 @@ const ShowTribePageContent: React.FC = () => {
           ]
         : []),
     ],
-    [isManager, activeTab, reorderingProjects, authorization?.authorized, archiving, tribeId, t, setShowTabConfig, setShowThemePicker, searchHighlight, searchParams, setSearchParams],
+    [isManager, activeTab, reorderingProjects, authorization?.authorized, archiving, tribeId, t, tabEditMode, toggleTabEditMode, setShowThemePicker, searchHighlight, searchParams, setSearchParams],
   );
 
   const breadcrumbs = React.useMemo(
@@ -386,11 +389,13 @@ const ShowTribePageContent: React.FC = () => {
       breadcrumbTabs={breadcrumbTabs}
       bookmarkSlot={tribe?.name ? <BookmarkToggle pagePath={location.pathname} pageTitle={tribe.name} pageDescription={buildBookmarkDescription(breadcrumbs)} /> : null}
     >
-      {showTabConfig && (
-        <TabConfigPopup
+      {editingTabKey && (
+        <TabEditPopup
+          tabKey={editingTabKey}
           tabsWithConfig={tabsWithConfig}
+          isPinned={false}
           onSave={saveConfig}
-          onClose={() => setShowTabConfig(false)}
+          onClose={() => setEditingTabKey(null)}
         />
       )}
 
@@ -422,6 +427,9 @@ const ShowTribePageContent: React.FC = () => {
         tabs={navTabs}
         activeTab={activeTab}
         onTabChange={handleTabChange}
+        editMode={tabEditMode}
+        hiddenTabs={hiddenTabs}
+        onEditTab={setEditingTabKey}
       />
 
       <div style={{ marginTop: '16px' }}>

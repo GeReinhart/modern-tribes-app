@@ -1,5 +1,5 @@
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
-import { IconPicker } from '@/app/platform/core/layout/themes/components/IconPicker.tsx';
+import { IconSectionPicker } from '@/app/platform/core/layout/themes/components/IconSectionPicker.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedBadge } from '@/app/platform/core/layout/themes/components/ThemedBadge.tsx';
 import { ThemedConfirmDialog } from '@/app/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
@@ -16,13 +16,15 @@ import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
 import { TabActionsProvider } from '@/app/platform/core/layout/TabActionsContext.tsx';
 import { ThemeProvider, useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { getFeatureComponent } from '@/app/features/glue/registry.ts';
-import { TabConfigPopup } from '@/app/features/glue/tab-config/TabConfigPopup.tsx';
+import { TabEditPopup } from '@/app/features/glue/tab-config/TabEditPopup.tsx';
 import { useTabConfig } from '@/app/features/glue/tab-config/useTabConfig.ts';
+import { useTabEditMode } from '@/app/features/glue/tab-config/useTabEditMode.ts';
 import { useCurrentUserProfile } from '@/app/platform/functions/people/users/useCurrentUserProfile.ts';
 import {
   useFeatureTypes,
   useProjectFeatures,
 } from '@/app/features/glue/features/useProjectFeatures.ts';
+import { iconSectionForFeatureType } from '@/app/features/glue/features/iconSectionForFeatureType.ts';
 import {
   useArchiveProject,
   useProjectTribesWithMembers,
@@ -179,7 +181,11 @@ const AddFeatureModal: React.FC<{
             >
               {t('features.featureIcon')}
             </label>
-            <IconPicker value={icon} onChange={setIcon} />
+            <IconSectionPicker
+              value={icon}
+              onChange={setIcon}
+              defaultOpenSection={iconSectionForFeatureType(featureType)}
+            />
           </div>
           <div
             style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}
@@ -251,7 +257,6 @@ const ShowProjectPageContent: React.FC = () => {
   const initialLabelId = searchParams.get('labelId') || null;
   const searchHighlight = searchParams.get('q') ?? null;
   const [showAddFeature, setShowAddFeature] = useState(false);
-  const [showTabConfig, setShowTabConfig] = useState(false);
   const [showProjectThemePicker, setShowProjectThemePicker] = useState(false);
   const [showFeatureThemePicker, setShowFeatureThemePicker] = useState(false);
   const [archiveProjectOpen, setArchiveProjectOpen] = useState(false);
@@ -346,6 +351,9 @@ const ShowProjectPageContent: React.FC = () => {
     featuresLoaded,
   );
 
+  const { tabEditMode, editingTabKey, setEditingTabKey, hiddenTabs, toggleTabEditMode } =
+    useTabEditMode(tabsWithConfig);
+
   const breadcrumbs = useMemo(
     () => [
       { label: t('common.home'), path: '/app' },
@@ -370,9 +378,9 @@ const ShowProjectPageContent: React.FC = () => {
   const menuActions = useMemo(
     (): MenuAction[] => [
       {
-        icon: 'settings',
-        label: t('tabConfig.configure'),
-        onClick: () => setShowTabConfig(true),
+        icon: tabEditMode ? ('x' as const) : ('settings' as const),
+        label: tabEditMode ? t('tabConfig.finishConfigure') : t('tabConfig.configure'),
+        onClick: toggleTabEditMode,
       },
       ...(searchHighlight
         ? [
@@ -419,7 +427,7 @@ const ShowProjectPageContent: React.FC = () => {
           ]
         : []),
     ],
-    [isManager, tribeId, projectId, t, navigate, searchHighlight, searchParams, setSearchParams],
+    [isManager, tribeId, projectId, t, navigate, tabEditMode, toggleTabEditMode, searchHighlight, searchParams, setSearchParams],
   );
 
   const tabActions = useMemo(
@@ -529,11 +537,13 @@ const ShowProjectPageContent: React.FC = () => {
       tabActions={tabActions}
       bookmarkSlot={project?.name ? <BookmarkToggle pagePath={location.pathname} pageTitle={project.name} pageDescription={buildBookmarkDescription(breadcrumbs)} /> : null}
     >
-      {showTabConfig && (
-        <TabConfigPopup
+      {editingTabKey && (
+        <TabEditPopup
+          tabKey={editingTabKey}
           tabsWithConfig={tabsWithConfig}
+          isPinned={false}
           onSave={saveConfig}
-          onClose={() => setShowTabConfig(false)}
+          onClose={() => setEditingTabKey(null)}
         />
       )}
 
@@ -568,6 +578,9 @@ const ShowProjectPageContent: React.FC = () => {
           tabs={navTabs}
           activeTab={activeTab}
           onTabChange={handleTabChange}
+          editMode={tabEditMode}
+          hiddenTabs={hiddenTabs}
+          onEditTab={setEditingTabKey}
         />
 
         <div style={{ paddingTop: '16px' }}>
@@ -877,7 +890,11 @@ const ShowProjectPageContent: React.FC = () => {
                 >
                   {t('features.featureIcon')}
                 </label>
-                <IconPicker value={renameIcon} onChange={setRenameIcon} />
+                <IconSectionPicker
+                  value={renameIcon}
+                  onChange={setRenameIcon}
+                  defaultOpenSection={iconSectionForFeatureType(activeFeature?.feature_type)}
+                />
               </div>
               <div style={{ marginBottom: '16px' }}>
                 <ThemeCodeSelect

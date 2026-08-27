@@ -32,6 +32,16 @@ const fr: Record<string, string> = {
   'common.updatedBy': 'Modifié le',
   'common.forceOnDashboard': 'Afficher sur le tableau de bord',
 
+  'iconPicker.searchPlaceholder': 'Rechercher une icône...',
+  'iconPicker.noResults': 'Aucune icône trouvée',
+  'iconPicker.section.general': 'Général',
+  'iconPicker.section.tasks': 'Tâches & suivi',
+  'iconPicker.section.calendar': 'Calendrier & temps',
+  'iconPicker.section.documents': 'Documents & fichiers',
+  'iconPicker.section.media': 'Média & musique',
+  'iconPicker.section.people': 'Communication & personnes',
+  'iconPicker.section.groceries': 'Courses',
+
   'auth.signIn': 'Connexion à votre compte',
   'auth.magicLinkHint':
     'Nous vous enverrons un lien magique pour vous connecter',

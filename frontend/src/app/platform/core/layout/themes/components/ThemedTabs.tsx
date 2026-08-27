@@ -17,17 +17,71 @@ interface ThemedTabsProps {
   tabs: Tab[];
   activeTab: string;
   onTabChange: (key: string) => void;
+  editMode?: boolean;
+  hiddenTabs?: Tab[];
+  onEditTab?: (key: string) => void;
 }
+
+interface DisplayTab extends Tab {
+  isHidden: boolean;
+}
+
+function buildTabStyle(
+  theme: ReturnType<typeof useTheme>['theme'],
+  tab: DisplayTab,
+  isActive: boolean,
+  editMode: boolean,
+): React.CSSProperties {
+  const tabColor = tab.color ?? theme.colors.primary;
+  const horizontalPadding = tab.label ? 'var(--space-lg)' : 'var(--space-sm)';
+  const editBorderColor = tab.isHidden ? theme.colors.border : theme.colors.accent;
+  return {
+    padding: `var(--space-sm) ${horizontalPadding}`,
+    border: editMode ? `1px dashed ${editBorderColor}` : 'none',
+    borderBottom: isActive ? `3px solid ${tabColor}` : '3px solid transparent',
+    marginBottom: '-2px',
+    background: editMode ? `${theme.colors.accent}15` : isActive ? `${tabColor}15` : 'transparent',
+    color: isActive ? tabColor : theme.colors.text,
+    opacity: tab.isHidden ? 0.5 : 1,
+    fontWeight: isActive ? 600 : 400,
+    cursor: 'pointer',
+    borderRadius: 'var(--radius-sm) var(--radius-sm) 0 0',
+    fontSize: 'var(--font-sm)',
+    transition: 'all 0.15s',
+    textDecoration: 'none',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+  };
+}
+
+const TabContent: React.FC<{ tab: Tab }> = ({ tab }) => {
+  const isIconOnly = !!tab.icon && !tab.label;
+  return (
+    <>
+      {tab.icon && <ThemedSvgIcon name={tab.icon as IconName} color="currentColor" size={isIconOnly ? 22 : 14} />}
+      {tab.label && <span>{tab.label}</span>}
+    </>
+  );
+};
 
 export const ThemedTabs: React.FC<ThemedTabsProps> = ({
   tabs,
   activeTab,
   onTabChange,
+  editMode = false,
+  hiddenTabs = [],
+  onEditTab,
 }) => {
   const { theme } = useTheme();
   const { chromeHidden } = useChromeVisibility();
 
   if (chromeHidden) return null;
+
+  const displayTabs: DisplayTab[] = [
+    ...tabs.map((tab) => ({ ...tab, isHidden: false })),
+    ...(editMode ? hiddenTabs.map((tab) => ({ ...tab, isHidden: true })) : []),
+  ];
 
   return (
     <div
@@ -40,37 +94,18 @@ export const ThemedTabs: React.FC<ThemedTabsProps> = ({
         marginBottom: '0',
       }}
     >
-      {tabs.map((tab) => {
+      {displayTabs.map((tab) => {
         const isActive = activeTab === tab.key;
-        const tabColor = tab.color ?? theme.colors.primary;
-        const isIconOnly = !!tab.icon && !tab.label;
-        const horizontalPadding = tab.label ? 'var(--space-lg)' : 'var(--space-sm)';
-        const iconSize = isIconOnly ? 22 : 14;
-        const tabStyle: React.CSSProperties = {
-          padding: `var(--space-sm) ${horizontalPadding}`,
-          border: 'none',
-          borderBottom: isActive
-            ? `3px solid ${tabColor}`
-            : '3px solid transparent',
-          marginBottom: '-2px',
-          background: isActive ? `${tabColor}15` : 'transparent',
-          color: isActive ? tabColor : theme.colors.text,
-          fontWeight: isActive ? 600 : 400,
-          cursor: 'pointer',
-          borderRadius: 'var(--radius-sm) var(--radius-sm) 0 0',
-          fontSize: 'var(--font-sm)',
-          transition: 'all 0.15s',
-          textDecoration: 'none',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px',
-        };
-        const content = (
-          <>
-            {tab.icon && <ThemedSvgIcon name={tab.icon as IconName} color="currentColor" size={iconSize} />}
-            {tab.label && <span>{tab.label}</span>}
-          </>
-        );
+        const tabStyle = buildTabStyle(theme, tab, isActive, editMode);
+        const content = <TabContent tab={tab} />;
+
+        if (editMode) {
+          return (
+            <button key={tab.key} type="button" onClick={() => onEditTab?.(tab.key)} style={tabStyle}>
+              {content}
+            </button>
+          );
+        }
         if (tab.href) {
           return (
             <Link key={tab.key} to={tab.href} style={tabStyle}>

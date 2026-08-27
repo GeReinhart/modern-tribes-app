@@ -674,11 +674,11 @@
         "description": {
           "en": [
             "- attach tools (task lists, kanban boards, guitar tools…) to a project as named tabs, each with its own icon",
-            "- each user can show, hide and reorder their own tabs, and personalize any tab's icon and name just for themselves"
+            "- each user can click on any tab to show, hide, reorder it, or personalize its icon, name and color, just for themselves"
           ],
           "fr": [
             "- ajoutez des outils (listes de tâches, kanbans, outils guitare…) à un projet sous forme d'onglets nommés, chacun avec sa propre icône",
-            "- chaque utilisateur peut afficher, masquer et réorganiser ses onglets, et personnaliser l'icône et le nom de n'importe quel onglet, juste pour lui"
+            "- chaque utilisateur peut cliquer sur n'importe quel onglet pour l'afficher, le masquer, le réordonner, ou personnaliser son icône, son nom et sa couleur, juste pour lui"
           ]
         },
         "backend": {
@@ -706,7 +706,7 @@
             "- Projects, Tasks and Events tabs: browse everything you have access to across your tribes, with open/upcoming counts, filterable by tribe",
             "- pin any feature tab (tasks, kanban, journal…) as a dashboard tab to view its content directly from the dashboard",
             "- jump straight from any task or event shown here to its project",
-            "- customize which tabs appear and set default project/tab shortcuts for quick-add"
+            "- customize each tab's color, visibility and order by clicking it, and choose your default project and tab for quick-add by picking a tribe then a project"
           ],
           "fr": [
             "- tableau de bord personnalisé affichant vos tâches, tribus et favoris",
@@ -714,7 +714,7 @@
             "- onglets Projets, Tâches et Événements : parcourez tout ce à quoi vous avez accès dans vos tribus, avec le nombre d'éléments ouverts/à venir, filtrable par tribu",
             "- épinglez n'importe quel onglet de fonctionnalité (tâches, kanban, journal…) comme onglet du tableau de bord pour en voir le contenu directement",
             "- accédez directement depuis une tâche ou un événement affiché ici à son projet",
-            "- personnalisez les onglets affichés et définissez des raccourcis de projet/onglet par défaut pour l'ajout rapide"
+            "- personnalisez la couleur, la visibilité et l'ordre de chaque onglet en cliquant dessus, et choisissez votre projet et onglet par défaut pour l'ajout rapide en sélectionnant une tribu puis un projet"
           ]
         },
         "frontend": {

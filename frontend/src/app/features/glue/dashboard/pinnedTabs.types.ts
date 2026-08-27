@@ -43,3 +43,13 @@ export function parseProjectFeaturePath(path: string): ProjectFeaturePathParams 
 export function isProjectFeaturePath(path: string): boolean {
   return PROJECT_FEATURE_PATH_RE.test(path);
 }
+
+export function makeUnpinHandler(
+  tabKey: string,
+  pinnedTabs: PinnedTab[],
+  unpin: (pinnedTabId: string) => Promise<void>,
+): (() => Promise<void>) | undefined {
+  const bookmarkId = parsePinnedTabKey(tabKey);
+  const pt = bookmarkId ? pinnedTabs.find((p) => p.bookmark_id === bookmarkId) : undefined;
+  return pt ? () => unpin(pt.id) : undefined;
+}
