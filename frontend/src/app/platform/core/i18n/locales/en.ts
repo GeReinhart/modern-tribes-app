@@ -301,6 +301,12 @@ const en: Record<string, string> = {
   'labels.delete': 'label',
   'labels.moveUp': 'Move up',
   'labels.moveDown': 'Move down',
+  'labels.manage': 'Manage labels',
+  'labels.none': 'No labels yet',
+  'labels.newLabelPlaceholder': 'New label name',
+  'labels.createLabel': 'Create label',
+  'labels.confirmDelete': 'Delete "{{name}}"?',
+  'labels.confirmDeleteInUse': 'Delete "{{name}}"? Used by {{count}} item(s).',
 
   'theme.selectTheme': 'Theme',
 

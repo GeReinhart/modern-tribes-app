@@ -37,6 +37,7 @@ const TodoListTab: React.FC<Props> = ({
     createLabel,
     updateLabel,
     deleteLabel,
+    reorderLabels,
     toggleLabel,
     setReminders,
   } = useTodoList(featureInstanceId);
@@ -114,6 +115,10 @@ const TodoListTab: React.FC<Props> = ({
   useRegisterTabActions(tabActions);
 
   const activeItemLabelIds = new Set(activeItems.flatMap((i) => i.label_ids));
+  const labelUsageCounts: Record<string, number> = {};
+  activeItems.forEach((i) => i.label_ids.forEach((id) => {
+    labelUsageCounts[id] = (labelUsageCounts[id] ?? 0) + 1;
+  }));
   const assignedPersons = persons.filter((p) =>
     activeItems.some((i) => i.assigned_person_id === p.id),
   );
@@ -167,8 +172,13 @@ const TodoListTab: React.FC<Props> = ({
           filterLabelId={filterLabelId}
           onFilter={setFilterLabelId}
           canEditLabels={isConfiguring}
+          usageCounts={labelUsageCounts}
+          onCreate={async (name, color) => {
+            await createLabel({ feature_instance_id: featureInstanceId, name, color });
+          }}
           onUpdate={updateLabel}
           onDelete={deleteLabel}
+          onReorder={reorderLabels}
         />
         {assignedPersons.length > 0 && (
           <div
@@ -244,6 +254,9 @@ const TodoListTab: React.FC<Props> = ({
             onToggleLabel={toggleLabel}
             onSetReminders={setReminders}
             onCreateLabel={createLabel}
+            onUpdateLabel={updateLabel}
+            onDeleteLabel={deleteLabel}
+            onReorderLabel={reorderLabels}
           />
         ))}
       </div>
@@ -296,6 +309,9 @@ const TodoListTab: React.FC<Props> = ({
           onToggleLabel={toggleLabel}
           onSetReminders={setReminders}
           onCreateLabel={createLabel}
+          onUpdateLabel={updateLabel}
+          onDeleteLabel={deleteLabel}
+          onReorderLabel={reorderLabels}
         />
       )}
     </div>

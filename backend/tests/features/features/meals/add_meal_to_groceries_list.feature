@@ -74,14 +74,14 @@ Feature: Add a suggested meal's ingredients to a groceries list
     When I POST /api/features/tasks/meals/grocery-suggestions/8001/add/7001
     Then the response status code is 204
     And the groceries_list_items table contains:
-      | groceries_list_id | groceries_item_id | custom_name    | custom_unit | quantity | status |
-      | 8001               | 3001               |                |             | 1.60      | active |
-      | 8001               |                    | Lasagna sheets | packs       | 2.00      | active |
+      | groceries_list_id | groceries_item_id | custom_name    | custom_unit | quantity | comment                    | status |
+      | 8001               | 3001               |                |             | 1.60      | 1.6 kg pour Family dinner  | active |
+      | 8001               |                    | Lasagna sheets | packs       | 2.00      | 2 packs pour Family dinner | active |
     And the groceries_list_meals table contains:
       | groceries_list_id | meal_id | headcount | status |
       | 8001               | 7001    | 8         | active |
 
-  Scenario: POST /meals/grocery-suggestions/8001/add/7001 — an ingredient already on the list has its quantity increased instead of being duplicated
+  Scenario: POST /meals/grocery-suggestions/8001/add/7001 — an ingredient already on the list has its quantity increased instead of being duplicated, and the comment reflects this meal's contribution
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:
       | id   | tribe_id | person_id | position | status |
@@ -94,9 +94,9 @@ Feature: Add a suggested meal's ingredients to a groceries list
     When I POST /api/features/tasks/meals/grocery-suggestions/8001/add/7001
     Then the response status code is 204
     And the groceries_list_items table contains:
-      | groceries_list_id | groceries_item_id | custom_name    | custom_unit | quantity | status |
-      | 8001               | 3001               |                |             | 2.10      | active |
-      | 8001               |                    | Lasagna sheets | packs       | 2.00      | active |
+      | groceries_list_id | groceries_item_id | custom_name    | custom_unit | quantity | comment                    | status |
+      | 8001               | 3001               |                |             | 2.10      | 1.6 kg pour Family dinner  | active |
+      | 8001               |                    | Lasagna sheets | packs       | 2.00      | 2 packs pour Family dinner | active |
 
   @error_case
   Scenario: POST /meals/grocery-suggestions/8001/add/7001 when the meal was already added — 400 error and nothing changes
@@ -170,10 +170,32 @@ Feature: Add a suggested meal's ingredients to a groceries list
     When I POST /api/features/tasks/meals/grocery-suggestions/8001/add-ingredient/7001/9004
     Then the response status code is 204
     And the groceries_list_items table contains:
-      | groceries_list_id | groceries_item_id | custom_name  | custom_unit | quantity | status |
-      | 8001               |                    | Garlic bread | pieces      | 2.00      | active |
+      | groceries_list_id | groceries_item_id | custom_name  | custom_unit | quantity | comment                     | status |
+      | 8001               |                    | Garlic bread | pieces      | 2.00      | 2 pieces pour Family dinner | active |
     And the groceries_list_meals table contains:
       | id | groceries_list_id | meal_id | headcount | status |
+
+  Scenario: POST /meals/grocery-suggestions/8001/add/7001 — the meal's description is included in each added item's comment
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the documents table contains:
+      | id   | content_html                    | status |
+      | 0500 | <p>Family favorite recipe.</p>  | active |
+    And the meals table contains:
+      | id   | feature_instance_id | document_id | status |
+      | 7001 | 0041                | 0500        | active |
+    And the groceries_list_items table contains:
+      | id | groceries_list_id | groceries_item_id | custom_name | custom_unit | quantity | position | status |
+    And the groceries_list_meals table contains:
+      | id | groceries_list_id | meal_id | headcount | status |
+    When I POST /api/features/tasks/meals/grocery-suggestions/8001/add/7001
+    Then the response status code is 204
+    And the groceries_list_items table contains:
+      | groceries_list_id | groceries_item_id | custom_name    | custom_unit | quantity | comment                                               | status |
+      | 8001               | 3001               |                |             | 1.60      | 1.6 kg pour Family dinner — Family favorite recipe.   | active |
+      | 8001               |                    | Lasagna sheets | packs       | 2.00      | 2 packs pour Family dinner — Family favorite recipe.  | active |
 
   @error_case
   Scenario: POST /meals/grocery-suggestions/8001/add-ingredient/7001/9004 as a project guest — 403 error and nothing changes

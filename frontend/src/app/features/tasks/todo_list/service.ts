@@ -49,6 +49,12 @@ class TodoListService {
     return apiService.delete<void>(`/features/tasks/todo-labels/${labelId}`);
   }
 
+  async reorderLabels(featureInstanceId: string, orderedIds: string[]): Promise<TodoLabel[]> {
+    return apiService.put<TodoLabel[]>('/features/tasks/todo-labels/reorder', {
+      feature_instance_id: featureInstanceId, ordered_ids: orderedIds,
+    });
+  }
+
   async toggleLabel(itemId: string, labelId: string): Promise<string[]> {
     return apiService.post<string[]>(
       `/features/tasks/todo-items/${itemId}/labels/${labelId}`,

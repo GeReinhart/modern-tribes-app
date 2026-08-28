@@ -55,6 +55,24 @@ const DashboardAddTaskModal: React.FC<Props> = ({ onClose, onCreated }) => {
     } catch { return null; }
   };
 
+  const handleUpdateLabel = async (labelId: string, updates: { name?: string; color?: string }): Promise<void> => {
+    if (!selectedInstance) return;
+    if (selectedInstance.feature_type === 'kanban') await kanbanService.updateLabel(labelId, updates);
+    else await todoListService.updateLabel(labelId, updates);
+  };
+
+  const handleDeleteLabel = async (labelId: string): Promise<void> => {
+    if (!selectedInstance) return;
+    if (selectedInstance.feature_type === 'kanban') await kanbanService.deleteLabel(labelId);
+    else await todoListService.deleteLabel(labelId);
+  };
+
+  const handleReorderLabel = async (orderedIds: string[]): Promise<void> => {
+    if (!selectedInstance) return;
+    if (selectedInstance.feature_type === 'kanban') await kanbanService.reorderLabels(selectedInstance.id, orderedIds);
+    else await todoListService.reorderLabels(selectedInstance.id, orderedIds);
+  };
+
   const handleSubmit = async (data: TaskCreateData) => {
     if (!selectedInstance) return;
     if (selectedInstance.feature_type === 'kanban') {
@@ -123,6 +141,9 @@ const DashboardAddTaskModal: React.FC<Props> = ({ onClose, onCreated }) => {
               canCreateLabel={true}
               onSubmit={handleSubmit}
               onCreateLabel={handleCreateLabel}
+              onUpdateLabel={handleUpdateLabel}
+              onDeleteLabel={handleDeleteLabel}
+              onReorderLabel={handleReorderLabel}
               onCancel={onClose}
             />
           )}

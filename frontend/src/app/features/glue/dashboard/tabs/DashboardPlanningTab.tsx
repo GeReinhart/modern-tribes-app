@@ -188,6 +188,9 @@ const DashboardPlanningTab: React.FC = () => {
           onSetReminders={async (id, rs) => { await eventsService.setReminders(id, rs); }}
           onToggleLabel={(id, lid) => eventsService.toggleLabel(id, lid)}
           onCreateLabel={data => eventsService.createLabel(data)}
+          onUpdateLabel={async (labelId, data) => { await eventsService.updateLabel(labelId, data); }}
+          onDeleteLabel={labelId => eventsService.deleteLabel(labelId)}
+          onReorderLabel={async (orderedIds) => { await eventsService.reorderLabels(editingEvent.feature_instance_id, orderedIds); }}
         />
       )}
       {showAddEvent && (

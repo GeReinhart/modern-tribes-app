@@ -104,3 +104,38 @@ Feature: Reorder recipe labels
         {"id": "2003", "name": "Holiday", "color": "#3b82f6", "position": 2}
       ]
       """
+
+  @error_case
+  Scenario: PUT /recipe-labels/reorder with an incomplete list — 400 error and the order is not changed
+    Given I am authenticated as an administrator: user.id 0001
+    When I PUT /api/features/tasks/recipe-labels/reorder with body:
+      """
+      {"feature_instance_id": "0040", "ordered_ids": ["2003", "2001"]}
+      """
+    Then the response status code is 400
+    And the labels table contains:
+      | id   | name    | position |
+      | 2001 | Quick   | 0        |
+      | 2002 | Family  | 1        |
+      | 2003 | Holiday | 2        |
+
+  @error_case
+  Scenario: PUT /recipe-labels/reorder with a label from another feature instance — 400 error and neither instance's order changes
+    Given the projects_features table contains:
+      | id   | project_id | name       | feature_type | status |
+      | 0041 | 0100       | Other Book | recipes      | active |
+    And the labels table contains:
+      | id   | name   | color   | position | feature_instance_id | status |
+      | 3001 | Snacks | #6b7280 | 0        | 0041                 | active |
+    And I am authenticated as an administrator: user.id 0001
+    When I PUT /api/features/tasks/recipe-labels/reorder with body:
+      """
+      {"feature_instance_id": "0040", "ordered_ids": ["2003", "2001", "3001"]}
+      """
+    Then the response status code is 400
+    And the labels table contains:
+      | id   | name    | position | feature_instance_id |
+      | 2001 | Quick   | 0        | 0040                 |
+      | 2002 | Family  | 1        | 0040                 |
+      | 2003 | Holiday | 2        | 0040                 |
+      | 3001 | Snacks  | 0        | 0041                 |

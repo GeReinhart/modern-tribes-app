@@ -33,7 +33,7 @@ def test_add_meal_success():
 @scenario(
     FEATURE,
     "POST /meals/grocery-suggestions/8001/add/7001 — an ingredient already on the list has its quantity "
-    "increased instead of being duplicated",
+    "increased instead of being duplicated, and the comment reflects this meal's contribution",
 )
 def test_add_meal_merges_existing_item():
     pass
@@ -83,6 +83,14 @@ def test_add_single_accompaniment():
     "changes",
 )
 def test_add_single_accompaniment_forbidden():
+    pass
+
+
+@scenario(
+    FEATURE,
+    "POST /meals/grocery-suggestions/8001/add/7001 — the meal's description is included in each added item's comment",
+)
+def test_add_meal_comment_includes_description():
     pass
 
 

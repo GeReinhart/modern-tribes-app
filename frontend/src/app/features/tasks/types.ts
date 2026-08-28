@@ -110,4 +110,7 @@ export interface TaskItemModalProps {
     name: string;
     color: string;
   }) => Promise<TaskLabelInfo | null>;
+  onUpdateLabel: (labelId: string, updates: { name?: string; color?: string }) => Promise<void>;
+  onDeleteLabel: (labelId: string) => Promise<void>;
+  onReorderLabel: (orderedIds: string[]) => Promise<void>;
 }

@@ -308,6 +308,12 @@ const fr: Record<string, string> = {
   'labels.delete': 'label',
   'labels.moveUp': 'Monter',
   'labels.moveDown': 'Descendre',
+  'labels.manage': 'Gérer les labels',
+  'labels.none': 'Aucun label pour le moment',
+  'labels.newLabelPlaceholder': 'Nom du nouveau label',
+  'labels.createLabel': 'Créer le label',
+  'labels.confirmDelete': 'Supprimer « {{name}} » ?',
+  'labels.confirmDeleteInUse': 'Supprimer « {{name}} » ? Utilisé par {{count}} élément(s).',
 
   'theme.selectTheme': 'Thème',
 

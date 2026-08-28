@@ -22,7 +22,7 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
   const { t } = useTranslation();
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const { recipes, labels, error, createRecipe, updateLabel, archiveLabel, reorderLabels } =
+  const { recipes, labels, error, createRecipe, createLabel, updateLabel, archiveLabel, reorderLabels } =
     useRecipes(featureInstanceId);
   const [creating, setCreating] = useState(false);
   const [filterLabelId, setFilterLabelId] = useState<string | null>(null);
@@ -48,6 +48,11 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
   useRegisterTabActions(tabActions);
 
   const activeLabelIds = useMemo(() => new Set(recipes.flatMap((r) => r.label_ids)), [recipes]);
+  const usageCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    recipes.forEach((r) => r.label_ids.forEach((id) => { counts[id] = (counts[id] ?? 0) + 1; }));
+    return counts;
+  }, [recipes]);
 
   useEffect(() => {
     if (filterLabelId && !activeLabelIds.has(filterLabelId)) setFilterLabelId(null);
@@ -75,6 +80,8 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
             filterLabelId={filterLabelId}
             onFilter={setFilterLabelId}
             canEditLabels={canEdit && configuringLabels}
+            usageCounts={usageCounts}
+            onCreate={async (name, color) => { await createLabel(name, color); }}
             onUpdate={updateLabel}
             onDelete={archiveLabel}
             onReorder={reorderLabels}

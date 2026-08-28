@@ -287,6 +287,19 @@ export function useKanban(featureInstanceId: string | null) {
     }
   }, []);
 
+  const reorderLabels = useCallback(
+    async (orderedIds: string[]) => {
+      if (!featureInstanceId) return;
+      try {
+        const labels = await kanbanService.reorderLabels(featureInstanceId, orderedIds);
+        setBoard((prev) => ({ ...prev, labels }));
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'An error occurred');
+      }
+    },
+    [featureInstanceId],
+  );
+
   const toggleCardLabel = useCallback(
     async (cardId: string, labelId: string, currentLabelIds: string[]) => {
       try {
@@ -340,6 +353,7 @@ export function useKanban(featureInstanceId: string | null) {
     createLabel,
     updateLabel,
     deleteLabel,
+    reorderLabels,
     toggleCardLabel,
     setCardReminders,
     refetch: fetchBoard,

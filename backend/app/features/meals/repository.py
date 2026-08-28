@@ -214,7 +214,8 @@ async def fetch_meal_ingredient_rows(pool, meal_id: str) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             """SELECT r.servings, ri.groceries_item_id, ri.custom_name, ri.custom_unit, ri.quantity,
-                      COALESCE(gi.is_divisible, TRUE) AS is_divisible
+                      COALESCE(gi.is_divisible, TRUE) AS is_divisible,
+                      COALESCE(gi.unit, ri.custom_unit) AS ingredient_unit
                FROM meal_recipes mr
                JOIN recipes r ON r.id = mr.recipe_id AND r.status = 'active'
                JOIN recipe_ingredients ri ON ri.recipe_id = r.id AND ri.status = 'active'
@@ -229,7 +230,8 @@ async def fetch_single_recipe_ingredient_for_meal(pool, meal_id: str, recipe_ing
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
             """SELECT r.servings, ri.groceries_item_id, ri.custom_name, ri.custom_unit, ri.quantity,
-                      COALESCE(gi.is_divisible, TRUE) AS is_divisible
+                      COALESCE(gi.is_divisible, TRUE) AS is_divisible,
+                      COALESCE(gi.unit, ri.custom_unit) AS ingredient_unit
                FROM meal_recipes mr
                JOIN recipes r ON r.id = mr.recipe_id AND r.status = 'active'
                JOIN recipe_ingredients ri ON ri.recipe_id = r.id AND ri.status = 'active'
@@ -283,7 +285,7 @@ async def unmark_meal_added(pool, groceries_list_id: str, meal_id: str, user_id:
 async def _find_matching_list_item(conn, groceries_list_id: str, item: dict) -> Optional[dict]:
     groceries_item_id = UUID(item["groceries_item_id"]) if item.get("groceries_item_id") else None
     return await conn.fetchrow(
-        """SELECT id, quantity FROM groceries_list_items
+        """SELECT id, quantity, comment FROM groceries_list_items
            WHERE groceries_list_id = $1
              AND (
                  (groceries_item_id IS NOT NULL AND groceries_item_id = $2)
@@ -298,7 +300,18 @@ async def _find_matching_list_item(conn, groceries_list_id: str, item: dict) -> 
     )
 
 
+def _append_comment(existing_comment: Optional[str], addition: Optional[str]) -> Optional[str]:
+    if not addition:
+        return existing_comment
+    if not existing_comment:
+        return addition
+    return f"{existing_comment}\n{addition}"
+
+
 async def insert_list_items_bulk(pool, groceries_list_id: str, items: list[dict], user_id: str) -> None:
+    """Each item may carry a `comment` (e.g. its quantity/unit for the originating meal) —
+    appended to any existing comment when merged into an already-present list item, so a
+    shared item keeps track of every meal that contributed to its quantity."""
     async with pool.acquire() as conn:
         position = await conn.fetchval(
             "SELECT COALESCE(MAX(position), -1) + 1 FROM groceries_list_items WHERE groceries_list_id = $1",
@@ -308,19 +321,20 @@ async def insert_list_items_bulk(pool, groceries_list_id: str, items: list[dict]
         for item in items:
             existing = await _find_matching_list_item(conn, groceries_list_id, item)
             if existing:
+                merged_comment = _append_comment(existing["comment"], item.get("comment"))
                 await conn.execute(
-                    "UPDATE groceries_list_items SET quantity = quantity + $2, updated_by = $3 WHERE id = $1",
-                    existing["id"], item["quantity"], UUID(user_id),
+                    "UPDATE groceries_list_items SET quantity = quantity + $2, comment = $3, updated_by = $4 WHERE id = $1",
+                    existing["id"], item["quantity"], merged_comment, UUID(user_id),
                 )
                 continue
             await conn.execute(
                 """INSERT INTO groceries_list_items
-                       (groceries_list_id, groceries_item_id, custom_name, custom_unit, quantity, position,
+                       (groceries_list_id, groceries_item_id, custom_name, custom_unit, quantity, comment, position,
                         created_by, updated_by)
-                   VALUES ($1, $2, $3, $4, $5, $6, $7, $7)""",
+                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8)""",
                 UUID(groceries_list_id),
                 UUID(item["groceries_item_id"]) if item.get("groceries_item_id") else None,
-                item.get("custom_name"), item.get("custom_unit"), item["quantity"], position + offset,
-                UUID(user_id),
+                item.get("custom_name"), item.get("custom_unit"), item["quantity"], item.get("comment"),
+                position + offset, UUID(user_id),
             )
             offset += 1

@@ -20,11 +20,15 @@ interface Props {
   onDelete: () => Promise<void>;
   onToggleLabel: (labelId: string) => void;
   onCreateLabel: (name: string, color: string) => Promise<void>;
+  onUpdateLabel: (labelId: string, updates: { name?: string; color?: string }) => Promise<void>;
+  onDeleteLabel: (labelId: string) => Promise<void>;
+  onReorderLabel: (orderedIds: string[]) => Promise<void>;
 }
 
 const JournalBlockCard: React.FC<Props> = ({
   block, labels, canEdit, isFirst, isLast, searchQuery,
   onMoveUp, onMoveDown, onSave, onDelete, onToggleLabel, onCreateLabel,
+  onUpdateLabel, onDeleteLabel, onReorderLabel,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -58,7 +62,15 @@ const JournalBlockCard: React.FC<Props> = ({
         {/* Action bar */}
         {canEdit && !editing && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 10px 2px', justifyContent: 'flex-end' }}>
-            <JournalLabelPicker labels={labels} activeLabelIds={block.label_ids} onToggle={onToggleLabel} onCreateLabel={onCreateLabel} />
+            <JournalLabelPicker
+              labels={labels}
+              activeLabelIds={block.label_ids}
+              onToggle={onToggleLabel}
+              onCreateLabel={onCreateLabel}
+              onUpdateLabel={onUpdateLabel}
+              onDeleteLabel={onDeleteLabel}
+              onReorderLabel={onReorderLabel}
+            />
             <button type="button" onClick={() => { setEditContent(block.content_html ?? ''); setEditing(true); }} title={t('journal.editBlock')}
               style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', opacity: 0.6 }}>
               <ThemedSvgIcon name="pencil" color={theme.colors.text} size={13} />

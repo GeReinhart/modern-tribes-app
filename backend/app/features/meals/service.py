@@ -2,6 +2,7 @@ import math
 from typing import Optional
 
 from app.features.meals import repository as meals_repository
+from app.platform.core.utils.document_helpers import strip_html
 
 
 def _scale_quantity(quantity: float, headcount: int, servings: int, is_divisible: bool) -> float:
@@ -9,6 +10,29 @@ def _scale_quantity(quantity: float, headcount: int, servings: int, is_divisible
     if is_divisible:
         return round(scaled, 2)
     return float(math.ceil(scaled - 1e-9))
+
+
+def _format_quantity(quantity: float) -> str:
+    return f"{quantity:g}"
+
+
+def _meal_label(meal: dict) -> str:
+    if meal.get("title"):
+        return meal["title"]
+    return f"repas du {meal['start_at']:%d/%m/%Y}"
+
+
+def _build_item_comment(meal: dict, quantity: float, unit: Optional[str]) -> str:
+    """The quantity/unit this meal contributes, plus the meal's own description, so a
+    shared groceries item keeps a trace of what it's needed for once merged with others."""
+    qty_part = _format_quantity(quantity)
+    if unit:
+        qty_part = f"{qty_part} {unit}"
+    comment = f"{qty_part} pour {_meal_label(meal)}"
+    description = strip_html(meal.get("document_content_html") or "").strip()
+    if description:
+        comment = f"{comment} — {description}"
+    return comment
 
 
 async def compute_grocery_suggestions(pool, groceries_list_id: str) -> Optional[list[dict]]:
@@ -73,15 +97,16 @@ async def add_meal_to_groceries_list(pool, groceries_list_id: str, meal_id: str,
     if not rows:
         return None
 
-    items = [
-        {
+    items = []
+    for r in rows:
+        quantity = _scale_quantity(r["quantity"], meal["headcount"], r["servings"], r["is_divisible"])
+        items.append({
             "groceries_item_id": str(r["groceries_item_id"]) if r["groceries_item_id"] else None,
             "custom_name": r["custom_name"],
             "custom_unit": r["custom_unit"],
-            "quantity": _scale_quantity(r["quantity"], meal["headcount"], r["servings"], r["is_divisible"]),
-        }
-        for r in rows
-    ]
+            "quantity": quantity,
+            "comment": _build_item_comment(meal, quantity, r["ingredient_unit"]),
+        })
     await meals_repository.insert_list_items_bulk(pool, groceries_list_id, items, user_id)
     await meals_repository.mark_meal_added(pool, groceries_list_id, meal_id, meal["headcount"], user_id)
     return items
@@ -116,11 +141,13 @@ async def add_ingredient_to_groceries_list(
     row = await meals_repository.fetch_single_recipe_ingredient_for_meal(pool, meal_id, recipe_ingredient_id)
     if not row:
         return None
+    quantity = _scale_quantity(row["quantity"], meal["headcount"], row["servings"], row["is_divisible"])
     item = {
         "groceries_item_id": str(row["groceries_item_id"]) if row["groceries_item_id"] else None,
         "custom_name": row["custom_name"],
         "custom_unit": row["custom_unit"],
-        "quantity": _scale_quantity(row["quantity"], meal["headcount"], row["servings"], row["is_divisible"]),
+        "quantity": quantity,
+        "comment": _build_item_comment(meal, quantity, row["ingredient_unit"]),
     }
     await meals_repository.insert_list_items_bulk(pool, groceries_list_id, [item], user_id)
     return item

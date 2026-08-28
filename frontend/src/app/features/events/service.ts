@@ -79,6 +79,12 @@ class EventsService {
   async deleteLabel(labelId: string): Promise<void> {
     return apiService.delete<void>(`/features/tasks/event-labels/${labelId}`);
   }
+
+  async reorderLabels(featureInstanceId: string, orderedIds: string[]): Promise<FeatureLabel[]> {
+    return apiService.put<FeatureLabel[]>('/features/tasks/event-labels/reorder', {
+      feature_instance_id: featureInstanceId, ordered_ids: orderedIds,
+    });
+  }
 }
 
 export const eventsService = new EventsService();

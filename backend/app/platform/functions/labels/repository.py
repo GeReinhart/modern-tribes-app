@@ -131,7 +131,7 @@ async def update_feature_label(
 
 
 async def reorder_feature_labels(pool, feature_instance_id: str, ordered_ids: list[str], user_id: str) -> list[dict]:
-    async with pool.acquire() as conn:
+    async with pool.acquire() as conn, conn.transaction():
         for position, label_id in enumerate(ordered_ids):
             await conn.execute(
                 "UPDATE labels SET position = $1, updated_by = $2 WHERE id = $3 AND feature_instance_id = $4",

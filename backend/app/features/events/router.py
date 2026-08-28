@@ -15,8 +15,12 @@ from app.features.events.label_service import (
     create_feature_label,
     update_feature_label,
     delete_feature_label,
+    reorder_feature_labels,
 )
-from app.features.tasks.models import PersonOption, FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate
+from app.features.tasks.models import PersonOption
+from app.platform.functions.labels.models import (
+    FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate, FeatureLabelsReorderRequest,
+)
 from app.platform.core.authorization.permissions import get_user_permissions
 from app.features.events.models import (
     EventCreate, EventUpdate, EventReminderCreate, EventReminderResponse, EventResponse,
@@ -245,3 +249,10 @@ async def update_label(label_id: str, data: FeatureLabelUpdate, current_user: di
 async def delete_label(label_id: str, current_user: dict = Depends(get_current_user)):
     """Delete an event label."""
     await delete_feature_label(get_database(), label_id, current_user)
+
+
+@label_router.put("/reorder", response_model=list[FeatureLabel])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def reorder_labels(data: FeatureLabelsReorderRequest, current_user: dict = Depends(get_current_user)):
+    """Reorder the labels of an events feature instance."""
+    return await reorder_feature_labels(get_database(), data, current_user)

@@ -33,6 +33,7 @@ const EventsTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager }) =
     events, labels, persons, error,
     createEvent, updateEvent, deleteEvent,
     setParticipants, setReminders, toggleLabel, createLabel,
+    updateLabel, deleteLabel, reorderLabels,
   } = useEvents(featureInstanceId);
 
   const today = new Date();
@@ -187,6 +188,9 @@ const EventsTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager }) =
             setCreating(false);
           }}
           onCreateLabel={createLabel}
+          onUpdateLabel={updateLabel}
+          onDeleteLabel={deleteLabel}
+          onReorderLabel={reorderLabels}
           onClose={() => setCreating(false)}
         />
       )}
@@ -213,6 +217,9 @@ const EventsTab: React.FC<Props> = ({ featureInstanceId, canEdit, isManager }) =
           onSetReminders={setReminders}
           onToggleLabel={toggleLabel}
           onCreateLabel={createLabel}
+          onUpdateLabel={updateLabel}
+          onDeleteLabel={deleteLabel}
+          onReorderLabel={reorderLabels}
         />
       )}
     </div>

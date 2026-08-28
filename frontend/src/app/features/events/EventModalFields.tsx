@@ -44,6 +44,10 @@ interface Props {
   onToggleLabel: (labelId: string) => void;
   onCreateLabel: (data: FeatureLabelCreate) => Promise<FeatureLabel | null>;
   onLabelCreated: (label: TaskLabelInfo) => void;
+  onUpdateLabel: (labelId: string, updates: { name?: string; color?: string }) => Promise<void>;
+  onDeleteLabel: (labelId: string) => Promise<void>;
+  onReorderLabel: (orderedIds: string[]) => Promise<void>;
+  onLabelDeleted: (labelId: string) => void;
   color: string;
   onColorChange: (v: string) => void;
   reminders: EventReminderCreate[];
@@ -59,6 +63,7 @@ const EventModalFields: React.FC<Props> = ({
   allDay, multiDay, startAt, endAt, onAllDayChange, onMultiDayChange, onStartAtChange, onEndAtChange,
   persons, participantIds, onParticipantsChange, size, onSizeChange,
   taskLabels, localLabelIds, isManager, featureInstanceId, onToggleLabel, onCreateLabel, onLabelCreated,
+  onUpdateLabel, onDeleteLabel, onReorderLabel, onLabelDeleted,
   color, onColorChange,
   reminders, onRemindersChange, notes, onNotesChange,
   forceOnDashboard, onForceOnDashboardChange,
@@ -112,6 +117,11 @@ const EventModalFields: React.FC<Props> = ({
           onToggle={onToggleLabel}
           onCreateLabel={onCreateLabel as Parameters<typeof TaskItemModalLabels>[0]['onCreateLabel']}
           onLabelCreated={onLabelCreated}
+          onUpdateLabel={onUpdateLabel}
+          onLabelUpdated={() => {}}
+          onDeleteLabel={onDeleteLabel}
+          onLabelDeleted={onLabelDeleted}
+          onReorderLabel={onReorderLabel}
         />
       </div>
 

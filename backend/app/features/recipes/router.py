@@ -16,7 +16,7 @@ from app.features.recipes.label_service import (
     delete_feature_label,
     reorder_feature_labels,
 )
-from app.features.tasks.models import (
+from app.platform.functions.labels.models import (
     FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate, FeatureLabelsReorderRequest,
 )
 from app.features.recipes.models import (

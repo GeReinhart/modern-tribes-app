@@ -24,12 +24,15 @@ interface Props {
   canCreateLabel: boolean;
   onSubmit: (data: TaskCreateData) => Promise<void>;
   onCreateLabel: (data: { feature_instance_id: string; name: string; color: string }) => Promise<TaskLabelInfo | null>;
+  onUpdateLabel: (labelId: string, updates: { name?: string; color?: string }) => Promise<void>;
+  onDeleteLabel: (labelId: string) => Promise<void>;
+  onReorderLabel: (orderedIds: string[]) => Promise<void>;
   onCancel: () => void;
 }
 
 const TaskCreateForm: React.FC<Props> = ({
   featureInstanceId, labels, persons, canCreateLabel,
-  onSubmit, onCreateLabel, onCancel,
+  onSubmit, onCreateLabel, onUpdateLabel, onDeleteLabel, onReorderLabel, onCancel,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -59,6 +62,15 @@ const TaskCreateForm: React.FC<Props> = ({
   const handleLabelCreated = (label: TaskLabelInfo) => {
     setAllLabels((prev) => [...prev, label]);
     setLocalLabelIds((prev) => [...prev, label.id]);
+  };
+
+  const handleLabelUpdated = (label: TaskLabelInfo) => {
+    setAllLabels((prev) => prev.map((l) => (l.id === label.id ? label : l)));
+  };
+
+  const handleLabelDeleted = (labelId: string) => {
+    setAllLabels((prev) => prev.filter((l) => l.id !== labelId));
+    setLocalLabelIds((prev) => prev.filter((id) => id !== labelId));
   };
 
   const handleSubmit = async () => {
@@ -106,6 +118,11 @@ const TaskCreateForm: React.FC<Props> = ({
         onToggle={handleToggle}
         onCreateLabel={onCreateLabel}
         onLabelCreated={handleLabelCreated}
+        onUpdateLabel={onUpdateLabel}
+        onLabelUpdated={handleLabelUpdated}
+        onDeleteLabel={onDeleteLabel}
+        onLabelDeleted={handleLabelDeleted}
+        onReorderLabel={onReorderLabel}
       />
 
       <div>

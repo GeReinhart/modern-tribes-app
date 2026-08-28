@@ -44,6 +44,7 @@ const KanbanTab: React.FC<Props> = ({
     createLabel,
     updateLabel,
     deleteLabel,
+    reorderLabels,
     toggleCardLabel,
     setCardReminders,
   } = useKanban(featureInstanceId);
@@ -123,6 +124,12 @@ const KanbanTab: React.FC<Props> = ({
       .filter((c) => c.status === 'active')
       .flatMap((c) => c.label_ids),
   );
+  const labelUsageCounts: Record<string, number> = {};
+  board.cards
+    .filter((c) => c.status === 'active')
+    .forEach((c) => c.label_ids.forEach((id) => {
+      labelUsageCounts[id] = (labelUsageCounts[id] ?? 0) + 1;
+    }));
   const assignedPersons = persons.filter((p) =>
     board.cards.some(
       (c) => c.status === 'active' && c.assigned_person_id === p.id,
@@ -168,8 +175,13 @@ const KanbanTab: React.FC<Props> = ({
           filterLabelId={filterLabelId}
           onFilter={setFilterLabelId}
           canEditLabels={isManager && configuring}
+          usageCounts={labelUsageCounts}
+          onCreate={async (name, color) => {
+            await createLabel({ feature_instance_id: featureInstanceId, name, color });
+          }}
           onUpdate={updateLabel}
           onDelete={deleteLabel}
+          onReorder={reorderLabels}
         />
         {assignedPersons.length > 0 && (
           <div
@@ -258,6 +270,9 @@ const KanbanTab: React.FC<Props> = ({
             onToggleLabel={toggleCardLabel}
             onSetReminders={setCardReminders}
             onCreateLabel={createLabel}
+            onUpdateLabel={updateLabel}
+            onDeleteLabel={deleteLabel}
+            onReorderLabel={reorderLabels}
           />
         ))}
 
@@ -285,6 +300,9 @@ const KanbanTab: React.FC<Props> = ({
           onToggleLabel={toggleCardLabel}
           onSetReminders={setCardReminders}
           onCreateLabel={createLabel}
+          onUpdateLabel={updateLabel}
+          onDeleteLabel={deleteLabel}
+          onReorderLabel={reorderLabels}
         />
       )}
     </div>

@@ -10,9 +10,9 @@ from app.features.tasks import label_service, reminder_service
 from app.features.tasks.todo_list import repository as todo_repository
 from app.platform.functions.labels import repository as labels_repo
 from app.platform.functions.search import index_repository as search_index
-from app.features.tasks.models import (
-    PersonOption, FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate,
-    TaskReminderCreate, TaskReminderResponse,
+from app.features.tasks.models import PersonOption, TaskReminderCreate, TaskReminderResponse
+from app.platform.functions.labels.models import (
+    FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate, FeatureLabelsReorderRequest,
 )
 from app.features.tasks.todo_list.models import (
     TodoItemCreate, TodoItemUpdate, TodoItemResponse,
@@ -232,3 +232,13 @@ async def delete_label(label_id: str, current_user: dict = Depends(get_current_u
     **Permissions:** admin | can_access_attached_tribes
     """
     await label_service.delete_feature_label(get_database(), label_id, current_user)
+
+
+@label_router.put("/reorder", response_model=list[FeatureLabel])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def reorder_labels(data: FeatureLabelsReorderRequest, current_user: dict = Depends(get_current_user)):
+    """Reorder the labels of a todo feature instance.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
+    return await label_service.reorder_feature_labels(get_database(), data, current_user)

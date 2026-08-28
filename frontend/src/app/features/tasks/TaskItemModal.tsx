@@ -1,6 +1,5 @@
 import { EntityAuditUserBadge } from '@/app/platform/functions/people/users/EntityAuditUserBadge.tsx';
 import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
-import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
@@ -8,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { highlightHtml } from './highlightHtml.ts';
+import TaskItemModalFooter from './TaskItemModalFooter.tsx';
 import TaskItemModalMeta from './TaskItemModalMeta.tsx';
 import TaskModalReminders from './TaskModalReminders.tsx';
 import type { TaskItemModalProps, TaskLabelInfo, TaskPatch, TaskReminderCreate } from './types.ts';
@@ -18,7 +18,8 @@ interface Props extends TaskItemModalProps {
 
 const TaskItemModal: React.FC<Props> = ({
   value, labels, persons, canEdit, canCreateLabel,
-  onClose, onUpdate, onToggleLabel, onSetReminders, onCreateLabel, highlightToken,
+  onClose, onUpdate, onToggleLabel, onSetReminders, onCreateLabel,
+  onUpdateLabel, onDeleteLabel, onReorderLabel, highlightToken,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -80,6 +81,15 @@ const TaskItemModal: React.FC<Props> = ({
     onToggleLabel(value.id, label.id, localLabelIds);
   };
 
+  const handleLabelUpdated = (label: TaskLabelInfo) => {
+    setAllLabels((prev) => prev.map((l) => (l.id === label.id ? label : l)));
+  };
+
+  const handleLabelDeleted = (labelId: string) => {
+    setAllLabels((prev) => prev.filter((l) => l.id !== labelId));
+    setLocalLabelIds((prev) => prev.filter((id) => id !== labelId));
+  };
+
   const notesHtml = highlightToken ? highlightHtml(notes, highlightToken) : notes;
 
   return (
@@ -122,6 +132,11 @@ const TaskItemModal: React.FC<Props> = ({
             onToggle={handleToggle}
             onCreateLabel={onCreateLabel}
             onLabelCreated={handleLabelCreated}
+            onUpdateLabel={onUpdateLabel}
+            onLabelUpdated={handleLabelUpdated}
+            onDeleteLabel={onDeleteLabel}
+            onLabelDeleted={handleLabelDeleted}
+            onReorderLabel={onReorderLabel}
           />
           <TaskModalReminders
             reminders={localReminders}
@@ -163,29 +178,16 @@ const TaskItemModal: React.FC<Props> = ({
             </div>
           )}
         </div>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', padding: '14px 20px', borderTop: `1px solid ${theme.colors.border}`, gap: '8px' }}>
-          {isEditing ? (
-            <>
-              <ThemedButton variant="ghost" onClick={() => setIsEditing(false)} disabled={saving} leftIcon={<ThemedSvgIcon name="x" color="currentColor" size={16} />}>
-                {t('common.cancel')}
-              </ThemedButton>
-              <ThemedButton variant="primary" onClick={handleSave} disabled={saving || !title.trim()} leftIcon={<ThemedSvgIcon name="save" color="currentColor" size={16} />}>
-                {saving ? t('common.saving') : t('common.save')}
-              </ThemedButton>
-            </>
-          ) : (
-            <>
-              <ThemedButton variant="ghost" onClick={onClose} leftIcon={<ThemedSvgIcon name="x" color="currentColor" size={16} />}>
-                {t('common.close')}
-              </ThemedButton>
-              {canEdit && (
-                <ThemedButton variant="primary" onClick={() => setIsEditing(true)}>
-                  {t('common.edit')}
-                </ThemedButton>
-              )}
-            </>
-          )}
-        </div>
+        <TaskItemModalFooter
+          isEditing={isEditing}
+          canEdit={canEdit}
+          saving={saving}
+          canSave={!!title.trim()}
+          onClose={onClose}
+          onCancelEdit={() => setIsEditing(false)}
+          onStartEdit={() => setIsEditing(true)}
+          onSave={handleSave}
+        />
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import type {
   KanbanCard,
   KanbanLabel,
   LabelCreate,
+  LabelUpdate,
   PersonOption,
 } from './types.ts';
 
@@ -26,6 +27,9 @@ interface Props {
   ) => Promise<void>;
   onSetReminders: (cardId: string, reminders: TaskReminderCreate[]) => Promise<void>;
   onCreateLabel: (data: LabelCreate) => Promise<KanbanLabel | null>;
+  onUpdateLabel: (labelId: string, data: LabelUpdate) => Promise<void>;
+  onDeleteLabel: (labelId: string) => Promise<void>;
+  onReorderLabel: (orderedIds: string[]) => Promise<void>;
 }
 
 const KanbanCardModal: React.FC<Props> = ({
@@ -39,6 +43,9 @@ const KanbanCardModal: React.FC<Props> = ({
   onToggleLabel,
   onSetReminders,
   onCreateLabel,
+  onUpdateLabel,
+  onDeleteLabel,
+  onReorderLabel,
 }) => {
   const labels: TaskLabelInfo[] = boardLabels.map((l) => ({
     ...l,
@@ -89,6 +96,9 @@ const KanbanCardModal: React.FC<Props> = ({
       onToggleLabel={onToggleLabel}
       onSetReminders={handleSetReminders}
       onCreateLabel={handleCreateLabel}
+      onUpdateLabel={onUpdateLabel}
+      onDeleteLabel={onDeleteLabel}
+      onReorderLabel={onReorderLabel}
     />
   );
 };

@@ -502,12 +502,12 @@
         "description": {
           "en": [
             "- manage your team's work with two views: a to-do list and a visual kanban board",
-            "- assign tasks to people, add labels, set due dates and attach detailed notes",
+            "- assign tasks to people, add labels, set due dates and attach detailed notes; rename, recolour, reorder or delete labels from one panel",
             "- set reminders on any task or card to get notified by push notification or email at a chosen date and time"
           ],
           "fr": [
             "- gérez le travail de votre équipe avec deux vues : une liste de tâches et un tableau kanban",
-            "- assignez des tâches, ajoutez des étiquettes, définissez des échéances et joignez des notes détaillées",
+            "- assignez des tâches, ajoutez des étiquettes, définissez des échéances et joignez des notes détaillées ; renommez, recolorez, réordonnez ou supprimez les étiquettes depuis un même panneau",
             "- définissez des rappels sur n'importe quelle tâche ou carte pour être notifié par notification push ou email à la date et l'heure choisies"
           ]
         },
@@ -728,7 +728,7 @@
         "description": {
           "en": [
             "- create and manage events within a project tab, with a start/end time or spanning the whole day or several days",
-            "- assign participants from the project tribe, attach labels, story points and notes",
+            "- assign participants from the project tribe, attach labels, story points and notes; rename, recolour, reorder or delete labels from one panel",
             "- pick a color for each event, shown on the calendar and day view",
             "- set reminders that notify participants by in-app alert or email before the event",
             "- view events on a monthly calendar, a day timeline with overlapping events side by side, or a week view",
@@ -736,7 +736,7 @@
           ],
           "fr": [
             "- créez et gérez des événements dans un onglet de projet, avec une heure de début/fin ou sur une ou plusieurs journées entières",
-            "- assignez des participants depuis la tribu du projet, ajoutez des étiquettes, des points d'effort et des notes",
+            "- assignez des participants depuis la tribu du projet, ajoutez des étiquettes, des points d'effort et des notes ; renommez, recolorez, réordonnez ou supprimez les étiquettes depuis un même panneau",
             "- choisissez une couleur pour chaque événement, affichée sur le calendrier et dans la vue du jour",
             "- définissez des rappels qui notifient les participants par alerte dans l'app ou par email avant l'événement",
             "- visualisez les événements sur un calendrier mensuel, une ligne de temps du jour avec chevauchements côte à côte, ou une vue semaine",
@@ -928,13 +928,13 @@
         "description": {
           "en": [
             "- add a daily journal to any project, shared with all tribe members",
-            "- write rich-text blocks for each day and label them to organize your notes",
+            "- write rich-text blocks for each day and label them to organize your notes; rename, recolour, reorder or delete labels from one panel",
             "- navigate between days with content, or browse all entries by label — blocks also appear in the global search",
             "- the planning dashboard shows journal activity and lets you jump straight to a day's journal"
           ],
           "fr": [
             "- ajoutez un journal quotidien à n'importe quel projet, partagé avec tous les membres de la tribu",
-            "- rédigez des blocs de texte enrichi pour chaque jour et étiquetez-les pour organiser vos notes",
+            "- rédigez des blocs de texte enrichi pour chaque jour et étiquetez-les pour organiser vos notes ; renommez, recolorez, réordonnez ou supprimez les étiquettes depuis un même panneau",
             "- naviguez entre les jours avec du contenu, ou parcourez toutes les entrées par étiquette — les blocs apparaissent aussi dans la recherche globale",
             "- le tableau de bord planning affiche l'activité du journal et permet d'accéder directement au journal d'un jour"
           ]

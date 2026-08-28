@@ -83,6 +83,9 @@ const RecipeDetailPageContent: React.FC = () => {
             await labelsHook.createLabel(name, color);
           }}
           onToggleLabel={toggleLabel}
+          onUpdateLabel={labelsHook.updateLabel}
+          onDeleteLabel={labelsHook.archiveLabel}
+          onReorderLabel={labelsHook.reorderLabels}
           onAddIngredient={addIngredient}
           onRemoveIngredient={removeIngredient}
         />

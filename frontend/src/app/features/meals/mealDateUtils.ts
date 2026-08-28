@@ -8,3 +8,7 @@ export function addDaysIso(dateStr: string, days: number): string {
   const date = new Date(y, m - 1, d + days);
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
+
+export function combineDateAndTime(dateStr: string, time: string): string {
+  return new Date(`${dateStr}T${time}`).toISOString();
+}

@@ -53,6 +53,19 @@ const DashboardAddEventModal: React.FC<Props> = ({ selectedDate, onClose, onCrea
     try { return await eventsService.createLabel(data); } catch { return null; }
   };
 
+  const handleUpdateLabel = async (labelId: string, updates: { name?: string; color?: string }): Promise<void> => {
+    await eventsService.updateLabel(labelId, updates);
+  };
+
+  const handleDeleteLabel = async (labelId: string): Promise<void> => {
+    await eventsService.deleteLabel(labelId);
+  };
+
+  const handleReorderLabel = async (orderedIds: string[]): Promise<void> => {
+    if (!selectedInstance) return;
+    await eventsService.reorderLabels(selectedInstance.id, orderedIds);
+  };
+
   return (
     <div
       style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: '8px' }}
@@ -89,6 +102,9 @@ const DashboardAddEventModal: React.FC<Props> = ({ selectedDate, onClose, onCrea
               isManager={false}
               onCreate={handleCreate}
               onCreateLabel={handleCreateLabel}
+              onUpdateLabel={handleUpdateLabel}
+              onDeleteLabel={handleDeleteLabel}
+              onReorderLabel={handleReorderLabel}
               onCancel={onClose}
             />
           )}

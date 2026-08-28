@@ -31,11 +31,15 @@ interface Props {
   onSetReminders: (id: string, reminders: EventReminderCreate[]) => Promise<void>;
   onToggleLabel: (id: string, labelId: string) => Promise<string[]>;
   onCreateLabel: (data: FeatureLabelCreate) => Promise<FeatureLabel | null>;
+  onUpdateLabel: (labelId: string, updates: { name?: string; color?: string }) => Promise<void>;
+  onDeleteLabel: (labelId: string) => Promise<void>;
+  onReorderLabel: (orderedIds: string[]) => Promise<void>;
 }
 
 const EventModal: React.FC<Props> = ({
   event, labels, persons, canEdit, isManager, featureInstanceId,
   onClose, onUpdate, onDelete, onSetParticipants, onSetReminders, onToggleLabel, onCreateLabel,
+  onUpdateLabel, onDeleteLabel, onReorderLabel,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -154,6 +158,10 @@ const EventModal: React.FC<Props> = ({
           onToggleLabel={handleToggle}
           onCreateLabel={onCreateLabel}
           onLabelCreated={(label) => setLocalLabelIds((prev) => [...prev, label.id])}
+          onUpdateLabel={onUpdateLabel}
+          onDeleteLabel={onDeleteLabel}
+          onReorderLabel={onReorderLabel}
+          onLabelDeleted={(labelId) => setLocalLabelIds((prev) => prev.filter((id) => id !== labelId))}
           color={color}
           onColorChange={setColor}
           reminders={reminders}

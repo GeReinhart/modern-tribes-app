@@ -25,7 +25,7 @@ pip install -r requirements.txt
 
 - Run the alembic upgrade head command
 ```bash
-cd backendy
+cd backend
 # Check migration status
 set -a && source .env.db.prod && set +a && alembic current
 

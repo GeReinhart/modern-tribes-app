@@ -28,6 +28,11 @@ interface Props {
     color: string;
   }) => Promise<TaskLabelInfo | null>;
   onLabelCreated: (label: TaskLabelInfo) => void;
+  onUpdateLabel: (labelId: string, updates: { name?: string; color?: string }) => Promise<void>;
+  onLabelUpdated: (label: TaskLabelInfo) => void;
+  onDeleteLabel: (labelId: string) => Promise<void>;
+  onLabelDeleted: (labelId: string) => void;
+  onReorderLabel: (orderedIds: string[]) => Promise<void>;
 }
 
 const sectionLabel: React.CSSProperties = {
@@ -43,6 +48,7 @@ const TaskItemModalMeta: React.FC<Props> = ({
   persons, assigneeId, onAssigneeChange,
   size, onSizeChange, dueDate, onDueDateChange,
   onToggle, onCreateLabel, onLabelCreated,
+  onUpdateLabel, onLabelUpdated, onDeleteLabel, onLabelDeleted, onReorderLabel,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -74,6 +80,11 @@ const TaskItemModalMeta: React.FC<Props> = ({
             onToggle={onToggle}
             onCreateLabel={onCreateLabel}
             onLabelCreated={onLabelCreated}
+            onUpdateLabel={onUpdateLabel}
+            onLabelUpdated={onLabelUpdated}
+            onDeleteLabel={onDeleteLabel}
+            onLabelDeleted={onLabelDeleted}
+            onReorderLabel={onReorderLabel}
           />
         </div>
         {persons.length > 0 && (

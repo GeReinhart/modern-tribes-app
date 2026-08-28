@@ -10,8 +10,11 @@ from app.features.daily_journal.label_service import (
     create_feature_label,
     update_feature_label,
     delete_feature_label,
+    reorder_feature_labels,
 )
-from app.features.tasks.models import FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate
+from app.platform.functions.labels.models import (
+    FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate, FeatureLabelsReorderRequest,
+)
 
 label_router = APIRouter(prefix="/journal-labels", tags=["features_daily_journal"])
 
@@ -38,3 +41,9 @@ async def update_label(label_id: str, data: FeatureLabelUpdate, current_user: di
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def delete_label(label_id: str, current_user: dict = Depends(get_current_user)):
     await delete_feature_label(get_database(), label_id, current_user)
+
+
+@label_router.put("/reorder", response_model=list[FeatureLabel])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def reorder_labels(data: FeatureLabelsReorderRequest, current_user: dict = Depends(get_current_user)):
+    return await reorder_feature_labels(get_database(), data, current_user)

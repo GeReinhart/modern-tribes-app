@@ -132,6 +132,18 @@ export function useTodoList(featureInstanceId: string | null) {
     }
   }, []);
 
+  const reorderLabels = useCallback(
+    async (orderedIds: string[]): Promise<void> => {
+      if (!featureInstanceId) return;
+      try {
+        setLabels(await todoListService.reorderLabels(featureInstanceId, orderedIds));
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Error');
+      }
+    },
+    [featureInstanceId],
+  );
+
   const toggleLabel = useCallback(
     async (itemId: string, labelId: string): Promise<void> => {
       try {
@@ -173,6 +185,7 @@ export function useTodoList(featureInstanceId: string | null) {
     createLabel,
     updateLabel,
     deleteLabel,
+    reorderLabels,
     toggleLabel,
     setReminders,
     refetch: fetchItems,

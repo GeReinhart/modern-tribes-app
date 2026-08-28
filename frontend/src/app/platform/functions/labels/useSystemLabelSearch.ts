@@ -2,12 +2,16 @@ import { labelService } from '@/app/platform/functions/labels/label.service.ts';
 
 import { useEffect, useState } from 'react';
 
-import type { TaskLabelInfo } from './types.ts';
+export interface SystemLabelSuggestion {
+  id: string;
+  name: string;
+  color: string;
+}
 
 const DEBOUNCE_MS = 250;
 
-export function useSystemLabelSearch(query: string): TaskLabelInfo[] {
-  const [results, setResults] = useState<TaskLabelInfo[]>([]);
+export function useSystemLabelSearch(query: string): SystemLabelSuggestion[] {
+  const [results, setResults] = useState<SystemLabelSuggestion[]>([]);
 
   useEffect(() => {
     if (!query.trim()) {

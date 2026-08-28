@@ -2243,16 +2243,21 @@ def given_meals_table(datatable):
                 uid = rec.get("id")
                 if not uid:
                     continue
+                # start_at/end_at fall back to "now" (rather than NULL) so a follow-up
+                # declaration of an already-inserted meal (e.g. to set document_id) still
+                # satisfies the NOT NULL constraint — Postgres validates the proposed row
+                # even though ON CONFLICT DO UPDATE only ever writes document_id here.
                 await conn.execute(
-                    """INSERT INTO meals(id, feature_instance_id, title, start_at, end_at, headcount, status)
-                       VALUES($1, $2, $3, $4, $5, $6, $7)
-                       ON CONFLICT (id) DO NOTHING""",
+                    """INSERT INTO meals(id, feature_instance_id, title, start_at, end_at, headcount, document_id, status)
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+                       ON CONFLICT (id) DO UPDATE SET document_id = EXCLUDED.document_id""",
                     UUID(uid),
                     UUID(rec["feature_instance_id"]),
                     rec.get("title", "Meal"),
-                    _parse_dt(rec.get("start_at")),
-                    _parse_dt(rec.get("end_at")),
+                    _parse_dt(rec.get("start_at")) or datetime.now(timezone.utc),
+                    _parse_dt(rec.get("end_at")) or datetime.now(timezone.utc),
                     int(rec.get("headcount", "0")),
+                    UUID(rec["document_id"]) if rec.get("document_id") else None,
                     rec.get("status", "active"),
                 )
         finally:

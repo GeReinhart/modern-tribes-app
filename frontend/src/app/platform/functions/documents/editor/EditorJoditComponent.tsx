@@ -21,6 +21,9 @@ const COMPACT_BUTTONS = [
   'redo',
 ];
 
+// For editors that only need the bare essentials (e.g. a short description field).
+const MINIMAL_BUTTONS = ['bold', 'italic', 'ul', 'ol', 'link'];
+
 interface UploadResponse {
   error?: number | boolean;
   message?: string;
@@ -42,6 +45,8 @@ interface JoditEditorComponentProps {
   onChange: (content: string) => void;
   minHeight?: number;
   compact?: boolean;
+  // Even smaller than compact: only bold/italic/lists/link. Takes precedence over `compact`.
+  minimal?: boolean;
   // Compact toolbars drop the fullsize button by default to stay small; set this when a
   // compact editor still needs a way to expand for a longer piece of writing.
   allowFullscreen?: boolean;
@@ -52,6 +57,7 @@ const EditorJoditComponent = ({
   onChange,
   minHeight = 600,
   compact = false,
+  minimal = false,
   allowFullscreen = false,
 }: JoditEditorComponentProps) => {
   const editor = useRef(null);
@@ -173,7 +179,9 @@ const EditorJoditComponent = ({
           });
         },
       },
-      buttons: compact
+      buttons: minimal
+        ? MINIMAL_BUTTONS
+        : compact
         ? (allowFullscreen ? [...COMPACT_BUTTONS, '|', 'fullsize'] : COMPACT_BUTTONS)
         : [
             'source',
@@ -208,9 +216,9 @@ const EditorJoditComponent = ({
             'fullsize',
             'print',
           ],
-      buttonsXS: COMPACT_BUTTONS,
+      buttonsXS: minimal ? MINIMAL_BUTTONS : COMPACT_BUTTONS,
     }),
-    [appConfig.editorImageExtensions, minHeight, compact, allowFullscreen],
+    [appConfig.editorImageExtensions, minHeight, compact, minimal, allowFullscreen],
   );
 
   return (

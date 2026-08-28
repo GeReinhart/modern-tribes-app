@@ -15,12 +15,15 @@ interface Props {
   isManager: boolean;
   onCreate: (data: EventCreate, participantIds: string[], labelIds: string[], reminders: EventReminderCreate[]) => Promise<void>;
   onCreateLabel: (data: FeatureLabelCreate) => Promise<FeatureLabel | null>;
+  onUpdateLabel: (labelId: string, updates: { name?: string; color?: string }) => Promise<void>;
+  onDeleteLabel: (labelId: string) => Promise<void>;
+  onReorderLabel: (orderedIds: string[]) => Promise<void>;
   onClose: () => void;
 }
 
 const EventCreateModal: React.FC<Props> = ({
   featureInstanceId, selectedDate, persons, labels, isManager,
-  onCreate, onCreateLabel, onClose,
+  onCreate, onCreateLabel, onUpdateLabel, onDeleteLabel, onReorderLabel, onClose,
 }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -51,6 +54,9 @@ const EventCreateModal: React.FC<Props> = ({
           isManager={isManager}
           onCreate={onCreate}
           onCreateLabel={onCreateLabel}
+          onUpdateLabel={onUpdateLabel}
+          onDeleteLabel={onDeleteLabel}
+          onReorderLabel={onReorderLabel}
           onCancel={onClose}
         />
       </div>

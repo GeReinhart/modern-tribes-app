@@ -1,30 +1,35 @@
+import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
-import ThemedDateSelection from '@/app/platform/core/layout/themes/components/ThemedDateSelection.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedModal, ThemedModalBody, ThemedModalFooter } from '@/app/platform/core/layout/themes/components/ThemedModal.tsx';
 import { ThemedMultiSelect } from '@/app/platform/core/layout/themes/components/ThemedMultiSelect.tsx';
-import ThemedTimeSelection from '@/app/platform/core/layout/themes/components/ThemedTimeSelection.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { MealCreate, RecipeOption } from './types.ts';
+import CollapsibleField from './CollapsibleField.tsx';
+import { combineDateAndTime } from './mealDateUtils.ts';
+import MealScheduleFields from './MealScheduleFields.tsx';
+import { MealCreate, PersonOption, RecipeOption } from './types.ts';
 
 interface Props {
   featureInstanceId: string;
   defaultDate: string;
+  persons: PersonOption[];
   recipes: RecipeOption[];
   onClose: () => void;
-  onCreate: (data: MealCreate, recipeIds: string[]) => Promise<void>;
+  onCreate: (data: MealCreate, recipeIds: string[], participantIds: string[]) => Promise<void>;
 }
 
-const CreateMealModal: React.FC<Props> = ({ featureInstanceId, defaultDate, recipes, onClose, onCreate }) => {
+const CreateMealModal: React.FC<Props> = ({ featureInstanceId, defaultDate, persons, recipes, onClose, onCreate }) => {
   const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(defaultDate);
   const [startTime, setStartTime] = useState('19:00');
   const [endTime, setEndTime] = useState('20:00');
   const [headcount, setHeadcount] = useState('4');
+  const [description, setDescription] = useState('');
+  const [participantIds, setParticipantIds] = useState<string[]>([]);
   const [recipeIds, setRecipeIds] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
@@ -39,11 +44,13 @@ const CreateMealModal: React.FC<Props> = ({ featureInstanceId, defaultDate, reci
       {
         feature_instance_id: featureInstanceId,
         title: title.trim() || undefined,
-        start_at: new Date(`${date}T${startTime}`).toISOString(),
-        end_at: new Date(`${date}T${endTime}`).toISOString(),
+        start_at: combineDateAndTime(date, startTime),
+        end_at: combineDateAndTime(date, endTime),
         headcount: headcountValue,
+        document_content_html: description || undefined,
       },
       recipeIds,
+      participantIds,
     );
     setSubmitting(false);
   };
@@ -60,24 +67,34 @@ const CreateMealModal: React.FC<Props> = ({ featureInstanceId, defaultDate, reci
               onChange={(e) => setTitle(e.target.value)}
               autoFocus
             />
-            <ThemedDateSelection label={t('features.meals.date')} value={date} onChange={setDate} />
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <ThemedTimeSelection label={t('features.meals.startTime')} value={startTime} onChange={setStartTime} />
-              <ThemedTimeSelection label={t('features.meals.endTime')} value={endTime} onChange={setEndTime} />
-            </div>
-            <ThemedInput
-              label={t('features.meals.headcount')}
-              type="number"
-              min={0}
-              value={headcount}
-              onChange={(e) => setHeadcount(e.target.value)}
+            <MealScheduleFields
+              date={date}
+              startTime={startTime}
+              endTime={endTime}
+              headcount={headcount}
+              onDateChange={setDate}
+              onStartTimeChange={setStartTime}
+              onEndTimeChange={setEndTime}
+              onHeadcountChange={setHeadcount}
             />
+            <CollapsibleField label={t('features.meals.description')} defaultExpanded={!!description}>
+              <EditorJoditComponent content={description} onChange={setDescription} minHeight={100} minimal />
+            </CollapsibleField>
+            <CollapsibleField label={t('features.meals.participants')} defaultExpanded={participantIds.length > 0}>
+              <ThemedMultiSelect
+                options={persons.map((p) => ({ value: p.id, label: p.name }))}
+                value={participantIds}
+                onChange={setParticipantIds}
+                placeholder={t('features.meals.selectParticipants')}
+              />
+            </CollapsibleField>
             <ThemedMultiSelect
               label={t('features.meals.recipes')}
               options={recipes.map((r) => ({ value: r.id, label: r.name }))}
               value={recipeIds}
               onChange={setRecipeIds}
               placeholder={t('features.meals.selectRecipes')}
+              inline
             />
           </div>
         </ThemedModalBody>

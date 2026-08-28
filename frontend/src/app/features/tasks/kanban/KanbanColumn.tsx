@@ -14,6 +14,7 @@ import {
   KanbanCard,
   KanbanLabel,
   LabelCreate,
+  LabelUpdate,
   MoveDirection,
   PersonOption,
   ReorderDirection,
@@ -48,6 +49,9 @@ interface Props {
   ) => Promise<void>;
   onSetReminders: (cardId: string, reminders: { remind_at: string; reminder_type: 'notification' | 'mail' }[]) => Promise<void>;
   onCreateLabel: (data: LabelCreate) => Promise<KanbanLabel | null>;
+  onUpdateLabel: (labelId: string, data: LabelUpdate) => Promise<void>;
+  onDeleteLabel: (labelId: string) => Promise<void>;
+  onReorderLabel: (orderedIds: string[]) => Promise<void>;
 }
 
 const KanbanColumn: React.FC<Props> = ({
@@ -75,6 +79,9 @@ const KanbanColumn: React.FC<Props> = ({
   onToggleLabel,
   onSetReminders,
   onCreateLabel,
+  onUpdateLabel,
+  onDeleteLabel,
+  onReorderLabel,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -277,6 +284,9 @@ const KanbanColumn: React.FC<Props> = ({
             onToggleLabel={onToggleLabel}
             onSetReminders={onSetReminders}
             onCreateLabel={onCreateLabel}
+            onUpdateLabel={onUpdateLabel}
+            onDeleteLabel={onDeleteLabel}
+            onReorderLabel={onReorderLabel}
           />
         ))}
         {visibleActive.length === 0 && (
@@ -322,6 +332,9 @@ const KanbanColumn: React.FC<Props> = ({
                 onToggleLabel={onToggleLabel}
                 onSetReminders={onSetReminders}
                 onCreateLabel={onCreateLabel}
+                onUpdateLabel={onUpdateLabel}
+                onDeleteLabel={onDeleteLabel}
+                onReorderLabel={onReorderLabel}
               />
             ))}
           </div>

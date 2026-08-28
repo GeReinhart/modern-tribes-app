@@ -119,6 +119,12 @@ class KanbanService {
     return apiService.delete<void>(`/features/tasks/kanban/labels/${labelId}`);
   }
 
+  async reorderLabels(featureInstanceId: string, orderedIds: string[]): Promise<KanbanLabel[]> {
+    return apiService.put<KanbanLabel[]>('/features/tasks/kanban/labels/reorder', {
+      feature_instance_id: featureInstanceId, ordered_ids: orderedIds,
+    });
+  }
+
   async addCardLabel(cardId: string, labelId: string): Promise<KanbanCard> {
     return apiService.post<KanbanCard>(
       `/features/tasks/kanban/cards/${cardId}/labels/${labelId}`,

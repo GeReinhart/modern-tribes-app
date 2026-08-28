@@ -71,6 +71,12 @@ class JournalService {
     return apiService.delete<void>(`${LABELS_BASE}/${labelId}`);
   }
 
+  async reorderLabels(featureInstanceId: string, orderedIds: string[]): Promise<JournalLabel[]> {
+    return apiService.put<JournalLabel[]>(`${LABELS_BASE}/reorder`, {
+      feature_instance_id: featureInstanceId, ordered_ids: orderedIds,
+    });
+  }
+
   async listAccessible(date: string): Promise<JournalDashboardResponse> {
     return apiService.get<JournalDashboardResponse>(`${BASE}/accessible?date=${date}`);
   }

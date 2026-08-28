@@ -71,13 +71,17 @@ const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, projectId }) =>
         <CreateMealModal
           featureInstanceId={featureInstanceId}
           defaultDate={selectedDate}
+          persons={persons}
           recipes={recipes}
           onClose={() => setCreating(false)}
-          onCreate={async (data, recipeIds) => {
+          onCreate={async (data, recipeIds, participantIds) => {
             const created = await createMeal(data);
             if (!created) return;
             for (const recipeId of recipeIds) {
               await toggleRecipe(created.id, recipeId);
+            }
+            if (participantIds.length > 0) {
+              await setParticipants(created.id, participantIds);
             }
             setCreating(false);
           }}

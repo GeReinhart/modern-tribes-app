@@ -158,6 +158,18 @@ export function useEvents(featureInstanceId: string | null) {
     }
   }, []);
 
+  const reorderLabels = useCallback(
+    async (orderedIds: string[]): Promise<void> => {
+      if (!featureInstanceId) return;
+      try {
+        setLabels(await eventsService.reorderLabels(featureInstanceId, orderedIds));
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Error');
+      }
+    },
+    [featureInstanceId],
+  );
+
   return {
     events,
     labels,
@@ -172,6 +184,7 @@ export function useEvents(featureInstanceId: string | null) {
     createLabel,
     updateLabel,
     deleteLabel,
+    reorderLabels,
     refetch: fetchEvents,
   };
 }

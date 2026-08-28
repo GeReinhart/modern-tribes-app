@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import TaskContentPopup from '@/app/features/tasks/TaskContentPopup.tsx';
 import TodoItemModal from './TodoItemModal.tsx';
-import { TodoItem, TodoItemUpdate, TodoLabel, TodoLabelCreate } from './types.ts';
+import { TodoItem, TodoItemUpdate, TodoLabel, TodoLabelCreate, TodoLabelUpdate } from './types.ts';
 
 interface Props {
   item: TodoItem;
@@ -21,6 +21,9 @@ interface Props {
   onToggleLabel: (itemId: string, labelId: string) => Promise<void>;
   onSetReminders: (itemId: string, reminders: { remind_at: string; reminder_type: 'notification' | 'mail' }[]) => Promise<void>;
   onCreateLabel: (data: TodoLabelCreate) => Promise<TodoLabel | null>;
+  onUpdateLabel: (labelId: string, data: TodoLabelUpdate) => Promise<void>;
+  onDeleteLabel: (labelId: string) => Promise<void>;
+  onReorderLabel: (orderedIds: string[]) => Promise<void>;
 }
 
 const TodoRow: React.FC<Props> = ({
@@ -35,6 +38,9 @@ const TodoRow: React.FC<Props> = ({
   onToggleLabel,
   onSetReminders,
   onCreateLabel,
+  onUpdateLabel,
+  onDeleteLabel,
+  onReorderLabel,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -372,6 +378,9 @@ const TodoRow: React.FC<Props> = ({
           onToggleLabel={onToggleLabel}
           onSetReminders={onSetReminders}
           onCreateLabel={onCreateLabel}
+          onUpdateLabel={onUpdateLabel}
+          onDeleteLabel={onDeleteLabel}
+          onReorderLabel={onReorderLabel}
         />
       )}
     </div>

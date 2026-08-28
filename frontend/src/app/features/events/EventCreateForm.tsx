@@ -21,6 +21,9 @@ interface Props {
   isManager: boolean;
   onCreate: (data: EventCreate, participantIds: string[], labelIds: string[], reminders: EventReminderCreate[]) => Promise<void>;
   onCreateLabel: (data: FeatureLabelCreate) => Promise<FeatureLabel | null>;
+  onUpdateLabel: (labelId: string, updates: { name?: string; color?: string }) => Promise<void>;
+  onDeleteLabel: (labelId: string) => Promise<void>;
+  onReorderLabel: (orderedIds: string[]) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -43,7 +46,7 @@ function buildDefaultReminders(startAt: string): EventReminderCreate[] {
 
 const EventCreateForm: React.FC<Props> = ({
   featureInstanceId, selectedDate, persons, labels, isManager,
-  onCreate, onCreateLabel, onCancel,
+  onCreate, onCreateLabel, onUpdateLabel, onDeleteLabel, onReorderLabel, onCancel,
 }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -140,6 +143,11 @@ const EventCreateForm: React.FC<Props> = ({
           onToggle={handleToggleLabel}
           onCreateLabel={onCreateLabel as Parameters<typeof TaskItemModalLabels>[0]['onCreateLabel']}
           onLabelCreated={(label) => setLocalLabelIds((prev) => [...prev, label.id])}
+          onUpdateLabel={onUpdateLabel}
+          onLabelUpdated={() => {}}
+          onDeleteLabel={onDeleteLabel}
+          onLabelDeleted={(labelId) => setLocalLabelIds((prev) => prev.filter((id) => id !== labelId))}
+          onReorderLabel={onReorderLabel}
         />
       </div>
 

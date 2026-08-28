@@ -14,8 +14,9 @@ interface UseJournalDayResult {
   reorderBlocks: (orderedIds: string[]) => Promise<void>;
   toggleLabel: (blockId: string, labelId: string) => Promise<void>;
   createLabel: (name: string, color: string) => Promise<JournalLabel | null>;
-  updateLabel: (labelId: string, name: string, color: string) => Promise<void>;
+  updateLabel: (labelId: string, updates: { name?: string; color?: string }) => Promise<void>;
   deleteLabel: (labelId: string) => Promise<void>;
+  reorderLabels: (orderedIds: string[]) => Promise<void>;
 }
 
 export function useJournalDay(
@@ -102,9 +103,9 @@ export function useJournalDay(
     }
   }, [featureInstanceId]);
 
-  const updateLabel = useCallback(async (labelId: string, name: string, color: string) => {
-    await journalService.updateLabel(labelId, { name, color });
-    setLabels(prev => prev.map(l => l.id === labelId ? { ...l, name, color } : l));
+  const updateLabel = useCallback(async (labelId: string, updates: { name?: string; color?: string }) => {
+    await journalService.updateLabel(labelId, updates);
+    setLabels(prev => prev.map(l => l.id === labelId ? { ...l, ...updates } : l));
   }, []);
 
   const deleteLabel = useCallback(async (labelId: string) => {
@@ -112,5 +113,12 @@ export function useJournalDay(
     setLabels(prev => prev.filter(l => l.id !== labelId));
   }, []);
 
-  return { blocks, labels, days, loading, error, createBlock, updateBlock, deleteBlock, reorderBlocks, toggleLabel, createLabel, updateLabel, deleteLabel };
+  const reorderLabels = useCallback(async (orderedIds: string[]) => {
+    setLabels(await journalService.reorderLabels(featureInstanceId, orderedIds));
+  }, [featureInstanceId]);
+
+  return {
+    blocks, labels, days, loading, error, createBlock, updateBlock, deleteBlock, reorderBlocks,
+    toggleLabel, createLabel, updateLabel, deleteLabel, reorderLabels,
+  };
 }

@@ -7,7 +7,8 @@ from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.database import get_database
 from app.features.tasks import label_service
 from app.features.tasks.kanban import repository as repo
-from app.features.tasks.models import PersonOption, FeatureLabel
+from app.features.tasks.models import PersonOption
+from app.platform.functions.labels.models import FeatureLabel
 from app.features.tasks.kanban.models import (
     KanbanBoard, KanbanColumnResponse, KanbanCardResponse,
     ColumnCreate, ColumnUpdate, MoveCard,

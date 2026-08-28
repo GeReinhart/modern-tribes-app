@@ -11,9 +11,9 @@ from app.features.tasks import label_service, reminder_service
 from app.features.tasks.kanban import repository as repo
 from app.platform.functions.labels import repository as labels_repo
 from app.platform.functions.search import index_repository as search_index
-from app.features.tasks.models import (
-    FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate,
-    TaskReminderCreate, TaskReminderResponse,
+from app.features.tasks.models import TaskReminderCreate, TaskReminderResponse
+from app.platform.functions.labels.models import (
+    FeatureLabel, FeatureLabelCreate, FeatureLabelUpdate, FeatureLabelsReorderRequest,
 )
 from app.features.tasks.kanban.models import (
     KanbanCardResponse, CardCreate, CardUpdate, MoveCard, ReorderCard,
@@ -248,6 +248,16 @@ async def create_label(data: FeatureLabelCreate, current_user: dict = Depends(ge
     **Permissions:** admin | can_access_attached_tribes
     """
     return await label_service.create_feature_label(get_database(), data, current_user)
+
+
+@card_router.put("/labels/reorder", response_model=list[FeatureLabel])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def reorder_labels(data: FeatureLabelsReorderRequest, current_user: dict = Depends(get_current_user)):
+    """Reorder the labels of a kanban feature instance.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
+    return await label_service.reorder_feature_labels(get_database(), data, current_user)
 
 
 @card_router.patch("/labels/{label_id}", response_model=FeatureLabel)

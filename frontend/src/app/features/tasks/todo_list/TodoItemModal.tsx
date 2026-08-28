@@ -9,6 +9,7 @@ import type {
   TodoItemUpdate,
   TodoLabel,
   TodoLabelCreate,
+  TodoLabelUpdate,
 } from './types.ts';
 
 interface Props {
@@ -23,6 +24,9 @@ interface Props {
   onToggleLabel: (itemId: string, labelId: string) => Promise<void>;
   onSetReminders: (itemId: string, reminders: TaskReminderCreate[]) => Promise<void>;
   onCreateLabel: (data: TodoLabelCreate) => Promise<TodoLabel | null>;
+  onUpdateLabel: (labelId: string, data: TodoLabelUpdate) => Promise<void>;
+  onDeleteLabel: (labelId: string) => Promise<void>;
+  onReorderLabel: (orderedIds: string[]) => Promise<void>;
 }
 
 const TodoItemModal: React.FC<Props> = ({
@@ -37,6 +41,9 @@ const TodoItemModal: React.FC<Props> = ({
   onToggleLabel,
   onSetReminders,
   onCreateLabel,
+  onUpdateLabel,
+  onDeleteLabel,
+  onReorderLabel,
 }) => {
   const taskLabels: TaskLabelInfo[] = labels.map((l) => ({
     ...l,
@@ -93,6 +100,9 @@ const TodoItemModal: React.FC<Props> = ({
       onToggleLabel={handleToggleLabel}
       onSetReminders={handleSetReminders}
       onCreateLabel={handleCreateLabel}
+      onUpdateLabel={onUpdateLabel}
+      onDeleteLabel={onDeleteLabel}
+      onReorderLabel={onReorderLabel}
     />
   );
 };

@@ -1,6 +1,4 @@
-import { ColorSwatchPicker } from '@/app/platform/core/layout/themes/components/ColorSwatchPicker.tsx';
-import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
-import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
+import { ManageLabelsModal } from '@/app/platform/core/layout/themes/components/ManageLabelsModal.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
@@ -9,11 +7,6 @@ import { useTranslation } from 'react-i18next';
 
 import { RecipeLabel } from './types.ts';
 
-const COLOR_PALETTE = [
-  '#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e', '#06b6d4',
-  '#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', '#6b7280', '#10b981',
-];
-
 interface Props {
   labels: RecipeLabel[];
   selectedLabelIds: string[];
@@ -21,23 +14,17 @@ interface Props {
   showTitle?: boolean;
   onToggle: (labelId: string) => void;
   onCreate: (name: string, color: string) => Promise<void>;
+  onUpdate: (labelId: string, data: { name?: string; color?: string }) => Promise<void>;
+  onDelete: (labelId: string) => Promise<void>;
+  onReorder: (orderedIds: string[]) => Promise<void>;
 }
 
 const RecipeLabelsSection: React.FC<Props> = ({
-  labels, selectedLabelIds, canEdit, showTitle = true, onToggle, onCreate,
+  labels, selectedLabelIds, canEdit, showTitle = true, onToggle, onCreate, onUpdate, onDelete, onReorder,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
-  const [creating, setCreating] = useState(false);
-  const [name, setName] = useState('');
-  const [color, setColor] = useState(COLOR_PALETTE[0]);
-
-  const handleCreate = async () => {
-    if (!name.trim()) return;
-    await onCreate(name.trim(), color);
-    setName('');
-    setCreating(false);
-  };
+  const [managing, setManaging] = useState(false);
 
   return (
     <div>
@@ -66,12 +53,12 @@ const RecipeLabelsSection: React.FC<Props> = ({
             </button>
           );
         })}
-        {canEdit && !creating && (
+        {canEdit && (
           <button
             type="button"
-            onClick={() => setCreating(true)}
-            title={t('features.recipes.newLabel')}
-            aria-label={t('features.recipes.newLabel')}
+            onClick={() => setManaging(true)}
+            title={t('labels.manage')}
+            aria-label={t('labels.manage')}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               width: '28px', height: '28px', borderRadius: 'var(--radius-md)',
@@ -79,21 +66,20 @@ const RecipeLabelsSection: React.FC<Props> = ({
               color: theme.colors.primary, cursor: 'pointer',
             }}
           >
-            <ThemedSvgIcon name="plus" color="currentColor" size={16} />
+            <ThemedSvgIcon name="pencil" color="currentColor" size={14} />
           </button>
         )}
       </div>
-      {creating && (
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '8px' }}>
-          <ThemedInput value={name} onChange={(e) => setName(e.target.value)} autoFocus />
-          <ColorSwatchPicker colors={COLOR_PALETTE} value={color} onChange={setColor} />
-          <ThemedButton variant="primary" onClick={handleCreate} disabled={!name.trim()}>
-            {t('features.recipes.create')}
-          </ThemedButton>
-          <ThemedButton variant="ghost" onClick={() => setCreating(false)}>
-            {t('features.recipes.cancel')}
-          </ThemedButton>
-        </div>
+      {canEdit && (
+        <ManageLabelsModal
+          isOpen={managing}
+          onClose={() => setManaging(false)}
+          labels={labels}
+          onCreate={onCreate}
+          onUpdate={onUpdate}
+          onDelete={onDelete}
+          onReorder={onReorder}
+        />
       )}
     </div>
   );

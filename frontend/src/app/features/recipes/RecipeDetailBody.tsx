@@ -17,12 +17,16 @@ interface Props {
   onUpdate: (data: { name?: string; servings?: number; document_content_html?: string }) => Promise<void>;
   onCreateLabel: (name: string, color: string) => Promise<void>;
   onToggleLabel: (labelId: string) => Promise<void>;
+  onUpdateLabel: (labelId: string, data: { name?: string; color?: string }) => Promise<void>;
+  onDeleteLabel: (labelId: string) => Promise<void>;
+  onReorderLabel: (orderedIds: string[]) => Promise<void>;
   onAddIngredient: (data: RecipeIngredientCreate) => Promise<boolean>;
   onRemoveIngredient: (ingredientId: string) => Promise<void>;
 }
 
 const RecipeDetailBody: React.FC<Props> = ({
-  recipe, labels, canEdit, onUpdate, onCreateLabel, onToggleLabel, onAddIngredient, onRemoveIngredient,
+  recipe, labels, canEdit, onUpdate, onCreateLabel, onToggleLabel,
+  onUpdateLabel, onDeleteLabel, onReorderLabel, onAddIngredient, onRemoveIngredient,
 }) => {
   const { t } = useTranslation();
   const [addingIngredient, setAddingIngredient] = useState(false);
@@ -35,6 +39,9 @@ const RecipeDetailBody: React.FC<Props> = ({
       showTitle={canEdit}
       onToggle={onToggleLabel}
       onCreate={onCreateLabel}
+      onUpdate={onUpdateLabel}
+      onDelete={onDeleteLabel}
+      onReorder={onReorderLabel}
     />
   );
 

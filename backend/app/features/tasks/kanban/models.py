@@ -2,7 +2,8 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import date, datetime
 
-from app.features.tasks.models import FeatureLabel, TaskReminderResponse
+from app.features.tasks.models import TaskReminderResponse
+from app.platform.functions.labels.models import FeatureLabel
 
 
 class KanbanColumnResponse(BaseModel):

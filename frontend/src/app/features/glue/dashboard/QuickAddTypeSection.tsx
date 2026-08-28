@@ -12,6 +12,15 @@ import { useInstanceOptions } from './useAllFeatureInstances.ts';
 
 type Theme = ReturnType<typeof useTheme>['theme'];
 
+function dedupeOptionsByValue(options: SelectOption[]): SelectOption[] {
+  const seen = new Set<string>();
+  return options.filter((option) => {
+    if (seen.has(option.value)) return false;
+    seen.add(option.value);
+    return true;
+  });
+}
+
 function linkButtonStyle(theme: Theme): React.CSSProperties {
   return {
     background: 'none',
@@ -51,8 +60,12 @@ export const QuickAddTypeSection: React.FC<QuickAddTypeSectionProps> = ({
   const { projects } = useUserProjectsByTribe(tribeId, userId);
   const instances = useInstanceOptions(projectId, featureTypes);
 
-  const tribeOptions: SelectOption[] = tribes.map((tr) => ({ value: tr.tribe_id, label: tr.tribe_name }));
-  const projectOptions: SelectOption[] = projects.map((p) => ({ value: p.project_id, label: p.project_name }));
+  const tribeOptions: SelectOption[] = dedupeOptionsByValue(
+    tribes.map((tr) => ({ value: tr.tribe_id, label: tr.tribe_name })),
+  );
+  const projectOptions: SelectOption[] = dedupeOptionsByValue(
+    projects.map((p) => ({ value: p.project_id, label: p.project_name })),
+  );
   const instanceOptions: SelectOption[] = instances.map((i) => ({ value: i.id, label: i.name ?? '' }));
 
   const handlePickInstance = async (instanceId: string) => {

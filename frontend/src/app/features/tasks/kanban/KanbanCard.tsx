@@ -18,6 +18,7 @@ import {
   CardUpdate,
   KanbanLabel,
   LabelCreate,
+  LabelUpdate,
   PersonOption,
   ReorderDirection,
   fibColor,
@@ -45,6 +46,9 @@ interface Props {
   ) => Promise<void>;
   onSetReminders: (cardId: string, reminders: { remind_at: string; reminder_type: 'notification' | 'mail' }[]) => Promise<void>;
   onCreateLabel: (data: LabelCreate) => Promise<KanbanLabel | null>;
+  onUpdateLabel: (labelId: string, data: LabelUpdate) => Promise<void>;
+  onDeleteLabel: (labelId: string) => Promise<void>;
+  onReorderLabel: (orderedIds: string[]) => Promise<void>;
 }
 
 interface MoveButtonProps {
@@ -99,6 +103,9 @@ const KanbanCard: React.FC<Props> = ({
   onToggleLabel,
   onSetReminders,
   onCreateLabel,
+  onUpdateLabel,
+  onDeleteLabel,
+  onReorderLabel,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -258,6 +265,9 @@ const KanbanCard: React.FC<Props> = ({
           onToggleLabel={onToggleLabel}
           onSetReminders={onSetReminders}
           onCreateLabel={onCreateLabel}
+          onUpdateLabel={onUpdateLabel}
+          onDeleteLabel={onDeleteLabel}
+          onReorderLabel={onReorderLabel}
         />
       )}
 

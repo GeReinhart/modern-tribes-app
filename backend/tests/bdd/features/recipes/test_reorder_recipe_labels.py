@@ -43,3 +43,13 @@ def test_reorder_labels_forbidden():
 @scenario(FEATURE, "PATCH /recipe-labels/2001 with status archived — the label is archived and no longer listed")
 def test_archive_label_via_update():
     pass
+
+
+@scenario(FEATURE, "PUT /recipe-labels/reorder with an incomplete list — 400 error and the order is not changed")
+def test_reorder_labels_incomplete_list():
+    pass
+
+
+@scenario(FEATURE, "PUT /recipe-labels/reorder with a label from another feature instance — 400 error and neither instance's order changes")
+def test_reorder_labels_foreign_label():
+    pass

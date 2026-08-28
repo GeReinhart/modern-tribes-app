@@ -100,6 +100,9 @@ const MyTaskEditModal: React.FC<Props> = ({ task, onClose, onSaved }) => {
         }}
         onSetReminders={async (cardId, reminders) => { await kanbanService.setReminders(cardId, reminders); onSaved(); }}
         onCreateLabel={async (data: LabelCreate) => { try { return await kanbanService.createLabel(data); } catch { return null; } }}
+        onUpdateLabel={async (labelId, data) => { await kanbanService.updateLabel(labelId, data); }}
+        onDeleteLabel={(labelId) => kanbanService.deleteLabel(labelId)}
+        onReorderLabel={async (orderedIds) => { await kanbanService.reorderLabels(task.feature_instance_id, orderedIds); }}
       />
     );
   }
@@ -116,6 +119,9 @@ const MyTaskEditModal: React.FC<Props> = ({ task, onClose, onSaved }) => {
       onToggleLabel={async (_itemId: string, labelId: string) => { await todoListService.toggleLabel(task.id, labelId); }}
       onSetReminders={async (itemId, reminders) => { await todoListService.setReminders(itemId, reminders); onSaved(); }}
       onCreateLabel={async (data: TodoLabelCreate) => { try { return await todoListService.createLabel(data); } catch { return null; } }}
+      onUpdateLabel={async (labelId, data) => { await todoListService.updateLabel(labelId, data); }}
+      onDeleteLabel={(labelId) => todoListService.deleteLabel(labelId)}
+      onReorderLabel={async (orderedIds) => { await todoListService.reorderLabels(task.feature_instance_id, orderedIds); }}
     />
   );
 };
