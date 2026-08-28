@@ -127,9 +127,9 @@ const GroceriesCatalogSectionGroup: React.FC<Props> = ({
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 {item.icon && <ThemedSvgIcon name={item.icon as IconName} color={theme.colors.text} size={14} />}
                 <span style={{ color: theme.colors.text }}>{item.name}</span>
-                {formatUnitSuffix(item.unit) && (
+                {formatUnitSuffix(item.unit, t) && (
                   <span style={{ color: theme.colors.secondary, fontSize: 'var(--font-xs)' }}>
-                    {formatUnitSuffix(item.unit)}
+                    {formatUnitSuffix(item.unit, t)}
                   </span>
                 )}
               </span>

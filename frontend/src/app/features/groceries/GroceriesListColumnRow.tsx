@@ -54,7 +54,7 @@ const GroceriesListColumnRow: React.FC<Props> = ({
     setPreviewQuantity(item.quantity);
   }, [item.quantity]);
 
-  const quantityLabel = formatQuantityUnit(previewQuantity, item.unit, item.is_divisible);
+  const quantityLabel = formatQuantityUnit(previewQuantity, item.unit, item.is_divisible, t);
 
   return (
     <div

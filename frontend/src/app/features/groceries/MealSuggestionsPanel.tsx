@@ -3,9 +3,11 @@ import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvg
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { useMemo, useState } from 'react';
+import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { formatMealDate } from './formatMealDate.ts';
+import { translateUnit } from './formatQuantity.ts';
 import GroceriesSectionToggleHeader from './GroceriesSectionToggleHeader.tsx';
 import { MealSuggestion, MealSuggestionIngredient } from './types.ts';
 
@@ -21,9 +23,9 @@ function suggestionKey(s: MealSuggestion): string {
   return `${s.meal_id}-${s.recipe_id}`;
 }
 
-function formatIngredientLabel(ingredient: MealSuggestionIngredient): string {
+function formatIngredientLabel(ingredient: MealSuggestionIngredient, t: TFunction): string {
   return ingredient.unit
-    ? `${ingredient.name} — ${ingredient.quantity} ${ingredient.unit}`
+    ? `${ingredient.name} — ${ingredient.quantity} ${translateUnit(ingredient.unit, t, ingredient.quantity)}`
     : `${ingredient.name} — ${ingredient.quantity}`;
 }
 
@@ -126,7 +128,7 @@ const MealSuggestionsPanel: React.FC<Props> = ({ suggestions, canEdit, onAddAll,
                 <div style={{ opacity: s.added ? 0.5 : 1 }}>
                   {mainIngredients.map((ingredient) => (
                     <div key={ingredient.recipe_ingredient_id} style={{ padding: '2px 0' }}>
-                      {formatIngredientLabel(ingredient)}
+                      {formatIngredientLabel(ingredient, t)}
                     </div>
                   ))}
                 </div>
@@ -147,7 +149,7 @@ const MealSuggestionsPanel: React.FC<Props> = ({ suggestions, canEdit, onAddAll,
                             label={t('features.groceries.addAccompanimentSuggestion')}
                           />
                         )}
-                        {formatIngredientLabel(ingredient)}
+                        {formatIngredientLabel(ingredient, t)}
                       </div>
                     ))}
                   </div>
