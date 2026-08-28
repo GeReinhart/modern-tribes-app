@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { findAdjacentIngredientInGroup } from './ingredientOrdering.ts';
 import { recipesService } from './service.ts';
 import {
   Recipe, RecipeCreate, RecipeDetail, RecipeIngredientCreate, RecipeIngredientUpdate, RecipeLabel,
@@ -182,6 +183,19 @@ export function useRecipeDetail(recipeId: string | null) {
     }
   }, [fetchDetail]);
 
+  const moveIngredient = useCallback(async (ingredientId: string, direction: 'up' | 'down'): Promise<void> => {
+    if (!detail) return;
+    const swap = findAdjacentIngredientInGroup(detail.ingredients, ingredientId, direction);
+    if (!swap) return;
+    try {
+      await recipesService.updateIngredient(swap.moved.id, { position: swap.neighbor.position });
+      await recipesService.updateIngredient(swap.neighbor.id, { position: swap.moved.position });
+      await fetchDetail();
+    } catch (e: unknown) {
+      setError(errorMessage(e));
+    }
+  }, [detail, fetchDetail]);
+
   const toggleLabel = useCallback(async (labelId: string): Promise<void> => {
     if (!recipeId) return;
     try {
@@ -192,5 +206,8 @@ export function useRecipeDetail(recipeId: string | null) {
     }
   }, [recipeId]);
 
-  return { detail, error, update, addIngredient, updateIngredient, removeIngredient, toggleLabel, refetch: fetchDetail };
+  return {
+    detail, error, update, addIngredient, updateIngredient, removeIngredient, moveIngredient, toggleLabel,
+    refetch: fetchDetail,
+  };
 }

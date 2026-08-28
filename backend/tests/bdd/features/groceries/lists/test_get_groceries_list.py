@@ -63,3 +63,8 @@ def test_get_groceries_list_done_stays_done():
 @scenario(FEATURE, "GET /groceries-lists/0204 — a list scheduled for today is still planned")
 def test_get_groceries_list_today_still_planned():
     pass
+
+
+@scenario(FEATURE, "GET /groceries-lists/0205 — a list with no scheduled date is never shown as passed")
+def test_get_groceries_list_no_date_stays_planned():
+    pass

@@ -1,3 +1,4 @@
+import { ThemedQuantityStepper } from '@/app/platform/core/layout/themes/components/ThemedQuantityStepper.tsx';
 import { IconName, ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
@@ -5,7 +6,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { formatQuantityUnit } from './formatQuantity.ts';
-import GroceriesListItemQuantityControls from './GroceriesListItemQuantityControls.tsx';
 import { GroceriesListItemDetail } from './types.ts';
 
 interface Props {
@@ -26,9 +26,8 @@ const GroceriesListColumnRow: React.FC<Props> = ({
   const { theme } = useTheme();
   const inputRef = useRef<HTMLInputElement>(null);
   const [panelOpen, setPanelOpen] = useState(autoFocus);
-  const [quantity, setQuantity] = useState(String(item.quantity));
+  const [previewQuantity, setPreviewQuantity] = useState(item.quantity);
   const [comment, setComment] = useState(item.comment ?? '');
-  const step = item.is_divisible ? 0.1 : 1;
 
   useEffect(() => {
     setComment(item.comment ?? '');
@@ -52,31 +51,10 @@ const GroceriesListColumnRow: React.FC<Props> = ({
   }, [autoFocus, panelOpen, onFocused]);
 
   useEffect(() => {
-    setQuantity(String(item.quantity));
+    setPreviewQuantity(item.quantity);
   }, [item.quantity]);
 
-  const commitQuantity = () => {
-    const parsed = Number(quantity);
-    if (Number.isNaN(parsed)) return;
-    const rounded = item.is_divisible ? Math.round(parsed * 10) / 10 : parsed;
-    setQuantity(String(rounded));
-    if (rounded !== item.quantity) onUpdateQuantity(item.id, rounded);
-  };
-
-  const applyStep = (delta: number) => {
-    const current = Number(quantity);
-    const raw = Math.max(0, (Number.isNaN(current) ? item.quantity : current) + delta);
-    const next = Math.round(raw * 100) / 100;
-    setQuantity(String(next));
-    onUpdateQuantity(item.id, next);
-  };
-
-  const previewQuantity = Number(quantity);
-  const quantityLabel = formatQuantityUnit(
-    Number.isNaN(previewQuantity) ? item.quantity : previewQuantity,
-    item.unit,
-    item.is_divisible,
-  );
+  const quantityLabel = formatQuantityUnit(previewQuantity, item.unit, item.is_divisible);
 
   return (
     <div
@@ -111,7 +89,11 @@ const GroceriesListColumnRow: React.FC<Props> = ({
       </div>
 
       {!panelOpen && item.comment && (
-        <div style={{ fontSize: 'var(--font-xs)', color: theme.colors.secondary, marginLeft: '20px' }}>
+        <div
+          style={{
+            fontSize: 'var(--font-xs)', color: theme.colors.secondary, marginLeft: '20px', whiteSpace: 'pre-line',
+          }}
+        >
           {item.comment}
         </div>
       )}
@@ -119,16 +101,16 @@ const GroceriesListColumnRow: React.FC<Props> = ({
       {panelOpen && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginLeft: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <GroceriesListItemQuantityControls
-              quantity={quantity}
-              itemQuantity={item.quantity}
+            <ThemedQuantityStepper
+              value={item.quantity}
               isDivisible={item.is_divisible}
               canEdit={canEdit}
-              step={step}
+              onChange={(value) => onUpdateQuantity(item.id, value)}
               inputRef={inputRef}
-              onChange={setQuantity}
-              onCommit={commitQuantity}
-              onApplyStep={applyStep}
+              onPreview={(text) => {
+                const parsed = Number(text);
+                if (!Number.isNaN(parsed)) setPreviewQuantity(parsed);
+              }}
             />
             {canEdit && onManage && (
               <button
@@ -141,13 +123,13 @@ const GroceriesListColumnRow: React.FC<Props> = ({
               </button>
             )}
           </div>
-          <input
-            type="text"
+          <textarea
             value={comment}
             disabled={!canEdit}
             onChange={(e) => setComment(e.target.value)}
             onBlur={commitComment}
             placeholder={t('features.groceries.itemCommentPlaceholder')}
+            rows={comment.split('\n').length}
             style={{
               padding: '6px 8px',
               border: `1px solid ${theme.colors.border}`,
@@ -155,6 +137,8 @@ const GroceriesListColumnRow: React.FC<Props> = ({
               backgroundColor: theme.colors.surface,
               color: theme.colors.text,
               fontSize: 'var(--font-xs)',
+              fontFamily: 'inherit',
+              resize: 'vertical',
               boxSizing: 'border-box',
             }}
           />

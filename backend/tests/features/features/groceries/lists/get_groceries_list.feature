@@ -182,3 +182,22 @@ Feature: View a grocery list
         "list_status": "planned"
       }
       """
+
+  Scenario: GET /groceries-lists/0205 — a list with no scheduled date is never shown as passed
+    Given the groceries_lists table contains:
+      | id   | feature_instance_id | name        | scheduled_date | list_status | status |
+      | 0205 | 0100                | Someday shop |                | planned     | active |
+    And I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | guest    | active |
+    When I GET /api/features/tasks/groceries-lists/0205
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "0205",
+        "scheduled_date": null,
+        "list_status": "planned"
+      }
+      """

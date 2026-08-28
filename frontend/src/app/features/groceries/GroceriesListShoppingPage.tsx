@@ -14,6 +14,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import AddedMealsBanner from './AddedMealsBanner.tsx';
 import GroceriesShoppingSectionGroup from './GroceriesShoppingSectionGroup.tsx';
 import { useGroceriesCatalog, useGroceriesListDetail } from './hooks.ts';
+import { formatListTitle } from './listTitle.ts';
 import { groupBySections } from './sectionGrouping.ts';
 
 const GroceriesListShoppingPageContent: React.FC = () => {
@@ -37,7 +38,7 @@ const GroceriesListShoppingPageContent: React.FC = () => {
       { label: t('tribes.title'), path: '/app/tribes' },
       { label: tribe?.name || t('common.loading'), path: `/app/tribes/${tribeId}` },
       { label: project?.name || t('common.loading'), path: `/app/tribes/${tribeId}/projects/${projectId}` },
-      { label: detail ? detail.name || detail.scheduled_date : t('common.loading') },
+      { label: detail ? formatListTitle(detail.name, t) : t('common.loading') },
     ],
     [tribe?.name, project?.name, detail, tribeId, projectId, t],
   );
@@ -45,7 +46,7 @@ const GroceriesListShoppingPageContent: React.FC = () => {
   const bookmarkSlot = detail ? (
     <BookmarkToggle
       pagePath={location.pathname}
-      pageTitle={detail.name || detail.scheduled_date}
+      pageTitle={formatListTitle(detail.name, t)}
       pageDescription={buildBookmarkDescription(breadcrumbs)}
     />
   ) : null;

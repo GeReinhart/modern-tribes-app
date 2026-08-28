@@ -32,8 +32,10 @@ def test_create_groceries_list_defaults():
     pass
 
 
-@scenario(FEATURE, "POST /groceries-lists/ without a scheduled_date — 422 error and the database is not modified")
-def test_create_groceries_list_missing_date():
+@scenario(
+    FEATURE, "POST /groceries-lists/ without a scheduled_date — the list is created with no date, still planned",
+)
+def test_create_groceries_list_no_date():
     pass
 
 

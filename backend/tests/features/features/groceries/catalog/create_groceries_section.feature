@@ -40,13 +40,13 @@ Feature: Add a new section to the shared groceries catalog
       | id   | project_id | name      | feature_type | status |
       | 0100 | 0100       | Groceries | groceries    | active |
 
-  Scenario: POST /groceries-sections/ as a project member — the section is created in the shared catalog
+  Scenario: POST /groceries-sections/ as a project member — the section is created in the shared catalog, alimentaire by default
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:
       | id   | tribe_id | person_id | position | status |
       | 1001 | 0010     | 0030      | member   | active |
     And the groceries_sections table contains:
-      | id | name | status |
+      | id | name | is_food | status |
     When I POST /api/features/tasks/groceries-sections/ with body:
       """
       {"feature_instance_id": "0100", "name": "Boucherie"}
@@ -56,12 +56,37 @@ Feature: Add a new section to the shared groceries catalog
       """
       {
         "name": "Boucherie",
+        "is_food": true,
         "status": "active"
       }
       """
     And the groceries_sections table contains:
-      | name      | status |
-      | Boucherie | active |
+      | name      | is_food | status |
+      | Boucherie | true    | active |
+
+  Scenario: POST /groceries-sections/ with is_food false — the section is created as non-food
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the groceries_sections table contains:
+      | id | name | is_food | status |
+    When I POST /api/features/tasks/groceries-sections/ with body:
+      """
+      {"feature_instance_id": "0100", "name": "Hygiène", "is_food": false}
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "name": "Hygiène",
+        "is_food": false,
+        "status": "active"
+      }
+      """
+    And the groceries_sections table contains:
+      | name    | is_food | status |
+      | Hygiène | false   | active |
 
   @error_case
   Scenario: POST /groceries-sections/ as a project guest — 403 error and the catalog is not modified

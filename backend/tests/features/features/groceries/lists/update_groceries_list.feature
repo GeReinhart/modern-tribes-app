@@ -115,6 +115,31 @@ Feature: Archive, restore or favorite a grocery list
       | id   | feature_instance_id | is_favorite | status |
       | 4001 | 0100                | true        | active |
 
+  Scenario: PATCH /groceries-lists/4001 as a project member — the scheduled date is changed
+    Given the groceries_lists table contains:
+      | id   | feature_instance_id | scheduled_date | is_favorite | status |
+      | 4001 | 0100                | 2026-08-22      | false       | active |
+    And I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    When I PATCH /api/features/tasks/groceries-lists/4001 with body:
+      """
+      {"scheduled_date": "2026-08-29"}
+      """
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "4001",
+        "scheduled_date": "2026-08-29",
+        "status": "active"
+      }
+      """
+    And the groceries_lists table contains:
+      | id   | feature_instance_id | scheduled_date | is_favorite | status |
+      | 4001 | 0100                | 2026-08-29      | false       | active |
+
   @error_case
   Scenario: PATCH /groceries-lists/4001 as a project guest — 403 error and the list is not archived
     Given the groceries_lists table contains:

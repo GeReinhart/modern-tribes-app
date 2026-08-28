@@ -76,6 +76,8 @@ const RecipePresentationPageContent: React.FC = () => {
           onDeleteLabel={noop}
           onReorderLabel={noop}
           onAddIngredient={async () => false}
+          onMoveIngredient={noop}
+          onUpdateIngredientQuantity={noop}
           onRemoveIngredient={noop}
         />
       </ThemedSection>

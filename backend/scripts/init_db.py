@@ -457,9 +457,11 @@ class DatabaseInitializer:
         ids: Dict[str, str] = {}
         async with self.pool.acquire() as conn:
             for position, row in enumerate(rows):
+                is_food = (row.get("is_food") or "true").strip().lower() != "false"
                 r = await conn.fetchrow(
-                    "INSERT INTO groceries_sections (name, icon, position) VALUES ($1, $2, $3) RETURNING id",
-                    row["name"], row.get("icon") or None, position,
+                    """INSERT INTO groceries_sections (name, icon, position, is_food)
+                       VALUES ($1, $2, $3, $4) RETURNING id""",
+                    row["name"], row.get("icon") or None, position, is_food,
                 )
                 ids[row["name"]] = str(r["id"])
         print(f"✓ Created {len(ids)} groceries sections")

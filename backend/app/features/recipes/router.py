@@ -50,6 +50,7 @@ def _row_to_ingredient_detail(row: dict) -> RecipeIngredientDetail:
         unit=row.get("unit"),
         is_divisible=row.get("is_divisible", True),
         quantity=float(row["quantity"]),
+        position=row["position"],
         is_accompaniment=row.get("is_accompaniment", False),
     )
 

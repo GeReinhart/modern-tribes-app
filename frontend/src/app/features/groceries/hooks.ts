@@ -54,8 +54,12 @@ export function useGroceriesLists(featureInstanceId: string | null) {
     async (data: GroceriesListCreate): Promise<GroceriesList | null> => {
       try {
         const created = await groceriesListsService.create(data);
+        // A list with no date yet sorts after every dated list.
+        const NO_DATE_SORT_KEY = '￿';
         setLists((prev) =>
-          [...prev, created].sort((a, b) => a.scheduled_date.localeCompare(b.scheduled_date)),
+          [...prev, created].sort(
+            (a, b) => (a.scheduled_date ?? NO_DATE_SORT_KEY).localeCompare(b.scheduled_date ?? NO_DATE_SORT_KEY),
+          ),
         );
         return created;
       } catch (e: unknown) {
@@ -225,22 +229,25 @@ export function useGroceriesListDetail(listId: string | null) {
     }
   }, []);
 
-  const renameList = useCallback(async (name: string): Promise<boolean> => {
-    if (!listId) return false;
-    try {
-      const updated = await groceriesListsService.update(listId, { name });
-      setDetail((prev) => (prev ? { ...prev, name: updated.name } : prev));
-      return true;
-    } catch (e: unknown) {
-      setError(errorMessage(e));
-      return false;
-    }
-  }, [listId]);
+  const updateListDetails = useCallback(
+    async (data: { name?: string; scheduled_date?: string }): Promise<boolean> => {
+      if (!listId) return false;
+      try {
+        const updated = await groceriesListsService.update(listId, data);
+        setDetail((prev) => (prev ? { ...prev, name: updated.name, scheduled_date: updated.scheduled_date } : prev));
+        return true;
+      } catch (e: unknown) {
+        setError(errorMessage(e));
+        return false;
+      }
+    },
+    [listId],
+  );
 
   return {
     detail, mealSuggestions, addedMeals, error, addItem, addMealSuggestion, removeMealSuggestion,
     addSuggestedIngredient, togglePickedUp, updateQuantity,
-    updateComment, renameList, removeItem,
+    updateComment, updateListDetails, removeItem,
     refetch: fetchDetail,
   };
 }
@@ -286,11 +293,11 @@ export function useGroceriesCatalog(featureInstanceId: string | null) {
   );
 
   const createSection = useCallback(
-    async (name: string, icon?: string): Promise<GroceriesSection | null> => {
+    async (name: string, icon?: string, isFood?: boolean): Promise<GroceriesSection | null> => {
       if (!featureInstanceId) return null;
       try {
         const created = await groceriesCatalogService.createSection({
-          feature_instance_id: featureInstanceId, name, icon,
+          feature_instance_id: featureInstanceId, name, icon, is_food: isFood,
         });
         setSections((prev) => [...prev, created]);
         return created;

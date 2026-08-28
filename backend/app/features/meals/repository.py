@@ -213,8 +213,8 @@ async def fetch_meal_ingredient_rows(pool, meal_id: str) -> list[dict]:
     not swept in by the bulk "add all" action."""
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            """SELECT r.servings, ri.groceries_item_id, ri.custom_name, ri.custom_unit, ri.quantity,
-                      COALESCE(gi.is_divisible, TRUE) AS is_divisible,
+            """SELECT r.servings, r.name AS recipe_name, ri.groceries_item_id, ri.custom_name, ri.custom_unit,
+                      ri.quantity, COALESCE(gi.is_divisible, TRUE) AS is_divisible,
                       COALESCE(gi.unit, ri.custom_unit) AS ingredient_unit
                FROM meal_recipes mr
                JOIN recipes r ON r.id = mr.recipe_id AND r.status = 'active'
@@ -229,8 +229,8 @@ async def fetch_meal_ingredient_rows(pool, meal_id: str) -> list[dict]:
 async def fetch_single_recipe_ingredient_for_meal(pool, meal_id: str, recipe_ingredient_id: str) -> Optional[dict]:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
-            """SELECT r.servings, ri.groceries_item_id, ri.custom_name, ri.custom_unit, ri.quantity,
-                      COALESCE(gi.is_divisible, TRUE) AS is_divisible,
+            """SELECT r.servings, r.name AS recipe_name, ri.groceries_item_id, ri.custom_name, ri.custom_unit,
+                      ri.quantity, COALESCE(gi.is_divisible, TRUE) AS is_divisible,
                       COALESCE(gi.unit, ri.custom_unit) AS ingredient_unit
                FROM meal_recipes mr
                JOIN recipes r ON r.id = mr.recipe_id AND r.status = 'active'

@@ -5,6 +5,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { formatListTitle } from './listTitle.ts';
 import { GroceriesList, PersonOption } from './types.ts';
 
 interface Props {
@@ -46,10 +47,10 @@ const GroceriesListRow: React.FC<Props> = ({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <div style={{ fontWeight: 600, color: theme.colors.text }}>
-            {list.name || list.scheduled_date}
+            {formatListTitle(list.name, t)}
           </div>
           <div style={{ fontSize: 'var(--font-xs)', color: theme.colors.secondary }}>
-            {list.scheduled_date}
+            {list.scheduled_date ?? t('features.groceries.noScheduledDate')}
             {assignee ? ` · ${assignee.name}` : ''}
             {` · ${list.picked_up_count}/${list.items_count}`}
           </div>

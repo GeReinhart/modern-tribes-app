@@ -3,6 +3,14 @@ export interface CatalogItemOption {
   name: string;
   unit: string;
   is_divisible: boolean;
+  section_ids: string[];
+}
+
+export interface CatalogSectionOption {
+  id: string;
+  name: string;
+  icon: string | null;
+  is_food: boolean;
 }
 
 export interface RecipeLabel {
@@ -44,6 +52,7 @@ export interface RecipeIngredient {
   unit: string | null;
   is_divisible: boolean;
   quantity: number;
+  position: number;
   is_accompaniment: boolean;
 }
 

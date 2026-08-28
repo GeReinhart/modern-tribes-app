@@ -9,7 +9,7 @@ _ITEM_COUNTS_SQL = """(SELECT COUNT(*) FROM groceries_list_items
 
 
 async def insert_list(
-    pool, feature_instance_id: str, name: Optional[str], scheduled_date: date,
+    pool, feature_instance_id: str, name: Optional[str], scheduled_date: Optional[date],
     assigned_person_id: Optional[str], force_on_dashboard: bool, user_id: str,
 ) -> dict:
     async with pool.acquire() as conn:
@@ -34,11 +34,14 @@ async def fetch_list(pool, list_id: str) -> Optional[dict]:
 
 
 async def update_list(
-    pool, list_id: str, name: Optional[str], status: Optional[str], is_favorite: Optional[bool], user_id: str,
+    pool, list_id: str, name: Optional[str], scheduled_date: Optional[date], status: Optional[str],
+    is_favorite: Optional[bool], user_id: str,
 ) -> dict:
     fields: dict = {"updated_by": UUID(user_id)}
     if name is not None:
         fields["name"] = name
+    if scheduled_date is not None:
+        fields["scheduled_date"] = scheduled_date
     if status is not None:
         fields["status"] = status
     if is_favorite is not None:

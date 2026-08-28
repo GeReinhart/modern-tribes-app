@@ -64,8 +64,8 @@ Feature: Get a recipe with its ingredients
         "name": "Lasagna",
         "servings": 4,
         "ingredients": [
-          {"id": "9001", "groceries_item_id": "3001", "name": "Ground beef", "unit": "kg", "is_divisible": true, "quantity": 0.8},
-          {"id": "9002", "groceries_item_id": null, "name": "Lasagna sheets", "unit": "packs", "is_divisible": true, "quantity": 1.0}
+          {"id": "9001", "groceries_item_id": "3001", "name": "Ground beef", "unit": "kg", "is_divisible": true, "quantity": 0.8, "position": 0},
+          {"id": "9002", "groceries_item_id": null, "name": "Lasagna sheets", "unit": "packs", "is_divisible": true, "quantity": 1.0, "position": 1}
         ]
       }
       """

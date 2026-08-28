@@ -46,6 +46,14 @@ def test_grocery_suggestions_done_list():
     pass
 
 
+@scenario(
+    FEATURE,
+    "GET /meals/grocery-suggestions for a list with no scheduled date — meals planned after today are suggested",
+)
+def test_grocery_suggestions_no_date():
+    pass
+
+
 @scenario(FEATURE, "GET /meals/grocery-suggestions/8001 without project access — 403 error")
 def test_grocery_suggestions_forbidden():
     pass

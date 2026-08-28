@@ -97,8 +97,7 @@ Feature: Create a grocery list
       | feature_instance_id | name | scheduled_date | list_status | assigned_person_id | force_on_dashboard | status |
       | 0100                |      | +3d             | planned     |                     | false               | active |
 
-  @error_case
-  Scenario: POST /groceries-lists/ without a scheduled_date — 422 error and the database is not modified
+  Scenario: POST /groceries-lists/ without a scheduled_date — the list is created with no date, still planned
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:
       | id   | tribe_id | person_id | position | status |
@@ -109,9 +108,20 @@ Feature: Create a grocery list
       """
       {"feature_instance_id": "0100", "name": "Weekly shop"}
       """
-    Then the response status code is 422
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "feature_instance_id": "0100",
+        "name": "Weekly shop",
+        "scheduled_date": null,
+        "list_status": "planned",
+        "status": "active"
+      }
+      """
     And the groceries_lists table contains:
-      | id | feature_instance_id | name | scheduled_date | list_status | assigned_person_id | force_on_dashboard | status |
+      | feature_instance_id | name        | scheduled_date | list_status | status |
+      | 0100                | Weekly shop |                | planned     | active |
 
   @error_case
   Scenario: POST /groceries-lists/ as a project guest — 403 error and the database is not modified

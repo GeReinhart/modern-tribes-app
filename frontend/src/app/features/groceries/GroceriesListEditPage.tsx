@@ -10,11 +10,12 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router-dom';
 
+import EditListModal from './EditListModal.tsx';
 import GroceriesCatalogColumn from './GroceriesCatalogColumn.tsx';
 import GroceriesListColumn from './GroceriesListColumn.tsx';
+import { formatListTitle } from './listTitle.ts';
 import { useGroceriesCatalog, useGroceriesListDetail } from './hooks.ts';
 import MealSuggestionsPanel from './MealSuggestionsPanel.tsx';
-import RenameListModal from './RenameListModal.tsx';
 
 const GroceriesListEditPageContent: React.FC = () => {
   const { t } = useTranslation();
@@ -27,12 +28,12 @@ const GroceriesListEditPageContent: React.FC = () => {
   const {
     detail, mealSuggestions, error: detailError, addItem, addMealSuggestion, removeMealSuggestion,
     addSuggestedIngredient, updateQuantity, updateComment,
-    renameList, removeItem,
+    updateListDetails, removeItem,
   } = useGroceriesListDetail(listId || null);
   const catalog = useGroceriesCatalog(detail?.feature_instance_id ?? null);
   const [focusItemId, setFocusItemId] = useState<string | null>(null);
   const [configuringSections, setConfiguringSections] = useState(false);
-  const [renamingList, setRenamingList] = useState(false);
+  const [editingList, setEditingList] = useState(false);
 
   const listItemCatalogIds = useMemo(
     () => new Set(detail?.items.map((i) => i.groceries_item_id).filter((id): id is string => id !== null) ?? []),
@@ -60,7 +61,7 @@ const GroceriesListEditPageContent: React.FC = () => {
       { label: t('tribes.title'), path: '/app/tribes' },
       { label: tribe?.name || t('common.loading'), path: `/app/tribes/${tribeId}` },
       { label: project?.name || t('common.loading'), path: `/app/tribes/${tribeId}/projects/${projectId}` },
-      { label: detail ? detail.name || detail.scheduled_date : t('common.loading') },
+      { label: detail ? formatListTitle(detail.name, t) : t('common.loading') },
     ],
     [tribe?.name, project?.name, detail, tribeId, projectId, t],
   );
@@ -68,7 +69,7 @@ const GroceriesListEditPageContent: React.FC = () => {
   const bookmarkSlot = detail ? (
     <BookmarkToggle
       pagePath={location.pathname}
-      pageTitle={detail.name || detail.scheduled_date}
+      pageTitle={formatListTitle(detail.name, t)}
       pageDescription={buildBookmarkDescription(breadcrumbs)}
     />
   ) : null;
@@ -83,8 +84,8 @@ const GroceriesListEditPageContent: React.FC = () => {
         ? [
             {
               icon: 'pencil' as const,
-              label: t('features.groceries.renameList'),
-              onClick: () => setRenamingList(true),
+              label: t('features.groceries.editList'),
+              onClick: () => setEditingList(true),
             },
             {
               icon: 'settings' as const,
@@ -110,11 +111,12 @@ const GroceriesListEditPageContent: React.FC = () => {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions} bookmarkSlot={bookmarkSlot}>
-      {renamingList && (
-        <RenameListModal
+      {editingList && (
+        <EditListModal
           initialName={detail.name ?? ''}
-          onClose={() => setRenamingList(false)}
-          onSubmit={renameList}
+          initialScheduledDate={detail.scheduled_date}
+          onClose={() => setEditingList(false)}
+          onSubmit={updateListDetails}
         />
       )}
       {(detailError || catalog.error) && <div>{detailError || catalog.error}</div>}

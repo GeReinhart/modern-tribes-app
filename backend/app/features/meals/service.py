@@ -1,4 +1,5 @@
 import math
+from datetime import date
 from typing import Optional
 
 from app.features.meals import repository as meals_repository
@@ -22,13 +23,13 @@ def _meal_label(meal: dict) -> str:
     return f"repas du {meal['start_at']:%d/%m/%Y}"
 
 
-def _build_item_comment(meal: dict, quantity: float, unit: Optional[str]) -> str:
-    """The quantity/unit this meal contributes, plus the meal's own description, so a
+def _build_item_comment(meal: dict, recipe_name: str, quantity: float, unit: Optional[str]) -> str:
+    """The quantity/unit this meal's recipe contributes, plus the meal's own description, so a
     shared groceries item keeps a trace of what it's needed for once merged with others."""
     qty_part = _format_quantity(quantity)
     if unit:
         qty_part = f"{qty_part} {unit}"
-    comment = f"{qty_part} pour {_meal_label(meal)}"
+    comment = f"{qty_part} pour {recipe_name} ({_meal_label(meal)})"
     description = strip_html(meal.get("document_content_html") or "").strip()
     if description:
         comment = f"{comment} — {description}"
@@ -36,16 +37,19 @@ def _build_item_comment(meal: dict, quantity: float, unit: Optional[str]) -> str
 
 
 async def compute_grocery_suggestions(pool, groceries_list_id: str) -> Optional[list[dict]]:
-    """Ingredients of meals planned after this groceries list's date, scaled to each
-    meal's headcount. Returns None if the list itself doesn't exist, [] if the list is
-    not in 'planned' state (already shopped for)."""
+    """Ingredients of meals planned after this groceries list's date (or after today, if the
+    list has no date yet), scaled to each meal's headcount. Returns None if the list itself
+    doesn't exist, [] if the list is not in 'planned' state (already shopped for)."""
     scope = await meals_repository.fetch_groceries_list_scope(pool, groceries_list_id)
     if not scope:
         return None
     if scope["list_status"] != "planned":
         return []
+    # A list with no date yet has nothing to compare meals against — fall back to today, so it
+    # still suggests every meal planned in the future instead of suggesting none at all.
+    after_date = scope["scheduled_date"] if scope["scheduled_date"] is not None else date.today()
 
-    rows = await meals_repository.fetch_grocery_suggestion_rows(pool, str(scope["project_id"]), scope["scheduled_date"])
+    rows = await meals_repository.fetch_grocery_suggestion_rows(pool, str(scope["project_id"]), after_date)
     added_meal_ids = await meals_repository.fetch_added_meal_ids(pool, groceries_list_id)
 
     groups: dict = {}
@@ -105,7 +109,7 @@ async def add_meal_to_groceries_list(pool, groceries_list_id: str, meal_id: str,
             "custom_name": r["custom_name"],
             "custom_unit": r["custom_unit"],
             "quantity": quantity,
-            "comment": _build_item_comment(meal, quantity, r["ingredient_unit"]),
+            "comment": _build_item_comment(meal, r["recipe_name"], quantity, r["ingredient_unit"]),
         })
     await meals_repository.insert_list_items_bulk(pool, groceries_list_id, items, user_id)
     await meals_repository.mark_meal_added(pool, groceries_list_id, meal_id, meal["headcount"], user_id)
@@ -147,7 +151,7 @@ async def add_ingredient_to_groceries_list(
         "custom_name": row["custom_name"],
         "custom_unit": row["custom_unit"],
         "quantity": quantity,
-        "comment": _build_item_comment(meal, quantity, row["ingredient_unit"]),
+        "comment": _build_item_comment(meal, row["recipe_name"], quantity, row["ingredient_unit"]),
     }
     await meals_repository.insert_list_items_bulk(pool, groceries_list_id, [item], user_id)
     return item

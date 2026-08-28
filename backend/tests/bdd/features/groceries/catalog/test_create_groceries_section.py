@@ -22,8 +22,17 @@ def non_admin_client():
     _test_app.dependency_overrides.clear()
 
 
-@scenario(FEATURE, "POST /groceries-sections/ as a project member — the section is created in the shared catalog")
+@scenario(
+    FEATURE,
+    "POST /groceries-sections/ as a project member — the section is created in the shared catalog, "
+    "alimentaire by default",
+)
 def test_create_groceries_section_success():
+    pass
+
+
+@scenario(FEATURE, "POST /groceries-sections/ with is_food false — the section is created as non-food")
+def test_create_groceries_section_non_food():
     pass
 
 

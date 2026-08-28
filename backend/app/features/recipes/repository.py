@@ -114,7 +114,7 @@ async def fetch_ingredients_detail(pool, recipe_id: str) -> list[dict]:
                       COALESCE(gi.name, ri.custom_name) AS name,
                       COALESCE(gi.unit, ri.custom_unit) AS unit,
                       COALESCE(gi.is_divisible, TRUE) AS is_divisible,
-                      ri.quantity, ri.is_accompaniment
+                      ri.quantity, ri.position, ri.is_accompaniment
                FROM recipe_ingredients ri
                LEFT JOIN groceries_items gi ON gi.id = ri.groceries_item_id
                WHERE ri.recipe_id = $1 AND ri.status = 'active'

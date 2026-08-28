@@ -51,6 +51,7 @@ export interface GroceriesSection {
   id: string;
   name: string;
   icon: string | null;
+  is_food: boolean;
   status: string;
 }
 
@@ -58,19 +59,21 @@ export interface GroceriesSectionCreate {
   feature_instance_id: string;
   name: string;
   icon?: string;
+  is_food?: boolean;
 }
 
 export interface GroceriesSectionUpdate {
   feature_instance_id: string;
   name?: string;
   icon?: string;
+  is_food?: boolean;
 }
 
 export interface GroceriesList {
   id: string;
   feature_instance_id: string;
   name: string | null;
-  scheduled_date: string;
+  scheduled_date: string | null;
   list_status: 'planned' | 'done' | 'passed';
   assigned_person_id: string | null;
   force_on_dashboard: boolean;
@@ -83,7 +86,7 @@ export interface GroceriesList {
 export interface GroceriesListCreate {
   feature_instance_id: string;
   name?: string;
-  scheduled_date: string;
+  scheduled_date?: string;
   assigned_person_id?: string;
   force_on_dashboard?: boolean;
   copy_from_list_id?: string;
@@ -91,6 +94,7 @@ export interface GroceriesListCreate {
 
 export interface GroceriesListUpdate {
   name?: string;
+  scheduled_date?: string;
   status?: 'active' | 'archived';
   is_favorite?: boolean;
 }

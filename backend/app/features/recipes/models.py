@@ -66,6 +66,7 @@ class RecipeIngredientDetail(BaseModel):
     unit: Optional[str] = None
     is_divisible: bool = True
     quantity: float
+    position: int
     is_accompaniment: bool = False
 
 

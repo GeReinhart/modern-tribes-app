@@ -11,6 +11,8 @@ interface Props {
   ingredients: RecipeIngredient[];
   canEdit: boolean;
   onAdd: () => void;
+  onMove: (ingredientId: string, direction: 'up' | 'down') => void;
+  onUpdateQuantity: (ingredientId: string, quantity: number) => void;
   onRemove: (ingredientId: string) => void;
 }
 
@@ -18,13 +20,24 @@ interface GroupProps {
   title?: string;
   ingredients: RecipeIngredient[];
   canEdit: boolean;
+  onMove: (ingredientId: string, direction: 'up' | 'down') => void;
+  onUpdateQuantity: (ingredientId: string, quantity: number) => void;
   onRemove: (ingredientId: string) => void;
 }
 
-const IngredientGroup: React.FC<GroupProps> = ({ title, ingredients, canEdit, onRemove }) => {
+const IngredientGroup: React.FC<GroupProps> = ({ title, ingredients, canEdit, onMove, onUpdateQuantity, onRemove }) => {
   if (ingredients.length === 0) return null;
-  const rows = ingredients.map((ingredient) => (
-    <RecipeIngredientRow key={ingredient.id} ingredient={ingredient} canEdit={canEdit} onRemove={onRemove} />
+  const rows = ingredients.map((ingredient, index) => (
+    <RecipeIngredientRow
+      key={ingredient.id}
+      ingredient={ingredient}
+      canEdit={canEdit}
+      canMoveUp={index > 0}
+      canMoveDown={index < ingredients.length - 1}
+      onMove={onMove}
+      onUpdateQuantity={onUpdateQuantity}
+      onRemove={onRemove}
+    />
   ));
   return (
     <div>
@@ -34,7 +47,7 @@ const IngredientGroup: React.FC<GroupProps> = ({ title, ingredients, canEdit, on
   );
 };
 
-const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, onRemove }) => {
+const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, onMove, onUpdateQuantity, onRemove }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const mainIngredients = ingredients.filter((i) => !i.is_accompaniment);
@@ -48,11 +61,19 @@ const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, o
           {t('features.recipes.noIngredients')}
         </div>
       )}
-      <IngredientGroup ingredients={mainIngredients} canEdit={canEdit} onRemove={onRemove} />
+      <IngredientGroup
+        ingredients={mainIngredients}
+        canEdit={canEdit}
+        onMove={onMove}
+        onUpdateQuantity={onUpdateQuantity}
+        onRemove={onRemove}
+      />
       <IngredientGroup
         title={t('features.recipes.accompaniments')}
         ingredients={accompaniments}
         canEdit={canEdit}
+        onMove={onMove}
+        onUpdateQuantity={onUpdateQuantity}
         onRemove={onRemove}
       />
       {canEdit && (

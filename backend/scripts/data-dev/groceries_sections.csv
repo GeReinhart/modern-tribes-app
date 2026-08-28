@@ -1,6 +1,7 @@
-name,icon
-Butchery,meat
-Bakery,bread
-Fruits & Vegetables,carrot
-Dairy,milk
-Pantry,
+name,icon,is_food
+Butchery,meat,true
+Bakery,bread,true
+Fruits & Vegetables,carrot,true
+Dairy,milk,true
+Pantry,,true
+Household,,false

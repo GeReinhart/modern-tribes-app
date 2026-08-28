@@ -55,12 +55,14 @@ class GroceriesSectionCreate(BaseModel):
     feature_instance_id: str
     name: str
     icon: Optional[str] = None
+    is_food: bool = True
 
 
 class GroceriesSectionUpdate(BaseModel):
     feature_instance_id: str
     name: Optional[str] = None
     icon: Optional[str] = None
+    is_food: Optional[bool] = None
 
 
 class GroceriesSectionsReorderRequest(BaseModel):
@@ -72,6 +74,7 @@ class GroceriesSectionResponse(BaseModel):
     id: str
     name: str
     icon: Optional[str] = None
+    is_food: bool = True
     status: str
     created_at: datetime
     updated_at: datetime

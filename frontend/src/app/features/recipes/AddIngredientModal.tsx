@@ -2,13 +2,14 @@ import { ThemedButton } from '@/app/platform/core/layout/themes/components/Theme
 import { ThemedCheckbox } from '@/app/platform/core/layout/themes/components/ThemedCheckbox.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedModal, ThemedModalBody, ThemedModalFooter } from '@/app/platform/core/layout/themes/components/ThemedModal.tsx';
-import { ThemedSelect } from '@/app/platform/core/layout/themes/components/ThemedSelect.tsx';
+import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import RecipeIngredientCatalogPicker from './RecipeIngredientCatalogPicker.tsx';
 import { recipesService } from './service.ts';
-import { CatalogItemOption, RecipeIngredientCreate } from './types.ts';
+import { CatalogItemOption, CatalogSectionOption, RecipeIngredientCreate } from './types.ts';
 
 interface Props {
   featureInstanceId: string;
@@ -18,7 +19,9 @@ interface Props {
 
 const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSubmit }) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const [catalogItems, setCatalogItems] = useState<CatalogItemOption[]>([]);
+  const [catalogSections, setCatalogSections] = useState<CatalogSectionOption[]>([]);
   const [useCustom, setUseCustom] = useState(false);
   const [catalogItemId, setCatalogItemId] = useState('');
   const [customName, setCustomName] = useState('');
@@ -29,6 +32,7 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
 
   useEffect(() => {
     recipesService.listCatalogItems(featureInstanceId).then(setCatalogItems).catch(() => undefined);
+    recipesService.listCatalogSections(featureInstanceId).then(setCatalogSections).catch(() => undefined);
   }, [featureInstanceId]);
 
   const quantityValue = Number(quantity);
@@ -78,13 +82,23 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
                   onChange={(e) => setCustomUnit(e.target.value)}
                 />
               </>
+            ) : selectedCatalogItem ? (
+              <div
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  padding: '8px 12px', border: `1px solid ${theme.colors.border}`, borderRadius: 'var(--radius-md)',
+                }}
+              >
+                <span>{selectedCatalogItem.name} ({selectedCatalogItem.unit})</span>
+                <ThemedButton variant="ghost" type="button" onClick={() => setCatalogItemId('')}>
+                  {t('features.recipes.changeIngredient')}
+                </ThemedButton>
+              </div>
             ) : (
-              <ThemedSelect
-                label={t('features.recipes.catalogItem')}
-                options={catalogItems.map((i) => ({ value: i.id, label: `${i.name} (${i.unit})` }))}
-                value={catalogItemId}
-                onChange={setCatalogItemId}
-                allowEmpty
+              <RecipeIngredientCatalogPicker
+                items={catalogItems}
+                sections={catalogSections}
+                onSelect={setCatalogItemId}
               />
             )}
             <ThemedInput

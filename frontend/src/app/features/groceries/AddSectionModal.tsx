@@ -1,4 +1,5 @@
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
+import { ThemedCheckbox } from '@/app/platform/core/layout/themes/components/ThemedCheckbox.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedModal, ThemedModalBody, ThemedModalFooter } from '@/app/platform/core/layout/themes/components/ThemedModal.tsx';
 
@@ -12,21 +13,25 @@ interface Props {
   submitLabel: string;
   initialName?: string;
   initialIcon?: string | null;
+  initialIsFood?: boolean;
   onClose: () => void;
-  onSubmit: (name: string, icon: string | null) => Promise<void>;
+  onSubmit: (name: string, icon: string | null, isFood: boolean) => Promise<void>;
 }
 
-const AddSectionModal: React.FC<Props> = ({ title, submitLabel, initialName, initialIcon, onClose, onSubmit }) => {
+const AddSectionModal: React.FC<Props> = ({
+  title, submitLabel, initialName, initialIcon, initialIsFood, onClose, onSubmit,
+}) => {
   const { t } = useTranslation();
   const [name, setName] = useState(initialName ?? '');
   const [icon, setIcon] = useState<string | null>(initialIcon ?? null);
+  const [isFood, setIsFood] = useState(initialIsFood ?? true);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
     setSubmitting(true);
-    await onSubmit(name.trim(), icon);
+    await onSubmit(name.trim(), icon, isFood);
     setSubmitting(false);
   };
 
@@ -43,6 +48,12 @@ const AddSectionModal: React.FC<Props> = ({ title, submitLabel, initialName, ini
               autoFocus
             />
             <GroceriesIconPickerField value={icon} onChange={setIcon} />
+            <ThemedCheckbox
+              label={t('features.groceries.isFoodSection')}
+              helperText={t('features.groceries.isFoodSectionHelp')}
+              checked={isFood}
+              onChange={setIsFood}
+            />
           </div>
         </ThemedModalBody>
         <ThemedModalFooter>

@@ -74,9 +74,9 @@ Feature: Add a suggested meal's ingredients to a groceries list
     When I POST /api/features/tasks/meals/grocery-suggestions/8001/add/7001
     Then the response status code is 204
     And the groceries_list_items table contains:
-      | groceries_list_id | groceries_item_id | custom_name    | custom_unit | quantity | comment                    | status |
-      | 8001               | 3001               |                |             | 1.60      | 1.6 kg pour Family dinner  | active |
-      | 8001               |                    | Lasagna sheets | packs       | 2.00      | 2 packs pour Family dinner | active |
+      | groceries_list_id | groceries_item_id | custom_name    | custom_unit | quantity | comment                              | status |
+      | 8001               | 3001               |                |             | 1.60      | 1.6 kg pour Lasagna (Family dinner)  | active |
+      | 8001               |                    | Lasagna sheets | packs       | 2.00      | 2 packs pour Lasagna (Family dinner) | active |
     And the groceries_list_meals table contains:
       | groceries_list_id | meal_id | headcount | status |
       | 8001               | 7001    | 8         | active |
@@ -94,9 +94,9 @@ Feature: Add a suggested meal's ingredients to a groceries list
     When I POST /api/features/tasks/meals/grocery-suggestions/8001/add/7001
     Then the response status code is 204
     And the groceries_list_items table contains:
-      | groceries_list_id | groceries_item_id | custom_name    | custom_unit | quantity | comment                    | status |
-      | 8001               | 3001               |                |             | 2.10      | 1.6 kg pour Family dinner  | active |
-      | 8001               |                    | Lasagna sheets | packs       | 2.00      | 2 packs pour Family dinner | active |
+      | groceries_list_id | groceries_item_id | custom_name    | custom_unit | quantity | comment                              | status |
+      | 8001               | 3001               |                |             | 2.10      | 1.6 kg pour Lasagna (Family dinner)  | active |
+      | 8001               |                    | Lasagna sheets | packs       | 2.00      | 2 packs pour Lasagna (Family dinner) | active |
 
   @error_case
   Scenario: POST /meals/grocery-suggestions/8001/add/7001 when the meal was already added — 400 error and nothing changes
@@ -170,8 +170,8 @@ Feature: Add a suggested meal's ingredients to a groceries list
     When I POST /api/features/tasks/meals/grocery-suggestions/8001/add-ingredient/7001/9004
     Then the response status code is 204
     And the groceries_list_items table contains:
-      | groceries_list_id | groceries_item_id | custom_name  | custom_unit | quantity | comment                     | status |
-      | 8001               |                    | Garlic bread | pieces      | 2.00      | 2 pieces pour Family dinner | active |
+      | groceries_list_id | groceries_item_id | custom_name  | custom_unit | quantity | comment                               | status |
+      | 8001               |                    | Garlic bread | pieces      | 2.00      | 2 pieces pour Lasagna (Family dinner) | active |
     And the groceries_list_meals table contains:
       | id | groceries_list_id | meal_id | headcount | status |
 
@@ -193,9 +193,9 @@ Feature: Add a suggested meal's ingredients to a groceries list
     When I POST /api/features/tasks/meals/grocery-suggestions/8001/add/7001
     Then the response status code is 204
     And the groceries_list_items table contains:
-      | groceries_list_id | groceries_item_id | custom_name    | custom_unit | quantity | comment                                               | status |
-      | 8001               | 3001               |                |             | 1.60      | 1.6 kg pour Family dinner — Family favorite recipe.   | active |
-      | 8001               |                    | Lasagna sheets | packs       | 2.00      | 2 packs pour Family dinner — Family favorite recipe.  | active |
+      | groceries_list_id | groceries_item_id | custom_name    | custom_unit | quantity | comment                                                          | status |
+      | 8001               | 3001               |                |             | 1.60      | 1.6 kg pour Lasagna (Family dinner) — Family favorite recipe.   | active |
+      | 8001               |                    | Lasagna sheets | packs       | 2.00      | 2 packs pour Lasagna (Family dinner) — Family favorite recipe.  | active |
 
   @error_case
   Scenario: POST /meals/grocery-suggestions/8001/add-ingredient/7001/9004 as a project guest — 403 error and nothing changes

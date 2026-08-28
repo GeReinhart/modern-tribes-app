@@ -25,7 +25,9 @@ const RecipeDetailPageContent: React.FC = () => {
   const { tribe } = useTribeWithPositions(tribeId || null);
   const { project } = useProject(projectId || null);
   const { canEdit } = useProjectPermissions(tribeId || null, projectId || null);
-  const { detail, error, update, addIngredient, removeIngredient, toggleLabel } = useRecipeDetail(recipeId || null);
+  const {
+    detail, error, update, addIngredient, moveIngredient, updateIngredient, removeIngredient, toggleLabel,
+  } = useRecipeDetail(recipeId || null);
   const labelsHook = useRecipeLabels(detail?.feature_instance_id ?? null);
   useDocumentTitle(detail ? `${detail.name} — ${t('common.edit')}` : undefined);
 
@@ -87,6 +89,8 @@ const RecipeDetailPageContent: React.FC = () => {
           onDeleteLabel={labelsHook.archiveLabel}
           onReorderLabel={labelsHook.reorderLabels}
           onAddIngredient={addIngredient}
+          onMoveIngredient={moveIngredient}
+          onUpdateIngredientQuantity={(ingredientId, quantity) => updateIngredient(ingredientId, { quantity })}
           onRemoveIngredient={removeIngredient}
         />
       </ThemedSection>
