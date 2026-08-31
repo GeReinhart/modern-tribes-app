@@ -3,7 +3,10 @@ import { ThemedButton } from '@/app/platform/core/layout/themes/components/Theme
 import { ThemedCheckbox } from '@/app/platform/core/layout/themes/components/ThemedCheckbox.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedModal, ThemedModalBody, ThemedModalFooter } from '@/app/platform/core/layout/themes/components/ThemedModal.tsx';
+import { ThemedSelect } from '@/app/platform/core/layout/themes/components/ThemedSelect.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { SelectOption } from '@/app/platform/core/common.types.ts';
+import { GROCERIES_UNITS, GroceriesUnit } from '@/types/groceries.ts';
 
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +29,8 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
   const [useCustom, setUseCustom] = useState(false);
   const [catalogItemId, setCatalogItemId] = useState('');
   const [customName, setCustomName] = useState('');
-  const [customUnit, setCustomUnit] = useState('');
+  const [customUnit, setCustomUnit] = useState<GroceriesUnit>('piece');
+  const [customSectionId, setCustomSectionId] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [displayOverride, setDisplayOverride] = useState('');
   const [isAccompaniment, setIsAccompaniment] = useState(false);
@@ -44,20 +48,28 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
     quantityValue > 0 &&
     (isDivisible || Number.isInteger(quantityValue)) &&
     (useCustom ? customName.trim().length > 0 : catalogItemId.length > 0);
+  const unitOptions: SelectOption[] = GROCERIES_UNITS.map((u) => ({ value: u, label: t(`features.groceries.unit.${u}`) }));
+  const sectionOptions: SelectOption[] = catalogSections.map((s) => ({ value: s.id, label: s.name }));
+
+  const createCustomCatalogItem = async (): Promise<string> => {
+    const item = await recipesService.createCatalogItem({
+      feature_instance_id: featureInstanceId, name: customName.trim(), unit: customUnit,
+    });
+    if (customSectionId) {
+      await recipesService.linkCatalogItemToSection(item.id, customSectionId, featureInstanceId);
+    }
+    return item.id;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isValid) return;
     setSubmitting(true);
-    const data: RecipeIngredientCreate = useCustom
-      ? {
-        custom_name: customName.trim(), custom_unit: customUnit.trim() || undefined, quantity: quantityValue,
-        display_override: displayOverride.trim() || undefined, is_accompaniment: isAccompaniment,
-      }
-      : {
-        groceries_item_id: catalogItemId, quantity: quantityValue,
-        display_override: displayOverride.trim() || undefined, is_accompaniment: isAccompaniment,
-      };
+    const groceriesItemId = useCustom ? await createCustomCatalogItem() : catalogItemId;
+    const data: RecipeIngredientCreate = {
+      groceries_item_id: groceriesItemId, quantity: quantityValue,
+      display_override: displayOverride.trim() || undefined, is_accompaniment: isAccompaniment,
+    };
     const ok = await onSubmit(data);
     setSubmitting(false);
     if (ok) onClose();
@@ -70,6 +82,7 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <ThemedCheckbox
               label={t('features.recipes.customIngredient')}
+              helperText={t('features.recipes.customIngredientHelp')}
               checked={useCustom}
               onChange={setUseCustom}
             />
@@ -81,10 +94,19 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
                   onChange={(e) => setCustomName(e.target.value)}
                   autoFocus
                 />
-                <ThemedInput
+                <ThemedSelect
                   label={t('features.recipes.customIngredientUnit')}
+                  options={unitOptions}
                   value={customUnit}
-                  onChange={(e) => setCustomUnit(e.target.value)}
+                  allowEmpty={false}
+                  onChange={(v) => setCustomUnit(v as GroceriesUnit)}
+                />
+                <ThemedSelect
+                  label={t('features.recipes.customIngredientSection')}
+                  placeholder={t('features.recipes.customIngredientSectionPlaceholder')}
+                  options={sectionOptions}
+                  value={customSectionId}
+                  onChange={setCustomSectionId}
                 />
               </>
             ) : selectedCatalogItem ? (

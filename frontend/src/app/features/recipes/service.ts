@@ -1,6 +1,7 @@
 import { apiService } from '@/app/platform/core/api/api.service.ts';
 
 import {
+  CatalogItemCreate,
   CatalogItemOption,
   CatalogSectionOption,
   Recipe,
@@ -85,6 +86,17 @@ class RecipesService {
   async listCatalogSections(featureInstanceId: string): Promise<CatalogSectionOption[]> {
     return apiService.get<CatalogSectionOption[]>(
       `/features/tasks/groceries-sections/?feature_instance_id=${featureInstanceId}`,
+    );
+  }
+
+  async createCatalogItem(data: CatalogItemCreate): Promise<CatalogItemOption> {
+    return apiService.post<CatalogItemOption>('/features/tasks/groceries-items/', data);
+  }
+
+  async linkCatalogItemToSection(itemId: string, sectionId: string, featureInstanceId: string): Promise<string[]> {
+    return apiService.post<string[]>(
+      `/features/tasks/groceries-items/${itemId}/sections/${sectionId}?feature_instance_id=${featureInstanceId}`,
+      {},
     );
   }
 }

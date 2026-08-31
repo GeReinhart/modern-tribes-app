@@ -40,7 +40,7 @@ _KANBAN_BASE = """
                 )
                 OR c.assigned_person_id IS NULL
             )
-            AND (c.due_date IS NOT NULL OR c.created_at < NOW() - INTERVAL '100 days')
+            AND c.due_date IS NOT NULL
         )
         OR (
             c.force_on_dashboard = TRUE
@@ -103,7 +103,7 @@ _TODO_BASE = """
                 )
                 OR i.assigned_person_id IS NULL
             )
-            AND (i.due_date IS NOT NULL OR i.created_at < NOW() - INTERVAL '100 days')
+            AND i.due_date IS NOT NULL
         )
         OR (
             i.force_on_dashboard = TRUE

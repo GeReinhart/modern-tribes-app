@@ -1,7 +1,7 @@
 Feature: Get my tasks
   As a user with platform access
   I want to retrieve my tasks across all projects
-  So that I can see tasks (assigned to me or unassigned) that have a due date or were created more than 100 days ago
+  So that I can see tasks (assigned to me or unassigned) that have a due date
 
   Background:
     Given the users table contains:
@@ -121,102 +121,6 @@ Feature: Get my tasks
       | id   | feature_instance_id | title           | due_date   | todo_status | status |
       | 7001 | 4002                | Unassigned todo | 2026-07-01 | todo        | active |
 
-  Scenario: GET /my-tasks — included: task assigned to me, no due date, created more than 100 days ago
-    Given I am authenticated as a regular user: user.id 0002
-    And the persons table contains:
-      | id   | first_name | last_name | gender | status |
-      | 1001 | John       | Doe       | male   | active |
-    And the represents table contains:
-      | user_id | person_id | status |
-      | 0002    | 1001      | active |
-    And the projects table contains:
-      | id   | name       | status |
-      | 2001 | My Project | active |
-    And the tribes table contains:
-      | id   | name        | status |
-      | 3001 | Alpha Tribe | active |
-    And the tribes_projects table contains:
-      | tribe_id | project_id |
-      | 3001     | 2001       |
-    And the projects_features table contains:
-      | id   | project_id | name      | feature_type | status |
-      | 4001 | 2001       | My Kanban | kanban       | active |
-      | 4002 | 2001       | My Todos  | todo         | active |
-    And the kanban_columns table contains:
-      | id   | feature_instance_id | name        | position | status |
-      | 5001 | 4001                | In Progress | 1        | active |
-      | 5002 | 4001                | Done        | 2        | active |
-    And the kanban_cards table contains:
-      | id   | feature_instance_id | column_id | title      | assigned_person_id | created_at | status |
-      | 6001 | 4001                | 5001      | Old task   | 1001               | -150d      | active |
-    And the todo_items table contains:
-      | id   | feature_instance_id | title    | assigned_person_id | created_at | todo_status | status |
-      | 7001 | 4002                | Old todo | 1001               | -150d      | todo        | active |
-    When I GET /api/features/my-tasks
-    Then the response status code is 200
-    And the response body includes:
-      """
-      {
-        "kanban": [
-          { "id": "6001", "title": "Old task", "assigned_person_id": "1001", "due_date": null }
-        ],
-        "todo": [
-          { "id": "7001", "title": "Old todo", "assigned_person_id": "1001", "due_date": null }
-        ]
-      }
-      """
-    And the kanban_cards table contains:
-      | id   | feature_instance_id | column_id | title    | assigned_person_id | status |
-      | 6001 | 4001                | 5001      | Old task | 1001               | active |
-    And the todo_items table contains:
-      | id   | feature_instance_id | title    | assigned_person_id | todo_status | status |
-      | 7001 | 4002                | Old todo | 1001               | todo        | active |
-
-  Scenario: GET /my-tasks — included: unassigned task, no due date, created more than 100 days ago
-    Given I am authenticated as a regular user: user.id 0002
-    And the projects table contains:
-      | id   | name       | status |
-      | 2001 | My Project | active |
-    And the tribes table contains:
-      | id   | name        | status |
-      | 3001 | Alpha Tribe | active |
-    And the tribes_projects table contains:
-      | tribe_id | project_id |
-      | 3001     | 2001       |
-    And the projects_features table contains:
-      | id   | project_id | name      | feature_type | status |
-      | 4001 | 2001       | My Kanban | kanban       | active |
-      | 4002 | 2001       | My Todos  | todo         | active |
-    And the kanban_columns table contains:
-      | id   | feature_instance_id | name        | position | status |
-      | 5001 | 4001                | In Progress | 1        | active |
-      | 5002 | 4001                | Done        | 2        | active |
-    And the kanban_cards table contains:
-      | id   | feature_instance_id | column_id | title            | created_at | status |
-      | 6001 | 4001                | 5001      | Old unassigned   | -150d      | active |
-    And the todo_items table contains:
-      | id   | feature_instance_id | title              | created_at | todo_status | status |
-      | 7001 | 4002                | Old unassigned todo| -150d      | todo        | active |
-    When I GET /api/features/my-tasks
-    Then the response status code is 200
-    And the response body includes:
-      """
-      {
-        "kanban": [
-          { "id": "6001", "title": "Old unassigned", "assigned_person_id": null, "due_date": null }
-        ],
-        "todo": [
-          { "id": "7001", "title": "Old unassigned todo", "assigned_person_id": null, "due_date": null }
-        ]
-      }
-      """
-    And the kanban_cards table contains:
-      | id   | feature_instance_id | column_id | title          | status |
-      | 6001 | 4001                | 5001      | Old unassigned | active |
-    And the todo_items table contains:
-      | id   | feature_instance_id | title               | todo_status | status |
-      | 7001 | 4002                | Old unassigned todo | todo        | active |
-
   @error_case
   Scenario: GET /my-tasks — excluded: task assigned to another person
     Given I am authenticated as a regular user: user.id 0002
@@ -258,7 +162,7 @@ Feature: Get my tasks
       | 7001 | 4002                | Someone else todo | 9001               | 2026-07-01 | todo        | active |
 
   @error_case
-  Scenario: GET /my-tasks — excluded: task assigned to me, no due date, created less than 100 days ago
+  Scenario: GET /my-tasks — excluded: task assigned to me, no due date
     Given I am authenticated as a regular user: user.id 0002
     And the persons table contains:
       | id   | first_name | last_name | gender | status |
@@ -278,11 +182,11 @@ Feature: Get my tasks
       | 5001 | 4001                | In Progress | 1        | active |
       | 5002 | 4001                | Done        | 2        | active |
     And the kanban_cards table contains:
-      | id   | feature_instance_id | column_id | title        | assigned_person_id | created_at | status |
-      | 6001 | 4001                | 5001      | Recent task  | 1001               | -30d       | active |
+      | id   | feature_instance_id | column_id | title       | assigned_person_id | status |
+      | 6001 | 4001                | 5001      | Undated task | 1001               | active |
     And the todo_items table contains:
-      | id   | feature_instance_id | title       | assigned_person_id | created_at | todo_status | status |
-      | 7001 | 4002                | Recent todo | 1001               | -30d       | todo        | active |
+      | id   | feature_instance_id | title        | assigned_person_id | todo_status | status |
+      | 7001 | 4002                | Undated todo | 1001               | todo        | active |
     When I GET /api/features/my-tasks
     Then the response status code is 200
     And the response body is:
@@ -290,11 +194,11 @@ Feature: Get my tasks
       { "kanban": [], "todo": [] }
       """
     And the kanban_cards table contains:
-      | id   | feature_instance_id | column_id | title       | assigned_person_id | status |
-      | 6001 | 4001                | 5001      | Recent task | 1001               | active |
+      | id   | feature_instance_id | column_id | title        | assigned_person_id | status |
+      | 6001 | 4001                | 5001      | Undated task | 1001               | active |
     And the todo_items table contains:
-      | id   | feature_instance_id | title       | assigned_person_id | todo_status | status |
-      | 7001 | 4002                | Recent todo | 1001               | todo        | active |
+      | id   | feature_instance_id | title        | assigned_person_id | todo_status | status |
+      | 7001 | 4002                | Undated todo | 1001               | todo        | active |
 
   @error_case
   Scenario: GET /my-tasks as a user with no app access — 403 error

@@ -13,6 +13,12 @@ export interface CatalogSectionOption {
   is_food: boolean;
 }
 
+export interface CatalogItemCreate {
+  feature_instance_id: string;
+  name: string;
+  unit: string;
+}
+
 export interface RecipeLabel {
   id: string;
   name: string;

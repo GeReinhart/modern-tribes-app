@@ -102,7 +102,10 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
           onClose={() => setCreating(false)}
           onCreate={async (data) => {
             const created = await createRecipe(data);
-            if (created) setCreating(false);
+            if (created) {
+              setCreating(false);
+              navigate(`/app/tribes/${tribeId}/projects/${projectId}/recipes/${created.id}`);
+            }
           }}
         />
       )}
