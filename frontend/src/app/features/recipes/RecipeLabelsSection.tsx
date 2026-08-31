@@ -25,6 +25,7 @@ const RecipeLabelsSection: React.FC<Props> = ({
   const { t } = useTranslation();
   const { theme } = useTheme();
   const [managing, setManaging] = useState(false);
+  const visibleLabels = canEdit ? labels : labels.filter((label) => selectedLabelIds.includes(label.id));
 
   return (
     <div>
@@ -32,7 +33,7 @@ const RecipeLabelsSection: React.FC<Props> = ({
         <div style={{ fontWeight: 600, marginBottom: '8px' }}>{t('features.recipes.labels')}</div>
       )}
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-        {labels.map((label) => {
+        {visibleLabels.map((label) => {
           const selected = selectedLabelIds.includes(label.id);
           return (
             <button

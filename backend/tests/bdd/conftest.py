@@ -2207,10 +2207,10 @@ def given_recipe_ingredients_table(datatable):
                 groceries_item_id = rec.get("groceries_item_id")
                 await conn.execute(
                     """INSERT INTO recipe_ingredients(
-                           id, recipe_id, groceries_item_id, custom_name, custom_unit, quantity, position,
-                           is_accompaniment, status
+                           id, recipe_id, groceries_item_id, custom_name, custom_unit, quantity,
+                           display_override, position, is_accompaniment, status
                        )
-                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(uid),
                     UUID(rec["recipe_id"]),
@@ -2218,6 +2218,7 @@ def given_recipe_ingredients_table(datatable):
                     rec.get("custom_name") or None,
                     rec.get("custom_unit") or None,
                     float(rec.get("quantity", "0")),
+                    rec.get("display_override") or None,
                     coerce("position", rec.get("position", "0")),
                     (rec.get("is_accompaniment") or "false").lower() == "true",
                     rec.get("status", "active"),

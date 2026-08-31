@@ -25,6 +25,8 @@ const en: Record<string, string> = {
   'features.recipes.noMatchingIngredients': 'No ingredient matches your search.',
   'features.recipes.changeIngredient': 'Change',
   'features.recipes.quantity': 'Quantity',
+  'features.recipes.displayOverride': 'Custom text',
+  'features.recipes.displayOverridePlaceholder': 'e.g. a pinch',
   'features.recipes.isAccompaniment': 'This is an accompaniment',
   'features.recipes.isAccompanimentHelp': "Not part of the recipe itself, but suggested alongside it (e.g. bread with a soup). Added to a groceries list one at a time, not with the recipe's core ingredients.",
   'features.recipes.accompaniments': 'Accompaniments',

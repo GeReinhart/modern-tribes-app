@@ -28,6 +28,16 @@ def test_update_ingredient_quantity():
     pass
 
 
+@scenario(FEATURE, "PATCH /recipe-ingredients/6101 with a display override — the override is set, quantity untouched")
+def test_update_ingredient_display_override():
+    pass
+
+
+@scenario(FEATURE, "PATCH /recipe-ingredients/6101 clearing the display override — the recipe shows quantity again")
+def test_update_ingredient_clear_display_override():
+    pass
+
+
 @scenario(FEATURE, "PATCH /recipe-ingredients/6101 and 6102 to swap positions — the ingredients are reordered")
 def test_update_ingredient_position_swap():
     pass

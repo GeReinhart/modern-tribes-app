@@ -33,6 +33,7 @@ class RecipeIngredientCreate(BaseModel):
     custom_name: Optional[str] = None
     custom_unit: Optional[str] = None
     quantity: float
+    display_override: Optional[str] = None
     is_accompaniment: bool = False
 
     @model_validator(mode="after")
@@ -46,6 +47,7 @@ class RecipeIngredientUpdate(BaseModel):
     quantity: Optional[float] = None
     position: Optional[int] = None
     is_accompaniment: Optional[bool] = None
+    display_override: Optional[str] = None
 
 
 class RecipeIngredientResponse(BaseModel):
@@ -55,6 +57,7 @@ class RecipeIngredientResponse(BaseModel):
     custom_name: Optional[str] = None
     custom_unit: Optional[str] = None
     quantity: float
+    display_override: Optional[str] = None
     is_accompaniment: bool = False
     status: str
 
@@ -66,6 +69,7 @@ class RecipeIngredientDetail(BaseModel):
     unit: Optional[str] = None
     is_divisible: bool = True
     quantity: float
+    display_override: Optional[str] = None
     position: int
     is_accompaniment: bool = False
 

@@ -16,8 +16,8 @@ export interface LabelBarItem {
 interface LabelBarProps {
   labels: LabelBarItem[];
   activeLabelIds: Set<string>;
-  filterLabelId: string | null;
-  onFilter: (id: string | null) => void;
+  filterLabelIds: string[];
+  onFilter: (id: string) => void;
   canEditLabels: boolean;
   usageCounts?: Record<string, number>;
   onCreate: (name: string, color: string) => Promise<void>;
@@ -29,7 +29,7 @@ interface LabelBarProps {
 export const LabelBar: React.FC<LabelBarProps> = ({
   labels,
   activeLabelIds,
-  filterLabelId,
+  filterLabelIds,
   onFilter,
   canEditLabels,
   usageCounts,
@@ -48,7 +48,7 @@ export const LabelBar: React.FC<LabelBarProps> = ({
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
       <Tag size={14} color={theme.colors.secondary} />
       {labels.map((label) => {
-        const isActive = filterLabelId === label.id;
+        const isActive = filterLabelIds.includes(label.id);
         const isUsed = activeLabelIds.has(label.id);
 
         return (
@@ -56,7 +56,7 @@ export const LabelBar: React.FC<LabelBarProps> = ({
             key={label.id}
             type="button"
             onClick={() => {
-              if (isUsed) onFilter(isActive ? null : label.id);
+              if (isUsed) onFilter(label.id);
             }}
             style={{
               padding: '4px 12px',

@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import AddIngredientModal from './AddIngredientModal.tsx';
 import RecipeIngredientsList from './RecipeIngredientsList.tsx';
 import RecipeLabelsSection from './RecipeLabelsSection.tsx';
-import { RecipeDetail, RecipeIngredientCreate, RecipeLabel } from './types.ts';
+import { RecipeDetail, RecipeIngredientCreate, RecipeIngredientUpdate, RecipeLabel } from './types.ts';
 
 interface Props {
   recipe: RecipeDetail;
@@ -22,13 +22,13 @@ interface Props {
   onReorderLabel: (orderedIds: string[]) => Promise<void>;
   onAddIngredient: (data: RecipeIngredientCreate) => Promise<boolean>;
   onMoveIngredient: (ingredientId: string, direction: 'up' | 'down') => Promise<void>;
-  onUpdateIngredientQuantity: (ingredientId: string, quantity: number) => Promise<void>;
+  onUpdateIngredient: (ingredientId: string, data: RecipeIngredientUpdate) => Promise<void>;
   onRemoveIngredient: (ingredientId: string) => Promise<void>;
 }
 
 const RecipeDetailBody: React.FC<Props> = ({
   recipe, labels, canEdit, onUpdate, onCreateLabel, onToggleLabel,
-  onUpdateLabel, onDeleteLabel, onReorderLabel, onAddIngredient, onMoveIngredient, onUpdateIngredientQuantity,
+  onUpdateLabel, onDeleteLabel, onReorderLabel, onAddIngredient, onMoveIngredient, onUpdateIngredient,
   onRemoveIngredient,
 }) => {
   const { t } = useTranslation();
@@ -80,7 +80,7 @@ const RecipeDetailBody: React.FC<Props> = ({
         canEdit={canEdit}
         onAdd={() => setAddingIngredient(true)}
         onMove={onMoveIngredient}
-        onUpdateQuantity={onUpdateIngredientQuantity}
+        onUpdateIngredient={onUpdateIngredient}
         onRemove={onRemoveIngredient}
       />
 
@@ -92,12 +92,16 @@ const RecipeDetailBody: React.FC<Props> = ({
             onChange={(content) => onUpdate({ document_content_html: content })}
           />
         ) : (
-          <div dangerouslySetInnerHTML={{ __html: recipe.document_content_html || '' }} />
+          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: recipe.document_content_html || '' }} />
         )}
       </div>
 
-      <ThemedDivider variant="secondary" />
-      {labelsSection}
+      {(canEdit || recipe.label_ids.length > 0) && (
+        <>
+          <ThemedDivider variant="secondary" />
+          {labelsSection}
+        </>
+      )}
 
       {addingIngredient && (
         <AddIngredientModal

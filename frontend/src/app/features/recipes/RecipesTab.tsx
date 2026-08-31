@@ -1,8 +1,9 @@
 import { LabelBar } from '@/app/platform/core/layout/themes/components/LabelBar.tsx';
+import { useLabelFilter } from '@/app/platform/core/layout/themes/components/useLabelFilter.ts';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -25,7 +26,6 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
   const { recipes, labels, error, createRecipe, createLabel, updateLabel, archiveLabel, reorderLabels } =
     useRecipes(featureInstanceId);
   const [creating, setCreating] = useState(false);
-  const [filterLabelId, setFilterLabelId] = useState<string | null>(null);
   const [configuringLabels, setConfiguringLabels] = useState(false);
 
   const tabActions = useMemo(
@@ -54,11 +54,8 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
     return counts;
   }, [recipes]);
 
-  useEffect(() => {
-    if (filterLabelId && !activeLabelIds.has(filterLabelId)) setFilterLabelId(null);
-  }, [activeLabelIds, filterLabelId]);
-
-  const visibleRecipes = recipes.filter((r) => !filterLabelId || r.label_ids.includes(filterLabelId));
+  const { filterLabelIds, toggleFilterLabel, matchesLabelFilter } = useLabelFilter(activeLabelIds);
+  const visibleRecipes = recipes.filter((r) => matchesLabelFilter(r.label_ids));
 
   const openRecipe = (recipeId: string) => {
     navigate(`/app/tribes/${tribeId}/projects/${projectId}/recipes/${recipeId}/present`);
@@ -77,8 +74,8 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
           <LabelBar
             labels={labels}
             activeLabelIds={activeLabelIds}
-            filterLabelId={filterLabelId}
-            onFilter={setFilterLabelId}
+            filterLabelIds={filterLabelIds}
+            onFilter={toggleFilterLabel}
             canEditLabels={canEdit && configuringLabels}
             usageCounts={usageCounts}
             onCreate={async (name, color) => { await createLabel(name, color); }}

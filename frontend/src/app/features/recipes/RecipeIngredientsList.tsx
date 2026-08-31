@@ -5,14 +5,14 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import RecipeIngredientRow from './RecipeIngredientRow.tsx';
-import { RecipeIngredient } from './types.ts';
+import { RecipeIngredient, RecipeIngredientUpdate } from './types.ts';
 
 interface Props {
   ingredients: RecipeIngredient[];
   canEdit: boolean;
   onAdd: () => void;
   onMove: (ingredientId: string, direction: 'up' | 'down') => void;
-  onUpdateQuantity: (ingredientId: string, quantity: number) => void;
+  onUpdateIngredient: (ingredientId: string, data: RecipeIngredientUpdate) => void;
   onRemove: (ingredientId: string) => void;
 }
 
@@ -21,11 +21,11 @@ interface GroupProps {
   ingredients: RecipeIngredient[];
   canEdit: boolean;
   onMove: (ingredientId: string, direction: 'up' | 'down') => void;
-  onUpdateQuantity: (ingredientId: string, quantity: number) => void;
+  onUpdateIngredient: (ingredientId: string, data: RecipeIngredientUpdate) => void;
   onRemove: (ingredientId: string) => void;
 }
 
-const IngredientGroup: React.FC<GroupProps> = ({ title, ingredients, canEdit, onMove, onUpdateQuantity, onRemove }) => {
+const IngredientGroup: React.FC<GroupProps> = ({ title, ingredients, canEdit, onMove, onUpdateIngredient, onRemove }) => {
   if (ingredients.length === 0) return null;
   const rows = ingredients.map((ingredient, index) => (
     <RecipeIngredientRow
@@ -35,7 +35,7 @@ const IngredientGroup: React.FC<GroupProps> = ({ title, ingredients, canEdit, on
       canMoveUp={index > 0}
       canMoveDown={index < ingredients.length - 1}
       onMove={onMove}
-      onUpdateQuantity={onUpdateQuantity}
+      onUpdateIngredient={onUpdateIngredient}
       onRemove={onRemove}
     />
   ));
@@ -47,7 +47,7 @@ const IngredientGroup: React.FC<GroupProps> = ({ title, ingredients, canEdit, on
   );
 };
 
-const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, onMove, onUpdateQuantity, onRemove }) => {
+const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, onMove, onUpdateIngredient, onRemove }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
   const mainIngredients = ingredients.filter((i) => !i.is_accompaniment);
@@ -65,7 +65,7 @@ const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, o
         ingredients={mainIngredients}
         canEdit={canEdit}
         onMove={onMove}
-        onUpdateQuantity={onUpdateQuantity}
+        onUpdateIngredient={onUpdateIngredient}
         onRemove={onRemove}
       />
       <IngredientGroup
@@ -73,7 +73,7 @@ const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, o
         ingredients={accompaniments}
         canEdit={canEdit}
         onMove={onMove}
-        onUpdateQuantity={onUpdateQuantity}
+        onUpdateIngredient={onUpdateIngredient}
         onRemove={onRemove}
       />
       {canEdit && (

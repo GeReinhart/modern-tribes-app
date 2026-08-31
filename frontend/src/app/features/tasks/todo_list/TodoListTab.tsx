@@ -1,10 +1,11 @@
 import { LabelBar } from '@/app/platform/core/layout/themes/components/LabelBar.tsx';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
+import { useLabelFilter } from '@/app/platform/core/layout/themes/components/useLabelFilter.ts';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -58,7 +59,6 @@ const TodoListTab: React.FC<Props> = ({
   const [newTitle, setNewTitle] = useState('');
   const [adding, setAdding] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
-  const [filterLabelId, setFilterLabelId] = useState<string | null>(null);
   const [filterPersonId, setFilterPersonId] = useState<string | null>(null);
   const [configuring, setConfiguring] = useState(false);
   const addInputRef = useRef<HTMLInputElement>(null);
@@ -123,16 +123,10 @@ const TodoListTab: React.FC<Props> = ({
     activeItems.some((i) => i.assigned_person_id === p.id),
   );
 
-  useEffect(() => {
-    const labelIds = new Set(
-      items.filter((i) => i.status !== 'archived').flatMap((i) => i.label_ids),
-    );
-    if (filterLabelId && !labelIds.has(filterLabelId)) setFilterLabelId(null);
-  }, [items, filterLabelId]);
-
+  const { filterLabelIds, toggleFilterLabel, matchesLabelFilter } = useLabelFilter(activeItemLabelIds);
   const visibleItems = items
     .filter((i) => showArchived || i.status !== 'archived')
-    .filter((i) => !filterLabelId || i.label_ids.includes(filterLabelId))
+    .filter((i) => matchesLabelFilter(i.label_ids))
     .filter((i) => !filterPersonId || i.assigned_person_id === filterPersonId);
 
   const handleAdd = async (e: React.FormEvent) => {
@@ -169,8 +163,8 @@ const TodoListTab: React.FC<Props> = ({
         <LabelBar
           labels={labels}
           activeLabelIds={activeItemLabelIds}
-          filterLabelId={filterLabelId}
-          onFilter={setFilterLabelId}
+          filterLabelIds={filterLabelIds}
+          onFilter={toggleFilterLabel}
           canEditLabels={isConfiguring}
           usageCounts={labelUsageCounts}
           onCreate={async (name, color) => {

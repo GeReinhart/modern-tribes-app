@@ -25,6 +25,8 @@ const fr: Record<string, string> = {
   'features.recipes.noMatchingIngredients': 'Aucun ingrédient ne correspond à votre recherche.',
   'features.recipes.changeIngredient': 'Changer',
   'features.recipes.quantity': 'Quantité',
+  'features.recipes.displayOverride': 'Texte personnalisé',
+  'features.recipes.displayOverridePlaceholder': 'ex. une pincée',
   'features.recipes.isAccompaniment': 'Ceci est un accompagnement',
   'features.recipes.isAccompanimentHelp': "Ne fait pas partie de la recette à proprement parler, mais est suggéré pour l'accompagner (ex. du pain avec une soupe). Ajouté à une liste de courses un par un, pas avec les ingrédients principaux de la recette.",
   'features.recipes.accompaniments': 'Accompagnements',

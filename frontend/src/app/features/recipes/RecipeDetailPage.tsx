@@ -90,7 +90,7 @@ const RecipeDetailPageContent: React.FC = () => {
           onReorderLabel={labelsHook.reorderLabels}
           onAddIngredient={addIngredient}
           onMoveIngredient={moveIngredient}
-          onUpdateIngredientQuantity={(ingredientId, quantity) => updateIngredient(ingredientId, { quantity })}
+          onUpdateIngredient={updateIngredient}
           onRemoveIngredient={removeIngredient}
         />
       </ThemedSection>

@@ -30,7 +30,7 @@ interface Props {
   isLast: boolean;
   canDelete: boolean;
   showArchived: boolean;
-  filterLabelId: string | null;
+  filterLabelIds: string[];
   filterPersonId: string | null;
   persons: PersonOption[];
   onRename: (columnId: string, name: string) => Promise<void>;
@@ -64,7 +64,7 @@ const KanbanColumn: React.FC<Props> = ({
   isLast,
   canDelete,
   showArchived,
-  filterLabelId,
+  filterLabelIds,
   filterPersonId,
   persons,
   onRename,
@@ -102,7 +102,7 @@ const KanbanColumn: React.FC<Props> = ({
   const archivedCards = allColCards.filter((c) => c.status === 'archived');
 
   const visibleActive = activeCards
-    .filter((c) => !filterLabelId || c.label_ids.includes(filterLabelId))
+    .filter((c) => filterLabelIds.every((id) => c.label_ids.includes(id)))
     .filter((c) => !filterPersonId || c.assigned_person_id === filterPersonId)
     .sort((a, b) => a.position - b.position);
 

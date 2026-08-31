@@ -1,3 +1,4 @@
+import { formatUnitSuffix } from '@/app/platform/core/formatQuantity.ts';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedCheckbox } from '@/app/platform/core/layout/themes/components/ThemedCheckbox.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
@@ -27,6 +28,7 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
   const [customName, setCustomName] = useState('');
   const [customUnit, setCustomUnit] = useState('');
   const [quantity, setQuantity] = useState('1');
+  const [displayOverride, setDisplayOverride] = useState('');
   const [isAccompaniment, setIsAccompaniment] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -50,9 +52,12 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
     const data: RecipeIngredientCreate = useCustom
       ? {
         custom_name: customName.trim(), custom_unit: customUnit.trim() || undefined, quantity: quantityValue,
-        is_accompaniment: isAccompaniment,
+        display_override: displayOverride.trim() || undefined, is_accompaniment: isAccompaniment,
       }
-      : { groceries_item_id: catalogItemId, quantity: quantityValue, is_accompaniment: isAccompaniment };
+      : {
+        groceries_item_id: catalogItemId, quantity: quantityValue,
+        display_override: displayOverride.trim() || undefined, is_accompaniment: isAccompaniment,
+      };
     const ok = await onSubmit(data);
     setSubmitting(false);
     if (ok) onClose();
@@ -89,7 +94,10 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
                   padding: '8px 12px', border: `1px solid ${theme.colors.border}`, borderRadius: 'var(--radius-md)',
                 }}
               >
-                <span>{selectedCatalogItem.name} ({selectedCatalogItem.unit})</span>
+                <span>
+                  {selectedCatalogItem.name}
+                  {formatUnitSuffix(selectedCatalogItem.unit, t) && ` ${formatUnitSuffix(selectedCatalogItem.unit, t)}`}
+                </span>
                 <ThemedButton variant="ghost" type="button" onClick={() => setCatalogItemId('')}>
                   {t('features.recipes.changeIngredient')}
                 </ThemedButton>
@@ -108,6 +116,12 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
               min={isDivisible ? 0.01 : 1}
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
+            />
+            <ThemedInput
+              label={t('features.recipes.displayOverride')}
+              placeholder={t('features.recipes.displayOverridePlaceholder')}
+              value={displayOverride}
+              onChange={(e) => setDisplayOverride(e.target.value)}
             />
             <ThemedCheckbox
               label={t('features.recipes.isAccompaniment')}

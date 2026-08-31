@@ -5,7 +5,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { formatQuantityUnit } from './formatQuantity.ts';
+import { formatQuantityUnit } from '@/app/platform/core/formatQuantity.ts';
 import { GroceriesListItemDetail } from './types.ts';
 
 interface Props {

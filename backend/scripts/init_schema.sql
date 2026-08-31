@@ -435,6 +435,9 @@ CREATE TABLE IF NOT EXISTS recipes (
 );
 CREATE INDEX IF NOT EXISTS idx_recipes_feature_instance ON recipes (feature_instance_id);
 
+-- display_override (migration 017) is a free-text substitute (e.g. "a pinch") shown
+-- instead of quantity + unit when reading a recipe; quantity/unit stay the source of
+-- truth for shopping lists.
 CREATE TABLE IF NOT EXISTS recipe_ingredients (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     recipe_id UUID REFERENCES recipes(id) ON DELETE CASCADE NOT NULL,
@@ -442,6 +445,7 @@ CREATE TABLE IF NOT EXISTS recipe_ingredients (
     custom_name VARCHAR(255),
     custom_unit VARCHAR(50),
     quantity NUMERIC(10, 2) NOT NULL,
+    display_override VARCHAR(100),
     position INTEGER NOT NULL DEFAULT 0,
     is_accompaniment BOOLEAN NOT NULL DEFAULT FALSE,
     status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),

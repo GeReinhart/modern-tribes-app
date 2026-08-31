@@ -37,6 +37,14 @@ def test_add_ingredient_custom():
 
 @scenario(
     FEATURE,
+    "POST /recipes/6001/ingredients with a display override — the override is stored alongside the quantity",
+)
+def test_add_ingredient_display_override():
+    pass
+
+
+@scenario(
+    FEATURE,
     "POST /recipes/6001/ingredients marked as an accompaniment — the ingredient is added flagged as such",
 )
 def test_add_ingredient_accompaniment():

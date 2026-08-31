@@ -1,4 +1,5 @@
 import { LabelBar } from '@/app/platform/core/layout/themes/components/LabelBar.tsx';
+import { useLabelFilter } from '@/app/platform/core/layout/themes/components/useLabelFilter.ts';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 
@@ -56,7 +57,6 @@ const KanbanTab: React.FC<Props> = ({
 
   const [configuring, setConfiguring] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
-  const [filterLabelId, setFilterLabelId] = useState<string | null>(null);
   const [filterPersonId, setFilterPersonId] = useState<string | null>(null);
 
   const deepLinkedCard = urlTaskId ? board.cards.find((c) => c.id === urlTaskId) ?? null : null;
@@ -124,6 +124,7 @@ const KanbanTab: React.FC<Props> = ({
       .filter((c) => c.status === 'active')
       .flatMap((c) => c.label_ids),
   );
+  const { filterLabelIds, toggleFilterLabel } = useLabelFilter(activeCardLabelIds);
   const labelUsageCounts: Record<string, number> = {};
   board.cards
     .filter((c) => c.status === 'active')
@@ -141,16 +142,6 @@ const KanbanTab: React.FC<Props> = ({
     initDone.current = true;
     if (board.columns.length === 0) setConfiguring(true);
   }, [loaded, board.columns.length, isManager]);
-
-  useEffect(() => {
-    if (!filterLabelId) return;
-    const activeIds = new Set(
-      board.cards
-        .filter((c) => c.status === 'active')
-        .flatMap((c) => c.label_ids),
-    );
-    if (!activeIds.has(filterLabelId)) setFilterLabelId(null);
-  }, [board.cards, filterLabelId]);
 
   return (
     <div>
@@ -172,8 +163,8 @@ const KanbanTab: React.FC<Props> = ({
         <LabelBar
           labels={board.labels}
           activeLabelIds={activeCardLabelIds}
-          filterLabelId={filterLabelId}
-          onFilter={setFilterLabelId}
+          filterLabelIds={filterLabelIds}
+          onFilter={toggleFilterLabel}
           canEditLabels={isManager && configuring}
           usageCounts={labelUsageCounts}
           onCreate={async (name, color) => {
@@ -255,7 +246,7 @@ const KanbanTab: React.FC<Props> = ({
               idx !== sortedCols.length - 1
             }
             showArchived={showArchived}
-            filterLabelId={filterLabelId}
+            filterLabelIds={filterLabelIds}
             filterPersonId={filterPersonId}
             persons={persons}
             onRename={renameColumn}

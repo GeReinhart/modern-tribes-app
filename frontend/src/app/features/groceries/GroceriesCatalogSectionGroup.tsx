@@ -4,7 +4,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { formatUnitSuffix } from './formatQuantity.ts';
+import { formatUnitSuffix } from '@/app/platform/core/formatQuantity.ts';
 import GroceriesSectionToggleHeader from './GroceriesSectionToggleHeader.tsx';
 import { SectionGroup } from './sectionGrouping.ts';
 import { GroceriesItem } from './types.ts';

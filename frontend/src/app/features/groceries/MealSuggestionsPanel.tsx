@@ -7,7 +7,7 @@ import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { formatMealDate } from './formatMealDate.ts';
-import { translateUnit } from './formatQuantity.ts';
+import { translateUnit } from '@/app/platform/core/formatQuantity.ts';
 import GroceriesSectionToggleHeader from './GroceriesSectionToggleHeader.tsx';
 import { MealSuggestion, MealSuggestionIngredient } from './types.ts';
 

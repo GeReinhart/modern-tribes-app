@@ -114,7 +114,7 @@ async def fetch_ingredients_detail(pool, recipe_id: str) -> list[dict]:
                       COALESCE(gi.name, ri.custom_name) AS name,
                       COALESCE(gi.unit, ri.custom_unit) AS unit,
                       COALESCE(gi.is_divisible, TRUE) AS is_divisible,
-                      ri.quantity, ri.position, ri.is_accompaniment
+                      ri.quantity, ri.display_override, ri.position, ri.is_accompaniment
                FROM recipe_ingredients ri
                LEFT JOIN groceries_items gi ON gi.id = ri.groceries_item_id
                WHERE ri.recipe_id = $1 AND ri.status = 'active'
@@ -126,7 +126,8 @@ async def fetch_ingredients_detail(pool, recipe_id: str) -> list[dict]:
 
 async def insert_ingredient(
     pool, recipe_id: str, groceries_item_id: Optional[str], custom_name: Optional[str],
-    custom_unit: Optional[str], quantity: float, is_accompaniment: bool, user_id: str,
+    custom_unit: Optional[str], quantity: float, display_override: Optional[str],
+    is_accompaniment: bool, user_id: str,
 ) -> dict:
     async with pool.acquire() as conn:
         position = await conn.fetchval(
@@ -135,11 +136,11 @@ async def insert_ingredient(
         )
         row = await conn.fetchrow(
             """INSERT INTO recipe_ingredients
-                   (recipe_id, groceries_item_id, custom_name, custom_unit, quantity, position, is_accompaniment,
-                    created_by, updated_by)
-               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8) RETURNING *""",
+                   (recipe_id, groceries_item_id, custom_name, custom_unit, quantity, display_override,
+                    position, is_accompaniment, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9) RETURNING *""",
             UUID(recipe_id), UUID(groceries_item_id) if groceries_item_id else None,
-            custom_name, custom_unit, quantity, position, is_accompaniment, UUID(user_id),
+            custom_name, custom_unit, quantity, display_override, position, is_accompaniment, UUID(user_id),
         )
     return dict(row)
 
@@ -152,7 +153,8 @@ async def fetch_ingredient(pool, ingredient_id: str) -> Optional[dict]:
 
 async def update_ingredient(
     pool, ingredient_id: str, quantity: Optional[float], position: Optional[int],
-    is_accompaniment: Optional[bool], user_id: str,
+    is_accompaniment: Optional[bool], display_override: Optional[str], update_display_override: bool,
+    user_id: str,
 ) -> dict:
     fields: dict = {"updated_by": UUID(user_id)}
     if quantity is not None:
@@ -161,6 +163,8 @@ async def update_ingredient(
         fields["position"] = position
     if is_accompaniment is not None:
         fields["is_accompaniment"] = is_accompaniment
+    if update_display_override:
+        fields["display_override"] = display_override
     set_clauses = ", ".join(f"{k} = ${i + 2}" for i, k in enumerate(fields.keys()))
     async with pool.acquire() as conn:
         row = await conn.fetchrow(

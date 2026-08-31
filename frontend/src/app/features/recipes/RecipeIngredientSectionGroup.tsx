@@ -1,7 +1,9 @@
+import { formatUnitSuffix } from '@/app/platform/core/formatQuantity.ts';
 import { IconName, ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { FoodSectionGroup } from './catalogGrouping.ts';
 
@@ -13,6 +15,7 @@ interface Props {
 
 const RecipeIngredientSectionGroup: React.FC<Props> = ({ group, filter, onSelect }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const [manuallyExpanded, setManuallyExpanded] = useState(false);
   const normalizedFilter = filter.trim().toLowerCase();
   const visibleItems = normalizedFilter === ''
@@ -51,7 +54,10 @@ const RecipeIngredientSectionGroup: React.FC<Props> = ({ group, filter, onSelect
                 color: theme.colors.text,
               }}
             >
-              {item.name} <span style={{ color: theme.colors.secondary }}>({item.unit})</span>
+              {item.name}
+              {formatUnitSuffix(item.unit, t) && (
+                <span style={{ color: theme.colors.secondary }}> {formatUnitSuffix(item.unit, t)}</span>
+              )}
             </div>
           ))}
         </div>

@@ -52,6 +52,7 @@ export interface RecipeIngredient {
   unit: string | null;
   is_divisible: boolean;
   quantity: number;
+  display_override: string | null;
   position: number;
   is_accompaniment: boolean;
 }
@@ -65,6 +66,7 @@ export interface RecipeIngredientCreate {
   custom_name?: string;
   custom_unit?: string;
   quantity: number;
+  display_override?: string;
   is_accompaniment?: boolean;
 }
 
@@ -72,4 +74,5 @@ export interface RecipeIngredientUpdate {
   quantity?: number;
   position?: number;
   is_accompaniment?: boolean;
+  display_override?: string | null;
 }

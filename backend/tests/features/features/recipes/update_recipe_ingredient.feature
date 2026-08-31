@@ -70,6 +70,55 @@ Feature: Update a recipe ingredient
       | id   | recipe_id | custom_name    | quantity | position | status |
       | 6101 | 6001      | Lasagna sheets | 2.00     | 0        | active |
 
+  Scenario: PATCH /recipe-ingredients/6101 with a display override — the override is set, quantity untouched
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the recipe_ingredients table contains:
+      | id   | recipe_id | custom_name | custom_unit | quantity | position | status |
+      | 6101 | 6001      | Salt        | kg          | 0.03      | 0        | active |
+    When I PATCH /api/features/tasks/recipe-ingredients/6101 with body:
+      """
+      {"display_override": "a pinch"}
+      """
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "6101",
+        "quantity": 0.03,
+        "display_override": "a pinch"
+      }
+      """
+    And the recipe_ingredients table contains:
+      | id   | recipe_id | custom_name | quantity | display_override | status |
+      | 6101 | 6001      | Salt        | 0.03      | a pinch           | active |
+
+  Scenario: PATCH /recipe-ingredients/6101 clearing the display override — the recipe shows quantity again
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the recipe_ingredients table contains:
+      | id   | recipe_id | custom_name | custom_unit | quantity | display_override | position | status |
+      | 6101 | 6001      | Salt        | kg          | 0.03      | a pinch           | 0        | active |
+    When I PATCH /api/features/tasks/recipe-ingredients/6101 with body:
+      """
+      {"display_override": null}
+      """
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "6101",
+        "display_override": null
+      }
+      """
+    And the recipe_ingredients table contains:
+      | id   | recipe_id | custom_name | quantity | display_override | status |
+      | 6101 | 6001      | Salt        | 0.03      |                   | active |
+
   Scenario: PATCH /recipe-ingredients/6101 and 6102 to swap positions — the ingredients are reordered
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:
