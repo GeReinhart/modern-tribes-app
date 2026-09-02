@@ -4,6 +4,7 @@ import EditorJoditComponent from '@/app/platform/functions/documents/editor/Edit
 
 import React from 'react';
 
+import { SongAuthorEditableField } from './SongAuthorEditableField.tsx';
 import { SongEditableBlockTitle } from './SongEditableBlockTitle.tsx';
 import { SongFormCustomBlockCard } from './SongFormCustomBlockCard.tsx';
 import { SongFreeformHtml } from './SongFreeformHtml.tsx';
@@ -38,8 +39,8 @@ const renderScalarBlock = (
 
     case 'author':
       return canEdit ? (
-        <SongInlineEditableText
-          value={song.author ?? ''} maxLength={255} placeholder={t('guitarSong.form.author')}
+        <SongAuthorEditableField
+          projectId={song.project_id} value={song.author ?? ''}
           onSave={(author) => hook.updateSongFields({ author: author || null })}
         />
       ) : (song.author ? (

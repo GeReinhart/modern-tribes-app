@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-COMMIT_MSG="${1:-}"
+SKIP_TESTS=false
+COMMIT_MSG=""
+for arg in "$@"; do
+    case "$arg" in
+        --skip-tests|--no-tests)
+            SKIP_TESTS=true
+            ;;
+        *)
+            COMMIT_MSG="$arg"
+            ;;
+    esac
+done
 FEATURE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 BACKEND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../backend" && pwd)"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -26,7 +37,9 @@ echo "==> Check code..."
 ./scripts/check-backend.sh || { echo "✗ Backend checks failed. Aborting."; exit 1; }
 ./scripts/check-frontend.sh || { echo "✗ Frontend checks failed. Aborting."; exit 1; }
 echo "==> Test code..."
-if git diff --quiet main -- backend/ && [ -z "$(git status --porcelain -- backend/)" ]; then
+if [ "$SKIP_TESTS" = true ]; then
+    echo "==> --skip-tests passed — skipping run-backend-tests.sh."
+elif git diff --quiet main -- backend/ && [ -z "$(git status --porcelain -- backend/)" ]; then
     echo "==> Backend unchanged vs main — skipping run-backend-tests.sh."
 else
     ./scripts/run-backend-tests.sh || { echo "✗ Backend checks failed. Aborting."; exit 1; }
