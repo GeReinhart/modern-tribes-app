@@ -10,7 +10,7 @@ interface Props {
   initialName: string;
   initialScheduledDate: string | null;
   onClose: () => void;
-  onSubmit: (data: { name?: string; scheduled_date?: string }) => Promise<boolean>;
+  onSubmit: (data: { name?: string; scheduled_date?: string; clear_scheduled_date?: boolean }) => Promise<boolean>;
 }
 
 const EditListModal: React.FC<Props> = ({ initialName, initialScheduledDate, onClose, onSubmit }) => {
@@ -22,9 +22,10 @@ const EditListModal: React.FC<Props> = ({ initialName, initialScheduledDate, onC
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    // Leaving the date empty on a list that already has none just leaves it unset — the date
-    // field only ever sets a date here, it doesn't clear one that was already set.
-    const ok = await onSubmit({ name: name.trim(), scheduled_date: scheduledDate || undefined });
+    const ok = await onSubmit({
+      name: name.trim(),
+      ...(scheduledDate ? { scheduled_date: scheduledDate } : { clear_scheduled_date: true }),
+    });
     setSubmitting(false);
     if (ok) onClose();
   };

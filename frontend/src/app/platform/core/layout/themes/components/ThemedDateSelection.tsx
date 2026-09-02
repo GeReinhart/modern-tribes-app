@@ -1,8 +1,10 @@
+import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { forwardRef, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useTranslation } from 'react-i18next';
 
 import { fr } from 'date-fns/locale';
 
@@ -72,6 +74,7 @@ const ThemedDateSelection: React.FC<Props> = ({
   maxDate,
 }) => {
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const root = document.documentElement;
@@ -96,23 +99,46 @@ const ThemedDateSelection: React.FC<Props> = ({
   return (
     <div style={width ? { width } : { flex: '1 1 160px' }}>
       {label && <span style={labelStyle}>{label}</span>}
-      <DatePicker
-        selected={parseDate(value)}
-        onChange={(date: Date | null) => onChange(date ? toISODate(date) : '')}
-        locale={fr}
-        dateFormat={dateFormat}
-        minDate={minDate ? parseDate(minDate) ?? undefined : undefined}
-        maxDate={maxDate ? parseDate(maxDate) ?? undefined : undefined}
-        disabled={disabled}
-        placeholderText="jj/mm/aaaa"
-        customInput={
-          <StyledInput
-            borderColor={theme.colors.border}
-            bgColor={theme.colors.surface}
-            textColor={theme.colors.text}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <DatePicker
+            selected={parseDate(value)}
+            onChange={(date: Date | null) => onChange(date ? toISODate(date) : '')}
+            locale={fr}
+            dateFormat={dateFormat}
+            minDate={minDate ? parseDate(minDate) ?? undefined : undefined}
+            maxDate={maxDate ? parseDate(maxDate) ?? undefined : undefined}
+            disabled={disabled}
+            placeholderText="jj/mm/aaaa"
+            customInput={
+              <StyledInput
+                borderColor={theme.colors.border}
+                bgColor={theme.colors.surface}
+                textColor={theme.colors.text}
+              />
+            }
           />
-        }
-      />
+        </div>
+        {value && !disabled && (
+          <button
+            type="button"
+            onClick={() => onChange('')}
+            title={t('common.removeDate')}
+            aria-label={t('common.removeDate')}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              flexShrink: 0,
+            }}
+          >
+            <ThemedSvgIcon name="calendar-x" color={theme.colors.secondary} size={18} />
+          </button>
+        )}
+      </div>
     </div>
   );
 };

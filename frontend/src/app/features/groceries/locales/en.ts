@@ -4,7 +4,6 @@ const en: Record<string, string> = {
   'features.groceries.listName': 'Name',
   'features.groceries.listNamePlaceholder': 'e.g. Weekly shop',
   'features.groceries.scheduledDate': 'Scheduled date',
-  'features.groceries.noDateYet': "I don't have a date yet",
   'features.groceries.noScheduledDate': 'No date yet',
   'features.groceries.assignedTo': 'Assigned to',
   'features.groceries.noAssignee': 'No one yet',

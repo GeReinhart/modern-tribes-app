@@ -34,13 +34,15 @@ async def fetch_list(pool, list_id: str) -> Optional[dict]:
 
 
 async def update_list(
-    pool, list_id: str, name: Optional[str], scheduled_date: Optional[date], status: Optional[str],
-    is_favorite: Optional[bool], user_id: str,
+    pool, list_id: str, name: Optional[str], scheduled_date: Optional[date], clear_scheduled_date: bool,
+    status: Optional[str], is_favorite: Optional[bool], user_id: str,
 ) -> dict:
     fields: dict = {"updated_by": UUID(user_id)}
     if name is not None:
         fields["name"] = name
-    if scheduled_date is not None:
+    if clear_scheduled_date:
+        fields["scheduled_date"] = None
+    elif scheduled_date is not None:
         fields["scheduled_date"] = scheduled_date
     if status is not None:
         fields["status"] = status

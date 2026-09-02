@@ -93,7 +93,7 @@ async def create_groceries_list(data: GroceriesListCreate, current_user: dict = 
 async def update_groceries_list(
     list_id: str, data: GroceriesListUpdate, current_user: dict = Depends(get_current_user)
 ):
-    """Rename a grocery list, reschedule its date, archive/restore it, or (un)mark it as favorite.
+    """Rename a grocery list, reschedule or clear its date, archive/restore it, or (un)mark it as favorite.
 
     **Permissions:** admin | can_access_attached_tribes
     **Feature access:** minimum position ≥ member
@@ -102,7 +102,8 @@ async def update_groceries_list(
     list_row = await _require_list(pool, list_id)
     await access.require_feature_access(pool, str(list_row["feature_instance_id"]), current_user, "member")
     row = await lists_repository.update_list(
-        pool, list_id, data.name, data.scheduled_date, data.status, data.is_favorite, str(current_user["id"]),
+        pool, list_id, data.name, data.scheduled_date, data.clear_scheduled_date,
+        data.status, data.is_favorite, str(current_user["id"]),
     )
     return _row_to_list(row)
 

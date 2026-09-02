@@ -31,6 +31,7 @@ const fr: Record<string, string> = {
   'common.createdBy': 'Créé le',
   'common.updatedBy': 'Modifié le',
   'common.forceOnDashboard': 'Afficher sur le tableau de bord',
+  'common.removeDate': 'Supprimer la date',
 
   'iconPicker.searchPlaceholder': 'Rechercher une icône...',
   'iconPicker.noResults': 'Aucune icône trouvée',

@@ -16,6 +16,7 @@ class GroceriesListCreate(BaseModel):
 class GroceriesListUpdate(BaseModel):
     name: Optional[str] = None
     scheduled_date: Optional[date] = None
+    clear_scheduled_date: bool = False
     status: Optional[Literal["active", "archived"]] = None
     is_favorite: Optional[bool] = None
 

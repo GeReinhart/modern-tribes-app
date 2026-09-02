@@ -30,7 +30,6 @@ const CreateGroceriesListModal: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation();
   const [name, setName] = useState('');
-  const [hasDate, setHasDate] = useState(true);
   const [scheduledDate, setScheduledDate] = useState(todayIsoDate());
   const [assignedPersonId, setAssignedPersonId] = useState('');
   const [forceOnDashboard, setForceOnDashboard] = useState(false);
@@ -41,16 +40,14 @@ const CreateGroceriesListModal: React.FC<Props> = ({
   const favoriteListOptions: SelectOption[] = favoriteLists.map((l) => ({
     value: l.id, label: formatListTitle(l.name, t),
   }));
-  const canSubmit = !hasDate || !!scheduledDate;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canSubmit) return;
     setSubmitting(true);
     await onCreate({
       feature_instance_id: featureInstanceId,
       name: name.trim() || undefined,
-      scheduled_date: hasDate ? scheduledDate : undefined,
+      scheduled_date: scheduledDate || undefined,
       assigned_person_id: assignedPersonId || undefined,
       force_on_dashboard: forceOnDashboard,
       copy_from_list_id: copyFromListId || undefined,
@@ -69,18 +66,11 @@ const CreateGroceriesListModal: React.FC<Props> = ({
               onChange={(e) => setName(e.target.value)}
               placeholder={t('features.groceries.listNamePlaceholder')}
             />
-            <ThemedCheckbox
-              label={t('features.groceries.noDateYet')}
-              checked={!hasDate}
-              onChange={(checked) => setHasDate(!checked)}
+            <ThemedDateSelection
+              label={t('features.groceries.scheduledDate')}
+              value={scheduledDate}
+              onChange={setScheduledDate}
             />
-            {hasDate && (
-              <ThemedDateSelection
-                label={t('features.groceries.scheduledDate')}
-                value={scheduledDate}
-                onChange={setScheduledDate}
-              />
-            )}
             <ThemedSelect
               label={t('features.groceries.assignedTo')}
               options={personOptions}
@@ -108,7 +98,7 @@ const CreateGroceriesListModal: React.FC<Props> = ({
           <ThemedButton variant="ghost" type="button" onClick={onClose}>
             {t('features.groceries.cancel')}
           </ThemedButton>
-          <ThemedButton variant="primary" type="submit" isLoading={submitting} disabled={!canSubmit}>
+          <ThemedButton variant="primary" type="submit" isLoading={submitting}>
             {t('features.groceries.create')}
           </ThemedButton>
         </ThemedModalFooter>

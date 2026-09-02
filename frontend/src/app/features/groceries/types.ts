@@ -95,6 +95,7 @@ export interface GroceriesListCreate {
 export interface GroceriesListUpdate {
   name?: string;
   scheduled_date?: string;
+  clear_scheduled_date?: boolean;
   status?: 'active' | 'archived';
   is_favorite?: boolean;
 }

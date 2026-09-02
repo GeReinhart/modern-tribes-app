@@ -33,6 +33,7 @@ export type IconName =
   | 'more-vertical'
   | 'palette'
   | 'calendar'
+  | 'calendar-x'
   | 'star'
   | 'bookmark'
   | 'heart'
@@ -149,7 +150,7 @@ export const ICON_NAMES: IconName[] = [
   'check', 'x', 'upload', 'download', 'save', 'search', 'user',
   'logout', 'refresh', 'settings', 'archive', 'file-text', 'warning',
   'info', 'arrow-up', 'arrow-down', 'hash', 'eye-off', 'external-link',
-  'bell', 'more-vertical', 'palette', 'calendar',
+  'bell', 'more-vertical', 'palette', 'calendar', 'calendar-x',
   'star', 'bookmark', 'heart', 'home', 'folder', 'list', 'clock',
   'map-pin', 'mail', 'tag', 'flag', 'book', 'users', 'message-circle',
   'image', 'link', 'lock', 'unlock', 'share-2', 'filter', 'layers',

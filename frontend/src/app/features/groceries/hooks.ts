@@ -230,7 +230,7 @@ export function useGroceriesListDetail(listId: string | null) {
   }, []);
 
   const updateListDetails = useCallback(
-    async (data: { name?: string; scheduled_date?: string }): Promise<boolean> => {
+    async (data: { name?: string; scheduled_date?: string; clear_scheduled_date?: boolean }): Promise<boolean> => {
       if (!listId) return false;
       try {
         const updated = await groceriesListsService.update(listId, data);

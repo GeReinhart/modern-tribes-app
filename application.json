@@ -502,12 +502,12 @@
         "description": {
           "en": [
             "- manage your team's work with two views: a to-do list and a visual kanban board",
-            "- assign tasks to people, add labels, set due dates and attach detailed notes; rename, recolour, reorder or delete labels from one panel",
+            "- assign tasks to people, add labels, set or clear due dates and attach detailed notes; rename, recolour, reorder or delete labels from one panel",
             "- set reminders on any task or card to get notified by push notification or email at a chosen date and time"
           ],
           "fr": [
             "- gérez le travail de votre équipe avec deux vues : une liste de tâches et un tableau kanban",
-            "- assignez des tâches, ajoutez des étiquettes, définissez des échéances et joignez des notes détaillées ; renommez, recolorez, réordonnez ou supprimez les étiquettes depuis un même panneau",
+            "- assignez des tâches, ajoutez des étiquettes, définissez ou supprimez des échéances et joignez des notes détaillées ; renommez, recolorez, réordonnez ou supprimez les étiquettes depuis un même panneau",
             "- définissez des rappels sur n'importe quelle tâche ou carte pour être notifié par notification push ou email à la date et l'heure choisies"
           ]
         },
@@ -605,14 +605,14 @@
         "description": {
           "en": [
             "- keep a shared shopping catalog of items (with a unit, how often you typically restock them, and a suggested quantity that pre-fills when you add it to a list) and reusable aisle sections like \"Butchery\" or \"Produce\", filterable by name and reorderable to match how you walk the aisles when building a list — browse and manage the catalog directly from the tab, without opening a list first; mark a section as a food aisle or not, so only food aisles are offered when picking a recipe's ingredients",
-            "- schedule shopping lists to a date you can change later, or leave undated for now, so they show up in your dashboard planning — a list you didn't get to in time shows as passed, while an undated list never does; rename it (or leave it untitled to show as \"Next shopping\"), archive once it's done, mark a list as a favorite, and start a new list from a favorite's content",
+            "- schedule shopping lists to a date you can change or clear later, or leave undated for now, so they show up in your dashboard planning — a list you didn't get to in time shows as passed, while an undated list never does; rename it (or leave it untitled to show as \"Next shopping\"), archive once it's done, mark a list as a favorite, and start a new list from a favorite's content",
             "- check items off as you put them in your cart, and see at a glance what's left to buy",
             "- get suggestions for items you're due to restock, and for ingredients needed by any meal planned after the list's date, shown day by day in date order; adding a suggested ingredient tops up the quantity of a matching item already on your list instead of adding a duplicate line — a recipe's core ingredients are added all at once, while its accompaniments (suggested sides) are added one by one; a meal already added can be removed again (with a confirmation) so it stops being accounted for on this list",
             "- add a note to any item, and add one-off items just for a single list without putting them in the shared catalog"
           ],
           "fr": [
             "- gérez un catalogue d'articles partagé (avec une unité, une fréquence de réapprovisionnement habituelle et une quantité suggérée préremplie lors de l'ajout à une liste) et des rayons réutilisables comme « Boucherie » ou « Fruits & Légumes », filtrables par nom et réordonnables selon l'ordre dans lequel vous parcourez les rayons — parcourez et gérez le catalogue directement depuis l'onglet, sans avoir à ouvrir une liste ; marquez un rayon comme alimentaire ou non, pour ne proposer que les rayons alimentaires lors du choix des ingrédients d'une recette",
-            "- programmez vos listes de courses à une date que vous pouvez changer ensuite, ou laissez-les sans date pour l'instant, pour qu'elles apparaissent dans la planification de votre tableau de bord — une liste que vous n'avez pas traitée à temps apparaît comme passée, une liste sans date jamais ; renommez-la (ou laissez-la sans titre pour qu'elle s'affiche comme « Prochaines courses »), archivez-la une fois terminée, marquez-la comme favorite, et repartez d'une liste favorite pour créer une nouvelle liste",
+            "- programmez vos listes de courses à une date que vous pouvez changer ou supprimer ensuite, ou laissez-les sans date pour l'instant, pour qu'elles apparaissent dans la planification de votre tableau de bord — une liste que vous n'avez pas traitée à temps apparaît comme passée, une liste sans date jamais ; renommez-la (ou laissez-la sans titre pour qu'elle s'affiche comme « Prochaines courses »), archivez-la une fois terminée, marquez-la comme favorite, et repartez d'une liste favorite pour créer une nouvelle liste",
             "- cochez les articles au fur et à mesure que vous les mettez dans votre panier, et voyez en un coup d'œil ce qu'il reste à acheter",
             "- recevez des suggestions d'articles à racheter, ainsi que des ingrédients nécessaires pour tout repas planifié après la date de la liste, présentées jour par jour et triées par date ; ajouter un ingrédient suggéré augmente la quantité d'un article déjà présent sur votre liste au lieu d'en créer un doublon — les ingrédients principaux d'une recette s'ajoutent tous d'un coup, tandis que ses accompagnements (suggestions à part) s'ajoutent un par un ; un repas déjà ajouté peut être retiré (avec confirmation) pour ne plus être pris en compte dans cette liste",
             "- ajoutez une note à n'importe quel article, et ajoutez des articles ponctuels propres à une seule liste sans les mettre dans le catalogue partagé"

@@ -20,7 +20,7 @@ const TASKS_ICONS: IconName[] = [
   'clipboard', 'grid', 'layout', 'columns', 'check-square',
 ];
 
-const CALENDAR_ICONS: IconName[] = ['bell', 'calendar', 'clock', 'alert-circle', 'watch'];
+const CALENDAR_ICONS: IconName[] = ['bell', 'calendar', 'calendar-x', 'clock', 'alert-circle', 'watch'];
 
 const DOCUMENTS_ICONS: IconName[] = [
   'save', 'file-text', 'folder', 'book', 'image',

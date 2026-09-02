@@ -31,6 +31,7 @@ const en: Record<string, string> = {
   'common.createdBy': 'Created',
   'common.updatedBy': 'Updated',
   'common.forceOnDashboard': 'Force on Dashboard',
+  'common.removeDate': 'Remove date',
 
   'iconPicker.searchPlaceholder': 'Search icons...',
   'iconPicker.noResults': 'No matching icon',

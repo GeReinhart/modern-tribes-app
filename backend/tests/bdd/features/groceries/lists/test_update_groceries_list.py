@@ -42,6 +42,11 @@ def test_update_list_scheduled_date():
     pass
 
 
+@scenario(FEATURE, "PATCH /groceries-lists/4001 as a project member — the scheduled date is cleared")
+def test_update_list_scheduled_date_cleared():
+    pass
+
+
 @scenario(FEATURE, "PATCH /groceries-lists/4001 as a project guest — 403 error and the list is not archived")
 def test_update_list_forbidden():
     pass
