@@ -3,13 +3,16 @@ import { useLabelFilter } from '@/app/platform/core/layout/themes/components/use
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import CreateRecipeModal from './CreateRecipeModal.tsx';
 import { useRecipes } from './hooks.ts';
 import RecipeRow from './RecipeRow.tsx';
+import RecipeSearchFilters from './RecipeSearchFilters.tsx';
+import { recipesService } from './service.ts';
+import { CatalogItemOption, RecipeState } from './types.ts';
 
 interface Props {
   featureInstanceId: string;
@@ -23,8 +26,23 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
   const { t } = useTranslation();
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const [searchInput, setSearchInput] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [ingredientId, setIngredientId] = useState('');
+  const [selectedStates, setSelectedStates] = useState<RecipeState[]>([]);
+  const [catalogItems, setCatalogItems] = useState<CatalogItemOption[]>([]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchInput), 350);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
+    recipesService.listCatalogItems(featureInstanceId).then(setCatalogItems).catch(() => undefined);
+  }, [featureInstanceId]);
+
   const { recipes, labels, error, createRecipe, createLabel, updateLabel, archiveLabel, reorderLabels } =
-    useRecipes(featureInstanceId);
+    useRecipes(featureInstanceId, { q: debouncedSearch || undefined, ingredientId: ingredientId || undefined });
   const [creating, setCreating] = useState(false);
   const [configuringLabels, setConfiguringLabels] = useState(false);
 
@@ -55,7 +73,13 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
   }, [recipes]);
 
   const { filterLabelIds, toggleFilterLabel, matchesLabelFilter } = useLabelFilter(activeLabelIds);
-  const visibleRecipes = recipes.filter((r) => matchesLabelFilter(r.label_ids));
+  const visibleRecipes = recipes.filter(
+    (r) => matchesLabelFilter(r.label_ids) && (selectedStates.length === 0 || selectedStates.includes(r.recipe_state)),
+  );
+
+  const toggleState = (state: RecipeState) => {
+    setSelectedStates((prev) => (prev.includes(state) ? prev.filter((s) => s !== state) : [...prev, state]));
+  };
 
   const openRecipe = (recipeId: string) => {
     navigate(`/app/tribes/${tribeId}/projects/${projectId}/recipes/${recipeId}/present`);
@@ -68,6 +92,18 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
           {error}
         </div>
       )}
+
+      <div style={{ marginBottom: '10px' }}>
+        <RecipeSearchFilters
+          searchInput={searchInput}
+          onSearchInputChange={setSearchInput}
+          catalogItems={catalogItems}
+          ingredientId={ingredientId}
+          onIngredientChange={setIngredientId}
+          selectedStates={selectedStates}
+          onToggleState={toggleState}
+        />
+      </div>
 
       {labels.length > 0 && (
         <div style={{ marginBottom: '10px' }}>

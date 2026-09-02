@@ -1,10 +1,11 @@
+import { ThemedBadge } from '@/app/platform/core/layout/themes/components/ThemedBadge.tsx';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Recipe, RecipeLabel } from './types.ts';
+import { Recipe, RecipeLabel, RecipeState } from './types.ts';
 
 interface Props {
   recipe: Recipe;
@@ -21,7 +22,12 @@ const RecipeRow: React.FC<Props> = ({ recipe, labels, onOpen }) => {
     <ThemedCard onClick={onOpen}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
         <div>
-          <div style={{ fontWeight: 600 }}>{recipe.name}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontWeight: 600 }}>{recipe.name}</span>
+            {recipe.recipe_state === RecipeState.draft && (
+              <ThemedBadge variant="secondary">{t('features.recipes.state.draft')}</ThemedBadge>
+            )}
+          </div>
           <div style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary }}>
             {t('features.recipes.servingsCount', { count: recipe.servings })}
           </div>

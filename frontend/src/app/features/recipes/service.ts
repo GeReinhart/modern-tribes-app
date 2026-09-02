@@ -11,12 +11,19 @@ import {
   RecipeIngredientCreate,
   RecipeIngredientUpdate,
   RecipeLabel,
+  RecipeListFilters,
   RecipeUpdate,
 } from './types.ts';
 
 class RecipesService {
-  async listByInstance(featureInstanceId: string): Promise<Recipe[]> {
-    return apiService.get<Recipe[]>(`/features/tasks/recipes/by-instance/${featureInstanceId}`);
+  async listByInstance(featureInstanceId: string, filters: RecipeListFilters = {}): Promise<Recipe[]> {
+    const params = new URLSearchParams();
+    if (filters.q) params.set('q', filters.q);
+    if (filters.ingredientId) params.set('ingredient_id', filters.ingredientId);
+    const query = params.toString();
+    return apiService.get<Recipe[]>(
+      `/features/tasks/recipes/by-instance/${featureInstanceId}${query ? `?${query}` : ''}`,
+    );
   }
 
   async getDetail(recipeId: string): Promise<RecipeDetail> {

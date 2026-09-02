@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Optional
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
@@ -38,6 +40,7 @@ def _row_to_recipe(row: dict) -> RecipeResponse:
         document_id=str(row["document_id"]) if row.get("document_id") else None,
         document_content_html=row.get("document_content_html"),
         status=row["status"],
+        recipe_state=row["recipe_state"],
         label_ids=list(row.get("label_ids") or []),
     )
 
@@ -106,15 +109,21 @@ async def create_recipe(data: RecipeCreate, current_user: dict = Depends(get_cur
 
 @router.get("/by-instance/{feature_instance_id}", response_model=list[RecipeResponse])
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
-async def list_recipes(feature_instance_id: str, current_user: dict = Depends(get_current_user)):
-    """List all recipes for a feature instance.
+async def list_recipes(
+    feature_instance_id: str,
+    q: Optional[str] = Query(None),
+    ingredient_id: Optional[str] = Query(None),
+    current_user: dict = Depends(get_current_user),
+):
+    """List recipes for a feature instance, matching a name/ingredient search and/or a
+    specific ingredient.
 
     **Permissions:** admin | can_access_attached_tribes
     **Feature access:** minimum position >= guest
     """
     pool = get_database()
     await access.require_feature_access(pool, feature_instance_id, current_user, "guest")
-    rows = await recipes_repository.fetch_recipes_for_instance(pool, feature_instance_id)
+    rows = await recipes_repository.fetch_recipes_for_instance(pool, feature_instance_id, q, ingredient_id)
     return [_row_to_recipe(r) for r in rows]
 
 
@@ -172,6 +181,8 @@ async def update_recipe(recipe_id: str, data: RecipeUpdate, current_user: dict =
         basic["servings"] = data.servings
     if data.status is not None:
         basic["status"] = data.status
+    if data.recipe_state is not None:
+        basic["recipe_state"] = data.recipe_state
     await recipes_repository.update_recipe(pool, recipe_id, basic, user_id)
 
     if data.document_content_html is not None:

@@ -428,6 +428,7 @@ CREATE TABLE IF NOT EXISTS recipes (
     document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
     servings INTEGER NOT NULL CHECK (servings > 0),
     status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    recipe_state VARCHAR(20) NOT NULL DEFAULT 'draft' CHECK (recipe_state IN ('draft', 'completed')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_by UUID REFERENCES users(id) ON DELETE SET NULL,

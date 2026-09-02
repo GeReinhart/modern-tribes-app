@@ -32,15 +32,49 @@ async def fetch_recipe(pool, recipe_id: str) -> Optional[dict]:
     return dict(row) if row else None
 
 
-async def fetch_recipes_for_instance(pool, feature_instance_id: str) -> list[dict]:
+_INGREDIENT_NAME_SQL = "COALESCE(gi.name, ri.custom_name)"
+
+
+def _recipe_search_conditions(
+    q: Optional[str], ingredient_id: Optional[str], params: list,
+) -> list[str]:
+    conditions = []
+    if q:
+        idx = len(params) + 1
+        params.append(f"%{q}%")
+        conditions.append(
+            f"""(r.name ILIKE ${idx} OR EXISTS (
+                    SELECT 1 FROM recipe_ingredients ri
+                    LEFT JOIN groceries_items gi ON gi.id = ri.groceries_item_id
+                    WHERE ri.recipe_id = r.id AND ri.status = 'active' AND {_INGREDIENT_NAME_SQL} ILIKE ${idx}
+                ))"""
+        )
+    if ingredient_id:
+        idx = len(params) + 1
+        params.append(UUID(ingredient_id))
+        conditions.append(
+            f"""EXISTS (
+                    SELECT 1 FROM recipe_ingredients ri
+                    WHERE ri.recipe_id = r.id AND ri.status = 'active' AND ri.groceries_item_id = ${idx}
+                )"""
+        )
+    return conditions
+
+
+async def fetch_recipes_for_instance(
+    pool, feature_instance_id: str, q: Optional[str] = None, ingredient_id: Optional[str] = None,
+) -> list[dict]:
+    params: list = [UUID(feature_instance_id)]
+    conditions = ["r.feature_instance_id = $1", "r.status = 'active'"]
+    conditions += _recipe_search_conditions(q, ingredient_id, params)
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             f"""SELECT r.*, d.content_html AS document_content_html, {_LABEL_IDS_SQL}
                FROM recipes r
                LEFT JOIN documents d ON d.id = r.document_id
-               WHERE r.feature_instance_id = $1 AND r.status = 'active'
+               WHERE {' AND '.join(conditions)}
                ORDER BY r.name ASC""",
-            UUID(feature_instance_id),
+            *params,
         )
     return [dict(r) for r in rows]
 

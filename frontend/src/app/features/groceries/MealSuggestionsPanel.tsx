@@ -7,7 +7,7 @@ import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { formatMealDate } from './formatMealDate.ts';
-import { translateUnit } from '@/app/platform/core/formatQuantity.ts';
+import { formatQuantityUnit } from '@/app/platform/core/formatQuantity.ts';
 import GroceriesSectionToggleHeader from './GroceriesSectionToggleHeader.tsx';
 import { MealSuggestion, MealSuggestionIngredient } from './types.ts';
 
@@ -24,9 +24,7 @@ function suggestionKey(s: MealSuggestion): string {
 }
 
 function formatIngredientLabel(ingredient: MealSuggestionIngredient, t: TFunction): string {
-  return ingredient.unit
-    ? `${ingredient.name} — ${ingredient.quantity} ${translateUnit(ingredient.unit, t, ingredient.quantity)}`
-    : `${ingredient.name} — ${ingredient.quantity}`;
+  return `${ingredient.name} — ${formatQuantityUnit(ingredient.quantity, ingredient.unit, true, t)}`;
 }
 
 const SuggestionIconButton: React.FC<{ onClick: () => void; label: string; icon: 'plus' | 'x'; danger?: boolean }> = ({

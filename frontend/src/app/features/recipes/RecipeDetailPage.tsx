@@ -10,16 +10,18 @@ import { ThemedSection } from '@/app/platform/core/layout/themes/components/Them
 import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { errorStyle } from '@/app/platform/core/layout/themes/theme.styles.tsx';
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import RecipeDetailBody from './RecipeDetailBody.tsx';
 import { useRecipeDetail, useRecipeLabels } from './hooks.ts';
+import { RecipeState } from './types.ts';
 
 const RecipeDetailPageContent: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
   const { tribeId, projectId, recipeId } = useParams<{ tribeId: string; projectId: string; recipeId: string }>();
 
   const { tribe } = useTribeWithPositions(tribeId || null);
@@ -30,6 +32,13 @@ const RecipeDetailPageContent: React.FC = () => {
   } = useRecipeDetail(recipeId || null);
   const labelsHook = useRecipeLabels(detail?.feature_instance_id ?? null);
   useDocumentTitle(detail ? `${detail.name} — ${t('common.edit')}` : undefined);
+
+  // Editing a recipe means it isn't finished yet -- entering this screen puts it back to draft.
+  useEffect(() => {
+    if (canEdit && detail && detail.recipe_state !== RecipeState.draft) {
+      update({ recipe_state: RecipeState.draft });
+    }
+  }, [canEdit, detail, update]);
 
   const presentPath = `/app/tribes/${tribeId}/projects/${projectId}/recipes/${recipeId}/present`;
   const listPath = `/app/tribes/${tribeId}/projects/${projectId}${detail ? `/${detail.feature_instance_id}` : ''}`;
@@ -53,12 +62,20 @@ const RecipeDetailPageContent: React.FC = () => {
     />
   ) : null;
 
+  const handleMarkCompleted = async () => {
+    await update({ recipe_state: RecipeState.completed });
+    navigate(presentPath);
+  };
+
   const menuActions = useMemo(
     () => [
       { icon: 'search' as const, label: t('features.recipes.backToList'), path: listPath },
       { icon: 'eye' as const, label: t('features.recipes.readMode'), path: presentPath },
+      ...(canEdit
+        ? [{ icon: 'check-circle' as const, label: t('features.recipes.markCompleted'), onClick: handleMarkCompleted }]
+        : []),
     ],
-    [listPath, presentPath, t],
+    [listPath, presentPath, canEdit, t],
   );
 
   if (!detail) {

@@ -960,12 +960,16 @@
             "- keep a recipe book in a project tab, each recipe with a title, a base serving count and a rich-text description",
             "- list ingredients from the shared groceries catalog with a quantity, searchable and grouped by food aisle, or add one-off ingredients that aren't in the catalog; mark an ingredient as an accompaniment (a suggested side, not part of the recipe itself) to keep it separate, and reorder ingredients to match how the recipe is written",
             "- tag recipes with labels shared within the tab to organize and filter your recipe book; a configuration mode lets you rename, reorder or archive labels",
+            "- opening a recipe for editing marks it as a draft (shown with a badge in the list) automatically, since editing means it's still being worked on; mark it as completed once it's ready, from the edit screen",
+            "- search the recipe book by name or by ingredient, filter by a specific ingredient, and filter by draft or completed",
             "- open a recipe in a clean read-only view, with a quick switch to an edit screen for the actual changes"
           ],
           "fr": [
             "- tenez un répertoire de recettes dans un onglet de projet, chaque recette avec un titre, un nombre de portions de base et une description enrichie",
             "- listez les ingrédients du catalogue de courses partagé avec une quantité, cherchables et regroupés par rayon alimentaire, ou ajoutez des ingrédients ponctuels absents du catalogue ; marquez un ingrédient comme accompagnement (une suggestion à part, qui ne fait pas partie de la recette elle-même) pour le distinguer, et réordonnez les ingrédients selon l'écriture de la recette",
             "- étiquetez les recettes avec des labels partagés dans l'onglet pour organiser et filtrer votre répertoire ; un mode configuration permet de renommer, réordonner ou archiver les labels",
+            "- ouvrir une recette en édition la marque automatiquement comme brouillon (affiché avec un badge dans la liste), puisque l'éditer signifie qu'elle est encore en cours ; marquez-la comme terminée une fois prête, depuis l'écran d'édition",
+            "- cherchez dans le répertoire par nom ou par ingrédient, filtrez par un ingrédient précis, et filtrez par brouillon ou terminée",
             "- ouvrez une recette dans une vue de lecture épurée, avec un accès rapide à un écran d'édition pour les modifications"
           ]
         },

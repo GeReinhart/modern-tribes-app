@@ -3,7 +3,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { findAdjacentIngredientInGroup } from './ingredientOrdering.ts';
 import { recipesService } from './service.ts';
 import {
-  Recipe, RecipeCreate, RecipeDetail, RecipeIngredientCreate, RecipeIngredientUpdate, RecipeLabel,
+  Recipe, RecipeCreate, RecipeDetail, RecipeIngredientCreate, RecipeIngredientUpdate, RecipeLabel, RecipeListFilters,
+  RecipeState,
 } from './types.ts';
 
 function errorMessage(e: unknown): string {
@@ -83,19 +84,20 @@ export function useRecipeLabels(featureInstanceId: string | null) {
   };
 }
 
-export function useRecipes(featureInstanceId: string | null) {
+export function useRecipes(featureInstanceId: string | null, filters: RecipeListFilters = {}) {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [error, setError] = useState<string | null>(null);
   const labelsHook = useRecipeLabels(featureInstanceId);
+  const { q, ingredientId } = filters;
 
   const fetchRecipes = useCallback(async () => {
     if (!featureInstanceId) return;
     try {
-      setRecipes(await recipesService.listByInstance(featureInstanceId));
+      setRecipes(await recipesService.listByInstance(featureInstanceId, { q, ingredientId }));
     } catch (e: unknown) {
       setError(errorMessage(e));
     }
-  }, [featureInstanceId]);
+  }, [featureInstanceId, q, ingredientId]);
 
   useEffect(() => {
     fetchRecipes();
@@ -143,7 +145,9 @@ export function useRecipeDetail(recipeId: string | null) {
     fetchDetail();
   }, [fetchDetail]);
 
-  const update = useCallback(async (data: { name?: string; servings?: number; document_content_html?: string }) => {
+  const update = useCallback(async (
+    data: { name?: string; servings?: number; document_content_html?: string; recipe_state?: RecipeState },
+  ) => {
     if (!recipeId) return;
     try {
       await recipesService.update(recipeId, data);

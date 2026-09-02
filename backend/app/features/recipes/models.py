@@ -1,6 +1,8 @@
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, model_validator
+
+RecipeState = Literal["draft", "completed"]
 
 
 class RecipeCreate(BaseModel):
@@ -15,6 +17,7 @@ class RecipeUpdate(BaseModel):
     servings: Optional[int] = None
     document_content_html: Optional[str] = None
     status: Optional[str] = None
+    recipe_state: Optional[RecipeState] = None
 
 
 class RecipeResponse(BaseModel):
@@ -25,6 +28,7 @@ class RecipeResponse(BaseModel):
     document_id: Optional[str] = None
     document_content_html: Optional[str] = None
     status: str
+    recipe_state: RecipeState
     label_ids: list[str] = []
 
 

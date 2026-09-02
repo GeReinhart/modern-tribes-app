@@ -19,6 +19,11 @@ export interface CatalogItemCreate {
   unit: string;
 }
 
+export enum RecipeState {
+  draft = 'draft',
+  completed = 'completed',
+}
+
 export interface RecipeLabel {
   id: string;
   name: string;
@@ -34,7 +39,13 @@ export interface Recipe {
   document_id: string | null;
   document_content_html: string | null;
   status: string;
+  recipe_state: RecipeState;
   label_ids: string[];
+}
+
+export interface RecipeListFilters {
+  q?: string;
+  ingredientId?: string;
 }
 
 export interface RecipeCreate {
@@ -49,6 +60,7 @@ export interface RecipeUpdate {
   servings?: number;
   document_content_html?: string;
   status?: 'active' | 'archived';
+  recipe_state?: RecipeState;
 }
 
 export interface RecipeIngredient {

@@ -2173,8 +2173,8 @@ def given_recipes_table(datatable):
                     continue
                 document_id = rec.get("document_id")
                 await conn.execute(
-                    """INSERT INTO recipes(id, feature_instance_id, name, servings, document_id, status)
-                       VALUES($1, $2, $3, $4, $5, $6)
+                    """INSERT INTO recipes(id, feature_instance_id, name, servings, document_id, status, recipe_state)
+                       VALUES($1, $2, $3, $4, $5, $6, $7)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(uid),
                     UUID(rec["feature_instance_id"]),
@@ -2182,6 +2182,7 @@ def given_recipes_table(datatable):
                     int(rec.get("servings", "1")),
                     UUID(document_id) if document_id else None,
                     rec.get("status", "active"),
+                    rec.get("recipe_state", "draft"),
                 )
         finally:
             await conn.close()
