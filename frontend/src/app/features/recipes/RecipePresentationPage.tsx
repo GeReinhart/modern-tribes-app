@@ -10,7 +10,7 @@ import { errorStyle } from '@/app/platform/core/layout/themes/theme.styles.tsx';
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import RecipeDetailBody from './RecipeDetailBody.tsx';
 import { useRecipeDetail, useRecipeLabels } from './hooks.ts';
@@ -20,6 +20,7 @@ const noop = async () => undefined;
 const RecipePresentationPageContent: React.FC = () => {
   const { t } = useTranslation();
   const { tribeId, projectId, recipeId } = useParams<{ tribeId: string; projectId: string; recipeId: string }>();
+  const navigate = useNavigate();
 
   const { tribe } = useTribeWithPositions(tribeId || null);
   const { project } = useProject(projectId || null);
@@ -44,10 +45,11 @@ const RecipePresentationPageContent: React.FC = () => {
 
   const menuActions = useMemo(
     () => [
+      { icon: 'arrow-left' as const, label: t('features.recipes.back'), onClick: () => navigate(-1) },
       { icon: 'search' as const, label: t('features.recipes.backToList'), path: listPath },
       ...(canEdit ? [{ icon: 'pencil' as const, label: t('features.recipes.editRecipe'), path: editPath }] : []),
     ],
-    [listPath, editPath, canEdit, t],
+    [listPath, editPath, canEdit, t, navigate],
   );
 
   if (!detail) {

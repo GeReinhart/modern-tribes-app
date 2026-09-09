@@ -24,13 +24,26 @@ async def fetch_recipes_detail_for_ids(pool, recipe_ids: list[str]) -> list[dict
     return [{**dict(r), "id": str(r["id"])} for r in rows]
 
 
+_IS_CONDIMENT_SQL = """EXISTS (
+                          SELECT 1 FROM groceries_item_sections gis
+                          JOIN groceries_sections gs ON gs.id = gis.groceries_section_id
+                          WHERE gis.groceries_item_id = ri.groceries_item_id
+                            AND gs.is_condiment = TRUE AND gs.status = 'active'
+                      ) AS is_condiment"""
+
+
 async def fetch_recipe_ingredients_for_ids(pool, recipe_ids: list[str]) -> dict[str, list[dict]]:
+    """Same field set as recipes.repository.fetch_ingredients_detail (name/unit/quantity plus
+    is_divisible/display_override/is_accompaniment/is_condiment), queried directly rather than
+    imported, so the PDF's ingredient list can match the recipe's own read-only presentation."""
     if not recipe_ids:
         return {}
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            """SELECT ri.recipe_id, COALESCE(gi.name, ri.custom_name) AS name,
-                      COALESCE(gi.unit, ri.custom_unit) AS unit, ri.quantity
+            f"""SELECT ri.recipe_id, COALESCE(gi.name, ri.custom_name) AS name,
+                      COALESCE(gi.unit, ri.custom_unit) AS unit,
+                      COALESCE(gi.is_divisible, TRUE) AS is_divisible,
+                      ri.quantity, ri.display_override, ri.is_accompaniment, {_IS_CONDIMENT_SQL}
                FROM recipe_ingredients ri
                LEFT JOIN groceries_items gi ON gi.id = ri.groceries_item_id
                WHERE ri.recipe_id = ANY($1) AND ri.status = 'active'
@@ -39,7 +52,9 @@ async def fetch_recipe_ingredients_for_ids(pool, recipe_ids: list[str]) -> dict[
         )
     result: dict = {}
     for r in rows:
-        result.setdefault(str(r["recipe_id"]), []).append(
-            {"name": r["name"], "unit": r["unit"], "quantity": r["quantity"]}
-        )
+        result.setdefault(str(r["recipe_id"]), []).append({
+            "name": r["name"], "unit": r["unit"], "quantity": r["quantity"],
+            "is_divisible": r["is_divisible"], "display_override": r["display_override"],
+            "is_accompaniment": r["is_accompaniment"], "is_condiment": r["is_condiment"],
+        })
     return result

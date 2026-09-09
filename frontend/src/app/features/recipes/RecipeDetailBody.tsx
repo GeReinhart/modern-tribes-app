@@ -70,10 +70,7 @@ const RecipeDetailBody: React.FC<Props> = ({
           />
         </div>
       ) : (
-        <div>
-          <h2 style={{ margin: '0 0 4px 0' }}>{recipe.name}</h2>
-          <div>{t('features.recipes.servingsCount', { count: recipe.servings })}</div>
-        </div>
+        <div>{t('features.recipes.servingsCount', { count: recipe.servings })}</div>
       )}
 
       <RecipeMetaSection

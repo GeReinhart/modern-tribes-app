@@ -3,7 +3,9 @@ from datetime import date
 
 from weasyprint import HTML
 
-from app.features.meals.formatting import format_quantity
+from app.features.meals.pdf.ingredient_format import (
+    GROUP_LABELS_FR, GROUP_ORDER, ingredient_display_text, ingredient_group,
+)
 
 _DAY_NAMES_FR = ("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche")
 _SLOT_LABELS_FR = {"morning": "Matin", "midday": "Midi", "evening": "Soir"}
@@ -25,6 +27,7 @@ _DOCUMENT_CSS = (
     "margin-right: 4px; margin-bottom: 6px; color: #ffffff; }"
     ".recipe-columns { display: flex; gap: 8px; }"
     ".recipe-col { flex: 1 1 0; min-width: 0; }"
+    ".ingredient-group-title { font-weight: 700; font-size: 9px; margin: 6px 0 2px; }"
     ".ingredients { margin: 0; padding-left: 14px; font-size: 9px; }"
     ".recipe-body { font-size: 9px; }"
     ".recipe-body img { max-width: 100%; height: auto; }"
@@ -106,12 +109,18 @@ def _render_labels(recipe: dict, label_details: dict) -> str:
     )
 
 
+def _render_ingredient_group(ingredients: list[dict], group_key: str) -> str:
+    items = [i for i in ingredients if ingredient_group(i) == group_key]
+    if not items:
+        return ""
+    title = GROUP_LABELS_FR.get(group_key)
+    title_html = f'<div class="ingredient-group-title">{html.escape(title)}</div>' if title else ""
+    list_items = "".join(f"<li>{html.escape(ingredient_display_text(i))}</li>" for i in items)
+    return f'{title_html}<ul class="ingredients">{list_items}</ul>'
+
+
 def _render_ingredients(ingredients: list[dict]) -> str:
-    items = "".join(
-        f'<li>{format_quantity(i["quantity"])} {html.escape(i["unit"] or "")} {html.escape(i["name"])}</li>'
-        for i in ingredients
-    )
-    return f'<ul class="ingredients">{items}</ul>' if items else ""
+    return "".join(_render_ingredient_group(ingredients, key) for key in GROUP_ORDER)
 
 
 def _render_recipe_card(recipe: dict, ingredients: list[dict], label_details: dict) -> str:

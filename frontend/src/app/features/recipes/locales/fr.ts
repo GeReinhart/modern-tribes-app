@@ -39,6 +39,7 @@ const fr: Record<string, string> = {
   'features.recipes.add': 'Ajouter',
   'features.recipes.create': 'Créer',
   'features.recipes.cancel': 'Annuler',
+  'features.recipes.back': 'Retour',
   'features.recipes.backToList': 'Retour aux recettes',
   'features.recipes.readMode': 'Mode lecture',
   'features.recipes.editRecipe': 'Modifier la recette',

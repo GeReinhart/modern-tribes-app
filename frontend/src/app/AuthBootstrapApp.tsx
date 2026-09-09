@@ -68,7 +68,11 @@ function AuthBootstrapApp() {
       }}
     >
       <ResponsiveProvider>
-        <BrowserRouter>
+        {/* unstable_useTransitions={false}: react-router wraps navigation state updates in
+            React.startTransition() by default, which can silently get dropped (address bar
+            updates, the matched route/content never re-renders) — this opts back into a plain
+            synchronous state update so every navigate()/<Link> click reliably takes effect. */}
+        <BrowserRouter unstable_useTransitions={false}>
           <AuthProvider>
             <AppConfigProvider>
               <UserProfileProvider>

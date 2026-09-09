@@ -39,6 +39,7 @@ const en: Record<string, string> = {
   'features.recipes.add': 'Add',
   'features.recipes.create': 'Create',
   'features.recipes.cancel': 'Cancel',
+  'features.recipes.back': 'Back',
   'features.recipes.backToList': 'Back to recipes',
   'features.recipes.readMode': 'Read mode',
   'features.recipes.editRecipe': 'Edit recipe',

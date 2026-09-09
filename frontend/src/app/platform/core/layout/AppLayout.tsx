@@ -59,8 +59,8 @@ const AppLayoutInner: React.FC<AppLayoutProps> = ({
             style={{
               padding: '4px 12px',
               textAlign: 'center',
-              fontSize: 'var(--font-sm)',
-              fontWeight: 600,
+              fontSize: 'var(--font-lg)',
+              fontWeight: 800,
               color: theme.colors.text,
             }}
           >
