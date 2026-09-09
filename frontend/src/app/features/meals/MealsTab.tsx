@@ -1,12 +1,14 @@
+import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import CreateMealModal from './CreateMealModal.tsx';
 import { useMeals } from './hooks.ts';
+import { useMealsPdfDownload } from './useMealsPdfDownload.ts';
 import { addDaysIso, todayIso } from './mealDateUtils.ts';
 import MealCalendarCard from './MealCalendarCard.tsx';
 import MealDetailModal from './MealDetailModal.tsx';
@@ -32,14 +34,22 @@ const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, projec
   const [selectedDate, setSelectedDate] = useState(todayIso());
   const [creating, setCreating] = useState(false);
   const [openMealId, setOpenMealId] = useState<string | null>(null);
+  const [displayedRange, setDisplayedRange] = useState({ start: todayIso(), end: todayIso() });
+  const handleRangeChange = useCallback((start: string, end: string) => {
+    setDisplayedRange((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
+  }, []);
+  const { download: downloadPdf, downloading: downloadingPdf } =
+    useMealsPdfDownload(featureInstanceId, displayedRange.start, displayedRange.end);
 
-  const tabActions = useMemo(
-    () =>
-      canEdit
-        ? [{ icon: 'plus' as const, label: t('features.meals.newMeal'), onClick: () => setCreating(true) }]
-        : [],
-    [canEdit, t],
-  );
+  const tabActions = useMemo(() => {
+    const actions: MenuAction[] = [
+      { icon: 'download', label: t('features.meals.exportPdf'), onClick: downloadPdf, disabled: downloadingPdf },
+    ];
+    if (canEdit) {
+      actions.push({ icon: 'plus', label: t('features.meals.newMeal'), onClick: () => setCreating(true) });
+    }
+    return actions;
+  }, [canEdit, t, downloadPdf, downloadingPdf]);
   useRegisterTabActions(tabActions);
 
   const openMeal = meals.find((m) => m.id === openMealId) || null;
@@ -69,6 +79,7 @@ const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, projec
         onPrevWeek={() => setSelectedDate(addDaysIso(selectedDate, -7))}
         onNextWeek={() => setSelectedDate(addDaysIso(selectedDate, 7))}
         renderMeal={renderMealCard}
+        onRangeChange={handleRangeChange}
       />
 
       {creating && (

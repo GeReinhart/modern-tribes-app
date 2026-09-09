@@ -29,10 +29,12 @@ const MEAL_SLOT_TIMES: Record<MealSlot, { start: string; end: string }> = {
   [MealSlot.evening]: { start: '20:00', end: '21:00' },
 };
 
-// Buckets a "HH:MM" time of day into the slot it's closest to, so a meal created before this
+// Buckets a meal's start_at into the slot it's closest to, so a meal created before this
 // simplified picker existed (or with a custom time) still lands in a sensible column/selection.
-export function slotFromTime(time: string): MealSlot {
-  const hour = Number(time.slice(0, 2));
+// Reads the LOCAL hour (start_at is stored as a UTC timestamp) so this stays consistent with
+// combineDateAndTime, which builds start_at from a local wall-clock time.
+export function slotFromTime(isoDateTime: string): MealSlot {
+  const hour = new Date(isoDateTime).getHours();
   if (hour < 11) return MealSlot.morning;
   if (hour < 17) return MealSlot.midday;
   return MealSlot.evening;

@@ -53,6 +53,7 @@ const MealCalendarCard: React.FC<Props> = ({ item, recipes, onSelect, onViewReci
                 style={{
                   border: 'none', background: 'none', padding: 0, cursor: 'pointer',
                   font: 'inherit', fontWeight: 800, color: theme.colors.text, textDecoration: 'underline',
+                  userSelect: 'none', position: 'relative', zIndex: 1,
                 }}
               >
                 {recipe.name}

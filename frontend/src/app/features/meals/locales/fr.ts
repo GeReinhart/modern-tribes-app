@@ -1,5 +1,6 @@
 const fr: Record<string, string> = {
   'features.meals.empty': 'Aucun repas planifié pour le moment.',
+  'features.meals.exportPdf': 'Exporter en PDF',
   'features.meals.newMeal': 'Nouveau repas',
   'features.meals.title': 'Titre',
   'features.meals.titlePlaceholder': 'Optionnel',

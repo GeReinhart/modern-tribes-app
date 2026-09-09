@@ -3,6 +3,7 @@ from datetime import date
 from typing import Optional
 
 from app.features.meals import repository as meals_repository
+from app.features.meals.formatting import format_quantity
 from app.platform.core.utils.document_helpers import strip_html
 
 
@@ -11,10 +12,6 @@ def _scale_quantity(quantity: float, headcount: int, servings: int, is_divisible
     if is_divisible:
         return round(scaled, 2)
     return float(math.ceil(scaled - 1e-9))
-
-
-def _format_quantity(quantity: float) -> str:
-    return f"{quantity:g}"
 
 
 def _meal_label(meal: dict) -> str:
@@ -26,7 +23,7 @@ def _meal_label(meal: dict) -> str:
 def _build_item_comment(meal: dict, recipe_name: str, quantity: float, unit: Optional[str]) -> str:
     """The quantity/unit this meal's recipe contributes, plus the meal's own description, so a
     shared groceries item keeps a trace of what it's needed for once merged with others."""
-    qty_part = _format_quantity(quantity)
+    qty_part = format_quantity(quantity)
     if unit:
         qty_part = f"{qty_part} {unit}"
     comment = f"{qty_part} pour {recipe_name} ({_meal_label(meal)})"

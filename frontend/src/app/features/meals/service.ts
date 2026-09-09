@@ -40,6 +40,27 @@ class MealsService {
   async getGrocerySuggestions(groceriesListId: string): Promise<GrocerySuggestion[]> {
     return apiService.get<GrocerySuggestion[]>(`/features/tasks/meals/grocery-suggestions/${groceriesListId}`);
   }
+
+  async downloadPdf(featureInstanceId: string, startDate: string, endDate: string): Promise<Blob> {
+    return apiService.getBlob(
+      `/features/tasks/meals/pdf/${featureInstanceId}?start_date=${startDate}&end_date=${endDate}`,
+    );
+  }
 }
 
 export const mealsService = new MealsService();
+
+export const triggerMealsPdfDownload = async (
+  featureInstanceId: string, startDate: string, endDate: string,
+): Promise<void> => {
+  const blob = await mealsService.downloadPdf(featureInstanceId, startDate, endDate);
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `meals-${startDate}-to-${endDate}.pdf`;
+  link.click();
+  // Also open it for viewing, same as saving a regular file then opening it — delay the
+  // revoke so the just-opened tab has time to actually load the blob before it's freed.
+  window.open(url, '_blank');
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+};

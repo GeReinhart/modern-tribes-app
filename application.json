@@ -992,18 +992,20 @@
         "package": "meals",
         "description": {
           "en": [
-            "- plan meals on a weekly view, one row per day with a morning/midday/evening slot to pick instead of exact times, an optional title, a description and how many people are eating (shown as a short tag, e.g. \"4p.\")",
+            "- plan meals on a weekly view, one row per day with a morning/midday/evening slot to pick instead of exact times, an optional title, a description and how many people are eating (shown as a short tag, e.g. \"4p.\"); the number of days shown can be extended day by day before or after the week",
             "- name which team members are coming, independently of the headcount",
             "- link one or more recipes to a meal to know what's being cooked; recipe names on the weekly view open the recipe directly, and a linked recipe can also be opened in a read-only view from the meal",
             "- when a meal is planned after a scheduled shopping list, its recipes' ingredients appear as suggestions on that list — scaled to the meal's headcount — so nothing gets forgotten",
-            "- add every ingredient of a suggested meal to the list in one click; the meal is remembered as added (with its headcount) and then shows greyed out among the suggestions — while shopping, see which meals this list already accounts for and for how many people"
+            "- add every ingredient of a suggested meal to the list in one click; the meal is remembered as added (with its headcount) and then shows greyed out among the suggestions — while shopping, see which meals this list already accounts for and for how many people",
+            "- export the displayed meals plan as a PDF to print: a table of the plan on the first page, then one page per linked recipe with its ingredients and instructions"
           ],
           "fr": [
-            "- planifiez des repas sur une vue hebdomadaire, une ligne par jour avec un créneau matin/midi/soir à choisir plutôt que des horaires précis, un titre optionnel, une description et le nombre de convives (affiché en abrégé, ex. « 4p. »)",
+            "- planifiez des repas sur une vue hebdomadaire, une ligne par jour avec un créneau matin/midi/soir à choisir plutôt que des horaires précis, un titre optionnel, une description et le nombre de convives (affiché en abrégé, ex. « 4p. ») ; le nombre de jours affichés peut être étendu jour par jour avant ou après la semaine",
             "- indiquez quels membres de l'équipe sont présents, indépendamment du nombre de convives",
             "- reliez une ou plusieurs recettes à un repas pour savoir ce qui est cuisiné ; les noms des recettes sur la vue hebdomadaire ouvrent directement la recette, et une recette liée peut aussi s'ouvrir en lecture depuis le repas",
             "- quand un repas est planifié après une liste de courses programmée, les ingrédients de ses recettes apparaissent en suggestion sur cette liste — proportionnels au nombre de convives — pour ne rien oublier",
-            "- ajoutez en un clic tous les ingrédients d'un repas suggéré à la liste de courses ; le repas est mémorisé comme ajouté (avec le nombre de convives) et apparaît alors grisé dans les suggestions — en mode course, consultez quels repas sont déjà pris en compte dans cette liste et pour combien de personnes"
+            "- ajoutez en un clic tous les ingrédients d'un repas suggéré à la liste de courses ; le repas est mémorisé comme ajouté (avec le nombre de convives) et apparaît alors grisé dans les suggestions — en mode course, consultez quels repas sont déjà pris en compte dans cette liste et pour combien de personnes",
+            "- exportez le planning de repas affiché en PDF pour l'imprimer : un tableau du planning en première page, puis une page par recette liée avec ses ingrédients et sa préparation"
           ]
         },
         "backend": {

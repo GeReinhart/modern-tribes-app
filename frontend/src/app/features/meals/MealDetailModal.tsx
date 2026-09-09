@@ -35,7 +35,7 @@ const MealDetailModal: React.FC<Props> = ({
   const editable = canEdit && mode === 'edit';
 
   const [date, setDate] = useState(meal.start_at.slice(0, 10));
-  const [slot, setSlot] = useState(slotFromTime(meal.start_at.slice(11, 16)));
+  const [slot, setSlot] = useState(slotFromTime(meal.start_at));
   const [headcount, setHeadcount] = useState(String(meal.headcount));
 
   const handleDateChange = (value: string) => {
