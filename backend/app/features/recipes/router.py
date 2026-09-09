@@ -41,6 +41,9 @@ def _row_to_recipe(row: dict) -> RecipeResponse:
         document_content_html=row.get("document_content_html"),
         status=row["status"],
         recipe_state=row["recipe_state"],
+        difficulty=row.get("difficulty"),
+        prep_time_minutes=row.get("prep_time_minutes"),
+        total_time_minutes=row.get("total_time_minutes"),
         label_ids=list(row.get("label_ids") or []),
     )
 
@@ -56,6 +59,7 @@ def _row_to_ingredient_detail(row: dict) -> RecipeIngredientDetail:
         display_override=row.get("display_override"),
         position=row["position"],
         is_accompaniment=row.get("is_accompaniment", False),
+        is_condiment=row.get("is_condiment", False),
     )
 
 
@@ -183,6 +187,12 @@ async def update_recipe(recipe_id: str, data: RecipeUpdate, current_user: dict =
         basic["status"] = data.status
     if data.recipe_state is not None:
         basic["recipe_state"] = data.recipe_state
+    if data.difficulty is not None:
+        basic["difficulty"] = data.difficulty
+    if data.prep_time_minutes is not None:
+        basic["prep_time_minutes"] = data.prep_time_minutes
+    if data.total_time_minutes is not None:
+        basic["total_time_minutes"] = data.total_time_minutes
     await recipes_repository.update_recipe(pool, recipe_id, basic, user_id)
 
     if data.document_content_html is not None:

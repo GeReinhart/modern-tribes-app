@@ -15,7 +15,7 @@ interface Props {
   sections: GroceriesSection[];
   addingSection: boolean;
   onCloseAddingSection: () => void;
-  onCreateSection: (name: string, icon?: string, isFood?: boolean) => Promise<GroceriesSection | null>;
+  onCreateSection: (name: string, icon?: string, isFood?: boolean, isCondiment?: boolean) => Promise<GroceriesSection | null>;
   renamingSection: GroceriesSection | null;
   onCloseRenamingSection: () => void;
   onUpdateSection: (sectionId: string, data: Omit<GroceriesSectionUpdate, 'feature_instance_id'>) => Promise<boolean>;
@@ -62,8 +62,8 @@ const GroceriesCatalogModals: React.FC<Props> = ({
           title={t('features.groceries.addSection')}
           submitLabel={t('features.groceries.create')}
           onClose={onCloseAddingSection}
-          onSubmit={async (name, icon, isFood) => {
-            const created = await onCreateSection(name, icon ?? undefined, isFood);
+          onSubmit={async (name, icon, isFood, isCondiment) => {
+            const created = await onCreateSection(name, icon ?? undefined, isFood, isCondiment);
             if (created) onCloseAddingSection();
           }}
         />
@@ -76,9 +76,12 @@ const GroceriesCatalogModals: React.FC<Props> = ({
           initialName={renamingSection.name}
           initialIcon={renamingSection.icon}
           initialIsFood={renamingSection.is_food}
+          initialIsCondiment={renamingSection.is_condiment}
           onClose={onCloseRenamingSection}
-          onSubmit={async (name, icon, isFood) => {
-            const ok = await onUpdateSection(renamingSection.id, { name, icon: icon ?? undefined, is_food: isFood });
+          onSubmit={async (name, icon, isFood, isCondiment) => {
+            const ok = await onUpdateSection(
+              renamingSection.id, { name, icon: icon ?? undefined, is_food: isFood, is_condiment: isCondiment },
+            );
             if (ok) onCloseRenamingSection();
           }}
         />

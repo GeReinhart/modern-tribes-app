@@ -83,11 +83,13 @@ const AddCatalogItemModal: React.FC<Props> = ({ featureInstanceId, section, onCl
               allowEmpty={false}
               onChange={(v) => setUnit(v as GroceriesUnit)}
             />
-            <ThemedCheckbox
-              label={t('features.groceries.isDivisible')}
-              checked={isDivisible}
-              onChange={setIsDivisible}
-            />
+            {unit !== 'none' && (
+              <ThemedCheckbox
+                label={t('features.groceries.isDivisible')}
+                checked={isDivisible}
+                onChange={setIsDivisible}
+              />
+            )}
             <GroceriesIconPickerField value={icon} onChange={setIcon} />
           </div>
         </ThemedModalBody>

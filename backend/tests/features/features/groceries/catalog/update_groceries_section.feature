@@ -108,6 +108,28 @@ Feature: Rename a groceries section
       | id   | name      | is_food | status |
       | 4001 | Boucherie | false   | active |
 
+  Scenario: PATCH /groceries-sections/4001 with is_condiment true — the section is marked as condiment
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    When I PATCH /api/features/tasks/groceries-sections/4001 with body:
+      """
+      {"feature_instance_id": "0100", "is_condiment": true}
+      """
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "4001",
+        "name": "Boucherie",
+        "is_condiment": true
+      }
+      """
+    And the groceries_sections table contains:
+      | id   | name      | is_condiment | status |
+      | 4001 | Boucherie | true         | active |
+
   @error_case
   Scenario: PATCH /groceries-sections/4001 as a project guest — 403 error and the section is not renamed
     Given I am authenticated as a regular user: user.id 0002

@@ -43,9 +43,10 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
   }, [featureInstanceId]);
 
   const selectedCatalogItem = selection.type === 'catalog' ? catalogItems.find((i) => i.id === selection.id) : undefined;
-  const quantityValue = Number(quantity);
   const isDivisible = selection.type !== 'catalog' || (selectedCatalogItem?.is_divisible ?? true);
   const quantityUnit = selection.type === 'catalog' ? (selectedCatalogItem?.unit ?? null) : selection.type !== 'none' ? customUnit : null;
+  const hasNoQuantity = quantityUnit === 'none';
+  const quantityValue = hasNoQuantity ? 1 : Number(quantity);
   const quantityUnitSuffix = formatUnitSuffix(quantityUnit, t);
   const quantityLabel = quantityUnitSuffix ? `${t('features.recipes.quantity')} ${quantityUnitSuffix}` : t('features.recipes.quantity');
   const isValid =
@@ -136,14 +137,16 @@ const AddIngredientModal: React.FC<Props> = ({ featureInstanceId, onClose, onSub
             )}
             {selection.type !== 'none' && (
               <>
-                <ThemedInput
-                  label={quantityLabel}
-                  type="number"
-                  step={isDivisible ? '0.01' : '1'}
-                  min={isDivisible ? 0.01 : 1}
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                />
+                {!hasNoQuantity && (
+                  <ThemedInput
+                    label={quantityLabel}
+                    type="number"
+                    step={isDivisible ? '0.01' : '1'}
+                    min={isDivisible ? 0.01 : 1}
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                  />
+                )}
                 <ThemedInput
                   label={t('features.recipes.displayOverride')}
                   placeholder={t('features.recipes.displayOverridePlaceholder')}

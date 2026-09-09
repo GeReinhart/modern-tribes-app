@@ -141,14 +141,22 @@ async def fetch_catalog_item(pool, groceries_item_id: str) -> Optional[dict]:
     return dict(row) if row else None
 
 
+_IS_CONDIMENT_SQL = """EXISTS (
+                          SELECT 1 FROM groceries_item_sections gis
+                          JOIN groceries_sections gs ON gs.id = gis.groceries_section_id
+                          WHERE gis.groceries_item_id = ri.groceries_item_id
+                            AND gs.is_condiment = TRUE AND gs.status = 'active'
+                      ) AS is_condiment"""
+
+
 async def fetch_ingredients_detail(pool, recipe_id: str) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            """SELECT ri.id, ri.groceries_item_id,
+            f"""SELECT ri.id, ri.groceries_item_id,
                       COALESCE(gi.name, ri.custom_name) AS name,
                       COALESCE(gi.unit, ri.custom_unit) AS unit,
                       COALESCE(gi.is_divisible, TRUE) AS is_divisible,
-                      ri.quantity, ri.display_override, ri.position, ri.is_accompaniment
+                      ri.quantity, ri.display_override, ri.position, ri.is_accompaniment, {_IS_CONDIMENT_SQL}
                FROM recipe_ingredients ri
                LEFT JOIN groceries_items gi ON gi.id = ri.groceries_item_id
                WHERE ri.recipe_id = $1 AND ri.status = 'active'

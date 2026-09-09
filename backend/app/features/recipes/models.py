@@ -1,6 +1,6 @@
 from typing import Literal, Optional
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 RecipeState = Literal["draft", "completed"]
 
@@ -18,6 +18,9 @@ class RecipeUpdate(BaseModel):
     document_content_html: Optional[str] = None
     status: Optional[str] = None
     recipe_state: Optional[RecipeState] = None
+    difficulty: Optional[int] = Field(default=None, ge=0, le=5)
+    prep_time_minutes: Optional[int] = Field(default=None, ge=0)
+    total_time_minutes: Optional[int] = Field(default=None, ge=0)
 
 
 class RecipeResponse(BaseModel):
@@ -29,6 +32,9 @@ class RecipeResponse(BaseModel):
     document_content_html: Optional[str] = None
     status: str
     recipe_state: RecipeState
+    difficulty: Optional[int] = None
+    prep_time_minutes: Optional[int] = None
+    total_time_minutes: Optional[int] = None
     label_ids: list[str] = []
 
 
@@ -76,6 +82,7 @@ class RecipeIngredientDetail(BaseModel):
     display_override: Optional[str] = None
     position: int
     is_accompaniment: bool = False
+    is_condiment: bool = False
 
 
 class RecipeDetailResponse(RecipeResponse):

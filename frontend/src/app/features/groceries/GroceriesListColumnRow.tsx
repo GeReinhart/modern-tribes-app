@@ -75,7 +75,9 @@ const GroceriesListColumnRow: React.FC<Props> = ({
           <ThemedSvgIcon name={panelOpen ? 'chevron-down' : 'chevron-up'} color={theme.colors.secondary} size={12} />
           {item.icon && <ThemedSvgIcon name={item.icon as IconName} color={theme.colors.text} size={14} />}
           <span>{item.name}</span>
-          <span style={{ color: theme.colors.secondary, fontSize: 'var(--font-xs)' }}>— {quantityLabel}</span>
+          {quantityLabel && (
+            <span style={{ color: theme.colors.secondary, fontSize: 'var(--font-xs)' }}>— {quantityLabel}</span>
+          )}
         </button>
         {canEdit && (
           <button
@@ -101,17 +103,19 @@ const GroceriesListColumnRow: React.FC<Props> = ({
       {panelOpen && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginLeft: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <ThemedQuantityStepper
-              value={item.quantity}
-              isDivisible={item.is_divisible}
-              canEdit={canEdit}
-              onChange={(value) => onUpdateQuantity(item.id, value)}
-              inputRef={inputRef}
-              onPreview={(text) => {
-                const parsed = Number(text);
-                if (!Number.isNaN(parsed)) setPreviewQuantity(parsed);
-              }}
-            />
+            {item.unit !== 'none' && (
+              <ThemedQuantityStepper
+                value={item.quantity}
+                isDivisible={item.is_divisible}
+                canEdit={canEdit}
+                onChange={(value) => onUpdateQuantity(item.id, value)}
+                inputRef={inputRef}
+                onPreview={(text) => {
+                  const parsed = Number(text);
+                  if (!Number.isNaN(parsed)) setPreviewQuantity(parsed);
+                }}
+              />
+            )}
             {canEdit && onManage && (
               <button
                 type="button"

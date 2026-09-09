@@ -70,6 +70,29 @@ Feature: Get a recipe with its ingredients
       }
       """
 
+  Scenario: GET /recipes/6001 with an ingredient in a condiment section — it is flagged as a condiment
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the groceries_sections table contains:
+      | id   | name       | is_condiment | status |
+      | 4001 | Condiments | true         | active |
+    And the groceries_item_sections table contains:
+      | groceries_item_id | groceries_section_id |
+      | 3001               | 4001                  |
+    When I GET /api/features/tasks/recipes/6001
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "ingredients": [
+          {"id": "9001", "name": "Ground beef", "is_condiment": true},
+          {"id": "9002", "name": "Lasagna sheets", "is_condiment": false}
+        ]
+      }
+      """
+
   @error_case
   Scenario: GET /recipes/6001 without project access — 403 error
     Given I am authenticated as a regular user: user.id 0002

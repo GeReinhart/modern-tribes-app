@@ -36,6 +36,11 @@ def test_create_groceries_section_non_food():
     pass
 
 
+@scenario(FEATURE, "POST /groceries-sections/ with is_condiment true — the section is created as a condiment section")
+def test_create_groceries_section_condiment():
+    pass
+
+
 @scenario(FEATURE, "POST /groceries-sections/ as a project guest — 403 error and the catalog is not modified")
 def test_create_groceries_section_guest_forbidden():
     pass

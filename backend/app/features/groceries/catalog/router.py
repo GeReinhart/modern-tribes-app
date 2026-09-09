@@ -41,6 +41,7 @@ def _row_to_section(row: dict) -> GroceriesSectionResponse:
         name=row["name"],
         icon=row.get("icon"),
         is_food=row.get("is_food", True),
+        is_condiment=row.get("is_condiment", False),
         status=row["status"],
         created_at=row["created_at"],
         updated_at=row["updated_at"],
@@ -183,7 +184,7 @@ async def create_groceries_section(data: GroceriesSectionCreate, current_user: d
     pool = get_database()
     await access.require_feature_access(pool, data.feature_instance_id, current_user, "member")
     row = await catalog_repository.insert_section(
-        pool, data.name, data.icon, data.is_food, str(current_user["id"]),
+        pool, data.name, data.icon, data.is_food, data.is_condiment, str(current_user["id"]),
     )
     return _row_to_section(row)
 
@@ -220,7 +221,7 @@ async def update_groceries_section(
     if not section:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Section not found.")
     row = await catalog_repository.update_section(
-        pool, section_id, data.name, data.icon, data.is_food, str(current_user["id"]),
+        pool, section_id, data.name, data.icon, data.is_food, data.is_condiment, str(current_user["id"]),
     )
     return _row_to_section(row)
 

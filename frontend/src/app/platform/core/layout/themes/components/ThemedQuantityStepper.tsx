@@ -1,6 +1,6 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface Props {
   value: number;
@@ -21,10 +21,14 @@ export const ThemedQuantityStepper: React.FC<Props> = ({
 }) => {
   const { theme } = useTheme();
   const [text, setText] = useState(String(value));
+  const isFocused = useRef(false);
   const step = isDivisible ? 0.1 : 1;
 
+  // Ignore server-driven value changes while the user is actively typing, so an unrelated
+  // background refetch (e.g. the recipe being reset to draft on entering edit mode) can't
+  // silently wipe out an in-progress edit before it gets committed on blur.
   useEffect(() => {
-    setText(String(value));
+    if (!isFocused.current) setText(String(value));
   }, [value]);
 
   const handleChange = (next: string) => {
@@ -97,12 +101,14 @@ export const ThemedQuantityStepper: React.FC<Props> = ({
         <input
           ref={inputRef}
           type="number"
+          className="no-number-spinner"
           min="0"
           step={step}
           value={text}
           disabled={!canEdit}
           onChange={(e) => handleChange(e.target.value)}
-          onBlur={commit}
+          onFocus={() => { isFocused.current = true; }}
+          onBlur={() => { isFocused.current = false; commit(); }}
           style={{
             width: '100%',
             padding: '6px 8px',

@@ -14,15 +14,17 @@ async def insert_item(
     return dict(row)
 
 
-async def insert_section(pool, name: str, icon: Optional[str], is_food: bool, user_id: str) -> dict:
+async def insert_section(
+    pool, name: str, icon: Optional[str], is_food: bool, is_condiment: bool, user_id: str,
+) -> dict:
     async with pool.acquire() as conn:
         position = await conn.fetchval(
             "SELECT COALESCE(MAX(position), -1) + 1 FROM groceries_sections",
         )
         row = await conn.fetchrow(
-            """INSERT INTO groceries_sections (name, icon, position, is_food, created_by, updated_by)
-               VALUES ($1, $2, $3, $4, $5, $5) RETURNING *""",
-            name, icon, position, is_food, UUID(user_id),
+            """INSERT INTO groceries_sections (name, icon, position, is_food, is_condiment, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING *""",
+            name, icon, position, is_food, is_condiment, UUID(user_id),
         )
     return dict(row)
 
@@ -168,7 +170,8 @@ async def fetch_section(pool, section_id: str) -> Optional[dict]:
 
 
 async def update_section(
-    pool, section_id: str, name: Optional[str], icon: Optional[str], is_food: Optional[bool], user_id: str,
+    pool, section_id: str, name: Optional[str], icon: Optional[str], is_food: Optional[bool],
+    is_condiment: Optional[bool], user_id: str,
 ) -> dict:
     fields: dict = {"updated_by": UUID(user_id)}
     if name is not None:
@@ -177,6 +180,8 @@ async def update_section(
         fields["icon"] = icon
     if is_food is not None:
         fields["is_food"] = is_food
+    if is_condiment is not None:
+        fields["is_condiment"] = is_condiment
     set_clauses = ", ".join(f"{k} = ${i + 2}" for i, k in enumerate(fields.keys()))
     async with pool.acquire() as conn:
         row = await conn.fetchrow(

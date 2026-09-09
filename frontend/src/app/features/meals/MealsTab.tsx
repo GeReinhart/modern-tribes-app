@@ -3,6 +3,7 @@ import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTab
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 import CreateMealModal from './CreateMealModal.tsx';
 import { useMeals } from './hooks.ts';
@@ -10,7 +11,7 @@ import { addDaysIso, todayIso } from './mealDateUtils.ts';
 import MealCalendarCard from './MealCalendarCard.tsx';
 import MealDetailModal from './MealDetailModal.tsx';
 import MealsWeekGrid from './MealsWeekGrid.tsx';
-import { Meal } from './types.ts';
+import { Meal, RecipeOption } from './types.ts';
 
 interface Props {
   featureInstanceId: string;
@@ -20,11 +21,13 @@ interface Props {
   projectId: string;
 }
 
-const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, projectId }) => {
+const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, projectId }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const { meals, persons, recipes, error, createMeal, updateMeal, archiveMeal, setParticipants, toggleRecipe } =
     useMeals(featureInstanceId, projectId);
+  const viewRecipe = (recipeId: string) => navigate(`/app/tribes/${tribeId}/projects/${projectId}/recipes/${recipeId}/present`);
 
   const [selectedDate, setSelectedDate] = useState(todayIso());
   const [creating, setCreating] = useState(false);
@@ -40,13 +43,14 @@ const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, projectId }) =>
   useRegisterTabActions(tabActions);
 
   const openMeal = meals.find((m) => m.id === openMealId) || null;
-  const recipeNameById = useMemo(() => new Map(recipes.map((r) => [r.id, r.name])), [recipes]);
+  const recipeById = useMemo(() => new Map(recipes.map((r) => [r.id, r])), [recipes]);
 
   const renderMealCard = (meal: Meal) => (
     <MealCalendarCard
       item={meal}
-      recipeNames={meal.recipe_ids.map((id) => recipeNameById.get(id)).filter((n): n is string => !!n)}
+      recipes={meal.recipe_ids.map((id) => recipeById.get(id)).filter((r): r is RecipeOption => !!r)}
       onSelect={() => setOpenMealId(meal.id)}
+      onViewRecipe={viewRecipe}
     />
   );
 
@@ -97,6 +101,7 @@ const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, projectId }) =>
           onUpdate={(data) => updateMeal(openMeal.id, data).then(() => undefined)}
           onSetParticipants={(personIds) => setParticipants(openMeal.id, personIds)}
           onToggleRecipe={(recipeId) => toggleRecipe(openMeal.id, recipeId)}
+          onViewRecipe={viewRecipe}
           onArchive={() => archiveMeal(openMeal.id)}
           onClose={() => setOpenMealId(null)}
         />

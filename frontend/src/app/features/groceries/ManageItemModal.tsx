@@ -96,13 +96,18 @@ const ManageItemModal: React.FC<Props> = ({
             options={unitOptions}
             value={unit}
             allowEmpty={false}
-            onChange={(v) => setUnit(v as GroceriesUnit)}
+            onChange={(v) => {
+              setUnit(v as GroceriesUnit);
+              if (v === 'none') setSuggestedQuantity('');
+            }}
           />
-          <ThemedCheckbox
-            label={t('features.groceries.isDivisible')}
-            checked={isDivisible}
-            onChange={setIsDivisible}
-          />
+          {unit !== 'none' && (
+            <ThemedCheckbox
+              label={t('features.groceries.isDivisible')}
+              checked={isDivisible}
+              onChange={setIsDivisible}
+            />
+          )}
           <ThemedInput
             label={t('features.groceries.renewalDays')}
             helperText={t('features.groceries.renewalDaysHelp')}
@@ -112,16 +117,18 @@ const ManageItemModal: React.FC<Props> = ({
             onChange={(e) => setRenewal(e.target.value)}
             placeholder={t('features.groceries.renewalDaysPlaceholder')}
           />
-          <ThemedInput
-            label={t('features.groceries.suggestedQuantity')}
-            helperText={t('features.groceries.suggestedQuantityHelp')}
-            type="number"
-            min="0"
-            step={isDivisible ? '0.01' : '1'}
-            value={suggestedQuantity}
-            onChange={(e) => setSuggestedQuantity(e.target.value)}
-            placeholder={t('features.groceries.suggestedQuantityPlaceholder')}
-          />
+          {unit !== 'none' && (
+            <ThemedInput
+              label={t('features.groceries.suggestedQuantity')}
+              helperText={t('features.groceries.suggestedQuantityHelp')}
+              type="number"
+              min="0"
+              step={isDivisible ? '0.01' : '1'}
+              value={suggestedQuantity}
+              onChange={(e) => setSuggestedQuantity(e.target.value)}
+              placeholder={t('features.groceries.suggestedQuantityPlaceholder')}
+            />
+          )}
           <GroceriesIconPickerField value={icon} onChange={setIcon} />
           <div>
             <div style={{ fontSize: 'var(--font-sm)', fontWeight: 500, marginBottom: '8px' }}>

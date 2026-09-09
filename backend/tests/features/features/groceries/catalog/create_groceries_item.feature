@@ -88,6 +88,30 @@ Feature: Add a new item to the shared groceries catalog
       | name   | unit  | is_divisible | status |
       | Yogurt | piece | false        | active |
 
+  Scenario: POST /groceries-items/ with unit "none" — the item is created without a display unit
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the groceries_items table contains:
+      | id | name | description | unit | status |
+    When I POST /api/features/tasks/groceries-items/ with body:
+      """
+      {"feature_instance_id": "0100", "name": "Curry powder", "unit": "none"}
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "name": "Curry powder",
+        "unit": "none",
+        "status": "active"
+      }
+      """
+    And the groceries_items table contains:
+      | name         | unit | status |
+      | Curry powder | none | active |
+
   Scenario: POST /groceries-items/ without a description — it defaults to empty
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:

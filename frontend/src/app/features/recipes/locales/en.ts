@@ -35,6 +35,7 @@ const en: Record<string, string> = {
   'features.recipes.isAccompaniment': 'This is an accompaniment',
   'features.recipes.isAccompanimentHelp': "Not part of the recipe itself, but suggested alongside it (e.g. bread with a soup). Added to a groceries list one at a time, not with the recipe's core ingredients.",
   'features.recipes.accompaniments': 'Accompaniments',
+  'features.recipes.condiments': 'Condiments',
   'features.recipes.add': 'Add',
   'features.recipes.create': 'Create',
   'features.recipes.cancel': 'Cancel',
@@ -46,6 +47,20 @@ const en: Record<string, string> = {
   'features.recipes.markCompleted': 'Mark as completed',
   'features.recipes.searchPlaceholder': 'Search a recipe or an ingredient…',
   'features.recipes.ingredientFilterPlaceholder': 'Filter by ingredient',
+  'features.recipes.difficulty.label': 'Difficulty',
+  'features.recipes.difficulty.level0': 'Very easy',
+  'features.recipes.difficulty.level1': 'Easy',
+  'features.recipes.difficulty.level2': 'Moderate',
+  'features.recipes.difficulty.level3': 'Intermediate',
+  'features.recipes.difficulty.level4': 'Hard',
+  'features.recipes.difficulty.level5': 'Very hard',
+  'features.recipes.prepTime': 'Prep time',
+  'features.recipes.totalTime': 'Total time',
+  'features.recipes.prepTimeValue': 'Prep: {{time}}',
+  'features.recipes.totalTimeValue': 'Total: {{time}}',
+  'features.recipes.minutesShort': '{{count}} min',
+  'features.recipes.hoursShort': '{{count}}h',
+  'features.recipes.hoursMinutesShort': '{{hours}}h{{minutes}}',
 };
 
 export default en;

@@ -37,6 +37,11 @@ def test_update_section_is_food():
     pass
 
 
+@scenario(FEATURE, "PATCH /groceries-sections/4001 with is_condiment true — the section is marked as condiment")
+def test_update_section_is_condiment():
+    pass
+
+
 @scenario(FEATURE, "PATCH /groceries-sections/4001 as a project guest — 403 error and the section is not renamed")
 def test_update_section_forbidden():
     pass

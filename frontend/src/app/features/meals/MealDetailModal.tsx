@@ -9,30 +9,25 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CollapsibleField from './CollapsibleField.tsx';
-import { combineDateAndTime } from './mealDateUtils.ts';
+import { combineDateAndSlot, MealSlot, slotFromTime } from './mealDateUtils.ts';
 import MealScheduleFields from './MealScheduleFields.tsx';
-import { Meal, PersonOption, RecipeOption } from './types.ts';
+import { Meal, MealUpdate, PersonOption, RecipeOption } from './types.ts';
 
 interface Props {
   meal: Meal;
   persons: PersonOption[];
   recipes: RecipeOption[];
   canEdit: boolean;
-  onUpdate: (data: {
-    title?: string;
-    start_at?: string;
-    end_at?: string;
-    headcount?: number;
-    document_content_html?: string;
-  }) => Promise<void>;
+  onUpdate: (data: MealUpdate) => Promise<void>;
   onSetParticipants: (personIds: string[]) => Promise<void>;
   onToggleRecipe: (recipeId: string) => Promise<void>;
+  onViewRecipe: (recipeId: string) => void;
   onArchive: () => Promise<void>;
   onClose: () => void;
 }
 
 const MealDetailModal: React.FC<Props> = ({
-  meal, persons, recipes, canEdit, onUpdate, onSetParticipants, onToggleRecipe, onArchive, onClose,
+  meal, persons, recipes, canEdit, onUpdate, onSetParticipants, onToggleRecipe, onViewRecipe, onArchive, onClose,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -40,21 +35,16 @@ const MealDetailModal: React.FC<Props> = ({
   const editable = canEdit && mode === 'edit';
 
   const [date, setDate] = useState(meal.start_at.slice(0, 10));
-  const [startTime, setStartTime] = useState(meal.start_at.slice(11, 16));
-  const [endTime, setEndTime] = useState(meal.end_at.slice(11, 16));
+  const [slot, setSlot] = useState(slotFromTime(meal.start_at.slice(11, 16)));
   const [headcount, setHeadcount] = useState(String(meal.headcount));
 
   const handleDateChange = (value: string) => {
     setDate(value);
-    onUpdate({ start_at: combineDateAndTime(value, startTime), end_at: combineDateAndTime(value, endTime) });
+    onUpdate(combineDateAndSlot(value, slot));
   };
-  const handleStartTimeChange = (value: string) => {
-    setStartTime(value);
-    onUpdate({ start_at: combineDateAndTime(date, value) });
-  };
-  const handleEndTimeChange = (value: string) => {
-    setEndTime(value);
-    onUpdate({ end_at: combineDateAndTime(date, value) });
+  const handleSlotChange = (value: MealSlot) => {
+    setSlot(value);
+    onUpdate(combineDateAndSlot(date, value));
   };
   const handleHeadcountChange = (value: string) => {
     setHeadcount(value);
@@ -76,12 +66,10 @@ const MealDetailModal: React.FC<Props> = ({
               />
               <MealScheduleFields
                 date={date}
-                startTime={startTime}
-                endTime={endTime}
+                slot={slot}
                 headcount={headcount}
                 onDateChange={handleDateChange}
-                onStartTimeChange={handleStartTimeChange}
-                onEndTimeChange={handleEndTimeChange}
+                onSlotChange={handleSlotChange}
                 onHeadcountChange={handleHeadcountChange}
               />
             </>
@@ -129,8 +117,8 @@ const MealDetailModal: React.FC<Props> = ({
                   <button
                     key={recipe.id}
                     type="button"
-                    disabled={!editable}
-                    onClick={() => onToggleRecipe(recipe.id)}
+                    title={editable ? undefined : t('features.recipes.readMode')}
+                    onClick={() => (editable ? onToggleRecipe(recipe.id) : onViewRecipe(recipe.id))}
                     style={{
                       border: `1px solid ${theme.colors.border}`,
                       background: linked ? theme.colors.primary : 'transparent',
@@ -138,7 +126,8 @@ const MealDetailModal: React.FC<Props> = ({
                       borderRadius: '10px',
                       padding: '2px 10px',
                       fontSize: 'var(--font-xs)',
-                      cursor: editable ? 'pointer' : 'default',
+                      cursor: 'pointer',
+                      textDecoration: editable ? 'none' : 'underline',
                     }}
                   >
                     {recipe.name}

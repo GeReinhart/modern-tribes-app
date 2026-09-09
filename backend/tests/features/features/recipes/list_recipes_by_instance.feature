@@ -77,7 +77,7 @@ Feature: List recipes for a feature instance, with search and ingredient filters
     And the response body is:
       """
       [
-        {"id": "6001", "feature_instance_id": "0040", "name": "Lasagna", "servings": 4, "document_id": null, "document_content_html": null, "status": "active", "recipe_state": "draft", "label_ids": []}
+        {"id": "6001", "feature_instance_id": "0040", "name": "Lasagna", "servings": 4, "document_id": null, "document_content_html": null, "status": "active", "recipe_state": "draft", "difficulty": null, "prep_time_minutes": null, "total_time_minutes": null, "label_ids": []}
       ]
       """
 

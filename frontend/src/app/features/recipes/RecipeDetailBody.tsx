@@ -8,13 +8,14 @@ import { useTranslation } from 'react-i18next';
 import AddIngredientModal from './AddIngredientModal.tsx';
 import RecipeIngredientsList from './RecipeIngredientsList.tsx';
 import RecipeLabelsSection from './RecipeLabelsSection.tsx';
-import { RecipeDetail, RecipeIngredientCreate, RecipeIngredientUpdate, RecipeLabel } from './types.ts';
+import RecipeMetaSection from './RecipeMetaSection.tsx';
+import { RecipeDetail, RecipeIngredientCreate, RecipeIngredientUpdate, RecipeLabel, RecipeUpdate } from './types.ts';
 
 interface Props {
   recipe: RecipeDetail;
   labels: RecipeLabel[];
   canEdit: boolean;
-  onUpdate: (data: { name?: string; servings?: number; document_content_html?: string }) => Promise<void>;
+  onUpdate: (data: RecipeUpdate) => Promise<void>;
   onCreateLabel: (name: string, color: string) => Promise<void>;
   onToggleLabel: (labelId: string) => Promise<void>;
   onUpdateLabel: (labelId: string, data: { name?: string; color?: string }) => Promise<void>;
@@ -74,6 +75,14 @@ const RecipeDetailBody: React.FC<Props> = ({
           <div>{t('features.recipes.servingsCount', { count: recipe.servings })}</div>
         </div>
       )}
+
+      <RecipeMetaSection
+        difficulty={recipe.difficulty}
+        prepTimeMinutes={recipe.prep_time_minutes}
+        totalTimeMinutes={recipe.total_time_minutes}
+        canEdit={canEdit}
+        onUpdate={onUpdate}
+      />
 
       <RecipeIngredientsList
         ingredients={recipe.ingredients}

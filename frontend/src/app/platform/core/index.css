@@ -104,6 +104,9 @@
     -webkit-appearance: none;
     margin: 0;
 }
+.no-number-spinner {
+    -moz-appearance: textfield;
+}
 
 /* Guitar song presentation layout: manual page breaks only apply when printing */
 @media print {

@@ -37,6 +37,11 @@ def test_update_item_archive():
     pass
 
 
+@scenario(FEATURE, "PATCH /groceries-items/3001 with unit \"none\" — the item stops showing a quantity/unit")
+def test_update_item_none_unit():
+    pass
+
+
 @scenario(FEATURE, "PATCH /groceries-items/3001 as a project guest — 403 error and the icon is not set")
 def test_update_item_icon_forbidden():
     pass

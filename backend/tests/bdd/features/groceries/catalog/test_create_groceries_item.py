@@ -45,6 +45,11 @@ def test_create_groceries_item_no_description():
     pass
 
 
+@scenario(FEATURE, "POST /groceries-items/ with unit \"none\" — the item is created without a display unit")
+def test_create_groceries_item_none_unit():
+    pass
+
+
 @scenario(FEATURE, "POST /groceries-items/ as a project guest — 403 error and the catalog is not modified")
 def test_create_groceries_item_guest_forbidden():
     pass

@@ -114,6 +114,63 @@ Feature: Update a recipe
       | id   | feature_instance_id | name    | status | recipe_state |
       | 6001 | 0040                | Lasagna | active | draft        |
 
+  Scenario: PATCH /recipes/6001 setting difficulty, prep time and total time — the recipe is updated
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the recipes table contains:
+      | id   | feature_instance_id | name    | servings | status |
+      | 6001 | 0040                | Lasagna | 4        | active |
+    When I PATCH /api/features/tasks/recipes/6001 with body:
+      """
+      {"difficulty": 2, "prep_time_minutes": 20, "total_time_minutes": 75}
+      """
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {"id": "6001", "difficulty": 2, "prep_time_minutes": 20, "total_time_minutes": 75}
+      """
+    And the recipes table contains:
+      | id   | feature_instance_id | name    | difficulty | prep_time_minutes | total_time_minutes | status |
+      | 6001 | 0040                | Lasagna | 2          | 20                 | 75                  | active |
+
+  @error_case
+  Scenario: PATCH /recipes/6001 with an out-of-range difficulty — 422 error and the database is not modified
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the recipes table contains:
+      | id   | feature_instance_id | name    | difficulty | status |
+      | 6001 | 0040                | Lasagna |            | active |
+    When I PATCH /api/features/tasks/recipes/6001 with body:
+      """
+      {"difficulty": 6}
+      """
+    Then the response status code is 422
+    And the recipes table contains:
+      | id   | feature_instance_id | name    | difficulty | status |
+      | 6001 | 0040                | Lasagna |            | active |
+
+  @error_case
+  Scenario: PATCH /recipes/6001 with a negative prep time — 422 error and the database is not modified
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the recipes table contains:
+      | id   | feature_instance_id | name    | prep_time_minutes | status |
+      | 6001 | 0040                | Lasagna |                    | active |
+    When I PATCH /api/features/tasks/recipes/6001 with body:
+      """
+      {"prep_time_minutes": -5}
+      """
+    Then the response status code is 422
+    And the recipes table contains:
+      | id   | feature_instance_id | name    | prep_time_minutes | status |
+      | 6001 | 0040                | Lasagna |                    | active |
+
   @error_case
   Scenario: PATCH /recipes/6001 as a project guest — 403 error and the recipe is not modified
     Given I am authenticated as a regular user: user.id 0002

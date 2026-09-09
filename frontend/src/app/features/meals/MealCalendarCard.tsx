@@ -3,18 +3,19 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Meal } from './types.ts';
+import { Meal, RecipeOption } from './types.ts';
 
 interface Props {
   item: Meal;
-  recipeNames: string[];
+  recipes: RecipeOption[];
   onSelect: () => void;
+  onViewRecipe: (recipeId: string) => void;
 }
 
 // Meals stack per day (see MealsWeekGrid) rather than sitting in an hourly
 // grid, so this card just flows at its natural height — no time range, and
 // no title line at all when there's no title.
-const MealCalendarCard: React.FC<Props> = ({ item, recipeNames, onSelect }) => {
+const MealCalendarCard: React.FC<Props> = ({ item, recipes, onSelect, onViewRecipe }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
@@ -38,13 +39,30 @@ const MealCalendarCard: React.FC<Props> = ({ item, recipeNames, onSelect }) => {
           {item.title}
         </span>
       )}
-      {recipeNames.length > 0 && (
-        <span style={{ fontSize: '13px', fontWeight: 800, color: theme.colors.text, lineHeight: 1.3 }}>
-          {recipeNames.join(', ')}
+      {recipes.length > 0 && (
+        <span style={{ fontSize: '13px', lineHeight: 1.3 }}>
+          {recipes.map((recipe, index) => (
+            <React.Fragment key={recipe.id}>
+              {index > 0 && ', '}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onViewRecipe(recipe.id);
+                }}
+                style={{
+                  border: 'none', background: 'none', padding: 0, cursor: 'pointer',
+                  font: 'inherit', fontWeight: 800, color: theme.colors.text, textDecoration: 'underline',
+                }}
+              >
+                {recipe.name}
+              </button>
+            </React.Fragment>
+          ))}
         </span>
       )}
       <span style={{ fontSize: '11px', color: theme.colors.secondary, fontWeight: 600 }}>
-        {t('features.meals.headcountValue', { count: item.headcount })}
+        {t('features.meals.headcountShort', { count: item.headcount })}
       </span>
     </div>
   );

@@ -1,7 +1,7 @@
 import asyncio
 import json
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from uuid import UUID
 
 import asyncpg
@@ -33,6 +33,24 @@ def _run(coro):
 
 async def _conn():
     return await asyncpg.connect(TEST_DB_DSN, timeout=5)
+
+
+# ── "today" freezing ────────────────────────────────────────────────────────────
+
+@given(parsers.parse("today is {date_str}"))
+def given_today_is(date_str, monkeypatch):
+    """Freezes date.today() as seen by app.features.meals.service, so a scenario relying on
+    "today" (e.g. a groceries list with no scheduled date falling back to today) stays
+    deterministic regardless of the real date the suite happens to run on. Extend the
+    setattr target list here if another module needs its own "today" frozen."""
+    fixed_today = date.fromisoformat(date_str)
+
+    class _FrozenDate(date):
+        @classmethod
+        def today(cls):
+            return fixed_today
+
+    monkeypatch.setattr("app.features.meals.service.date", _FrozenDate)
 
 
 # ── authentication step stubs ──────────────────────────────────────────────────
@@ -734,13 +752,15 @@ def given_groceries_sections_table(datatable):
             for row in datatable[1:]:
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
                 await conn.execute(
-                    """INSERT INTO groceries_sections(id, name, icon, position, status)
-                       VALUES($1, $2, $3, $4, $5)
+                    """INSERT INTO groceries_sections(id, name, icon, position, is_food, is_condiment, status)
+                       VALUES($1, $2, $3, $4, $5, $6, $7)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(rec["id"]),
                     rec.get("name", "Section"),
                     rec.get("icon") or None,
                     int(rec.get("position") or 0),
+                    (rec.get("is_food") or "true").lower() == "true",
+                    (rec.get("is_condiment") or "false").lower() == "true",
                     rec.get("status", "active"),
                 )
         finally:
@@ -2172,9 +2192,13 @@ def given_recipes_table(datatable):
                 if not uid:
                     continue
                 document_id = rec.get("document_id")
+                difficulty = rec.get("difficulty")
+                prep_time_minutes = rec.get("prep_time_minutes")
+                total_time_minutes = rec.get("total_time_minutes")
                 await conn.execute(
-                    """INSERT INTO recipes(id, feature_instance_id, name, servings, document_id, status, recipe_state)
-                       VALUES($1, $2, $3, $4, $5, $6, $7)
+                    """INSERT INTO recipes(id, feature_instance_id, name, servings, document_id, status,
+                                            recipe_state, difficulty, prep_time_minutes, total_time_minutes)
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(uid),
                     UUID(rec["feature_instance_id"]),
@@ -2183,6 +2207,9 @@ def given_recipes_table(datatable):
                     UUID(document_id) if document_id else None,
                     rec.get("status", "active"),
                     rec.get("recipe_state", "draft"),
+                    int(difficulty) if difficulty else None,
+                    int(prep_time_minutes) if prep_time_minutes else None,
+                    int(total_time_minutes) if total_time_minutes else None,
                 )
         finally:
             await conn.close()

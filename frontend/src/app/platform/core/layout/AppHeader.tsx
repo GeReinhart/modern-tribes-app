@@ -7,7 +7,7 @@ import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb.tsx';
+import { BreadcrumbItem, BreadcrumbTab, getPageTitle } from './Breadcrumb.tsx';
 import {predefinedThemes} from "@/app/platform/core/layout/themes/themes.ts";
 
 interface AppHeaderProps {
@@ -167,10 +167,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   };
 
   const hasMenuContent = true;
-  const pageTitle =
-    breadcrumbs && breadcrumbs.length > 0
-      ? breadcrumbs[breadcrumbs.length - 1].label
-      : undefined;
+  const pageTitle = getPageTitle(breadcrumbs);
 
   return (
     <header style={headerStyle}>

@@ -52,6 +52,7 @@ export interface GroceriesSection {
   name: string;
   icon: string | null;
   is_food: boolean;
+  is_condiment: boolean;
   status: string;
 }
 
@@ -60,6 +61,7 @@ export interface GroceriesSectionCreate {
   name: string;
   icon?: string;
   is_food?: boolean;
+  is_condiment?: boolean;
 }
 
 export interface GroceriesSectionUpdate {
@@ -67,6 +69,7 @@ export interface GroceriesSectionUpdate {
   name?: string;
   icon?: string;
   is_food?: boolean;
+  is_condiment?: boolean;
 }
 
 export interface GroceriesList {

@@ -14,24 +14,26 @@ interface Props {
   initialName?: string;
   initialIcon?: string | null;
   initialIsFood?: boolean;
+  initialIsCondiment?: boolean;
   onClose: () => void;
-  onSubmit: (name: string, icon: string | null, isFood: boolean) => Promise<void>;
+  onSubmit: (name: string, icon: string | null, isFood: boolean, isCondiment: boolean) => Promise<void>;
 }
 
 const AddSectionModal: React.FC<Props> = ({
-  title, submitLabel, initialName, initialIcon, initialIsFood, onClose, onSubmit,
+  title, submitLabel, initialName, initialIcon, initialIsFood, initialIsCondiment, onClose, onSubmit,
 }) => {
   const { t } = useTranslation();
   const [name, setName] = useState(initialName ?? '');
   const [icon, setIcon] = useState<string | null>(initialIcon ?? null);
   const [isFood, setIsFood] = useState(initialIsFood ?? true);
+  const [isCondiment, setIsCondiment] = useState(initialIsCondiment ?? false);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
     setSubmitting(true);
-    await onSubmit(name.trim(), icon, isFood);
+    await onSubmit(name.trim(), icon, isFood, isCondiment);
     setSubmitting(false);
   };
 
@@ -53,6 +55,12 @@ const AddSectionModal: React.FC<Props> = ({
               helperText={t('features.groceries.isFoodSectionHelp')}
               checked={isFood}
               onChange={setIsFood}
+            />
+            <ThemedCheckbox
+              label={t('features.groceries.isCondimentSection')}
+              helperText={t('features.groceries.isCondimentSectionHelp')}
+              checked={isCondiment}
+              onChange={setIsCondiment}
             />
           </div>
         </ThemedModalBody>

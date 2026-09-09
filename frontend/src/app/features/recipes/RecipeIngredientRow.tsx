@@ -32,7 +32,8 @@ const RecipeIngredientRow: React.FC<Props> = ({
   if (!canEdit) {
     const quantityLabel = ingredient.display_override
       || formatQuantityUnit(ingredient.quantity, ingredient.unit, ingredient.is_divisible, t);
-    return <li style={{ padding: '2px 0' }}>{`${ingredient.name} — ${quantityLabel}`}</li>;
+    const text = quantityLabel ? `${ingredient.name} — ${quantityLabel}` : ingredient.name;
+    return <li style={{ padding: '2px 0' }}>{text}</li>;
   }
 
   const commitDisplayOverride = () => {
@@ -51,13 +52,15 @@ const RecipeIngredientRow: React.FC<Props> = ({
     >
       <span>{ingredient.name}</span>
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-        <ThemedQuantityStepper
-          value={ingredient.quantity}
-          isDivisible={ingredient.is_divisible}
-          canEdit={canEdit}
-          onChange={(value) => onUpdateIngredient(ingredient.id, { quantity: value })}
-        />
-        {ingredient.unit && ingredient.unit !== 'piece' && (
+        {ingredient.unit !== 'none' && (
+          <ThemedQuantityStepper
+            value={ingredient.quantity}
+            isDivisible={ingredient.is_divisible}
+            canEdit={canEdit}
+            onChange={(value) => onUpdateIngredient(ingredient.id, { quantity: value })}
+          />
+        )}
+        {ingredient.unit && ingredient.unit !== 'piece' && ingredient.unit !== 'none' && (
           <span style={{ color: theme.colors.secondary, fontSize: 'var(--font-xs)' }}>
             {translateUnit(ingredient.unit, t, ingredient.quantity)}
           </span>

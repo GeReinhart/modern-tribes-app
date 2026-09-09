@@ -7,7 +7,7 @@ import React from 'react';
 
 import { AppFooter } from './AppFooter.tsx';
 import { AppHeader } from './AppHeader.tsx';
-import { BreadcrumbItem, BreadcrumbTab } from './Breadcrumb.tsx';
+import { BreadcrumbItem, BreadcrumbTab, getPageTitle } from './Breadcrumb.tsx';
 import { ChromeVisibilityProvider } from './ChromeVisibilityContext.tsx';
 import { ToolbarPlacementProvider } from './ToolbarPlacementContext.tsx';
 
@@ -40,10 +40,11 @@ const AppLayoutInner: React.FC<AppLayoutProps> = ({
     toolbarActions,
   } = useAppLayoutState({ menuActions, tabActions });
   const { layoutStyle, mainStyle, contentStyle } = useAppLayoutStyles(theme);
+  const pageTitle = getPageTitle(breadcrumbs);
 
   return (
     <div style={layoutStyle}>
-      {headerVisible && (
+      {headerVisible ? (
         <AppHeader
           actions={headerActions}
           secondaryActions={secondaryActions}
@@ -52,6 +53,20 @@ const AppLayoutInner: React.FC<AppLayoutProps> = ({
           breadcrumbs={breadcrumbs}
           breadcrumbTabs={breadcrumbTabs}
         />
+      ) : (
+        pageTitle && (
+          <div
+            style={{
+              padding: '4px 12px',
+              textAlign: 'center',
+              fontSize: 'var(--font-sm)',
+              fontWeight: 600,
+              color: theme.colors.text,
+            }}
+          >
+            {pageTitle}
+          </div>
+        )
       )}
       {toolbarPlacement === 'header' && <ToolbarBar actions={toolbarActions} />}
       <main style={mainStyle}>

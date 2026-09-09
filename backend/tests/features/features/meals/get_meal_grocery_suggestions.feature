@@ -210,6 +210,7 @@ Feature: Get grocery suggestions from planned meals
 
   Scenario: GET /meals/grocery-suggestions for a list with no scheduled date — meals planned after today are suggested
     Given I am authenticated as a regular user: user.id 0002
+    And today is 2026-09-04
     And the positions table contains:
       | id   | tribe_id | person_id | position | status |
       | 1001 | 0010     | 0030      | member   | active |

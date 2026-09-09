@@ -88,6 +88,30 @@ Feature: Add a new section to the shared groceries catalog
       | name    | is_food | status |
       | Hygiène | false   | active |
 
+  Scenario: POST /groceries-sections/ with is_condiment true — the section is created as a condiment section
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the groceries_sections table contains:
+      | id | name | is_condiment | status |
+    When I POST /api/features/tasks/groceries-sections/ with body:
+      """
+      {"feature_instance_id": "0100", "name": "Condiments", "is_condiment": true}
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "name": "Condiments",
+        "is_condiment": true,
+        "status": "active"
+      }
+      """
+    And the groceries_sections table contains:
+      | name       | is_condiment | status |
+      | Condiments | true         | active |
+
   @error_case
   Scenario: POST /groceries-sections/ as a project guest — 403 error and the catalog is not modified
     Given I am authenticated as a regular user: user.id 0002

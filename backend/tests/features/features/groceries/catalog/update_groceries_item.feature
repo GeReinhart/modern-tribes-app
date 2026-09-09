@@ -86,6 +86,27 @@ Feature: Set an icon on a groceries item
       | id   | name            | unit  | status |
       | 3001 | Cherry Tomatoes | piece | active |
 
+  Scenario: PATCH /groceries-items/3001 with unit "none" — the item stops showing a quantity/unit
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    When I PATCH /api/features/tasks/groceries-items/3001 with body:
+      """
+      {"feature_instance_id": "0100", "unit": "none"}
+      """
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "id": "3001",
+        "unit": "none"
+      }
+      """
+    And the groceries_items table contains:
+      | id   | unit | status |
+      | 3001 | none | active |
+
   Scenario: PATCH /groceries-items/3001 with status archived — the item is archived
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:

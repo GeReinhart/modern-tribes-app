@@ -35,6 +35,11 @@ def test_get_recipe_success():
     pass
 
 
+@scenario(FEATURE, "GET /recipes/6001 with an ingredient in a condiment section — it is flagged as a condiment")
+def test_get_recipe_condiment_ingredient():
+    pass
+
+
 @scenario(FEATURE, "GET /recipes/6001 without project access — 403 error")
 def test_get_recipe_forbidden():
     pass

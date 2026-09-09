@@ -16,6 +16,10 @@ export interface BreadcrumbTab {
   icon?: string | null;
 }
 
+export function getPageTitle(breadcrumbs?: BreadcrumbItem[]): string | undefined {
+  return breadcrumbs && breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].label : undefined;
+}
+
 interface BreadcrumbProps {
   items: BreadcrumbItem[];
 }

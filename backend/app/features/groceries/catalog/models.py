@@ -3,7 +3,7 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel
 
-GroceriesUnit = Literal["gram", "kg", "piece", "liter"]
+GroceriesUnit = Literal["gram", "kg", "piece", "liter", "none"]
 GroceriesItemStatus = Literal["active", "archived"]
 
 
@@ -56,6 +56,7 @@ class GroceriesSectionCreate(BaseModel):
     name: str
     icon: Optional[str] = None
     is_food: bool = True
+    is_condiment: bool = False
 
 
 class GroceriesSectionUpdate(BaseModel):
@@ -63,6 +64,7 @@ class GroceriesSectionUpdate(BaseModel):
     name: Optional[str] = None
     icon: Optional[str] = None
     is_food: Optional[bool] = None
+    is_condiment: Optional[bool] = None
 
 
 class GroceriesSectionsReorderRequest(BaseModel):
@@ -75,6 +77,7 @@ class GroceriesSectionResponse(BaseModel):
     name: str
     icon: Optional[str] = None
     is_food: bool = True
+    is_condiment: bool = False
     status: str
     created_at: datetime
     updated_at: datetime

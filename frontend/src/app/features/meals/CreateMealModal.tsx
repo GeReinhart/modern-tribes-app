@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CollapsibleField from './CollapsibleField.tsx';
-import { combineDateAndTime } from './mealDateUtils.ts';
+import { combineDateAndSlot, MealSlot } from './mealDateUtils.ts';
 import MealScheduleFields from './MealScheduleFields.tsx';
 import { MealCreate, PersonOption, RecipeOption } from './types.ts';
 
@@ -25,8 +25,7 @@ const CreateMealModal: React.FC<Props> = ({ featureInstanceId, defaultDate, pers
   const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(defaultDate);
-  const [startTime, setStartTime] = useState('19:00');
-  const [endTime, setEndTime] = useState('20:00');
+  const [slot, setSlot] = useState<MealSlot>(MealSlot.evening);
   const [headcount, setHeadcount] = useState('4');
   const [description, setDescription] = useState('');
   const [participantIds, setParticipantIds] = useState<string[]>([]);
@@ -40,12 +39,13 @@ const CreateMealModal: React.FC<Props> = ({ featureInstanceId, defaultDate, pers
     e.preventDefault();
     if (!isValid) return;
     setSubmitting(true);
+    const { start_at, end_at } = combineDateAndSlot(date, slot);
     await onCreate(
       {
         feature_instance_id: featureInstanceId,
         title: title.trim() || undefined,
-        start_at: combineDateAndTime(date, startTime),
-        end_at: combineDateAndTime(date, endTime),
+        start_at,
+        end_at,
         headcount: headcountValue,
         document_content_html: description || undefined,
       },
@@ -69,12 +69,10 @@ const CreateMealModal: React.FC<Props> = ({ featureInstanceId, defaultDate, pers
             />
             <MealScheduleFields
               date={date}
-              startTime={startTime}
-              endTime={endTime}
+              slot={slot}
               headcount={headcount}
               onDateChange={setDate}
-              onStartTimeChange={setStartTime}
-              onEndTimeChange={setEndTime}
+              onSlotChange={setSlot}
               onHeadcountChange={setHeadcount}
             />
             <CollapsibleField label={t('features.meals.description')} defaultExpanded={!!description}>

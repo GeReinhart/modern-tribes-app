@@ -24,7 +24,8 @@ function suggestionKey(s: MealSuggestion): string {
 }
 
 function formatIngredientLabel(ingredient: MealSuggestionIngredient, t: TFunction): string {
-  return `${ingredient.name} — ${formatQuantityUnit(ingredient.quantity, ingredient.unit, true, t)}`;
+  const quantityLabel = formatQuantityUnit(ingredient.quantity, ingredient.unit, true, t);
+  return quantityLabel ? `${ingredient.name} — ${quantityLabel}` : ingredient.name;
 }
 
 const SuggestionIconButton: React.FC<{ onClick: () => void; label: string; icon: 'plus' | 'x'; danger?: boolean }> = ({

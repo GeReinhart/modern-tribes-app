@@ -4,6 +4,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ingredientGroupKey } from './ingredientOrdering.ts';
 import RecipeIngredientRow from './RecipeIngredientRow.tsx';
 import { RecipeIngredient, RecipeIngredientUpdate } from './types.ts';
 
@@ -50,8 +51,9 @@ const IngredientGroup: React.FC<GroupProps> = ({ title, ingredients, canEdit, on
 const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, onMove, onUpdateIngredient, onRemove }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const mainIngredients = ingredients.filter((i) => !i.is_accompaniment);
-  const accompaniments = ingredients.filter((i) => i.is_accompaniment);
+  const mainIngredients = ingredients.filter((i) => ingredientGroupKey(i) === 'main');
+  const accompaniments = ingredients.filter((i) => ingredientGroupKey(i) === 'accompaniment');
+  const condiments = ingredients.filter((i) => ingredientGroupKey(i) === 'condiment');
 
   return (
     <div>
@@ -61,21 +63,37 @@ const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, o
           {t('features.recipes.noIngredients')}
         </div>
       )}
-      <IngredientGroup
-        ingredients={mainIngredients}
-        canEdit={canEdit}
-        onMove={onMove}
-        onUpdateIngredient={onUpdateIngredient}
-        onRemove={onRemove}
-      />
-      <IngredientGroup
-        title={t('features.recipes.accompaniments')}
-        ingredients={accompaniments}
-        canEdit={canEdit}
-        onMove={onMove}
-        onUpdateIngredient={onUpdateIngredient}
-        onRemove={onRemove}
-      />
+      <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+        <div style={{ flex: '2 1 260px', minWidth: '220px' }}>
+          <IngredientGroup
+            ingredients={mainIngredients}
+            canEdit={canEdit}
+            onMove={onMove}
+            onUpdateIngredient={onUpdateIngredient}
+            onRemove={onRemove}
+          />
+          <IngredientGroup
+            title={t('features.recipes.accompaniments')}
+            ingredients={accompaniments}
+            canEdit={canEdit}
+            onMove={onMove}
+            onUpdateIngredient={onUpdateIngredient}
+            onRemove={onRemove}
+          />
+        </div>
+        {condiments.length > 0 && (
+          <div style={{ flex: '1 1 160px', minWidth: '160px' }}>
+            <IngredientGroup
+              title={t('features.recipes.condiments')}
+              ingredients={condiments}
+              canEdit={canEdit}
+              onMove={onMove}
+              onUpdateIngredient={onUpdateIngredient}
+              onRemove={onRemove}
+            />
+          </div>
+        )}
+      </div>
       {canEdit && (
         <button
           type="button"

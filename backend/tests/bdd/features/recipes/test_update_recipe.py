@@ -37,6 +37,23 @@ def test_update_recipe_state_draft():
     pass
 
 
+@scenario(
+    FEATURE, "PATCH /recipes/6001 setting difficulty, prep time and total time — the recipe is updated"
+)
+def test_update_recipe_difficulty_and_time():
+    pass
+
+
+@scenario(FEATURE, "PATCH /recipes/6001 with an out-of-range difficulty — 422 error and the database is not modified")
+def test_update_recipe_difficulty_out_of_range():
+    pass
+
+
+@scenario(FEATURE, "PATCH /recipes/6001 with a negative prep time — 422 error and the database is not modified")
+def test_update_recipe_negative_prep_time():
+    pass
+
+
 @scenario(FEATURE, "PATCH /recipes/6001 as a project guest — 403 error and the recipe is not modified")
 def test_update_recipe_forbidden():
     pass

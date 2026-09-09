@@ -24,6 +24,7 @@ function normalizeWeightForDisplay(quantity: number, unit: string | null): { qua
 }
 
 export function formatQuantityUnit(quantity: number, unit: string | null, isDivisible: boolean, t: TFunction): string {
+  if (unit === 'none') return '';
   const { quantity: displayQuantity, unit: displayUnit } = normalizeWeightForDisplay(quantity, unit);
   const formattedQuantity = isDivisible ? formatDivisibleQuantity(displayQuantity) : String(displayQuantity);
   if (!displayUnit || displayUnit === 'piece') return formattedQuantity;
@@ -32,5 +33,5 @@ export function formatQuantityUnit(quantity: number, unit: string | null, isDivi
 }
 
 export function formatUnitSuffix(unit: string | null, t: TFunction): string {
-  return !unit || unit === 'piece' ? '' : `(${translateUnit(unit, t)})`;
+  return !unit || unit === 'piece' || unit === 'none' ? '' : `(${translateUnit(unit, t)})`;
 }

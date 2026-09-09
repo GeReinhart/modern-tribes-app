@@ -40,6 +40,9 @@ export interface Recipe {
   document_content_html: string | null;
   status: string;
   recipe_state: RecipeState;
+  difficulty: number | null;
+  prep_time_minutes: number | null;
+  total_time_minutes: number | null;
   label_ids: string[];
 }
 
@@ -61,6 +64,9 @@ export interface RecipeUpdate {
   document_content_html?: string;
   status?: 'active' | 'archived';
   recipe_state?: RecipeState;
+  difficulty?: number;
+  prep_time_minutes?: number;
+  total_time_minutes?: number;
 }
 
 export interface RecipeIngredient {
@@ -73,6 +79,7 @@ export interface RecipeIngredient {
   display_override: string | null;
   position: number;
   is_accompaniment: boolean;
+  is_condiment: boolean;
 }
 
 export interface RecipeDetail extends Recipe {

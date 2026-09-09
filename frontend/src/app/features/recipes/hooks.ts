@@ -4,7 +4,7 @@ import { findAdjacentIngredientInGroup } from './ingredientOrdering.ts';
 import { recipesService } from './service.ts';
 import {
   Recipe, RecipeCreate, RecipeDetail, RecipeIngredientCreate, RecipeIngredientUpdate, RecipeLabel, RecipeListFilters,
-  RecipeState,
+  RecipeUpdate,
 } from './types.ts';
 
 function errorMessage(e: unknown): string {
@@ -145,9 +145,7 @@ export function useRecipeDetail(recipeId: string | null) {
     fetchDetail();
   }, [fetchDetail]);
 
-  const update = useCallback(async (
-    data: { name?: string; servings?: number; document_content_html?: string; recipe_state?: RecipeState },
-  ) => {
+  const update = useCallback(async (data: RecipeUpdate) => {
     if (!recipeId) return;
     try {
       await recipesService.update(recipeId, data);

@@ -1,3 +1,5 @@
+import { DIFFICULTY_LEVEL_STYLES } from '@/app/platform/core/layout/themes/components/difficultyLevelStyles.ts';
+import { LevelBadge } from '@/app/platform/core/layout/themes/components/LevelBadge.tsx';
 import { ThemedBadge } from '@/app/platform/core/layout/themes/components/ThemedBadge.tsx';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
@@ -5,6 +7,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { formatDurationMinutes } from './durationFormat.ts';
 import { Recipe, RecipeLabel, RecipeState } from './types.ts';
 
 interface Props {
@@ -28,8 +31,21 @@ const RecipeRow: React.FC<Props> = ({ recipe, labels, onOpen }) => {
               <ThemedBadge variant="secondary">{t('features.recipes.state.draft')}</ThemedBadge>
             )}
           </div>
-          <div style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary }}>
-            {t('features.recipes.servingsCount', { count: recipe.servings })}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary }}>
+              {t('features.recipes.servingsCount', { count: recipe.servings })}
+            </span>
+            {recipe.difficulty != null && (
+              <LevelBadge
+                styles={DIFFICULTY_LEVEL_STYLES} labelKeyPrefix="features.recipes.difficulty.level"
+                value={recipe.difficulty} size="sm"
+              />
+            )}
+            {recipe.total_time_minutes != null && (
+              <span style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary }}>
+                {t('features.recipes.totalTimeValue', { time: formatDurationMinutes(recipe.total_time_minutes, t) })}
+              </span>
+            )}
           </div>
         </div>
         {recipeLabels.length > 0 && (

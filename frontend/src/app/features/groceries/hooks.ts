@@ -293,11 +293,11 @@ export function useGroceriesCatalog(featureInstanceId: string | null) {
   );
 
   const createSection = useCallback(
-    async (name: string, icon?: string, isFood?: boolean): Promise<GroceriesSection | null> => {
+    async (name: string, icon?: string, isFood?: boolean, isCondiment?: boolean): Promise<GroceriesSection | null> => {
       if (!featureInstanceId) return null;
       try {
         const created = await groceriesCatalogService.createSection({
-          feature_instance_id: featureInstanceId, name, icon, is_food: isFood,
+          feature_instance_id: featureInstanceId, name, icon, is_food: isFood, is_condiment: isCondiment,
         });
         setSections((prev) => [...prev, created]);
         return created;
