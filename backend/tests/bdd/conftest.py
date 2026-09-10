@@ -2261,6 +2261,40 @@ def then_recipe_ingredients_table(datatable):
     _assert_db("recipe_ingredients", datatable)
 
 
+@given("the recipe_components table contains:")
+def given_recipe_components_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not uid:
+                    continue
+                await conn.execute(
+                    """INSERT INTO recipe_components(
+                           id, parent_recipe_id, component_recipe_id, multiplier, position, status
+                       )
+                       VALUES($1, $2, $3, $4, $5, $6)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid),
+                    UUID(rec["parent_recipe_id"]),
+                    UUID(rec["component_recipe_id"]),
+                    float(rec.get("multiplier", "1")),
+                    coerce("position", rec.get("position", "0")),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the recipe_components table contains:")
+def then_recipe_components_table(datatable):
+    _assert_db("recipe_components", datatable)
+
+
 @given("the meals table contains:")
 def given_meals_table(datatable):
     async def _insert():

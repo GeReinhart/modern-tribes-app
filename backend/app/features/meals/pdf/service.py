@@ -50,7 +50,11 @@ async def build_meals_pdf(pool, feature_instance_id: str, start_date: date, end_
 
     recipe_ids = sorted({rid for m in meals for rid in m["recipe_ids"]})
     recipes = await pdf_repository.fetch_recipes_detail_for_ids(pool, recipe_ids)
-    ingredients_by_recipe = await pdf_repository.fetch_recipe_ingredients_for_ids(pool, recipe_ids)
+    components_by_recipe = await pdf_repository.fetch_recipe_components_for_ids(pool, recipe_ids)
+    component_recipe_ids = sorted({c["component_recipe_id"] for cs in components_by_recipe.values() for c in cs})
+    ingredients_by_recipe = await pdf_repository.fetch_recipe_ingredients_for_ids(
+        pool, sorted(set(recipe_ids) | set(component_recipe_ids)),
+    )
     label_ids = sorted({lid for r in recipes for lid in r["label_ids"]})
     label_details = await fetch_label_details(pool, label_ids)
 
@@ -60,5 +64,6 @@ async def build_meals_pdf(pool, feature_instance_id: str, start_date: date, end_
         by_cell=by_cell,
         recipes=recipes,
         ingredients_by_recipe=ingredients_by_recipe,
+        components_by_recipe=components_by_recipe,
         label_details=label_details,
     )

@@ -24,10 +24,12 @@ from app.platform.functions.labels.models import (
 from app.features.recipes.models import (
     RecipeCreate, RecipeUpdate, RecipeResponse, RecipeDetailResponse, RecipeIngredientDetail,
     RecipeIngredientCreate, RecipeIngredientUpdate, RecipeIngredientResponse,
+    RecipeComponentCreate, RecipeComponentDetail,
 )
 
 router = APIRouter(prefix="/recipes", tags=["features_recipes"])
 ingredients_router = APIRouter(prefix="/recipe-ingredients", tags=["features_recipes"])
+components_router = APIRouter(prefix="/recipe-components", tags=["features_recipes"])
 label_router = APIRouter(prefix="/recipe-labels", tags=["features_recipes"])
 
 
@@ -82,6 +84,29 @@ async def _require_recipe(pool, recipe_id: str) -> dict:
     if not row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe not found.")
     return row
+
+
+def _row_to_component_detail(row: dict, ingredients: list[dict]) -> RecipeComponentDetail:
+    return RecipeComponentDetail(
+        id=str(row["id"]),
+        parent_recipe_id=str(row["parent_recipe_id"]),
+        component_recipe_id=str(row["component_recipe_id"]),
+        component_recipe_name=row["component_recipe_name"],
+        multiplier=float(row["multiplier"]),
+        position=row["position"],
+        ingredients=[_row_to_ingredient_detail(i) for i in ingredients],
+    )
+
+
+async def _fetch_components_with_ingredients(pool, recipe_id: str) -> list[RecipeComponentDetail]:
+    components = await recipes_repository.fetch_components_detail(pool, recipe_id)
+    details = []
+    for component in components:
+        ingredients = await recipes_repository.fetch_ingredients_detail(pool, str(component["component_recipe_id"]))
+        multiplier = float(component["multiplier"])
+        scaled = [{**i, "quantity": float(i["quantity"]) * multiplier} for i in ingredients]
+        details.append(_row_to_component_detail(component, scaled))
+    return details
 
 
 def _require_divisible_quantity(is_divisible: bool, quantity: float) -> None:
@@ -159,9 +184,11 @@ async def get_recipe(recipe_id: str, current_user: dict = Depends(get_current_us
     row = await _require_recipe(pool, recipe_id)
     await access.require_feature_access(pool, str(row["feature_instance_id"]), current_user, "guest")
     ingredients = await recipes_repository.fetch_ingredients_detail(pool, recipe_id)
+    components = await _fetch_components_with_ingredients(pool, recipe_id)
     return RecipeDetailResponse(
         **_row_to_recipe(row).model_dump(),
         ingredients=[_row_to_ingredient_detail(i) for i in ingredients],
+        components=components,
     )
 
 
@@ -287,6 +314,51 @@ async def delete_ingredient(ingredient_id: str, current_user: dict = Depends(get
     recipe_row = await _require_recipe(pool, str(ingredient_row["recipe_id"]))
     await access.require_feature_access(pool, str(recipe_row["feature_instance_id"]), current_user, "member")
     await recipes_repository.delete_ingredient(pool, ingredient_id)
+
+
+@router.post("/{recipe_id}/components", response_model=RecipeComponentDetail, status_code=status.HTTP_201_CREATED)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def add_component(recipe_id: str, data: RecipeComponentCreate, current_user: dict = Depends(get_current_user)):
+    """Link an existing recipe as a reusable component of this recipe (e.g. a Tarte using a
+    Pâte à Tarte), with its own multiplier.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position >= member
+    """
+    pool = get_database()
+    recipe_row = await _require_recipe(pool, recipe_id)
+    await access.require_feature_access(pool, str(recipe_row["feature_instance_id"]), current_user, "member")
+    if data.component_recipe_id == recipe_id:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="A recipe cannot be its own component.")
+    component_recipe_row = await _require_recipe(pool, data.component_recipe_id)
+    if await recipes_repository.recipe_has_components(pool, data.component_recipe_id):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="A recipe that already has its own components cannot be used as a component.",
+        )
+    row = await recipes_repository.insert_recipe_component(
+        pool, recipe_id, data.component_recipe_id, data.multiplier, str(current_user["id"]),
+    )
+    ingredients = await recipes_repository.fetch_ingredients_detail(pool, data.component_recipe_id)
+    scaled = [{**i, "quantity": float(i["quantity"]) * data.multiplier} for i in ingredients]
+    return _row_to_component_detail({**row, "component_recipe_name": component_recipe_row["name"]}, scaled)
+
+
+@components_router.delete("/{component_id}", status_code=status.HTTP_204_NO_CONTENT)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def delete_component(component_id: str, current_user: dict = Depends(get_current_user)):
+    """Remove a component link from a recipe.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position >= member
+    """
+    pool = get_database()
+    component_row = await recipes_repository.fetch_recipe_component(pool, component_id)
+    if not component_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recipe component not found.")
+    recipe_row = await _require_recipe(pool, str(component_row["parent_recipe_id"]))
+    await access.require_feature_access(pool, str(recipe_row["feature_instance_id"]), current_user, "member")
+    await recipes_repository.delete_recipe_component(pool, component_id)
 
 
 # --- Label endpoints ---

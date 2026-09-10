@@ -5,6 +5,8 @@ import {
   CatalogItemOption,
   CatalogSectionOption,
   Recipe,
+  RecipeComponent,
+  RecipeComponentCreate,
   RecipeCreate,
   RecipeDetail,
   RecipeIngredient,
@@ -30,6 +32,13 @@ class RecipesService {
     return apiService.get<RecipeDetail>(`/features/tasks/recipes/${recipeId}`);
   }
 
+  // Used to pick an existing recipe as a component of another one — any recipe across the
+  // project's recipe books is eligible, not just the current tab's (mirrors how meals picks
+  // recipes to link).
+  async listByProject(projectId: string): Promise<Recipe[]> {
+    return apiService.get<Recipe[]>(`/features/tasks/recipes/by-project/${projectId}`);
+  }
+
   async create(data: RecipeCreate): Promise<Recipe> {
     return apiService.post<Recipe>('/features/tasks/recipes/', data);
   }
@@ -52,6 +61,14 @@ class RecipesService {
 
   async removeIngredient(ingredientId: string): Promise<void> {
     return apiService.delete<void>(`/features/tasks/recipe-ingredients/${ingredientId}`);
+  }
+
+  async addComponent(recipeId: string, data: RecipeComponentCreate): Promise<RecipeComponent> {
+    return apiService.post<RecipeComponent>(`/features/tasks/recipes/${recipeId}/components`, data);
+  }
+
+  async removeComponent(componentId: string): Promise<void> {
+    return apiService.delete<void>(`/features/tasks/recipe-components/${componentId}`);
   }
 
   async listLabels(featureInstanceId: string): Promise<RecipeLabel[]> {

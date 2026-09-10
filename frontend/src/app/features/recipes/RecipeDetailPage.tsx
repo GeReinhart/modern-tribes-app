@@ -29,6 +29,7 @@ const RecipeDetailPageContent: React.FC = () => {
   const { canEdit } = useProjectPermissions(tribeId || null, projectId || null);
   const {
     detail, error, update, addIngredient, moveIngredient, updateIngredient, removeIngredient, toggleLabel,
+    addComponent, removeComponent,
   } = useRecipeDetail(recipeId || null);
   const labelsHook = useRecipeLabels(detail?.feature_instance_id ?? null);
   useDocumentTitle(detail ? `${detail.name} — ${t('common.edit')}` : undefined);
@@ -97,6 +98,7 @@ const RecipeDetailPageContent: React.FC = () => {
           recipe={detail}
           labels={labelsHook.labels}
           canEdit={canEdit}
+          projectId={projectId || ''}
           onUpdate={update}
           onCreateLabel={async (name, color) => {
             await labelsHook.createLabel(name, color);
@@ -109,6 +111,8 @@ const RecipeDetailPageContent: React.FC = () => {
           onMoveIngredient={moveIngredient}
           onUpdateIngredient={updateIngredient}
           onRemoveIngredient={removeIngredient}
+          onAddComponent={addComponent}
+          onRemoveComponent={removeComponent}
         />
       </ThemedSection>
     </AppLayout>

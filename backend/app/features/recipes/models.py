@@ -85,5 +85,21 @@ class RecipeIngredientDetail(BaseModel):
     is_condiment: bool = False
 
 
+class RecipeComponentCreate(BaseModel):
+    component_recipe_id: str
+    multiplier: float = Field(default=1, gt=0)
+
+
+class RecipeComponentDetail(BaseModel):
+    id: str
+    parent_recipe_id: str
+    component_recipe_id: str
+    component_recipe_name: str
+    multiplier: float
+    position: int
+    ingredients: list[RecipeIngredientDetail] = []
+
+
 class RecipeDetailResponse(RecipeResponse):
     ingredients: list[RecipeIngredientDetail] = []
+    components: list[RecipeComponentDetail] = []

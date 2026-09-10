@@ -108,6 +108,7 @@ class DatabaseInitializer:
             "meal_recipes",
             "meal_participants",
             "meals",
+            "recipe_components",
             "recipe_ingredients",
             "recipes",
             "guitar_songs_layout_column_blocks",

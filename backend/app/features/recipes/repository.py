@@ -219,3 +219,55 @@ async def update_ingredient(
 async def delete_ingredient(pool, ingredient_id: str) -> None:
     async with pool.acquire() as conn:
         await conn.execute("DELETE FROM recipe_ingredients WHERE id = $1", UUID(ingredient_id))
+
+
+async def recipe_has_components(pool, recipe_id: str) -> bool:
+    """True if this recipe is itself a parent of one or more components — used to reject
+    linking it as someone else's component, since only one level of nesting is supported."""
+    async with pool.acquire() as conn:
+        return bool(await conn.fetchval(
+            "SELECT EXISTS(SELECT 1 FROM recipe_components WHERE parent_recipe_id = $1 AND status = 'active')",
+            UUID(recipe_id),
+        ))
+
+
+async def insert_recipe_component(
+    pool, parent_recipe_id: str, component_recipe_id: str, multiplier: float, user_id: str,
+) -> dict:
+    async with pool.acquire() as conn:
+        position = await conn.fetchval(
+            "SELECT COALESCE(MAX(position), -1) + 1 FROM recipe_components WHERE parent_recipe_id = $1",
+            UUID(parent_recipe_id),
+        )
+        row = await conn.fetchrow(
+            """INSERT INTO recipe_components
+                   (parent_recipe_id, component_recipe_id, multiplier, position, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $5, $5) RETURNING *""",
+            UUID(parent_recipe_id), UUID(component_recipe_id), multiplier, position, UUID(user_id),
+        )
+    return dict(row)
+
+
+async def fetch_recipe_component(pool, component_id: str) -> Optional[dict]:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("SELECT * FROM recipe_components WHERE id = $1", UUID(component_id))
+    return dict(row) if row else None
+
+
+async def fetch_components_detail(pool, parent_recipe_id: str) -> list[dict]:
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            """SELECT rc.id, rc.parent_recipe_id, rc.component_recipe_id, r.name AS component_recipe_name,
+                      rc.multiplier, rc.position
+               FROM recipe_components rc
+               JOIN recipes r ON r.id = rc.component_recipe_id
+               WHERE rc.parent_recipe_id = $1 AND rc.status = 'active'
+               ORDER BY rc.position ASC""",
+            UUID(parent_recipe_id),
+        )
+    return [dict(r) for r in rows]
+
+
+async def delete_recipe_component(pool, component_id: str) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute("DELETE FROM recipe_components WHERE id = $1", UUID(component_id))

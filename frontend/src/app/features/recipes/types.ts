@@ -82,8 +82,24 @@ export interface RecipeIngredient {
   is_condiment: boolean;
 }
 
+export interface RecipeComponent {
+  id: string;
+  parent_recipe_id: string;
+  component_recipe_id: string;
+  component_recipe_name: string;
+  multiplier: number;
+  position: number;
+  ingredients: RecipeIngredient[];
+}
+
+export interface RecipeComponentCreate {
+  component_recipe_id: string;
+  multiplier: number;
+}
+
 export interface RecipeDetail extends Recipe {
   ingredients: RecipeIngredient[];
+  components: RecipeComponent[];
 }
 
 export interface RecipeIngredientCreate {

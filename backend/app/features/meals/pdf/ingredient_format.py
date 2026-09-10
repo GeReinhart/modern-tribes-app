@@ -1,10 +1,10 @@
 # Ports the read-only ingredient display used by RecipeIngredientRow.tsx / ingredientOrdering.ts
-# (name — quantity+unit, grouped into main/accompaniments/condiments) so the printed PDF matches
+# (name — quantity+unit, grouped into main/condiments/accompaniments) so the printed PDF matches
 # the recipe's actual on-screen presentation instead of a plain flat list.
 
 _GRAMS_PER_KG = 1000
 _COMPACT_UNIT_SYMBOLS = {"gram": "g", "kg": "kg", "liter": "L"}
-GROUP_ORDER = ("main", "accompaniment", "condiment")
+GROUP_ORDER = ("main", "condiment", "accompaniment")
 GROUP_LABELS_FR = {"accompaniment": "Accompagnements", "condiment": "Condiments"}
 
 

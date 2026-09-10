@@ -71,6 +71,7 @@ const RecipePresentationPageContent: React.FC = () => {
           recipe={detail}
           labels={labelsHook.labels}
           canEdit={false}
+          projectId={projectId || ''}
           onUpdate={noop}
           onCreateLabel={noop}
           onToggleLabel={noop}
@@ -81,6 +82,8 @@ const RecipePresentationPageContent: React.FC = () => {
           onMoveIngredient={noop}
           onUpdateIngredient={noop}
           onRemoveIngredient={noop}
+          onAddComponent={async () => false}
+          onRemoveComponent={noop}
         />
       </ThemedSection>
     </AppLayout>

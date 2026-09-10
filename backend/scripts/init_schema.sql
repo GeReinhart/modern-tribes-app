@@ -463,8 +463,30 @@ CREATE TABLE IF NOT EXISTS recipe_ingredients (
 );
 CREATE INDEX IF NOT EXISTS idx_recipe_ingredients_recipe ON recipe_ingredients (recipe_id);
 
+-- A recipe can reuse another existing recipe as a component (e.g. a Tarte using a Pâte à
+-- Tarte), with its own multiplier (migration 022). Only one level of nesting is allowed: a
+-- recipe already used as someone else's component cannot itself have components (enforced
+-- in the service layer, not here).
+CREATE TABLE IF NOT EXISTS recipe_components (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    parent_recipe_id UUID REFERENCES recipes(id) ON DELETE CASCADE NOT NULL,
+    component_recipe_id UUID REFERENCES recipes(id) ON DELETE CASCADE NOT NULL,
+    multiplier NUMERIC(6, 2) NOT NULL DEFAULT 1 CHECK (multiplier > 0),
+    position INTEGER NOT NULL DEFAULT 0,
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT recipe_components_no_self_reference CHECK (parent_recipe_id <> component_recipe_id),
+    UNIQUE (parent_recipe_id, component_recipe_id)
+);
+CREATE INDEX IF NOT EXISTS idx_recipe_components_parent ON recipe_components (parent_recipe_id);
+CREATE INDEX IF NOT EXISTS idx_recipe_components_component ON recipe_components (component_recipe_id);
+
 CREATE OR REPLACE TRIGGER update_recipes_updated_at BEFORE UPDATE ON recipes FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE OR REPLACE TRIGGER update_recipe_ingredients_updated_at BEFORE UPDATE ON recipe_ingredients FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_recipe_components_updated_at BEFORE UPDATE ON recipe_components FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Meals: per-project-tab planning entry linking recipes, a date range and named
 -- participants (migration 008). headcount drives ingredient-quantity scaling

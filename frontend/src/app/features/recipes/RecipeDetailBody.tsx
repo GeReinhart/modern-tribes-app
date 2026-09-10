@@ -6,15 +6,19 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import AddIngredientModal from './AddIngredientModal.tsx';
+import RecipeComponentsSection from './RecipeComponentsSection.tsx';
 import RecipeIngredientsList from './RecipeIngredientsList.tsx';
 import RecipeLabelsSection from './RecipeLabelsSection.tsx';
 import RecipeMetaSection from './RecipeMetaSection.tsx';
-import { RecipeDetail, RecipeIngredientCreate, RecipeIngredientUpdate, RecipeLabel, RecipeUpdate } from './types.ts';
+import {
+  RecipeComponentCreate, RecipeDetail, RecipeIngredientCreate, RecipeIngredientUpdate, RecipeLabel, RecipeUpdate,
+} from './types.ts';
 
 interface Props {
   recipe: RecipeDetail;
   labels: RecipeLabel[];
   canEdit: boolean;
+  projectId: string;
   onUpdate: (data: RecipeUpdate) => Promise<void>;
   onCreateLabel: (name: string, color: string) => Promise<void>;
   onToggleLabel: (labelId: string) => Promise<void>;
@@ -25,12 +29,14 @@ interface Props {
   onMoveIngredient: (ingredientId: string, direction: 'up' | 'down') => Promise<void>;
   onUpdateIngredient: (ingredientId: string, data: RecipeIngredientUpdate) => Promise<void>;
   onRemoveIngredient: (ingredientId: string) => Promise<void>;
+  onAddComponent: (data: RecipeComponentCreate) => Promise<boolean>;
+  onRemoveComponent: (componentId: string) => Promise<void>;
 }
 
 const RecipeDetailBody: React.FC<Props> = ({
-  recipe, labels, canEdit, onUpdate, onCreateLabel, onToggleLabel,
+  recipe, labels, canEdit, projectId, onUpdate, onCreateLabel, onToggleLabel,
   onUpdateLabel, onDeleteLabel, onReorderLabel, onAddIngredient, onMoveIngredient, onUpdateIngredient,
-  onRemoveIngredient,
+  onRemoveIngredient, onAddComponent, onRemoveComponent,
 }) => {
   const { t } = useTranslation();
   const [addingIngredient, setAddingIngredient] = useState(false);
@@ -79,6 +85,15 @@ const RecipeDetailBody: React.FC<Props> = ({
         totalTimeMinutes={recipe.total_time_minutes}
         canEdit={canEdit}
         onUpdate={onUpdate}
+      />
+
+      <RecipeComponentsSection
+        components={recipe.components}
+        canEdit={canEdit}
+        projectId={projectId}
+        currentRecipeId={recipe.id}
+        onAdd={onAddComponent}
+        onRemove={onRemoveComponent}
       />
 
       <RecipeIngredientsList

@@ -3,8 +3,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { findAdjacentIngredientInGroup } from './ingredientOrdering.ts';
 import { recipesService } from './service.ts';
 import {
-  Recipe, RecipeCreate, RecipeDetail, RecipeIngredientCreate, RecipeIngredientUpdate, RecipeLabel, RecipeListFilters,
-  RecipeUpdate,
+  Recipe, RecipeComponentCreate, RecipeCreate, RecipeDetail, RecipeIngredientCreate, RecipeIngredientUpdate,
+  RecipeLabel, RecipeListFilters, RecipeUpdate,
 } from './types.ts';
 
 function errorMessage(e: unknown): string {
@@ -198,6 +198,27 @@ export function useRecipeDetail(recipeId: string | null) {
     }
   }, [detail, fetchDetail]);
 
+  const addComponent = useCallback(async (data: RecipeComponentCreate): Promise<boolean> => {
+    if (!recipeId) return false;
+    try {
+      await recipesService.addComponent(recipeId, data);
+      await fetchDetail();
+      return true;
+    } catch (e: unknown) {
+      setError(errorMessage(e));
+      return false;
+    }
+  }, [recipeId, fetchDetail]);
+
+  const removeComponent = useCallback(async (componentId: string): Promise<void> => {
+    try {
+      await recipesService.removeComponent(componentId);
+      await fetchDetail();
+    } catch (e: unknown) {
+      setError(errorMessage(e));
+    }
+  }, [fetchDetail]);
+
   const toggleLabel = useCallback(async (labelId: string): Promise<void> => {
     if (!recipeId) return;
     try {
@@ -210,6 +231,6 @@ export function useRecipeDetail(recipeId: string | null) {
 
   return {
     detail, error, update, addIngredient, updateIngredient, removeIngredient, moveIngredient, toggleLabel,
-    refetch: fetchDetail,
+    addComponent, removeComponent, refetch: fetchDetail,
   };
 }

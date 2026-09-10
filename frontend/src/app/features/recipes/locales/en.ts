@@ -62,6 +62,14 @@ const en: Record<string, string> = {
   'features.recipes.minutesShort': '{{count}} min',
   'features.recipes.hoursShort': '{{count}}h',
   'features.recipes.hoursMinutesShort': '{{hours}}h{{minutes}}',
+  'features.recipes.components': 'Components',
+  'features.recipes.addComponent': 'Add a component',
+  'features.recipes.removeComponent': 'Remove component',
+  'features.recipes.componentRecipe': 'Recipe',
+  'features.recipes.selectComponentRecipe': 'Select a recipe…',
+  'features.recipes.multiplier': 'Multiplier',
+  'features.recipes.multiplierHelp': 'How many times to use this recipe (e.g. 2 for a double batch).',
+  'features.recipes.componentMultiplier': '×{{multiplier}}',
 };
 
 export default en;
