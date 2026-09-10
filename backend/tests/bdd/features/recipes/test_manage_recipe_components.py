@@ -57,7 +57,11 @@ def test_add_component_forbidden():
     pass
 
 
-@scenario(FEATURE, "GET /recipes/6001 with a component — the component's ingredients are scaled by its multiplier")
+@scenario(
+    FEATURE,
+    "GET /recipes/6001 with a component — the component's ingredients are scaled by its multiplier "
+    "and its own description is included",
+)
 def test_get_recipe_with_component():
     pass
 

@@ -2195,11 +2195,14 @@ def given_recipes_table(datatable):
                 difficulty = rec.get("difficulty")
                 prep_time_minutes = rec.get("prep_time_minutes")
                 total_time_minutes = rec.get("total_time_minutes")
+                # ON CONFLICT DO UPDATE only ever writes document_id here, so a follow-up
+                # declaration of an already-inserted recipe (e.g. to attach a description to a
+                # component recipe seeded in Background) can do so without disturbing other fields.
                 await conn.execute(
                     """INSERT INTO recipes(id, feature_instance_id, name, servings, document_id, status,
                                             recipe_state, difficulty, prep_time_minutes, total_time_minutes)
                        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-                       ON CONFLICT (id) DO NOTHING""",
+                       ON CONFLICT (id) DO UPDATE SET document_id = EXCLUDED.document_id""",
                     UUID(uid),
                     UUID(rec["feature_instance_id"]),
                     rec.get("name", "Recipe"),

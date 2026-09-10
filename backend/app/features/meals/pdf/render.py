@@ -27,10 +27,11 @@ _DOCUMENT_CSS = (
     ".recipe-meta { color: #555555; font-size: 9px; margin-bottom: 6px; }"
     ".label-chip { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 8px; "
     "margin-right: 4px; margin-bottom: 6px; color: #ffffff; }"
-    ".ingredients-columns { column-count: 2; column-gap: 8mm; margin-top: 4px; }"
-    ".ingredient-group { break-inside: avoid; page-break-inside: avoid; }"
-    ".ingredient-group-title { font-weight: 700; font-size: 9px; margin: 6px 0 2px; }"
-    ".ingredients { margin: 0; padding-left: 14px; font-size: 9px; }"
+    ".ingredients-columns { margin-top: 4px; }"
+    ".ingredient-group-title { font-weight: 700; font-size: 9px; margin: 6px 0 2px; break-after: avoid; "
+    "page-break-after: avoid; }"
+    ".ingredients { column-count: 2; column-gap: 8mm; margin: 0; padding-left: 14px; font-size: 9px; }"
+    ".ingredients li { break-inside: avoid; page-break-inside: avoid; }"
     ".recipe-component { margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #cccccc; }"
     ".recipe-component-title { font-weight: 700; font-size: 10px; margin-bottom: 2px; }"
     ".recipe-body { font-size: 9px; margin-top: 6px; }"
@@ -146,10 +147,12 @@ def _render_component_block(component: dict, ingredients_by_recipe: dict) -> str
     multiplier = component["multiplier"]
     multiplier_label = str(int(multiplier)) if multiplier == int(multiplier) else str(multiplier)
     title = f"{component['component_recipe_name']} ×{multiplier_label}"
+    body = component.get("document_content_html") or ""
     return (
         '<div class="recipe-component">'
         f'<div class="recipe-component-title">{html.escape(title)}</div>'
         f'<div class="ingredients-columns">{_render_ingredients(scaled)}</div>'
+        f'<div class="recipe-body">{body}</div>'
         "</div>"
     )
 

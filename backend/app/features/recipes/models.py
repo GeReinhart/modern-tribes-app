@@ -97,6 +97,7 @@ class RecipeComponentDetail(BaseModel):
     component_recipe_name: str
     multiplier: float
     position: int
+    document_content_html: Optional[str] = None
     ingredients: list[RecipeIngredientDetail] = []
 
 

@@ -1,14 +1,14 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import CreateGroceriesListModal from './CreateGroceriesListModal.tsx';
 import GroceriesCatalogColumn from './GroceriesCatalogColumn.tsx';
 import GroceriesListRow from './GroceriesListRow.tsx';
-import { useGroceriesCatalog, useGroceriesLists } from './hooks.ts';
+import { useAutoOpenOngoingList, useGroceriesCatalog, useGroceriesLists } from './hooks.ts';
 
 interface Props {
   featureInstanceId: string;
@@ -22,12 +22,19 @@ const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, pr
   const { t } = useTranslation();
   const { theme } = useTheme();
   const navigate = useNavigate();
-  const { lists, persons, error, createList, toggleFavorite, setArchived } = useGroceriesLists(featureInstanceId);
+  const { lists, persons, error, loaded, createList, toggleFavorite, setArchived } =
+    useGroceriesLists(featureInstanceId);
   const catalog = useGroceriesCatalog(featureInstanceId);
   const [creating, setCreating] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
   const [viewingCatalog, setViewingCatalog] = useState(false);
   const [configuringSections, setConfiguringSections] = useState(false);
+
+  const openList = useCallback(
+    (listId: string) => navigate(`/app/tribes/${tribeId}/projects/${projectId}/groceries/${listId}`, { replace: true }),
+    [navigate, tribeId, projectId],
+  );
+  useAutoOpenOngoingList(lists, loaded, !!error, canEdit, featureInstanceId, createList, openList);
 
   const activeLists = lists.filter((l) => l.status !== 'archived');
   const archivedLists = lists.filter((l) => l.status === 'archived');

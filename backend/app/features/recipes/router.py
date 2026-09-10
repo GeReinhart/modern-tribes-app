@@ -94,6 +94,7 @@ def _row_to_component_detail(row: dict, ingredients: list[dict]) -> RecipeCompon
         component_recipe_name=row["component_recipe_name"],
         multiplier=float(row["multiplier"]),
         position=row["position"],
+        document_content_html=row.get("document_content_html"),
         ingredients=[_row_to_ingredient_detail(i) for i in ingredients],
     )
 
@@ -341,7 +342,11 @@ async def add_component(recipe_id: str, data: RecipeComponentCreate, current_use
     )
     ingredients = await recipes_repository.fetch_ingredients_detail(pool, data.component_recipe_id)
     scaled = [{**i, "quantity": float(i["quantity"]) * data.multiplier} for i in ingredients]
-    return _row_to_component_detail({**row, "component_recipe_name": component_recipe_row["name"]}, scaled)
+    return _row_to_component_detail({
+        **row,
+        "component_recipe_name": component_recipe_row["name"],
+        "document_content_html": component_recipe_row.get("document_content_html"),
+    }, scaled)
 
 
 @components_router.delete("/{component_id}", status_code=status.HTTP_204_NO_CONTENT)

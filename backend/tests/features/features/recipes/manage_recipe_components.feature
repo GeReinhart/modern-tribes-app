@@ -134,11 +134,17 @@ Feature: Compose a recipe from another recipe
     And the recipe_components table contains:
       | parent_recipe_id | component_recipe_id | multiplier | position | status |
 
-  Scenario: GET /recipes/6001 with a component — the component's ingredients are scaled by its multiplier
+  Scenario: GET /recipes/6001 with a component — the component's ingredients are scaled by its multiplier and its own description is included
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:
       | id   | tribe_id | person_id | position | status |
       | 1001 | 0010     | 0030      | member   | active |
+    And the documents table contains:
+      | id   | content_html                 | status |
+      | 0500 | <p>Blind-bake the base.</p> | active |
+    And the recipes table contains:
+      | id   | feature_instance_id | name         | servings | document_id | status |
+      | 6002 | 0040                 | Pâte à Tarte | 6        | 0500        | active |
     And the recipe_ingredients table contains:
       | id   | recipe_id | groceries_item_id | custom_name | custom_unit | quantity | position | status |
       | 9001 | 6001       |                    | Pommes       | kg           | 1.0       | 0        | active |
@@ -161,6 +167,7 @@ Feature: Compose a recipe from another recipe
             "component_recipe_id": "6002",
             "component_recipe_name": "Pâte à Tarte",
             "multiplier": 2.0,
+            "document_content_html": "<p>Blind-bake the base.</p>",
             "ingredients": [
               {"id": "9002", "name": "Farine", "quantity": 600.0}
             ]

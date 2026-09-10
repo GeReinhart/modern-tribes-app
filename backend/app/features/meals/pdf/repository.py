@@ -67,9 +67,11 @@ async def fetch_recipe_components_for_ids(pool, recipe_ids: list[str]) -> dict[s
         return {}
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            """SELECT rc.parent_recipe_id, rc.component_recipe_id, r.name AS component_recipe_name, rc.multiplier
+            """SELECT rc.parent_recipe_id, rc.component_recipe_id, r.name AS component_recipe_name, rc.multiplier,
+                      d.content_html AS document_content_html
                FROM recipe_components rc
                JOIN recipes r ON r.id = rc.component_recipe_id
+               LEFT JOIN documents d ON d.id = r.document_id
                WHERE rc.parent_recipe_id = ANY($1) AND rc.status = 'active'
                ORDER BY rc.parent_recipe_id, rc.position ASC""",
             [UUID(rid) for rid in recipe_ids],
@@ -80,5 +82,6 @@ async def fetch_recipe_components_for_ids(pool, recipe_ids: list[str]) -> dict[s
             "component_recipe_id": str(r["component_recipe_id"]),
             "component_recipe_name": r["component_recipe_name"],
             "multiplier": float(r["multiplier"]),
+            "document_content_html": r["document_content_html"],
         })
     return result

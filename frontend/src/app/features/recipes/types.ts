@@ -89,6 +89,7 @@ export interface RecipeComponent {
   component_recipe_name: string;
   multiplier: number;
   position: number;
+  document_content_html: string | null;
   ingredients: RecipeIngredient[];
 }
 

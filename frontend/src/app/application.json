@@ -606,6 +606,7 @@
           "en": [
             "- keep a shared shopping catalog of items (with a unit, how often you typically restock them, and a suggested quantity that pre-fills when you add it to a list) and reusable aisle sections like \"Butchery\" or \"Produce\", filterable by name and reorderable to match how you walk the aisles when building a list — browse and manage the catalog directly from the tab, without opening a list first; mark a section as a food aisle or not, so only food aisles are offered when picking a recipe's ingredients, and mark a section as condiments so a recipe shows its condiment ingredients set apart",
             "- schedule shopping lists to a date you can change or clear later, or leave undated for now, so they show up in your dashboard planning — a list you didn't get to in time shows as passed, while an undated list never does; rename it (or leave it untitled to show as \"Next shopping\"), archive once it's done, mark a list as a favorite, and start a new list from a favorite's content",
+            "- there's always an ongoing list to shop from: opening the tab takes you straight into it when there's exactly one, and starts a fresh untitled, undated one for you when there isn't any",
             "- check items off as you put them in your cart, and see at a glance what's left to buy",
             "- get suggestions for items you're due to restock, and for ingredients needed by any meal planned after the list's date, shown day by day in date order; adding a suggested ingredient tops up the quantity of a matching item already on your list instead of adding a duplicate line — a recipe's core ingredients are added all at once, while its accompaniments (suggested sides) are added one by one; a meal already added can be removed again (with a confirmation) so it stops being accounted for on this list",
             "- add a note to any item, and add one-off items just for a single list without putting them in the shared catalog"
@@ -613,6 +614,7 @@
           "fr": [
             "- gérez un catalogue d'articles partagé (avec une unité, une fréquence de réapprovisionnement habituelle et une quantité suggérée préremplie lors de l'ajout à une liste) et des rayons réutilisables comme « Boucherie » ou « Fruits & Légumes », filtrables par nom et réordonnables selon l'ordre dans lequel vous parcourez les rayons — parcourez et gérez le catalogue directement depuis l'onglet, sans avoir à ouvrir une liste ; marquez un rayon comme alimentaire ou non, pour ne proposer que les rayons alimentaires lors du choix des ingrédients d'une recette, et marquez un rayon comme condiments pour qu'une recette affiche ses ingrédients condiments à part",
             "- programmez vos listes de courses à une date que vous pouvez changer ou supprimer ensuite, ou laissez-les sans date pour l'instant, pour qu'elles apparaissent dans la planification de votre tableau de bord — une liste que vous n'avez pas traitée à temps apparaît comme passée, une liste sans date jamais ; renommez-la (ou laissez-la sans titre pour qu'elle s'affiche comme « Prochaines courses »), archivez-la une fois terminée, marquez-la comme favorite, et repartez d'une liste favorite pour créer une nouvelle liste",
+            "- il y a toujours une liste en cours pour faire vos courses : ouvrir l'onglet vous y emmène directement s'il n'y en a qu'une, et vous en ouvre une nouvelle sans titre ni date s'il n'y en a aucune",
             "- cochez les articles au fur et à mesure que vous les mettez dans votre panier, et voyez en un coup d'œil ce qu'il reste à acheter",
             "- recevez des suggestions d'articles à racheter, ainsi que des ingrédients nécessaires pour tout repas planifié après la date de la liste, présentées jour par jour et triées par date ; ajouter un ingrédient suggéré augmente la quantité d'un article déjà présent sur votre liste au lieu d'en créer un doublon — les ingrédients principaux d'une recette s'ajoutent tous d'un coup, tandis que ses accompagnements (suggestions à part) s'ajoutent un par un ; un repas déjà ajouté peut être retiré (avec confirmation) pour ne plus être pris en compte dans cette liste",
             "- ajoutez une note à n'importe quel article, et ajoutez des articles ponctuels propres à une seule liste sans les mettre dans le catalogue partagé"
@@ -958,7 +960,8 @@
         "description": {
           "en": [
             "- keep a recipe book in a project tab, each recipe with a title, a base serving count, a difficulty level, a prep time and a total time, and a rich-text description",
-            "- list ingredients from the shared groceries catalog with a quantity, searchable and grouped by food aisle, or add one-off ingredients that aren't in the catalog; mark an ingredient as an accompaniment (a suggested side, not part of the recipe itself) to keep it separate, and reorder ingredients to match how the recipe is written; an ingredient from a condiments aisle shows apart automatically, next to the ingredient list",
+            "- list ingredients from the shared groceries catalog with a quantity, searchable and grouped by food aisle, or add one-off ingredients that aren't in the catalog; mark an ingredient as an accompaniment (a suggested side, not part of the recipe itself) to keep it separate, and reorder ingredients to match how the recipe is written; ingredients are shown in two columns, with condiments and accompaniments each in their own section below the main ingredient list",
+            "- compose a recipe out of another existing recipe (e.g. a Tart reusing a Pie Dough recipe), with how many times to use it; the reused recipe's ingredients and its own description appear in their own labeled section, both on screen and when printed",
             "- tag recipes with labels shared within the tab to organize and filter your recipe book; a configuration mode lets you rename, reorder or archive labels",
             "- opening a recipe for editing marks it as a draft (shown with a badge in the list) automatically, since editing means it's still being worked on; mark it as completed once it's ready, from the edit screen",
             "- search the recipe book by name or by ingredient, filter by a specific ingredient, and filter by draft or completed",
@@ -966,7 +969,8 @@
           ],
           "fr": [
             "- tenez un répertoire de recettes dans un onglet de projet, chaque recette avec un titre, un nombre de portions de base, un niveau de difficulté, un temps de préparation et un temps total, et une description enrichie",
-            "- listez les ingrédients du catalogue de courses partagé avec une quantité, cherchables et regroupés par rayon alimentaire, ou ajoutez des ingrédients ponctuels absents du catalogue ; marquez un ingrédient comme accompagnement (une suggestion à part, qui ne fait pas partie de la recette elle-même) pour le distinguer, et réordonnez les ingrédients selon l'écriture de la recette ; un ingrédient d'un rayon condiments s'affiche automatiquement à part, à côté de la liste d'ingrédients",
+            "- listez les ingrédients du catalogue de courses partagé avec une quantité, cherchables et regroupés par rayon alimentaire, ou ajoutez des ingrédients ponctuels absents du catalogue ; marquez un ingrédient comme accompagnement (une suggestion à part, qui ne fait pas partie de la recette elle-même) pour le distinguer, et réordonnez les ingrédients selon l'écriture de la recette ; les ingrédients s'affichent sur deux colonnes, condiments et accompagnements ayant chacun leur propre section sous la liste principale",
+            "- composez une recette à partir d'une autre recette existante (ex. une Tarte réutilisant une recette de Pâte à Tarte), en précisant combien de fois l'utiliser ; les ingrédients de la recette réutilisée et sa propre description apparaissent dans leur propre section, à l'écran comme à l'impression",
             "- étiquetez les recettes avec des labels partagés dans l'onglet pour organiser et filtrer votre répertoire ; un mode configuration permet de renommer, réordonner ou archiver les labels",
             "- ouvrir une recette en édition la marque automatiquement comme brouillon (affiché avec un badge dans la liste), puisque l'éditer signifie qu'elle est encore en cours ; marquez-la comme terminée une fois prête, depuis l'écran d'édition",
             "- cherchez dans le répertoire par nom ou par ingrédient, filtrez par un ingrédient précis, et filtrez par brouillon ou terminée",
@@ -976,7 +980,8 @@
         "backend": {
           "schema": [
             "recipes",
-            "recipe_ingredients"
+            "recipe_ingredients",
+            "recipe_components"
           ],
           "path": [
             "backend/app/features/recipes/**"
@@ -997,7 +1002,7 @@
             "- link one or more recipes to a meal to know what's being cooked; recipe names on the weekly view open the recipe directly, and a linked recipe can also be opened in a read-only view from the meal",
             "- when a meal is planned after a scheduled shopping list, its recipes' ingredients appear as suggestions on that list — scaled to the meal's headcount — so nothing gets forgotten",
             "- add every ingredient of a suggested meal to the list in one click; the meal is remembered as added (with its headcount) and then shows greyed out among the suggestions — while shopping, see which meals this list already accounts for and for how many people",
-            "- export the displayed meals plan as a PDF to print: a table of the plan on the first page, then one page per linked recipe with its ingredients and instructions"
+            "- export the displayed meals plan as a PDF to print: a table of the plan on the first page (showing each meal's description when there is one), then one page per linked recipe with its ingredients and instructions"
           ],
           "fr": [
             "- planifiez des repas sur une vue hebdomadaire, une ligne par jour avec un créneau matin/midi/soir à choisir plutôt que des horaires précis, un titre optionnel, une description et le nombre de convives (affiché en abrégé, ex. « 4p. ») ; le nombre de jours affichés peut être étendu jour par jour avant ou après la semaine",
@@ -1005,7 +1010,7 @@
             "- reliez une ou plusieurs recettes à un repas pour savoir ce qui est cuisiné ; les noms des recettes sur la vue hebdomadaire ouvrent directement la recette, et une recette liée peut aussi s'ouvrir en lecture depuis le repas",
             "- quand un repas est planifié après une liste de courses programmée, les ingrédients de ses recettes apparaissent en suggestion sur cette liste — proportionnels au nombre de convives — pour ne rien oublier",
             "- ajoutez en un clic tous les ingrédients d'un repas suggéré à la liste de courses ; le repas est mémorisé comme ajouté (avec le nombre de convives) et apparaît alors grisé dans les suggestions — en mode course, consultez quels repas sont déjà pris en compte dans cette liste et pour combien de personnes",
-            "- exportez le planning de repas affiché en PDF pour l'imprimer : un tableau du planning en première page, puis une page par recette liée avec ses ingrédients et sa préparation"
+            "- exportez le planning de repas affiché en PDF pour l'imprimer : un tableau du planning en première page (avec la description du repas quand il y en a une), puis une page par recette liée avec ses ingrédients et sa préparation"
           ]
         },
         "backend": {

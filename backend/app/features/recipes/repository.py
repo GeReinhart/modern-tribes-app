@@ -258,9 +258,10 @@ async def fetch_components_detail(pool, parent_recipe_id: str) -> list[dict]:
     async with pool.acquire() as conn:
         rows = await conn.fetch(
             """SELECT rc.id, rc.parent_recipe_id, rc.component_recipe_id, r.name AS component_recipe_name,
-                      rc.multiplier, rc.position
+                      rc.multiplier, rc.position, d.content_html AS document_content_html
                FROM recipe_components rc
                JOIN recipes r ON r.id = rc.component_recipe_id
+               LEFT JOIN documents d ON d.id = r.document_id
                WHERE rc.parent_recipe_id = $1 AND rc.status = 'active'
                ORDER BY rc.position ASC""",
             UUID(parent_recipe_id),

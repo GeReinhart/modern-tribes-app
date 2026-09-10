@@ -49,6 +49,9 @@ const ComponentBlock: React.FC<{ component: RecipeComponent; canEdit: boolean; o
         <IngredientGroupBlock title={t('features.recipes.condiments')} ingredients={condiments} canEdit={false} />
         <IngredientGroupBlock title={t('features.recipes.accompaniments')} ingredients={accompaniments} canEdit={false} />
       </div>
+      {component.document_content_html && (
+        <div className="prose max-w-none" style={{ marginTop: '8px' }} dangerouslySetInnerHTML={{ __html: component.document_content_html }} />
+      )}
     </div>
   );
 };

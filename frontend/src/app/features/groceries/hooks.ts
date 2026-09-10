@@ -3,6 +3,7 @@ import { usePolling } from '@/app/platform/core/polling/usePolling.ts';
 import { useCallback, useEffect, useState } from 'react';
 
 import { groceriesCatalogService } from './catalogService.ts';
+import { isOngoingList } from './listStatus.ts';
 import { groceriesListsService } from './listsService.ts';
 import {
   AddedMeal,
@@ -31,6 +32,7 @@ export function useGroceriesLists(featureInstanceId: string | null) {
   const [lists, setLists] = useState<GroceriesList[]>([]);
   const [persons, setPersons] = useState<PersonOption[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState(false);
 
   const fetchLists = useCallback(async () => {
     if (!featureInstanceId) return;
@@ -38,6 +40,8 @@ export function useGroceriesLists(featureInstanceId: string | null) {
       setLists(await groceriesListsService.listByInstance(featureInstanceId));
     } catch (e: unknown) {
       setError(errorMessage(e));
+    } finally {
+      setLoaded(true);
     }
   }, [featureInstanceId]);
 
@@ -94,7 +98,36 @@ export function useGroceriesLists(featureInstanceId: string | null) {
     [updateList],
   );
 
-  return { lists, persons, error, createList, toggleFavorite, setArchived, refetch: fetchLists };
+  return { lists, persons, error, loaded, createList, toggleFavorite, setArchived, refetch: fetchLists };
+}
+
+// Ensures there's always exactly one ongoing list to work with: when the Groceries tab loads
+// (once per mount, gated by `loaded` so it never fires on the initial empty/unfetched render)
+// and there's no ongoing list, a new one (no name, no date) is created; when there's exactly
+// one, the user is taken straight into it instead of the tab's list-of-lists view.
+export function useAutoOpenOngoingList(
+  lists: GroceriesList[],
+  loaded: boolean,
+  hasError: boolean,
+  canCreate: boolean,
+  featureInstanceId: string,
+  createList: (data: GroceriesListCreate) => Promise<GroceriesList | null>,
+  onOpen: (listId: string) => void,
+) {
+  const [handled, setHandled] = useState(false);
+
+  useEffect(() => {
+    if (!loaded || handled || hasError) return;
+    setHandled(true);
+    const ongoing = lists.filter(isOngoingList);
+    if (ongoing.length === 1) {
+      onOpen(ongoing[0].id);
+    } else if (ongoing.length === 0 && canCreate) {
+      createList({ feature_instance_id: featureInstanceId }).then((created) => {
+        if (created) onOpen(created.id);
+      });
+    }
+  }, [loaded, handled, hasError, canCreate, lists, createList, featureInstanceId, onOpen]);
 }
 
 export function useGroceriesListDetail(listId: string | null) {
