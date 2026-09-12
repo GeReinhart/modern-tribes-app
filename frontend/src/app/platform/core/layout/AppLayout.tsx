@@ -1,5 +1,6 @@
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 import { ToolbarBar } from '@/app/platform/core/layout/themes/components/ToolbarBar.tsx';
+import { ToolbarConfigModal } from '@/app/platform/core/layout/themes/components/ToolbarConfigModal.tsx';
 import { useAppLayoutState } from '@/app/platform/core/layout/useAppLayoutState.ts';
 import { useAppLayoutStyles } from '@/app/platform/core/layout/useAppLayoutStyles.ts';
 
@@ -37,7 +38,12 @@ const AppLayoutInner: React.FC<AppLayoutProps> = ({
     headerVisible,
     toolbarPlacement,
     mergedTabActions,
-    toolbarActions,
+    toolbarLayout,
+    configurableActions,
+    placementOf,
+    setPlacement,
+    configureModalOpen,
+    closeConfigureModal,
   } = useAppLayoutState({ menuActions, tabActions });
   const { layoutStyle, mainStyle, contentStyle } = useAppLayoutStyles(theme);
   const pageTitle = getPageTitle(breadcrumbs);
@@ -68,13 +74,20 @@ const AppLayoutInner: React.FC<AppLayoutProps> = ({
           </div>
         )
       )}
-      {toolbarPlacement === 'header' && <ToolbarBar actions={toolbarActions} />}
+      {toolbarPlacement === 'header' && <ToolbarBar layout={toolbarLayout} />}
       <main style={mainStyle}>
         <div style={contentStyle}>{children}</div>
       </main>
       <AppFooter
         bookmarkSlot={bookmarkSlot}
-        toolbarActions={toolbarPlacement === 'footer' ? toolbarActions : undefined}
+        toolbarLayout={toolbarPlacement === 'footer' ? toolbarLayout : undefined}
+      />
+      <ToolbarConfigModal
+        isOpen={configureModalOpen}
+        onClose={closeConfigureModal}
+        actions={configurableActions}
+        placementOf={placementOf}
+        onSetPlacement={setPlacement}
       />
     </div>
   );

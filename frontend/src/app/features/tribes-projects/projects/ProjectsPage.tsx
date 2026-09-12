@@ -72,6 +72,7 @@ const ProjectsPageContent: React.FC = () => {
   const menuActions = useMemo(
     (): MenuAction[] => [
       {
+        id: 'projects.backToTribes',
         icon: 'arrow-left',
         label: t('tribes.title'),
         path: '/app/tribes',

@@ -25,6 +25,7 @@ export function useCalendarViewToggle(storageKey: string, t: TranslateFn) {
   }, []);
 
   const toggleAction: MenuAction = useMemo(() => ({
+    id: 'events.toggleCalendarView',
     icon: 'columns', badgeIcon: 'calendar',
     label: viewMode === 'day' ? t('features.events.switchToWeekView') : t('features.events.switchToDayView'),
     onClick: toggleViewMode,

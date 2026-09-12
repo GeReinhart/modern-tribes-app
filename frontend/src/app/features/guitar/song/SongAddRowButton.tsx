@@ -35,7 +35,7 @@ export const SongAddRowButton: React.FC<SongAddRowButtonProps> = ({ rows, hook, 
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '200px' }}>
         <SongBlockTypePicker options={options} onAdd={handleAdd} onAddFreeText={handleAddFreeText} />
-        <ThemedIconButton action={{ icon: 'layout', label: t('guitarSong.layout.addEmptyRow'), onClick: handleAddEmptyRow }} />
+        <ThemedIconButton action={{ id: 'guitar.song.addEmptyRow', icon: 'layout', label: t('guitarSong.layout.addEmptyRow'), onClick: handleAddEmptyRow }} />
       </div>
     </ThemedPopover>
   );

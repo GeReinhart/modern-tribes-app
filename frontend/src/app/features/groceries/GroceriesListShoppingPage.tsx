@@ -9,7 +9,7 @@ import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.ts
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import AddedMealsBanner from './AddedMealsBanner.tsx';
 import GroceriesShoppingSectionGroup from './GroceriesShoppingSectionGroup.tsx';
@@ -21,6 +21,7 @@ const GroceriesListShoppingPageContent: React.FC = () => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
   const { tribeId, projectId, listId } = useParams<{ tribeId: string; projectId: string; listId: string }>();
 
   const { tribe } = useTribeWithPositions(tribeId || null);
@@ -53,10 +54,17 @@ const GroceriesListShoppingPageContent: React.FC = () => {
 
   const menuActions = useMemo(
     () => [
-      { icon: 'arrow-left' as const, label: t('features.groceries.backToList'), path: backPath },
-      ...(canEdit ? [{ icon: 'pencil' as const, label: t('features.groceries.editItems'), path: editPath }] : []),
+      {
+        id: 'groceries.backToList',
+        icon: 'arrow-left' as const,
+        label: t('features.groceries.backToList'),
+        // Passes skipAutoOpen so the tab shows the list-of-lists even when there's a single
+        // ongoing list — otherwise the tab would auto-redirect straight back into this list.
+        onClick: () => navigate(backPath, { state: { skipAutoOpen: true } }),
+      },
+      ...(canEdit ? [{ id: 'groceries.editItems', icon: 'pencil' as const, label: t('features.groceries.editItems'), path: editPath }] : []),
     ],
-    [backPath, editPath, canEdit, t],
+    [backPath, editPath, canEdit, t, navigate],
   );
 
   if (!detail) {

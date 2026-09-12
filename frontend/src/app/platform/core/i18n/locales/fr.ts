@@ -319,6 +319,10 @@ const fr: Record<string, string> = {
   'labels.confirmDelete': 'Supprimer « {{name}} » ?',
   'labels.confirmDeleteInUse': 'Supprimer « {{name}} » ? Utilisé par {{count}} élément(s).',
 
+  'layout.toolbarConfigure': 'Configurer la barre d\'outils',
+  'layout.toolbarConfigureDirect': 'Directe',
+  'layout.toolbarConfigureInMenu': 'Dans le menu',
+
   'theme.selectTheme': 'Thème',
 
   'calendar.allDay': 'Toute la journée',

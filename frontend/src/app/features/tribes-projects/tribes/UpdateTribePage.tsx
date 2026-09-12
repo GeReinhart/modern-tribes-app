@@ -133,6 +133,7 @@ const UpdateTribePageContent: React.FC = () => {
   const menuActions = useMemo(
     (): MenuAction[] => [
       {
+        id: 'tribe.cancelUpdate',
         icon: 'x',
         badgeIcon: 'users',
         label: t('common.cancel'),

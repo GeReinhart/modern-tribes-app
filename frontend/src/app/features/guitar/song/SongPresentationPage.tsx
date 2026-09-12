@@ -74,26 +74,30 @@ const SongPresentationPageContent: React.FC = () => {
 
   const menuActions = useMemo(
     () => [
-      { icon: 'search' as const, label: t('guitarSong.detail.backToList'), path: songListPath },
+      { id: 'guitar.song.backToList', icon: 'search' as const, label: t('guitarSong.detail.backToList'), path: songListPath },
       ...(isCompleted
-        ? (canEdit ? [{ icon: 'pencil' as const, label: t('guitarSong.detail.backToDraft'), onClick: handleBackToDraft }] : [])
-        : [{ icon: 'arrow-left' as const, label: t('guitarSong.layout.backToSong'), path: songPath }]),
-      { icon: 'printer' as const, label: t('guitarSong.layout.pageSettingsLabel'), onClick: () => setPageSettingsModalOpen(true) },
+        ? (canEdit ? [{ id: 'guitar.song.backToDraft', icon: 'pencil' as const, label: t('guitarSong.detail.backToDraft'), onClick: handleBackToDraft }] : [])
+        : [{ id: 'guitar.song.backToSong', icon: 'arrow-left' as const, label: t('guitarSong.layout.backToSong'), path: songPath }]),
+      { id: 'guitar.song.pageSettings', icon: 'printer' as const, label: t('guitarSong.layout.pageSettingsLabel'), onClick: () => setPageSettingsModalOpen(true) },
       {
+        id: 'guitar.song.learningTools',
         icon: 'headphones' as const, label: t('guitarSong.learningTools.title'), onClick: () => setLearningToolsOpen(true),
       },
       ...(canEdit
         ? [{
+            id: 'guitar.song.manageLabels',
             icon: 'tag' as const, label: t('guitarSong.labels.manageLabels'),
             onClick: () => setLabelsModalOpen(true),
           }]
         : []),
       {
+        id: 'guitar.song.toggleStructureOutlines',
         icon: 'grid' as const,
         label: showOutlines ? t('guitarSong.layout.hideStructureOutlines') : t('guitarSong.layout.showStructureOutlines'),
         onClick: () => setShowOutlines(!showOutlines),
       },
       {
+        id: 'guitar.song.downloadPdf',
         icon: 'download' as const, label: t('guitarSong.layout.downloadPdf'), onClick: downloadPdf,
         disabled: downloadingPdf,
       },

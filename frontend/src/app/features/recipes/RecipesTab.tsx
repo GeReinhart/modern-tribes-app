@@ -50,8 +50,9 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
     () =>
       canEdit
         ? [
-            { icon: 'plus' as const, label: t('features.recipes.newRecipe'), onClick: () => setCreating(true) },
+            { id: 'recipes.new', icon: 'plus' as const, label: t('features.recipes.newRecipe'), onClick: () => setCreating(true) },
             {
+              id: 'recipes.configureLabels',
               icon: 'settings' as const,
               badgeIcon: 'tag' as const,
               label: configuringLabels

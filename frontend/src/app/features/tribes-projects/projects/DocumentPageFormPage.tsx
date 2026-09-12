@@ -133,6 +133,7 @@ const DocumentPageFormPageContent: React.FC = () => {
   const menuActions = useMemo(
     (): MenuAction[] => [
       {
+        id: 'documentPage.cancel',
         icon: 'x',
         badgeIcon: 'file-text',
         label: t('common.cancel'),

@@ -217,6 +217,7 @@ const ShowTribePageContent: React.FC = () => {
   const menuActions = useMemo(
     (): MenuAction[] => [
       {
+        id: 'tribe.configureTabs',
         icon: tabEditMode ? ('x' as const) : ('settings' as const),
         label: tabEditMode ? t('tabConfig.finishConfigure') : t('tabConfig.configure'),
         onClick: toggleTabEditMode,
@@ -224,6 +225,7 @@ const ShowTribePageContent: React.FC = () => {
       ...(searchHighlight
         ? [
             {
+              id: 'tribe.removeSearchHighlight',
               icon: 'x' as const,
               badgeIcon: 'search' as const,
               label: t('search.removeHighlight'),
@@ -238,6 +240,7 @@ const ShowTribePageContent: React.FC = () => {
       ...(isManager
         ? [
             {
+              id: 'tribe.newProject',
               icon: 'plus' as const,
               badgeIcon: 'briefcase' as const,
               label: t('common.project'),
@@ -248,6 +251,7 @@ const ShowTribePageContent: React.FC = () => {
       ...(isManager && activeTab === 'projects'
         ? [
             {
+              id: 'tribe.reorderProjects',
               icon: 'chevrons-up' as const,
               label: reorderingProjects ? t('projects.finishReorderProjects') : t('projects.reorderProjects'),
               onClick: () => setReorderingProjects((v) => !v),
@@ -257,18 +261,21 @@ const ShowTribePageContent: React.FC = () => {
       ...(authorization?.authorized
         ? [
             {
+              id: 'tribe.theme',
               icon: 'palette' as const,
               badgeIcon: 'users' as const,
               label: t('tribes.title'),
               onClick: () => setShowThemePicker(true),
             },
             {
+              id: 'tribe.edit',
               icon: 'pencil' as const,
               badgeIcon: 'users' as const,
               label: t('common.edit'),
               path: `/app/tribes/${tribeId}/update`,
             },
             {
+              id: 'tribe.archive',
               icon: 'archive' as const,
               badgeIcon: 'users' as const,
               label: t('tribes.archive'),

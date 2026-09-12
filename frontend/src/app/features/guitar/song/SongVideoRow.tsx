@@ -41,13 +41,13 @@ export const SongVideoRow: React.FC<SongVideoRowProps> = ({
       {canManage && (
         <div style={{ display: 'flex', gap: '2px' }}>
           <ThemedIconButton
-            action={{ icon: 'chevron-up', label: t('guitarSong.detail.moveUp'), onClick: () => onMove('prev'), disabled: isFirst }}
+            action={{ id: 'guitar.song.videoMoveUp', icon: 'chevron-up', label: t('guitarSong.detail.moveUp'), onClick: () => onMove('prev'), disabled: isFirst }}
           />
           <ThemedIconButton
-            action={{ icon: 'chevron-down', label: t('guitarSong.detail.moveDown'), onClick: () => onMove('next'), disabled: isLast }}
+            action={{ id: 'guitar.song.videoMoveDown', icon: 'chevron-down', label: t('guitarSong.detail.moveDown'), onClick: () => onMove('next'), disabled: isLast }}
           />
           <ThemedIconButton
-            action={{ icon: 'trash', label: t('guitarSong.videos.remove'), onClick: onRemove, variant: 'danger' }}
+            action={{ id: 'guitar.song.videoRemove', icon: 'trash', label: t('guitarSong.videos.remove'), onClick: onRemove, variant: 'danger' }}
           />
         </div>
       )}

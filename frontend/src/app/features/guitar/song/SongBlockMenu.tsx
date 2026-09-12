@@ -52,9 +52,9 @@ export const SongBlockMenu: React.FC<SongBlockMenuProps> = ({
   };
 
   const actions: MenuAction[] = [
-    { icon: 'pencil', label: t('guitarSong.layout.editBlock'), onClick: onEdit },
-    ...(onCopy ? [{ icon: 'copy' as const, label: t('guitarSong.layout.copyBlock'), onClick: onCopy }] : []),
-    { icon: 'trash', label: t('guitarSong.layout.removeBlock'), onClick: () => setConfirmRemoveOpen(true), variant: 'danger' },
+    { id: 'guitar.song.editBlock', icon: 'pencil', label: t('guitarSong.layout.editBlock'), onClick: onEdit },
+    ...(onCopy ? [{ id: 'guitar.song.copyBlock', icon: 'copy' as const, label: t('guitarSong.layout.copyBlock'), onClick: onCopy }] : []),
+    { id: 'guitar.song.removeBlock', icon: 'trash', label: t('guitarSong.layout.removeBlock'), onClick: () => setConfirmRemoveOpen(true), variant: 'danger' },
   ];
 
   return (

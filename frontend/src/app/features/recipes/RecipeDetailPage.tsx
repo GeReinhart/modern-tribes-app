@@ -70,10 +70,10 @@ const RecipeDetailPageContent: React.FC = () => {
 
   const menuActions = useMemo(
     () => [
-      { icon: 'search' as const, label: t('features.recipes.backToList'), path: listPath },
-      { icon: 'eye' as const, label: t('features.recipes.readMode'), path: presentPath },
+      { id: 'recipes.backToList', icon: 'search' as const, label: t('features.recipes.backToList'), path: listPath },
+      { id: 'recipes.readMode', icon: 'eye' as const, label: t('features.recipes.readMode'), path: presentPath },
       ...(canEdit
-        ? [{ icon: 'check-circle' as const, label: t('features.recipes.markCompleted'), onClick: handleMarkCompleted }]
+        ? [{ id: 'recipes.markCompleted', icon: 'check-circle' as const, label: t('features.recipes.markCompleted'), onClick: handleMarkCompleted }]
         : []),
     ],
     [listPath, presentPath, canEdit, t],

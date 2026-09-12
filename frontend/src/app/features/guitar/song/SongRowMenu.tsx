@@ -59,17 +59,17 @@ export const SongRowMenu: React.FC<SongRowMenuProps> = ({ rows, row, hook, onOpe
             <>
               <SongBlockTypePicker options={columnOptions} onAdd={handleAddColumn} onAddFreeText={handleAddColumnFreeText} />
               <ThemedIconButton
-                action={{ icon: 'layout', label: t('guitarSong.layout.addEmptyColumn'), onClick: handleAddEmptyColumn }}
+                action={{ id: 'guitar.song.addEmptyColumn', icon: 'layout', label: t('guitarSong.layout.addEmptyColumn'), onClick: handleAddEmptyColumn }}
               />
             </>
           ) : (
             <ThemedText size="small">{t('guitarSong.layout.noRoomForNewColumn')}</ThemedText>
           )}
           <div style={{ backgroundColor: row.page_break_before ? `${theme.colors.primary}25` : 'transparent', borderRadius: 'var(--radius-md)' }}>
-            <ThemedIconButton action={{ icon: 'flag', label: t('guitarSong.layout.pageBreakBefore'), onClick: handleTogglePageBreak }} />
+            <ThemedIconButton action={{ id: 'guitar.song.togglePageBreak', icon: 'flag', label: t('guitarSong.layout.pageBreakBefore'), onClick: handleTogglePageBreak }} />
           </div>
           <ThemedIconButton
-            action={{ icon: 'trash', label: t('guitarSong.layout.removeRow'), onClick: () => setConfirmRemoveOpen(true), variant: 'danger' }}
+            action={{ id: 'guitar.song.removeRow', icon: 'trash', label: t('guitarSong.layout.removeRow'), onClick: () => setConfirmRemoveOpen(true), variant: 'danger' }}
           />
         </div>
       </ThemedPopover>

@@ -55,11 +55,11 @@ export const SongBlockTypePicker: React.FC<SongBlockTypePickerProps> = ({
               placeholder={t('guitarSong.layout.addElementPlaceholder')}
             />
           </div>
-          <ThemedIconButton action={{ icon: 'plus', label: t('guitarSong.layout.addElementConfirm'), onClick: handleAdd, disabled: !pending }} />
+          <ThemedIconButton action={{ id: 'guitar.song.addElementConfirm', icon: 'plus', label: t('guitarSong.layout.addElementConfirm'), onClick: handleAdd, disabled: !pending }} />
         </div>
       )}
       {!freeTextInDropdown && (
-        <ThemedIconButton action={{ icon: 'file-text', label: freeTextChoiceLabel, onClick: onAddFreeText }} />
+        <ThemedIconButton action={{ id: 'guitar.song.addFreeTextBlock', icon: 'file-text', label: freeTextChoiceLabel, onClick: onAddFreeText }} />
       )}
     </>
   );

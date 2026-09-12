@@ -33,6 +33,7 @@ export const SongChordPickerCard: React.FC<SongChordPickerCardProps> = ({
       </div>
       <ThemedIconButton
         action={{
+          id: 'guitar.song.chordPickerAdd',
           icon: 'plus',
           label: t('guitarSong.picker.add'),
           onClick: onAdd,

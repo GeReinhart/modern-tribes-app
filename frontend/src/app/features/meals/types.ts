@@ -6,6 +6,7 @@ export interface PersonOption {
 export interface RecipeOption {
   id: string;
   name: string;
+  difficulty: number | null;
 }
 
 export interface MealParticipantInfo {

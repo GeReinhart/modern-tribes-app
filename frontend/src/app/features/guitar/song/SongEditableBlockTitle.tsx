@@ -52,7 +52,7 @@ export const SongEditableBlockTitle: React.FC<SongEditableBlockTitleProps> = ({ 
       />
       {editValue && (
         <ThemedIconButton
-          action={{ icon: 'x', label: t('guitarSong.layout.removeBlockTitle'), onClick: () => onSave(''), variant: 'danger' }}
+          action={{ id: 'guitar.song.removeBlockTitle', icon: 'x', label: t('guitarSong.layout.removeBlockTitle'), onClick: () => onSave(''), variant: 'danger' }}
         />
       )}
     </div>

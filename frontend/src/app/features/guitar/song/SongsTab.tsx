@@ -68,6 +68,7 @@ const SongsTab: React.FC<Props> = ({ canEdit }) => {
   const tabActions = useMemo(
     () => (canEdit
       ? [{
+          id: 'guitar.songs.new',
           icon: 'plus' as const, label: t('guitarSong.list.add'),
           onClick: () => navigate(`/app/tribes/${tribeId}/projects/${projectId}/songs/new`),
         }]

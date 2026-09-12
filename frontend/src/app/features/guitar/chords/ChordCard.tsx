@@ -28,9 +28,9 @@ export const ChordCard: React.FC<ChordCardProps> = ({ chord, onEdit, onDelete })
           </div>
         </div>
         <div style={{ display: 'flex', gap: '4px' }}>
-          <ThemedIconButton action={{ icon: 'pencil', label: t('common.edit'), onClick: onEdit }} />
+          <ThemedIconButton action={{ id: 'guitar.chords.edit', icon: 'pencil', label: t('common.edit'), onClick: onEdit }} />
           <ThemedIconButton
-            action={{ icon: 'trash', label: t('common.delete'), onClick: onDelete, variant: 'danger' }}
+            action={{ id: 'guitar.chords.delete', icon: 'trash', label: t('common.delete'), onClick: onDelete, variant: 'danger' }}
           />
         </div>
       </div>

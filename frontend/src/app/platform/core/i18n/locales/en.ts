@@ -312,6 +312,10 @@ const en: Record<string, string> = {
   'labels.confirmDelete': 'Delete "{{name}}"?',
   'labels.confirmDeleteInUse': 'Delete "{{name}}"? Used by {{count}} item(s).',
 
+  'layout.toolbarConfigure': 'Configure toolbar',
+  'layout.toolbarConfigureDirect': 'Direct',
+  'layout.toolbarConfigureInMenu': 'In menu',
+
   'theme.selectTheme': 'Theme',
 
   'calendar.allDay': 'All day',

@@ -50,13 +50,13 @@ export const SongChordRow: React.FC<SongChordRowProps> = ({
       {canManage && (
         <div style={{ display: 'flex', gap: '2px' }}>
           <ThemedIconButton
-            action={{ icon: 'chevron-up', label: t('guitarSong.detail.moveUp'), onClick: onMoveUp, disabled: isFirst }}
+            action={{ id: 'guitar.song.chordRowMoveUp', icon: 'chevron-up', label: t('guitarSong.detail.moveUp'), onClick: onMoveUp, disabled: isFirst }}
           />
           <ThemedIconButton
-            action={{ icon: 'chevron-down', label: t('guitarSong.detail.moveDown'), onClick: onMoveDown, disabled: isLast }}
+            action={{ id: 'guitar.song.chordRowMoveDown', icon: 'chevron-down', label: t('guitarSong.detail.moveDown'), onClick: onMoveDown, disabled: isLast }}
           />
           <ThemedIconButton
-            action={{ icon: 'trash', label: t('guitarSong.detail.removeChord'), onClick: onRemove, variant: 'danger' }}
+            action={{ id: 'guitar.song.chordRowRemove', icon: 'trash', label: t('guitarSong.detail.removeChord'), onClick: onRemove, variant: 'danger' }}
           />
         </div>
       )}

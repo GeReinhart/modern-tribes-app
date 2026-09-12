@@ -55,6 +55,7 @@ export const ProjectDocumentsTab: React.FC<ProjectDocumentsTabProps> = ({
       canEdit
         ? [
             {
+              id: 'projectDocuments.add',
               icon: 'plus' as const,
               badgeIcon: 'file-text' as const,
               label: t('projectDocuments.addDocument'),

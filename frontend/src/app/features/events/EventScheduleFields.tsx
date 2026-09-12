@@ -73,6 +73,7 @@ const EventScheduleFields: React.FC<Props> = ({
             disabled={!canEdit}
             label={t('features.events.from')}
             dateFormat="EEEE dd/MM/yyyy"
+            required
           />
           <ThemedDateSelection
             value={endAt.slice(0, 10)}
@@ -81,6 +82,7 @@ const EventScheduleFields: React.FC<Props> = ({
             label={t('features.events.to')}
             dateFormat="EEEE dd/MM/yyyy"
             minDate={startAt.slice(0, 10)}
+            required
           />
         </div>
       </div>
@@ -100,6 +102,7 @@ const EventScheduleFields: React.FC<Props> = ({
               disabled={!canEdit}
               label={t('features.events.from')}
               dateFormat="EEEE dd/MM/yyyy"
+              required
             />
             <ThemedTimeSelection
               value={startAt.slice(11, 16)}
@@ -115,6 +118,7 @@ const EventScheduleFields: React.FC<Props> = ({
               label={t('features.events.to')}
               dateFormat="EEEE dd/MM/yyyy"
               minDate={startAt.slice(0, 10)}
+              required
             />
             <ThemedTimeSelection
               value={endAt.slice(11, 16)}
@@ -146,6 +150,7 @@ const EventScheduleFields: React.FC<Props> = ({
           disabled={!canEdit}
           dateFormat="EEEE dd/MM/yyyy"
           width="190px"
+          required
         />
       </div>
       {checkboxRow}

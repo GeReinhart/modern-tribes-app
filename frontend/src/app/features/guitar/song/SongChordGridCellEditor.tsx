@@ -56,7 +56,7 @@ export const SongChordGridCellEditor: React.FC<SongChordGridCellEditorProps> = (
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <ThemedText size="small">{t('guitarSong.chordGrid.editCell')}</ThemedText>
-        <ThemedIconButton action={{ icon: 'x', label: t('common.close'), onClick: onClose }} />
+        <ThemedIconButton action={{ id: 'guitar.song.closeChordGridCellEditor', icon: 'x', label: t('common.close'), onClick: onClose }} />
       </div>
       <div>
         <SongChordGridBorderPicker cell={cell} onToggle={(side) => onSave({ ...cell, [side]: !cell[side] })}>
@@ -65,6 +65,7 @@ export const SongChordGridCellEditor: React.FC<SongChordGridCellEditorProps> = (
               <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
                 <ThemedIconButton
                   action={{
+                    id: `guitar.song.chordGridItemMoveLeft.${index}`,
                     icon: 'arrow-left', label: t('guitarSong.chordGrid.moveItemLeft'), disabled: index === 0,
                     onClick: () => onSave(moveChordGridCellItem(cell, index, 'prev')),
                   }}
@@ -74,6 +75,7 @@ export const SongChordGridCellEditor: React.FC<SongChordGridCellEditorProps> = (
                 </span>
                 <ThemedIconButton
                   action={{
+                    id: `guitar.song.chordGridItemMoveRight.${index}`,
                     icon: 'arrow-right', label: t('guitarSong.chordGrid.moveItemRight'),
                     disabled: index === cell.items.length - 1,
                     onClick: () => onSave(moveChordGridCellItem(cell, index, 'next')),
@@ -81,6 +83,7 @@ export const SongChordGridCellEditor: React.FC<SongChordGridCellEditorProps> = (
                 />
                 <ThemedIconButton
                   action={{
+                    id: `guitar.song.chordGridItemRemove.${index}`,
                     icon: 'x', label: t('guitarSong.chordGrid.removeItem'), variant: 'danger',
                     onClick: () => onSave(removeChordGridCellItem(cell, index)),
                   }}
@@ -97,7 +100,7 @@ export const SongChordGridCellEditor: React.FC<SongChordGridCellEditorProps> = (
             placeholder={t('guitarSong.chordGrid.addTextPlaceholder')}
           />
         </div>
-        <ThemedIconButton action={{ icon: 'plus', label: t('guitarSong.chordGrid.addText'), onClick: handleAddText }} />
+        <ThemedIconButton action={{ id: 'guitar.song.chordGridAddText', icon: 'plus', label: t('guitarSong.chordGrid.addText'), onClick: handleAddText }} />
       </div>
       {canAddChord ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>

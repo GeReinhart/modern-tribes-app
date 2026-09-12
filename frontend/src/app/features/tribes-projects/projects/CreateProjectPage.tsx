@@ -169,6 +169,7 @@ const CreateProjectPageContent: React.FC = () => {
   const menuActions = useMemo(
     (): MenuAction[] => [
       {
+        id: 'project.cancelCreate',
         icon: 'x',
         badgeIcon: 'briefcase',
         label: t('common.cancel'),

@@ -57,12 +57,12 @@ export const SongChordBadge: React.FC<SongChordBadgeProps> = ({
       <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
         {onMoveUp && (
           <ThemedIconButton
-            action={{ icon: 'chevron-up', label: t('guitarSong.detail.moveUp'), onClick: onMoveUp, disabled: isFirst }}
+            action={{ id: 'guitar.song.chordMoveUp', icon: 'chevron-up', label: t('guitarSong.detail.moveUp'), onClick: onMoveUp, disabled: isFirst }}
           />
         )}
         {onMoveDown && (
           <ThemedIconButton
-            action={{ icon: 'chevron-down', label: t('guitarSong.detail.moveDown'), onClick: onMoveDown, disabled: isLast }}
+            action={{ id: 'guitar.song.chordMoveDown', icon: 'chevron-down', label: t('guitarSong.detail.moveDown'), onClick: onMoveDown, disabled: isLast }}
           />
         )}
         <button

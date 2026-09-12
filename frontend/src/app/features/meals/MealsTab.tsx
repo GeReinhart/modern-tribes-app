@@ -12,8 +12,13 @@ import { useMealsPdfDownload } from './useMealsPdfDownload.ts';
 import { addDaysIso, todayIso } from './mealDateUtils.ts';
 import MealCalendarCard from './MealCalendarCard.tsx';
 import MealDetailModal from './MealDetailModal.tsx';
+import MealDifficultyFilter from './MealDifficultyFilter.tsx';
 import MealsWeekGrid from './MealsWeekGrid.tsx';
 import { Meal, RecipeOption } from './types.ts';
+
+function toggleInArray<T>(list: T[], value: T): T[] {
+  return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
+}
 
 interface Props {
   featureInstanceId: string;
@@ -35,6 +40,7 @@ const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, projec
   const [creating, setCreating] = useState(false);
   const [openMealId, setOpenMealId] = useState<string | null>(null);
   const [displayedRange, setDisplayedRange] = useState({ start: todayIso(), end: todayIso() });
+  const [selectedDifficulties, setSelectedDifficulties] = useState<number[]>([]);
   const handleRangeChange = useCallback((start: string, end: string) => {
     setDisplayedRange((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
   }, []);
@@ -43,10 +49,10 @@ const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, projec
 
   const tabActions = useMemo(() => {
     const actions: MenuAction[] = [
-      { icon: 'download', label: t('features.meals.exportPdf'), onClick: downloadPdf, disabled: downloadingPdf },
+      { id: 'meals.exportPdf', icon: 'download', label: t('features.meals.exportPdf'), onClick: downloadPdf, disabled: downloadingPdf },
     ];
     if (canEdit) {
-      actions.push({ icon: 'plus', label: t('features.meals.newMeal'), onClick: () => setCreating(true) });
+      actions.push({ id: 'meals.new', icon: 'plus', label: t('features.meals.newMeal'), onClick: () => setCreating(true) });
     }
     return actions;
   }, [canEdit, t, downloadPdf, downloadingPdf]);
@@ -54,6 +60,14 @@ const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, projec
 
   const openMeal = meals.find((m) => m.id === openMealId) || null;
   const recipeById = useMemo(() => new Map(recipes.map((r) => [r.id, r])), [recipes]);
+
+  const visibleMeals = useMemo(() => {
+    if (selectedDifficulties.length === 0) return meals;
+    return meals.filter((meal) => meal.recipe_ids.some((id) => {
+      const difficulty = recipeById.get(id)?.difficulty;
+      return difficulty != null && selectedDifficulties.includes(difficulty);
+    }));
+  }, [meals, recipeById, selectedDifficulties]);
 
   const renderMealCard = (meal: Meal) => (
     <MealCalendarCard
@@ -72,8 +86,16 @@ const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, projec
         </div>
       )}
 
+      <div style={{ marginBottom: '12px' }}>
+        <MealDifficultyFilter
+          selectedDifficulties={selectedDifficulties}
+          onToggle={(value) => setSelectedDifficulties((prev) => toggleInArray(prev, value))}
+          onClear={() => setSelectedDifficulties([])}
+        />
+      </div>
+
       <MealsWeekGrid
-        meals={meals}
+        meals={visibleMeals}
         selectedDate={selectedDate}
         onSelectDate={setSelectedDate}
         onPrevWeek={() => setSelectedDate(addDaysIso(selectedDate, -7))}

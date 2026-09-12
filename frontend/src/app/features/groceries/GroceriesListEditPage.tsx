@@ -8,7 +8,7 @@ import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.ts
 
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import EditListModal from './EditListModal.tsx';
 import GroceriesCatalogColumn from './GroceriesCatalogColumn.tsx';
@@ -20,6 +20,7 @@ import MealSuggestionsPanel from './MealSuggestionsPanel.tsx';
 const GroceriesListEditPageContent: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
   const { tribeId, projectId, listId } = useParams<{ tribeId: string; projectId: string; listId: string }>();
 
   const { tribe } = useTribeWithPositions(tribeId || null);
@@ -78,16 +79,25 @@ const GroceriesListEditPageContent: React.FC = () => {
 
   const menuActions = useMemo(
     () => [
-      { icon: 'arrow-left' as const, label: t('features.groceries.backToList'), path: backPath },
-      { icon: 'check-square' as const, label: t('features.groceries.shoppingMode'), path: shoppingPath },
+      {
+        id: 'groceries.backToList',
+        icon: 'arrow-left' as const,
+        label: t('features.groceries.backToList'),
+        // Passes skipAutoOpen so the tab shows the list-of-lists even when there's a single
+        // ongoing list — otherwise the tab would auto-redirect straight back into this list.
+        onClick: () => navigate(backPath, { state: { skipAutoOpen: true } }),
+      },
+      { id: 'groceries.shoppingMode', icon: 'check-square' as const, label: t('features.groceries.shoppingMode'), path: shoppingPath },
       ...(canEdit
         ? [
             {
+              id: 'groceries.editList',
               icon: 'pencil' as const,
               label: t('features.groceries.editList'),
               onClick: () => setEditingList(true),
             },
             {
+              id: 'groceries.configureSections',
               icon: 'settings' as const,
               badgeIcon: 'layers' as const,
               label: configuringSections
@@ -98,7 +108,7 @@ const GroceriesListEditPageContent: React.FC = () => {
           ]
         : []),
     ],
-    [backPath, shoppingPath, canEdit, configuringSections, t],
+    [backPath, shoppingPath, canEdit, configuringSections, t, navigate],
   );
 
   if (!detail) {

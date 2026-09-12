@@ -58,6 +58,7 @@ const MyTasksTab: React.FC = () => {
   const tabActions = useMemo(
     () => [
       {
+        id: 'myTasks.addTask',
         icon: 'plus' as const,
         badgeIcon: 'check-square' as const,
         label: t('dashboard.quickAdd.addTask'),

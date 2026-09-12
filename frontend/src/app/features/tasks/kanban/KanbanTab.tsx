@@ -74,6 +74,7 @@ const KanbanTab: React.FC<Props> = ({
       ...(isManager
         ? [
             {
+              id: 'kanban.configureColumns',
               icon: 'settings' as const,
               badgeIcon: 'layers' as const,
               label: configuring
@@ -86,6 +87,7 @@ const KanbanTab: React.FC<Props> = ({
       ...(canEdit && hasArchived
         ? [
             {
+              id: 'kanban.toggleArchived',
               icon: (showArchived ? 'eye-off' as const : 'eye' as const),
               label: showArchived
                 ? t('features.kanban.hideArchived')
@@ -98,6 +100,7 @@ const KanbanTab: React.FC<Props> = ({
       ...(urlHighlight
         ? [
             {
+              id: 'kanban.removeSearchHighlight',
               icon: 'x' as const,
               badgeIcon: 'layers' as const,
               label: t('search.removeHighlight'),

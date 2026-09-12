@@ -55,10 +55,10 @@ export const SongLayoutRow: React.FC<SongLayoutRowProps> = ({
           <>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '2px', marginBottom: '4px' }}>
               <ThemedIconButton
-                action={{ icon: 'chevron-up', label: t('guitarSong.detail.moveUp'), onClick: () => hook.moveLayoutRow(row.id, 'prev'), disabled: isFirst }}
+                action={{ id: 'guitar.song.rowMoveUp', icon: 'chevron-up', label: t('guitarSong.detail.moveUp'), onClick: () => hook.moveLayoutRow(row.id, 'prev'), disabled: isFirst }}
               />
               <ThemedIconButton
-                action={{ icon: 'chevron-down', label: t('guitarSong.detail.moveDown'), onClick: () => hook.moveLayoutRow(row.id, 'next'), disabled: isLast }}
+                action={{ id: 'guitar.song.rowMoveDown', icon: 'chevron-down', label: t('guitarSong.detail.moveDown'), onClick: () => hook.moveLayoutRow(row.id, 'next'), disabled: isLast }}
               />
             </div>
             <div style={{ position: 'absolute', left: '-14px', top: '50%', transform: 'translateY(-50%)', zIndex: 2 }}>

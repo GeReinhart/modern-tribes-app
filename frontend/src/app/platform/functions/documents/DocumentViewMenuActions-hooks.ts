@@ -40,6 +40,7 @@ export const documentViewMenuActionsHooks = ({
   return useMemo(
     (): MenuAction[] => [
       {
+        id: 'projectDocument.backToDocuments',
         icon: 'arrow-left',
         label: t('projectDocuments.backToDocuments'),
         onClick: () =>
@@ -48,6 +49,7 @@ export const documentViewMenuActionsHooks = ({
       ...(canEdit && isActive
         ? [
             {
+              id: 'projectDocument.edit',
               icon: 'pencil' as const,
               badgeIcon: 'file-text' as const,
               label: t('common.edit'),
@@ -61,6 +63,7 @@ export const documentViewMenuActionsHooks = ({
       ...(isManager && isActive && effectivePublicationUrlParamId
         ? [
             {
+              id: 'projectDocument.viewPublication',
               icon: 'external-link' as const,
               label: t('publications.view'),
               onClick: () =>
@@ -73,6 +76,7 @@ export const documentViewMenuActionsHooks = ({
       ...(isManager && isActive && !effectivePublicationUrlParamId
         ? [
             {
+              id: 'projectDocument.publish',
               icon: 'upload' as const,
               label: t('publications.publish'),
               onClick: onPublish,
@@ -83,6 +87,7 @@ export const documentViewMenuActionsHooks = ({
       ...(isManager && isActive && !!effectivePublicationUrlParamId
         ? [
             {
+              id: 'projectDocument.unpublish',
               icon: 'download' as const,
               label: t('publications.unpublish'),
               onClick: onUnpublish,
@@ -93,6 +98,7 @@ export const documentViewMenuActionsHooks = ({
       ...(isManager && isActive
         ? [
             {
+              id: 'projectDocument.archive',
               icon: 'archive' as const,
               badgeIcon: 'file-text' as const,
               label: t('common.archive'),

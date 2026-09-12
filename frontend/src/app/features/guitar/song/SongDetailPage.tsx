@@ -101,40 +101,46 @@ const SongDetailPageContent: React.FC = () => {
     if (!song) return [];
     return [
       {
+        id: 'guitar.song.backToList',
         icon: 'search' as const,
         label: t('guitarSong.detail.backToList'),
         path: songListPath,
       },
       {
+        id: 'guitar.song.presentationMode',
         icon: 'eye' as const,
         label: t('guitarSong.layout.presentationMode'),
         path: presentPath,
       },
       {
+        id: 'guitar.song.learningTools',
         icon: 'headphones' as const,
         label: t('guitarSong.learningTools.title'),
         onClick: () => setLearningToolsOpen(true),
       },
       ...(canEdit
         ? [{
+            id: 'guitar.song.markCompleted',
             icon: 'check-circle' as const, label: t('guitarSong.detail.markCompleted'),
             onClick: handleMarkCompleted,
           }]
         : []),
       ...(canEdit
         ? [{
+            id: 'guitar.song.manageLabels',
             icon: 'tag' as const, label: t('guitarSong.labels.manageLabels'),
             onClick: () => setLabelsModalOpen(true),
           }]
         : []),
       ...(canEdit && clipboardHook.clipboard
         ? [{
+            id: 'guitar.song.previewClipboard',
             icon: 'clipboard' as const, label: t('guitarSong.layout.previewClipboard'),
             onClick: () => setClipboardPreviewOpen(true),
           }]
         : []),
       ...(isManager
-        ? [{ icon: 'trash' as const, label: t('guitarSong.detail.archive'), onClick: () => setArchiveConfirmOpen(true) }]
+        ? [{ id: 'guitar.song.archive', icon: 'trash' as const, label: t('guitarSong.detail.archive'), onClick: () => setArchiveConfirmOpen(true) }]
         : []),
     ];
   }, [song, isManager, canEdit, clipboardHook.clipboard, t, presentPath, songListPath]);

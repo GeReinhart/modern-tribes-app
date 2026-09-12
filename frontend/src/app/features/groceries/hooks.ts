@@ -105,6 +105,9 @@ export function useGroceriesLists(featureInstanceId: string | null) {
 // (once per mount, gated by `loaded` so it never fires on the initial empty/unfetched render)
 // and there's no ongoing list, a new one (no name, no date) is created; when there's exactly
 // one, the user is taken straight into it instead of the tab's list-of-lists view.
+// `skipAutoOpen` lets a caller who explicitly navigated back to this tab (e.g. from the single
+// ongoing list's own "back to list" action) see the list-of-lists once, so a second list can
+// ever be created — without it, a lone ongoing list would immediately redirect right back to it.
 export function useAutoOpenOngoingList(
   lists: GroceriesList[],
   loaded: boolean,
@@ -113,12 +116,14 @@ export function useAutoOpenOngoingList(
   featureInstanceId: string,
   createList: (data: GroceriesListCreate) => Promise<GroceriesList | null>,
   onOpen: (listId: string) => void,
+  skipAutoOpen: boolean,
 ) {
   const [handled, setHandled] = useState(false);
 
   useEffect(() => {
     if (!loaded || handled || hasError) return;
     setHandled(true);
+    if (skipAutoOpen) return;
     const ongoing = lists.filter(isOngoingList);
     if (ongoing.length === 1) {
       onOpen(ongoing[0].id);
@@ -127,7 +132,7 @@ export function useAutoOpenOngoingList(
         if (created) onOpen(created.id);
       });
     }
-  }, [loaded, handled, hasError, canCreate, lists, createList, featureInstanceId, onOpen]);
+  }, [loaded, handled, hasError, canCreate, lists, createList, featureInstanceId, onOpen, skipAutoOpen]);
 }
 
 export function useGroceriesListDetail(listId: string | null) {

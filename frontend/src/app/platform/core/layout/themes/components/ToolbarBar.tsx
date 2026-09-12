@@ -1,19 +1,21 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
-import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
+import { ToolbarLayout } from '@/app/platform/core/layout/toolbarLayout.ts';
 import { useChromeVisibility } from '@/app/platform/core/layout/ChromeVisibilityContext.tsx';
 import { ActionsToolbar } from '@/app/platform/core/layout/themes/components/ActionsToolbar.tsx';
 
 import React from 'react';
 
 interface ToolbarBarProps {
-  actions: MenuAction[];
+  layout: ToolbarLayout;
 }
 
-export const ToolbarBar: React.FC<ToolbarBarProps> = ({ actions }) => {
+export const ToolbarBar: React.FC<ToolbarBarProps> = ({ layout }) => {
   const { theme } = useTheme();
   const { chromeHidden } = useChromeVisibility();
+  const { directTabActions, directPageActions, overflowActions } = layout;
+  const isEmpty = directTabActions.length === 0 && directPageActions.length === 0 && overflowActions.length === 0;
 
-  if (actions.length === 0 || chromeHidden) return null;
+  if (isEmpty || chromeHidden) return null;
 
   const style: React.CSSProperties = {
     padding: '2px 8px',
@@ -25,7 +27,11 @@ export const ToolbarBar: React.FC<ToolbarBarProps> = ({ actions }) => {
 
   return (
     <div style={style}>
-      <ActionsToolbar actions={actions} />
+      <ActionsToolbar
+        tabActions={directTabActions}
+        pageActions={directPageActions}
+        overflowActions={overflowActions}
+      />
     </div>
   );
 };

@@ -378,6 +378,7 @@ const ShowProjectPageContent: React.FC = () => {
   const menuActions = useMemo(
     (): MenuAction[] => [
       {
+        id: 'project.configureTabs',
         icon: tabEditMode ? ('x' as const) : ('settings' as const),
         label: tabEditMode ? t('tabConfig.finishConfigure') : t('tabConfig.configure'),
         onClick: toggleTabEditMode,
@@ -385,6 +386,7 @@ const ShowProjectPageContent: React.FC = () => {
       ...(searchHighlight
         ? [
             {
+              id: 'project.removeSearchHighlight',
               icon: 'x' as const,
               badgeIcon: 'search' as const,
               label: t('search.removeHighlight'),
@@ -399,18 +401,21 @@ const ShowProjectPageContent: React.FC = () => {
       ...(isManager
         ? [
             {
+              id: 'project.addFeature',
               icon: 'plus' as const,
               badgeIcon: 'layers' as const,
               label: t('features.feature'),
               onClick: () => setShowAddFeature(true),
             },
             {
+              id: 'project.theme',
               icon: 'palette' as const,
               badgeIcon: 'briefcase' as const,
               label: t('common.project'),
               onClick: () => setShowProjectThemePicker(true),
             },
             {
+              id: 'project.edit',
               icon: 'pencil' as const,
               badgeIcon: 'briefcase' as const,
               label: t('common.project'),
@@ -418,6 +423,7 @@ const ShowProjectPageContent: React.FC = () => {
                 navigate(`/app/tribes/${tribeId}/projects/${projectId}/edit`),
             },
             {
+              id: 'project.archive',
               icon: 'archive' as const,
               badgeIcon: 'briefcase' as const,
               label: t('common.project'),
@@ -435,6 +441,7 @@ const ShowProjectPageContent: React.FC = () => {
       isManager && activeFeature
         ? [
             {
+              id: 'project.renameFeature',
               icon: 'pencil' as const,
               badgeIcon: 'layers' as const,
               label: t('features.feature'),
@@ -451,12 +458,14 @@ const ShowProjectPageContent: React.FC = () => {
               },
             },
             {
+              id: 'project.featureTheme',
               icon: 'palette' as const,
               badgeIcon: 'layers' as const,
               label: t('features.feature'),
               onClick: () => setShowFeatureThemePicker(true),
             },
             {
+              id: 'project.archiveFeature',
               icon: 'archive' as const,
               badgeIcon: 'layers' as const,
               label: t('features.feature'),
@@ -529,7 +538,7 @@ const ShowProjectPageContent: React.FC = () => {
   }
 
   return (
-    <TabActionsProvider>
+    <TabActionsProvider tabTypeKey={activeFeature?.feature_type ?? null}>
     <AppLayout
       breadcrumbs={breadcrumbs}
       breadcrumbTabs={breadcrumbTabs}

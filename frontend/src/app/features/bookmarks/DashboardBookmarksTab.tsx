@@ -22,6 +22,7 @@ const DashboardBookmarksTab: React.FC = () => {
   const tabActions = useMemo(
     () => [
       {
+        id: 'bookmarks.configure',
         icon: 'settings' as const,
         badgeIcon: 'layers' as const,
         label: configuring ? t('bookmarks.configuring') : t('bookmarks.configure'),

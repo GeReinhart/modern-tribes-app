@@ -9,13 +9,14 @@ import { UserAvatarIcon } from '@/app/platform/functions/people/users/UserAvatar
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { useChromeVisibility } from '@/app/platform/core/layout/ChromeVisibilityContext.tsx';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
+import { ToolbarLayout } from '@/app/platform/core/layout/toolbarLayout.ts';
 
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface AppFooterProps {
   bookmarkSlot?: React.ReactNode;
-  toolbarActions?: MenuAction[];
+  toolbarLayout?: ToolbarLayout;
 }
 
 const NAV_ITEMS: { path: string; icon: IconName; label: string }[] = [
@@ -42,13 +43,14 @@ const FooterIconToggle: React.FC<FooterIconToggleProps> = ({ icon, label, color,
   </div>
 );
 
-export const AppFooter: React.FC<AppFooterProps> = ({ bookmarkSlot, toolbarActions }) => {
+export const AppFooter: React.FC<AppFooterProps> = ({ bookmarkSlot, toolbarLayout }) => {
   const { theme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const { chromeHidden, toggleChromeHidden } = useChromeVisibility();
 
   const chromeToggleAction: MenuAction = {
+    id: 'layout.chromeToggle',
     icon: chromeHidden ? 'eye' : 'eye-off',
     label: chromeHidden ? 'Show header, toolbar and footer' : 'Hide header, toolbar and footer',
     onClick: toggleChromeHidden,
@@ -116,9 +118,18 @@ export const AppFooter: React.FC<AppFooterProps> = ({ bookmarkSlot, toolbarActio
 
   return (
     <footer style={footerStyle}>
-      {toolbarActions && toolbarActions.length > 0 && (
+      {toolbarLayout && (
+        toolbarLayout.directTabActions.length > 0
+        || toolbarLayout.directPageActions.length > 0
+        || toolbarLayout.overflowActions.length > 0
+      ) && (
         <div style={toolbarRowStyle}>
-          <ActionsToolbar actions={toolbarActions} menuDirection="up" />
+          <ActionsToolbar
+            tabActions={toolbarLayout.directTabActions}
+            pageActions={toolbarLayout.directPageActions}
+            overflowActions={toolbarLayout.overflowActions}
+            menuDirection="up"
+          />
         </div>
       )}
       <div style={navRowStyle}>

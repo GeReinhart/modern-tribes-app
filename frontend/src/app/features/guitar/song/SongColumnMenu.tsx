@@ -80,11 +80,11 @@ export const SongColumnMenu: React.FC<SongColumnMenuProps> = ({
             {clipboard && (
               <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <ThemedIconButton
-                  action={{ icon: 'eye', label: t('guitarSong.layout.previewClipboard'), onClick: () => setPreviewOpen(true) }}
+                  action={{ id: 'guitar.song.columnPreviewClipboard', icon: 'eye', label: t('guitarSong.layout.previewClipboard'), onClick: () => setPreviewOpen(true) }}
                 />
                 <ThemedIconButton
                   action={{
-                    icon: 'clipboard', label: t('guitarSong.layout.pasteBlock'), onClick: handlePaste, disabled: !canPasteHere,
+                    id: 'guitar.song.columnPasteBlock', icon: 'clipboard', label: t('guitarSong.layout.pasteBlock'), onClick: handlePaste, disabled: !canPasteHere,
                   }}
                 />
                 {!canPasteHere && <ThemedText size="small">{t('guitarSong.layout.pasteOtherSong')}</ThemedText>}
@@ -98,11 +98,12 @@ export const SongColumnMenu: React.FC<SongColumnMenuProps> = ({
                 <>
                   <SongBlockTypePicker options={options} onAdd={handleAddColumn} onAddFreeText={handleAddColumnFreeText} />
                   <ThemedIconButton
-                    action={{ icon: 'layout', label: t('guitarSong.layout.addEmptyColumn'), onClick: handleAddEmptyColumn }}
+                    action={{ id: 'guitar.song.addEmptyColumn', icon: 'layout', label: t('guitarSong.layout.addEmptyColumn'), onClick: handleAddEmptyColumn }}
                   />
                   {clipboard && (
                     <ThemedIconButton
                       action={{
+                        id: 'guitar.song.pasteToNewColumn',
                         icon: 'clipboard', label: t('guitarSong.layout.pasteToNewColumn'),
                         onClick: handlePasteToNewColumn, disabled: !canPasteHere,
                       }}
@@ -114,7 +115,7 @@ export const SongColumnMenu: React.FC<SongColumnMenuProps> = ({
               )}
             </div>
             {row.columns.length > 1 && (
-              <ThemedIconButton action={{ icon: 'trash', label: t('guitarSong.layout.removeColumn'), onClick: handleRemoveColumn, variant: 'danger' }} />
+              <ThemedIconButton action={{ id: 'guitar.song.removeColumn', icon: 'trash', label: t('guitarSong.layout.removeColumn'), onClick: handleRemoveColumn, variant: 'danger' }} />
             )}
           </div>
         </div>

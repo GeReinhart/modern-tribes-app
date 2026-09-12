@@ -5,7 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import IngredientGroupBlock from './IngredientGroupBlock.tsx';
-import { ingredientGroupKey } from './ingredientOrdering.ts';
+import { buildIngredientDisplayGroups } from './ingredientOrdering.ts';
 import { RecipeIngredient, RecipeIngredientUpdate } from './types.ts';
 
 interface Props {
@@ -20,9 +20,10 @@ interface Props {
 const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, onMove, onUpdateIngredient, onRemove }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
-  const mainIngredients = ingredients.filter((i) => ingredientGroupKey(i) === 'main');
-  const condiments = ingredients.filter((i) => ingredientGroupKey(i) === 'condiment');
-  const accompaniments = ingredients.filter((i) => ingredientGroupKey(i) === 'accompaniment');
+  const groups = buildIngredientDisplayGroups(ingredients, canEdit, {
+    condiments: t('features.recipes.condiments'),
+    accompaniments: t('features.recipes.accompaniments'),
+  });
 
   return (
     <div>
@@ -33,29 +34,17 @@ const RecipeIngredientsList: React.FC<Props> = ({ ingredients, canEdit, onAdd, o
         </div>
       )}
       <div style={{ columnCount: 2, columnGap: '24px' }}>
-        <IngredientGroupBlock
-          ingredients={mainIngredients}
-          canEdit={canEdit}
-          onMove={onMove}
-          onUpdateIngredient={onUpdateIngredient}
-          onRemove={onRemove}
-        />
-        <IngredientGroupBlock
-          title={t('features.recipes.condiments')}
-          ingredients={condiments}
-          canEdit={canEdit}
-          onMove={onMove}
-          onUpdateIngredient={onUpdateIngredient}
-          onRemove={onRemove}
-        />
-        <IngredientGroupBlock
-          title={t('features.recipes.accompaniments')}
-          ingredients={accompaniments}
-          canEdit={canEdit}
-          onMove={onMove}
-          onUpdateIngredient={onUpdateIngredient}
-          onRemove={onRemove}
-        />
+        {groups.map((group, index) => (
+          <IngredientGroupBlock
+            key={group.title ?? `group-${index}`}
+            title={group.title}
+            ingredients={group.ingredients}
+            canEdit={canEdit}
+            onMove={onMove}
+            onUpdateIngredient={onUpdateIngredient}
+            onRemove={onRemove}
+          />
+        ))}
       </div>
       {canEdit && (
         <button

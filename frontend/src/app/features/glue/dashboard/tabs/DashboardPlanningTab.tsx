@@ -51,7 +51,7 @@ const DashboardPlanningTab: React.FC = () => {
   const tasks: MyTasksResponse = data ?? emptyTasks;
 
   const tabActions = useMemo(
-    () => [{ icon: 'plus' as const, badgeIcon: 'calendar' as const, label: t('features.events.addEvent'), onClick: () => setShowAddEvent(true) }, toggleAction],
+    () => [{ id: 'dashboard.planning.addEvent', icon: 'plus' as const, badgeIcon: 'calendar' as const, label: t('features.events.addEvent'), onClick: () => setShowAddEvent(true) }, toggleAction],
     [t, toggleAction],
   );
   useRegisterTabActions(tabActions);

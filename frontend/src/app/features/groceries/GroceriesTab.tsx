@@ -3,7 +3,7 @@ import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTab
 
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import CreateGroceriesListModal from './CreateGroceriesListModal.tsx';
 import GroceriesCatalogColumn from './GroceriesCatalogColumn.tsx';
@@ -22,6 +22,8 @@ const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, pr
   const { t } = useTranslation();
   const { theme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
+  const skipAutoOpen = Boolean((location.state as { skipAutoOpen?: boolean } | null)?.skipAutoOpen);
   const { lists, persons, error, loaded, createList, toggleFavorite, setArchived } =
     useGroceriesLists(featureInstanceId);
   const catalog = useGroceriesCatalog(featureInstanceId);
@@ -34,7 +36,7 @@ const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, pr
     (listId: string) => navigate(`/app/tribes/${tribeId}/projects/${projectId}/groceries/${listId}`, { replace: true }),
     [navigate, tribeId, projectId],
   );
-  useAutoOpenOngoingList(lists, loaded, !!error, canEdit, featureInstanceId, createList, openList);
+  useAutoOpenOngoingList(lists, loaded, !!error, canEdit, featureInstanceId, createList, openList, skipAutoOpen);
 
   const activeLists = lists.filter((l) => l.status !== 'archived');
   const archivedLists = lists.filter((l) => l.status === 'archived');
@@ -44,6 +46,7 @@ const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, pr
   const tabActions = useMemo(
     () => [
       {
+        id: 'groceries.toggleCatalog',
         icon: 'book' as const,
         label: viewingCatalog ? t('features.groceries.backToLists') : t('features.groceries.viewCatalog'),
         onClick: () => setViewingCatalog((v) => !v),
@@ -52,6 +55,7 @@ const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, pr
         ? (canEdit
           ? [
               {
+                id: 'groceries.configureSections',
                 icon: 'settings' as const,
                 badgeIcon: 'layers' as const,
                 label: configuringSections
@@ -65,6 +69,7 @@ const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, pr
             ...(canEdit
               ? [
                   {
+                    id: 'groceries.newList',
                     icon: 'plus' as const,
                     label: t('features.groceries.newList'),
                     onClick: () => setCreating(true),
@@ -74,6 +79,7 @@ const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, pr
             ...(archivedLists.length > 0
               ? [
                   {
+                    id: 'groceries.toggleArchivedLists',
                     icon: (showArchived ? 'eye-off' as const : 'eye' as const),
                     label: showArchived
                       ? t('features.groceries.hideArchivedLists')

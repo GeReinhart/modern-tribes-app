@@ -19,6 +19,9 @@ interface Props {
   dateFormat?: string;
   minDate?: string;
   maxDate?: string;
+  // When the field can never be empty (e.g. an event's start/end date), hide the "remove date"
+  // button instead of letting the user clear it into an invalid state.
+  required?: boolean;
 }
 
 function parseDate(value: string): Date | null {
@@ -72,6 +75,7 @@ const ThemedDateSelection: React.FC<Props> = ({
   dateFormat = 'dd/MM/yyyy',
   minDate,
   maxDate,
+  required = false,
 }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
@@ -119,7 +123,7 @@ const ThemedDateSelection: React.FC<Props> = ({
             }
           />
         </div>
-        {value && !disabled && (
+        {value && !disabled && !required && (
           <button
             type="button"
             onClick={() => onChange('')}

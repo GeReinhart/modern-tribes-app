@@ -73,6 +73,7 @@ const TodoListTab: React.FC<Props> = ({
       ...(isManager
         ? [
             {
+              id: 'todo.configure',
               icon: 'settings' as const,
               badgeIcon: 'layers' as const,
               label: configuring
@@ -85,6 +86,7 @@ const TodoListTab: React.FC<Props> = ({
       ...(archivedCount > 0
         ? [
             {
+              id: 'todo.toggleArchived',
               icon: (showArchived ? 'eye-off' as const : 'eye' as const),
               label: showArchived
                 ? t('features.todo.hideArchived')
@@ -97,6 +99,7 @@ const TodoListTab: React.FC<Props> = ({
       ...(urlHighlight
         ? [
             {
+              id: 'todo.removeSearchHighlight',
               icon: 'x' as const,
               badgeIcon: 'layers' as const,
               label: t('search.removeHighlight'),

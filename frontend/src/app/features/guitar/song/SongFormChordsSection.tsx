@@ -31,7 +31,7 @@ export const SongFormChordsSection: React.FC<SongFormChordsSectionProps> = ({
     <div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '8px' }}>
         <ThemedIconButton
-          action={{ icon: 'plus', label: t('guitarSong.detail.addChord'), onClick: () => setPickerOpen(true) }}
+          action={{ id: 'guitar.song.addChord', icon: 'plus', label: t('guitarSong.detail.addChord'), onClick: () => setPickerOpen(true) }}
         />
       </div>
       {chords.length > 0 && (

@@ -102,7 +102,7 @@ export const BlockPresentationFields: React.FC<BlockPresentationFieldsProps> = (
         />
         <div style={{ backgroundColor: block.show_card ? `${theme.colors.primary}25` : 'transparent', borderRadius: 'var(--radius-md)' }}>
           <ThemedIconButton
-            action={{ icon: 'credit-card', label: t('guitarSong.layout.blockShowCard'), onClick: () => updateBlock({ show_card: !block.show_card }) }}
+            action={{ id: 'guitar.song.blockShowCard', icon: 'credit-card', label: t('guitarSong.layout.blockShowCard'), onClick: () => updateBlock({ show_card: !block.show_card }) }}
           />
         </div>
         <SongInlineEditableNumber
@@ -150,20 +150,21 @@ export const ColumnPresentationFields: React.FC<ColumnPresentationFieldsProps> =
       <div style={{ display: 'flex', gap: '2px' }}>
         {ALL_ALIGNS.map((align) => (
           <div key={align} style={{ backgroundColor: column.align === align ? `${theme.colors.primary}25` : 'transparent', borderRadius: 'var(--radius-md)' }}>
-            <ThemedIconButton action={{ icon: alignIcon(align), label: alignLabel(t, align), onClick: () => updateColumn({ align }) }} />
+            <ThemedIconButton action={{ id: `guitar.song.columnAlign.${align}`, icon: alignIcon(align), label: alignLabel(t, align), onClick: () => updateColumn({ align }) }} />
           </div>
         ))}
       </div>
       <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
-        <ThemedIconButton action={{ icon: 'chevron-down', label: t('guitarSong.layout.widthNarrower'), onClick: () => resizeWidth(-1) }} />
+        <ThemedIconButton action={{ id: 'guitar.song.columnWidthNarrower', icon: 'chevron-down', label: t('guitarSong.layout.widthNarrower'), onClick: () => resizeWidth(-1) }} />
         <span style={{ fontSize: '12px' }}>{column.width_twelfths}/12</span>
-        <ThemedIconButton action={{ icon: 'chevron-up', label: t('guitarSong.layout.widthWider'), onClick: () => resizeWidth(1) }} />
+        <ThemedIconButton action={{ id: 'guitar.song.columnWidthWider', icon: 'chevron-up', label: t('guitarSong.layout.widthWider'), onClick: () => resizeWidth(1) }} />
       </div>
       <PaddingFieldsGrid titleKey="guitarSong.layout.columnMarginsTitle" value={column} onUpdate={updateColumn} />
       <div style={{ display: 'flex', gap: '2px' }}>
         <div style={{ backgroundColor: column.separator_left ? `${theme.colors.primary}25` : 'transparent', borderRadius: 'var(--radius-md)' }}>
           <ThemedIconButton
             action={{
+              id: 'guitar.song.columnSeparatorLeft',
               icon: 'separator-vertical', label: t('guitarSong.layout.separatorLeft'),
               onClick: () => updateColumn({ separator_left: !column.separator_left }),
             }}
@@ -172,6 +173,7 @@ export const ColumnPresentationFields: React.FC<ColumnPresentationFieldsProps> =
         <div style={{ backgroundColor: column.separator_right ? `${theme.colors.primary}25` : 'transparent', borderRadius: 'var(--radius-md)' }}>
           <ThemedIconButton
             action={{
+              id: 'guitar.song.columnSeparatorRight',
               icon: 'separator-vertical', label: t('guitarSong.layout.separatorRight'),
               onClick: () => updateColumn({ separator_right: !column.separator_right }),
             }}

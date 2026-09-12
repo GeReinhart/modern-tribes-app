@@ -63,11 +63,11 @@ export const SongAddBlockAfterMenu: React.FC<SongAddBlockAfterMenuProps> = ({
           {clipboard && (
             <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap' }}>
               <ThemedIconButton
-                action={{ icon: 'eye', label: t('guitarSong.layout.previewClipboard'), onClick: () => setPreviewOpen(true) }}
+                action={{ id: 'guitar.song.previewClipboard', icon: 'eye', label: t('guitarSong.layout.previewClipboard'), onClick: () => setPreviewOpen(true) }}
               />
               <ThemedIconButton
                 action={{
-                  icon: 'clipboard', label: t('guitarSong.layout.pasteBlock'), onClick: handlePaste, disabled: !canPasteHere,
+                  id: 'guitar.song.pasteBlock', icon: 'clipboard', label: t('guitarSong.layout.pasteBlock'), onClick: handlePaste, disabled: !canPasteHere,
                 }}
               />
               {!canPasteHere && <ThemedText size="small">{t('guitarSong.layout.pasteOtherSong')}</ThemedText>}

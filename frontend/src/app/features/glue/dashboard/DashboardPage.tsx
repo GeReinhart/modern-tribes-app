@@ -87,20 +87,22 @@ const DashboardPageContent: React.FC = () => {
   const menuActions = useMemo(
     (): MenuAction[] => [
       {
+        id: 'dashboard.configureTabs',
         icon: tabEditMode ? ('x' as const) : ('settings' as const),
         label: tabEditMode ? t('tabConfig.finishConfigure') : t('tabConfig.configure'),
         onClick: toggleTabEditMode,
       },
       {
+        id: 'dashboard.quickAddDefaults',
         icon: 'zap' as const,
         label: t('dashboard.quickAddDefaults.menuLabel'),
         onClick: () => setShowQuickAddDefaults(true),
       },
       ...(authorization?.authorized
-        ? [{ icon: 'plus' as const, badgeIcon: 'users' as const, label: t('tribes.createTribe'), path: '/app/tribes/create' }]
+        ? [{ id: 'dashboard.createTribe', icon: 'plus' as const, badgeIcon: 'users' as const, label: t('tribes.createTribe'), path: '/app/tribes/create' }]
         : []),
       ...(hasAdminAccess
-        ? [{ icon: 'shield' as const, label: t('common.admin'), path: '/admin' }]
+        ? [{ id: 'dashboard.admin', icon: 'shield' as const, label: t('common.admin'), path: '/admin' }]
         : []),
     ],
     [authorization?.authorized, hasAdminAccess, tabEditMode, toggleTabEditMode, t],
@@ -121,6 +123,7 @@ const DashboardPageContent: React.FC = () => {
   );
 
   return (
+    <TabActionsProvider tabTypeKey={activeTab}>
     <AppLayout
       breadcrumbs={breadcrumbs}
       breadcrumbTabs={breadcrumbTabs}
@@ -177,15 +180,14 @@ const DashboardPageContent: React.FC = () => {
         />
       )}
     </AppLayout>
+    </TabActionsProvider>
   );
 };
 
 const DashboardPage: React.FC = () => (
   <ThemeProvider defaultTheme="default">
     <PinnedTabsProvider>
-      <TabActionsProvider>
-        <DashboardPageContent />
-      </TabActionsProvider>
+      <DashboardPageContent />
     </PinnedTabsProvider>
   </ThemeProvider>
 );

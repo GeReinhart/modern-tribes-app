@@ -76,11 +76,11 @@ const WordPositionPicker: React.FC<WordPositionPickerProps> = ({
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <ThemedIconButton
-            action={{ icon: 'arrow-left', label: t('guitarSong.sections.previousWord'), onClick: onPrevWord, disabled: !hasPrevWord }}
+            action={{ id: 'guitar.song.lyricsPreviousWord', icon: 'arrow-left', label: t('guitarSong.sections.previousWord'), onClick: onPrevWord, disabled: !hasPrevWord }}
           />
           <div style={{ color: theme.colors.text }}>{word.text || t('guitarSong.sections.emptySlotLabel')}</div>
           <ThemedIconButton
-            action={{ icon: 'arrow-right', label: t('guitarSong.sections.nextWord'), onClick: onNextWord, disabled: !hasNextWord }}
+            action={{ id: 'guitar.song.lyricsNextWord', icon: 'arrow-right', label: t('guitarSong.sections.nextWord'), onClick: onNextWord, disabled: !hasNextWord }}
           />
         </div>
       </div>

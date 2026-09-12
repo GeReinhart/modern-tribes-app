@@ -45,9 +45,9 @@ const RecipePresentationPageContent: React.FC = () => {
 
   const menuActions = useMemo(
     () => [
-      { icon: 'arrow-left' as const, label: t('features.recipes.back'), onClick: () => navigate(-1) },
-      { icon: 'search' as const, label: t('features.recipes.backToList'), path: listPath },
-      ...(canEdit ? [{ icon: 'pencil' as const, label: t('features.recipes.editRecipe'), path: editPath }] : []),
+      { id: 'recipes.back', icon: 'arrow-left' as const, label: t('features.recipes.back'), onClick: () => navigate(-1) },
+      { id: 'recipes.backToList', icon: 'search' as const, label: t('features.recipes.backToList'), path: listPath },
+      ...(canEdit ? [{ id: 'recipes.edit', icon: 'pencil' as const, label: t('features.recipes.editRecipe'), path: editPath }] : []),
     ],
     [listPath, editPath, canEdit, t, navigate],
   );

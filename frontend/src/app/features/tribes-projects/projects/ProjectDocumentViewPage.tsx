@@ -213,6 +213,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
     () => [
       ...docMenuActions,
       {
+        id: 'projectDocument.readMode',
         icon: 'eye' as const,
         label: t('documentPages.read'),
         onClick: () => setReaderMode(true),
@@ -220,6 +221,7 @@ const ProjectDocumentViewPageContent: React.FC = () => {
       ...(searchHighlight
         ? [
             {
+              id: 'projectDocument.removeSearchHighlight',
               icon: 'x' as const,
               badgeIcon: 'search' as const,
               label: t('search.removeHighlight'),

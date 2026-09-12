@@ -33,6 +33,7 @@ const AboutPageContent: React.FC = () => {
   const menuActions = useMemo(
     () => [
       {
+        id: 'about.back',
         icon: 'arrow-left' as const,
         label: t('common.return'),
         onClick: () => navigate(-1),

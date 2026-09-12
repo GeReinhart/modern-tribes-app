@@ -17,13 +17,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-const GENDER_I18N_KEY: Record<string, string> = {
-  male: 'admin.genderMale',
-  female: 'admin.genderFemale',
-  other: 'admin.genderOther',
-  prefer_not_to_say: 'admin.genderPreferNot',
-};
-
 function RepresentedPersonRow({ personId }: { personId: string }) {
   const { person } = usePerson(personId);
   return (
@@ -48,6 +41,7 @@ function ProfilePageContent() {
 
   const menuActions = [
     {
+      id: 'profile.back',
       icon: 'arrow-left' as const,
       label: t('common.return'),
       onClick: () => navigate(-1),
@@ -176,14 +170,6 @@ function ProfilePageContent() {
                 <ThemedText variant="text" size="small">
                   {person.last_name}
                 </ThemedText>
-              </div>
-              <div className="flex justify-between items-center">
-                <ThemedText variant="secondary" size="small">
-                  {t('profile.gender')}
-                </ThemedText>
-                <ThemedBadge variant="accent">
-                  {t(GENDER_I18N_KEY[person.gender] ?? 'admin.genderOther')}
-                </ThemedBadge>
               </div>
               {person.document_id && (
                 <div className="flex justify-between items-center">
