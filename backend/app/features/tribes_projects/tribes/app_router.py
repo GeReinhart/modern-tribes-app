@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, status
 
 from app.platform.core.database import get_database
@@ -12,6 +14,7 @@ from app.platform.core.authorization.router import require_any_permission_decora
 from app.features.tribes_projects.tribes import service as tribe_service
 from app.platform.core.utils.db_helpers import resolve_url_param_id
 from app.platform.core.authorization.ownership import check_own_tribe_position_or_admin
+from app.platform.functions.documents.models import DocumentRevision
 
 router = APIRouter(prefix="/tribes", tags=["features_tribes_projects"])
 
@@ -42,6 +45,19 @@ async def get_tribe_with_positions(tribe_id: str, current_user: dict = Depends(g
     tribe_id = await resolve_url_param_id(pool, "tribes", tribe_id)
     await check_own_tribe_position_or_admin(tribe_id, current_user, pool)
     return await tribe_service.get_tribe_with_positions(tribe_id, pool)
+
+
+@router.get("/{tribe_id}/document/revisions", response_model=List[DocumentRevision])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_tribe_document_revisions(tribe_id: str, current_user: dict = Depends(get_current_user)):
+    """List this tribe's description revision history, current version first.
+
+    **Permissions:** admin | can_access_attached_tribes (own tribe only)
+    """
+    pool = get_database()
+    tribe_id = await resolve_url_param_id(pool, "tribes", tribe_id)
+    await check_own_tribe_position_or_admin(tribe_id, current_user, pool)
+    return await tribe_service.get_tribe_document_revisions(tribe_id, pool)
 
 
 @router.put("/{tribe_id}/with-positions", response_model=TribeWithPositionsResponse)

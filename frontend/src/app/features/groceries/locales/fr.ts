@@ -34,7 +34,7 @@ const fr: Record<string, string> = {
   'features.groceries.copyFromFavoriteNone': 'Ne rien copier',
   'features.groceries.mealSuggestionsTitle': 'Suggéré par les repas à venir',
   'features.groceries.mealsAccountedFor': 'Repas pris en compte dans cette liste',
-  'features.groceries.mealAccountedForHeadcount': '{{count}} personnes',
+  'features.groceries.mealAccountedForHeadcount': '{{count}}p.',
   'features.groceries.mealSuggestionSubtitle': '{{recipe}} — {{meal}}, {{date}}, {{count}} personnes',
   'features.groceries.addAllSuggestion': 'Tout ajouter',
   'features.groceries.addAccompanimentSuggestion': 'Ajouter',

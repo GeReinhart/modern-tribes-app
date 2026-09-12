@@ -19,7 +19,8 @@ from app.platform.core.uploads.helpers import (
     update_document_attachments,
 )
 from app.platform.core.utils.db_helpers import generate_url_param_id, row_to_dict
-from app.platform.core.utils.document_helpers import update_document_content_with_revision
+from app.platform.core.utils.document_helpers import fetch_document_revisions, update_document_content_with_revision
+from app.platform.functions.documents.models import DocumentRevision
 
 
 async def get_project_with_document(project_id: str, pool) -> ProjectWithDocumentResponse:
@@ -70,6 +71,16 @@ async def create_project_with_document(
         pool, str(project_row["id"]), str(document["id"]), str(current_user["id"])
     )
     return await _build_response(row_to_dict(project_row), pool)
+
+
+async def get_project_document_revisions(project_id: str, pool) -> list[DocumentRevision]:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow("SELECT document_id FROM projects WHERE id = $1", UUID(project_id))
+    if not row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+    if not row["document_id"]:
+        return []
+    return [DocumentRevision(**r) for r in await fetch_document_revisions(pool, str(row["document_id"]))]
 
 
 async def update_project_with_document(

@@ -15,7 +15,7 @@ interface Props {
   prepTimeMinutes: number | null;
   totalTimeMinutes: number | null;
   canEdit: boolean;
-  onUpdate: (data: RecipeUpdate) => Promise<void>;
+  onUpdate: (data: RecipeUpdate) => Promise<boolean>;
 }
 
 function parseMinutesInput(value: string): number | undefined {

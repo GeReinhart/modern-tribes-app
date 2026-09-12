@@ -1,4 +1,5 @@
 import { apiService } from '@/app/platform/core/api/api.service.ts';
+import { DocumentRevision } from '@/app/platform/functions/documents/editor/documentRevisionTypes.ts';
 
 import {
   CatalogItemCreate,
@@ -49,6 +50,10 @@ class RecipesService {
 
   async remove(recipeId: string): Promise<void> {
     return apiService.delete<void>(`/features/tasks/recipes/${recipeId}`);
+  }
+
+  async listDocumentRevisions(recipeId: string): Promise<DocumentRevision[]> {
+    return apiService.get<DocumentRevision[]>(`/features/tasks/recipes/${recipeId}/document/revisions`);
   }
 
   async addIngredient(recipeId: string, data: RecipeIngredientCreate): Promise<RecipeIngredient> {

@@ -9,6 +9,8 @@ from app.platform.core.database import get_database
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_permission_decorator
+from app.platform.core.utils.document_helpers import fetch_document_revisions
+from app.platform.functions.documents.models import DocumentRevision
 
 router = APIRouter(prefix="/monitoring", tags=["platform_monitoring"])
 
@@ -165,37 +167,6 @@ ORDER BY GREATEST(created_at, updated_at) DESC
 """
 
 
-class DocumentRevision(BaseModel):
-    content_html: str
-    updated_at: datetime
-    updated_by: Optional[str] = None
-    is_current: bool = False
-
-
-_REVISIONS_QUERY = """
-SELECT
-    content_html,
-    updated_at,
-    (SELECT email FROM users WHERE id = updated_by) AS updated_by,
-    true                                             AS is_current
-FROM documents
-WHERE id = $1::uuid
-
-UNION ALL
-
-SELECT
-    rev->>'content_html',
-    (rev->>'updated_at')::timestamptz,
-    (SELECT email FROM users WHERE id = (rev->>'updated_by')::uuid),
-    false
-FROM documents,
-     jsonb_array_elements(revisions) AS rev
-WHERE id = $1::uuid
-
-ORDER BY updated_at DESC
-"""
-
-
 @router.get("/documents/{document_id}/revisions", response_model=List[DocumentRevision])
 @require_permission_decorator(PermissionEnum.ADMIN)
 async def get_document_revisions(document_id: str, current_user: dict = Depends(get_current_user)):
@@ -204,23 +175,14 @@ async def get_document_revisions(document_id: str, current_user: dict = Depends(
     **Permissions:** admin
     """
     try:
-        uid = UUID(document_id)
+        UUID(document_id)
     except (ValueError, AttributeError):
         raise HTTPException(status_code=400, detail="Invalid document ID format")
     pool = get_database()
-    async with pool.acquire() as conn:
-        rows = await conn.fetch(_REVISIONS_QUERY, uid)
-    if not rows:
+    revisions = await fetch_document_revisions(pool, document_id)
+    if not revisions:
         raise HTTPException(status_code=404, detail="Document not found")
-    return [
-        DocumentRevision(
-            content_html=r["content_html"],
-            updated_at=r["updated_at"],
-            updated_by=r["updated_by"],
-            is_current=r["is_current"],
-        )
-        for r in rows
-    ]
+    return [DocumentRevision(**r) for r in revisions]
 
 
 @router.get("/recent-changes", response_model=List[RecentChange])

@@ -3,6 +3,29 @@ from typing import Optional
 from uuid import UUID
 
 from app.features.tasks import reminder_repository
+from app.platform.core.utils.document_helpers import (
+    strip_html, extract_content_summary, update_document_content_with_revision,
+)
+
+
+async def upsert_document(pool, card_id: str, content_html: str, user_id: str) -> None:
+    cid = UUID(card_id)
+    async with pool.acquire() as conn:
+        doc_id = await conn.fetchval("SELECT document_id FROM kanban_cards WHERE id = $1", cid)
+    if doc_id is not None:
+        await update_document_content_with_revision(pool, str(doc_id), content_html, user_id)
+        return
+    uid = UUID(user_id)
+    async with pool.acquire() as conn:
+        new_doc_id = await conn.fetchval(
+            """INSERT INTO documents (content_html, content_text, content_summary, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $4) RETURNING id""",
+            content_html,
+            strip_html(content_html),
+            extract_content_summary(content_html),
+            uid,
+        )
+        await conn.execute("UPDATE kanban_cards SET document_id = $1 WHERE id = $2", new_doc_id, cid)
 
 
 async def fetch_board(pool, feature_instance_id: str) -> dict:

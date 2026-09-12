@@ -145,13 +145,15 @@ export function useRecipeDetail(recipeId: string | null) {
     fetchDetail();
   }, [fetchDetail]);
 
-  const update = useCallback(async (data: RecipeUpdate) => {
-    if (!recipeId) return;
+  const update = useCallback(async (data: RecipeUpdate): Promise<boolean> => {
+    if (!recipeId) return false;
     try {
       await recipesService.update(recipeId, data);
       await fetchDetail();
+      return true;
     } catch (e: unknown) {
       setError(errorMessage(e));
+      return false;
     }
   }, [recipeId, fetchDetail]);
 

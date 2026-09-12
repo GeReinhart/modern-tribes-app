@@ -1,4 +1,5 @@
 import { apiService } from '@/app/platform/core/api/api.service.ts';
+import { DocumentRevision } from '@/app/platform/functions/documents/editor/documentRevisionTypes.ts';
 
 import {
   PersonOption,
@@ -29,6 +30,10 @@ class TodoListService {
 
   async delete(itemId: string): Promise<void> {
     return apiService.delete<void>(`/features/tasks/todo-items/${itemId}`);
+  }
+
+  async listDocumentRevisions(itemId: string): Promise<DocumentRevision[]> {
+    return apiService.get<DocumentRevision[]>(`/features/tasks/todo-items/${itemId}/document/revisions`);
   }
 
   async listLabels(featureInstanceId: string): Promise<TodoLabel[]> {

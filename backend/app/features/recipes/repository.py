@@ -1,11 +1,13 @@
-from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
 
-from app.platform.core.utils.document_helpers import strip_html, extract_content_summary
+from app.platform.core.utils.document_helpers import (
+    strip_html, extract_content_summary, update_document_content_with_revision,
+)
 
 _LABEL_IDS_SQL = """ARRAY(
                           SELECT le.label_id::text FROM label_entities le
+                          JOIN labels l ON l.id = le.label_id AND l.status = 'active'
                           WHERE le.entity_type = 'recipe' AND le.entity_id = r.id
                       ) AS label_ids"""
 
@@ -103,26 +105,22 @@ async def update_recipe(pool, recipe_id: str, updates: dict, user_id: str) -> No
 
 
 async def upsert_document(pool, recipe_id: str, content_html: str, user_id: str) -> None:
-    uid = UUID(user_id)
     rid = UUID(recipe_id)
-    content_text = strip_html(content_html)
-    content_summary = extract_content_summary(content_html)
-    now = datetime.now(timezone.utc)
     async with pool.acquire() as conn:
         doc_id = await conn.fetchval("SELECT document_id FROM recipes WHERE id = $1", rid)
-        if doc_id is None:
-            new_doc_id = await conn.fetchval(
-                """INSERT INTO documents (content_html, content_text, content_summary, created_by, updated_by)
-                   VALUES ($1, $2, $3, $4, $4) RETURNING id""",
-                content_html, content_text, content_summary, uid,
-            )
-            await conn.execute("UPDATE recipes SET document_id = $1 WHERE id = $2", new_doc_id, rid)
-        else:
-            await conn.execute(
-                """UPDATE documents SET content_html=$1, content_text=$2, content_summary=$3,
-                   updated_at=$4, updated_by=$5 WHERE id=$6""",
-                content_html, content_text, content_summary, now, uid, doc_id,
-            )
+    if doc_id is not None:
+        await update_document_content_with_revision(pool, str(doc_id), content_html, user_id)
+        return
+    uid = UUID(user_id)
+    content_text = strip_html(content_html)
+    content_summary = extract_content_summary(content_html)
+    async with pool.acquire() as conn:
+        new_doc_id = await conn.fetchval(
+            """INSERT INTO documents (content_html, content_text, content_summary, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $4) RETURNING id""",
+            content_html, content_text, content_summary, uid,
+        )
+        await conn.execute("UPDATE recipes SET document_id = $1 WHERE id = $2", new_doc_id, rid)
 
 
 async def delete_recipe(pool, recipe_id: str) -> None:

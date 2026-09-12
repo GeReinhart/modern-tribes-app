@@ -3,7 +3,8 @@ from fastapi import HTTPException, status
 from app.platform.core.authorization.project_access import check_project_access_or_admin
 from app.platform.core.uploads.helpers import create_document_with_attachments, get_document_with_attachments
 from app.platform.core.utils.db_helpers import generate_url_param_id
-from app.platform.core.utils.document_helpers import update_document_content_with_revision
+from app.platform.core.utils.document_helpers import fetch_document_revisions, update_document_content_with_revision
+from app.platform.functions.documents.models import DocumentRevision
 from app.platform.functions.labels import repository as labels_repo
 from app.platform.functions.labels.repository import fetch_label_ids_for_entity
 from app.features.guitar.song import mastery_repository as mastery_repo, song_lookup
@@ -112,6 +113,16 @@ async def get_song(pool, song_id: str, user: dict) -> GuitarSongDetailResponse:
         },
         chords=chords, videos=videos, layout=layout,
     )
+
+
+async def get_song_document_revisions(pool, song_id: str, user: dict) -> list[DocumentRevision]:
+    project_id = await _require_song_project(pool, song_id)
+    await check_project_access_or_admin(project_id, user, pool, min_position="guest")
+    row = await repo.fetch_song(pool, song_id)
+    document_id = row.get("document_id")
+    if not document_id:
+        return []
+    return [DocumentRevision(**r) for r in await fetch_document_revisions(pool, str(document_id))]
 
 
 async def update_song(pool, song_id: str, data: GuitarSongUpdate, user: dict) -> GuitarSongResponse:

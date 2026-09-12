@@ -6,7 +6,6 @@
    - ./scripts/check-area.sh
    - ./scripts/check-application.json.sh
    - ./scripts/check-backend.sh
-   - ./scripts/run-backend-tests.sh
    - ./scripts/check-frontend.sh
    - read ./application.json it will give you a great idea of the project structure; descriptions are written from the application user's perspective (what users see and do), not from the developer's perspective
 - 2 - **Apply changes** to the project.
@@ -17,10 +16,9 @@
 - 3 - **Check** the produced code is still a good status.
   - ./scripts/check-application.json.sh
   - ./scripts/check-backend.sh
-  - ./scripts/run-backend-tests.sh
   - ./scripts/check-frontend.sh
 
-Note on `scripts/merge-deploy.sh`: that script skips `run-backend-tests.sh` automatically when the backend hasn't changed relative to `main` (no diff and no untracked files under `backend/`). This is a deploy-time optimization only — during active development (steps 1 and 3 above), still run `run-backend-tests.sh` yourself whenever backend files changed that round.
+- **NEVER run `./scripts/run-backend-tests.sh` yourself, under any circumstance.** The user runs it themselves before pushing to the remote repo. Do not launch it to "make sure the area is good" — assume it's good and let them verify it on their own.
 
 ## Testing the changes
 

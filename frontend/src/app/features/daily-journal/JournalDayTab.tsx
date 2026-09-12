@@ -19,7 +19,7 @@ interface Props {
   onDateChange: (date: string) => void;
   onFilterLabel: (labelId: string | null) => void;
   onCreateBlock: (position: number, contentHtml: string) => Promise<void>;
-  onUpdateBlock: (blockId: string, contentHtml: string) => Promise<void>;
+  onUpdateBlock: (blockId: string, contentHtml: string) => Promise<boolean>;
   onDeleteBlock: (blockId: string) => Promise<void>;
   onReorderBlocks: (orderedIds: string[]) => Promise<void>;
   onToggleLabel: (blockId: string, labelId: string) => void;

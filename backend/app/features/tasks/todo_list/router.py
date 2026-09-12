@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from uuid import UUID
 
@@ -5,7 +6,8 @@ from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.database import get_database
-from app.platform.core.utils.document_helpers import strip_html, extract_content_summary
+from app.platform.core.utils.document_helpers import fetch_document_revisions
+from app.platform.functions.documents.models import DocumentRevision
 from app.features.tasks import label_service, reminder_service
 from app.features.tasks.todo_list import repository as todo_repository
 from app.platform.functions.labels import repository as labels_repo
@@ -86,6 +88,27 @@ async def create_todo_item(data: TodoItemCreate, current_user: dict = Depends(ge
     return _row_to_todo(row)
 
 
+@router.get("/{item_id}/document/revisions", response_model=List[DocumentRevision])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_todo_item_document_revisions(item_id: str, current_user: dict = Depends(get_current_user)):
+    """List this todo item's description revision history, current version first.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position >= guest
+    """
+    pool = get_database()
+    async with pool.acquire() as conn:
+        item_row = await conn.fetchrow(
+            "SELECT feature_instance_id, document_id FROM todo_items WHERE id = $1", UUID(item_id),
+        )
+    if not item_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo item not found.")
+    await label_service.require_feature_access(pool, str(item_row["feature_instance_id"]), current_user, "guest")
+    if not item_row["document_id"]:
+        return []
+    return [DocumentRevision(**r) for r in await fetch_document_revisions(pool, str(item_row["document_id"]))]
+
+
 @router.patch("/{item_id}", response_model=TodoItemResponse)
 @require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
 async def update_todo_item(item_id: str, data: TodoItemUpdate, current_user: dict = Depends(get_current_user)):
@@ -119,13 +142,7 @@ async def update_todo_item(item_id: str, data: TodoItemUpdate, current_user: dic
         )
 
     if data.document_content_html is not None:
-        await todo_repository.upsert_document(
-            pool, item_id,
-            data.document_content_html,
-            strip_html(data.document_content_html),
-            extract_content_summary(data.document_content_html),
-            user_id,
-        )
+        await todo_repository.upsert_document(pool, item_id, data.document_content_html, user_id)
 
     row = await todo_repository.fetch_todo_item(pool, item_id)
     if row["status"] != "archived":

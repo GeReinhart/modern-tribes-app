@@ -1,5 +1,5 @@
 import EditorFileUploader from '@/app/platform/functions/documents/editor/EditorFileUploader.tsx';
-import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
@@ -15,6 +15,7 @@ import {
   useProjectWithDocumentMutations,
 } from '@/app/features/tribes-projects/projects/useProjects.ts';
 import { useTribeWithPositions } from '@/app/features/tribes-projects/tribes/useTribesWithPositions.ts';
+import { projectService } from '@/app/features/tribes-projects/projects/project.service.ts';
 import {
   errorStyle,
   formActionsStyle,
@@ -89,9 +90,7 @@ const EditProjectPageContent: React.FC = () => {
     try {
       const result = await updateProjectWithDocument(projectId, {
         name: name.trim(),
-        document_content_html: documentContent,
         document_attachments: attachments,
-
       });
       if (!result) throw new Error('Failed to update project');
       navigate(`/app/tribes/${tribeId}/projects/${projectId}`);
@@ -100,6 +99,14 @@ const EditProjectPageContent: React.FC = () => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const saveDescription = async (html: string): Promise<boolean> => {
+    if (!projectId) return false;
+    const result = await updateProjectWithDocument(projectId, { document_content_html: html });
+    if (!result) return false;
+    setDocumentContent(html);
+    return true;
   };
 
   const menuActions = useMemo(
@@ -165,9 +172,10 @@ const EditProjectPageContent: React.FC = () => {
               {t('projects.description')}
             </ThemedText>
             <div className="border border-gray-300 rounded-lg overflow-hidden">
-              <EditorJoditComponent
+              <DocumentContentEditor
                 content={documentContent}
-                onChange={setDocumentContent}
+                onSave={saveDescription}
+                fetchRevisions={() => projectService.listDocumentRevisions(projectId!)}
               />
             </div>
             <div className="mb-6">

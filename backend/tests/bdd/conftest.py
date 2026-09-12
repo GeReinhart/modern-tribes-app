@@ -423,6 +423,35 @@ def given_projects_documents_table(datatable):
     _run(_insert())
 
 
+@given("the document_pages table contains:")
+def given_document_pages_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not uid:
+                    continue
+                await conn.execute(
+                    """INSERT INTO document_pages(id, url_param_id, project_document_id, title, content_html,
+                                                    order_index, status)
+                       VALUES($1, $2, $3, $4, $5, $6, $7)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid),
+                    rec.get("url_param_id", url_param_id_from_uuid(uid)),
+                    UUID(rec["project_document_id"]),
+                    rec.get("title", "Page"),
+                    rec.get("content_html", ""),
+                    coerce("order_index", rec.get("order_index", "0")),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
 @given("the publications table contains:")
 def given_publications_table(datatable):
     async def _insert():
@@ -484,13 +513,18 @@ def given_projects_table(datatable):
             for row in datatable[1:]:
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
                 uid = rec["id"]
+                document_id = rec.get("document_id")
+                # ON CONFLICT DO UPDATE only ever writes document_id here, so a follow-up
+                # declaration of an already-inserted project (e.g. to attach a description) can
+                # do so without disturbing other fields (same precedent as recipes/meals/tribes).
                 await conn.execute(
-                    """INSERT INTO projects(id, url_param_id, name, status)
-                       VALUES($1, $2, $3, $4)
-                       ON CONFLICT (id) DO NOTHING""",
+                    """INSERT INTO projects(id, url_param_id, name, document_id, status)
+                       VALUES($1, $2, $3, $4, $5)
+                       ON CONFLICT (id) DO UPDATE SET document_id = EXCLUDED.document_id""",
                     UUID(uid),
                     rec.get("url_param_id", url_param_id_from_uuid(uid)),
                     rec.get("name", "Project"),
+                    UUID(document_id) if document_id else None,
                     rec.get("status", "active"),
                 )
         finally:
@@ -507,13 +541,18 @@ def given_tribes_table(datatable):
             for row in datatable[1:]:
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
                 uid = rec["id"]
+                document_id = rec.get("document_id")
+                # ON CONFLICT DO UPDATE only ever writes document_id here, so a follow-up
+                # declaration of an already-inserted tribe (e.g. to attach a description) can do
+                # so without disturbing other fields.
                 await conn.execute(
-                    """INSERT INTO tribes(id, url_param_id, name, status)
-                       VALUES($1, $2, $3, $4)
-                       ON CONFLICT (id) DO NOTHING""",
+                    """INSERT INTO tribes(id, url_param_id, name, document_id, status)
+                       VALUES($1, $2, $3, $4, $5)
+                       ON CONFLICT (id) DO UPDATE SET document_id = EXCLUDED.document_id""",
                     UUID(uid),
                     rec.get("url_param_id", url_param_id_from_uuid(uid)),
                     rec.get("name", "Tribe"),
+                    UUID(document_id) if document_id else None,
                     rec.get("status", "active"),
                 )
         finally:
@@ -642,6 +681,7 @@ def given_kanban_cards_table(datatable):
                 uid = rec["id"]
                 assigned = rec.get("assigned_person_id")
                 due = rec.get("due_date")
+                document_id = rec.get("document_id")
                 created_at = _parse_created_at(rec.get("created_at"))
                 created_by = rec.get("created_by")
                 fields = [
@@ -664,10 +704,16 @@ def given_kanban_cards_table(datatable):
                 if created_by is not None:
                     fields.append("created_by")
                     values.append(UUID(created_by))
+                if document_id is not None:
+                    fields.append("document_id")
+                    values.append(UUID(document_id))
                 placeholders = ", ".join(f"${i + 1}" for i in range(len(fields)))
+                # ON CONFLICT DO UPDATE only ever writes document_id here, so a follow-up
+                # declaration of an already-inserted card (e.g. to attach a description) can do
+                # so without disturbing other fields.
                 query = (
                     f"INSERT INTO kanban_cards({', '.join(fields)}) "
-                    f"VALUES({placeholders}) ON CONFLICT (id) DO NOTHING"
+                    f"VALUES({placeholders}) ON CONFLICT (id) DO UPDATE SET document_id = EXCLUDED.document_id"
                 )
                 await conn.execute(query, *values)
         finally:
@@ -1998,17 +2044,23 @@ def given_events_table(datatable):
                 uid = rec.get("id")
                 if not uid:
                     continue
+                document_id = rec.get("document_id")
+                # ON CONFLICT DO UPDATE only ever writes document_id here, so a follow-up
+                # declaration of an already-inserted event (e.g. to attach a description) can do
+                # so without disturbing other fields.
                 await conn.execute(
-                    """INSERT INTO events(id, feature_instance_id, title, start_at, end_at, all_day, color, status)
-                       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
-                       ON CONFLICT (id) DO NOTHING""",
+                    """INSERT INTO events(id, feature_instance_id, title, start_at, end_at, all_day, color,
+                                           document_id, status)
+                       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                       ON CONFLICT (id) DO UPDATE SET document_id = EXCLUDED.document_id""",
                     UUID(uid),
                     UUID(rec["feature_instance_id"]),
                     rec.get("title", "Event"),
-                    _parse_dt(rec.get("start_at")),
-                    _parse_dt(rec.get("end_at")),
+                    _parse_dt(rec.get("start_at")) or datetime.now(timezone.utc),
+                    _parse_dt(rec.get("end_at")) or datetime.now(timezone.utc),
                     rec.get("all_day", "false").lower() == "true",
                     rec.get("color", "#6b7280"),
+                    UUID(document_id) if document_id else None,
                     rec.get("status", "active"),
                 )
         finally:

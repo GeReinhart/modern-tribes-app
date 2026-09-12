@@ -1,4 +1,4 @@
-import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedModal, ThemedModalBody, ThemedModalFooter } from '@/app/platform/core/layout/themes/components/ThemedModal.tsx';
@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import CollapsibleField from './CollapsibleField.tsx';
 import { combineDateAndSlot, MealSlot, slotFromTime } from './mealDateUtils.ts';
 import MealScheduleFields from './MealScheduleFields.tsx';
+import { mealsService } from './service.ts';
 import { Meal, MealUpdate, PersonOption, RecipeOption } from './types.ts';
 
 interface Props {
@@ -18,7 +19,7 @@ interface Props {
   persons: PersonOption[];
   recipes: RecipeOption[];
   canEdit: boolean;
-  onUpdate: (data: MealUpdate) => Promise<void>;
+  onUpdate: (data: MealUpdate) => Promise<boolean>;
   onSetParticipants: (personIds: string[]) => Promise<void>;
   onToggleRecipe: (recipeId: string) => Promise<void>;
   onViewRecipe: (recipeId: string) => void;
@@ -80,9 +81,10 @@ const MealDetailModal: React.FC<Props> = ({
           {(editable || meal.document_content_html) && (
             <CollapsibleField label={t('features.meals.description')} defaultExpanded={!!meal.document_content_html}>
               {editable ? (
-                <EditorJoditComponent
+                <DocumentContentEditor
                   content={meal.document_content_html || ''}
-                  onChange={(content) => onUpdate({ document_content_html: content })}
+                  onSave={(content) => onUpdate({ document_content_html: content })}
+                  fetchRevisions={() => mealsService.listDocumentRevisions(meal.id)}
                   minHeight={100}
                   minimal
                 />

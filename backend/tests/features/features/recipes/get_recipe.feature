@@ -93,6 +93,28 @@ Feature: Get a recipe with its ingredients
       }
       """
 
+  Scenario: GET /recipes/6001 tagged with an archived label — the archived label is not returned
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the labels table contains:
+      | id   | name    | color   | feature_instance_id | status   |
+      | 2001 | Quick   | #ff0000 | 0040                 | active   |
+      | 2002 | Retired | #00ff00 | 0040                 | archived |
+    And the label_entities table contains:
+      | label_id | entity_type | entity_id |
+      | 2001     | recipe      | 6001      |
+      | 2002     | recipe      | 6001      |
+    When I GET /api/features/tasks/recipes/6001
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "label_ids": ["2001"]
+      }
+      """
+
   @error_case
   Scenario: GET /recipes/6001 without project access — 403 error
     Given I am authenticated as a regular user: user.id 0002

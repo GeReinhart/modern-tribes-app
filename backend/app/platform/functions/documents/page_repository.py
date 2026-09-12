@@ -41,6 +41,45 @@ async def create_page(
     return row_to_dict(row)
 
 
+_PAGE_REVISIONS_QUERY = """
+SELECT
+    content_html,
+    updated_at,
+    (SELECT email FROM users WHERE id = updated_by) AS updated_by,
+    true                                             AS is_current
+FROM document_pages
+WHERE id = $1::uuid
+
+UNION ALL
+
+SELECT
+    rev->>'content_html',
+    (rev->>'updated_at')::timestamptz,
+    (SELECT email FROM users WHERE id = (rev->>'updated_by')::uuid),
+    false
+FROM document_pages,
+     jsonb_array_elements(revisions) AS rev
+WHERE id = $1::uuid
+
+ORDER BY updated_at DESC
+"""
+
+
+async def fetch_page_revisions(pool, page_id: str) -> List[dict]:
+    """All revision snapshots for a page, current version first."""
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(_PAGE_REVISIONS_QUERY, UUID(page_id))
+    return [
+        {
+            "content_html": r["content_html"],
+            "updated_at": r["updated_at"],
+            "updated_by": r["updated_by"],
+            "is_current": r["is_current"],
+        }
+        for r in rows
+    ]
+
+
 async def get_page(pool, page_id: str) -> Optional[dict]:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(

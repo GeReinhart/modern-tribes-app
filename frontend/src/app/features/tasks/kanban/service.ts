@@ -1,4 +1,5 @@
 import { apiService } from '@/app/platform/core/api/api.service.ts';
+import { DocumentRevision } from '@/app/platform/functions/documents/editor/documentRevisionTypes.ts';
 
 import {
   CardCreate,
@@ -64,6 +65,10 @@ class KanbanService {
       `/features/tasks/kanban/cards/${cardId}`,
       data,
     );
+  }
+
+  async listDocumentRevisions(cardId: string): Promise<DocumentRevision[]> {
+    return apiService.get<DocumentRevision[]>(`/features/tasks/kanban/cards/${cardId}/document/revisions`);
   }
 
   async archiveCard(cardId: string): Promise<void> {

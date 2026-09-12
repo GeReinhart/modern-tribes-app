@@ -5,6 +5,7 @@ import {
 } from '@/app/features/tribes-projects/tribes/tribe_with_positions.types.ts';
 
 import { apiService } from '@/app/platform/core/api/api.service.ts';
+import { DocumentRevision } from '@/app/platform/functions/documents/editor/documentRevisionTypes.ts';
 
 export const tribeWithPositionService = {
   async createWithPositions(
@@ -37,5 +38,9 @@ export const tribeWithPositionService = {
 
   async archiveTribe(id: string): Promise<void> {
     await apiService.patch<void>(`/features/tribes-projects/tribes/${id}/archive`);
+  },
+
+  async listDocumentRevisions(id: string): Promise<DocumentRevision[]> {
+    return apiService.get<DocumentRevision[]>(`/features/tribes-projects/tribes/${id}/document/revisions`);
   },
 };

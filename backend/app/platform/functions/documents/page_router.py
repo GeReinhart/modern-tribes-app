@@ -13,6 +13,7 @@ from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 from app.platform.functions.documents import page_service as document_page_service
+from app.platform.functions.documents.models import DocumentRevision
 from app.platform.core.utils.db_helpers import resolve_url_param_id
 from app.platform.core.authorization.project_access import check_project_access_or_admin
 
@@ -111,6 +112,30 @@ async def get_page(
     page_id = await resolve_url_param_id(pool, "document_pages", page_id)
     await check_project_access_or_admin(project_id, current_user, pool, min_position="guest")
     return await document_page_service.get_page(project_id, project_document_id, page_id, pool)
+
+
+@router.get(
+    "/projects/{project_id}/documents/{project_document_id}/pages/{page_id}/revisions",
+    response_model=List[DocumentRevision],
+)
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_page_revisions(
+    project_id: str,
+    project_document_id: str,
+    page_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """List a page's content revision history, current version first.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ guest
+    """
+    pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    project_document_id = await resolve_url_param_id(pool, "projects_documents", project_document_id)
+    page_id = await resolve_url_param_id(pool, "document_pages", page_id)
+    await check_project_access_or_admin(project_id, current_user, pool, min_position="guest")
+    return await document_page_service.get_page_revisions(project_id, project_document_id, page_id, pool)
 
 
 @router.put(

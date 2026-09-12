@@ -3,6 +3,9 @@ from typing import Optional
 from uuid import UUID
 
 from app.features.tasks import reminder_repository
+from app.platform.core.utils.document_helpers import (
+    strip_html, extract_content_summary, update_document_content_with_revision,
+)
 
 
 async def fetch_todo_items(pool, feature_instance_id: str) -> list[dict]:
@@ -130,32 +133,21 @@ async def update_todo_fields(
             )
 
 
-async def upsert_document(
-    pool, item_id: str, content_html: str, content_text: str, content_summary: str, user_id: str
-) -> None:
-    uid = UUID(user_id)
+async def upsert_document(pool, item_id: str, content_html: str, user_id: str) -> None:
     iid = UUID(item_id)
-    now = datetime.now(timezone.utc)
     async with pool.acquire() as conn:
         doc_id = await conn.fetchval("SELECT document_id FROM todo_items WHERE id = $1", iid)
-        if doc_id is None:
-            new_doc_id = await conn.fetchval(
-                """INSERT INTO documents (content_html, content_text, content_summary, created_by, updated_by)
-                   VALUES ($1, $2, $3, $4, $4) RETURNING id""",
-                content_html,
-                content_text,
-                content_summary,
-                uid,
-            )
-            await conn.execute("UPDATE todo_items SET document_id = $1 WHERE id = $2", new_doc_id, iid)
-        else:
-            await conn.execute(
-                """UPDATE documents SET content_html=$1, content_text=$2, content_summary=$3,
-                   updated_at=$4, updated_by=$5 WHERE id=$6""",
-                content_html,
-                content_text,
-                content_summary,
-                now,
-                uid,
-                doc_id,
-            )
+    if doc_id is not None:
+        await update_document_content_with_revision(pool, str(doc_id), content_html, user_id)
+        return
+    uid = UUID(user_id)
+    async with pool.acquire() as conn:
+        new_doc_id = await conn.fetchval(
+            """INSERT INTO documents (content_html, content_text, content_summary, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $4) RETURNING id""",
+            content_html,
+            strip_html(content_html),
+            extract_content_summary(content_html),
+            uid,
+        )
+        await conn.execute("UPDATE todo_items SET document_id = $1 WHERE id = $2", new_doc_id, iid)

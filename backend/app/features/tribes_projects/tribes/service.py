@@ -15,7 +15,9 @@ from app.platform.core.uploads.helpers import (
     update_document_attachments,
 )
 from app.platform.core.utils.db_helpers import check_unique_field
+from app.platform.core.utils.document_helpers import fetch_document_revisions
 from app.platform.core.utils.validators import EntityValidator
+from app.platform.functions.documents.models import DocumentRevision
 
 
 async def get_tribe_with_positions(tribe_id: str, pool) -> TribeWithPositionsResponse:
@@ -35,6 +37,15 @@ async def get_tribe_with_positions(tribe_id: str, pool) -> TribeWithPositionsRes
     tribe_projects = await tribe_repo.get_tribe_projects(pool, tribe_id)
 
     return _build_response(tribe, document, persons, tribe_projects)
+
+
+async def get_tribe_document_revisions(tribe_id: str, pool) -> list[DocumentRevision]:
+    tribe = await tribe_repo.get_tribe_by_id(pool, tribe_id)
+    if not tribe:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tribe not found")
+    if not tribe.get("document_id"):
+        return []
+    return [DocumentRevision(**r) for r in await fetch_document_revisions(pool, str(tribe["document_id"]))]
 
 
 async def create_tribe_with_positions(

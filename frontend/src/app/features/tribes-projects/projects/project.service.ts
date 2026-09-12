@@ -12,6 +12,7 @@ import {
   UserProjectEntry,
 } from '@/app/features/tribes-projects/projects/projects.query.types.ts';
 import { apiService } from '@/app/platform/core/api/api.service.ts';
+import { DocumentRevision } from '@/app/platform/functions/documents/editor/documentRevisionTypes.ts';
 
 class ProjectService {
   private endpoint = '/features/tribes-projects/projects';
@@ -79,6 +80,12 @@ class ProjectService {
     return apiService.put<ProjectWithDocumentResponse>(
       `/features/tribes-projects/projects/${projectId}/with-document`,
       data,
+    );
+  }
+
+  async listDocumentRevisions(projectId: string): Promise<DocumentRevision[]> {
+    return apiService.get<DocumentRevision[]>(
+      `/features/tribes-projects/projects/${projectId}/document/revisions`,
     );
   }
 

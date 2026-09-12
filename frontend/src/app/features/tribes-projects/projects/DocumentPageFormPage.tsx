@@ -1,5 +1,6 @@
 import EditorFileUploader from '@/app/platform/functions/documents/editor/EditorFileUploader.tsx';
 import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
@@ -85,6 +86,17 @@ const DocumentPageFormPageContent: React.FC = () => {
     },
   ];
 
+  const saveContent = async (html: string): Promise<boolean> => {
+    if (!projectId || !projectDocumentId || !pageId) return false;
+    try {
+      await documentPageService.update(projectId, projectDocumentId, pageId, { content_html: html });
+      setContent(html);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!projectId || !projectDocumentId) return;
@@ -98,7 +110,6 @@ const DocumentPageFormPageContent: React.FC = () => {
       if (isEdit && pageId) {
         await documentPageService.update(projectId, projectDocumentId, pageId, {
           title: title.trim(),
-          content_html: content,
           attachments,
         });
         navigate(docPath);
@@ -215,7 +226,15 @@ const DocumentPageFormPageContent: React.FC = () => {
                 {t('projects.description')}
               </ThemedText>
               <div className="border border-gray-300 rounded-lg overflow-hidden">
-                <EditorJoditComponent content={content} onChange={setContent} />
+                {isEdit && pageId ? (
+                  <DocumentContentEditor
+                    content={content}
+                    onSave={saveContent}
+                    fetchRevisions={() => documentPageService.listDocumentRevisions(projectId!, projectDocumentId!, pageId)}
+                  />
+                ) : (
+                  <EditorJoditComponent content={content} onChange={setContent} />
+                )}
               </div>
             </div>
             <div>

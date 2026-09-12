@@ -1,4 +1,5 @@
 import { ThemedCheckbox } from '@/app/platform/core/layout/themes/components/ThemedCheckbox.tsx';
+import { ThemedPopover } from '@/app/platform/core/layout/themes/components/ThemedPopover.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React, { useState } from 'react';
@@ -6,6 +7,7 @@ import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import { formatQuantityUnit } from '@/app/platform/core/formatQuantity.ts';
+import { renderCommentContent } from './commentContent.tsx';
 import GroceriesSectionToggleHeader from './GroceriesSectionToggleHeader.tsx';
 import { SectionGroup } from './sectionGrouping.ts';
 import { GroceriesListItemDetail } from './types.ts';
@@ -55,8 +57,17 @@ const GroceriesShoppingSectionGroup: React.FC<Props> = ({ group, canEdit, onTogg
                 size="lg"
               />
               {item.comment && (
-                <div style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary, marginLeft: '32px' }}>
-                  {item.comment}
+                <div style={{ marginLeft: '32px' }}>
+                  <ThemedPopover
+                    triggerIcon="info"
+                    triggerLabel={t('features.groceries.itemComment')}
+                    closeLabel={t('common.close')}
+                    triggerIconSize={12}
+                  >
+                    <div style={{ fontSize: 'var(--font-sm)', color: theme.colors.text, maxWidth: '240px' }}>
+                      {renderCommentContent(item.comment)}
+                    </div>
+                  </ThemedPopover>
                 </div>
               )}
             </div>

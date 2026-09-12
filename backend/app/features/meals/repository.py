@@ -1,8 +1,10 @@
-from datetime import date, datetime, timezone
+from datetime import date, datetime
 from typing import Optional
 from uuid import UUID
 
-from app.platform.core.utils.document_helpers import strip_html, extract_content_summary
+from app.platform.core.utils.document_helpers import (
+    strip_html, extract_content_summary, update_document_content_with_revision,
+)
 
 _DOCUMENT_SQL = "d.content_html AS document_content_html"
 
@@ -50,26 +52,22 @@ async def fetch_meals_for_instance(pool, feature_instance_id: str) -> list[dict]
 
 
 async def upsert_document(pool, meal_id: str, content_html: str, user_id: str) -> None:
-    uid = UUID(user_id)
     mid = UUID(meal_id)
-    content_text = strip_html(content_html)
-    content_summary = extract_content_summary(content_html)
-    now = datetime.now(timezone.utc)
     async with pool.acquire() as conn:
         doc_id = await conn.fetchval("SELECT document_id FROM meals WHERE id = $1", mid)
-        if doc_id is None:
-            new_doc_id = await conn.fetchval(
-                """INSERT INTO documents (content_html, content_text, content_summary, created_by, updated_by)
-                   VALUES ($1, $2, $3, $4, $4) RETURNING id""",
-                content_html, content_text, content_summary, uid,
-            )
-            await conn.execute("UPDATE meals SET document_id = $1 WHERE id = $2", new_doc_id, mid)
-        else:
-            await conn.execute(
-                """UPDATE documents SET content_html=$1, content_text=$2, content_summary=$3,
-                   updated_at=$4, updated_by=$5 WHERE id=$6""",
-                content_html, content_text, content_summary, now, uid, doc_id,
-            )
+    if doc_id is not None:
+        await update_document_content_with_revision(pool, str(doc_id), content_html, user_id)
+        return
+    uid = UUID(user_id)
+    content_text = strip_html(content_html)
+    content_summary = extract_content_summary(content_html)
+    async with pool.acquire() as conn:
+        new_doc_id = await conn.fetchval(
+            """INSERT INTO documents (content_html, content_text, content_summary, created_by, updated_by)
+               VALUES ($1, $2, $3, $4, $4) RETURNING id""",
+            content_html, content_text, content_summary, uid,
+        )
+        await conn.execute("UPDATE meals SET document_id = $1 WHERE id = $2", new_doc_id, mid)
 
 
 async def _fetch_participants_map(conn, meal_ids: list) -> dict:

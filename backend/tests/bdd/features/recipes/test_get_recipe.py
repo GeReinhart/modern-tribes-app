@@ -40,6 +40,11 @@ def test_get_recipe_condiment_ingredient():
     pass
 
 
+@scenario(FEATURE, "GET /recipes/6001 tagged with an archived label — the archived label is not returned")
+def test_get_recipe_excludes_archived_label():
+    pass
+
+
 @scenario(FEATURE, "GET /recipes/6001 without project access — 403 error")
 def test_get_recipe_forbidden():
     pass

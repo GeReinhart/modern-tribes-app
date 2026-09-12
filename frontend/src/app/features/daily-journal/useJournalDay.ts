@@ -9,7 +9,7 @@ interface UseJournalDayResult {
   loading: boolean;
   error: string | null;
   createBlock: (position: number, contentHtml: string) => Promise<void>;
-  updateBlock: (blockId: string, contentHtml: string) => Promise<void>;
+  updateBlock: (blockId: string, contentHtml: string) => Promise<boolean>;
   deleteBlock: (blockId: string) => Promise<void>;
   reorderBlocks: (orderedIds: string[]) => Promise<void>;
   toggleLabel: (blockId: string, labelId: string) => Promise<void>;
@@ -73,9 +73,15 @@ export function useJournalDay(
     await Promise.all([loadBlocks(), loadDays()]);
   }, [featureInstanceId, selectedDate, loadBlocks, loadDays]);
 
-  const updateBlock = useCallback(async (blockId: string, contentHtml: string) => {
-    await journalService.updateBlock(blockId, { content_html: contentHtml });
-    await loadBlocks();
+  const updateBlock = useCallback(async (blockId: string, contentHtml: string): Promise<boolean> => {
+    try {
+      await journalService.updateBlock(blockId, { content_html: contentHtml });
+      await loadBlocks();
+      return true;
+    } catch {
+      setError('Failed to update journal block.');
+      return false;
+    }
   }, [loadBlocks]);
 
   const deleteBlock = useCallback(async (blockId: string) => {

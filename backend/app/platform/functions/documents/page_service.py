@@ -9,6 +9,7 @@ from app.platform.functions.documents.page_models import (
     DocumentPageResponse,
     DocumentPageUpdate,
 )
+from app.platform.functions.documents.models import DocumentRevision
 from app.platform.core.uploads.files import AttachmentFile
 from app.platform.functions.documents import page_repository as repo
 from app.platform.functions.search import index_repository as search_index_repo
@@ -91,6 +92,17 @@ async def get_page(
     if not row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Page not found")
     return _build_response(row)
+
+
+async def get_page_revisions(
+    project_id: str,
+    project_document_id: str,
+    page_id: str,
+    pool,
+) -> List[DocumentRevision]:
+    await _verify_document_belongs_to_project(pool, project_id, project_document_id)
+    await _verify_page_belongs_to_document(pool, project_document_id, page_id)
+    return [DocumentRevision(**r) for r in await repo.fetch_page_revisions(pool, page_id)]
 
 
 async def list_pages(

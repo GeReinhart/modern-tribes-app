@@ -1,4 +1,5 @@
 import { apiService } from '@/app/platform/core/api/api.service.ts';
+import { DocumentRevision } from '@/app/platform/functions/documents/editor/documentRevisionTypes.ts';
 import {
   CalendarEvent,
   EventCreate,
@@ -33,6 +34,10 @@ class EventsService {
 
   async delete(eventId: string): Promise<void> {
     return apiService.delete<void>(`/features/tasks/events/${eventId}`);
+  }
+
+  async listDocumentRevisions(eventId: string): Promise<DocumentRevision[]> {
+    return apiService.get<DocumentRevision[]>(`/features/tasks/events/${eventId}/document/revisions`);
   }
 
   async setParticipants(eventId: string, personIds: string[]): Promise<string[]> {

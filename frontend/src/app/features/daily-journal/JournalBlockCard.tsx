@@ -1,10 +1,11 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
-import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 import { highlightHtml } from '@/app/platform/functions/search/highlight.utils.ts';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import JournalLabelPicker from './JournalLabelPicker.tsx';
+import { journalService } from './service.ts';
 import type { JournalBlock, JournalLabel } from './types.ts';
 
 interface Props {
@@ -16,7 +17,7 @@ interface Props {
   searchQuery?: string;
   onMoveUp: () => void;
   onMoveDown: () => void;
-  onSave: (contentHtml: string) => Promise<void>;
+  onSave: (contentHtml: string) => Promise<boolean>;
   onDelete: () => Promise<void>;
   onToggleLabel: (labelId: string) => void;
   onCreateLabel: (name: string, color: string) => Promise<void>;
@@ -33,19 +34,8 @@ const JournalBlockCard: React.FC<Props> = ({
   const { t } = useTranslation();
   const { theme } = useTheme();
   const [editing, setEditing] = useState(false);
-  const [editContent, setEditContent] = useState(block.content_html ?? '');
 
   const blockLabels = labels.filter(l => block.label_ids.includes(l.id));
-
-  const handleSave = async () => {
-    await onSave(editContent);
-    setEditing(false);
-  };
-
-  const handleCancel = () => {
-    setEditContent(block.content_html ?? '');
-    setEditing(false);
-  };
 
   return (
     <div style={{ display: 'flex', gap: '0', border: `1px solid ${theme.colors.border}`, borderRadius: '8px', backgroundColor: theme.colors.surface, position: 'relative' }}>
@@ -71,7 +61,7 @@ const JournalBlockCard: React.FC<Props> = ({
               onDeleteLabel={onDeleteLabel}
               onReorderLabel={onReorderLabel}
             />
-            <button type="button" onClick={() => { setEditContent(block.content_html ?? ''); setEditing(true); }} title={t('journal.editBlock')}
+            <button type="button" onClick={() => setEditing(true)} title={t('journal.editBlock')}
               style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex', opacity: 0.6 }}>
               <ThemedSvgIcon name="pencil" color={theme.colors.text} size={13} />
             </button>
@@ -97,26 +87,21 @@ const JournalBlockCard: React.FC<Props> = ({
         {/* Content */}
         <div style={{ padding: canEdit && !editing ? '2px 12px 12px' : '10px 12px 12px' }}>
           {editing ? (
-            <>
-              <EditorJoditComponent content={editContent} onChange={setEditContent} minHeight={160} compact />
-              <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-                <button type="button" onClick={handleSave}
-                  style={{ padding: '6px 16px', borderRadius: '6px', background: theme.colors.primary, color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 'var(--font-sm)' }}>
-                  {t('journal.save')}
-                </button>
-                <button type="button" onClick={handleCancel}
-                  style={{ padding: '6px 16px', borderRadius: '6px', background: 'none', color: theme.colors.secondary, border: `1px solid ${theme.colors.border}`, cursor: 'pointer', fontSize: 'var(--font-sm)' }}>
-                  {t('journal.cancel')}
-                </button>
-              </div>
-            </>
+            <DocumentContentEditor
+              content={block.content_html ?? ''}
+              onSave={onSave}
+              fetchRevisions={() => journalService.listBlockDocumentRevisions(block.id)}
+              onDone={() => setEditing(false)}
+              minHeight={160}
+              compact
+            />
           ) : (
             <>
               <div
                 className="prose max-w-none"
                 style={{ fontSize: 'var(--font-sm)', color: theme.colors.text, cursor: canEdit ? 'pointer' : 'default' }}
                 dangerouslySetInnerHTML={{ __html: searchQuery ? highlightHtml(block.content_html ?? '', searchQuery) : (block.content_html ?? '') }}
-                onClick={canEdit ? () => { setEditContent(block.content_html ?? ''); setEditing(true); } : undefined}
+                onClick={canEdit ? () => setEditing(true) : undefined}
               />
               {searchQuery && (
                 <style>{`mark { background-color: ${theme.colors.primary}30; color: ${theme.colors.primary}; border-radius: 2px; padding: 0 2px; }`}</style>

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
@@ -8,6 +8,8 @@ from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.authorization.project_access import check_project_access_or_admin
 from app.platform.core.database import get_database
 from app.platform.core.utils.db_helpers import resolve_url_param_id
+from app.platform.core.utils.document_helpers import fetch_document_revisions
+from app.platform.functions.documents.models import DocumentRevision
 from app.platform.functions.labels import repository as labels_repo
 from app.features.recipes import access
 from app.features.recipes import repository as recipes_repository
@@ -191,6 +193,22 @@ async def get_recipe(recipe_id: str, current_user: dict = Depends(get_current_us
         ingredients=[_row_to_ingredient_detail(i) for i in ingredients],
         components=components,
     )
+
+
+@router.get("/{recipe_id}/document/revisions", response_model=List[DocumentRevision])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_recipe_document_revisions(recipe_id: str, current_user: dict = Depends(get_current_user)):
+    """List this recipe's description revision history, current version first.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position >= guest
+    """
+    pool = get_database()
+    row = await _require_recipe(pool, recipe_id)
+    await access.require_feature_access(pool, str(row["feature_instance_id"]), current_user, "guest")
+    if not row.get("document_id"):
+        return []
+    return [DocumentRevision(**r) for r in await fetch_document_revisions(pool, str(row["document_id"]))]
 
 
 @router.patch("/{recipe_id}", response_model=RecipeResponse)

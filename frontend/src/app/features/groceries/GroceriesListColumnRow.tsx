@@ -1,3 +1,4 @@
+import { ThemedPopover } from '@/app/platform/core/layout/themes/components/ThemedPopover.tsx';
 import { ThemedQuantityStepper } from '@/app/platform/core/layout/themes/components/ThemedQuantityStepper.tsx';
 import { IconName, ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
@@ -6,6 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { formatQuantityUnit } from '@/app/platform/core/formatQuantity.ts';
+import { renderCommentContent } from './commentContent.tsx';
 import { GroceriesListItemDetail } from './types.ts';
 
 interface Props {
@@ -91,12 +93,17 @@ const GroceriesListColumnRow: React.FC<Props> = ({
       </div>
 
       {!panelOpen && item.comment && (
-        <div
-          style={{
-            fontSize: 'var(--font-xs)', color: theme.colors.secondary, marginLeft: '20px', whiteSpace: 'pre-line',
-          }}
-        >
-          {item.comment}
+        <div style={{ marginLeft: '20px' }}>
+          <ThemedPopover
+            triggerIcon="info"
+            triggerLabel={t('features.groceries.itemComment')}
+            closeLabel={t('common.close')}
+            triggerIconSize={12}
+          >
+            <div style={{ fontSize: 'var(--font-xs)', color: theme.colors.text, maxWidth: '240px' }}>
+              {renderCommentContent(item.comment)}
+            </div>
+          </ThemedPopover>
         </div>
       )}
 

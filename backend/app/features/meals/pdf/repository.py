@@ -2,6 +2,7 @@ from uuid import UUID
 
 _RECIPE_LABEL_IDS_SQL = """ARRAY(
                           SELECT le.label_id::text FROM label_entities le
+                          JOIN labels l ON l.id = le.label_id AND l.status = 'active'
                           WHERE le.entity_type = 'recipe' AND le.entity_id = r.id
                       ) AS label_ids"""
 

@@ -1,4 +1,5 @@
 from datetime import date
+from typing import List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -8,6 +9,8 @@ from app.platform.core.authorization.router import require_any_permission_decora
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.authorization.permissions import get_user_permissions
 from app.platform.core.database import get_database
+from app.platform.core.utils.document_helpers import fetch_document_revisions
+from app.platform.functions.documents.models import DocumentRevision
 from app.platform.functions.labels import repository as labels_repo
 from app.features.daily_journal import repository as journal_repo
 from app.features.daily_journal import repository_dashboard as journal_dash_repo
@@ -139,6 +142,20 @@ async def create_block(data: JournalBlockCreate, current_user: dict = Depends(ge
     await journal_service.index_block(pool, block_id, user_id)
     full = await journal_repo.fetch_block(pool, block_id)
     return _row_to_block(full)
+
+
+@router.get("/blocks/{block_id}/document/revisions", response_model=List[DocumentRevision])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_block_document_revisions(block_id: str, current_user: dict = Depends(get_current_user)):
+    """List this journal block's content revision history, current version first."""
+    pool = get_database()
+    blk = await journal_repo.fetch_block(pool, block_id)
+    if not blk:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Block not found.")
+    await require_feature_access(pool, str(blk["feature_instance_id"]), current_user, "guest")
+    if not blk.get("document_id"):
+        return []
+    return [DocumentRevision(**r) for r in await fetch_document_revisions(pool, str(blk["document_id"]))]
 
 
 @router.patch("/blocks/{block_id}", response_model=JournalBlockResponse)

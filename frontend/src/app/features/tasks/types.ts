@@ -1,4 +1,5 @@
 import { FIB_COLORS, URGENCY_COLORS } from '@/app/platform/core/layout/themes/themes.ts';
+import { DocumentRevision } from '@/app/platform/functions/documents/editor/documentRevisionTypes.ts';
 
 export interface PersonOption {
   id: string;
@@ -103,6 +104,7 @@ export interface TaskItemModalProps {
   canCreateLabel: boolean;
   onClose: () => void;
   onUpdate: (id: string, patch: TaskPatch) => Promise<void>;
+  fetchDocumentRevisions: (id: string) => Promise<DocumentRevision[]>;
   onToggleLabel: (id: string, labelId: string, currentLabelIds: string[]) => Promise<void>;
   onSetReminders: (id: string, reminders: TaskReminderCreate[]) => Promise<void>;
   onCreateLabel: (data: {

@@ -1,10 +1,11 @@
-import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 import { ThemedDivider } from '@/app/platform/core/layout/themes/components/ThemedDivider.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { recipesService } from './service.ts';
 import AddIngredientModal from './AddIngredientModal.tsx';
 import RecipeComponentsSection from './RecipeComponentsSection.tsx';
 import RecipeIngredientsList from './RecipeIngredientsList.tsx';
@@ -19,7 +20,7 @@ interface Props {
   labels: RecipeLabel[];
   canEdit: boolean;
   projectId: string;
-  onUpdate: (data: RecipeUpdate) => Promise<void>;
+  onUpdate: (data: RecipeUpdate) => Promise<boolean>;
   onCreateLabel: (name: string, color: string) => Promise<void>;
   onToggleLabel: (labelId: string) => Promise<void>;
   onUpdateLabel: (labelId: string, data: { name?: string; color?: string }) => Promise<void>;
@@ -108,9 +109,10 @@ const RecipeDetailBody: React.FC<Props> = ({
       <div>
         <div style={{ fontWeight: 600, marginBottom: '8px' }}>{t('features.recipes.description')}</div>
         {canEdit ? (
-          <EditorJoditComponent
+          <DocumentContentEditor
             content={recipe.document_content_html || ''}
-            onChange={(content) => onUpdate({ document_content_html: content })}
+            onSave={(content) => onUpdate({ document_content_html: content })}
+            fetchRevisions={() => recipesService.listDocumentRevisions(recipe.id)}
           />
         ) : (
           <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: recipe.document_content_html || '' }} />

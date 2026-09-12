@@ -25,3 +25,10 @@ class Document(DocumentBase):
     updated_at: datetime
     created_by: Optional[str] = None
     updated_by: Optional[str] = None
+
+
+class DocumentRevision(BaseModel):
+    content_html: str
+    updated_at: datetime
+    updated_by: Optional[str] = None
+    is_current: bool = False

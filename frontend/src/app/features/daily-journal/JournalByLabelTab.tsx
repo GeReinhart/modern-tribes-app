@@ -74,7 +74,7 @@ const JournalByLabelTab: React.FC<Props> = ({ featureInstanceId, labels }) => {
                 isLast
                 onMoveUp={() => {}}
                 onMoveDown={() => {}}
-                onSave={async () => {}}
+                onSave={async () => false}
                 onDelete={async () => {}}
                 onToggleLabel={() => {}}
                 onCreateLabel={async () => {}}

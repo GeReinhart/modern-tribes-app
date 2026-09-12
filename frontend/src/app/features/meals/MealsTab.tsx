@@ -109,7 +109,7 @@ const MealsTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, projec
           persons={persons}
           recipes={recipes}
           canEdit={canEdit}
-          onUpdate={(data) => updateMeal(openMeal.id, data).then(() => undefined)}
+          onUpdate={(data) => updateMeal(openMeal.id, data)}
           onSetParticipants={(personIds) => setParticipants(openMeal.id, personIds)}
           onToggleRecipe={(recipeId) => toggleRecipe(openMeal.id, recipeId)}
           onViewRecipe={viewRecipe}

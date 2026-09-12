@@ -3,6 +3,7 @@ import type { TaskLabelInfo, TaskPatch, TaskReminderCreate } from '@/app/feature
 
 import React from 'react';
 
+import { kanbanService } from './service.ts';
 import type {
   CardUpdate,
   KanbanCard,
@@ -93,6 +94,7 @@ const KanbanCardModal: React.FC<Props> = ({
       canCreateLabel={canEdit}
       onClose={onClose}
       onUpdate={handleUpdate}
+      fetchDocumentRevisions={() => kanbanService.listDocumentRevisions(card.id)}
       onToggleLabel={onToggleLabel}
       onSetReminders={handleSetReminders}
       onCreateLabel={handleCreateLabel}

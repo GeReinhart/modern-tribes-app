@@ -5,6 +5,7 @@ import {
   DocumentPageUpdate,
 } from '@/app/platform/functions/documents/document-page.types.ts';
 import { apiService } from '@/app/platform/core/api/api.service.ts';
+import { DocumentRevision } from '@/app/platform/functions/documents/editor/documentRevisionTypes.ts';
 
 class DocumentPageService {
   private base(projectId: string, projectDocumentId: string) {
@@ -47,6 +48,16 @@ class DocumentPageService {
     return apiService.put<DocumentPage>(
       `${this.base(projectId, projectDocumentId)}/${pageId}`,
       data,
+    );
+  }
+
+  listDocumentRevisions(
+    projectId: string,
+    projectDocumentId: string,
+    pageId: string,
+  ): Promise<DocumentRevision[]> {
+    return apiService.get<DocumentRevision[]>(
+      `${this.base(projectId, projectDocumentId)}/${pageId}/revisions`,
     );
   }
 

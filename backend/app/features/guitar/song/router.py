@@ -7,6 +7,7 @@ from app.platform.core.authorization.router import require_any_permission_decora
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.database import get_database
 from app.platform.core.utils.db_helpers import resolve_url_param_id
+from app.platform.functions.documents.models import DocumentRevision
 from app.features.guitar.song import mastery_service, service as song_service
 from app.features.guitar.song.mastery_models import GuitarSongMasterySet, GuitarSongMasteryResponse
 from app.features.guitar.song.models import (
@@ -72,6 +73,19 @@ async def get_song(song_id: str, current_user: dict = Depends(get_current_user))
     pool = get_database()
     song_id = await resolve_url_param_id(pool, "guitar_songs", song_id)
     return await song_service.get_song(pool, song_id, current_user)
+
+
+@router.get("/songs/{song_id}/document/revisions", response_model=List[DocumentRevision])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_song_document_revisions(song_id: str, current_user: dict = Depends(get_current_user)):
+    """List this song's description revision history, current version first.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Project access:** minimum position ≥ guest
+    """
+    pool = get_database()
+    song_id = await resolve_url_param_id(pool, "guitar_songs", song_id)
+    return await song_service.get_song_document_revisions(pool, song_id, current_user)
 
 
 @router.patch("/songs/{song_id}", response_model=GuitarSongResponse)

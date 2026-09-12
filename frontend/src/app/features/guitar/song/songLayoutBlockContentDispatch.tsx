@@ -1,6 +1,6 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
-import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 
 import React from 'react';
 
@@ -10,6 +10,7 @@ import { SongFormCustomBlockCard } from './SongFormCustomBlockCard.tsx';
 import { SongFreeformHtml } from './SongFreeformHtml.tsx';
 import { SongInlineEditableNumber, SongInlineEditableText } from './SongInlineEditableField.tsx';
 import { SongStatCard } from './SongStatCard.tsx';
+import { guitarSongsService } from './service.ts';
 import { TITLE_HEADING_SIZES_PX } from './layoutBlockOptions.ts';
 import {
   renderChordGridBlock, renderChordsBlock, renderLabelsBlock, renderSectionsBlock,
@@ -89,9 +90,19 @@ const renderScalarBlock = (
           <>
             <SongEditableBlockTitle block={block} defaultTitle="" canEdit={canEdit} onSave={onSaveTitle} />
             <div className="border border-gray-300 rounded-lg overflow-hidden">
-              <EditorJoditComponent
-                content={song.description_html} onChange={(description_html) => hook.updateSongFields({ description_html })}
-                compact minHeight={150}
+              <DocumentContentEditor
+                content={song.description_html}
+                onSave={async (description_html) => {
+                  try {
+                    await hook.updateSongFields({ description_html });
+                    return true;
+                  } catch {
+                    return false;
+                  }
+                }}
+                fetchRevisions={() => guitarSongsService.listDocumentRevisions(song.id)}
+                compact
+                minHeight={150}
               />
             </div>
           </>

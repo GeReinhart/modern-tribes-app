@@ -1,4 +1,5 @@
 import { apiService } from '@/app/platform/core/api/api.service.ts';
+import { DocumentRevision } from '@/app/platform/functions/documents/editor/documentRevisionTypes.ts';
 import type {
   JournalBlock,
   JournalBlockCreate,
@@ -41,6 +42,10 @@ class JournalService {
 
   async updateBlock(blockId: string, data: JournalBlockUpdate): Promise<JournalBlock> {
     return apiService.patch<JournalBlock>(`${BASE}/blocks/${blockId}`, data);
+  }
+
+  async listBlockDocumentRevisions(blockId: string): Promise<DocumentRevision[]> {
+    return apiService.get<DocumentRevision[]>(`${BASE}/blocks/${blockId}/document/revisions`);
   }
 
   async deleteBlock(blockId: string): Promise<void> {

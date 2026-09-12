@@ -72,7 +72,7 @@ const RecipePresentationPageContent: React.FC = () => {
           labels={labelsHook.labels}
           canEdit={false}
           projectId={projectId || ''}
-          onUpdate={noop}
+          onUpdate={async () => false}
           onCreateLabel={noop}
           onToggleLabel={noop}
           onUpdateLabel={noop}

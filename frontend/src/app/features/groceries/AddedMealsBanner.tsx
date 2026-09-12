@@ -40,15 +40,15 @@ const AddedMealsBanner: React.FC<Props> = ({ meals }) => {
               color: theme.colors.text,
             }}
           >
-            {meal.meal_title && (
-              <>
-                <span style={{ fontWeight: 600 }}>{meal.meal_title}</span>
-                {' — '}
-              </>
-            )}
             {formatMealDate(meal.meal_start_at, i18n.language)}
             {' — '}
             {t('features.groceries.mealAccountedForHeadcount', { count: meal.headcount })}
+            {meal.meal_title && (
+              <>
+                {' — '}
+                <span style={{ fontWeight: 600 }}>{meal.meal_title}</span>
+              </>
+            )}
             {meal.recipe_names.length > 0 && (
               <>
                 {' — '}

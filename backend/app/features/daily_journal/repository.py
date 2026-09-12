@@ -2,7 +2,9 @@ from datetime import date, datetime, timezone
 from typing import Optional
 from uuid import UUID
 
-from app.platform.core.utils.document_helpers import strip_html, extract_content_summary
+from app.platform.core.utils.document_helpers import (
+    strip_html, extract_content_summary, update_document_content_with_revision,
+)
 
 
 async def fetch_blocks_for_day(pool, feature_instance_id: str, day: date) -> list[dict]:
@@ -111,17 +113,12 @@ async def insert_block(
 async def update_block_content(pool, block_id: str, content_html: str, user_id: str) -> None:
     uid = UUID(user_id)
     bid = UUID(block_id)
-    content_text = strip_html(content_html)
-    content_summary = extract_content_summary(content_html)
     now = datetime.now(timezone.utc)
     async with pool.acquire() as conn:
         doc_id = await conn.fetchval("SELECT document_id FROM journal_blocks WHERE id = $1", bid)
-        if doc_id:
-            await conn.execute(
-                """UPDATE documents SET content_html=$1, content_text=$2, content_summary=$3,
-                   updated_at=$4, updated_by=$5 WHERE id=$6""",
-                content_html, content_text, content_summary, now, uid, doc_id,
-            )
+    if doc_id:
+        await update_document_content_with_revision(pool, str(doc_id), content_html, user_id)
+    async with pool.acquire() as conn:
         await conn.execute(
             "UPDATE journal_blocks SET updated_at=$1, updated_by=$2 WHERE id=$3",
             now, uid, bid,

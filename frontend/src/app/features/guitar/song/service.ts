@@ -1,4 +1,5 @@
 import { apiService } from '@/app/platform/core/api/api.service.ts';
+import { DocumentRevision } from '@/app/platform/functions/documents/editor/documentRevisionTypes.ts';
 
 import {
   GuitarSong,
@@ -32,6 +33,9 @@ export const guitarSongsService = {
 
   updateSong: (songId: string, data: GuitarSongUpdate): Promise<GuitarSong> =>
     apiService.patch<GuitarSong>(`${BASE}/songs/${songId}`, data),
+
+  listDocumentRevisions: (songId: string): Promise<DocumentRevision[]> =>
+    apiService.get<DocumentRevision[]>(`${BASE}/songs/${songId}/document/revisions`),
 
   setMyMastery: (songId: string, masteryLevel: number): Promise<{ my_mastery: number }> =>
     apiService.put<{ my_mastery: number }>(`${BASE}/songs/${songId}/mastery`, { mastery_level: masteryLevel }),

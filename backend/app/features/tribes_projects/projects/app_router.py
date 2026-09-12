@@ -10,6 +10,7 @@ from app.features.tribes_projects.projects.app_models import (
     ProjectWithDocumentResponse,
     ProjectWithDocumentUpdate,
 )
+from app.platform.functions.documents.models import DocumentRevision
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
@@ -50,6 +51,18 @@ async def get_project_with_document(project_id: str, current_user: dict = Depend
     pool = get_database()
     project_id = await resolve_url_param_id(pool, "projects", project_id)
     return await project_service.get_project_with_document(project_id, pool)
+
+
+@router.get("/{project_id}/document/revisions", response_model=List[DocumentRevision])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_project_document_revisions(project_id: str, current_user: dict = Depends(get_current_user)):
+    """List this project's description revision history, current version first.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
+    pool = get_database()
+    project_id = await resolve_url_param_id(pool, "projects", project_id)
+    return await project_service.get_project_document_revisions(project_id, pool)
 
 
 @router.put("/{project_id}/with-document", response_model=ProjectWithDocumentResponse)

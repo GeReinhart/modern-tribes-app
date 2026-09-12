@@ -1,12 +1,13 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from uuid import UUID
-from datetime import datetime, timezone
 
 from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.database import get_database
-from app.platform.core.utils.document_helpers import strip_html, extract_content_summary
+from app.platform.core.utils.document_helpers import fetch_document_revisions
+from app.platform.functions.documents.models import DocumentRevision
 from app.features.tasks import label_service, reminder_service
 from app.features.tasks.kanban import repository as repo
 from app.platform.functions.labels import repository as labels_repo
@@ -80,7 +81,7 @@ async def update_card(card_id: str, data: CardUpdate, current_user: dict = Depen
     uid = str(current_user["id"])
     await repo.update_card_fields(pool, card_id, data.title, data.assigned_person_id, data.clear_assignee, data.size, data.clear_size, data.due_date, data.clear_due_date, data.force_on_dashboard, uid)
     if data.document_content_html is not None:
-        await _upsert_card_document(pool, card, data.document_content_html, uid)
+        await repo.upsert_document(pool, card_id, data.document_content_html, uid)
     updated = await repo.fetch_card(pool, card_id)
     if updated["status"] != "archived":
         await search_index.index_kanban_card(pool, card_id, uid)
@@ -89,22 +90,22 @@ async def update_card(card_id: str, data: CardUpdate, current_user: dict = Depen
     return _card(updated)
 
 
-async def _upsert_card_document(pool, card: dict, html: str, uid: str) -> None:
-    now = datetime.now(timezone.utc)
-    async with pool.acquire() as conn:
-        doc_id = card.get("document_id")
-        if doc_id is None:
-            new_doc = await conn.fetchrow(
-                "INSERT INTO documents (content_html, content_text, content_summary, created_by, updated_by) VALUES ($1, $2, $3, $4, $4) RETURNING id",
-                html, strip_html(html), extract_content_summary(html), UUID(uid),
-            )
-            doc_id = new_doc["id"]
-            await conn.execute("UPDATE kanban_cards SET document_id = $1 WHERE id = $2", doc_id, UUID(str(card["id"])))
-        else:
-            await conn.execute(
-                "UPDATE documents SET content_html=$1, content_text=$2, content_summary=$3, updated_at=$4, updated_by=$5 WHERE id=$6",
-                html, strip_html(html), extract_content_summary(html), now, UUID(uid), UUID(str(doc_id)),
-            )
+@card_router.get("/cards/{card_id}/document/revisions", response_model=List[DocumentRevision])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_card_document_revisions(card_id: str, current_user: dict = Depends(get_current_user)):
+    """List this card's description revision history, current version first.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position >= guest
+    """
+    pool = get_database()
+    card = await repo.fetch_card(pool, card_id)
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found.")
+    await label_service.require_feature_access(pool, str(card["feature_instance_id"]), current_user, "guest")
+    if not card.get("document_id"):
+        return []
+    return [DocumentRevision(**r) for r in await fetch_document_revisions(pool, str(card["document_id"]))]
 
 
 @card_router.delete("/cards/{card_id}", status_code=status.HTTP_204_NO_CONTENT)

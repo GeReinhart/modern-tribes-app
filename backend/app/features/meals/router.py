@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from uuid import UUID
 
@@ -5,6 +6,8 @@ from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.database import get_database
+from app.platform.core.utils.document_helpers import fetch_document_revisions
+from app.platform.functions.documents.models import DocumentRevision
 from app.platform.functions.people.persons import repository as persons_repository
 from app.features.meals import access
 from app.features.meals import repository as meals_repository
@@ -103,6 +106,22 @@ async def get_meal(meal_id: str, current_user: dict = Depends(get_current_user))
     row = await _require_meal(pool, meal_id)
     await access.require_feature_access(pool, str(row["feature_instance_id"]), current_user, "guest")
     return _row_to_meal(row)
+
+
+@router.get("/{meal_id}/document/revisions", response_model=List[DocumentRevision])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_meal_document_revisions(meal_id: str, current_user: dict = Depends(get_current_user)):
+    """List this meal's description revision history, current version first.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position >= guest
+    """
+    pool = get_database()
+    row = await _require_meal(pool, meal_id)
+    await access.require_feature_access(pool, str(row["feature_instance_id"]), current_user, "guest")
+    if not row.get("document_id"):
+        return []
+    return [DocumentRevision(**r) for r in await fetch_document_revisions(pool, str(row["document_id"]))]
 
 
 @router.patch("/{meal_id}", response_model=MealResponse)

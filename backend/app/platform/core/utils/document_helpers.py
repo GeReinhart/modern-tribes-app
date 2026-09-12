@@ -44,6 +44,46 @@ class _ContentSummaryParser(HTMLParser):
         self._plain_parts.append(data)
 
 
+_REVISIONS_QUERY = """
+SELECT
+    content_html,
+    updated_at,
+    (SELECT email FROM users WHERE id = updated_by) AS updated_by,
+    true                                             AS is_current
+FROM documents
+WHERE id = $1::uuid
+
+UNION ALL
+
+SELECT
+    rev->>'content_html',
+    (rev->>'updated_at')::timestamptz,
+    (SELECT email FROM users WHERE id = (rev->>'updated_by')::uuid),
+    false
+FROM documents,
+     jsonb_array_elements(revisions) AS rev
+WHERE id = $1::uuid
+
+ORDER BY updated_at DESC
+"""
+
+
+async def fetch_document_revisions(pool, document_id: str) -> list[dict]:
+    """All revision snapshots for a document, current version first, empty if the document
+    doesn't exist (e.g. a feature entity that has never had its description saved yet)."""
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(_REVISIONS_QUERY, UUID(document_id))
+    return [
+        {
+            "content_html": r["content_html"],
+            "updated_at": r["updated_at"],
+            "updated_by": r["updated_by"],
+            "is_current": r["is_current"],
+        }
+        for r in rows
+    ]
+
+
 async def update_document_content_with_revision(
     pool, document_id: str, content_html: str, user_id: str
 ) -> None:

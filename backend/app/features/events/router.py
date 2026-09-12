@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from uuid import UUID
 
@@ -5,6 +6,8 @@ from app.platform.core.authentication.router import get_current_user
 from app.platform.core.authorization.router import require_any_permission_decorator
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.database import get_database
+from app.platform.core.utils.document_helpers import fetch_document_revisions
+from app.platform.functions.documents.models import DocumentRevision
 from app.platform.functions.labels import repository as labels_repo
 from app.features.events import repository as event_repository
 from app.features.events import service as event_service
@@ -120,6 +123,24 @@ async def create_event(data: EventCreate, current_user: dict = Depends(get_curre
         await event_repository.update_event_size(pool, event_id, data.size, False, user_id)
     full = await event_repository.fetch_event(pool, event_id)
     return _row_to_event(full)
+
+
+@router.get("/{event_id}/document/revisions", response_model=List[DocumentRevision])
+@require_any_permission_decorator(PermissionEnum.ADMIN, PermissionEnum.CAN_ACCESS_OWN_TRIBES)
+async def get_event_document_revisions(event_id: str, current_user: dict = Depends(get_current_user)):
+    """List this event's description revision history, current version first.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position >= guest
+    """
+    pool = get_database()
+    ev = await event_repository.fetch_event(pool, event_id)
+    if not ev:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found.")
+    await require_feature_access(pool, str(ev["feature_instance_id"]), current_user, "guest")
+    if not ev.get("document_id"):
+        return []
+    return [DocumentRevision(**r) for r in await fetch_document_revisions(pool, str(ev["document_id"]))]
 
 
 @router.patch("/{event_id}", response_model=EventResponse)

@@ -230,7 +230,7 @@ async def fetch_label_details(pool, label_ids: list[str]) -> dict[str, dict]:
         return {}
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            "SELECT id, name, color FROM labels WHERE id = ANY($1::uuid[])",
+            "SELECT id, name, color FROM labels WHERE id = ANY($1::uuid[]) AND status = 'active'",
             [UUID(lid) for lid in label_ids],
         )
     return {str(r["id"]): {"id": str(r["id"]), "name": r["name"], "color": r["color"]} for r in rows}

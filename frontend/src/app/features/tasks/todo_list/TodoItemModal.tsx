@@ -4,6 +4,7 @@ import type { PersonOption } from './types.ts';
 
 import React from 'react';
 
+import { todoListService } from './service.ts';
 import type {
   TodoItem,
   TodoItemUpdate,
@@ -97,6 +98,7 @@ const TodoItemModal: React.FC<Props> = ({
       canCreateLabel={canEdit}
       onClose={onClose}
       onUpdate={handleUpdate}
+      fetchDocumentRevisions={() => todoListService.listDocumentRevisions(item.id)}
       onToggleLabel={handleToggleLabel}
       onSetReminders={handleSetReminders}
       onCreateLabel={handleCreateLabel}

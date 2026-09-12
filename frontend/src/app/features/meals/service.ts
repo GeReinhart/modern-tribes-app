@@ -1,4 +1,5 @@
 import { apiService } from '@/app/platform/core/api/api.service.ts';
+import { DocumentRevision } from '@/app/platform/functions/documents/editor/documentRevisionTypes.ts';
 
 import { GrocerySuggestion, Meal, MealCreate, MealUpdate, PersonOption, RecipeOption } from './types.ts';
 
@@ -17,6 +18,10 @@ class MealsService {
 
   async remove(mealId: string): Promise<void> {
     return apiService.delete<void>(`/features/tasks/meals/${mealId}`);
+  }
+
+  async listDocumentRevisions(mealId: string): Promise<DocumentRevision[]> {
+    return apiService.get<DocumentRevision[]>(`/features/tasks/meals/${mealId}/document/revisions`);
   }
 
   async setParticipants(mealId: string, personIds: string[]): Promise<string[]> {

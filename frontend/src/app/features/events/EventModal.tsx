@@ -16,6 +16,7 @@ import type {
 import { isoToLocalDt } from './dateUtils.ts';
 import EventDeleteConfirm from './EventDeleteConfirm.tsx';
 import EventModalFields from './EventModalFields.tsx';
+import { eventsService } from './service.ts';
 
 interface Props {
   event: CalendarEvent | null;
@@ -51,7 +52,6 @@ const EventModal: React.FC<Props> = ({
   const [multiDay, setMultiDay] = useState(
     !!event && !event.all_day && isoToLocalDt(event.start_at).slice(0, 10) !== isoToLocalDt(event.end_at).slice(0, 10),
   );
-  const [notes, setNotes] = useState(event?.document_content_html ?? '');
   const [size, setSize] = useState<number | null>(event?.size ?? null);
   const [color, setColor] = useState(event?.color ?? '#6b7280');
   const [forceOnDashboard, setForceOnDashboard] = useState(event?.force_on_dashboard ?? false);
@@ -78,7 +78,6 @@ const EventModal: React.FC<Props> = ({
     if (allDay !== event.all_day) patch.all_day = allDay;
     if (startAt) patch.start_at = new Date(startAt).toISOString();
     if (endAt) patch.end_at = new Date(endAt).toISOString();
-    if (notes !== (event.document_content_html ?? '')) patch.document_content_html = notes;
     if (size !== event.size) {
       if (size === null) patch.clear_size = true;
       else patch.size = size;
@@ -93,6 +92,15 @@ const EventModal: React.FC<Props> = ({
     );
     setSaving(false);
     onClose();
+  };
+
+  const saveNotes = async (html: string): Promise<boolean> => {
+    try {
+      await onUpdate(event.id, { document_content_html: html });
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   const handleMultiDayChange = (v: boolean) => {
@@ -166,8 +174,9 @@ const EventModal: React.FC<Props> = ({
           onColorChange={setColor}
           reminders={reminders}
           onRemindersChange={setReminders}
-          notes={notes}
-          onNotesChange={setNotes}
+          notes={event.document_content_html ?? ''}
+          onSaveNotes={saveNotes}
+          fetchNotesRevisions={() => eventsService.listDocumentRevisions(event.id)}
           forceOnDashboard={forceOnDashboard}
           onForceOnDashboardChange={setForceOnDashboard}
         />

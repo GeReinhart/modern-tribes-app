@@ -1,5 +1,5 @@
 import EditorFileUploader from '@/app/platform/functions/documents/editor/EditorFileUploader.tsx';
-import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
@@ -15,6 +15,7 @@ import {
   useTribeWithPositions,
   useTribeWithPositionsMutations,
 } from '@/app/features/tribes-projects/tribes/useTribesWithPositions.ts';
+import { tribeWithPositionService } from '@/app/features/tribes-projects/tribes/tribe_with_positions.service.ts';
 import {
   checkboxStyle,
   clearButtonStyle,
@@ -242,6 +243,14 @@ const UpdateTribePageContent: React.FC = () => {
     return true;
   };
 
+  const saveDescription = async (html: string): Promise<boolean> => {
+    const result = await updateTribeWithPositions(tribeId!, { document_content_html: html });
+    if (!result) return false;
+    setDocumentContent(html);
+    setOriginalDocumentContent(html);
+    return true;
+  };
+
   // Submit handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -269,14 +278,12 @@ const UpdateTribePageContent: React.FC = () => {
         updateData.name = tribeName;
       }
 
-      // Add document fields if document content OR attachments changed
-      const documentChanged = documentContent !== originalDocumentContent;
+      // The description saves independently via its own editor (with autosave and version
+      // history) -- this submit only needs to send attachments, name and positions.
       const attachmentsChanged =
         JSON.stringify(attachments) !== JSON.stringify(originalAttachments);
 
-      if (documentChanged || attachmentsChanged) {
-        // Always send both when either changes - backend expects them together
-        updateData.document_content_html = documentContent;
+      if (attachmentsChanged) {
         updateData.document_attachments = attachments;
       }
 
@@ -290,7 +297,6 @@ const UpdateTribePageContent: React.FC = () => {
 
       // Update original values
       setOriginalTribeName(tribeName);
-      setOriginalDocumentContent(documentContent);
       setOriginalAttachments([...attachments]);
       setOriginalPersons([...selectedPersons]);
 
@@ -454,9 +460,10 @@ const UpdateTribePageContent: React.FC = () => {
               </ThemedText>
               <div className="border border-gray-300 rounded-lg overflow-hidden">
                 {initialized && (
-                  <EditorJoditComponent
+                  <DocumentContentEditor
                     content={documentContent}
-                    onChange={setDocumentContent}
+                    onSave={saveDescription}
+                    fetchRevisions={() => tribeWithPositionService.listDocumentRevisions(tribeId!)}
                   />
                 )}
               </div>

@@ -1,5 +1,5 @@
 import { EntityAuditUserBadge } from '@/app/platform/functions/people/users/EntityAuditUserBadge.tsx';
-import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
+import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
@@ -18,7 +18,7 @@ interface Props extends TaskItemModalProps {
 
 const TaskItemModal: React.FC<Props> = ({
   value, labels, persons, canEdit, canCreateLabel,
-  onClose, onUpdate, onToggleLabel, onSetReminders, onCreateLabel,
+  onClose, onUpdate, fetchDocumentRevisions, onToggleLabel, onSetReminders, onCreateLabel,
   onUpdateLabel, onDeleteLabel, onReorderLabel, highlightToken,
 }) => {
   const { t } = useTranslation();
@@ -28,7 +28,6 @@ const TaskItemModal: React.FC<Props> = ({
   const [assigneeId, setAssigneeId] = useState(value.assigned_person_id ?? '');
   const [size, setSize] = useState<number | null>(value.size);
   const [dueDate, setDueDate] = useState(value.due_date ?? '');
-  const [notes, setNotes] = useState(value.document_content_html ?? '');
   const [forceOnDashboard, setForceOnDashboard] = useState(value.force_on_dashboard ?? false);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -56,7 +55,6 @@ const TaskItemModal: React.FC<Props> = ({
     const patch: TaskPatch = {};
     if (title.trim() && title.trim() !== value.title) patch.title = title.trim();
     if (size !== value.size) { if (size === null) patch.clear_size = true; else patch.size = size; }
-    if (notes !== (value.document_content_html ?? '')) patch.document_content_html = notes;
     if (assigneeId !== (value.assigned_person_id ?? '')) {
       if (!assigneeId) patch.clear_assignee = true; else patch.assigned_person_id = assigneeId;
     }
@@ -90,7 +88,17 @@ const TaskItemModal: React.FC<Props> = ({
     setLocalLabelIds((prev) => prev.filter((id) => id !== labelId));
   };
 
+  const notes = value.document_content_html ?? '';
   const notesHtml = highlightToken ? highlightHtml(notes, highlightToken) : notes;
+
+  const saveNotes = async (html: string): Promise<boolean> => {
+    try {
+      await onUpdate(value.id, { document_content_html: html });
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
   return (
     <div
@@ -148,7 +156,13 @@ const TaskItemModal: React.FC<Props> = ({
               {t('features.kanban.notes')}
             </div>
             {isEditing ? (
-              <EditorJoditComponent content={notes} onChange={setNotes} minHeight={320} compact />
+              <DocumentContentEditor
+                content={notes}
+                onSave={saveNotes}
+                fetchRevisions={() => fetchDocumentRevisions(value.id)}
+                minHeight={320}
+                compact
+              />
             ) : notesHtml ? (
               <div className="prose max-w-none" style={{ fontSize: 'var(--font-sm)', color: theme.colors.text }} dangerouslySetInnerHTML={{ __html: notesHtml }} />
             ) : (
