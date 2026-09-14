@@ -1,11 +1,11 @@
-import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
+import DocumentContentEditor, { DocumentContentEditorHandle } from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 import { ColorSwatchPicker } from '@/app/platform/core/layout/themes/components/ColorSwatchPicker.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { LABEL_COLORS } from '@/app/platform/core/layout/themes/themes.ts';
 import { DocumentRevision } from '@/app/platform/functions/documents/editor/documentRevisionTypes.ts';
 import TaskItemModalLabels from '@/app/features/tasks/TaskItemModalLabels.tsx';
 
-import React from 'react';
+import React, { RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import EventForceOnDashboardField from './EventForceOnDashboardField.tsx';
@@ -56,6 +56,9 @@ interface Props {
   notes: string;
   onSaveNotes: (contentHtml: string) => Promise<boolean>;
   fetchNotesRevisions: () => Promise<DocumentRevision[]>;
+  // Lets the parent's own Save button flush the notes editor's current draft first, so text
+  // typed there is never lost just because the user only clicked the modal's Save.
+  notesEditorRef?: RefObject<DocumentContentEditorHandle>;
   forceOnDashboard: boolean;
   onForceOnDashboardChange: (v: boolean) => void;
 }
@@ -67,7 +70,7 @@ const EventModalFields: React.FC<Props> = ({
   taskLabels, localLabelIds, isManager, featureInstanceId, onToggleLabel, onCreateLabel, onLabelCreated,
   onUpdateLabel, onDeleteLabel, onReorderLabel, onLabelDeleted,
   color, onColorChange,
-  reminders, onRemindersChange, notes, onSaveNotes, fetchNotesRevisions,
+  reminders, onRemindersChange, notes, onSaveNotes, fetchNotesRevisions, notesEditorRef,
   forceOnDashboard, onForceOnDashboardChange,
 }) => {
   const { t } = useTranslation();
@@ -148,7 +151,7 @@ const EventModalFields: React.FC<Props> = ({
       <div>
         <div style={sectionLabel}>{t('features.events.notes')}</div>
         {isEditing ? (
-          <DocumentContentEditor content={notes} onSave={onSaveNotes} fetchRevisions={fetchNotesRevisions} />
+          <DocumentContentEditor ref={notesEditorRef} content={notes} onSave={onSaveNotes} fetchRevisions={fetchNotesRevisions} />
         ) : notes ? (
           <div dangerouslySetInnerHTML={{ __html: notes }} style={{ fontSize: 'var(--font-sm)', color: theme.colors.text }} />
         ) : (

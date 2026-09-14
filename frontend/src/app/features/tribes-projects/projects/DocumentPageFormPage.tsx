@@ -1,6 +1,6 @@
 import EditorFileUploader from '@/app/platform/functions/documents/editor/EditorFileUploader.tsx';
 import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
-import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
+import DocumentContentEditor, { DocumentContentEditorHandle } from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
@@ -22,7 +22,7 @@ import {
 import { AttachmentFile } from '@/app/platform/functions/documents/document.types.ts';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -53,6 +53,7 @@ const DocumentPageFormPageContent: React.FC = () => {
   const [initialized, setInitialized] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const contentEditorRef = useRef<DocumentContentEditorHandle>(null);
 
   useEffect(() => {
     if (isEdit && existingPage && !initialized) {
@@ -107,6 +108,10 @@ const DocumentPageFormPageContent: React.FC = () => {
     setSubmitting(true);
     setError(null);
     try {
+      // Flush the content editor's current draft first (edit mode only -- it saves
+      // independently there, unlike create mode where `content` already flows through this
+      // submit directly), so text typed there is saved even if the user only clicked Save here.
+      await contentEditorRef.current?.saveIfDirty();
       if (isEdit && pageId) {
         await documentPageService.update(projectId, projectDocumentId, pageId, {
           title: title.trim(),
@@ -229,6 +234,7 @@ const DocumentPageFormPageContent: React.FC = () => {
               <div className="border border-gray-300 rounded-lg overflow-hidden">
                 {isEdit && pageId ? (
                   <DocumentContentEditor
+                    ref={contentEditorRef}
                     content={content}
                     onSave={saveContent}
                     fetchRevisions={() => documentPageService.listDocumentRevisions(projectId!, projectDocumentId!, pageId)}

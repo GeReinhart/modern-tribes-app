@@ -1,8 +1,9 @@
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { DocumentContentEditorHandle } from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type {
@@ -66,6 +67,7 @@ const EventModal: React.FC<Props> = ({
   // read-only case is handled separately by EventViewModal), so it should
   // start in edit mode rather than force a redundant second click.
   const [isEditing, setIsEditing] = useState(true);
+  const notesEditorRef = useRef<DocumentContentEditorHandle>(null);
 
   if (!event) return null;
 
@@ -73,6 +75,9 @@ const EventModal: React.FC<Props> = ({
 
   const handleSave = async () => {
     setSaving(true);
+    // Flush the notes editor's current draft first, so text typed there is saved even if the
+    // user only clicked this modal's own Save button.
+    await notesEditorRef.current?.saveIfDirty();
     const patch: EventUpdate = {};
     if (title.trim() !== event.title) patch.title = title.trim();
     if (allDay !== event.all_day) patch.all_day = allDay;
@@ -177,6 +182,7 @@ const EventModal: React.FC<Props> = ({
           notes={event.document_content_html ?? ''}
           onSaveNotes={saveNotes}
           fetchNotesRevisions={() => eventsService.listDocumentRevisions(event.id)}
+          notesEditorRef={notesEditorRef}
           forceOnDashboard={forceOnDashboard}
           onForceOnDashboardChange={setForceOnDashboard}
         />

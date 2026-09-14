@@ -1,5 +1,5 @@
 import EditorFileUploader from '@/app/platform/functions/documents/editor/EditorFileUploader.tsx';
-import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
+import DocumentContentEditor, { DocumentContentEditorHandle } from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
@@ -25,7 +25,7 @@ import {
 import { AttachmentFile } from '@/app/platform/functions/documents/document.types.ts';
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -51,6 +51,7 @@ const EditProjectPageContent: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const descriptionEditorRef = useRef<DocumentContentEditorHandle>(null);
 
   const inputStyle = getInputStyle(theme);
 
@@ -88,6 +89,9 @@ const EditProjectPageContent: React.FC = () => {
     setSubmitting(true);
     setError(null);
     try {
+      // Flush the description editor's current draft first, so text typed there is saved even
+      // if the user only clicked this page's own Save button.
+      await descriptionEditorRef.current?.saveIfDirty();
       const result = await updateProjectWithDocument(projectId, {
         name: name.trim(),
         document_attachments: attachments,
@@ -174,6 +178,7 @@ const EditProjectPageContent: React.FC = () => {
             </ThemedText>
             <div className="border border-gray-300 rounded-lg overflow-hidden">
               <DocumentContentEditor
+                ref={descriptionEditorRef}
                 content={documentContent}
                 onSave={saveDescription}
                 fetchRevisions={() => projectService.listDocumentRevisions(projectId!)}

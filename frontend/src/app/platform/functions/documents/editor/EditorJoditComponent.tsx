@@ -68,6 +68,9 @@ const EditorJoditComponent = ({
 }: JoditEditorComponentProps) => {
   const editor = useRef(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Tracks what we know to actually be in the live editor right now -- updated synchronously on
+  // every keystroke (not debounced) and resynced after an external `content` change commits.
+  const liveContentRef = useRef(content);
   const { config: appConfig } = useAppConfig();
 
   const clearPendingChange = useCallback(() => {
@@ -79,6 +82,7 @@ const EditorJoditComponent = ({
 
   const handleChange = useCallback(
     (value: string) => {
+      liveContentRef.current = value;
       clearPendingChange();
       debounceRef.current = setTimeout(() => {
         debounceRef.current = null;
@@ -90,6 +94,7 @@ const EditorJoditComponent = ({
 
   const handleBlur = useCallback(
     (value: string) => {
+      liveContentRef.current = value;
       clearPendingChange();
       onChange(value);
     },
@@ -97,6 +102,16 @@ const EditorJoditComponent = ({
   );
 
   useEffect(() => clearPendingChange, [clearPendingChange]);
+
+  // Only push `content` down into the underlying editor when it's a genuine external change (a
+  // different revision loaded, a cancel/reset) -- not merely React echoing back what we ourselves
+  // just typed. jodit-react replaces the editor's whole DOM content whenever its `value` prop
+  // doesn't match its current live value, which resets the caret to the start of the document;
+  // feeding back our own just-typed content on every keystroke was doing exactly that.
+  const editorValue = content === liveContentRef.current ? undefined : content;
+  useEffect(() => {
+    liveContentRef.current = content;
+  }, [content]);
 
   const config = useMemo(
     () => ({
@@ -260,7 +275,7 @@ const EditorJoditComponent = ({
     <div className="w-full">
       <JoditEditor
         ref={editor}
-        value={content}
+        value={editorValue}
         config={config}
         onBlur={handleBlur}
         onChange={handleChange}

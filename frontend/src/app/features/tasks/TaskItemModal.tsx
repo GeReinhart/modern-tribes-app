@@ -1,9 +1,9 @@
 import { EntityAuditUserBadge } from '@/app/platform/functions/people/users/EntityAuditUserBadge.tsx';
-import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
+import DocumentContentEditor, { DocumentContentEditorHandle } from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { highlightHtml } from './highlightHtml.ts';
@@ -36,11 +36,20 @@ const TaskItemModal: React.FC<Props> = ({
   const [localReminders, setLocalReminders] = useState<TaskReminderCreate[]>(
     value.reminders.map((r) => ({ remind_at: r.remind_at, reminder_type: r.reminder_type }))
   );
+  const notesEditorRef = useRef<DocumentContentEditorHandle>(null);
+
+  // The notes editor unmounts whenever the modal closes, so its current draft must be flushed
+  // first or a change typed there but never explicitly saved would be silently discarded.
+  const handleClose = async () => {
+    await notesEditorRef.current?.saveIfDirty();
+    onClose();
+  };
 
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onClose]);
 
   const inputStyle: React.CSSProperties = {
@@ -52,6 +61,7 @@ const TaskItemModal: React.FC<Props> = ({
 
   const handleSave = async () => {
     setSaving(true);
+    await notesEditorRef.current?.saveIfDirty();
     const patch: TaskPatch = {};
     if (title.trim() && title.trim() !== value.title) patch.title = title.trim();
     if (size !== value.size) { if (size === null) patch.clear_size = true; else patch.size = size; }
@@ -103,7 +113,7 @@ const TaskItemModal: React.FC<Props> = ({
   return (
     <div
       style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, padding: '8px' }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
     >
       <div style={{ backgroundColor: theme.colors.surface, borderRadius: '14px', border: `1px solid ${theme.colors.border}`, width: '98vw', maxWidth: '98vw', maxHeight: '90vh', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '18px 20px 14px', borderBottom: `1px solid ${theme.colors.border}` }}>
@@ -114,7 +124,7 @@ const TaskItemModal: React.FC<Props> = ({
             style={{ ...inputStyle, flex: 1, fontSize: 'var(--font-md)', fontWeight: 600, border: isEditing ? `1px solid ${theme.colors.border}` : 'none', background: isEditing ? theme.colors.surface : 'transparent', padding: isEditing ? '6px 10px' : '6px 0' }}
             placeholder={t('features.kanban.addCardPlaceholder')}
           />
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          <button onClick={handleClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
             <ThemedSvgIcon name="x" color={theme.colors.secondary} size={20} />
           </button>
         </div>
@@ -157,6 +167,7 @@ const TaskItemModal: React.FC<Props> = ({
             </div>
             {isEditing ? (
               <DocumentContentEditor
+                ref={notesEditorRef}
                 content={notes}
                 onSave={saveNotes}
                 fetchRevisions={() => fetchDocumentRevisions(value.id)}
@@ -197,7 +208,7 @@ const TaskItemModal: React.FC<Props> = ({
           canEdit={canEdit}
           saving={saving}
           canSave={!!title.trim()}
-          onClose={onClose}
+          onClose={handleClose}
           onCancelEdit={() => setIsEditing(false)}
           onStartEdit={() => setIsEditing(true)}
           onSave={handleSave}

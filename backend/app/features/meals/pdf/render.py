@@ -15,7 +15,7 @@ _DOCUMENT_CSS = (
     "body { font-family: Helvetica, Arial, sans-serif; color: #1a1a1a; margin: 0; }"
     "h1 { font-size: 20px; margin: 0 0 12px; }"
     "table { width: 100%; border-collapse: collapse; margin-top: 8px; }"
-    "th, td { border: 1px solid #ccc; padding: 6px; vertical-align: top; font-size: 13px; }"
+    "th, td { border: 1px solid #ccc; padding: 6px; vertical-align: top; font-size: 16px; }"
     "th { background: #f2f2f2; text-transform: uppercase; font-size: 9px; }"
     ".meal-title { font-weight: 700; }"
     ".meal-headcount { color: #666666; font-size: 9px; }"

@@ -1,11 +1,11 @@
-import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
+import DocumentContentEditor, { DocumentContentEditorHandle } from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedModal, ThemedModalBody, ThemedModalFooter } from '@/app/platform/core/layout/themes/components/ThemedModal.tsx';
 import { ThemedMultiSelect } from '@/app/platform/core/layout/themes/components/ThemedMultiSelect.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CollapsibleField from './CollapsibleField.tsx';
@@ -34,10 +34,18 @@ const MealDetailModal: React.FC<Props> = ({
   const { theme } = useTheme();
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const editable = canEdit && mode === 'edit';
+  const descriptionEditorRef = useRef<DocumentContentEditorHandle>(null);
 
   const [date, setDate] = useState(meal.start_at.slice(0, 10));
   const [slot, setSlot] = useState(slotFromTime(meal.start_at));
   const [headcount, setHeadcount] = useState(String(meal.headcount));
+
+  // The description editor unmounts whenever we leave edit mode or close the modal, so its
+  // current draft must be flushed first or a change typed there but never explicitly saved
+  // would be silently discarded.
+  const flushDescription = () => descriptionEditorRef.current?.saveIfDirty();
+  const handleSwitchToView = async () => { await flushDescription(); setMode('view'); };
+  const handleClose = async () => { await flushDescription(); onClose(); };
 
   const handleDateChange = (value: string) => {
     setDate(value);
@@ -54,7 +62,7 @@ const MealDetailModal: React.FC<Props> = ({
   };
 
   return (
-    <ThemedModal isOpen onClose={onClose} title={meal.title || t('features.meals.untitled')}>
+    <ThemedModal isOpen onClose={handleClose} title={meal.title || t('features.meals.untitled')}>
       <ThemedModalBody>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {editable ? (
@@ -82,6 +90,7 @@ const MealDetailModal: React.FC<Props> = ({
             <CollapsibleField label={t('features.meals.description')} defaultExpanded={!!meal.document_content_html}>
               {editable ? (
                 <DocumentContentEditor
+                  ref={descriptionEditorRef}
                   content={meal.document_content_html || ''}
                   onSave={(content) => onUpdate({ document_content_html: content })}
                   fetchRevisions={() => mealsService.listDocumentRevisions(meal.id)}
@@ -147,7 +156,7 @@ const MealDetailModal: React.FC<Props> = ({
           </ThemedButton>
         )}
         {mode === 'edit' && (
-          <ThemedButton variant="ghost" type="button" icon="eye" iconOnly onClick={() => setMode('view')}>
+          <ThemedButton variant="ghost" type="button" icon="eye" iconOnly onClick={handleSwitchToView}>
             {t('features.meals.readMode')}
           </ThemedButton>
         )}
@@ -165,7 +174,7 @@ const MealDetailModal: React.FC<Props> = ({
             {t('features.meals.archive')}
           </ThemedButton>
         )}
-        <ThemedButton variant="ghost" type="button" icon="x" iconOnly onClick={onClose}>
+        <ThemedButton variant="ghost" type="button" icon="x" iconOnly onClick={handleClose}>
           {t('features.meals.close')}
         </ThemedButton>
       </ThemedModalFooter>

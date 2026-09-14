@@ -1,5 +1,5 @@
 import EditorFileUploader from '@/app/platform/functions/documents/editor/EditorFileUploader.tsx';
-import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
+import DocumentContentEditor, { DocumentContentEditorHandle } from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { ThemedCard } from '@/app/platform/core/layout/themes/components/ThemedCard.tsx';
@@ -38,7 +38,7 @@ import { AttachmentFile } from '@/app/platform/functions/documents/document.type
 import { MenuAction } from '@/app/platform/core/layout/menu.types.ts';
 import { PositionEnum } from '@/app/features/tribes-projects/positions/position.types.ts';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -75,6 +75,7 @@ const UpdateTribePageContent: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const descriptionEditorRef = useRef<DocumentContentEditorHandle>(null);
 
   // Form data
   const [tribeName, setTribeName] = useState('');
@@ -259,6 +260,10 @@ const UpdateTribePageContent: React.FC = () => {
     if (isSubmitting) {
       return;
     }
+
+    // Flush the description editor's current draft first, so validation below (which checks
+    // documentContent/hasChanges) and the submit itself both see the latest on-screen content.
+    await descriptionEditorRef.current?.saveIfDirty();
 
     if (!validateForm()) {
       return;
@@ -462,6 +467,7 @@ const UpdateTribePageContent: React.FC = () => {
               <div className="border border-gray-300 rounded-lg overflow-hidden">
                 {initialized && (
                   <DocumentContentEditor
+                    ref={descriptionEditorRef}
                     content={documentContent}
                     onSave={saveDescription}
                     fetchRevisions={() => tribeWithPositionService.listDocumentRevisions(tribeId!)}

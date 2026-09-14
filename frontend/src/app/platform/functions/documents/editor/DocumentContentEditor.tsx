@@ -2,7 +2,7 @@ import { ThemedButton } from '@/app/platform/core/layout/themes/components/Theme
 import EditorJoditComponent from '@/app/platform/functions/documents/editor/EditorJoditComponent.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
-import React from 'react';
+import { forwardRef, useImperativeHandle } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { DocumentRevision } from './documentRevisionTypes.ts';
@@ -22,16 +22,25 @@ interface Props {
   onDone?: () => void;
 }
 
+// Lets a caller whose own Save button wraps this editor (rather than relying on the editor's
+// own Save/autosave) flush the current on-screen draft first, so a change never gets silently
+// discarded just because the user only clicked the surrounding form's Save.
+export interface DocumentContentEditorHandle {
+  saveIfDirty: () => Promise<void>;
+}
+
 // Drop-in replacement for a bare EditorJoditComponent + its Save/Cancel buttons: adds
 // every-minute autosave (only while the content actually changed) and '<'/'>' navigation
 // through the document's revision history, editable in place -- saving from an old version
 // makes it the new current one, per the app's document versioning feature.
-const DocumentContentEditor: React.FC<Props> = ({
+const DocumentContentEditor = forwardRef<DocumentContentEditorHandle, Props>(({
   content, onSave, fetchRevisions, compact, minimal, minHeight, allowFullscreen, onDone,
-}) => {
+}, ref) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
   const editor = useDocumentVersionEditor(content, onSave, fetchRevisions);
+
+  useImperativeHandle(ref, () => ({ saveIfDirty: editor.save }), [editor.save]);
 
   return (
     <div>
@@ -88,6 +97,8 @@ const DocumentContentEditor: React.FC<Props> = ({
       </div>
     </div>
   );
-};
+});
+
+DocumentContentEditor.displayName = 'DocumentContentEditor';
 
 export default DocumentContentEditor;
