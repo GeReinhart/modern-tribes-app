@@ -81,19 +81,7 @@ const GroceriesListColumnRow: React.FC<Props> = ({
             <span style={{ color: theme.colors.secondary, fontSize: 'var(--font-xs)' }}>— {quantityLabel}</span>
           )}
         </button>
-        {canEdit && (
-          <button
-            type="button"
-            onClick={() => onRemove(item.id)}
-            style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: theme.colors.danger, display: 'flex' }}
-          >
-            <ThemedSvgIcon name="x" color="currentColor" size={16} />
-          </button>
-        )}
-      </div>
-
-      {!panelOpen && item.comment && (
-        <div style={{ marginLeft: '20px' }}>
+        {!panelOpen && item.comment && (
           <ThemedPopover
             triggerIcon="info"
             triggerLabel={t('features.groceries.itemComment')}
@@ -104,8 +92,17 @@ const GroceriesListColumnRow: React.FC<Props> = ({
               {renderCommentContent(item.comment)}
             </div>
           </ThemedPopover>
-        </div>
-      )}
+        )}
+        {canEdit && (
+          <button
+            type="button"
+            onClick={() => onRemove(item.id)}
+            style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: theme.colors.danger, display: 'flex' }}
+          >
+            <ThemedSvgIcon name="x" color="currentColor" size={16} />
+          </button>
+        )}
+      </div>
 
       {panelOpen && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginLeft: '20px' }}>

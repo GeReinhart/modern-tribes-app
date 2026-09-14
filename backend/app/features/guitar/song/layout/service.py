@@ -13,6 +13,7 @@ from app.features.guitar.song.layout.models import (
     CHORDS_BLOCK_TYPE,
     CUSTOM_BLOCK_TYPE,
     DEFAULT_CHORD_GRID_CHORD_SIZE_PX,
+    DEFAULT_CUSTOM_CONTENT_SIZE_PX,
     REPEATABLE_BLOCK_TYPES,
     ROW_WIDTH_TWELFTHS,
     SECTIONS_BLOCK_TYPE,
@@ -82,6 +83,7 @@ async def _resolve_block_input(pool, block, user_id: str) -> dict:
         "custom_title": block.custom_title, "custom_document_id": custom_document_id,
         "chord_grid_rows": _serialize_chord_grid_rows(block.chord_grid_rows),
         "chord_grid_chord_size_px": block.chord_grid_chord_size_px,
+        "custom_content_size_px": block.custom_content_size_px,
         "linked_to_block_id": block.linked_to_block_id if block.block_type == SECTIONS_BLOCK_TYPE else None,
         "chords": _serialize_block_chords(block.chords),
         **_resolve_sections_input(block),
@@ -166,6 +168,7 @@ async def _duplicate_block_for_copy(pool, block: dict, user_id: str) -> dict:
         "custom_title": block.get("custom_title"), "custom_document_id": custom_document_id,
         "chord_grid_rows": block.get("chord_grid_rows"),
         "chord_grid_chord_size_px": block.get("chord_grid_chord_size_px", DEFAULT_CHORD_GRID_CHORD_SIZE_PX),
+        "custom_content_size_px": block.get("custom_content_size_px", DEFAULT_CUSTOM_CONTENT_SIZE_PX),
         "lyrics_text": block.get("lyrics_text"), "lyrics_words": block.get("lyrics_words"),
         "linked_to_block_id": None,
         # A 'chords' block's own list is plain chord_id/comment data (no document involved,
@@ -274,6 +277,7 @@ async def _resolve_block_response(pool, block: dict, chords_by_id: dict[str, dic
         padding_bottom_mm=block["padding_bottom_mm"], padding_left_mm=block["padding_left_mm"],
         custom_title=block.get("custom_title"), custom_content_html=custom_content_html,
         chord_grid_rows=block.get("chord_grid_rows"), chord_grid_chord_size_px=block["chord_grid_chord_size_px"],
+        custom_content_size_px=block["custom_content_size_px"],
         linked_to_block_id=block.get("linked_to_block_id"),
         chords=_resolve_block_chords_response(block, chords_by_id),
         **sections_fields,
@@ -419,6 +423,8 @@ async def update_block_content(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Only 'chords' blocks have that kind of content.")
     if "chord_grid_chord_size_px" in fields_sent and context["block_type"] != CHORD_GRID_BLOCK_TYPE:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Only chord grids have a chord size.")
+    if "custom_content_size_px" in fields_sent and context["block_type"] != CUSTOM_BLOCK_TYPE:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Only custom blocks have a content size.")
     await check_project_access_or_admin(context["project_id"], user, pool, min_position="member")
     await song_lookup.require_song_editable(pool, context["song_id"])
     if "custom_title" in fields_sent:
@@ -433,6 +439,8 @@ async def update_block_content(
         )
     if "chord_grid_chord_size_px" in fields_sent:
         await repo.update_block_chord_grid_chord_size_px(pool, block_id, data.chord_grid_chord_size_px, user["id"])
+    if "custom_content_size_px" in fields_sent:
+        await repo.update_block_custom_content_size_px(pool, block_id, data.custom_content_size_px, user["id"])
     if "chords" in fields_sent:
         await repo.update_block_chords(pool, block_id, _serialize_block_chords(data.chords), user["id"])
     if sections_fields_sent:

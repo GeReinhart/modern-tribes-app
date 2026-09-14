@@ -125,14 +125,14 @@ def _is_blank_html(content_html: str | None) -> bool:
     return not re.sub(r"&nbsp;", "", re.sub(r"<[^>]*>", "", content_html)).strip()
 
 
-def _wrap_freeform_html(content_html: str, zoom: float) -> str:
+def _wrap_freeform_html(content_html: str, zoom: float, base_font_size_px: int = _BASE_FONT_SIZE) -> str:
     if _is_blank_html(content_html):
         return ""
     # "freeform" class caps embedded images at their column's width (see the matching CSS rule
     # in pdf_service._build_html_document) -- without it, an image narrower than its on-screen
     # column (which caps via Tailwind's preflight img reset) would overflow the column in the
     # PDF instead of shrinking to match, since WeasyPrint has no such rule of its own.
-    return f'<div class="freeform" style="font-size:{_BASE_FONT_SIZE * zoom}px;">{content_html}</div>'
+    return f'<div class="freeform" style="font-size:{base_font_size_px * zoom}px;">{content_html}</div>'
 
 
 def render_description_block(song, zoom: float) -> str:
@@ -140,7 +140,7 @@ def render_description_block(song, zoom: float) -> str:
 
 
 def render_custom_block(block, zoom: float) -> str:
-    return _wrap_freeform_html(block.custom_content_html, zoom)
+    return _wrap_freeform_html(block.custom_content_html, zoom, block.custom_content_size_px)
 
 
 def _render_chord_grid_cell_item(item, chords_by_id: dict, zoom: float, chord_size_px: int) -> str:

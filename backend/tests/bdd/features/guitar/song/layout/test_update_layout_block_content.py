@@ -64,6 +64,21 @@ def test_update_chord_grid_chord_size_out_of_range():
     pass
 
 
+@scenario(FEATURE, "PATCH a custom block's content size alone — it updates without touching the title or body")
+def test_update_custom_block_content_size():
+    pass
+
+
+@scenario(FEATURE, "PATCH custom_content_size_px on a non-custom block — 409 and nothing changes")
+def test_update_custom_content_size_on_non_custom_block_is_rejected():
+    pass
+
+
+@scenario(FEATURE, "PATCH a custom block's content size out of range — 422 and nothing changes")
+def test_update_custom_content_size_out_of_range():
+    pass
+
+
 @scenario(FEATURE, "PATCH the content of a non-custom block — 409 and nothing changes")
 def test_update_non_custom_block_content():
     pass

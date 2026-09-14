@@ -4,6 +4,7 @@ import { useChromeVisibility } from '@/app/platform/core/layout/ChromeVisibility
 import { useTabActionsContext } from '@/app/platform/core/layout/TabActionsContext.tsx';
 import { useToolbarPlacement } from '@/app/platform/core/layout/ToolbarPlacementContext.tsx';
 import { computeToolbarLayout, getEffectivePlacement } from '@/app/platform/core/layout/toolbarLayout.ts';
+import { TOOLBAR_CONFIGURE_ACTION_ID } from '@/app/platform/core/layout/toolbarConfig.types.ts';
 import { useToolbarConfig } from '@/app/platform/core/layout/useToolbarConfig.ts';
 
 import { useCallback, useMemo, useState } from 'react';
@@ -20,7 +21,7 @@ interface UseAppLayoutStateParams {
 function useConfigureToolbarAction(tabTypeKey: string | null, onOpen: () => void): MenuAction | null {
   const { t } = useTranslation();
   return useMemo(
-    () => (tabTypeKey ? { id: 'toolbar.configure', icon: 'settings' as const, label: t('layout.toolbarConfigure'), onClick: onOpen } : null),
+    () => (tabTypeKey ? { id: TOOLBAR_CONFIGURE_ACTION_ID, icon: 'settings' as const, label: t('layout.toolbarConfigure'), onClick: onOpen } : null),
     [tabTypeKey, t, onOpen],
   );
 }
@@ -48,9 +49,10 @@ export const useAppLayoutState = ({ menuActions, tabActions }: UseAppLayoutState
 
   const tabActionIds = useMemo(() => new Set(mergedTabActions.map((a) => a.id)), [mergedTabActions]);
   const total = mergedTabActions.length + pageActions.length;
+  const hasPageActions = pageActions.length > 0;
   const placementOf = useCallback(
-    (actionId: string) => getEffectivePlacement(actionId, !tabActionIds.has(actionId), total, overrides),
-    [tabActionIds, total, overrides],
+    (actionId: string) => getEffectivePlacement(actionId, !tabActionIds.has(actionId), total, hasPageActions, overrides),
+    [tabActionIds, total, hasPageActions, overrides],
   );
 
   return {
@@ -59,9 +61,7 @@ export const useAppLayoutState = ({ menuActions, tabActions }: UseAppLayoutState
     toolbarPlacement,
     mergedTabActions,
     toolbarLayout,
-    // The "configure toolbar" action itself is excluded — no point letting the user bury the
-    // only entry point to this picker inside the overflow menu it controls.
-    configurableActions: [...(tabActions ?? []), ...tabActionsFromTab, ...pageActions],
+    configurableActions: [...(tabActions ?? []), ...tabActionsFromTab, ...(configureAction ? [configureAction] : []), ...pageActions],
     placementOf,
     setPlacement,
     configureModalOpen,

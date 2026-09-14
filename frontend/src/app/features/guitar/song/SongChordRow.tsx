@@ -6,6 +6,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import SongChordComment from './SongChordComment.tsx';
 import { GuitarSongChord } from './types.ts';
 
 interface SongChordRowProps {
@@ -75,11 +76,7 @@ export const SongChordRow: React.FC<SongChordRowProps> = ({
           placeholder={t('guitarSong.detail.commentPlaceholder')}
         />
       ) : (
-        songChord.comment && (
-          <div style={{ color: theme.colors.text, fontSize: '13px', opacity: 0.85, fontStyle: 'italic', textAlign: 'center' }}>
-            {songChord.comment}
-          </div>
-        )
+        <SongChordComment comment={songChord.comment} />
       )}
     </div>
   );

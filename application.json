@@ -780,11 +780,11 @@
             "package": "notes",
             "description": {
               "en": [
-                "- a random note is played and displayed — guess it before it's revealed, using the fretboard to show which string and fret to play",
+                "- a random note is played and displayed — guess it before it's revealed, using the fretboard to show which string and fret to play; every other occurrence of that same note elsewhere on the neck is circled, so you can see all its octaves at a glance",
                 "- customize the interval, sound length, octave range and which notes to include — saved per tab"
               ],
               "fr": [
-                "- une note aléatoire est jouée et affichée — devinez-la avant qu'elle soit révélée, le manche montre la corde et la frette à jouer",
+                "- une note aléatoire est jouée et affichée — devinez-la avant qu'elle soit révélée, le manche montre la corde et la frette à jouer ; chaque autre occurrence de cette même note ailleurs sur le manche est entourée, pour voir d'un coup d'œil toutes ses octaves",
                 "- personnalisez l'intervalle, la durée du son, la plage d'octaves et les notes à inclure — sauvegardé par onglet"
               ]
             },
@@ -886,7 +886,7 @@
               "en": [
                 "- keep a shared songbook of the songs your group is practicing, searchable by title, author, lyrics, labels, difficulty and your own mastery level",
                 "- each song has a title, author, tempo, time signature, capo and chord list, plus a rich-text description",
-                "- lay out a song's page freely — chords, lyrics, chord grids, videos — arranged in rows and columns exactly as it will read or print",
+                "- lay out a song's page freely — chords, lyrics, chord grids, free-text blocks, videos — arranged in rows and columns exactly as it will read or print, with text size adjustable on a chord grid's chord names and on a free-text block's own content",
                 "- switch to a clean presentation view for reading, printing or sharing, with a downloadable PDF",
                 "- rate your own mastery of a song privately, and optionally rate its overall difficulty",
                 "- mark a song as completed to lock it from accidental edits, or keep it as a draft while you build it",
@@ -896,7 +896,7 @@
               "fr": [
                 "- tenez un répertoire partagé des morceaux que votre groupe travaille, cherchable par titre, auteur, paroles, labels, difficulté et votre propre niveau de maîtrise",
                 "- un morceau a un titre, un auteur, un tempo, une signature rythmique, un capo et une liste d'accords, avec une description enrichie",
-                "- composez librement la page d'un morceau — accords, paroles, tableaux d'accords, vidéos — organisés en lignes et colonnes exactement comme il sera lu ou imprimé",
+                "- composez librement la page d'un morceau — accords, paroles, tableaux d'accords, blocs de texte libre, vidéos — organisés en lignes et colonnes exactement comme il sera lu ou imprimé, avec une taille de texte réglable pour les noms d'accords d'un tableau et pour le contenu d'un bloc de texte libre",
                 "- passez à une vue présentation épurée pour la lecture, l'impression ou le partage, avec un PDF téléchargeable",
                 "- notez votre propre maîtrise d'un morceau en privé, et notez si vous le souhaitez sa difficulté globale",
                 "- marquez un morceau comme terminé pour le protéger des modifications accidentelles, ou gardez-le en brouillon pendant que vous le construisez",
@@ -966,7 +966,7 @@
             "- compose a recipe out of another existing recipe (e.g. a Tart reusing a Pie Dough recipe), with how many times to use it; the reused recipe's ingredients and its own description appear in their own labeled section, both on screen and when printed",
             "- tag recipes with labels shared within the tab to organize and filter your recipe book; a configuration mode lets you rename, reorder or archive labels",
             "- opening a recipe for editing marks it as a draft (shown with a badge in the list) automatically, since editing means it's still being worked on; mark it as completed once it's ready, from the edit screen",
-            "- search the recipe book by name or by ingredient, filter by a specific ingredient, and filter by draft or completed",
+            "- search the recipe book by name or by ingredient, filter by a specific ingredient, filter by draft or completed, and filter by difficulty level",
             "- open a recipe in a clean read-only view, with a quick switch to an edit screen for the actual changes"
           ],
           "fr": [
@@ -975,7 +975,7 @@
             "- composez une recette à partir d'une autre recette existante (ex. une Tarte réutilisant une recette de Pâte à Tarte), en précisant combien de fois l'utiliser ; les ingrédients de la recette réutilisée et sa propre description apparaissent dans leur propre section, à l'écran comme à l'impression",
             "- étiquetez les recettes avec des labels partagés dans l'onglet pour organiser et filtrer votre répertoire ; un mode configuration permet de renommer, réordonner ou archiver les labels",
             "- ouvrir une recette en édition la marque automatiquement comme brouillon (affiché avec un badge dans la liste), puisque l'éditer signifie qu'elle est encore en cours ; marquez-la comme terminée une fois prête, depuis l'écran d'édition",
-            "- cherchez dans le répertoire par nom ou par ingrédient, filtrez par un ingrédient précis, et filtrez par brouillon ou terminée",
+            "- cherchez dans le répertoire par nom ou par ingrédient, filtrez par un ingrédient précis, filtrez par brouillon ou terminée, et filtrez par niveau de difficulté",
             "- ouvrez une recette dans une vue de lecture épurée, avec un accès rapide à un écran d'édition pour les modifications"
           ]
         },
@@ -1001,7 +1001,7 @@
           "en": [
             "- plan meals on a weekly view, one row per day with a morning/midday/evening slot to pick instead of exact times, an optional title, a description and how many people are eating (shown as a short tag, e.g. \"4p.\"); the number of days shown can be extended day by day before or after the week",
             "- name which team members are coming, independently of the headcount",
-            "- link one or more recipes to a meal to know what's being cooked; recipe names on the weekly view open the recipe directly, and a linked recipe can also be opened in a read-only view from the meal; filter the weekly view by difficulty to only show meals that include a recipe at that difficulty",
+            "- link one or more recipes to a meal to know what's being cooked; recipe names on the weekly view open the recipe directly, and a linked recipe can also be opened in a read-only view from the meal",
             "- when a meal is planned after a scheduled shopping list, its recipes' ingredients appear as suggestions on that list — scaled to the meal's headcount — so nothing gets forgotten",
             "- add every ingredient of a suggested meal to the list in one click; the meal is remembered as added (with its headcount) and then shows greyed out among the suggestions — while shopping, see which meals this list already accounts for and for how many people",
             "- export the displayed meals plan as a PDF to print: a table of the plan on the first page (showing each meal's description when there is one), then one page per linked recipe with its ingredients and instructions"
@@ -1009,7 +1009,7 @@
           "fr": [
             "- planifiez des repas sur une vue hebdomadaire, une ligne par jour avec un créneau matin/midi/soir à choisir plutôt que des horaires précis, un titre optionnel, une description et le nombre de convives (affiché en abrégé, ex. « 4p. ») ; le nombre de jours affichés peut être étendu jour par jour avant ou après la semaine",
             "- indiquez quels membres de l'équipe sont présents, indépendamment du nombre de convives",
-            "- reliez une ou plusieurs recettes à un repas pour savoir ce qui est cuisiné ; les noms des recettes sur la vue hebdomadaire ouvrent directement la recette, et une recette liée peut aussi s'ouvrir en lecture depuis le repas ; filtrez la vue hebdomadaire par difficulté pour n'afficher que les repas contenant une recette de cette difficulté",
+            "- reliez une ou plusieurs recettes à un repas pour savoir ce qui est cuisiné ; les noms des recettes sur la vue hebdomadaire ouvrent directement la recette, et une recette liée peut aussi s'ouvrir en lecture depuis le repas",
             "- quand un repas est planifié après une liste de courses programmée, les ingrédients de ses recettes apparaissent en suggestion sur cette liste — proportionnels au nombre de convives — pour ne rien oublier",
             "- ajoutez en un clic tous les ingrédients d'un repas suggéré à la liste de courses ; le repas est mémorisé comme ajouté (avec le nombre de convives) et apparaît alors grisé dans les suggestions — en mode course, consultez quels repas sont déjà pris en compte dans cette liste et pour combien de personnes",
             "- exportez le planning de repas affiché en PDF pour l'imprimer : un tableau du planning en première page (avec la description du repas quand il y en a une), puis une page par recette liée avec ses ingrédients et sa préparation"

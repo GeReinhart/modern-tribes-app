@@ -249,6 +249,55 @@ Feature: Edit a custom layout block's title and rich text from the song page
       | 0711 | 0710      | custom     | Old title    | 18                       | active |
       | 0741 | 0710      | chord_grid | Bridge grid  | 18                       | active |
 
+  Scenario: PATCH a custom block's content size alone — it updates without touching the title or body
+    Given I am authenticated as a regular user: user.id 0002
+    When I PATCH /api/features/tasks/guitar-songs/layout/blocks/0711 with body:
+      """
+      {"custom_content_size_px": 20}
+      """
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "block_type": "custom",
+        "custom_title": "Old title",
+        "custom_content_size_px": 20
+      }
+      """
+    And the guitar_songs_layout_column_blocks table contains:
+      | id   | column_id | block_type | custom_title | custom_content_size_px | status |
+      | 0711 | 0710      | custom     | Old title    | 20                     | active |
+
+  @error_case
+  Scenario: PATCH custom_content_size_px on a non-custom block — 409 and nothing changes
+    Given I am authenticated as a regular user: user.id 0002
+    And the guitar_songs_layout_column_blocks table contains:
+      | id   | column_id | song_id | position | block_type | custom_title | status |
+      | 0742 | 0710      | 0200    | 13       | chord_grid | Grid block   | active |
+    When I PATCH /api/features/tasks/guitar-songs/layout/blocks/0742 with body:
+      """
+      {"custom_content_size_px": 20}
+      """
+    Then the response status code is 409
+    And the guitar_songs_layout_column_blocks table contains:
+      | id   | column_id | block_type | custom_title | custom_content_size_px | status |
+      | 0742 | 0710      | chord_grid | Grid block   | 16                     | active |
+
+  @error_case
+  Scenario: PATCH a custom block's content size out of range — 422 and nothing changes
+    Given I am authenticated as a regular user: user.id 0002
+    And the guitar_songs_layout_column_blocks table contains:
+      | id   | column_id | song_id | position | block_type | custom_title | status |
+      | 0743 | 0710      | 0200    | 14       | custom     | Notes block  | active |
+    When I PATCH /api/features/tasks/guitar-songs/layout/blocks/0743 with body:
+      """
+      {"custom_content_size_px": 100}
+      """
+    Then the response status code is 422
+    And the guitar_songs_layout_column_blocks table contains:
+      | id   | column_id | block_type | custom_title | custom_content_size_px | status |
+      | 0743 | 0710      | custom     | Notes block  | 16                     | active |
+
   @error_case
   Scenario: PATCH the content of a non-custom block — 409 and nothing changes
     Given I am authenticated as a regular user: user.id 0002

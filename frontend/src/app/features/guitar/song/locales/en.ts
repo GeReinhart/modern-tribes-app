@@ -178,6 +178,7 @@ const en: Record<string, string> = {
   'guitarSong.layout.removeBlockTitle': 'Remove title',
   'guitarSong.layout.blockTitlePlaceholder': 'Block title',
   'guitarSong.layout.customBlockTitle': 'Block title',
+  'guitarSong.layout.customBlockContentSize': 'Text size',
   'guitarSong.layout.customBlockWidth': 'Width (1-{{max}})',
   'guitarSong.layout.blockZoom': 'Zoom % (30-200)',
   'guitarSong.layout.titleHeadingLevel': 'Title size',

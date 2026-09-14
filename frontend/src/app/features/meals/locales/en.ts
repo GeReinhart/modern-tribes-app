@@ -25,8 +25,6 @@ const en: Record<string, string> = {
   'features.meals.selectRecipes': 'Select recipes',
   'features.meals.recipes': 'Recipes',
   'features.meals.noRecipes': 'No recipes in this project yet.',
-  'features.meals.filterByDifficulty': 'Difficulty',
-  'features.meals.clearDifficultyFilter': 'Clear',
 };
 
 export default en;

@@ -62,20 +62,24 @@ const DocumentContentEditor: React.FC<Props> = ({
         >
           {t('common.nextVersion')}
         </ThemedButton>
-        {editor.viewIndex > 0 && (
+        {editor.viewIndex > 0 && editor.versionNumber != null && editor.versionCount != null && (
           <span style={{ fontSize: 'var(--font-xs)', color: theme.colors.secondary }}>
-            {t('common.viewingPastVersion')}
+            {t('common.viewingVersionNumber', { number: editor.versionNumber, total: editor.versionCount })}
           </span>
         )}
         <div style={{ flex: 1 }} />
         <ThemedButton
           variant="secondary"
+          icon="x"
+          iconOnly
           onClick={async () => { await editor.cancel(); onDone?.(); }}
           disabled={!editor.dirty && editor.viewIndex === 0}
         >
           {t('common.cancel')}
         </ThemedButton>
         <ThemedButton
+          icon="save"
+          iconOnly
           onClick={async () => { await editor.save(); onDone?.(); }}
           disabled={!editor.dirty}
         >

@@ -2,7 +2,7 @@ import { getAPIBaseUrl } from '@/app/platform/core/env.ts';
 import { useAppConfig } from '@/app/platform/core/app-config/AppConfigContext.tsx';
 import { uploadImage } from '@/app/platform/functions/documents/editor/editor-upload-utils.ts';
 
-import { useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import type { Jodit } from 'jodit';
 import JoditEditor from 'jodit-react';
@@ -23,6 +23,12 @@ const COMPACT_BUTTONS = [
 
 // For editors that only need the bare essentials (e.g. a short description field).
 const MINIMAL_BUTTONS = ['bold', 'italic', 'ul', 'ol', 'link'];
+
+// jodit-react only calls onChange with the freshest content on blur, so typed content used to
+// only reach the caller's state once the field lost focus -- stale for autosave/dirty-tracking
+// during a long, uninterrupted typing session. Debouncing the live onChange keeps state current
+// while typing without re-rendering the caller on every keystroke.
+const CHANGE_DEBOUNCE_MS = 400;
 
 interface UploadResponse {
   error?: number | boolean;
@@ -61,7 +67,36 @@ const EditorJoditComponent = ({
   allowFullscreen = false,
 }: JoditEditorComponentProps) => {
   const editor = useRef(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { config: appConfig } = useAppConfig();
+
+  const clearPendingChange = useCallback(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+      debounceRef.current = null;
+    }
+  }, []);
+
+  const handleChange = useCallback(
+    (value: string) => {
+      clearPendingChange();
+      debounceRef.current = setTimeout(() => {
+        debounceRef.current = null;
+        onChange(value);
+      }, CHANGE_DEBOUNCE_MS);
+    },
+    [clearPendingChange, onChange],
+  );
+
+  const handleBlur = useCallback(
+    (value: string) => {
+      clearPendingChange();
+      onChange(value);
+    },
+    [clearPendingChange, onChange],
+  );
+
+  useEffect(() => clearPendingChange, [clearPendingChange]);
 
   const config = useMemo(
     () => ({
@@ -227,8 +262,8 @@ const EditorJoditComponent = ({
         ref={editor}
         value={content}
         config={config}
-        onBlur={onChange}
-        onChange={() => {}}
+        onBlur={handleBlur}
+        onChange={handleChange}
       />
     </div>
   );

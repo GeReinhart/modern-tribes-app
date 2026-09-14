@@ -30,6 +30,7 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [ingredientId, setIngredientId] = useState('');
   const [selectedStates, setSelectedStates] = useState<RecipeState[]>([]);
+  const [selectedDifficulties, setSelectedDifficulties] = useState<number[]>([]);
   const [catalogItems, setCatalogItems] = useState<CatalogItemOption[]>([]);
 
   useEffect(() => {
@@ -75,11 +76,18 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
 
   const { filterLabelIds, toggleFilterLabel, matchesLabelFilter } = useLabelFilter(activeLabelIds);
   const visibleRecipes = recipes.filter(
-    (r) => matchesLabelFilter(r.label_ids) && (selectedStates.length === 0 || selectedStates.includes(r.recipe_state)),
+    (r) =>
+      matchesLabelFilter(r.label_ids) &&
+      (selectedStates.length === 0 || selectedStates.includes(r.recipe_state)) &&
+      (selectedDifficulties.length === 0 || (r.difficulty != null && selectedDifficulties.includes(r.difficulty))),
   );
 
   const toggleState = (state: RecipeState) => {
     setSelectedStates((prev) => (prev.includes(state) ? prev.filter((s) => s !== state) : [...prev, state]));
+  };
+
+  const toggleDifficulty = (value: number) => {
+    setSelectedDifficulties((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
   };
 
   const openRecipe = (recipeId: string) => {
@@ -103,6 +111,9 @@ const RecipesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, proj
           onIngredientChange={setIngredientId}
           selectedStates={selectedStates}
           onToggleState={toggleState}
+          selectedDifficulties={selectedDifficulties}
+          onToggleDifficulty={toggleDifficulty}
+          onClearDifficulty={() => setSelectedDifficulties([])}
         />
       </div>
 

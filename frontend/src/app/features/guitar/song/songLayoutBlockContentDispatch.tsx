@@ -133,7 +133,9 @@ const renderScalarBlock = (
               {block.custom_title}
             </div>
           )}
-          {block.custom_content_html && <SongFreeformHtml html={block.custom_content_html} />}
+          {block.custom_content_html && (
+            <SongFreeformHtml html={block.custom_content_html} style={{ fontSize: `${block.custom_content_size_px}px` }} />
+          )}
         </>
       ) : null;
 

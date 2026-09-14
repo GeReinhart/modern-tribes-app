@@ -79,7 +79,12 @@ export const SongBlockClipboardPreviewModal: React.FC<SongBlockClipboardPreviewM
             {copied.custom_title && (
               <div style={{ fontWeight: 700, color: theme.colors.text, marginBottom: '8px' }}>{copied.custom_title}</div>
             )}
-            {!isBlankHtml(copied.custom_content_html) && <SongFreeformHtml html={copied.custom_content_html as string} />}
+            {!isBlankHtml(copied.custom_content_html) && (
+              <SongFreeformHtml
+                html={copied.custom_content_html as string}
+                style={{ fontSize: `${copied.custom_content_size_px}px` }}
+              />
+            )}
           </>
         )}
         {copied.block_type === 'sections' && (

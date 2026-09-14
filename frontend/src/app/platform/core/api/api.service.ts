@@ -34,9 +34,15 @@ class ApiService {
             return this.request<T>(endpoint, options, true);
           }
         }
-        // Refresh failed or retry still got 401 — session is dead, go to login
-        window.location.replace('/auth/login');
-        return new Promise<T>(() => {});
+        // A failed refresh only means the session is dead if it actually got cleared (a
+        // confirmed 401/403 rejection from the refresh endpoint) — a transient failure
+        // (network error, 5xx during e.g. a redeploy) leaves tokens in place, so this
+        // request should just fail rather than force the user to log back in.
+        if (!tokenManager.getRefreshToken()) {
+          window.location.replace('/auth/login');
+          return new Promise<T>(() => {});
+        }
+        throw new Error('Session temporarily unavailable — please try again.');
       }
 
       if (!response.ok) {

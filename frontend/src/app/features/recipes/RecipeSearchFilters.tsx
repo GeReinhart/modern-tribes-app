@@ -1,5 +1,7 @@
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedSelect } from '@/app/platform/core/layout/themes/components/ThemedSelect.tsx';
+import { DIFFICULTY_LEVEL_STYLES } from '@/app/platform/core/layout/themes/components/difficultyLevelStyles.ts';
+import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { SelectOption } from '@/app/platform/core/common.types.ts';
 
@@ -16,6 +18,9 @@ interface Props {
   onIngredientChange: (value: string) => void;
   selectedStates: RecipeState[];
   onToggleState: (state: RecipeState) => void;
+  selectedDifficulties: number[];
+  onToggleDifficulty: (value: number) => void;
+  onClearDifficulty: () => void;
 }
 
 const STATE_OPTIONS: Array<{ value: RecipeState; labelKey: string }> = [
@@ -24,22 +29,24 @@ const STATE_OPTIONS: Array<{ value: RecipeState; labelKey: string }> = [
 ];
 
 const RecipeSearchFilters: React.FC<Props> = ({
-  searchInput, onSearchInputChange, catalogItems, ingredientId, onIngredientChange, selectedStates, onToggleState,
+  searchInput, onSearchInputChange, catalogItems, ingredientId, onIngredientChange,
+  selectedStates, onToggleState, selectedDifficulties, onToggleDifficulty, onClearDifficulty,
 }) => {
   const { theme } = useTheme();
   const { t } = useTranslation();
 
   const ingredientOptions: SelectOption[] = catalogItems.map((i) => ({ value: i.id, label: i.name }));
 
-  const chipStyle = (active: boolean): React.CSSProperties => ({
+  const chipStyle = (active: boolean, color = theme.colors.primary): React.CSSProperties => ({
+    display: 'flex', alignItems: 'center', gap: '4px',
     padding: '3px 10px',
     borderRadius: '16px',
     fontSize: 'var(--font-xxs)',
     fontWeight: 500,
     cursor: 'pointer',
-    border: `1px solid ${active ? theme.colors.primary : theme.colors.border}`,
-    backgroundColor: active ? `${theme.colors.primary}15` : theme.colors.surface,
-    color: active ? theme.colors.primary : theme.colors.secondary,
+    border: `1px solid ${active ? color : theme.colors.border}`,
+    backgroundColor: active ? `${color}15` : theme.colors.surface,
+    color: active ? color : theme.colors.secondary,
     whiteSpace: 'nowrap',
   });
 
@@ -69,6 +76,30 @@ const RecipeSearchFilters: React.FC<Props> = ({
             {t(option.labelKey)}
           </button>
         ))}
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
+        <span style={{ fontSize: 'var(--font-xs)', color: theme.colors.secondary, fontWeight: 600 }}>
+          {t('features.recipes.difficulty.label')}
+        </span>
+        {DIFFICULTY_LEVEL_STYLES.map((style) => {
+          const active = selectedDifficulties.includes(style.value);
+          return (
+            <button
+              key={style.value}
+              type="button"
+              style={chipStyle(active, style.color)}
+              onClick={() => onToggleDifficulty(style.value)}
+            >
+              <ThemedSvgIcon name={style.icon} color={active ? style.color : theme.colors.secondary} size={11} />
+              {t(`features.recipes.difficulty.level${style.value}`)}
+            </button>
+          );
+        })}
+        {selectedDifficulties.length > 0 && (
+          <button type="button" style={chipStyle(false)} onClick={onClearDifficulty}>
+            {t('features.recipes.clearDifficultyFilter')}
+          </button>
+        )}
       </div>
     </div>
   );

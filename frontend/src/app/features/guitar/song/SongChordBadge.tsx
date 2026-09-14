@@ -10,6 +10,8 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import SongChordComment from './SongChordComment.tsx';
+
 interface SongChordBadgeProps {
   chord: GuitarChord;
   diagramStyle: ChordDiagramStyle;
@@ -99,11 +101,7 @@ export const SongChordBadge: React.FC<SongChordBadgeProps> = ({
                 style={{ width: '100%' }}
               />
             ) : (
-              comment && (
-                <div style={{ color: theme.colors.text, fontSize: '13px', opacity: 0.85, fontStyle: 'italic', textAlign: 'center' }}>
-                  {comment}
-                </div>
-              )
+              <SongChordComment comment={comment} />
             )}
             <div style={{ display: 'flex', gap: '8px' }}>
               <ThemedButton variant="ghost" fullWidth={false} onClick={() => setOpen(false)}>

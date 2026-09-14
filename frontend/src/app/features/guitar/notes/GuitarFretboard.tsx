@@ -45,7 +45,9 @@ function cellStatus(
   activeSample: Sample | null,
 ): CellStatus {
   if (activeSample !== null && activeSample.string === str && activeSample.fret === fret) return 'active';
-  if (currentNote !== null && currentOctave !== null && noteAtPos === currentNote && octaveAtPos === currentOctave) return 'match';
+  if (currentNote === null) return 'none';
+  if (noteAtPos === currentNote && octaveAtPos === currentOctave) return 'match';
+  if (noteAtPos === currentNote) return 'sameNote';
   return 'none';
 }
 

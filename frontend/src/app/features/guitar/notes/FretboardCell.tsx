@@ -1,6 +1,7 @@
 import React from 'react';
 
-export type CellStatus = 'active' | 'match' | 'none';
+// 'sameNote': same pitch class as the current note, but in a different octave — circled, not filled.
+export type CellStatus = 'active' | 'match' | 'sameNote' | 'none';
 
 interface Props {
   note: string;
@@ -24,11 +25,15 @@ function cellStyle(status: CellStatus, theme: Props['theme'], size: number): Rea
   if (status === 'active' || status === 'match') {
     return { ...base, backgroundColor: theme.colors.primary, border: `2px solid ${theme.colors.primary}` };
   }
+  if (status === 'sameNote') {
+    return { ...base, backgroundColor: theme.colors.surface, border: `2px solid ${theme.colors.primary}` };
+  }
   return { ...base, backgroundColor: theme.colors.surface, border: `1px solid #bbb` };
 }
 
 function textStyle(status: CellStatus, theme: Props['theme']): React.CSSProperties {
   if (status === 'active' || status === 'match') return { fontSize: '10px', fontWeight: 700, color: theme.colors.surface, lineHeight: 1 };
+  if (status === 'sameNote') return { fontSize: '9px', fontWeight: 700, color: theme.colors.primary, lineHeight: 1 };
   return { fontSize: '9px', fontWeight: 400, color: '#888', lineHeight: 1 };
 }
 

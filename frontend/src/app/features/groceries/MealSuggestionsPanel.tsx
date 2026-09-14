@@ -54,7 +54,9 @@ const SuggestionIconButton: React.FC<{ onClick: () => void; label: string; icon:
 const MealSuggestionsPanel: React.FC<Props> = ({ suggestions, canEdit, onAddAll, onRemoveAll, onAddIngredient }) => {
   const { t, i18n } = useTranslation();
   const { theme } = useTheme();
-  const [collapsedKeys, setCollapsedKeys] = useState<Set<string>>(new Set());
+  // Closed by default: tracks which suggestions the user explicitly expanded, rather than
+  // which ones are collapsed, so a new suggestion is never accidentally born expanded.
+  const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
   const [removingMeal, setRemovingMeal] = useState<MealSuggestion | null>(null);
   const [removing, setRemoving] = useState(false);
 
@@ -66,7 +68,7 @@ const MealSuggestionsPanel: React.FC<Props> = ({ suggestions, canEdit, onAddAll,
   if (sortedSuggestions.length === 0) return null;
 
   const toggle = (key: string) => {
-    setCollapsedKeys((prev) => {
+    setExpandedKeys((prev) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key); else next.add(key);
       return next;
@@ -86,7 +88,7 @@ const MealSuggestionsPanel: React.FC<Props> = ({ suggestions, canEdit, onAddAll,
       <div style={{ fontWeight: 600, marginBottom: '8px' }}>{t('features.groceries.mealSuggestionsTitle')}</div>
       {sortedSuggestions.map((s) => {
         const key = suggestionKey(s);
-        const expanded = !collapsedKeys.has(key);
+        const expanded = expandedKeys.has(key);
         const mainIngredients = s.ingredients.filter((i) => !i.is_accompaniment);
         const accompaniments = s.ingredients.filter((i) => i.is_accompaniment);
         return (

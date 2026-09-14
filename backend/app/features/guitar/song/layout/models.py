@@ -38,6 +38,9 @@ MAX_CHORD_GRID_COLUMNS = 15
 MIN_CHORD_GRID_CHORD_SIZE_PX = 8
 MAX_CHORD_GRID_CHORD_SIZE_PX = 40
 DEFAULT_CHORD_GRID_CHORD_SIZE_PX = 18
+MIN_CUSTOM_CONTENT_SIZE_PX = 8
+MAX_CUSTOM_CONTENT_SIZE_PX = 40
+DEFAULT_CUSTOM_CONTENT_SIZE_PX = 16
 MAX_LYRICS_TEXT_LENGTH = 20_000
 
 
@@ -160,6 +163,11 @@ class GuitarSongLayoutBlockInput(BaseModel):
     chord_grid_chord_size_px: int = Field(
         default=DEFAULT_CHORD_GRID_CHORD_SIZE_PX, ge=MIN_CHORD_GRID_CHORD_SIZE_PX, le=MAX_CHORD_GRID_CHORD_SIZE_PX
     )
+    # 'custom' blocks only -- font size of the block's rich-text body. Meaningless for every
+    # other block type, same reasoning as chord_grid_chord_size_px just above.
+    custom_content_size_px: int = Field(
+        default=DEFAULT_CUSTOM_CONTENT_SIZE_PX, ge=MIN_CUSTOM_CONTENT_SIZE_PX, le=MAX_CUSTOM_CONTENT_SIZE_PX
+    )
     # 'sections' blocks only -- NULL lyrics_text means the block hasn't been set up yet; NULL/
     # empty on a block that links to another via linked_to_block_id, which never stores content
     # of its own.
@@ -196,6 +204,10 @@ class GuitarSongLayoutBlockContentUpdate(BaseModel):
     # 'chord_grid' blocks only -- 409 if sent for any other block type.
     chord_grid_chord_size_px: Optional[int] = Field(
         default=None, ge=MIN_CHORD_GRID_CHORD_SIZE_PX, le=MAX_CHORD_GRID_CHORD_SIZE_PX
+    )
+    # 'custom' blocks only -- 409 if sent for any other block type.
+    custom_content_size_px: Optional[int] = Field(
+        default=None, ge=MIN_CUSTOM_CONTENT_SIZE_PX, le=MAX_CUSTOM_CONTENT_SIZE_PX
     )
     # 'sections' blocks only -- 409 if sent for any other block type.
     lyrics_text: Optional[str] = None
@@ -284,6 +296,7 @@ class GuitarSongLayoutBlockResponse(BaseModel):
     custom_content_html: Optional[str] = None
     chord_grid_rows: Optional[List[List[ChordGridCell]]] = None
     chord_grid_chord_size_px: int
+    custom_content_size_px: int
     # 'sections' blocks only. lyrics_text/lyrics_words are resolved from linked_to_block_id's
     # target when this block is a link -- linked_to_block_id itself always stays this block's own.
     # NULL lyrics_text means the block hasn't been set up yet (shows the setup picker); '' is a

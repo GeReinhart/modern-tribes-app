@@ -26,6 +26,8 @@ export interface CopiedBlock {
   chord_grid_rows: ChordGridCell[][] | null;
   // Only meaningful for a chord_grid block -- carried directly, like chord_grid_rows above.
   chord_grid_chord_size_px: number;
+  // Only meaningful for a custom block -- carried directly, like chord_grid_chord_size_px above.
+  custom_content_size_px: number;
   // 'sections' blocks only -- carried directly, like every other content field here, so pasting
   // is a single row-replace instead of a second step that duplicates content server-side.
   lyrics_text: string | null;
@@ -62,6 +64,7 @@ export const buildCopiedBlock = (
   custom_content_html: block.custom_content_html,
   chord_grid_rows: block.chord_grid_rows,
   chord_grid_chord_size_px: block.chord_grid_chord_size_px,
+  custom_content_size_px: block.custom_content_size_px,
   lyrics_text: block.lyrics_text,
   lyrics_words: block.lyrics_words?.map((line) => line.map((word) => ({
     text: word.text,

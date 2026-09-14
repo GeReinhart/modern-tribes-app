@@ -8,7 +8,7 @@ _BLOCK_FIELDS = (
     "id::text, column_id::text, song_id::text, block_type, width_twelfths, zoom_percent, show_card, "
     "title_heading_level, padding_top_mm, padding_right_mm, padding_bottom_mm, padding_left_mm, "
     "custom_title, custom_document_id::text, chord_grid_rows, chord_grid_chord_size_px, "
-    "lyrics_text, lyrics_words, linked_to_block_id::text, chords"
+    "custom_content_size_px, lyrics_text, lyrics_words, linked_to_block_id::text, chords"
 )
 
 
@@ -308,10 +308,10 @@ async def _insert_columns(conn, row_id: str, song_id: str, columns: list[dict], 
                        (column_id, song_id, position, block_type, width_twelfths, zoom_percent, show_card,
                         title_heading_level, padding_top_mm, padding_right_mm, padding_bottom_mm, padding_left_mm,
                         custom_title, custom_document_id, chord_grid_rows, chord_grid_chord_size_px,
-                        lyrics_text, lyrics_words, linked_to_block_id, chords,
+                        custom_content_size_px, lyrics_text, lyrics_words, linked_to_block_id, chords,
                         created_by, updated_by)
-                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::jsonb, $16, $17,
-                           $18::jsonb, $19, $20::jsonb, $21::uuid, $21::uuid)
+                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::jsonb, $16, $17, $18,
+                           $19::jsonb, $20, $21::jsonb, $22::uuid, $22::uuid)
                    RETURNING id::text""",
                 UUID(column_id), UUID(song_id), block_position, block["block_type"], block["width_twelfths"],
                 block["zoom_percent"], block["show_card"], block["title_heading_level"],
@@ -321,6 +321,7 @@ async def _insert_columns(conn, row_id: str, song_id: str, columns: list[dict], 
                 UUID(custom_document_id) if custom_document_id else None,
                 json.dumps(chord_grid_rows) if chord_grid_rows is not None else None,
                 block.get("chord_grid_chord_size_px", 18),
+                block.get("custom_content_size_px", 16),
                 block.get("lyrics_text"),
                 json.dumps(lyrics_words) if lyrics_words is not None else None,
                 UUID(linked_to_block_id) if linked_to_block_id else None,
@@ -401,6 +402,16 @@ async def update_block_chord_grid_chord_size_px(pool, block_id: str, chord_grid_
                    updated_at = NOW()
                WHERE id = $3""",
             chord_grid_chord_size_px, UUID(user_id), UUID(block_id),
+        )
+
+
+async def update_block_custom_content_size_px(pool, block_id: str, custom_content_size_px: int, user_id: str) -> None:
+    async with pool.acquire() as conn:
+        await conn.execute(
+            """UPDATE guitar_songs_layout_column_blocks SET custom_content_size_px = $1, updated_by = $2::uuid,
+                   updated_at = NOW()
+               WHERE id = $3""",
+            custom_content_size_px, UUID(user_id), UUID(block_id),
         )
 
 

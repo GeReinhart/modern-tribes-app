@@ -165,6 +165,9 @@ export interface GuitarSongLayoutBlock {
   // 'chord_grid' blocks only -- font size of the chord name text in this table's own cells,
   // independent of the song-wide chord_diagram_size. Meaningless for every other block type.
   chord_grid_chord_size_px: number;
+  // 'custom' blocks only -- font size of the block's rich-text body. Meaningless for every
+  // other block type.
+  custom_content_size_px: number;
   // 'sections' blocks only. lyrics_text/lyrics_words are resolved from linked_to_block_id's
   // target when this block mirrors another -- linked_to_block_id itself always stays this
   // block's own. NULL lyrics_text means the block hasn't been set up yet (shows the setup
@@ -182,6 +185,8 @@ export interface GuitarSongLayoutBlockContentUpdate {
   chord_grid_rows?: ChordGridCell[][] | null;
   // 'chord_grid' blocks only.
   chord_grid_chord_size_px?: number;
+  // 'custom' blocks only.
+  custom_content_size_px?: number;
   lyrics_text?: string | null;
   linked_to_block_id?: string | null;
   // 'chords' blocks only.
@@ -259,6 +264,7 @@ export interface GuitarSongLayoutBlockInput {
   custom_content_html?: string | null;
   chord_grid_rows?: ChordGridCell[][] | null;
   chord_grid_chord_size_px?: number;
+  custom_content_size_px?: number;
   lyrics_text?: string | null;
   lyrics_words?: GuitarSongLyricsWordInput[][] | null;
   linked_to_block_id?: string | null;

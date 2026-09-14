@@ -1136,6 +1136,9 @@ CREATE TABLE IF NOT EXISTS guitar_songs_layout_column_blocks (
     -- other block type, which is why it's not NULL-able like chord_grid_rows -- there is no
     -- "unset" state, just a starting default every chord_grid block has from creation.
     chord_grid_chord_size_px SMALLINT NOT NULL DEFAULT 18 CHECK (chord_grid_chord_size_px BETWEEN 8 AND 40),
+    -- 'custom' block only (migration 023): font size of the block's rich-text body. Meaningless
+    -- for every other block type, same reasoning as chord_grid_chord_size_px just above.
+    custom_content_size_px SMALLINT NOT NULL DEFAULT 16 CHECK (custom_content_size_px BETWEEN 8 AND 40),
     -- "Lyrics & Chords" block content (block_type = 'sections'); NULL for every other type, and
     -- also NULL on a block that mirrors another one via linked_to_block_id (migration 024).
     -- NULL lyrics_text means the block hasn't been set up yet (still shows the setup picker);

@@ -82,5 +82,9 @@ export function useDocumentVersionEditor(
     goNewer,
     canGoOlder: revisions ? viewIndex < revisions.length - 1 : true,
     canGoNewer: viewIndex > 0,
+    // revisions[0] is the current version; index grows with age, so the chronological version
+    // number (oldest = 1) is the count minus how many steps back the viewed index is.
+    versionNumber: revisions ? revisions.length - viewIndex : null,
+    versionCount: revisions ? revisions.length : null,
   };
 }

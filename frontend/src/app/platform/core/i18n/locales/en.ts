@@ -30,7 +30,7 @@ const en: Record<string, string> = {
   'common.saving': 'Saving...',
   'common.previousVersion': 'Previous version',
   'common.nextVersion': 'Next version',
-  'common.viewingPastVersion': 'You are viewing a past version',
+  'common.viewingVersionNumber': 'Viewing version {{number}} of {{total}}',
   'common.createdBy': 'Created',
   'common.updatedBy': 'Updated',
   'common.forceOnDashboard': 'Force on Dashboard',

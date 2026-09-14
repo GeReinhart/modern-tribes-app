@@ -1,5 +1,5 @@
 import { isDocumentBackedBlockType, isTitleEditableBlockType } from './layoutBlockOptions.ts';
-import { DEFAULT_CHORD_GRID_CHORD_SIZE_PX } from './songLimits.ts';
+import { DEFAULT_CHORD_GRID_CHORD_SIZE_PX, DEFAULT_CUSTOM_CONTENT_SIZE_PX } from './songLimits.ts';
 import {
   BlockChordInput,
   ChordGridCell,
@@ -45,6 +45,9 @@ export interface DraftBlock {
   // Only meaningful for a chord_grid block; same "always round-tripped as-is" rule as
   // chord_grid_rows above.
   chord_grid_chord_size_px: number;
+  // Only meaningful for a custom block; same "always round-tripped as-is" rule as
+  // chord_grid_rows above.
+  custom_content_size_px: number;
   // 'sections' blocks only -- same "always round-tripped as-is" rule as chord_grid_rows above,
   // for the same reason: a "Lyrics & Chords" block's content must survive every row replace
   // triggered by an edit to something else entirely. null means the block hasn't been set up
@@ -113,6 +116,7 @@ export const emptyDraftBlock = (blockType: LayoutBlockType): DraftBlock => ({
   custom_content_html: '',
   chord_grid_rows: blockType === CHORD_GRID_BLOCK_TYPE ? defaultChordGridRows() : null,
   chord_grid_chord_size_px: DEFAULT_CHORD_GRID_CHORD_SIZE_PX,
+  custom_content_size_px: DEFAULT_CUSTOM_CONTENT_SIZE_PX,
   // A fresh 'sections' block starts unconfigured (lyrics_text: null) -- its own presentation
   // menu shows the setup picker until the user starts typing lyrics or links to another block.
   lyrics_text: null,
@@ -138,6 +142,7 @@ export const draftBlockFromCopy = (copied: CopiedBlock): DraftBlock => ({
   custom_content_html: copied.custom_content_html ?? '',
   chord_grid_rows: copied.chord_grid_rows,
   chord_grid_chord_size_px: copied.chord_grid_chord_size_px,
+  custom_content_size_px: copied.custom_content_size_px,
   lyrics_text: copied.lyrics_text,
   lyrics_words: copied.lyrics_words,
   linked_to_block_id: copied.linked_to_block_id,
@@ -213,6 +218,7 @@ export const draftColumnsFromRow = (row: GuitarSongLayoutRow): DraftColumn[] =>
       custom_content_html: block.custom_content_html ?? '',
       chord_grid_rows: block.chord_grid_rows,
       chord_grid_chord_size_px: block.chord_grid_chord_size_px,
+      custom_content_size_px: block.custom_content_size_px,
       lyrics_text: block.lyrics_text,
       lyrics_words: draftLyricsWords(block),
       linked_to_block_id: block.linked_to_block_id,
@@ -247,6 +253,7 @@ export const draftColumnsToInput = (
       custom_content_html: isDocumentBackedBlockType(block.block_type) ? block.custom_content_html : null,
       chord_grid_rows: block.chord_grid_rows,
       chord_grid_chord_size_px: block.chord_grid_chord_size_px,
+      custom_content_size_px: block.custom_content_size_px,
       lyrics_text: block.lyrics_text,
       lyrics_words: block.lyrics_words,
       linked_to_block_id: block.linked_to_block_id,

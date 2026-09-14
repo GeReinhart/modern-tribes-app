@@ -49,7 +49,10 @@ const GroceriesShoppingSectionGroup: React.FC<Props> = ({ group, canEdit, onTogg
           }}
         >
           {group.items.map((item) => (
-            <div key={item.id} style={{ opacity: canEdit ? 1 : 0.6, pointerEvents: canEdit ? 'auto' : 'none' }}>
+            <div
+              key={item.id}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: canEdit ? 1 : 0.6, pointerEvents: canEdit ? 'auto' : 'none' }}
+            >
               <ThemedCheckbox
                 label={formatItemLabel(item, t)}
                 checked={item.picked_up}
@@ -57,18 +60,16 @@ const GroceriesShoppingSectionGroup: React.FC<Props> = ({ group, canEdit, onTogg
                 size="lg"
               />
               {item.comment && (
-                <div style={{ marginLeft: '32px' }}>
-                  <ThemedPopover
-                    triggerIcon="info"
-                    triggerLabel={t('features.groceries.itemComment')}
-                    closeLabel={t('common.close')}
-                    triggerIconSize={12}
-                  >
-                    <div style={{ fontSize: 'var(--font-sm)', color: theme.colors.text, maxWidth: '240px' }}>
-                      {renderCommentContent(item.comment)}
-                    </div>
-                  </ThemedPopover>
-                </div>
+                <ThemedPopover
+                  triggerIcon="info"
+                  triggerLabel={t('features.groceries.itemComment')}
+                  closeLabel={t('common.close')}
+                  triggerIconSize={12}
+                >
+                  <div style={{ fontSize: 'var(--font-sm)', color: theme.colors.text, maxWidth: '240px' }}>
+                    {renderCommentContent(item.comment)}
+                  </div>
+                </ThemedPopover>
               )}
             </div>
           ))}

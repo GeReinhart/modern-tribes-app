@@ -57,19 +57,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
           return;
         }
-        if (
-          (response.status === 401 || response.status === 403) &&
-          allowRefresh
-        ) {
-          const newToken = await tokenManager.tryRefresh();
-          if (newToken) {
-            await fetchUser(newToken, false);
-            return;
+        if (response.status === 401 || response.status === 403) {
+          if (allowRefresh) {
+            const newToken = await tokenManager.tryRefresh();
+            if (newToken) {
+              await fetchUser(newToken, false);
+              return;
+            }
           }
+          // Token definitively rejected and refresh unavailable — clear session.
+          tokenManager.clearAll();
+          setToken(null);
+          return;
         }
-        // Token definitively rejected and refresh unavailable — clear session.
-        tokenManager.clearAll();
-        setToken(null);
+        // Any other status (5xx, etc.) is a transient server/infra issue — e.g. a redeploy
+        // briefly returning 502/503 — not proof the session is invalid, so keep the tokens
+        // and let the next request retry instead of forcing a re-login.
       } catch {
         // Network error or CORS failure — token may still be valid.
       } finally {

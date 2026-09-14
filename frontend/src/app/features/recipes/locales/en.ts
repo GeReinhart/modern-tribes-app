@@ -55,6 +55,7 @@ const en: Record<string, string> = {
   'features.recipes.difficulty.level3': 'Intermediate',
   'features.recipes.difficulty.level4': 'Hard',
   'features.recipes.difficulty.level5': 'Very hard',
+  'features.recipes.clearDifficultyFilter': 'Clear',
   'features.recipes.prepTime': 'Prep time',
   'features.recipes.totalTime': 'Total time',
   'features.recipes.prepTimeValue': 'Prep: {{time}}',

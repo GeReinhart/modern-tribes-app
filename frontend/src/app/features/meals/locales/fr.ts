@@ -25,8 +25,6 @@ const fr: Record<string, string> = {
   'features.meals.selectRecipes': 'Choisir les recettes',
   'features.meals.recipes': 'Recettes',
   'features.meals.noRecipes': "Aucune recette dans ce projet pour l'instant.",
-  'features.meals.filterByDifficulty': 'Difficulté',
-  'features.meals.clearDifficultyFilter': 'Réinitialiser',
 };
 
 export default fr;
