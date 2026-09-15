@@ -8,7 +8,8 @@ interface TabActionsContextValue {
   // Stable identifier for the active tab's *type* (e.g. a feature type, or a dashboard tab key),
   // passed in by the tab container (ShowProjectPage, DashboardPage) as it already knows which
   // tab is active — individual tabs stay unaware of it. Used to key the per-tab-type toolbar
-  // configuration in localStorage, and to gate the injected "configure toolbar" action.
+  // configuration in localStorage. A standalone page (no provider ancestor, so this is null)
+  // falls back to a key derived from its own route instead -- see useAppLayoutState.
   tabTypeKey: string | null;
 }
 
