@@ -27,7 +27,7 @@ pip install -r requirements.txt
 ```bash
 cd backend
 # Check migration status
-set -a && source .env.db.prod && set +a && alembic current
+set -a && source .env.db.prod && set +a && alembic current 
 
 
 # Migration update
