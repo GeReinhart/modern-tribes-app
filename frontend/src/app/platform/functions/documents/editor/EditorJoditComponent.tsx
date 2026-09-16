@@ -68,12 +68,15 @@ const EditorJoditComponent = ({
 }: JoditEditorComponentProps) => {
   const editor = useRef(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Tracks the last content value *we* handed to `onChange` (or the initial content at mount) --
-  // as opposed to what's freshest in the live DOM. Used to tell a genuine external content change
-  // (a different revision loaded, a document finishing its async fetch, cancel/revert) apart from
-  // our own debounced echo of the user's typing arriving back through `content`, no matter when a
-  // re-render happens to land relative to that debounce.
-  const lastEmittedRef = useRef(content);
+  // Tracks the last content value *we* handed to `onChange` -- as opposed to what's freshest in
+  // the live DOM. Used to tell a genuine external content change (a different revision loaded, a
+  // document finishing its async fetch, cancel/revert) apart from our own debounced echo of the
+  // user's typing arriving back through `content`, no matter when a re-render happens to land
+  // relative to that debounce. Starts at `undefined` (never a valid `content` value) so the very
+  // first render always treats `content` as external and passes the initial value to Jodit --
+  // seeding it with `content` here would make the first render indistinguishable from an echo,
+  // leaving the editor blank whenever it opens on a block that already has content.
+  const lastEmittedRef = useRef<string | undefined>(undefined);
   const { config: appConfig } = useAppConfig();
 
   const clearPendingChange = useCallback(() => {

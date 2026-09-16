@@ -28,7 +28,7 @@ async def create_session_for_magic_link(
         )
 
     user_id = str(user["id"])
-    await auth_repo.cleanup_old_sessions(pool, user_id, max_sessions=5)
+    await auth_repo.delete_expired_sessions(pool, user_id)
 
     session_id = generate_session_id()
     expires_at = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -113,6 +113,6 @@ async def validate_session(token: str, pool) -> dict:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired")
 
     await auth_repo.update_session_activity(pool, user_id, session_id)
-    await auth_repo.cleanup_old_sessions(pool, user_id, max_sessions=5)
+    await auth_repo.delete_expired_sessions(pool, user_id)
 
     return user

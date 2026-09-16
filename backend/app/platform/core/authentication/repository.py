@@ -81,16 +81,12 @@ async def delete_session(pool, user_id: str, session_id: str) -> None:
         )
 
 
-async def cleanup_old_sessions(pool, user_id: str, max_sessions: int = 5) -> None:
+async def delete_expired_sessions(pool, user_id: str) -> None:
     async with pool.acquire() as conn:
-        sessions = await conn.fetch(
-            "SELECT id FROM user_sessions WHERE user_id = $1 ORDER BY last_activity DESC", UUID(user_id)
-        )
-        if not sessions or len(sessions) <= max_sessions:
-            return
-        ids_to_keep = [s["id"] for s in sessions[:max_sessions]]
         await conn.execute(
-            "DELETE FROM user_sessions WHERE user_id = $1 AND id != ALL($2)", UUID(user_id), ids_to_keep
+            "DELETE FROM user_sessions WHERE user_id = $1 AND expires_at < $2",
+            UUID(user_id),
+            datetime.now(timezone.utc),
         )
 
 
