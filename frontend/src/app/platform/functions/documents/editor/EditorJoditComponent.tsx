@@ -68,9 +68,12 @@ const EditorJoditComponent = ({
 }: JoditEditorComponentProps) => {
   const editor = useRef(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // Tracks what we know to actually be in the live editor right now -- updated synchronously on
-  // every keystroke (not debounced) and resynced after an external `content` change commits.
-  const liveContentRef = useRef(content);
+  // Tracks the last content value *we* handed to `onChange` (or the initial content at mount) --
+  // as opposed to what's freshest in the live DOM. Used to tell a genuine external content change
+  // (a different revision loaded, a document finishing its async fetch, cancel/revert) apart from
+  // our own debounced echo of the user's typing arriving back through `content`, no matter when a
+  // re-render happens to land relative to that debounce.
+  const lastEmittedRef = useRef(content);
   const { config: appConfig } = useAppConfig();
 
   const clearPendingChange = useCallback(() => {
@@ -82,10 +85,10 @@ const EditorJoditComponent = ({
 
   const handleChange = useCallback(
     (value: string) => {
-      liveContentRef.current = value;
       clearPendingChange();
       debounceRef.current = setTimeout(() => {
         debounceRef.current = null;
+        lastEmittedRef.current = value;
         onChange(value);
       }, CHANGE_DEBOUNCE_MS);
     },
@@ -94,8 +97,8 @@ const EditorJoditComponent = ({
 
   const handleBlur = useCallback(
     (value: string) => {
-      liveContentRef.current = value;
       clearPendingChange();
+      lastEmittedRef.current = value;
       onChange(value);
     },
     [clearPendingChange, onChange],
@@ -103,14 +106,14 @@ const EditorJoditComponent = ({
 
   useEffect(() => clearPendingChange, [clearPendingChange]);
 
-  // Only push `content` down into the underlying editor when it's a genuine external change (a
-  // different revision loaded, a cancel/reset) -- not merely React echoing back what we ourselves
-  // just typed. jodit-react replaces the editor's whole DOM content whenever its `value` prop
-  // doesn't match its current live value, which resets the caret to the start of the document;
-  // feeding back our own just-typed content on every keystroke was doing exactly that.
-  const editorValue = content === liveContentRef.current ? undefined : content;
+  // Only push `content` down into the underlying editor when it differs from what we ourselves
+  // last emitted -- i.e. it's a genuine external change, not merely React echoing back what we
+  // just typed (whether immediately or after the debounce/autosave round trip, however many
+  // unrelated re-renders happen in between). jodit-react replaces the editor's whole DOM content
+  // whenever its `value` prop is defined, which resets the caret to the start of the document.
+  const editorValue = content === lastEmittedRef.current ? undefined : content;
   useEffect(() => {
-    liveContentRef.current = content;
+    lastEmittedRef.current = content;
   }, [content]);
 
   const config = useMemo(
