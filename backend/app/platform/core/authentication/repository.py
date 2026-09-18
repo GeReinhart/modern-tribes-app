@@ -82,9 +82,17 @@ async def delete_session(pool, user_id: str, session_id: str) -> None:
 
 
 async def delete_expired_sessions(pool, user_id: str) -> None:
+    # A session is only truly dead once it can no longer be refreshed: its access-token window
+    # (expires_at) AND its refresh-token window (refresh_token_expires_at) have both passed.
+    # expires_at alone tracks the short access-token lifetime, not the session's real lifespan --
+    # deleting on that alone would drop an inactive device's session while its refresh token (up
+    # to REFRESH_TOKEN_EXPIRE_DAYS) is still valid, forcing a needless re-login on that device.
     async with pool.acquire() as conn:
         await conn.execute(
-            "DELETE FROM user_sessions WHERE user_id = $1 AND expires_at < $2",
+            """DELETE FROM user_sessions
+               WHERE user_id = $1
+                 AND expires_at < $2
+                 AND (refresh_token_expires_at IS NULL OR refresh_token_expires_at < $2)""",
             UUID(user_id),
             datetime.now(timezone.utc),
         )
