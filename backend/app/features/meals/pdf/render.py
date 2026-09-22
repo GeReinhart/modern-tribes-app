@@ -13,28 +13,28 @@ _SLOT_LABELS_FR = {"morning": "Matin", "midday": "Midi", "evening": "Soir"}
 
 _DOCUMENT_CSS = (
     "body { font-family: Helvetica, Arial, sans-serif; color: #1a1a1a; margin: 0; }"
-    "h1 { font-size: 20px; margin: 0 0 12px; }"
+    "h1 { font-size: 22px; margin: 0 0 12px; }"
     "table { width: 100%; border-collapse: collapse; margin-top: 8px; }"
-    "th, td { border: 1px solid #ccc; padding: 6px; vertical-align: top; font-size: 16px; }"
-    "th { background: #f2f2f2; text-transform: uppercase; font-size: 9px; }"
+    "th, td { border: 1px solid #ccc; padding: 6px; vertical-align: top; font-size: 18px; }"
+    "th { background: #f2f2f2; text-transform: uppercase; font-size: 11px; }"
     ".meal-title { font-weight: 700; }"
-    ".meal-headcount { color: #666666; font-size: 9px; }"
-    ".meal-description { color: #444444; font-size: 9px; font-style: italic; margin-top: 2px; }"
+    ".meal-headcount { color: #666666; font-size: 11px; }"
+    ".meal-description { color: #444444; font-size: 11px; font-style: italic; margin-top: 2px; }"
     ".recipes-columns { column-count: 2; column-gap: 10mm; margin-top: 12px; }"
     ".recipe-card { border: 1px solid #ccc; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; "
     "break-inside: avoid; page-break-inside: avoid; }"
-    ".recipe-card h2 { font-size: 13px; margin: 0 0 6px; }"
-    ".recipe-meta { color: #555555; font-size: 9px; margin-bottom: 6px; }"
-    ".label-chip { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 8px; "
+    ".recipe-card h2 { font-size: 15px; margin: 0 0 6px; }"
+    ".recipe-meta { color: #555555; font-size: 11px; margin-bottom: 6px; }"
+    ".label-chip { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; "
     "margin-right: 4px; margin-bottom: 6px; color: #ffffff; }"
     ".ingredients-columns { margin-top: 4px; }"
-    ".ingredient-group-title { font-weight: 700; font-size: 9px; margin: 6px 0 2px; break-after: avoid; "
+    ".ingredient-group-title { font-weight: 700; font-size: 11px; margin: 6px 0 2px; break-after: avoid; "
     "page-break-after: avoid; }"
-    ".ingredients { column-count: 2; column-gap: 8mm; margin: 0; padding-left: 14px; font-size: 9px; }"
+    ".ingredients { column-count: 2; column-gap: 8mm; margin: 0; padding-left: 14px; font-size: 11px; }"
     ".ingredients li { break-inside: avoid; page-break-inside: avoid; }"
     ".recipe-component { margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #cccccc; }"
-    ".recipe-component-title { font-weight: 700; font-size: 10px; margin-bottom: 2px; }"
-    ".recipe-body { font-size: 9px; margin-top: 6px; }"
+    ".recipe-component-title { font-weight: 700; font-size: 12px; margin-bottom: 2px; }"
+    ".recipe-body { font-size: 11px; margin-top: 6px; }"
     ".recipe-body img { max-width: 100%; height: auto; }"
 )
 
@@ -62,7 +62,7 @@ def _build_html_document(
         for r in recipes
     )
     recipes_html = f'<div class="recipes-columns">{cards_html}</div>' if cards_html else ""
-    footer_css = '@bottom-right { content: counter(page) " / " counter(pages); font-size: 9px; color: #666666; }'
+    footer_css = '@bottom-right { content: counter(page) " / " counter(pages); font-size: 11px; color: #666666; }'
     return (
         '<!doctype html><html><head><meta charset="utf-8" />'
         f"<style>@page {{ size: A4 portrait; margin: 15mm 12mm; {footer_css} }} {_DOCUMENT_CSS}</style>"

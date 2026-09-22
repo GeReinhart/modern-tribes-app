@@ -7,7 +7,7 @@ import { AppLayout } from '@/app/platform/core/layout/AppLayout.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { ThemeProvider } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
@@ -29,6 +29,7 @@ const GroceriesListShoppingPageContent: React.FC = () => {
   const { canEdit } = useProjectPermissions(tribeId || null, projectId || null);
   const { detail, addedMeals, error, togglePickedUp } = useGroceriesListDetail(listId || null);
   const { sections } = useGroceriesCatalog(detail?.feature_instance_id ?? null);
+  const [showPickedUp, setShowPickedUp] = useState(true);
 
   const editPath = `/app/tribes/${tribeId}/projects/${projectId}/groceries/${listId}/edit`;
   const backPath = `/app/tribes/${tribeId}/projects/${projectId}${detail ? `/${detail.feature_instance_id}` : ''}`;
@@ -63,8 +64,14 @@ const GroceriesListShoppingPageContent: React.FC = () => {
         onClick: () => navigate(backPath, { state: { skipAutoOpen: true } }),
       },
       ...(canEdit ? [{ id: 'groceries.editItems', icon: 'pencil' as const, label: t('features.groceries.editItems'), path: editPath }] : []),
+      {
+        id: 'groceries.togglePickedUpVisibility',
+        icon: showPickedUp ? ('eye-off' as const) : ('eye' as const),
+        label: showPickedUp ? t('features.groceries.hidePickedUpItems') : t('features.groceries.showPickedUpItems'),
+        onClick: () => setShowPickedUp((v) => !v),
+      },
     ],
-    [backPath, editPath, canEdit, t, navigate],
+    [backPath, editPath, canEdit, showPickedUp, t, navigate],
   );
 
   if (!detail) {
@@ -72,7 +79,9 @@ const GroceriesListShoppingPageContent: React.FC = () => {
   }
 
   const remaining = detail.items.filter((i) => !i.picked_up).length;
-  const groups = groupBySections(detail.items, sections, t('features.groceries.uncategorized'));
+  const visibleItems = showPickedUp ? detail.items : detail.items.filter((i) => !i.picked_up);
+  const groups = groupBySections(visibleItems, sections, t('features.groceries.uncategorized'));
+  const allPickedUpHidden = detail.items.length > 0 && visibleItems.length === 0;
 
   return (
     <AppLayout breadcrumbs={breadcrumbs} menuActions={menuActions} bookmarkSlot={bookmarkSlot}>
@@ -89,6 +98,12 @@ const GroceriesListShoppingPageContent: React.FC = () => {
       {detail.items.length === 0 && (
         <div style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary }}>
           {t('features.groceries.noItems')}
+        </div>
+      )}
+
+      {allPickedUpHidden && (
+        <div style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary }}>
+          {t('features.groceries.allPickedUpHidden')}
         </div>
       )}
 

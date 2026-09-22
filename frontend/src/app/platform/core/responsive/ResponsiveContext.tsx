@@ -5,6 +5,7 @@ import React, { ReactNode, createContext, useContext } from 'react';
 interface ResponsiveContextType {
   isPhone: boolean;
   isMobile: boolean;
+  windowWidth: number;
   zoom: number;
   updateZoom: (zoom: number) => void;
 }
@@ -16,9 +17,9 @@ const ResponsiveContext = createContext<ResponsiveContextType | undefined>(
 export const ResponsiveProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { isPhone, isMobile, zoom, updateZoom } = useResponsive();
+  const { isPhone, isMobile, windowWidth, zoom, updateZoom } = useResponsive();
   return (
-    <ResponsiveContext.Provider value={{ isPhone, isMobile, zoom, updateZoom }}>
+    <ResponsiveContext.Provider value={{ isPhone, isMobile, windowWidth, zoom, updateZoom }}>
       {children}
     </ResponsiveContext.Provider>
   );

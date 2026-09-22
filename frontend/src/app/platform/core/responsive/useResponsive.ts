@@ -24,6 +24,7 @@ const loadZoom = (): number => {
 
 export const useResponsive = () => {
   const [isPhone, setIsPhone] = useState(detectPhone);
+  const [windowWidth, setWindowWidth] = useState(() => window.innerWidth);
   const [zoom, setZoom] = useState(loadZoom);
 
   useEffect(() => {
@@ -31,7 +32,10 @@ export const useResponsive = () => {
   }, [isPhone, zoom]);
 
   useEffect(() => {
-    const handler = () => setIsPhone(detectPhone());
+    const handler = () => {
+      setIsPhone(detectPhone());
+      setWindowWidth(window.innerWidth);
+    };
     window.addEventListener('resize', handler);
     return () => window.removeEventListener('resize', handler);
   }, []);
@@ -42,5 +46,5 @@ export const useResponsive = () => {
     setZoom(clamped);
   };
 
-  return { isPhone, isMobile: isPhone, zoom, updateZoom };
+  return { isPhone, isMobile: isPhone, windowWidth, zoom, updateZoom };
 };

@@ -116,6 +116,7 @@ const GroceriesTab: React.FC<Props> = ({ featureInstanceId, canEdit, tribeId, pr
           sections={catalog.sections}
           canEdit={canEdit}
           configuring={configuringSections}
+          showFullCatalog
           onCreateSection={catalog.createSection}
           onUpdateSection={catalog.updateSection}
           onReorderSections={catalog.reorderSections}

@@ -21,6 +21,7 @@ interface Props {
   excludeItemIds?: Set<string>;
   canEdit: boolean;
   configuring: boolean;
+  showFullCatalog: boolean;
   onAddItem?: (itemId: string) => Promise<void>;
   onCreateSection: (name: string, icon?: string) => Promise<GroceriesSection | null>;
   onUpdateSection: (sectionId: string, data: Omit<GroceriesSectionUpdate, 'feature_instance_id'>) => Promise<boolean>;
@@ -34,7 +35,7 @@ interface Props {
 }
 
 const GroceriesCatalogColumn: React.FC<Props> = ({
-  featureInstanceId, items, sections, suggestions, excludeItemIds, canEdit, configuring,
+  featureInstanceId, items, sections, suggestions, excludeItemIds, canEdit, configuring, showFullCatalog,
   onAddItem, onCreateSection, onUpdateSection, onReorderSections, onDeleteSection,
   onCreateItem, onLinkItemToSection, onUpdateItem, onSetItemRenewal, onSetItemSuggestedQuantity,
 }) => {
@@ -45,15 +46,19 @@ const GroceriesCatalogColumn: React.FC<Props> = ({
   const [renamingSection, setRenamingSection] = useState<GroceriesSection | null>(null);
   const [deletingSection, setDeletingSection] = useState<GroceriesSection | null>(null);
   const [managingItemId, setManagingItemId] = useState<string | null>(null);
-  const [catalogExpanded, setCatalogExpanded] = useState(true);
   const [filter, setFilter] = useState('');
 
   const normalizedFilter = filter.trim().toLowerCase();
   const matchesFilter = (name: string) => name.toLowerCase().includes(normalizedFilter);
+  const hasFilter = normalizedFilter !== '';
+  // The search field (and any match) is always visible. Sections/items beyond that only show
+  // once the search matches something, unless the "show full catalog" tab action or section
+  // configuration forces the whole catalog open regardless of the search text.
+  const showBrowseArea = configuring || showFullCatalog || hasFilter;
 
   const availableItems = items.filter((i) => !excludeItemIds?.has(i.id) && matchesFilter(i.name));
   const groups = groupBySections(
-    availableItems, sections, t('features.groceries.uncategorized'), normalizedFilter === '',
+    availableItems, sections, t('features.groceries.uncategorized'), configuring || (showFullCatalog && !hasFilter),
   );
   const availableSuggestions = (suggestions ?? []).filter((s) => !excludeItemIds?.has(s.groceries_item_id));
   const suggestionItems = availableSuggestions
@@ -84,19 +89,9 @@ const GroceriesCatalogColumn: React.FC<Props> = ({
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-        <div
-          onClick={() => setCatalogExpanded((v) => !v)}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
-        >
-          <ThemedSvgIcon
-            name={catalogExpanded ? 'chevron-down' : 'chevron-up'}
-            color={theme.colors.text}
-            size={16}
-          />
-          <h3 style={{ margin: 0, color: theme.colors.text, fontSize: 'var(--font-md)' }}>
-            {t('features.groceries.catalog')}
-          </h3>
-        </div>
+        <h3 style={{ margin: 0, color: theme.colors.text, fontSize: 'var(--font-md)' }}>
+          {t('features.groceries.catalog')}
+        </h3>
         {canEdit && (
           <button
             type="button"
@@ -109,16 +104,16 @@ const GroceriesCatalogColumn: React.FC<Props> = ({
         )}
       </div>
 
-      {catalogExpanded && (
-        <>
-          <div style={{ marginBottom: '10px' }}>
-            <ThemedInput
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              placeholder={t('features.groceries.filterItemsPlaceholder')}
-            />
-          </div>
+      <div style={{ marginBottom: '10px' }}>
+        <ThemedInput
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          placeholder={t('features.groceries.filterItemsPlaceholder')}
+        />
+      </div>
 
+      {showBrowseArea && (
+        <>
           {suggestionItems.length > 0 && (
             <GroceriesCatalogSectionGroup
               group={{ id: null, name: t('features.groceries.suggestions'), icon: null, items: suggestionItems }}

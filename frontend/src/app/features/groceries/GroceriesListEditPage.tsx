@@ -15,7 +15,7 @@ import GroceriesCatalogColumn from './GroceriesCatalogColumn.tsx';
 import GroceriesListColumn from './GroceriesListColumn.tsx';
 import { formatListTitle } from './listTitle.ts';
 import { useGroceriesCatalog, useGroceriesListDetail } from './hooks.ts';
-import MealSuggestionsPanel from './MealSuggestionsPanel.tsx';
+import MealSuggestionsModal from './MealSuggestionsModal.tsx';
 
 const GroceriesListEditPageContent: React.FC = () => {
   const { t } = useTranslation();
@@ -35,6 +35,8 @@ const GroceriesListEditPageContent: React.FC = () => {
   const [focusItemId, setFocusItemId] = useState<string | null>(null);
   const [configuringSections, setConfiguringSections] = useState(false);
   const [editingList, setEditingList] = useState(false);
+  const [showFullCatalog, setShowFullCatalog] = useState(false);
+  const [mealSuggestionsOpen, setMealSuggestionsOpen] = useState(false);
 
   const listItemCatalogIds = useMemo(
     () => new Set(detail?.items.map((i) => i.groceries_item_id).filter((id): id is string => id !== null) ?? []),
@@ -88,6 +90,18 @@ const GroceriesListEditPageContent: React.FC = () => {
         onClick: () => navigate(backPath, { state: { skipAutoOpen: true } }),
       },
       { id: 'groceries.shoppingMode', icon: 'check-square' as const, label: t('features.groceries.shoppingMode'), path: shoppingPath },
+      {
+        id: 'groceries.addFromMeals',
+        icon: 'calendar' as const,
+        label: t('features.groceries.addFromMeals'),
+        onClick: () => setMealSuggestionsOpen(true),
+      },
+      {
+        id: 'groceries.toggleCatalog',
+        icon: showFullCatalog ? ('eye-off' as const) : ('eye' as const),
+        label: showFullCatalog ? t('features.groceries.hideCatalog') : t('features.groceries.showCatalog'),
+        onClick: () => setShowFullCatalog((v) => !v),
+      },
       ...(canEdit
         ? [
             {
@@ -108,7 +122,7 @@ const GroceriesListEditPageContent: React.FC = () => {
           ]
         : []),
     ],
-    [backPath, shoppingPath, canEdit, configuringSections, t, navigate],
+    [backPath, shoppingPath, canEdit, configuringSections, showFullCatalog, t, navigate],
   );
 
   if (!detail) {
@@ -130,13 +144,16 @@ const GroceriesListEditPageContent: React.FC = () => {
         />
       )}
       {(detailError || catalog.error) && <div>{detailError || catalog.error}</div>}
-      <MealSuggestionsPanel
-        suggestions={mealSuggestions}
-        canEdit={canEdit}
-        onAddAll={addMealSuggestion}
-        onRemoveAll={removeMealSuggestion}
-        onAddIngredient={addSuggestedIngredient}
-      />
+      {mealSuggestionsOpen && (
+        <MealSuggestionsModal
+          suggestions={mealSuggestions}
+          canEdit={canEdit}
+          onClose={() => setMealSuggestionsOpen(false)}
+          onAddAll={addMealSuggestion}
+          onRemoveAll={removeMealSuggestion}
+          onAddIngredient={addSuggestedIngredient}
+        />
+      )}
       <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 320px', minWidth: '280px' }}>
           <GroceriesCatalogColumn
@@ -147,6 +164,7 @@ const GroceriesListEditPageContent: React.FC = () => {
             excludeItemIds={listItemCatalogIds}
             canEdit={canEdit}
             configuring={configuringSections}
+            showFullCatalog={showFullCatalog}
             onAddItem={handleAddItem}
             onCreateSection={catalog.createSection}
             onUpdateSection={catalog.updateSection}
