@@ -6,6 +6,13 @@ export enum GuitarSongState {
   completed = 'completed',
 }
 
+// Chosen once, at creation, and never changed afterward -- see GuitarSongCreate. 'pdf' replaces
+// the whole row/column layout with a single uploaded file.
+export enum GuitarSongContentType {
+  layout = 'layout',
+  pdf = 'pdf',
+}
+
 export interface GuitarSong {
   id: string;
   url_param_id: string;
@@ -25,6 +32,10 @@ export interface GuitarSong {
   label_ids: string[];
   song_state: GuitarSongState;
   difficulty: number | null;
+  content_type: GuitarSongContentType;
+  pdf_file_url: string | null;
+  pdf_file_name: string | null;
+  pdf_file_size: number | null;
   chord_count: number;
   difficult_chord_count: number;
   my_mastery: number | null;
@@ -58,6 +69,10 @@ export interface GuitarSongCreate {
   template_song_id?: string | null;
   copy_from_song_id?: string | null;
   blank_layout?: boolean;
+  content_type?: GuitarSongContentType;
+  pdf_file_url?: string | null;
+  pdf_file_name?: string | null;
+  pdf_file_size?: number | null;
 }
 
 export interface GuitarSongUpdate {
@@ -74,6 +89,9 @@ export interface GuitarSongUpdate {
   description_html?: string | null;
   song_state?: GuitarSongState;
   difficulty?: number | null;
+  pdf_file_url?: string;
+  pdf_file_name?: string;
+  pdf_file_size?: number;
 }
 
 // One entry of a 'chords' block's own chord list (or, for GuitarSongDetail.chords, the

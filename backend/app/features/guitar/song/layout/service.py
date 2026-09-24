@@ -346,6 +346,7 @@ async def add_row(
     project_id = await song_lookup.require_song_project(pool, song_id)
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
     await song_lookup.require_song_editable(pool, song_id)
+    await song_lookup.require_layout_content_song(pool, song_id)
     await _require_no_block_conflict(pool, song_id, data.columns)
     if insert_before_row_id:
         before_context = await _require_row_context(pool, insert_before_row_id)
@@ -363,6 +364,7 @@ async def replace_row(pool, row_id: str, data: GuitarSongLayoutRowInput, user: d
     context = await _require_row_context(pool, row_id)
     await check_project_access_or_admin(context["project_id"], user, pool, min_position="member")
     await song_lookup.require_song_editable(pool, context["song_id"])
+    await song_lookup.require_layout_content_song(pool, context["song_id"])
     await _require_no_block_conflict(pool, context["song_id"], data.columns, exclude_row_id=row_id)
     columns = [await _resolve_column_input(pool, c, user["id"]) for c in data.columns]
     await repo.replace_row(pool, row_id, context["song_id"], data.page_break_before, columns, user["id"])
@@ -373,6 +375,7 @@ async def move_row(pool, row_id: str, data: GuitarSongChordMove, user: dict) -> 
     context = await _require_row_context(pool, row_id)
     await check_project_access_or_admin(context["project_id"], user, pool, min_position="manager")
     await song_lookup.require_song_editable(pool, context["song_id"])
+    await song_lookup.require_layout_content_song(pool, context["song_id"])
     ordered = await repo.fetch_rows_sorted(pool, context["song_id"])
     target_id = position_utils.find_move_target_id(ordered, row_id, data.direction)
     if target_id:
@@ -384,6 +387,7 @@ async def remove_row(pool, row_id: str, user: dict) -> None:
     context = await _require_row_context(pool, row_id)
     await check_project_access_or_admin(context["project_id"], user, pool, min_position="manager")
     await song_lookup.require_song_editable(pool, context["song_id"])
+    await song_lookup.require_layout_content_song(pool, context["song_id"])
     await repo.archive_row(pool, row_id, user["id"])
 
 
@@ -427,6 +431,7 @@ async def update_block_content(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Only custom blocks have a content size.")
     await check_project_access_or_admin(context["project_id"], user, pool, min_position="member")
     await song_lookup.require_song_editable(pool, context["song_id"])
+    await song_lookup.require_layout_content_song(pool, context["song_id"])
     if "custom_title" in fields_sent:
         await repo.update_block_title(pool, block_id, data.custom_title, user["id"])
     if "custom_content_html" in fields_sent:
@@ -465,6 +470,7 @@ async def set_lyrics_word_chord(
         )
     await check_project_access_or_admin(context["project_id"], user, pool, min_position="member")
     await song_lookup.require_song_editable(pool, context["song_id"])
+    await song_lookup.require_layout_content_song(pool, context["song_id"])
     block = await block_content_service.set_lyrics_word_chord(
         pool, block_id, line_index, word_index, position, chord_id, user["id"],
     )
@@ -497,6 +503,7 @@ async def update_settings(
     editorial content."""
     project_id = await song_lookup.require_song_project(pool, song_id)
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
+    await song_lookup.require_layout_content_song(pool, song_id)
     updates = data.model_dump(exclude_unset=True)
     await _require_footer_spacing_fits_margin(pool, song_id, updates)
     row = await repo.update_settings(pool, song_id, updates, user["id"])

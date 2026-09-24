@@ -1,6 +1,7 @@
 from fastapi import HTTPException, status
 
 from app.platform.core.authorization.project_access import check_project_access_or_admin
+from app.platform.core.uploads.file_handler import file_handler
 from app.platform.core.uploads.helpers import create_document_with_attachments, get_document_with_attachments
 from app.platform.core.utils.db_helpers import generate_url_param_id
 from app.platform.core.utils.document_helpers import fetch_document_revisions, update_document_content_with_revision
@@ -47,6 +48,7 @@ async def create_song(pool, project_id: str, data: GuitarSongCreate, user: dict)
         return await _create_song_from_copy(pool, project_id, data, user)
     if data.template_song_id:
         await _require_song_in_project(pool, project_id, data.template_song_id)
+        await _require_template_is_layout_song(pool, data.template_song_id)
     document_id = None
     if data.description_html:
         document = await create_document_with_attachments(pool, data.description_html, [], user["id"])
@@ -58,12 +60,24 @@ async def create_song(pool, project_id: str, data: GuitarSongCreate, user: dict)
         data.chord_diagram_style, data.chord_diagram_size,
         data.lyrics_line_spacing_px, data.lyrics_text_size_px, data.lyrics_chord_size_px,
         document_id, user["id"],
+        data.content_type, data.pdf_file_url, data.pdf_file_name, data.pdf_file_size,
     )
-    if data.template_song_id:
+    if data.content_type == "pdf":
+        pass
+    elif data.template_song_id:
         await copy_layout_from(pool, data.template_song_id, row["id"], user["id"])
     elif not data.blank_layout:
         await seed_default_layout(pool, row["id"], user["id"])
     return await _build_song_response(pool, row)
+
+
+async def _require_template_is_layout_song(pool, template_song_id: str) -> None:
+    """A PDF song has no row/column layout to copy from."""
+    template_row = await repo.fetch_song(pool, template_song_id)
+    if template_row and template_row.get("content_type") == "pdf":
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Cannot use a PDF song as a layout template."
+        )
 
 
 async def _create_song_from_copy(pool, project_id: str, data: GuitarSongCreate, user: dict) -> GuitarSongResponse:
@@ -81,8 +95,12 @@ async def _create_song_from_copy(pool, project_id: str, data: GuitarSongCreate, 
         source_row["chord_diagram_style"], source_row["chord_diagram_size"],
         source_row["lyrics_line_spacing_px"], source_row["lyrics_text_size_px"], source_row["lyrics_chord_size_px"],
         document_id, user["id"],
+        source_row["content_type"], source_row.get("pdf_file_url"),
+        source_row.get("pdf_file_name"), source_row.get("pdf_file_size"),
     )
-    await _copy_song_content(pool, data.copy_from_song_id, row["id"], user["id"])
+    await _copy_song_content(
+        pool, data.copy_from_song_id, row["id"], user["id"], copy_layout=source_row["content_type"] == "layout",
+    )
     return await _build_song_response(pool, row)
 
 
@@ -130,6 +148,11 @@ async def update_song(pool, song_id: str, data: GuitarSongUpdate, user: dict) ->
     await check_project_access_or_admin(project_id, user, pool, min_position="member")
     if data.model_fields_set - {"song_state"}:
         await song_lookup.require_song_editable(pool, song_id)
+    old_row = None
+    if "pdf_file_url" in data.model_fields_set:
+        old_row = await repo.fetch_song(pool, song_id)
+        if old_row and old_row.get("content_type") != "pdf":
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Only a PDF song's file can be replaced.")
     updates = data.model_dump(exclude_unset=True, exclude={"description_html", "author"})
     await repo.update_song(pool, song_id, updates, user["id"])
     if "description_html" in data.model_fields_set:
@@ -137,8 +160,17 @@ async def update_song(pool, song_id: str, data: GuitarSongUpdate, user: dict) ->
     if "author" in data.model_fields_set:
         author_id = await resolve_or_create_author(pool, project_id, data.author, user["id"])
         await repo.set_song_author(pool, song_id, author_id, user["id"])
+    if old_row and old_row.get("pdf_file_url") and old_row["pdf_file_url"] != data.pdf_file_url:
+        await _delete_uploaded_pdf(old_row["pdf_file_url"])
     row = await repo.fetch_song(pool, song_id)
     return await _build_song_response(pool, row)
+
+
+async def _delete_uploaded_pdf(url: str) -> None:
+    """Best-effort cleanup of a replaced PDF -- uploads are always served under '/files/<name>'
+    (see uploads.router.upload_file), regardless of local disk or Cellar storage."""
+    filename = url.rsplit("/", 1)[-1]
+    await file_handler.delete_file(filename, "files")
 
 
 async def _update_song_description(pool, song_id: str, description_html: str | None, user_id: str) -> None:
@@ -196,17 +228,25 @@ async def duplicate_song(pool, song_id: str, user: dict) -> GuitarSongDetailResp
         source_row["chord_diagram_style"], source_row["chord_diagram_size"],
         source_row["lyrics_line_spacing_px"], source_row["lyrics_text_size_px"], source_row["lyrics_chord_size_px"],
         document_id, user["id"],
+        source_row["content_type"], source_row.get("pdf_file_url"),
+        source_row.get("pdf_file_name"), source_row.get("pdf_file_size"),
     )
-    await _copy_song_content(pool, song_id, new_row["id"], user["id"])
+    await _copy_song_content(
+        pool, song_id, new_row["id"], user["id"], copy_layout=source_row["content_type"] == "layout",
+    )
     return await get_song(pool, new_row["id"], user)
 
 
-async def _copy_song_content(pool, source_song_id: str, target_song_id: str, user_id: str) -> None:
+async def _copy_song_content(
+    pool, source_song_id: str, target_song_id: str, user_id: str, copy_layout: bool = True,
+) -> None:
     # A song's chords now live entirely on its 'chords' blocks, so copying the layout (below)
     # already brings every block's own chord list along -- no separate chords copy step needed.
+    # copy_layout is False for a PDF-content source, which has no layout to copy.
     await _duplicate_song_videos(pool, source_song_id, target_song_id, user_id)
     await _duplicate_song_labels(pool, source_song_id, target_song_id)
-    await copy_layout_from(pool, source_song_id, target_song_id, user_id)
+    if copy_layout:
+        await copy_layout_from(pool, source_song_id, target_song_id, user_id)
 
 
 async def _duplicate_song_description(pool, source_document_id: str | None, user_id: str) -> str | None:

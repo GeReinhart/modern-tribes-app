@@ -992,6 +992,12 @@ CREATE TABLE IF NOT EXISTS guitar_songs (
     -- How hard the song is to play: 0 (easiest) to 5 (hardest), optional (migration 031).
     -- Independent of any of its chords' own difficulty.
     difficulty SMALLINT NULL CHECK (difficulty BETWEEN 0 AND 5),
+    -- Content mode (migration 024): chosen once at creation, never changed afterward. 'pdf'
+    -- replaces the whole row/column layout with a single uploaded file.
+    content_type VARCHAR(20) NOT NULL DEFAULT 'layout' CHECK (content_type IN ('layout', 'pdf')),
+    pdf_file_url TEXT NULL,
+    pdf_file_name VARCHAR(255) NULL,
+    pdf_file_size INTEGER NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'active'
         CHECK (status IN ('pending', 'active', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),

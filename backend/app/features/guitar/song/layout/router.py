@@ -7,6 +7,7 @@ from app.platform.core.authorization.router import require_any_permission_decora
 from app.platform.core.authorization.models import PermissionEnum
 from app.platform.core.database import get_database
 from app.platform.core.utils.db_helpers import resolve_url_param_id
+from app.features.guitar.song import song_lookup
 from app.features.guitar.song.models import GuitarSongChordMove
 from app.features.guitar.song.service import get_song
 from app.features.guitar.song.layout import service as layout_service
@@ -139,6 +140,7 @@ async def download_layout_pdf(song_id: str, current_user: dict = Depends(get_cur
     """
     pool = get_database()
     song_id = await resolve_url_param_id(pool, "guitar_songs", song_id)
+    await song_lookup.require_layout_content_song(pool, song_id)
     song = await get_song(pool, song_id, current_user)
     pdf_bytes = await render_song_pdf(pool, song, current_user["id"])
     filename = _safe_pdf_filename(song.title)

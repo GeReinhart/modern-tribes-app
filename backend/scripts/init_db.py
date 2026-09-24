@@ -611,18 +611,24 @@ class DatabaseInitializer:
                 project_id = project_ids[row["project"]]
                 author_id = await self._find_or_create_guitar_song_author(conn, project_id, row.get("author") or None)
                 difficulty = row.get("difficulty")
+                pdf_file_size = row.get("pdf_file_size")
                 r = await conn.fetchrow(
                     """INSERT INTO guitar_songs (
                            project_id, url_param_id, title, author_id, tempo_bpm, beats_per_bar, capo,
                            chord_diagram_style, chord_diagram_size, document_id, song_state, difficulty,
+                           content_type, pdf_file_url, pdf_file_name, pdf_file_size,
                            created_by, updated_by
                        )
-                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $13) RETURNING id""",
+                       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $17)
+                       RETURNING id""",
                     project_id, _generate_url_param_id(), row["title"], author_id,
                     int(row.get("tempo_bpm") or 120), int(row.get("beats_per_bar") or 4),
                     int(row.get("capo") or 0), row.get("chord_diagram_style") or "full",
                     row.get("chord_diagram_size") or "m", document_id, row.get("song_state") or "draft",
-                    int(difficulty) if difficulty else None, admin_id,
+                    int(difficulty) if difficulty else None,
+                    row.get("content_type") or "layout", row.get("pdf_file_url") or None,
+                    row.get("pdf_file_name") or None, int(pdf_file_size) if pdf_file_size else None,
+                    admin_id,
                 )
                 ids[f"{row['project']}|{row['title']}"] = str(r["id"])
         print(f"✓ Created {len(ids)} guitar songs")
@@ -748,6 +754,11 @@ class DatabaseInitializer:
         count = 0
         async with self.pool.acquire() as conn:
             for song_key, song_id in song_ids.items():
+                content_type = await conn.fetchval("SELECT content_type FROM guitar_songs WHERE id = $1", song_id)
+                if content_type == "pdf":
+                    # A PDF song has no row/column layout to seed (see
+                    # song_lookup.require_layout_content_song on the backend).
+                    continue
                 await conn.execute(
                     "INSERT INTO guitar_songs_layout_settings (song_id, created_by, updated_by) VALUES ($1, $2, $2)",
                     song_id, admin_id,

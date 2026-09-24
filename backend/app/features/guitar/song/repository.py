@@ -4,7 +4,7 @@ _SONG_SELECT_FIELDS = (
     "id::text, url_param_id, project_id::text, title, author_id::text, tempo_bpm, beats_per_bar, capo, "
     "chord_diagram_style, chord_diagram_size, "
     "lyrics_line_spacing_px, lyrics_text_size_px, lyrics_chord_size_px, document_id::text, "
-    "song_state, difficulty, status, "
+    "song_state, difficulty, content_type, pdf_file_url, pdf_file_name, pdf_file_size, status, "
     "created_at, updated_at, created_by::text, updated_by::text"
 )
 
@@ -12,7 +12,7 @@ _SONG_JOIN_SELECT_FIELDS = (
     "s.id::text, s.url_param_id, s.project_id::text, s.title, s.author_id::text, s.tempo_bpm, s.beats_per_bar, "
     "s.capo, s.chord_diagram_style, s.chord_diagram_size, "
     "s.lyrics_line_spacing_px, s.lyrics_text_size_px, s.lyrics_chord_size_px, s.document_id::text, "
-    "s.song_state, s.difficulty, s.status, "
+    "s.song_state, s.difficulty, s.content_type, s.pdf_file_url, s.pdf_file_name, s.pdf_file_size, s.status, "
     "s.created_at, s.updated_at, s.created_by::text, s.updated_by::text, a.name AS author_name"
 )
 
@@ -126,6 +126,8 @@ async def insert_song(
     chord_diagram_style: str, chord_diagram_size: str,
     lyrics_line_spacing_px: int, lyrics_text_size_px: int, lyrics_chord_size_px: int,
     document_id: str | None, user_id: str,
+    content_type: str = "layout", pdf_file_url: str | None = None,
+    pdf_file_name: str | None = None, pdf_file_size: int | None = None,
 ) -> dict:
     async with pool.acquire() as conn:
         row = await conn.fetchrow(
@@ -133,15 +135,17 @@ async def insert_song(
                     project_id, url_param_id, title, author_id, tempo_bpm, beats_per_bar, capo,
                     chord_diagram_style, chord_diagram_size,
                     lyrics_line_spacing_px, lyrics_text_size_px, lyrics_chord_size_px,
-                    document_id, created_by, updated_by
+                    document_id, content_type, pdf_file_url, pdf_file_name, pdf_file_size,
+                    created_by, updated_by
                 )
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14::uuid, $14::uuid)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18::uuid, $18::uuid)
                 RETURNING {_SONG_SELECT_FIELDS}""",
             UUID(project_id), url_param_id, title, UUID(author_id) if author_id else None,
             tempo_bpm, beats_per_bar, capo,
             chord_diagram_style, chord_diagram_size,
             lyrics_line_spacing_px, lyrics_text_size_px, lyrics_chord_size_px,
-            UUID(document_id) if document_id else None, UUID(user_id),
+            UUID(document_id) if document_id else None,
+            content_type, pdf_file_url, pdf_file_name, pdf_file_size, UUID(user_id),
         )
     return dict(row)
 

@@ -886,7 +886,7 @@
               "en": [
                 "- keep a shared songbook of the songs your group is practicing, searchable by title, author, lyrics, labels, difficulty and your own mastery level",
                 "- each song has a title, author, tempo, time signature, capo and chord list, plus a rich-text description",
-                "- lay out a song's page freely — chords, lyrics, chord grids, free-text blocks, videos — arranged in rows and columns exactly as it will read or print, with text size adjustable on a chord grid's chord names and on a free-text block's own content",
+                "- lay out a song's page freely — chords, lyrics, chord grids, free-text blocks, videos — arranged in rows and columns exactly as it will read or print, with text size adjustable on a chord grid's chord names and on a free-text block's own content, or skip building a layout altogether and just upload a ready-made PDF sheet instead — chosen once when you add the song",
                 "- switch to a clean presentation view for reading, printing or sharing, with a downloadable PDF",
                 "- rate your own mastery of a song privately, and optionally rate its overall difficulty",
                 "- mark a song as completed to lock it from accidental edits, or keep it as a draft while you build it",
@@ -896,7 +896,7 @@
               "fr": [
                 "- tenez un répertoire partagé des morceaux que votre groupe travaille, cherchable par titre, auteur, paroles, labels, difficulté et votre propre niveau de maîtrise",
                 "- un morceau a un titre, un auteur, un tempo, une signature rythmique, un capo et une liste d'accords, avec une description enrichie",
-                "- composez librement la page d'un morceau — accords, paroles, tableaux d'accords, blocs de texte libre, vidéos — organisés en lignes et colonnes exactement comme il sera lu ou imprimé, avec une taille de texte réglable pour les noms d'accords d'un tableau et pour le contenu d'un bloc de texte libre",
+                "- composez librement la page d'un morceau — accords, paroles, tableaux d'accords, blocs de texte libre, vidéos — organisés en lignes et colonnes exactement comme il sera lu ou imprimé, avec une taille de texte réglable pour les noms d'accords d'un tableau et pour le contenu d'un bloc de texte libre, ou renoncez à composer une mise en page et importez directement une feuille PDF déjà prête — choisi une fois pour toutes à la création du morceau",
                 "- passez à une vue présentation épurée pour la lecture, l'impression ou le partage, avec un PDF téléchargeable",
                 "- notez votre propre maîtrise d'un morceau en privé, et notez si vous le souhaitez sa difficulté globale",
                 "- marquez un morceau comme terminé pour le protéger des modifications accidentelles, ou gardez-le en brouillon pendant que vous le construisez",

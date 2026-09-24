@@ -1,13 +1,14 @@
 from datetime import datetime
 from typing import List, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.features.guitar.song.layout.models import BlockChordResponse, GuitarSongLayoutResponse
 from app.features.guitar.song.video.models import GuitarSongVideoResponse
 
 ChordDiagramSize = Literal["xxs", "xs", "s", "m", "l", "xl", "xxl"]
 GuitarSongState = Literal["draft", "completed"]
+GuitarSongContentType = Literal["layout", "pdf"]
 
 
 class GuitarSongCreate(BaseModel):
@@ -25,6 +26,23 @@ class GuitarSongCreate(BaseModel):
     template_song_id: Optional[str] = None
     copy_from_song_id: Optional[str] = None
     blank_layout: bool = False
+    # A song's content mode is chosen once, here, and never changes afterward (see
+    # song_lookup.require_layout_content_song). "pdf" replaces the whole row/column layout with a
+    # single uploaded file, so it cannot be combined with anything that seeds a layout.
+    content_type: GuitarSongContentType = "layout"
+    pdf_file_url: Optional[str] = None
+    pdf_file_name: Optional[str] = None
+    pdf_file_size: Optional[int] = Field(default=None, ge=0)
+
+    @model_validator(mode="after")
+    def _check_pdf_content(self) -> "GuitarSongCreate":
+        if self.content_type != "pdf":
+            return self
+        if not self.pdf_file_url or not self.pdf_file_name:
+            raise ValueError("a PDF song needs pdf_file_url and pdf_file_name")
+        if self.template_song_id or self.blank_layout:
+            raise ValueError("content_type 'pdf' cannot be combined with template_song_id or blank_layout")
+        return self
 
 
 class GuitarSongUpdate(BaseModel):
@@ -41,6 +59,11 @@ class GuitarSongUpdate(BaseModel):
     description_html: Optional[str] = None
     song_state: Optional[GuitarSongState] = None
     difficulty: Optional[int] = Field(default=None, ge=0, le=5)
+    # Only meaningful for a PDF song (see song_lookup.require_layout_content_song) -- replaces the
+    # currently uploaded file. content_type itself is never in this model: it's fixed at creation.
+    pdf_file_url: Optional[str] = None
+    pdf_file_name: Optional[str] = None
+    pdf_file_size: Optional[int] = Field(default=None, ge=0)
 
 
 class GuitarSongResponse(BaseModel):
@@ -62,6 +85,10 @@ class GuitarSongResponse(BaseModel):
     label_ids: List[str] = []
     song_state: GuitarSongState
     difficulty: Optional[int] = None
+    content_type: GuitarSongContentType = "layout"
+    pdf_file_url: Optional[str] = None
+    pdf_file_name: Optional[str] = None
+    pdf_file_size: Optional[int] = None
     # The song's own deduplicated chord list's size, and how many of those chords are rated
     # difficult (4 or 5) -- computed, not stored. A chord with no difficulty rating counts
     # toward chord_count but not difficult_chord_count.

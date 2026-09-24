@@ -20,3 +20,14 @@ async def require_song_editable(pool, song_id: str) -> None:
             status_code=status.HTTP_409_CONFLICT,
             detail="This song is completed. Set it back to draft to edit it.",
         )
+
+
+async def require_layout_content_song(pool, song_id: str) -> None:
+    """A song's content mode (free-form layout vs. a single uploaded PDF) is chosen once at
+    creation and never changes -- a PDF song has no rows/columns/blocks to edit or render."""
+    song = await repo.fetch_song(pool, song_id)
+    if song and song.get("content_type") == "pdf":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This song's content is a PDF file, not a layout.",
+        )

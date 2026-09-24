@@ -23,7 +23,7 @@ import { SongLabelsBand } from './SongLabelsBand.tsx';
 import { SongLearningToolsPanel } from './SongLearningToolsPanel.tsx';
 import { SongMasteryBand } from './SongMasteryBand.tsx';
 import { songDocumentTitle } from './songDocumentTitle.ts';
-import { GuitarSongState } from './types.ts';
+import { GuitarSongContentType, GuitarSongState } from './types.ts';
 import { useGuitarSong } from './useGuitarSong.ts';
 import { useGuitarSongLabels } from './useGuitarSongLabels.ts';
 import { usePresentationPageSize } from './usePresentationPageSize.ts';
@@ -132,7 +132,7 @@ const SongDetailPageContent: React.FC = () => {
             onClick: () => setLabelsModalOpen(true),
           }]
         : []),
-      ...(canEdit && clipboardHook.clipboard
+      ...(canEdit && clipboardHook.clipboard && song.content_type !== GuitarSongContentType.pdf
         ? [{
             id: 'guitar.song.previewClipboard',
             icon: 'clipboard' as const, label: t('guitarSong.layout.previewClipboard'),

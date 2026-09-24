@@ -23,7 +23,15 @@ export const uploadImage = async (file: File): Promise<string> => {
   return data.url;
 };
 
-export const uploadFile = async (file: File): Promise<string> => {
+export interface UploadedFileInfo {
+  url: string;
+  name: string;
+  size: number;
+  type: string;
+  id: string;
+}
+
+export const uploadFileWithMetadata = async (file: File): Promise<UploadedFileInfo> => {
   const formData = new FormData();
   formData.append('file', file);
 
@@ -34,11 +42,15 @@ export const uploadFile = async (file: File): Promise<string> => {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || 'File upload failed');
+    throw new Error(errorData.message || errorData.detail || 'File upload failed');
   }
 
-  const data = await response.json();
-  return data.url;
+  return response.json();
+};
+
+export const uploadFile = async (file: File): Promise<string> => {
+  const info = await uploadFileWithMetadata(file);
+  return info.url;
 };
 
 export const formatFileSize = (bytes: number): string => {

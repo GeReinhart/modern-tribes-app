@@ -3,7 +3,8 @@ import React from 'react';
 import { ActiveLayoutMenuProvider } from './ActiveLayoutMenuContext.tsx';
 import { SongAddRowButton } from './SongAddRowButton.tsx';
 import { SongLayoutRow } from './SongLayoutRow.tsx';
-import { GuitarSongDetail } from './types.ts';
+import { SongPdfContent } from './SongPdfContent.tsx';
+import { GuitarSongContentType, GuitarSongDetail } from './types.ts';
 import { useGuitarSong } from './useGuitarSong.ts';
 import { useGuitarSongLabels } from './useGuitarSongLabels.ts';
 import { useSongBlockClipboard } from './useSongBlockClipboard.ts';
@@ -28,6 +29,10 @@ export const SongDetailBody: React.FC<SongDetailBodyProps> = ({
 }) => {
   const canManage = canEdit && isManager;
   const sortedRows = [...song.layout.rows].sort((a, b) => a.position - b.position);
+
+  if (song.content_type === GuitarSongContentType.pdf) {
+    return <SongPdfContent song={song} canEdit={canEdit} hook={hook} />;
+  }
 
   return (
     <ActiveLayoutMenuProvider>

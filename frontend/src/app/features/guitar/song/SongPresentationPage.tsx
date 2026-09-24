@@ -19,7 +19,7 @@ import { SongLearningToolsPanel } from './SongLearningToolsPanel.tsx';
 import { SongMasteryBand } from './SongMasteryBand.tsx';
 import { SongPageSettings } from './SongPageSettings.tsx';
 import { songDocumentTitle } from './songDocumentTitle.ts';
-import { GuitarSongState } from './types.ts';
+import { GuitarSongContentType, GuitarSongState } from './types.ts';
 import { useGuitarSong } from './useGuitarSong.ts';
 import { useGuitarSongLabels } from './useGuitarSongLabels.ts';
 import { usePresentationPageSize } from './usePresentationPageSize.ts';
@@ -66,6 +66,7 @@ const SongPresentationPageContent: React.FC = () => {
   );
 
   const isCompleted = song?.song_state === GuitarSongState.completed;
+  const isPdfSong = song?.content_type === GuitarSongContentType.pdf;
   const songListPath = useSongListPath(tribeId || null, projectId || null);
   const handleBackToDraft = async () => {
     await hook.updateSongFields({ song_state: GuitarSongState.draft });
@@ -78,7 +79,9 @@ const SongPresentationPageContent: React.FC = () => {
       ...(isCompleted
         ? (canEdit ? [{ id: 'guitar.song.backToDraft', icon: 'pencil' as const, label: t('guitarSong.detail.backToDraft'), onClick: handleBackToDraft }] : [])
         : [{ id: 'guitar.song.backToSong', icon: 'arrow-left' as const, label: t('guitarSong.layout.backToSong'), path: songPath }]),
-      { id: 'guitar.song.pageSettings', icon: 'printer' as const, label: t('guitarSong.layout.pageSettingsLabel'), onClick: () => setPageSettingsModalOpen(true) },
+      ...(isPdfSong
+        ? []
+        : [{ id: 'guitar.song.pageSettings', icon: 'printer' as const, label: t('guitarSong.layout.pageSettingsLabel'), onClick: () => setPageSettingsModalOpen(true) }]),
       {
         id: 'guitar.song.learningTools',
         icon: 'headphones' as const, label: t('guitarSong.learningTools.title'), onClick: () => setLearningToolsOpen(true),
@@ -90,19 +93,23 @@ const SongPresentationPageContent: React.FC = () => {
             onClick: () => setLabelsModalOpen(true),
           }]
         : []),
-      {
-        id: 'guitar.song.toggleStructureOutlines',
-        icon: 'grid' as const,
-        label: showOutlines ? t('guitarSong.layout.hideStructureOutlines') : t('guitarSong.layout.showStructureOutlines'),
-        onClick: () => setShowOutlines(!showOutlines),
-      },
-      {
-        id: 'guitar.song.downloadPdf',
-        icon: 'download' as const, label: t('guitarSong.layout.downloadPdf'), onClick: downloadPdf,
-        disabled: downloadingPdf,
-      },
+      ...(isPdfSong
+        ? []
+        : [
+            {
+              id: 'guitar.song.toggleStructureOutlines',
+              icon: 'grid' as const,
+              label: showOutlines ? t('guitarSong.layout.hideStructureOutlines') : t('guitarSong.layout.showStructureOutlines'),
+              onClick: () => setShowOutlines(!showOutlines),
+            },
+            {
+              id: 'guitar.song.downloadPdf',
+              icon: 'download' as const, label: t('guitarSong.layout.downloadPdf'), onClick: downloadPdf,
+              disabled: downloadingPdf,
+            },
+          ]),
     ],
-    [songPath, songListPath, t, downloadPdf, downloadingPdf, showOutlines, setShowOutlines, isCompleted, canEdit],
+    [songPath, songListPath, t, downloadPdf, downloadingPdf, showOutlines, setShowOutlines, isCompleted, isPdfSong, canEdit],
   );
 
   if (loading && !song) {
