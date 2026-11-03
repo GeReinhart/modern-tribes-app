@@ -40,6 +40,11 @@ def test_update_language_theme_success():
     pass
 
 
-@scenario(FEATURE, "PATCH a language's theme as a non-admin — 403 and nothing changes")
+@scenario(FEATURE, "PATCH a language's theme as a regular member — it is updated too, the theme being shared by every project")
+def test_update_language_theme_as_member():
+    pass
+
+
+@scenario(FEATURE, "PATCH a language's theme as a user without any access to the projects' tribes — 403 and nothing changes")
 def test_update_language_theme_forbidden():
     pass

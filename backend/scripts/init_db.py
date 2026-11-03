@@ -453,7 +453,8 @@ class DatabaseInitializer:
         async with self.pool.acquire() as conn:
             for row in rows:
                 await conn.execute(
-                    "INSERT INTO languages (code, name) VALUES ($1, $2)", row["code"], row["name"],
+                    "INSERT INTO languages (code, name, theme_code) VALUES ($1, $2, $3)",
+                    row["code"], row["name"], row.get("theme_code") or None,
                 )
                 ids[row["code"]] = row["code"]
         print(f"✓ Created {len(ids)} languages")

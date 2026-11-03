@@ -1,4 +1,4 @@
-code,name
-fr,French
-en,English
-de,German
+code,name,theme_code
+fr,French,main_2
+en,English,alt_07
+de,German,alt_05
