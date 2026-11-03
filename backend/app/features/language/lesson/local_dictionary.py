@@ -32,12 +32,20 @@ by language, so it needs computing separately from `article` (the translation's 
 article). Together these let a match confirm the typed word's own grammar (type,
 article) while it's still being typed, not just suggest its translation.
 
+Memory: one archive serves both directions and both languages, so it is indexed ONCE (never
+per direction). The index keeps only the raw entry lines plus, per column, the cleaned
+lower-cased texts in sorted order with the line each comes from. Lookups bisect those texts and
+parse just the few matching lines, instead of holding a parsed object for every entry.
+
 Never raises: a missing archive for a pair, or a word with no match, both simply mean "no
 suggestions", since the translation can always be typed in by hand instead.
 """
 import html
 import re
+import threading
 import zipfile
+from array import array
+from bisect import bisect_left, bisect_right
 from pathlib import Path
 from typing import NamedTuple, Optional
 
@@ -79,10 +87,6 @@ class DictionaryWord(NamedTuple):
     article: Optional[str]
 
 
-_cache: dict[tuple[str, str, str], dict[str, list[DictionaryCandidate]]] = {}
-_side_cache: dict[tuple[str, str, str], tuple[list[tuple[str, "DictionaryWord"]], list[tuple[str, "DictionaryWord"]]]] = {}
-
-
 def _clean(entry: str) -> str:
     """Decodes dict.cc's HTML-numeric-entity encoding and strips the {gender}/[usage]/
     <alternate-form> annotations dict.cc attaches to a headword or translation."""
@@ -103,12 +107,15 @@ def _context_of(raw_headword: str) -> Optional[str]:
 
 
 def _locate_archive(source: str, target: str) -> tuple[Path, bool] | None:
-    forward = DATA_DIR / f"dict.{source.lower()}.{target.lower()}.zip"
-    if forward.is_file():
-        return forward, False
-    reverse = DATA_DIR / f"dict.{target.lower()}.{source.lower()}.zip"
-    if reverse.is_file():
-        return reverse, True
+    """The archive covering a language pair, and whether `source` is its second column.
+    dict.cc ships each pair twice (de.fr and fr.de), mirrors of one another: the archive named
+    in alphabetical order is always preferred, so both directions share one archive -- and
+    therefore one in-memory index -- instead of loading each pair twice."""
+    first, second = sorted((source.lower(), target.lower()))
+    for owner, other in ((first, second), (second, first)):
+        archive = DATA_DIR / f"dict.{owner}.{other}.zip"
+        if archive.is_file():
+            return archive, source.lower() != owner
     return None
 
 
@@ -141,48 +148,71 @@ def _candidate_from_line(
     )
 
 
-def _parse_lines(text: str, swap: bool, source: str, target: str) -> dict[str, list[DictionaryCandidate]]:
-    """headword (lowercased) -> every distinct candidate translation seen for it, in
-    file order, capped at _MAX_CANDIDATES."""
-    by_headword: dict[str, list[DictionaryCandidate]] = {}
-    for line in text.splitlines():
-        if line.startswith("#"):
-            continue
-        fields = line.split("\t")
-        if len(fields) < 2:
-            continue
-        headword_raw, translation_raw = (fields[1], fields[0]) if swap else (fields[0], fields[1])
-        headword = _clean(headword_raw).lower()
-        if not headword:
-            continue
-        bucket = by_headword.setdefault(headword, [])
-        if len(bucket) >= _MAX_CANDIDATES:
-            continue
-        raw_type = fields[2] if len(fields) > 2 else ""
-        candidate = _candidate_from_line(headword_raw, translation_raw, raw_type, source, target)
-        if candidate not in bucket:
-            bucket.append(candidate)
-    return by_headword
+
+class _Index(NamedTuple):
+    lines: list[str]
+    # Per column (0 = first, 1 = second): cleaned lower-cased texts sorted, and the line of each.
+    keys: tuple[list[str], list[str]]
+    line_of: tuple[array, array]
 
 
-def _load_dictionary(source: str, target: str) -> dict[str, list[DictionaryCandidate]] | None:
-    cache_key = (str(DATA_DIR), source, target)
-    if cache_key in _cache:
-        return _cache[cache_key]
+_indexes: dict[tuple[str, str], _Index] = {}
+_load_lock = threading.Lock()
+
+
+def _build_index(text: str) -> _Index:
+    lines = [line for line in text.splitlines() if "\t" in line and not line.startswith("#")]
+    keys: list[list[str]] = []
+    line_of: list[array] = []
+    for column in (0, 1):
+        cleaned = [_clean(line.split("\t")[column]).lower() for line in lines]
+        order = sorted((i for i, key in enumerate(cleaned) if key), key=cleaned.__getitem__)
+        keys.append([cleaned[i] for i in order])
+        line_of.append(array("I", order))
+    return _Index(lines, (keys[0], keys[1]), (line_of[0], line_of[1]))
+
+
+def _index_for(source: str, target: str) -> tuple[_Index, bool] | None:
+    """The shared index of the archive covering this pair, and whether `source` is its
+    second column. Keyed by archive, so fr->de and de->fr reuse the same index."""
     located = _locate_archive(source, target)
     if located is None:
         return None
     path, swapped = located
-    words = _parse_lines(_read_archive_text(path), swapped, source, target)
-    _cache[cache_key] = words
-    return words
+    cache_key = (str(DATA_DIR), path.name)
+    with _load_lock:
+        if cache_key not in _indexes:
+            _indexes[cache_key] = _build_index(_read_archive_text(path))
+    return _indexes[cache_key], swapped
+
+
+def _fields_of(index: _Index, column: int, position: int) -> list[str]:
+    return index.lines[index.line_of[column][position]].split("\t")
+
+
+def _raw_type(fields: list[str]) -> str:
+    return fields[2] if len(fields) > 2 else ""
 
 
 def suggest_translations(source: str, target: str, text: str) -> list[DictionaryCandidate]:
-    words = _load_dictionary(source, target)
-    if words is None:
+    found = _index_for(source, target)
+    if found is None:
         return []
-    return words.get(text.strip().lower(), [])
+    index, swapped = found
+    column = 1 if swapped else 0
+    key = text.strip().lower()
+    keys = index.keys[column]
+    candidates: list[DictionaryCandidate] = []
+    for position in range(bisect_left(keys, key), bisect_right(keys, key)):
+        fields = _fields_of(index, column, position)
+        candidate = _candidate_from_line(
+            fields[column], fields[1 - column], _raw_type(fields), source, target,
+        )
+        if candidate not in candidates:
+            candidates.append(candidate)
+        if len(candidates) >= _MAX_CANDIDATES:
+            break
+    return candidates
 
 
 def _word_for_side(raw_this_side: str, raw_type: str, this_language: str) -> DictionaryWord:
@@ -193,45 +223,13 @@ def _word_for_side(raw_this_side: str, raw_type: str, this_language: str) -> Dic
     )
 
 
-def _build_side_indexes(
-    text: str, swap: bool, source: str, target: str,
-) -> tuple[list[tuple[str, DictionaryWord]], list[tuple[str, DictionaryWord]]]:
-    """Every dict.cc line, indexed separately by its source-language text and by its
-    target-language text (each paired with that side's own word_type/article) -- unlike
-    `_parse_lines` (keyed by exact headword, for translating one known word), this is
-    built for prefix search: same-language autocomplete over everything dict.cc has for
-    that language, independent of any translation."""
-    source_entries: list[tuple[str, DictionaryWord]] = []
-    target_entries: list[tuple[str, DictionaryWord]] = []
-    for line in text.splitlines():
-        if line.startswith("#"):
-            continue
-        fields = line.split("\t")
-        if len(fields) < 2:
-            continue
-        headword_raw, translation_raw = (fields[1], fields[0]) if swap else (fields[0], fields[1])
-        raw_type = fields[2] if len(fields) > 2 else ""
-        source_word = _word_for_side(headword_raw, raw_type, source)
-        target_word = _word_for_side(translation_raw, raw_type, target)
-        if source_word.text:
-            source_entries.append((source_word.text.lower(), source_word))
-        if target_word.text:
-            target_entries.append((target_word.text.lower(), target_word))
-    return source_entries, target_entries
 
 
-def _load_side_indexes(source: str, target: str) -> tuple[list[tuple[str, DictionaryWord]], list[tuple[str, DictionaryWord]]]:
-    cache_key = (str(DATA_DIR), source, target)
-    if cache_key in _side_cache:
-        return _side_cache[cache_key]
-    located = _locate_archive(source, target)
-    if located is None:
-        result: tuple[list[tuple[str, DictionaryWord]], list[tuple[str, DictionaryWord]]] = ([], [])
-    else:
-        path, swapped = located
-        result = _build_side_indexes(_read_archive_text(path), swapped, source, target)
-    _side_cache[cache_key] = result
-    return result
+def _prefix_positions(keys: list[str], prefix: str) -> list[int]:
+    """Positions of the texts starting with `prefix`, shortest text first (then alphabetical)."""
+    start = bisect_left(keys, prefix)
+    end = bisect_left(keys, prefix + "\U0010ffff", start)
+    return sorted(range(start, end), key=lambda p: (len(keys[p]), keys[p]))
 
 
 def search_words_by_prefix(source: str, target: str, language: str, prefix: str, limit: int = 20) -> list[DictionaryWord]:
@@ -239,24 +237,25 @@ def search_words_by_prefix(source: str, target: str, language: str, prefix: str,
     same-language autocomplete (e.g. typing "Ja" in a French column suggests "jambe"),
     independent of any translation. `language` must be `source` or `target` (whichever
     this column's own language is); the archive for the (source, target) pair is reused
-    either way, since it's the only one this project's lesson actually has. Ranked
-    shortest-first, since among words sharing the typed prefix the shortest one is the
-    closest to what was actually typed (and an exact match, zero letters longer, always
-    comes first)."""
+    either way. Ranked shortest-first, since among words sharing the typed prefix the
+    shortest one is the closest to what was actually typed (an exact match always comes
+    first). Only the lines of the words actually returned are parsed."""
     normalized_prefix = prefix.strip().lower()
-    if not normalized_prefix or language not in (source, target):
+    found = _index_for(source, target)
+    if not normalized_prefix or language not in (source, target) or found is None:
         return []
-    source_entries, target_entries = _load_side_indexes(source, target)
-    entries = source_entries if language == source else target_entries
+    index, swapped = found
+    column = (1 if swapped else 0) if language == source else (0 if swapped else 1)
     seen: set[tuple[str, Optional[str], Optional[str]]] = set()
     matches: list[DictionaryWord] = []
-    for text_lower, word in entries:
-        if not text_lower.startswith(normalized_prefix):
-            continue
+    for position in _prefix_positions(index.keys[column], normalized_prefix):
+        fields = _fields_of(index, column, position)
+        word = _word_for_side(fields[column], _raw_type(fields), language)
         key = (word.text, word.word_type, word.article)
         if key in seen:
             continue
         seen.add(key)
         matches.append(word)
-    matches.sort(key=lambda w: (len(w.text), w.text.lower()))
-    return matches[:limit]
+        if len(matches) >= limit:
+            break
+    return matches
