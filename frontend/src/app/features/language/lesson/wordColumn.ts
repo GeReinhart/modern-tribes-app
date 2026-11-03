@@ -46,10 +46,15 @@ export function columnFromSummary(summary: WordSummary): WordColumnState {
   };
 }
 
-// A picked translation candidate fills the column's text and article -- never its plural,
-// which dict.cc doesn't reliably pair with a single sense (see local_dictionary.py).
+// A picked translation candidate fills the column's text and article, and its plural when the
+// dictionary found one (a best-effort match, see local_dictionary.py -- still editable).
 export function applyTranslationCandidate(column: WordColumnState, candidate: TranslationCandidate): WordColumnState {
-  return { ...column, text: candidate.text, article: candidate.article ?? '' };
+  return { ...column, text: candidate.text, article: candidate.article ?? '', plural: candidate.plural ?? column.plural };
+}
+
+// The typed word's own plural, suggested for the column it was typed in unless one is already set.
+export function applySourcePlural(column: WordColumnState, candidate: TranslationCandidate): WordColumnState {
+  return column.plural.trim() || !candidate.source_plural ? column : { ...column, plural: candidate.source_plural };
 }
 
 export function isColumnValid(column: WordColumnState): boolean {

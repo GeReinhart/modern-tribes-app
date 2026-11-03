@@ -3,10 +3,10 @@ import asyncio
 from fastapi import HTTPException
 
 from app.features.language import dictionary, lessons
-from app.features.language.lesson import local_dictionary
+from app.features.language.lesson import local_dictionary, online_translation
 from app.features.language.lesson.models import (
     DictionaryWordMatch, LanguageInfo, LanguageSettingsCreate, LanguageSettingsResponse,
-    LanguageThemeUpdate, LessonCreate, LessonResponse, LessonUpdate, LessonWordLink, TranslationCandidate,
+    LanguageThemeUpdate, LessonCreate, OnlineTranslationSuggestion, LessonResponse, LessonUpdate, LessonWordLink, TranslationCandidate,
     TranslationSuggestion, WordCreate, WordResponse, WordSummary, WordTranslationInput, WordUpdate,
 )
 from app.platform.core.uploads.helpers import create_document_with_attachments
@@ -188,11 +188,22 @@ async def get_translation_suggestion(
         text=text, source_language=source_language, target_language=target_language,
         suggestions=[
             TranslationCandidate(
-                text=c.text, article=c.article, context=c.context,
-                word_type=c.word_type, source_article=c.source_article,
+                text=c.text, article=c.article, context=c.context, word_type=c.word_type,
+                source_article=c.source_article, plural=c.plural, source_plural=c.source_plural,
             )
             for c in candidates
         ],
+    )
+
+
+async def get_online_translation_suggestion(
+    text: str, source_language: str, target_language: str,
+) -> OnlineTranslationSuggestion:
+    """A single machine translation: unlike the dictionary it carries no article, plural or type."""
+    translated = await online_translation.translate_word(text, source_language, target_language)
+    return OnlineTranslationSuggestion(
+        text=text, source_language=source_language, target_language=target_language,
+        suggestions=[TranslationCandidate(text=translated)],
     )
 
 

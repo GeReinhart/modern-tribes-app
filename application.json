@@ -1060,7 +1060,7 @@
                 "- remove a word from a lesson at any time — it only leaves that lesson and stays available everywhere else",
                 "- every field where you type German (words, plurals, declension forms, test answers) has a ß button next to it to insert the character in one click",
                 "- choose a color theme for each language: it colors every word of that language wherever it is shown or edited, in all projects",
-                "- get a suggested translation from the app's built-in dictionary while typing a new word, with its own type and article confirmed as you type and, for German words, plural forms suggested at a click — adjust any of it freely before saving"
+                "- get a suggested translation from the app's built-in dictionary while typing a new word, with its own type and article confirmed as you type and, when known, the plural filled in (or type the plural in your own language and translate it with one click) — and when the dictionary has no match, you can choose to ask an online translation service (your typed word is only sent when you click) — adjust any of it freely before saving"
               ],
               "fr": [
                 "- une leçon s'ouvre sur deux sous-onglets, « La leçon » pour son titre et son contenu et « Le vocabulaire » pour sa liste de mots en cartes compactes filtrables par type — le sous-onglet consulté est mémorisé",
@@ -1072,7 +1072,7 @@
                 "- retirez un mot d'une leçon à tout moment — il ne quitte que cette leçon et reste disponible partout ailleurs",
                 "- chaque champ où vous saisissez de l'allemand (mots, pluriels, formes déclinées, réponses aux tests) a un bouton ß à côté pour insérer le caractère en un clic",
                 "- choisissez un thème de couleur pour chaque langue : il colore chaque mot de cette langue partout où il est affiché ou édité, dans tous les projets",
-                "- obtenez une suggestion de traduction du dictionnaire intégré à l'app pendant que vous tapez un nouveau mot, avec son type et son article confirmés au fil de la frappe et, pour les mots allemands, des formes au pluriel suggérées d'un clic — ajustez librement avant d'enregistrer"
+                "- obtenez une suggestion de traduction du dictionnaire intégré à l'app pendant que vous tapez un nouveau mot, avec son type et son article confirmés au fil de la frappe et, quand il est connu, le pluriel pré-rempli (ou saisissez le pluriel dans votre langue et traduisez-le d'un clic) — et si le dictionnaire ne trouve rien, vous pouvez choisir d'interroger un service de traduction en ligne (le mot saisi n'est envoyé qu'au clic) — ajustez librement avant d'enregistrer"
               ]
             },
             "backend": {

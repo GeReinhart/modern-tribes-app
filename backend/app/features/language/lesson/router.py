@@ -6,7 +6,7 @@ from app.features.language import access
 from app.features.language.lesson import service
 from app.features.language.lesson.models import (
     DictionaryWordMatch, LanguageInfo, LanguageSettingsCreate, LanguageSettingsResponse,
-    LanguageThemeUpdate, LessonCreate, LessonResponse, LessonUpdate, LessonWordLink, TranslationSuggestion,
+    LanguageThemeUpdate, LessonCreate, LessonResponse, LessonUpdate, LessonWordLink, OnlineTranslationSuggestion, TranslationSuggestion,
     WordCreate, WordResponse, WordSummary, WordTranslationInput, WordUpdate,
 )
 from app.platform.core.authentication.router import get_current_user
@@ -238,6 +238,19 @@ async def translate_suggestion(
     **Permissions:** admin | can_access_attached_tribes
     """
     return await service.get_translation_suggestion(text, source_language, target_language)
+
+
+@router.get("/translate-suggestion/online", response_model=OnlineTranslationSuggestion)
+@require_any_permission_decorator(*_PERMISSIONS)
+async def translate_suggestion_online(
+    text: str, source_language: str, target_language: str, current_user: dict = Depends(get_current_user),
+):
+    """Get a machine translation from the online service (DeepL), only on explicit request when
+    the local dictionary has no match. The typed text is sent to that service.
+
+    **Permissions:** admin | can_access_attached_tribes
+    """
+    return await service.get_online_translation_suggestion(text, source_language, target_language)
 
 
 @router.get("/dictionary-words", response_model=List[DictionaryWordMatch])

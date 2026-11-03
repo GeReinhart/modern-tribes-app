@@ -28,7 +28,15 @@ const ArticleQuiz: React.FC<Props> = ({ lessonId, words, languages, targetLangua
   if (!current) {
     return <ThemedText variant="secondary" size="small">{t('features.language.noArticleWords')}</ThemedText>;
   }
-  if (result) return <QuizResultBanner result={result} onContinue={continueToNext} />;
+  if (result) {
+    return (
+      <QuizResultBanner
+        result={result}
+        correctAnswerLabel={`${result.correct_answer} ${current.text}`}
+        onContinue={continueToNext}
+      />
+    );
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

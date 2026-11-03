@@ -45,6 +45,12 @@ class Settings(BaseSettings):
     EMAILS_FROM_NAME: str = "no-reply-modern-tribes"
     MAILPACE_API_TOKEN: str = ""
 
+    # Online translation (DeepL API Free) -- optional fallback of the language feature's local
+    # dictionary. Leave the key empty to disable it.
+    DEEPL_API_KEY: str = ""
+    DEEPL_API_URL: str = "https://api-free.deepl.com/v2/translate"
+    DEEPL_TIMEOUT_SECONDS: float = 8.0
+
     # Mail scheduler
     MAIL_CRON_INTERVAL_SECONDS: int = 5
 

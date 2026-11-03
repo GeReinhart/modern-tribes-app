@@ -66,3 +66,24 @@ def test_suggest_translations_not_found():
 @scenario(FEATURE, "GET translation candidates as a user with no role at all — 403")
 def test_suggest_translations_forbidden():
     pass
+
+
+@scenario(
+    FEATURE,
+    "GET translation candidates for a noun whose plural is in the dictionary — the plural of the typed word and of its translation are suggested",
+)
+def test_suggest_translations_with_plurals():
+    pass
+
+
+@scenario(FEATURE, "GET translation candidates for a noun with no plural in the dictionary — both plurals are empty")
+def test_suggest_translations_without_plurals():
+    pass
+
+
+@scenario(
+    FEATURE,
+    "GET translation candidates in the reverse direction for a noun whose plural is in the dictionary — the plurals follow the requested direction",
+)
+def test_suggest_translations_plurals_reverse_direction():
+    pass

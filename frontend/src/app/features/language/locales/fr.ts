@@ -33,6 +33,7 @@ const fr: Record<string, string> = {
 
   'features.language.article': 'Article',
   'features.language.plural': 'Pluriel',
+  'features.language.translatePlural': 'Traduire le pluriel',
   'features.language.declensions': 'Déclinaisons',
   'features.language.declensionCase': 'Cas',
   'features.language.declensionForm': 'Forme',
@@ -44,6 +45,10 @@ const fr: Record<string, string> = {
   'features.language.changeWord': 'Changer',
   'features.language.suggestTranslation': 'Suggérer',
   'features.language.noSuggestionFound': 'Aucune suggestion trouvée.',
+  'features.language.searchOnline': 'Chercher en ligne',
+  'features.language.searchOnlineTooltip': 'Chercher en ligne, ne pas en abuser',
+  'features.language.searchOnlineHint': 'Le mot saisi sera envoyé à un service de traduction en ligne (DeepL).',
+  'features.language.onlineSuggestionNotice': 'Traduction automatique : vérifie l\'article, le pluriel et le type.',
   'features.language.lessonWordsHintLabel': 'Dans les leçons',
   'features.language.dictionaryHintLabel': 'Dans le dictionnaire',
   'features.language.searchWordPlaceholder': 'Chercher ou saisir un nouveau mot…',

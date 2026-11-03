@@ -33,6 +33,7 @@ const en: Record<string, string> = {
 
   'features.language.article': 'Article',
   'features.language.plural': 'Plural',
+  'features.language.translatePlural': 'Translate the plural',
   'features.language.declensions': 'Declensions',
   'features.language.declensionCase': 'Case',
   'features.language.declensionForm': 'Form',
@@ -44,6 +45,10 @@ const en: Record<string, string> = {
   'features.language.changeWord': 'Change',
   'features.language.suggestTranslation': 'Suggest',
   'features.language.noSuggestionFound': 'No suggestion found.',
+  'features.language.searchOnline': 'Search online',
+  'features.language.searchOnlineTooltip': 'Search online, do not overuse',
+  'features.language.searchOnlineHint': 'The word you typed will be sent to an online translation service (DeepL).',
+  'features.language.onlineSuggestionNotice': 'Automatic translation: check the article, the plural and the type.',
   'features.language.lessonWordsHintLabel': 'In the lessons',
   'features.language.dictionaryHintLabel': 'In the dictionary',
   'features.language.searchWordPlaceholder': 'Search or type a new word…',

@@ -3,14 +3,10 @@ import { ThemedInput } from '@/app/platform/core/layout/themes/components/Themed
 
 import React, { useRef } from 'react';
 
-// Languages that have a character missing from a regular keyboard, with a button to type it.
-const SPECIAL_CHARACTER_BY_LANGUAGE: Record<string, string> = { de: 'ß' };
+import { SPECIAL_CHARACTER_BY_LANGUAGE } from './specialCharacters.ts';
 
 // Fixed width of the special-character button, so a neighbouring field can reserve the same room.
-const SPECIAL_BUTTON_WIDTH = '2.5rem';
-
-export const hasSpecialCharacter = (language?: string): boolean =>
-  Boolean(language && SPECIAL_CHARACTER_BY_LANGUAGE[language]);
+const SPECIAL_BUTTON_WIDTH = '2rem';
 
 type InputProps = Omit<React.ComponentProps<typeof ThemedInput>, 'onChange' | 'value'>;
 
@@ -54,7 +50,7 @@ const LanguageTextInput: React.FC<Props> = ({ value, onValueChange, language, co
       {specialCharacter && !disabled && (
         <ThemedButton
           type="button" variant="secondary" fullWidth={false} title={specialCharacter}
-          style={{ width: SPECIAL_BUTTON_WIDTH, padding: 'var(--btn-pad-v) 0' }} onClick={insertSpecialCharacter}
+          style={{ width: SPECIAL_BUTTON_WIDTH, height: SPECIAL_BUTTON_WIDTH, minHeight: 0, padding: 0, fontSize: 'var(--font-sm)' }} onClick={insertSpecialCharacter}
         >
           {specialCharacter}
         </ThemedButton>

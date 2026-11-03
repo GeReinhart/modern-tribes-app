@@ -77,6 +77,9 @@ class TranslationCandidate(BaseModel):
     context: Optional[str] = None
     word_type: Optional[str] = None
     source_article: Optional[str] = None
+    # Plural of the translation / of the typed word, when the dictionary lists it.
+    plural: Optional[str] = None
+    source_plural: Optional[str] = None
 
 
 class TranslationSuggestion(BaseModel):
@@ -84,6 +87,10 @@ class TranslationSuggestion(BaseModel):
     source_language: str
     target_language: str
     suggestions: List[TranslationCandidate] = []
+
+
+class OnlineTranslationSuggestion(TranslationSuggestion):
+    source: str = "online"
 
 
 class DictionaryWordMatch(BaseModel):

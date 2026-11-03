@@ -125,6 +125,9 @@ export interface TranslationCandidate {
   context: string | null;
   word_type: WordType | null;
   source_article: string | null;
+  // Plural of the translation / of the typed word, when the dictionary lists it.
+  plural: string | null;
+  source_plural: string | null;
 }
 
 export interface TranslationSuggestion {

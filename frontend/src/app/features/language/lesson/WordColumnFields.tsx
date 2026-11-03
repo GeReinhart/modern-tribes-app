@@ -9,6 +9,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import PluralInput from './PluralInput.tsx';
 import WordDetailFields from './WordDetailFields.tsx';
 import DictionaryAutocompleteList from './DictionaryAutocompleteList.tsx';
 import { useDictionaryAutocomplete } from './useDictionaryAutocomplete.ts';
@@ -33,6 +34,13 @@ interface Props {
   onClearPick?: () => void;
   suggestAction?: React.ReactNode;
   suggestionsPanel?: React.ReactNode;
+  // Online search of the typed word, offered as the last row of the dictionary autocomplete.
+  onSearchOnline?: () => void;
+  // Known-language column: only the plural field (nouns), to be translated into the other column.
+  pluralOnly?: boolean;
+  // Button / proposals translating the other column's plural into this one's plural field.
+  pluralAction?: React.ReactNode;
+  pluralPanel?: React.ReactNode;
 }
 
 // One column of the two-column word form: a text field (a live dictionary search box in the
@@ -49,6 +57,7 @@ type ContentProps = Omit<Props, 'themeCode'>;
 
 const WordColumnFieldsContent: React.FC<ContentProps> = ({
   languageCode, value, onChange, searchEnabled, detailed, otherLanguageCode, onPickWord, onClearPick, suggestAction, suggestionsPanel,
+  pluralOnly, pluralAction, pluralPanel, onSearchOnline,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -147,12 +156,19 @@ const WordColumnFieldsContent: React.FC<ContentProps> = ({
       )}
 
       {showAutocomplete && (
-        <DictionaryAutocompleteList loading={matchesLoading} matches={matches} onPick={applyAutocompleteMatch} />
+        <DictionaryAutocompleteList
+          loading={matchesLoading} matches={matches} onPick={applyAutocompleteMatch} onSearchOnline={onSearchOnline}
+        />
       )}
 
       {suggestionsPanel}
 
-      {detailed && <WordDetailFields value={value} locked={locked} onChange={onChange} />}
+      {detailed && (
+        <WordDetailFields
+          value={value} locked={locked} onChange={onChange} pluralAction={pluralAction} pluralPanel={pluralPanel}
+        />
+      )}
+      {pluralOnly && value.wordType === 'noun' && <PluralInput value={value} locked={locked} onChange={onChange} />}
     </div>
   );
 };

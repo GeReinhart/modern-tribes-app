@@ -43,8 +43,8 @@ Feature: Get translation candidates from the local dict.cc dictionary while crea
       {
         "text": "Haus", "source_language": "de", "target_language": "fr",
         "suggestions": [
-          { "text": "maison", "article": "la", "context": "Gebäude", "word_type": "noun", "source_article": "das" },
-          { "text": "maisonnée", "article": "la", "context": "Haushalt, Hausgemeinschaft, Familie", "word_type": "noun", "source_article": "das" }
+          { "text": "maison", "article": "la", "context": "Gebäude", "word_type": "noun", "source_article": "das", "plural": null, "source_plural": null },
+          { "text": "maisonnée", "article": "la", "context": "Haushalt, Hausgemeinschaft, Familie", "word_type": "noun", "source_article": "das", "plural": null, "source_plural": null }
         ]
       }
       """
@@ -61,7 +61,65 @@ Feature: Get translation candidates from the local dict.cc dictionary while crea
       """
       {
         "text": "maison", "source_language": "fr", "target_language": "de",
-        "suggestions": [ { "text": "Haus", "article": "das", "context": null, "word_type": "noun", "source_article": "la" } ]
+        "suggestions": [ { "text": "Haus", "article": "das", "context": null, "word_type": "noun", "source_article": "la", "plural": null, "source_plural": null } ]
+      }
+      """
+
+  Scenario: GET translation candidates for a noun whose plural is in the dictionary — the plural of the typed word and of its translation are suggested
+    Given I am authenticated as a regular user: user.id 0002
+    And the bundled dictionary archive "dict.de.fr.zip" contains a file with content:
+      """
+      Kind {n}	enfant {m}	noun
+      Kinder {pl}	enfants {m.pl}	noun
+      """
+    When I GET /api/features/tasks/language/translate-suggestion?text=Kind&source_language=de&target_language=fr
+    Then the response status code is 200
+    And the response body is:
+      """
+      {
+        "text": "Kind", "source_language": "de", "target_language": "fr",
+        "suggestions": [
+          { "text": "enfant", "article": "le", "context": null, "word_type": "noun", "source_article": "das", "plural": "enfants", "source_plural": "Kinder" }
+        ]
+      }
+      """
+
+  Scenario: GET translation candidates for a noun with no plural in the dictionary — both plurals are empty
+    Given I am authenticated as a regular user: user.id 0002
+    And the bundled dictionary archive "dict.de.fr.zip" contains a file with content:
+      """
+      Kind {n}	enfant {m}	noun
+      Kinder {pl}	enfants {m.pl}	noun
+      Katze {f}	chat {m}	noun
+      """
+    When I GET /api/features/tasks/language/translate-suggestion?text=Katze&source_language=de&target_language=fr
+    Then the response status code is 200
+    And the response body is:
+      """
+      {
+        "text": "Katze", "source_language": "de", "target_language": "fr",
+        "suggestions": [
+          { "text": "chat", "article": "le", "context": null, "word_type": "noun", "source_article": "die", "plural": null, "source_plural": null }
+        ]
+      }
+      """
+
+  Scenario: GET translation candidates in the reverse direction for a noun whose plural is in the dictionary — the plurals follow the requested direction
+    Given I am authenticated as a regular user: user.id 0002
+    And the bundled dictionary archive "dict.de.fr.zip" contains a file with content:
+      """
+      Mann {m}	homme {m}	noun
+      Männer {pl}	hommes {m.pl}	noun
+      """
+    When I GET /api/features/tasks/language/translate-suggestion?text=homme&source_language=fr&target_language=de
+    Then the response status code is 200
+    And the response body is:
+      """
+      {
+        "text": "homme", "source_language": "fr", "target_language": "de",
+        "suggestions": [
+          { "text": "Mann", "article": "der", "context": null, "word_type": "noun", "source_article": "le", "plural": "Männer", "source_plural": "hommes" }
+        ]
       }
       """
 

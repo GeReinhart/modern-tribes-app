@@ -5,12 +5,13 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import SuggestionList from './SuggestionList.tsx';
+import { usePluralTranslation } from './usePluralTranslation.tsx';
 import { useLinkedTranslation } from './useLinkedTranslation.ts';
 import { useSyncedWordType } from './useSyncedWordType.ts';
 import { useTranslationSuggestions } from './useTranslationSuggestions.ts';
 import WordColumnFields from './WordColumnFields.tsx';
 import {
-  applyTranslationCandidate, createEmptyColumn, isColumnValid, toTranslationInput,
+  applySourcePlural, applyTranslationCandidate, createEmptyColumn, isColumnValid, toTranslationInput,
   toWordCreateInput, WordColumnState,
 } from './wordColumn.ts';
 import { themeCodeForLanguage } from '../shared/languageTheme.ts';
@@ -51,15 +52,18 @@ const AddWordForm: React.FC<Props> = ({ lessonTitle, languageSettings, languages
   const updateLeft = (next: React.SetStateAction<WordColumnState>) => { setLeft(next); setJustAdded(false); };
   const updateRight = (next: React.SetStateAction<WordColumnState>) => { setRight(next); setJustAdded(false); };
   useSyncedWordType(left, updateLeft, Boolean(left.wordId), right, updateRight, Boolean(right.wordId));
+  const pluralTranslation = usePluralTranslation(left, right, updateRight);
 
   const { linkedTranslationId, pickExisting, resetLink } = useLinkedTranslation(languageSettings, updateLeft, updateRight);
 
   const pickLeft = (candidate: TranslationCandidate) => {
     updateLeft((prev) => applyTranslationCandidate(prev, candidate));
+    updateRight((prev) => applySourcePlural(prev, candidate));
     suggestions.clear();
   };
   const pickRight = (candidate: TranslationCandidate) => {
     updateRight((prev) => applyTranslationCandidate(prev, candidate));
+    updateLeft((prev) => applySourcePlural(prev, candidate));
     suggestions.clear();
   };
 
@@ -80,6 +84,7 @@ const AddWordForm: React.FC<Props> = ({ lessonTitle, languageSettings, languages
       setLeft(createEmptyColumn(languageSettings.source_language));
       setRight(createEmptyColumn(languageSettings.target_language));
       suggestions.clear();
+      pluralTranslation.clear();
       resetLink();
       setJustAdded(true);
     } else {
@@ -99,6 +104,8 @@ const AddWordForm: React.FC<Props> = ({ lessonTitle, languageSettings, languages
           value={left}
           onChange={updateLeft}
           searchEnabled
+          pluralOnly
+          onSearchOnline={() => suggestions.suggestOnline('right', left.text, left.language, right.language)}
           otherLanguageCode={languageSettings.target_language}
           onPickWord={(word) => pickExisting('left', word)}
           onClearPick={() => { resetLink(); updateLeft(createEmptyColumn(languageSettings.source_language)); }}
@@ -110,7 +117,7 @@ const AddWordForm: React.FC<Props> = ({ lessonTitle, languageSettings, languages
             </ThemedButton>
           )}
           suggestionsPanel={suggestions.side === 'left' && (
-            <SuggestionList loading={suggestions.loading} candidates={suggestions.candidates} onPick={pickLeft} />
+            <SuggestionList loading={suggestions.loading} candidates={suggestions.candidates} onPick={pickLeft} onSearchOnline={suggestions.searchOnline} online={suggestions.online} />
           )}
         />
         <WordColumnFields
@@ -119,6 +126,9 @@ const AddWordForm: React.FC<Props> = ({ lessonTitle, languageSettings, languages
           value={right}
           onChange={updateRight}
           detailed
+          onSearchOnline={() => suggestions.suggestOnline('left', right.text, right.language, left.language)}
+          pluralAction={pluralTranslation.action}
+          pluralPanel={pluralTranslation.panel}
           searchEnabled
           otherLanguageCode={languageSettings.source_language}
           onPickWord={(word) => pickExisting('right', word)}
@@ -131,7 +141,7 @@ const AddWordForm: React.FC<Props> = ({ lessonTitle, languageSettings, languages
             </ThemedButton>
           )}
           suggestionsPanel={suggestions.side === 'right' && (
-            <SuggestionList loading={suggestions.loading} candidates={suggestions.candidates} onPick={pickRight} />
+            <SuggestionList loading={suggestions.loading} candidates={suggestions.candidates} onPick={pickRight} onSearchOnline={suggestions.searchOnline} online={suggestions.online} />
           )}
         />
       </div>

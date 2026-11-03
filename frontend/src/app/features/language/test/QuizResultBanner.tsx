@@ -9,13 +9,15 @@ import { TestAnswerResult } from './types.ts';
 
 interface Props {
   result: TestAnswerResult;
+  // Shown instead of the bare correct answer, e.g. the article together with its noun.
+  correctAnswerLabel?: string;
   onContinue: () => void;
 }
 
 // How many different comments a wrong answer can get (keys `features.language.incorrect0..9`).
 const INCORRECT_MESSAGE_COUNT = 10;
 
-const QuizResultBanner: React.FC<Props> = ({ result, onContinue }) => {
+const QuizResultBanner: React.FC<Props> = ({ result, correctAnswerLabel, onContinue }) => {
   const { t } = useTranslation();
   // Drawn once per result: the banner is mounted anew for each answer, so the comment varies
   // from one wrong answer to the next but stays put while this result is shown.
@@ -27,7 +29,7 @@ const QuizResultBanner: React.FC<Props> = ({ result, onContinue }) => {
         {result.correct ? t('features.language.correct') : t(`features.language.incorrect${incorrectIndex}`)}
       </ThemedText>
       {!result.correct && (
-        <ThemedText size="small">{t('features.language.correctAnswerWas', { answer: result.correct_answer })}</ThemedText>
+        <ThemedText size="small">{t('features.language.correctAnswerWas', { answer: correctAnswerLabel ?? result.correct_answer })}</ThemedText>
       )}
       <ThemedText variant="secondary" size="small">
         {t('features.language.wordScorePercent', { percent: Math.round(result.word_score * 100) })}

@@ -152,6 +152,8 @@ CREATE TABLE IF NOT EXISTS user_sessions (
     last_activity TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     refresh_token_hash VARCHAR(255),
     refresh_token_expires_at TIMESTAMP WITH TIME ZONE,
+    previous_refresh_token_hash VARCHAR(255),
+    previous_rotated_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -639,6 +641,7 @@ CREATE INDEX IF NOT EXISTS idx_publications_url_param_id ON publications(url_par
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_person_id ON users(person_id);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_user_sessions_refresh_token ON user_sessions(refresh_token_hash) WHERE refresh_token_hash IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_user_sessions_previous_refresh_token ON user_sessions(previous_refresh_token_hash) WHERE previous_refresh_token_hash IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_user_sessions_session_id ON user_sessions(session_id);
 CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON user_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_represents_user_id ON represents(user_id);

@@ -4,7 +4,8 @@ import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedT
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import LanguageTextInput, { hasSpecialCharacter } from '../shared/LanguageTextInput.tsx';
+import LanguageTextInput from '../shared/LanguageTextInput.tsx';
+import { hasSpecialCharacter } from '../shared/specialCharacters.ts';
 import { Declension } from '../shared/types.ts';
 
 interface Props {

@@ -5,11 +5,12 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import SuggestionList from './SuggestionList.tsx';
+import { usePluralTranslation } from './usePluralTranslation.tsx';
 import { useSyncedWordType } from './useSyncedWordType.ts';
 import { useTranslationSuggestions } from './useTranslationSuggestions.ts';
 import WordColumnFields from './WordColumnFields.tsx';
 import {
-  applyTranslationCandidate, columnFieldsEqual, columnFromWord, isColumnValid, toWordUpdateInput, WordColumnState,
+  applySourcePlural, applyTranslationCandidate, columnFieldsEqual, columnFromWord, isColumnValid, toWordUpdateInput, WordColumnState,
 } from './wordColumn.ts';
 import { themeCodeForLanguage } from '../shared/languageTheme.ts';
 import { Language, TranslationCandidate, Word, WordUpdateInput } from '../shared/types.ts';
@@ -42,13 +43,18 @@ const EditWordForm: React.FC<Props> = ({ lessonTitle, word, languages, onUpdateW
 
   const isValid = isColumnValid(left) && (!right || isColumnValid(right));
   useSyncedWordType(left, setLeft, false, right, setRight, false);
+  const pluralTranslation = usePluralTranslation(
+    left, right ?? left, (next) => setRight(next),
+  );
 
   const pickLeft = (candidate: TranslationCandidate) => {
     setLeft((prev) => applyTranslationCandidate(prev, candidate));
+    setRight((prev) => (prev ? applySourcePlural(prev, candidate) : prev));
     suggestions.clear();
   };
   const pickRight = (candidate: TranslationCandidate) => {
     setRight((prev) => (prev ? applyTranslationCandidate(prev, candidate) : prev));
+    setLeft((prev) => applySourcePlural(prev, candidate));
     suggestions.clear();
   };
 
@@ -80,6 +86,7 @@ const EditWordForm: React.FC<Props> = ({ lessonTitle, word, languages, onUpdateW
           value={left}
           onChange={setLeft}
           searchEnabled={false}
+          pluralOnly={Boolean(right)}
           otherLanguageCode={right?.language}
           suggestAction={right && (
             <ThemedButton type="button" variant="secondary" fullWidth={false} icon="zap" iconOnly
@@ -89,7 +96,7 @@ const EditWordForm: React.FC<Props> = ({ lessonTitle, word, languages, onUpdateW
             </ThemedButton>
           )}
           suggestionsPanel={Boolean(right) && suggestions.side === 'left' && (
-            <SuggestionList loading={suggestions.loading} candidates={suggestions.candidates} onPick={pickLeft} />
+            <SuggestionList loading={suggestions.loading} candidates={suggestions.candidates} onPick={pickLeft} onSearchOnline={suggestions.searchOnline} online={suggestions.online} />
           )}
         />
         {right && (
@@ -99,6 +106,8 @@ const EditWordForm: React.FC<Props> = ({ lessonTitle, word, languages, onUpdateW
             value={right}
             onChange={setRight}
             detailed
+            pluralAction={pluralTranslation.action}
+            pluralPanel={pluralTranslation.panel}
             searchEnabled={false}
             otherLanguageCode={left.language}
             suggestAction={(
@@ -109,7 +118,7 @@ const EditWordForm: React.FC<Props> = ({ lessonTitle, word, languages, onUpdateW
               </ThemedButton>
             )}
             suggestionsPanel={suggestions.side === 'right' && (
-              <SuggestionList loading={suggestions.loading} candidates={suggestions.candidates} onPick={pickRight} />
+              <SuggestionList loading={suggestions.loading} candidates={suggestions.candidates} onPick={pickRight} onSearchOnline={suggestions.searchOnline} online={suggestions.online} />
             )}
           />
         )}

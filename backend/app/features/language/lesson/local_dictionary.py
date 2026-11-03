@@ -43,6 +43,7 @@ suggestions", since the translation can always be typed in by hand instead.
 import html
 import re
 import threading
+import unicodedata
 import zipfile
 from array import array
 from bisect import bisect_left, bisect_right
@@ -57,6 +58,7 @@ _BRACKETED = re.compile(r"\[.+?\]|\{.+?\}|<.+?>")
 _WHITESPACE = re.compile(r"\s+")
 _GENDER = re.compile(r"\{(m|f|n)(?:\.[a-z]+)?\}")
 _CONTEXT = re.compile(r"\[(.+?)\]")
+_PLURAL_TAG = re.compile(r"\{(?:[mfn]\.)?pl\}")
 
 # Only languages where dict.cc's {m}/{f}/{n} gender tag maps onto a real article are
 # listed here — a language with no entry here (e.g. English) simply gets no article.
@@ -79,6 +81,8 @@ class DictionaryCandidate(NamedTuple):
     context: Optional[str]
     word_type: Optional[str]
     source_article: Optional[str]
+    plural: Optional[str] = None
+    source_plural: Optional[str] = None
 
 
 class DictionaryWord(NamedTuple):
@@ -154,10 +158,25 @@ class _Index(NamedTuple):
     # Per column (0 = first, 1 = second): cleaned lower-cased texts sorted, and the line of each.
     keys: tuple[list[str], list[str]]
     line_of: tuple[array, array]
+    # (first column, second column) cleaned texts of the entries that are plural on both sides.
+    plural_pairs: list[tuple[str, str]]
 
 
 _indexes: dict[tuple[str, str], _Index] = {}
 _load_lock = threading.Lock()
+
+
+def _plural_pairs(lines: list[str]) -> list[tuple[str, str]]:
+    """dict.cc lists a plural as its own entry ("Kinder {pl}" / "enfants {m.pl}"), not on the
+    singular's line: keep those entries, to pair them with a singular afterwards."""
+    pairs = []
+    for line in lines:
+        if "pl}" not in line:
+            continue
+        first, second = line.split("\t")[:2]
+        if _PLURAL_TAG.search(first) and _PLURAL_TAG.search(second):
+            pairs.append((_clean(first), _clean(second)))
+    return pairs
 
 
 def _build_index(text: str) -> _Index:
@@ -169,7 +188,7 @@ def _build_index(text: str) -> _Index:
         order = sorted((i for i, key in enumerate(cleaned) if key), key=cleaned.__getitem__)
         keys.append([cleaned[i] for i in order])
         line_of.append(array("I", order))
-    return _Index(lines, (keys[0], keys[1]), (line_of[0], line_of[1]))
+    return _Index(lines, (keys[0], keys[1]), (line_of[0], line_of[1]), _plural_pairs(lines))
 
 
 def _index_for(source: str, target: str) -> tuple[_Index, bool] | None:
@@ -194,6 +213,36 @@ def _raw_type(fields: list[str]) -> str:
     return fields[2] if len(fields) > 2 else ""
 
 
+def _fold(text: str) -> str:
+    decomposed = unicodedata.normalize("NFD", text.lower().replace("ß", "ss"))
+    return "".join(c for c in decomposed if not unicodedata.combining(c))
+
+
+def _extends(singular: str, plural: str) -> bool:
+    """Whether `plural` looks like the plural of `singular`: same start (an umlaut or a dropped
+    final letter is tolerated: Mann/Männer) and a similar length."""
+    stem = singular[:-1] if len(singular) >= 4 else singular
+    return plural.startswith(stem) and len(singular) - 1 <= len(plural) <= len(singular) + 4
+
+
+def _find_plurals(index: _Index, column: int, word: str, translation: str) -> tuple[Optional[str], Optional[str]]:
+    """(plural of the typed word, plural of its translation) from the first plural entry that
+    extends both -- the dictionary does not link a singular to its plural, so this is a
+    best-effort match; the user can always correct the suggested plural."""
+    folded_word, folded_translation = _fold(word), _fold(translation)
+    for pair in index.plural_pairs:
+        if _extends(folded_word, _fold(pair[column])) and _extends(folded_translation, _fold(pair[1 - column])):
+            return pair[column], pair[1 - column]
+    return None, None
+
+
+def _with_plurals(index: _Index, column: int, word: str, candidate: DictionaryCandidate) -> DictionaryCandidate:
+    if candidate.word_type != "noun":
+        return candidate
+    source_plural, plural = _find_plurals(index, column, word, candidate.text)
+    return candidate._replace(plural=plural, source_plural=source_plural)
+
+
 def suggest_translations(source: str, target: str, text: str) -> list[DictionaryCandidate]:
     found = _index_for(source, target)
     if found is None:
@@ -208,6 +257,7 @@ def suggest_translations(source: str, target: str, text: str) -> list[Dictionary
         candidate = _candidate_from_line(
             fields[column], fields[1 - column], _raw_type(fields), source, target,
         )
+        candidate = _with_plurals(index, column, _clean(fields[column]), candidate)
         if candidate not in candidates:
             candidates.append(candidate)
         if len(candidates) >= _MAX_CANDIDATES:

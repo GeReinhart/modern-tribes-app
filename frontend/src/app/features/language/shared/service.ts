@@ -90,6 +90,15 @@ class LanguageService {
     return apiService.get<TranslationSuggestion>(`${BASE}/translate-suggestion?${query.toString()}`);
   }
 
+  // A machine translation (the typed text is sent to an online service): only on explicit request,
+  // when the bundled dictionary has no match. Carries no article, plural or type.
+  async getOnlineTranslationSuggestion(
+    text: string, sourceLanguage: string, targetLanguage: string,
+  ): Promise<TranslationSuggestion> {
+    const query = new URLSearchParams({ text, source_language: sourceLanguage, target_language: targetLanguage });
+    return apiService.get<TranslationSuggestion>(`${BASE}/translate-suggestion/online?${query.toString()}`);
+  }
+
   // Same-language, prefix-based autocomplete from the bundled dict.cc data -- `otherLanguage`
   // only locates the right bundled archive (the pair's data file), it is never the language
   // being searched.

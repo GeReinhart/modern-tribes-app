@@ -4,6 +4,7 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { CORRECT_COLOR, WRONG_COLOR } from './attemptColors.ts';
 import { WordAttempt, WordScore } from './types.ts';
 import { Language, Word } from '../shared/types.ts';
 import WordCompactCard from '../shared/WordCompactCard.tsx';
@@ -46,7 +47,7 @@ const WordResultCard: React.FC<Props> = ({ word, languages, score }) => {
         {attempts.map((attempt) => (
           <span
             key={`${attempt.created_at}-${attempt.direction}`}
-            style={{ fontSize: 'var(--font-xs)', color: attempt.correct ? theme.colors.success : theme.colors.danger }}
+            style={{ fontSize: 'var(--font-xs)', color: attempt.correct ? CORRECT_COLOR : WRONG_COLOR }}
           >
             {attempt.correct ? '✓' : '✗'} {new Date(attempt.created_at).toLocaleDateString()} · {directionLabel(attempt)} · {t(`features.language.testMode.${attempt.mode}`)}
           </span>
