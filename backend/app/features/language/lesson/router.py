@@ -243,14 +243,16 @@ async def translate_suggestion(
 @router.get("/translate-suggestion/online", response_model=OnlineTranslationSuggestion)
 @require_any_permission_decorator(*_PERMISSIONS)
 async def translate_suggestion_online(
-    text: str, source_language: str, target_language: str, current_user: dict = Depends(get_current_user),
+    text: str, source_language: str, target_language: str, plural: bool = False,
+    current_user: dict = Depends(get_current_user),
 ):
     """Get a machine translation from the online service (DeepL), only on explicit request when
-    the local dictionary has no match. The typed text is sent to that service.
+    the local dictionary has no match. The typed text is sent to that service. With `plural=true`
+    the text is a plural form: it is sent with its plural article and the answer is the bare plural.
 
     **Permissions:** admin | can_access_attached_tribes
     """
-    return await service.get_online_translation_suggestion(text, source_language, target_language)
+    return await service.get_online_translation_suggestion(text, source_language, target_language, plural)
 
 
 @router.get("/dictionary-words", response_model=List[DictionaryWordMatch])

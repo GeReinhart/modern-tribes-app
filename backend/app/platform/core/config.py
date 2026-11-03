@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int
     POSTGRES_POOL_MIN: int = 2
     POSTGRES_POOL_MAX: int = 10
+    POSTGRES_POOL_ACQUIRE_TIMEOUT: float = 10.0  # seconds to wait for a free connection
+    POSTGRES_POOL_IDLE_LIFETIME: float = 60.0  # seconds before an idle connection is closed
+    POSTGRES_COMMAND_TIMEOUT: float = 30.0  # seconds before a query is aborted
 
     # File Upload
     UPLOAD_DIR: str = "./uploads"

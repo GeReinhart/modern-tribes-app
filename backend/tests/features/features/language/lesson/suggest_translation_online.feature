@@ -33,6 +33,21 @@ Feature: Get a translation from an online service when the dictionary has none
       }
       """
 
+  Scenario: GET an online translation of a plural — the plural article is sent with the word and removed from the suggestion
+    Given I am authenticated as a regular user: user.id 0002
+    And the online translation service is configured and translates "les écureuils" into "die Eichhörnchen"
+    When I GET /api/features/tasks/language/translate-suggestion/online?text=écureuils&source_language=fr&target_language=de&plural=true
+    Then the response status code is 200
+    And the response body is:
+      """
+      {
+        "text": "écureuils", "source_language": "fr", "target_language": "de", "source": "online",
+        "suggestions": [
+          { "text": "Eichhörnchen", "article": null, "context": null, "word_type": null, "source_article": null, "plural": null, "source_plural": null }
+        ]
+      }
+      """
+
   @error_case
   Scenario: GET an online translation when the service is not configured — 503 online_translation_unavailable
     Given I am authenticated as a regular user: user.id 0002

@@ -197,10 +197,11 @@ async def get_translation_suggestion(
 
 
 async def get_online_translation_suggestion(
-    text: str, source_language: str, target_language: str,
+    text: str, source_language: str, target_language: str, plural: bool = False,
 ) -> OnlineTranslationSuggestion:
-    """A single machine translation: unlike the dictionary it carries no article, plural or type."""
-    translated = await online_translation.translate_word(text, source_language, target_language)
+    """A single machine translation: unlike the dictionary it carries no article, plural or type.
+    With `plural`, `text` is a plural form and the answer is the bare plural in the target language."""
+    translated = await online_translation.translate_word(text, source_language, target_language, plural)
     return OnlineTranslationSuggestion(
         text=text, source_language=source_language, target_language=target_language,
         suggestions=[TranslationCandidate(text=translated)],

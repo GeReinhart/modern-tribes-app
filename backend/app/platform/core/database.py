@@ -22,6 +22,9 @@ async def connect_to_postgres():
         port=settings.POSTGRES_PORT,
         min_size=settings.POSTGRES_POOL_MIN,
         max_size=settings.POSTGRES_POOL_MAX,
+        timeout=settings.POSTGRES_POOL_ACQUIRE_TIMEOUT,
+        max_inactive_connection_lifetime=settings.POSTGRES_POOL_IDLE_LIFETIME,
+        command_timeout=settings.POSTGRES_COMMAND_TIMEOUT,
     )
     print(f"Connected to PostgreSQL")
 

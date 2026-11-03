@@ -6,6 +6,7 @@ import time
 import httpx
 from fastapi import HTTPException
 
+from app.features.language.lesson.plural_articles import with_plural_article, without_plural_article
 from app.platform.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -34,16 +35,19 @@ async def _post_translation(text: str, source_language: str, target_language: st
         return response.json()["translations"][0]["text"]
 
 
-async def translate_word(text: str, source_language: str, target_language: str) -> str:
+async def translate_word(text: str, source_language: str, target_language: str, plural: bool = False) -> str:
+    """Translate `text`. For a plural, the word is sent with its plural article and the target's
+    article is dropped from the answer, so the result is the bare plural form."""
     if not settings.DEEPL_API_KEY:
         logger.warning("DeepL call skipped: DEEPL_API_KEY is not configured")
         raise _error(503, "online_translation_unavailable", "Online translation is not configured")
-    logger.info("Calling DeepL: %s -> %s for %r", source_language, target_language, text)
+    sent_text = with_plural_article(text, source_language) if plural else text
+    logger.info("Calling DeepL: %s -> %s for %r", source_language, target_language, sent_text)
     started = time.monotonic()
     try:
-        translated = await _post_translation(text, source_language, target_language)
+        translated = await _post_translation(sent_text, source_language, target_language)
     except (httpx.HTTPError, KeyError, IndexError, ValueError) as exc:
         logger.warning("DeepL call failed after %.2fs: %r", time.monotonic() - started, exc)
         raise _error(502, "online_translation_failed", "The online translation service failed") from exc
     logger.info("DeepL answered %r in %.2fs", translated, time.monotonic() - started)
-    return translated
+    return without_plural_article(translated, target_language) if plural else translated

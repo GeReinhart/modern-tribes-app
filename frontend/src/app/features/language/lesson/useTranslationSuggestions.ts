@@ -19,6 +19,8 @@ interface Query {
   text: string;
   from: string;
   to: string;
+  // The text is a noun's plural form (online lookups then translate it as a plural).
+  plural: boolean;
 }
 
 const IDLE_STATE: TranslationSuggestionsState = { side: null, loading: false, candidates: null, online: false };
@@ -39,7 +41,7 @@ export function useTranslationSuggestions() {
     setState({ side: query.side, loading: true, candidates: online ? kept : null, online });
     try {
       const result = online
-        ? await languageService.getOnlineTranslationSuggestion(query.text, query.from, query.to)
+        ? await languageService.getOnlineTranslationSuggestion(query.text, query.from, query.to, query.plural)
         : await languageService.getTranslationSuggestion(query.text, query.from, query.to);
       const added = result.suggestions.filter((s) => !kept.some((k) => k.text.toLowerCase() === s.text.toLowerCase()));
       setState({ side: query.side, loading: false, candidates: [...kept, ...added], online });
@@ -48,10 +50,12 @@ export function useTranslationSuggestions() {
     }
   };
 
-  const suggest = async (side: SuggestionSide, queryText: string, fromLanguage: string, toLanguage: string) => {
+  const suggest = async (
+    side: SuggestionSide, queryText: string, fromLanguage: string, toLanguage: string, plural = false,
+  ) => {
     const text = queryText.trim();
     if (!text) return;
-    lastQuery.current = { side, text, from: fromLanguage, to: toLanguage };
+    lastQuery.current = { side, text, from: fromLanguage, to: toLanguage, plural };
     await run(lastQuery.current, false);
   };
 
@@ -63,7 +67,7 @@ export function useTranslationSuggestions() {
   const suggestOnline = async (side: SuggestionSide, queryText: string, fromLanguage: string, toLanguage: string) => {
     const text = queryText.trim();
     if (!text) return;
-    lastQuery.current = { side, text, from: fromLanguage, to: toLanguage };
+    lastQuery.current = { side, text, from: fromLanguage, to: toLanguage, plural: false };
     await run(lastQuery.current, true, []);
   };
 

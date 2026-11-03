@@ -38,6 +38,14 @@ def test_online_translation_configured():
     pass
 
 
+@scenario(
+    FEATURE,
+    "GET an online translation of a plural — the plural article is sent with the word and removed from the suggestion",
+)
+def test_online_translation_plural():
+    pass
+
+
 @scenario(FEATURE, "GET an online translation when the service is not configured — 503 online_translation_unavailable")
 def test_online_translation_not_configured():
     pass

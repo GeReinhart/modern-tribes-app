@@ -91,11 +91,13 @@ class LanguageService {
   }
 
   // A machine translation (the typed text is sent to an online service): only on explicit request,
-  // when the bundled dictionary has no match. Carries no article, plural or type.
+  // when the bundled dictionary has no match. Carries no article, plural or type. With `plural`,
+  // `text` is a plural form and the suggestion is the bare plural in the target language.
   async getOnlineTranslationSuggestion(
-    text: string, sourceLanguage: string, targetLanguage: string,
+    text: string, sourceLanguage: string, targetLanguage: string, plural = false,
   ): Promise<TranslationSuggestion> {
     const query = new URLSearchParams({ text, source_language: sourceLanguage, target_language: targetLanguage });
+    if (plural) query.set('plural', 'true');
     return apiService.get<TranslationSuggestion>(`${BASE}/translate-suggestion/online?${query.toString()}`);
   }
 

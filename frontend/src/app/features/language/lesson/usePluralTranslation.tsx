@@ -15,7 +15,7 @@ export function usePluralTranslation(
   const action = (
     <PluralTranslateButton
       disabled={!canTranslate} loading={suggestions.loading}
-      onClick={() => suggestions.suggest('right', source.plural, source.language, target.language)}
+      onClick={() => suggestions.suggest('right', source.plural, source.language, target.language, true)}
     />
   );
   const panel = suggestions.side === 'right' && (
