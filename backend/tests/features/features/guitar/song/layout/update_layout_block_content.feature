@@ -281,6 +281,7 @@ Feature: Edit a custom layout block's title and rich text from the song page
     Then the response status code is 409
     And the guitar_songs_layout_column_blocks table contains:
       | id   | column_id | block_type | custom_title | custom_content_size_px | status |
+      | 0711 | 0710      | custom     | Old title    | 16                     | active |
       | 0742 | 0710      | chord_grid | Grid block   | 16                     | active |
 
   @error_case
@@ -296,6 +297,7 @@ Feature: Edit a custom layout block's title and rich text from the song page
     Then the response status code is 422
     And the guitar_songs_layout_column_blocks table contains:
       | id   | column_id | block_type | custom_title | custom_content_size_px | status |
+      | 0711 | 0710      | custom     | Old title    | 16                     | active |
       | 0743 | 0710      | custom     | Notes block  | 16                     | active |
 
   @error_case

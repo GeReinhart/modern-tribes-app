@@ -9,7 +9,6 @@ Feature: Configure the theme associated with a language
       | id   | email          | status |
       | 0001 | admin@test.com | active |
       | 0002 | user@test.com  | active |
-      | 0003 | other@test.com | active |
     And the roles table contains:
       | name          | status |
       | administrator | active |
@@ -21,14 +20,16 @@ Feature: Configure the theme associated with a language
     And the user_roles table contains:
       | user           | role          |
       | admin@test.com | administrator |
-      | user@test.com  | viewer        |
     And the languages table contains:
       | code | name    | theme_code | status |
       | fr   | French  |            | active |
       | en   | English | ocean      | active |
 
   Scenario: GET the language list — each language's configured theme is included
-    Given I am authenticated as a regular user: user.id 0002
+    Given the user_roles table contains:
+      | user          | role   |
+      | user@test.com | viewer |
+    And I am authenticated as a regular user: user.id 0002
     When I GET /api/features/tasks/language/languages
     Then the response status code is 200
     And the response body includes:
@@ -56,7 +57,10 @@ Feature: Configure the theme associated with a language
       | fr   | French  | forest     | active |
 
   Scenario: PATCH a language's theme as a regular member — it is updated too, the theme being shared by every project
-    Given I am authenticated as a regular user: user.id 0002
+    Given the user_roles table contains:
+      | user          | role   |
+      | user@test.com | viewer |
+    And I am authenticated as a regular user: user.id 0002
     When I PATCH /api/features/tasks/language/languages/fr with body:
       """
       { "theme_code": "forest" }
@@ -73,7 +77,7 @@ Feature: Configure the theme associated with a language
 
   @error_case
   Scenario: PATCH a language's theme as a user without any access to the projects' tribes — 403 and nothing changes
-    Given I am authenticated as a regular user: user.id 0003
+    Given I am authenticated as a regular user: user.id 0002
     When I PATCH /api/features/tasks/language/languages/fr with body:
       """
       { "theme_code": "forest" }

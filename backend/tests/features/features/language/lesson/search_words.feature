@@ -51,7 +51,7 @@ Feature: Search the shared word dictionary
   Scenario: GET a dictionary search — an exact match is ranked before a mere prefix match, itself ranked before a word that only contains the query
     Given the language_words table contains:
       | id   | text        | language | word_type | status |
-      | 2004 | entêté      | fr       | adjective | active |
+      | 2004 | casse-tête  | fr       | noun      | active |
       | 2005 | tête-à-tête | fr       | noun      | active |
       | 2006 | tête        | fr       | noun      | active |
     And I am authenticated as a regular user: user.id 0002
@@ -62,6 +62,6 @@ Feature: Search the shared word dictionary
       [
         { "id": "2006", "text": "tête", "language": "fr", "word_type": "noun" },
         { "id": "2005", "text": "tête-à-tête", "language": "fr", "word_type": "noun" },
-        { "id": "2004", "text": "entêté", "language": "fr", "word_type": "adjective" }
+        { "id": "2004", "text": "casse-tête", "language": "fr", "word_type": "noun" }
       ]
       """

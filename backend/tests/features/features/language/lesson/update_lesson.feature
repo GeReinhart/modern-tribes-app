@@ -84,7 +84,10 @@ Feature: Update a lesson's title and content
     Then the response status code is 200
     And the response body includes:
       """
-      [ { "content_html": "Les salutations" } ]
+      [
+        { "content_html": "Les salutations et les adieux", "is_current": true },
+        { "content_html": "Les salutations", "is_current": false }
+      ]
       """
 
   Scenario: PATCH an unknown lesson — 404

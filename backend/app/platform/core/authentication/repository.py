@@ -104,18 +104,29 @@ async def get_session_by_refresh_token_hash(pool, token_hash: str) -> dict | Non
     return row_to_dict(row) if row else None
 
 
+async def get_session_by_previous_refresh_token_hash(pool, token_hash: str) -> dict | None:
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT * FROM user_sessions WHERE previous_refresh_token_hash = $1", token_hash
+        )
+    return row_to_dict(row) if row else None
+
+
 async def rotate_refresh_token(
     pool, session_pk: str, new_hash: str, new_expires_at: datetime, new_session_expires_at: datetime
 ) -> None:
+    """Install a new refresh token; the one it replaces is kept as `previous` for the grace window."""
+    now = datetime.now(timezone.utc)
     async with pool.acquire() as conn:
         await conn.execute(
             """UPDATE user_sessions
-               SET refresh_token_hash = $1, refresh_token_expires_at = $2,
+               SET previous_refresh_token_hash = refresh_token_hash, previous_rotated_at = $3,
+                   refresh_token_hash = $1, refresh_token_expires_at = $2,
                    last_activity = $3, expires_at = $4
                WHERE id = $5""",
             new_hash,
             new_expires_at,
-            datetime.now(timezone.utc),
+            now,
             new_session_expires_at,
             UUID(session_pk),
         )

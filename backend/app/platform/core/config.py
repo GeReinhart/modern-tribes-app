@@ -30,7 +30,10 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60  # 1 hour
-    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    # Sliding window: every refresh pushes the expiry again, so a device in regular use stays signed in.
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 365
+    # A just-rotated refresh token stays usable this long, so two tabs refreshing at once both succeed.
+    REFRESH_TOKEN_GRACE_SECONDS: int = 120
     MAGIC_LINK_EXPIRE_MINUTES: int = 60 * 24  # 1 day
 
     # Email

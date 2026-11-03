@@ -1215,7 +1215,13 @@ async def _query_table(table: str, headers: list) -> list[dict]:
     conn = await _conn()
     try:
         cols = ", ".join(f'"{h}"' for h in headers)
-        rows = await conn.fetch(f"SELECT {cols} FROM {table} ORDER BY created_at, id")
+        has_id = await conn.fetchval(
+            "SELECT 1 FROM information_schema.columns WHERE table_name = $1 AND column_name = 'id'", table,
+        )
+        # Tables keyed by something else than `id` (e.g. languages.code, language_settings.project_id)
+        # are ordered by their first asserted column: their rows have no meaningful creation order.
+        order_by = "created_at, id" if has_id else f'"{headers[0]}"'
+        rows = await conn.fetch(f"SELECT {cols} FROM {table} ORDER BY {order_by}")
         return [dict(r) for r in rows]
     finally:
         await conn.close()

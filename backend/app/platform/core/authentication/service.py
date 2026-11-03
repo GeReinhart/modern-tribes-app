@@ -58,36 +58,59 @@ async def create_session_for_magic_link(
     )
 
 
-async def refresh_access_token(raw_refresh_token: str, pool) -> RefreshResponse:
+def _unauthorized(code: str, message: str) -> HTTPException:
+    """401 whose detail carries a stable machine-readable `code` next to the human message."""
+    return HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED, detail={"code": code, "message": message}
+    )
+
+
+async def _find_session_for_refresh(raw_refresh_token: str, pool) -> dict:
+    """The session owning this refresh token: either its current token, or the one it replaced
+    a moment ago (grace window, for two tabs refreshing at once)."""
     token_hash = hash_refresh_token(raw_refresh_token)
     session = await auth_repo.get_session_by_refresh_token_hash(pool, token_hash)
-    if not session:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
+    if session:
+        return session
+    previous = await auth_repo.get_session_by_previous_refresh_token_hash(pool, token_hash)
+    if not previous:
+        raise _unauthorized("refresh_token_unknown", "Unknown refresh token")
+    grace = timedelta(seconds=settings.REFRESH_TOKEN_GRACE_SECONDS)
+    rotated_at = previous.get("previous_rotated_at")
+    if not rotated_at or rotated_at < datetime.now(timezone.utc) - grace:
+        raise _unauthorized("refresh_token_reused", "Refresh token already used and replaced")
+    return previous
 
-    if not session.get("refresh_token_expires_at") or session["refresh_token_expires_at"] < datetime.now(
-        timezone.utc
-    ):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token expired")
+
+def _check_refresh_not_expired(session: dict) -> None:
+    expires_at = session.get("refresh_token_expires_at")
+    if not expires_at or expires_at < datetime.now(timezone.utc):
+        raise _unauthorized("refresh_token_expired", "Refresh token expired after a long inactivity")
+
+
+async def refresh_access_token(raw_refresh_token: str, pool) -> RefreshResponse:
+    session = await _find_session_for_refresh(raw_refresh_token, pool)
+    _check_refresh_not_expired(session)
 
     user_id = str(session["user_id"])
     user = await auth_repo.get_user_by_id(pool, user_id)
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        raise _unauthorized("user_not_found", "User not found")
 
+    now = datetime.now(timezone.utc)
     new_raw_refresh, new_hash = create_refresh_token()
-    new_refresh_expires_at = datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    new_session_expires_at = datetime.now(timezone.utc) + timedelta(
-        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-    )
     await auth_repo.rotate_refresh_token(
-        pool, str(session["id"]), new_hash, new_refresh_expires_at, new_session_expires_at
+        pool,
+        str(session["id"]),
+        new_hash,
+        now + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
+        now + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     )
 
     roles = await auth_repo.get_user_roles(pool, user_id)
     new_access_token = create_access_token(
         data={"sub": user_id, "email": user["email"], "session_id": session["session_id"], "roles": roles}
     )
-
     return RefreshResponse(access_token=new_access_token, refresh_token=new_raw_refresh)
 
 

@@ -1,4 +1,5 @@
 import html
+from datetime import date
 
 from weasyprint import HTML
 
@@ -45,12 +46,14 @@ def _language_label(learned_language: dict | None, lang: str) -> str:
 
 
 def _page_css(language_name: str) -> str:
-    """A4 page with a footer: the learned language on the left, "page / total" on the right."""
+    """A4 page with a footer: the learned language on the left, the date (YYYY-MM-DD) in the
+    middle and "page / total" on the right."""
     footer_style = "font-family: Helvetica, Arial, sans-serif; font-size: 9px; color: #666666;"
     language_literal = language_name.replace("\\", "\\\\").replace('"', '\\"')
     return (
         "@page { size: A4 portrait; margin: 15mm 12mm 18mm;"
         f' @bottom-left {{ content: "{language_literal}"; {footer_style} }}'
+        f' @bottom-center {{ content: "{date.today().isoformat()}"; {footer_style} }}'
         f' @bottom-right {{ content: counter(page) " / " counter(pages); {footer_style} }} }}'
     )
 

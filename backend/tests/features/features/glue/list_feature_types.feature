@@ -43,7 +43,10 @@ Feature: List feature types
         {"feature_type": "events", "label": "Events"},
         {"feature_type": "daily_journal", "label": "Daily Journal"},
         {"feature_type": "recipes", "label": "Recipes"},
-        {"feature_type": "meals", "label": "Meals"}
+        {"feature_type": "meals", "label": "Meals"},
+        {"feature_type": "language_lesson", "label": "Language - Lesson"},
+        {"feature_type": "language_learn", "label": "Language - Learn"},
+        {"feature_type": "language_test", "label": "Language - Test"}
       ]
       """
 

@@ -10,6 +10,7 @@ def _block(custom_title=None, custom_content_html="") -> SimpleNamespace:
         block_type="custom", custom_title=custom_title, custom_content_html=custom_content_html,
         title_heading_level="h3", zoom_percent=100, show_card=False, width_twelfths=12,
         padding_top_mm=0, padding_right_mm=0, padding_bottom_mm=0, padding_left_mm=0,
+        custom_content_size_px=16,
     )
 
 

@@ -11,16 +11,12 @@ Feature: Get a dictionary word with its translations
     Given the users table contains:
       | id   | email          | status |
       | 0002 | user@test.com  | active |
-      | 0003 | other@test.com | active |
     And the roles table contains:
       | name   | status |
       | viewer | active |
     And the role_permissions table contains:
       | role   | permission                 |
       | viewer | can_access_attached_tribes |
-    And the user_roles table contains:
-      | user          | role   |
-      | user@test.com | viewer |
     And the languages table contains:
       | code | name    | status |
       | fr   | French  | active |
@@ -34,7 +30,10 @@ Feature: Get a dictionary word with its translations
       | 4001 | 2001      | 2002      | active |
 
   Scenario: GET a word that has a translation — the word and its translation are returned
-    Given I am authenticated as a regular user: user.id 0002
+    Given the user_roles table contains:
+      | user          | role   |
+      | user@test.com | viewer |
+    And I am authenticated as a regular user: user.id 0002
     When I GET /api/features/tasks/language/words/2001
     Then the response status code is 200
     And the response body includes:
@@ -46,7 +45,10 @@ Feature: Get a dictionary word with its translations
       """
 
   Scenario: GET the translation side of a pair — the link works both ways
-    Given I am authenticated as a regular user: user.id 0002
+    Given the user_roles table contains:
+      | user          | role   |
+      | user@test.com | viewer |
+    And I am authenticated as a regular user: user.id 0002
     When I GET /api/features/tasks/language/words/2002
     Then the response status code is 200
     And the response body includes:
@@ -55,12 +57,15 @@ Feature: Get a dictionary word with its translations
       """
 
   Scenario: GET an unknown word — 404
-    Given I am authenticated as a regular user: user.id 0002
+    Given the user_roles table contains:
+      | user          | role   |
+      | user@test.com | viewer |
+    And I am authenticated as a regular user: user.id 0002
     When I GET /api/features/tasks/language/words/9999
     Then the response status code is 404
 
   @error_case
   Scenario: GET a word as a user without access to the projects' tribes — 403
-    Given I am authenticated as a regular user: user.id 0003
+    Given I am authenticated as a regular user: user.id 0002
     When I GET /api/features/tasks/language/words/2001
     Then the response status code is 403
