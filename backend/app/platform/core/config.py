@@ -3,6 +3,9 @@ from typing import List
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+DEFAULT_VAPID_SUBJECT = "mailto:admin@modern-tribes.com"
+
+
 class Settings(BaseSettings):
     # Application
     APP_NAME: str
@@ -74,7 +77,7 @@ class Settings(BaseSettings):
     # VAPID keys for Web Push (generate with: python -m pywebpush --vapid-info)
     VAPID_PUBLIC_KEY: str = ""
     VAPID_PRIVATE_KEY: str = ""
-    VAPID_SUBJECT: str = "mailto:admin@modern-tribes.com"
+    VAPID_SUBJECT: str = DEFAULT_VAPID_SUBJECT
 
     # Cellar (S3-compatible object storage — CleverCloud)
     CELLAR_ADDON_HOST: str = "cellar-c2.services.clever-cloud.com"

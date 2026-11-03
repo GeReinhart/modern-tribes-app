@@ -112,6 +112,8 @@ VAPID_PRIVATE_KEY=<url-safe base64 — 32 bytes EC private key>
 VAPID_SUBJECT=mailto:admin@your-domain.com
 ```
 
+> `VAPID_SUBJECT` must be a `mailto:` or `https://` URL. A bare email, surrounding quotes or a blank value are normalized by the backend (bare email → `mailto:`, blank → default), but write it correctly in `.env`.
+
 Generate with:
 
 ```bash
