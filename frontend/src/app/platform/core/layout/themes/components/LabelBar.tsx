@@ -1,4 +1,5 @@
 import { ManageLabelsModal } from '@/app/platform/core/layout/themes/components/ManageLabelsModal.tsx';
+import { ThemedFilterPill } from '@/app/platform/core/layout/themes/components/ThemedFilterPill.tsx';
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
@@ -47,35 +48,16 @@ export const LabelBar: React.FC<LabelBarProps> = ({
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
       <Tag size={14} color={theme.colors.secondary} />
-      {labels.map((label) => {
-        const isActive = filterLabelIds.includes(label.id);
-        const isUsed = activeLabelIds.has(label.id);
-
-        return (
-          <button
-            key={label.id}
-            type="button"
-            onClick={() => {
-              if (isUsed) onFilter(label.id);
-            }}
-            style={{
-              padding: '4px 12px',
-              borderRadius: '16px',
-              fontSize: 'var(--font-xs)',
-              fontWeight: isActive ? 700 : 500,
-              cursor: isUsed ? 'pointer' : 'default',
-              border: `1px solid ${label.color}`,
-              backgroundColor: isActive ? `${label.color}20` : 'transparent',
-              color: label.color,
-              transition: 'all 0.15s',
-              whiteSpace: 'nowrap',
-              opacity: isUsed ? 1 : 0.5,
-            }}
-          >
-            {label.name}
-          </button>
-        );
-      })}
+      {labels.map((label) => (
+        <ThemedFilterPill
+          key={label.id}
+          label={label.name}
+          color={label.color}
+          active={filterLabelIds.includes(label.id)}
+          enabled={activeLabelIds.has(label.id)}
+          onClick={() => onFilter(label.id)}
+        />
+      ))}
       {canEditLabels && (
         <button
           type="button"

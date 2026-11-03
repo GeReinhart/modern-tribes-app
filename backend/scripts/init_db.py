@@ -118,6 +118,14 @@ class DatabaseInitializer:
             "guitar_songs_videos",
             "guitar_songs",
             "guitar_song_author",
+            "language_word_test_attempts",
+            "language_lesson_words",
+            "language_lessons",
+            "language_word_translations",
+            "language_word_declensions",
+            "language_words",
+            "language_settings",
+            "languages",
             "groceries_list_items",
             "groceries_lists",
             "groceries_instance_items",
@@ -437,6 +445,186 @@ class DatabaseInitializer:
                 )
                 count += 1
         print(f"✓ Created {count} todo items")
+        return count
+
+    async def create_languages(self) -> Dict[str, str]:
+        rows = self.load_csv("languages.csv")
+        ids: Dict[str, str] = {}
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                await conn.execute(
+                    "INSERT INTO languages (code, name) VALUES ($1, $2)", row["code"], row["name"],
+                )
+                ids[row["code"]] = row["code"]
+        print(f"✓ Created {len(ids)} languages")
+        return ids
+
+    # One language pair per demo project (project name -> source/target language codes).
+    # See backend/CLAUDE.md: kept as a hardcoded tuple rather than a CSV since it's a
+    # single row per project, simple enough not to warrant its own file.
+    _LANGUAGE_SETTINGS = [
+        ("Book of the Month", "fr", "en"),
+    ]
+
+    async def create_language_settings(self, project_ids: Dict[str, str], user_ids: Dict[str, str]) -> int:
+        admin_id = user_ids.get("admin")
+        count = 0
+        async with self.pool.acquire() as conn:
+            for project, source, target in self._LANGUAGE_SETTINGS:
+                if project not in project_ids:
+                    print(f"✗ Unknown project '{project}' in language settings")
+                    sys.exit(1)
+                await conn.execute(
+                    """INSERT INTO language_settings (project_id, source_language, target_language, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $4)""",
+                    project_ids[project], source, target, admin_id,
+                )
+                count += 1
+        print(f"✓ Created {count} language settings")
+        return count
+
+    async def create_language_words(self, language_ids: Dict[str, str], user_ids: Dict[str, str]) -> Dict[str, str]:
+        rows = self.load_csv("language_words.csv")
+        ids: Dict[str, str] = {}
+        admin_id = user_ids.get("admin")
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                if row["language"] not in language_ids:
+                    print(f"✗ Unknown language '{row['language']}' in language_words.csv")
+                    sys.exit(1)
+                r = await conn.fetchrow(
+                    """INSERT INTO language_words (text, language, word_type, article, plural, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $5, $6, $6) RETURNING id""",
+                    row["text"], row["language"], row["word_type"],
+                    row.get("article") or None, row.get("plural") or None, admin_id,
+                )
+                ids[f"{row['language']}|{row['text']}"] = str(r["id"])
+        print(f"✓ Created {len(ids)} language words")
+        return ids
+
+    async def create_language_word_declensions(self, word_ids: Dict[str, str], user_ids: Dict[str, str]) -> int:
+        rows = self.load_csv("language_word_declensions.csv")
+        count = 0
+        admin_id = user_ids.get("admin")
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                key = f"{row['language']}|{row['text']}"
+                if key not in word_ids:
+                    print(f"✗ Unknown word '{key}' in language_word_declensions.csv")
+                    sys.exit(1)
+                await conn.execute(
+                    """INSERT INTO language_word_declensions (word_id, case_label, form, position, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $5, $5)""",
+                    word_ids[key], row["case_label"], row["form"], int(row["position"]), admin_id,
+                )
+                count += 1
+        print(f"✓ Created {count} language word declensions")
+        return count
+
+    async def create_language_word_translations(self, word_ids: Dict[str, str], user_ids: Dict[str, str]) -> int:
+        rows = self.load_csv("language_word_translations.csv")
+        count = 0
+        admin_id = user_ids.get("admin")
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                key_a = f"{row['language_a']}|{row['text_a']}"
+                key_b = f"{row['language_b']}|{row['text_b']}"
+                if key_a not in word_ids:
+                    print(f"✗ Unknown word '{key_a}' in language_word_translations.csv")
+                    sys.exit(1)
+                if key_b not in word_ids:
+                    print(f"✗ Unknown word '{key_b}' in language_word_translations.csv")
+                    sys.exit(1)
+                await conn.execute(
+                    """INSERT INTO language_word_translations (word_id_a, word_id_b, created_by, updated_by)
+                       VALUES ($1, $2, $3, $3)""",
+                    word_ids[key_a], word_ids[key_b], admin_id,
+                )
+                count += 1
+        print(f"✓ Created {count} language word translations")
+        return count
+
+    async def create_language_lessons(self, project_ids: Dict[str, str], user_ids: Dict[str, str]) -> Dict[str, str]:
+        """A lesson owns its own document, created empty the same way the app does when a
+        lesson is first created (see LessonService.create_lesson / create_document_with_attachments)."""
+        rows = self.load_csv("language_lessons.csv")
+        ids: Dict[str, str] = {}
+        admin_id = user_ids.get("admin")
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                if row["project"] not in project_ids:
+                    print(f"✗ Unknown project '{row['project']}' in language_lessons.csv")
+                    sys.exit(1)
+                doc_r = await conn.fetchrow(
+                    "INSERT INTO documents (content_html, content_summary, content_text) VALUES ($1, $2, $3) RETURNING id",
+                    "", None, "",
+                )
+                r = await conn.fetchrow(
+                    """INSERT INTO language_lessons (project_id, title, document_id, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $4) RETURNING id""",
+                    project_ids[row["project"]], row["title"], str(doc_r["id"]), admin_id,
+                )
+                ids[f"{row['project']}|{row['title']}"] = str(r["id"])
+        print(f"✓ Created {len(ids)} language lessons")
+        return ids
+
+    async def create_language_lesson_words(
+        self, lesson_ids: Dict[str, str], word_ids: Dict[str, str], user_ids: Dict[str, str]
+    ) -> int:
+        rows = self.load_csv("language_lesson_words.csv")
+        count = 0
+        admin_id = user_ids.get("admin")
+        async with self.pool.acquire() as conn:
+            for row in rows:
+                lesson_key = f"{row['project']}|{row['lesson_title']}"
+                word_key = f"{row['language']}|{row['text']}"
+                if lesson_key not in lesson_ids:
+                    print(f"✗ Unknown lesson '{lesson_key}' in language_lesson_words.csv")
+                    sys.exit(1)
+                if word_key not in word_ids:
+                    print(f"✗ Unknown word '{word_key}' in language_lesson_words.csv")
+                    sys.exit(1)
+                await conn.execute(
+                    """INSERT INTO language_lesson_words (lesson_id, word_id, position, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $4)""",
+                    lesson_ids[lesson_key], word_ids[word_key], int(row.get("position") or 0), admin_id,
+                )
+                count += 1
+        print(f"✓ Created {count} language lesson words")
+        return count
+
+    # A handful of hardcoded test attempts (not CSV-backed, same reasoning as
+    # _LANGUAGE_SETTINGS) spread across several distinct days, mixing free/choice and
+    # correct/incorrect answers, so a word's score shows a realistic partial result
+    # instead of an all-or-nothing demo (see app/features/language/test/scoring.py).
+    _TEST_ATTEMPTS = [
+        # (word_key, user_login, direction, mode, correct, created_at)
+        ("fr|manger", "user5", "source_to_target", "free", True, datetime(2026, 10, 19, 10, 0, tzinfo=timezone.utc)),
+        ("fr|manger", "user5", "source_to_target", "free", True, datetime(2026, 10, 26, 10, 0, tzinfo=timezone.utc)),
+        ("fr|maison", "user5", "target_to_source", "choice", False, datetime(2026, 10, 28, 9, 0, tzinfo=timezone.utc)),
+        ("fr|maison", "user5", "target_to_source", "free", True, datetime(2026, 10, 28, 9, 5, tzinfo=timezone.utc)),
+        ("fr|maison", "user5", "source_to_target", "choice", True, datetime(2026, 10, 31, 9, 0, tzinfo=timezone.utc)),
+        ("fr|maison", "user5", "source_to_target", "free", False, datetime(2026, 11, 1, 9, 0, tzinfo=timezone.utc)),
+    ]
+
+    async def create_language_word_test_attempts(self, word_ids: Dict[str, str], user_ids: Dict[str, str]) -> int:
+        count = 0
+        async with self.pool.acquire() as conn:
+            for word_key, login, direction, mode, correct, created_at in self._TEST_ATTEMPTS:
+                if word_key not in word_ids:
+                    print(f"✗ Unknown word '{word_key}' in language test attempts")
+                    sys.exit(1)
+                if login not in user_ids:
+                    print(f"✗ Unknown user '{login}' in language test attempts")
+                    sys.exit(1)
+                await conn.execute(
+                    """INSERT INTO language_word_test_attempts
+                           (user_id, word_id, direction, mode, correct, created_at, created_by, updated_by)
+                       VALUES ($1, $2, $3, $4, $5, $6, $1, $1)""",
+                    user_ids[login], word_ids[word_key], direction, mode, correct, created_at,
+                )
+                count += 1
+        print(f"✓ Created {count} language word test attempts")
         return count
 
     async def create_groceries_items(self) -> Dict[str, str]:
@@ -949,6 +1137,16 @@ class DatabaseInitializer:
             pages_count = await self.create_document_pages(pd_ids, user_ids)
             feature_ids = await self.create_projects_features(project_ids)
             todo_count = await self.create_todo_items(feature_ids, user_ids)
+            language_ids = await self.create_languages()
+            language_settings_count = await self.create_language_settings(project_ids, user_ids)
+            language_word_ids = await self.create_language_words(language_ids, user_ids)
+            language_declension_count = await self.create_language_word_declensions(language_word_ids, user_ids)
+            language_translation_count = await self.create_language_word_translations(language_word_ids, user_ids)
+            language_lesson_ids = await self.create_language_lessons(project_ids, user_ids)
+            language_lesson_word_count = await self.create_language_lesson_words(
+                language_lesson_ids, language_word_ids, user_ids,
+            )
+            language_attempt_count = await self.create_language_word_test_attempts(language_word_ids, user_ids)
             groceries_item_ids = await self.create_groceries_items()
             groceries_section_ids = await self.create_groceries_sections()
             groceries_item_sections_count = await self.create_groceries_item_sections(groceries_item_ids, groceries_section_ids)
@@ -979,6 +1177,14 @@ class DatabaseInitializer:
             print(f"   • Document pages:           {pages_count}")
             print(f"   • Project features:         {len(feature_ids)}")
             print(f"   • Todo items:               {todo_count}")
+            print(f"   • Languages:                {len(language_ids)}")
+            print(f"   • Language settings:        {language_settings_count}")
+            print(f"   • Language words:           {len(language_word_ids)}")
+            print(f"   • Language word declensions:{language_declension_count}")
+            print(f"   • Language word translations:{language_translation_count}")
+            print(f"   • Language lessons:         {len(language_lesson_ids)}")
+            print(f"   • Language lesson words:    {language_lesson_word_count}")
+            print(f"   • Language test attempts:   {language_attempt_count}")
             print(f"   • Groceries items:          {len(groceries_item_ids)}")
             print(f"   • Groceries sections:       {len(groceries_section_ids)}")
             print(f"   • Groceries item-sections:  {groceries_item_sections_count}")

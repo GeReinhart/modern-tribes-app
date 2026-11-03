@@ -11,6 +11,7 @@ import React, {
 } from 'react';
 
 import { authService } from './authentication-service.ts';
+import { setSessionEndReason } from './sessionEndReason.ts';
 import { tokenManager } from './tokenManager.ts';
 import { useProactiveTokenRefresh } from './useProactiveTokenRefresh.ts';
 
@@ -58,6 +59,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
         if (response.status === 401 || response.status === 403) {
+          const failureDetail: string | null = await response
+            .json()
+            .then((d) => d?.detail ?? null)
+            .catch(() => null);
           if (allowRefresh) {
             const newToken = await tokenManager.tryRefresh();
             if (newToken) {
@@ -65,7 +70,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               return;
             }
           }
-          // Token definitively rejected and refresh unavailable — clear session.
+          // Token definitively rejected and refresh unavailable — clear session. A refresh
+          // attempt just above may already have recorded the more specific reason the
+          // *refresh itself* was rejected for (see doRefresh's catch below); this is only
+          // the fallback when no refresh was attempted or available.
+          setSessionEndReason(failureDetail || 'Your session is no longer valid.', true);
           tokenManager.clearAll();
           setToken(null);
           return;
@@ -97,6 +106,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Network errors and 5xx are transient — keep tokens so the next attempt can retry.
       const status = (err as Error & { status?: number }).status;
       if (status === 401 || status === 403) {
+        // This is the most specific reason available (the refresh endpoint's own
+        // rejection, e.g. "Refresh token expired" / "Refresh token revoked") — it always
+        // wins over the plain "session is no longer valid" fallback set elsewhere.
+        setSessionEndReason((err as Error).message || 'Your session is no longer valid.');
         tokenManager.clearAll();
         setToken(null);
         setUser(null);

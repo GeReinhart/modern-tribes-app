@@ -11,3 +11,6 @@ import '../events';
 import '../daily-journal';
 import '../recipes';
 import '../meals';
+import '../language/lesson';
+import '../language/learn';
+import '../language/test';

@@ -1193,5 +1193,143 @@ CREATE TABLE IF NOT EXISTS guitar_songs_layout_pdf_cache (
 );
 CREATE OR REPLACE TRIGGER update_guitar_songs_layout_pdf_cache_updated_at BEFORE UPDATE ON guitar_songs_layout_pdf_cache FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- Learn Language: a shared, app-wide word dictionary plus per-project lessons built from
+-- it, and a private per-user test history used to score how well each word is known
+-- (migration 025).
+CREATE TABLE IF NOT EXISTS languages (
+    code VARCHAR(5) PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    -- Theme reused everywhere a word of this language is shown (migration 027).
+    theme_code VARCHAR(50) NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- One language pair per project: set once, shared by every lesson/learn/test tab added
+-- to that project.
+CREATE TABLE IF NOT EXISTS language_settings (
+    project_id UUID PRIMARY KEY REFERENCES projects(id) ON DELETE CASCADE,
+    source_language VARCHAR(5) NOT NULL REFERENCES languages(code),
+    target_language VARCHAR(5) NOT NULL REFERENCES languages(code),
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT language_settings_distinct_languages CHECK (source_language <> target_language)
+);
+
+-- The dictionary is global: a word is shared by every project, never duplicated per
+-- language (enforced on the active rows only, so an archived word's text can be reused).
+CREATE TABLE IF NOT EXISTS language_words (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    text VARCHAR(255) NOT NULL,
+    language VARCHAR(5) NOT NULL REFERENCES languages(code),
+    word_type VARCHAR(20) NOT NULL CHECK (word_type IN ('noun', 'adjective', 'verb')),
+    article VARCHAR(20),
+    plural VARCHAR(255),
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_language_words_unique_text ON language_words (lower(text), language)
+    WHERE status = 'active';
+
+-- A word's optional declension, e.g. the German cases of "Mann": a free list of (case
+-- label, inflected form) pairs rather than a fixed per-language structure.
+CREATE TABLE IF NOT EXISTS language_word_declensions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    word_id UUID REFERENCES language_words(id) ON DELETE CASCADE NOT NULL,
+    case_label VARCHAR(50) NOT NULL,
+    form VARCHAR(255) NOT NULL,
+    position INTEGER NOT NULL DEFAULT 0,
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_language_word_declensions_word ON language_word_declensions (word_id);
+
+-- An undirected link between two words of different languages. Uniqueness is enforced
+-- regardless of which side is "a" and which is "b".
+CREATE TABLE IF NOT EXISTS language_word_translations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    word_id_a UUID REFERENCES language_words(id) ON DELETE CASCADE NOT NULL,
+    word_id_b UUID REFERENCES language_words(id) ON DELETE CASCADE NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT language_word_translations_no_self_reference CHECK (word_id_a <> word_id_b)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_language_word_translations_unique_pair ON language_word_translations
+    (LEAST(word_id_a, word_id_b), GREATEST(word_id_a, word_id_b)) WHERE status = 'active';
+
+-- A lesson belongs to a project (not to one tab instance), so every lesson/learn/test tab
+-- added to that project reads and writes the same lessons.
+CREATE TABLE IF NOT EXISTS language_lessons (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    project_id UUID REFERENCES projects(id) ON DELETE CASCADE NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_language_lessons_project ON language_lessons (project_id);
+
+CREATE TABLE IF NOT EXISTS language_lesson_words (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    lesson_id UUID REFERENCES language_lessons(id) ON DELETE CASCADE NOT NULL,
+    word_id UUID REFERENCES language_words(id) ON DELETE CASCADE NOT NULL,
+    position INTEGER NOT NULL DEFAULT 0,
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_language_lesson_words_lesson ON language_lesson_words (lesson_id);
+CREATE INDEX IF NOT EXISTS idx_language_lesson_words_word ON language_lesson_words (word_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_language_lesson_words_unique ON language_lesson_words (lesson_id, word_id)
+    WHERE status = 'active';
+
+-- Append-only test history: a word's score is derived from this log (per user, not per
+-- lesson), so practicing a word through one lesson also raises its score in any other
+-- lesson it belongs to.
+CREATE TABLE IF NOT EXISTS language_word_test_attempts (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    word_id UUID REFERENCES language_words(id) ON DELETE CASCADE NOT NULL,
+    direction VARCHAR(20) NOT NULL CHECK (direction IN ('source_to_target', 'target_to_source', 'article', 'plural')),
+    mode VARCHAR(10) NOT NULL CHECK (mode IN ('free', 'choice')),
+    correct BOOLEAN NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    updated_by UUID REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_language_word_test_attempts_user_word ON language_word_test_attempts
+    (user_id, word_id, created_at);
+
+CREATE OR REPLACE TRIGGER update_languages_updated_at BEFORE UPDATE ON languages FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_language_settings_updated_at BEFORE UPDATE ON language_settings FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_language_words_updated_at BEFORE UPDATE ON language_words FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_language_word_declensions_updated_at BEFORE UPDATE ON language_word_declensions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_language_word_translations_updated_at BEFORE UPDATE ON language_word_translations FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_language_lessons_updated_at BEFORE UPDATE ON language_lessons FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_language_lesson_words_updated_at BEFORE UPDATE ON language_lesson_words FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE OR REPLACE TRIGGER update_language_word_test_attempts_updated_at BEFORE UPDATE ON language_word_test_attempts FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 -- Schema evolution: add columns that may be missing on databases created before they were introduced
 ALTER TABLE tribes_projects ADD COLUMN IF NOT EXISTS display_order INTEGER NOT NULL DEFAULT 0;

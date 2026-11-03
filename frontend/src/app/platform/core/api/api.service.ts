@@ -1,5 +1,6 @@
 import { getAPIBaseUrl } from '@/app/platform/core/env.ts';
 import { tokenManager } from '@/app/platform/core/authentication/tokenManager.ts';
+import { setSessionEndReason } from '@/app/platform/core/authentication/sessionEndReason.ts';
 
 class ApiService {
   private getAuthHeaders(): Record<string, string> {
@@ -28,6 +29,11 @@ class ApiService {
       });
 
       if (response.status === 401) {
+        const failureDetail: string | null = await response
+          .json()
+          .then((d) => d?.detail ?? null)
+          .catch(() => null);
+
         if (!isRetry) {
           const newToken = await tokenManager.tryRefresh();
           if (newToken) {
@@ -39,6 +45,10 @@ class ApiService {
         // (network error, 5xx during e.g. a redeploy) leaves tokens in place, so this
         // request should just fail rather than force the user to log back in.
         if (!tokenManager.getRefreshToken()) {
+          // keepExisting: a refresh attempt just above may already have recorded the more
+          // specific reason the *refresh itself* was rejected for (see AuthContext's
+          // doRefresh) — this is only the fallback when no refresh was attempted at all.
+          setSessionEndReason(failureDetail || 'Your session is no longer valid.', true);
           window.location.replace('/auth/login');
           return new Promise<T>(() => {});
         }
@@ -49,9 +59,11 @@ class ApiService {
         const error = await response
           .json()
           .catch(() => ({ detail: 'An error occurred' }));
-        throw new Error(
+        const apiError: Error & { status?: number } = new Error(
           error.detail || `HTTP error! status: ${response.status}`,
         );
+        apiError.status = response.status;
+        throw apiError;
       }
 
       // Handle 204 No Content

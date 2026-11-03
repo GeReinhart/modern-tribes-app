@@ -30,6 +30,8 @@ import recipesEn from '@/app/features/recipes/locales/en.ts';
 import recipesFr from '@/app/features/recipes/locales/fr.ts';
 import mealsEn from '@/app/features/meals/locales/en.ts';
 import mealsFr from '@/app/features/meals/locales/fr.ts';
+import languageEn from '@/app/features/language/locales/en.ts';
+import languageFr from '@/app/features/language/locales/fr.ts';
 import en from './locales/en.ts';
 import fr from './locales/fr.ts';
 
@@ -56,6 +58,7 @@ i18n.use(initReactI18next).init({
         ...dailyJournalEn,
         ...recipesEn,
         ...mealsEn,
+        ...languageEn,
       },
     },
     fr: {
@@ -75,6 +78,7 @@ i18n.use(initReactI18next).init({
         ...dailyJournalFr,
         ...recipesFr,
         ...mealsFr,
+        ...languageFr,
       },
     },
   },

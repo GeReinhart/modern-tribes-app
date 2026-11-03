@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useAuth } from './AuthContext.tsx';
 import { authService } from './authentication-service.ts';
+import { consumeSessionEndReason } from './sessionEndReason.ts';
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -19,6 +20,9 @@ export default function LoginPage() {
   const [success, setSuccess] = useState(false);
   const [sentEmail, setSentEmail] = useState('');
   const [error, setError] = useState('');
+  // Read once on mount, not on every render: consuming it clears it from storage, and a
+  // re-render (e.g. after isLoading flips) must not make the message disappear early.
+  const [sessionEndReason] = useState(() => consumeSessionEndReason());
 
   if (!isLoading && isAuthenticated) {
     return <Navigate to="/app" replace />;
@@ -62,6 +66,12 @@ export default function LoginPage() {
               {t('auth.magicLinkHint')}
             </ThemedText>
           </div>
+
+          {sessionEndReason && (
+            <ThemedText variant="secondary" size="medium">
+              {t('auth.sessionEndedReason', { reason: sessionEndReason })}
+            </ThemedText>
+          )}
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             {!success && (

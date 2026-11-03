@@ -1,0 +1,14 @@
+text,language,word_type,article,plural
+livre,fr,noun,le,livres
+maison,fr,noun,la,maisons
+grand,fr,adjective,,
+petit,fr,adjective,,
+manger,fr,verb,,
+parler,fr,verb,,
+book,en,noun,,books
+house,en,noun,,houses
+big,en,adjective,,
+small,en,adjective,,
+to eat,en,verb,,
+to speak,en,verb,,
+Mann,de,noun,der,Männer

@@ -60,6 +60,7 @@ const fr: Record<string, string> = {
   'auth.verificationError': "Une erreur s'est produite lors de la vérification",
   'auth.requestNewLink': 'Demander un nouveau lien magique',
   'auth.emailNotFound': 'Aucun compte trouvé pour cette adresse e-mail.',
+  'auth.sessionEndedReason': 'Vous avez été déconnecté : {{reason}}',
 
   'status.active': 'Actif',
   'status.pending': 'En attente',

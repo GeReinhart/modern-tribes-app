@@ -1,6 +1,7 @@
 import asyncio
 import json
 import re
+import zipfile
 from datetime import date, datetime, timedelta, timezone
 from uuid import UUID
 
@@ -51,6 +52,7 @@ def given_today_is(date_str, monkeypatch):
             return fixed_today
 
     monkeypatch.setattr("app.features.meals.service.date", _FrozenDate)
+    monkeypatch.setattr("app.features.language.test.service.date", _FrozenDate)
 
 
 # ── authentication step stubs ──────────────────────────────────────────────────
@@ -2505,3 +2507,285 @@ def then_reminders_table(datatable):
                 act_str = "" if act_val is None else (act_val.isoformat() if isinstance(act_val, datetime) else str(act_val))
                 exp_val = expand_id(exp[j])
             assert act_str == exp_val, f"reminders[{i}].{col}: expected {exp_val!r}, got {act_str!r}"
+
+
+# ── Given/Then: Learn Language ──────────────────────────────────────────────────
+
+@given("the languages table contains:")
+def given_languages_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                if not rec.get("code"):
+                    continue
+                await conn.execute(
+                    """INSERT INTO languages(code, name, theme_code, status)
+                       VALUES($1, $2, $3, $4)
+                       ON CONFLICT (code) DO NOTHING""",
+                    rec["code"],
+                    rec.get("name", rec["code"]),
+                    rec.get("theme_code") or None,
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the languages table contains:")
+def then_languages_table(datatable):
+    _assert_db("languages", datatable)
+
+
+@given("the language_settings table contains:")
+def given_language_settings_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                if not rec.get("project_id"):
+                    continue
+                await conn.execute(
+                    """INSERT INTO language_settings(project_id, source_language, target_language, status)
+                       VALUES($1, $2, $3, $4)
+                       ON CONFLICT (project_id) DO NOTHING""",
+                    UUID(rec["project_id"]),
+                    rec["source_language"],
+                    rec["target_language"],
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the language_settings table contains:")
+def then_language_settings_table(datatable):
+    _assert_db("language_settings", datatable)
+
+
+@given("the language_words table contains:")
+def given_language_words_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not rec.get("text"):
+                    continue
+                await conn.execute(
+                    """INSERT INTO language_words(id, text, language, word_type, article, plural, status)
+                       VALUES(COALESCE($1, uuid_generate_v4()), $2, $3, $4, $5, $6, $7)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid) if uid else None,
+                    rec["text"],
+                    rec["language"],
+                    rec.get("word_type", "noun"),
+                    rec.get("article") or None,
+                    rec.get("plural") or None,
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the language_words table contains:")
+def then_language_words_table(datatable):
+    _assert_db("language_words", datatable)
+
+
+@given("the language_word_declensions table contains:")
+def given_language_word_declensions_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not rec.get("word_id"):
+                    continue
+                await conn.execute(
+                    """INSERT INTO language_word_declensions(id, word_id, case_label, form, position, status)
+                       VALUES(COALESCE($1, uuid_generate_v4()), $2, $3, $4, $5, $6)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid) if uid else None,
+                    UUID(rec["word_id"]),
+                    rec["case_label"],
+                    rec["form"],
+                    coerce("position", rec.get("position", "0")),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the language_word_declensions table contains:")
+def then_language_word_declensions_table(datatable):
+    _assert_db("language_word_declensions", datatable)
+
+
+@given("the language_word_translations table contains:")
+def given_language_word_translations_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not rec.get("word_id_a"):
+                    continue
+                await conn.execute(
+                    """INSERT INTO language_word_translations(id, word_id_a, word_id_b, status)
+                       VALUES(COALESCE($1, uuid_generate_v4()), $2, $3, $4)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid) if uid else None,
+                    UUID(rec["word_id_a"]),
+                    UUID(rec["word_id_b"]),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the language_word_translations table contains:")
+def then_language_word_translations_table(datatable):
+    _assert_db("language_word_translations", datatable)
+
+
+@given("the language_lessons table contains:")
+def given_language_lessons_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                uid = rec.get("id")
+                if not rec.get("project_id"):
+                    continue
+                document_id = rec.get("document_id")
+                await conn.execute(
+                    """INSERT INTO language_lessons(id, project_id, title, document_id, status)
+                       VALUES(COALESCE($1, uuid_generate_v4()), $2, $3, $4, $5)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid) if uid else None,
+                    UUID(rec["project_id"]),
+                    rec.get("title", "Lesson"),
+                    UUID(document_id) if document_id else None,
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the language_lessons table contains:")
+def then_language_lessons_table(datatable):
+    _assert_db("language_lessons", datatable)
+
+
+@given("the language_lesson_words table contains:")
+def given_language_lesson_words_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+                if not rec.get("lesson_id"):
+                    continue
+                uid = rec.get("id")
+                await conn.execute(
+                    """INSERT INTO language_lesson_words(id, lesson_id, word_id, position, status)
+                       VALUES(COALESCE($1, uuid_generate_v4()), $2, $3, $4, $5)
+                       ON CONFLICT (id) DO NOTHING""",
+                    UUID(uid) if uid else None,
+                    UUID(rec["lesson_id"]),
+                    UUID(rec["word_id"]),
+                    coerce("position", rec.get("position", "0")),
+                    rec.get("status", "active"),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the language_lesson_words table contains:")
+def then_language_lesson_words_table(datatable):
+    _assert_db("language_lesson_words", datatable)
+
+
+@given("the language_word_test_attempts table contains:")
+def given_language_word_test_attempts_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                await _insert_test_attempt_row(conn, headers, row)
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+async def _insert_test_attempt_row(conn, headers, row):
+    rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
+    if not rec.get("word_id"):
+        return
+    user_id = rec.get("user_id") or expand_id("0002")
+    fields = ["user_id", "word_id", "direction", "mode", "correct", "status"]
+    values = [
+        UUID(user_id),
+        UUID(rec["word_id"]),
+        rec.get("direction", "source_to_target"),
+        rec.get("mode", "free"),
+        (rec.get("correct") or "false").lower() == "true",
+        rec.get("status", "active"),
+    ]
+    uid = rec.get("id")
+    if uid:
+        fields.insert(0, "id")
+        values.insert(0, UUID(uid))
+    created_at = _parse_created_at(rec.get("created_at"))
+    if created_at is not None:
+        fields.append("created_at")
+        values.append(created_at)
+    placeholders = ", ".join(f"${i + 1}" for i in range(len(fields)))
+    await conn.execute(
+        f"INSERT INTO language_word_test_attempts({', '.join(fields)}) VALUES({placeholders})", *values,
+    )
+
+
+@then("the language_word_test_attempts table contains:")
+def then_language_word_test_attempts_table(datatable):
+    _assert_db("language_word_test_attempts", datatable)
+
+
+@given("the bundled dictionary data directory is empty")
+def given_empty_dictionary_data_dir(tmp_path, monkeypatch):
+    """Points local_dictionary.DATA_DIR at an empty per-test temp directory, so the
+    scenario sees no archives regardless of what's actually bundled in the repo --
+    exactly how "today is" freezes date.today() for app.features.meals.service."""
+    monkeypatch.setattr("app.features.language.lesson.local_dictionary.DATA_DIR", tmp_path)
+
+
+@given(parsers.parse('the bundled dictionary archive "{filename}" contains a file with content:'))
+def given_dictionary_archive(filename, docstring, tmp_path, monkeypatch):
+    """Writes a real dict.cc-format zip archive (one arbitrarily-named entry, like a real
+    dict.cc export) to a per-test temp directory and points local_dictionary.DATA_DIR at
+    it — genuine file I/O, no mocking of the lookup logic itself."""
+    with zipfile.ZipFile(tmp_path / filename, "w") as archive:
+        archive.writestr("entries.txt", docstring)
+    monkeypatch.setattr("app.features.language.lesson.local_dictionary.DATA_DIR", tmp_path)

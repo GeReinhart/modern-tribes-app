@@ -1031,6 +1031,122 @@
             "frontend/src/app/features/meals/**"
           ]
         }
+      },
+      {
+        "package": "language",
+        "description": {
+          "en": [
+            "- Learn Language turns a project into a shared knowledge base to learn one language from another — French to English, for example",
+            "- Together, a lesson's three tabs cover the whole learning loop: write the lesson, learn it, then test yourself on it — and they all draw from the exact same lessons and vocabulary, however many of each tab you add",
+            "- an admin manages the list of languages available, and suggested translations while adding a word come from a dictionary built into the app, with nothing to connect or configure"
+          ],
+          "fr": [
+            "- « Apprendre une langue » transforme un projet en base de connaissances partagée pour apprendre une langue à partir d'une autre — du français vers l'anglais, par exemple",
+            "- les trois onglets couvrent ensemble tout le cycle d'apprentissage : rédiger la leçon, l'apprendre, puis se tester dessus — et ils puisent tous dans les mêmes leçons et le même vocabulaire, quel que soit le nombre d'onglets de chaque type",
+            "- un administrateur gère la liste des langues disponibles, et les suggestions de traduction lors de l'ajout d'un mot proviennent d'un dictionnaire intégré à l'app, sans rien à connecter ni configurer"
+          ]
+        },
+        "sub_packages": [
+          {
+            "package": "lesson",
+            "description": {
+              "en": [
+                "- a lesson opens on two sub-tabs, \"The lesson\" for its title and write-up and \"The vocabulary\" for its word list as compact cards you can filter by word type — the sub-tab you were on is remembered",
+                "- write a lesson's free-text content, exactly like any other rich-text document in the app",
+                "- build its word list by picking a word already in the shared dictionary, or by creating a brand-new one with its translation, type, and — depending on the language — an article, a plural and a declension",
+                "- a word you create becomes available to every project, so it's never retyped or retranslated twice",
+                "- picking a word that already exists in another lesson brings its known translation along, so it is never retyped; the add-word page names the lesson it adds to",
+                "remove a word from a lesson at any time — it only leaves that lesson and stays available everywhere else",
+                "- every field where you type German (words, plurals, declension forms, test answers) has a ß button next to it to insert the character in one click",
+                "- choose a color theme for each language: it colors every word of that language wherever it is shown or edited, in all projects",
+                "- get a suggested translation from the app's built-in dictionary while typing a new word, with its own type and article confirmed as you type and, for German words, plural forms suggested at a click — adjust any of it freely before saving"
+              ],
+              "fr": [
+                "- une leçon s'ouvre sur deux sous-onglets, « La leçon » pour son titre et son contenu et « Le vocabulaire » pour sa liste de mots en cartes compactes filtrables par type — le sous-onglet consulté est mémorisé",
+                "- rédigez le contenu libre d'une leçon, comme n'importe quel autre document enrichi de l'app",
+                "- construisez sa liste de mots en piochant un mot déjà présent dans le dictionnaire partagé, ou en créant un nouveau mot avec sa traduction, son type, et selon la langue, un article, un pluriel et une déclinaison",
+                "- un mot que vous créez devient disponible pour tous les projets, il n'est jamais ressaisi ni retraduit deux fois",
+                "- choisir un mot déjà présent dans une autre leçon reprend sa traduction connue, sans la ressaisir ; la page d'ajout d'un mot précise la leçon concernée",
+                "retirez un mot d'une leçon à tout moment — il ne quitte que cette leçon et reste disponible partout ailleurs",
+                "- chaque champ où vous saisissez de l'allemand (mots, pluriels, formes déclinées, réponses aux tests) a un bouton ß à côté pour insérer le caractère en un clic",
+                "- choisissez un thème de couleur pour chaque langue : il colore chaque mot de cette langue partout où il est affiché ou édité, dans tous les projets",
+                "- obtenez une suggestion de traduction du dictionnaire intégré à l'app pendant que vous tapez un nouveau mot, avec son type et son article confirmés au fil de la frappe et, pour les mots allemands, des formes au pluriel suggérées d'un clic — ajustez librement avant d'enregistrer"
+              ]
+            },
+            "backend": {
+              "schema": [
+                "languages",
+                "language_settings",
+                "language_words",
+                "language_word_declensions",
+                "language_word_translations",
+                "language_lessons",
+                "language_lesson_words"
+              ],
+              "path": [
+                "backend/app/features/language/lesson/**"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/language/lesson/**"
+              ]
+            }
+          },
+          {
+            "package": "learn",
+            "description": {
+              "en": [
+                "- read a lesson in a clean view made for learning, split into two sub-tabs like when writing it: the lesson itself, and its vocabulary as compact cards filterable by word type, each word shown with its translation",
+                "- download the lesson as a printable PDF to study away from a screen, with the words grouped by type in the same compact cards, and the learned language and page numbers in the footer"
+              ],
+              "fr": [
+                "- lisez une leçon dans une vue épurée pensée pour l'apprentissage, découpée en deux sous-onglets comme à la rédaction : la leçon elle-même, et son vocabulaire en cartes compactes filtrables par type, chaque mot avec sa traduction",
+                "- téléchargez la leçon en PDF imprimable pour l'étudier loin d'un écran, avec les mots regroupés par type dans les mêmes cartes compactes, et la langue apprise et le numéro de page en bas de page"
+              ]
+            },
+            "backend": {
+              "path": [
+                "backend/app/features/language/learn/**"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/language/learn/**"
+              ]
+            }
+          },
+          {
+            "package": "test",
+            "description": {
+              "en": [
+                "- a lesson's test page has six sub-tabs: two full tests, one per direction (e.g. French to German, then German to French), each going through every word once in random order with a word counter, a random test that comes back more often to the words you know least (without forgetting the well-known ones), an article test where you pick the article of a noun (e.g. der, die or das), a plural test where you type the plural of a noun, and your results — you answer either by typing the translation freely or by picking it among several words of the same type from the lesson",
+                "- find out immediately whether your answer was right; when it wasn't, you get a varied, encouraging comment and the correct answer",
+                "- each person's score for each word (including, for a noun with an article, knowing its article) goes from 0 to 1 as you keep answering it correctly in both directions over several different days — picking from choices helps much less than typing freely — and it slowly fades if you stop practicing a word",
+                "- in the results, pick any member of the project (you by default) to see their big overall score, a chart of how it evolved over a duration you can reduce (week, month, 3 months), a collapsible explanation of how it is calculated and, for each word, its score and the history of their answers"
+              ],
+              "fr": [
+                "- la page de test d'une leçon a six sous-onglets : deux tests complets, un par sens (par exemple français vers allemand, puis allemand vers français), qui passent chacun chaque mot une fois dans un ordre aléatoire avec un compteur de mots, un test aléatoire qui revient plus souvent sur les mots les moins bien sus (sans oublier les mieux connus), un test des articles où vous choisissez l'article d'un nom (par exemple der, die ou das), un test des pluriels où vous saisissez le pluriel d'un nom, et vos résultats — vous répondez en saisissant librement la traduction ou en la choisissant parmi plusieurs mots du même type de la leçon",
+                "- découvrez immédiatement si votre réponse est juste ; si ce n'est pas le cas, un commentaire varié et encourageant s'affiche avec la bonne réponse",
+                "- la note de chaque personne pour chaque mot (y compris, pour un nom avec article, la connaissance de son article) va de 0 à 1 à mesure que vous répondez juste dans les deux sens sur plusieurs jours différents — choisir parmi plusieurs options aide beaucoup moins que la saisie libre — et elle diminue doucement si vous arrêtez de pratiquer un mot",
+                "- dans les résultats, choisissez n'importe quel membre du projet (vous par défaut) pour voir sa grosse note globale, un graphique de son évolution sur une durée réductible (semaine, mois, 3 mois), une explication repliable de son calcul et, pour chaque mot, sa note et l'historique de ses réponses"
+              ]
+            },
+            "backend": {
+              "schema": [
+                "language_word_test_attempts"
+              ],
+              "path": [
+                "backend/app/features/language/test/**"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/language/test/**"
+              ]
+            }
+          }
+        ]
       }
     ]
   },
