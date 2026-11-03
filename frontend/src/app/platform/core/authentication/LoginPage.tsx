@@ -22,7 +22,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   // Read once on mount, not on every render: consuming it clears it from storage, and a
   // re-render (e.g. after isLoading flips) must not make the message disappear early.
-  const [sessionEndReason] = useState(() => consumeSessionEndReason());
+  const [sessionEnd] = useState(() => consumeSessionEndReason());
 
   if (!isLoading && isAuthenticated) {
     return <Navigate to="/app" replace />;
@@ -67,10 +67,17 @@ export default function LoginPage() {
             </ThemedText>
           </div>
 
-          {sessionEndReason && (
-            <ThemedText variant="secondary" size="medium">
-              {t('auth.sessionEndedReason', { reason: sessionEndReason })}
-            </ThemedText>
+          {sessionEnd && (
+            <div className="space-y-1">
+              <ThemedText variant="secondary" size="medium">
+                {t('auth.sessionEndedReason', { reason: sessionEnd.reason })}
+              </ThemedText>
+              {sessionEnd.technical && (
+                <ThemedText variant="secondary" size="small">
+                  {t('auth.sessionEndedTechnical', { detail: sessionEnd.technical })}
+                </ThemedText>
+              )}
+            </div>
           )}
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>

@@ -15,7 +15,7 @@ import { themeCodeForLanguage } from '../shared/languageTheme.ts';
 import { Language, TranslationCandidate, Word, WordUpdateInput } from '../shared/types.ts';
 
 interface Props {
-  // The lesson the word is edited from, named at the top of the form (the page title lives in the header).
+  // The lesson the word is edited from, shown as the form's title like on the other lesson pages.
   lessonTitle: string;
   word: Word;
   languages: Language[];
@@ -71,7 +71,7 @@ const EditWordForm: React.FC<Props> = ({ lessonTitle, word, languages, onUpdateW
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <ThemedText variant="secondary" size="small">{t('features.language.editingInLesson', { title: lessonTitle })}</ThemedText>
+      <ThemedText as="h2" size="medium">{lessonTitle}</ThemedText>
       {error && <ThemedText variant="danger" size="small">{error}</ThemedText>}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <WordColumnFields

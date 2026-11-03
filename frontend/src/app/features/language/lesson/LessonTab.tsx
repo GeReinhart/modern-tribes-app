@@ -3,7 +3,7 @@ import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedT
 import { usePersistedString } from '@/app/platform/core/browser/usePersistedString.ts';
 import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -15,6 +15,7 @@ import { LESSON_SUB_TABS, LESSON_SUB_TAB_STORAGE_KEY } from '../shared/lessonSub
 import { addWordPath } from './wordFormRoutes.ts';
 import { useLanguageSettings } from '../shared/useLanguageSettings.ts';
 import { useLessonsList } from '../shared/useLessonsList.ts';
+import { useSelectedLesson } from '../shared/useSelectedLesson.ts';
 import LessonList from '../shared/LessonList.tsx';
 import type { FeatureTabProps } from '../../glue/registry.ts';
 
@@ -25,7 +26,22 @@ const LessonTab: React.FC<FeatureTabProps> = ({ canEdit, projectId, tribeId, fea
   // Kept in the URL (not local state) so navigating away to the add/edit word page and back
   // lands on the same lesson, instead of resetting to the lesson list.
   const [searchParams, setSearchParams] = useSearchParams();
-  const selectedLessonId = searchParams.get('lessonId');
+  // The URL (set when coming back from the add/edit word page) wins over the lesson remembered
+  // from the other tabs; either way the lesson is shared with the learn and test tabs.
+  const { selectedLessonId: rememberedLessonId, select } = useSelectedLesson(projectId, lessons);
+  const urlLessonId = searchParams.get('lessonId');
+  const selectedLessonId = urlLessonId ?? rememberedLessonId;
+  useEffect(() => {
+    if (urlLessonId) select(urlLessonId);
+  }, [urlLessonId, select]);
+  const openLesson = useCallback((lessonId: string) => {
+    select(lessonId);
+    setSearchParams({ lessonId });
+  }, [select, setSearchParams]);
+  const backToLessons = useCallback(() => {
+    select(null);
+    setSearchParams({});
+  }, [select, setSearchParams]);
   const navigate = useNavigate();
   const [subTab, setSubTab] = usePersistedString(LESSON_SUB_TAB_STORAGE_KEY, LESSON_SUB_TABS, 'lesson');
   const [creating, setCreating] = useState(false);
@@ -34,7 +50,7 @@ const LessonTab: React.FC<FeatureTabProps> = ({ canEdit, projectId, tribeId, fea
   const tabActions = useMemo(
     () => [
       ...(selectedLessonId
-        ? [{ id: 'language.backToLessons', icon: 'arrow-left' as const, label: t('features.language.backToLessons'), onClick: () => setSearchParams({}) }]
+        ? [{ id: 'language.backToLessons', icon: 'arrow-left' as const, label: t('features.language.backToLessons'), onClick: backToLessons }]
         : []),
       ...(canEdit && selectedLessonId && subTab === 'vocabulary'
         ? [{
@@ -56,7 +72,7 @@ const LessonTab: React.FC<FeatureTabProps> = ({ canEdit, projectId, tribeId, fea
           }]
         : []),
     ],
-    [canEdit, settings, selectedLessonId, subTab, navigate, tribeId, projectId, featureInstanceId, setSearchParams, t],
+    [canEdit, settings, selectedLessonId, subTab, navigate, tribeId, projectId, featureInstanceId, backToLessons, t],
   );
   useRegisterTabActions(tabActions);
 
@@ -99,7 +115,7 @@ const LessonTab: React.FC<FeatureTabProps> = ({ canEdit, projectId, tribeId, fea
   return (
     <div>
       {lessonsError && <ThemedText variant="danger" size="small">{lessonsError}</ThemedText>}
-      <LessonList lessons={lessons} onOpen={(lessonId) => setSearchParams({ lessonId })} />
+      <LessonList lessons={lessons} onOpen={openLesson} />
       {creating && (
         <CreateLessonModal onClose={() => setCreating(false)} onCreate={createLesson} />
       )}

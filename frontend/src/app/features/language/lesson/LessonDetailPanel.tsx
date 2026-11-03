@@ -55,6 +55,7 @@ const LessonDetailPanel: React.FC<Props> = ({
 
   return (
     <div>
+      <ThemedText as="h2" size="medium">{detail.title}</ThemedText>
       <LessonSubTabs active={subTab} onChange={onSubTabChange} />
       {(lessonError || wordsError) && <ThemedText variant="danger" size="small">{lessonError || wordsError}</ThemedText>}
       {subTab === 'lesson' ? (

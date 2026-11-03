@@ -1,11 +1,10 @@
 import { ThemedButton } from '@/app/platform/core/layout/themes/components/ThemedButton.tsx';
-import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
 import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import LanguageTextInput from '../shared/LanguageTextInput.tsx';
+import LanguageTextInput, { hasSpecialCharacter } from '../shared/LanguageTextInput.tsx';
 import { Declension } from '../shared/types.ts';
 
 interface Props {
@@ -32,11 +31,13 @@ const DeclensionRowsEditor: React.FC<Props> = ({ declensions, onChange, disabled
       <ThemedText size="small" variant="secondary">{t('features.language.declensions')}</ThemedText>
       {declensions.map((row, index) => (
         <div key={index} style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
-          <ThemedInput
+          <LanguageTextInput
             label={t('features.language.declensionCase')}
             value={row.case_label}
             disabled={disabled}
-            onChange={(e) => updateRow(index, 'case_label', e.target.value)}
+            reserveButtonSpace={hasSpecialCharacter(language) && !disabled}
+            onValueChange={(caseLabel) => updateRow(index, 'case_label', caseLabel)}
+            containerStyle={{ flex: 1 }}
           />
           <LanguageTextInput
             label={t('features.language.declensionForm')}
@@ -44,6 +45,7 @@ const DeclensionRowsEditor: React.FC<Props> = ({ declensions, onChange, disabled
             language={language}
             disabled={disabled}
             onValueChange={(form) => updateRow(index, 'form', form)}
+            containerStyle={{ flex: 1 }}
           />
           {!disabled && (
             <ThemedButton variant="ghost" type="button" icon="trash" iconOnly onClick={() => removeRow(index)}>

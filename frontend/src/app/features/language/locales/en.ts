@@ -105,8 +105,6 @@ const en: Record<string, string> = {
   'features.language.scoreExplanationDays': 'A part earns its points over 3 different days of correct answers: answering correctly several times on the same day counts once, and a part never earns more than its maximum.',
   'features.language.scoreExplanationChoice': 'Picking the translation among choices counts for only a fifth of a day, much less than typing it. Article and plural answers count fully.',
   'features.language.scoreExplanationDecay': 'A word that has not been tested for a full week loses 10% of its score, and again for each further week, until you practice it again.',
-  'features.language.addingToLesson': 'Adding to lesson: {{title}}',
-  'features.language.editingInLesson': 'Editing from lesson: {{title}}',
   'features.language.reviewComplete': 'You\'ve reviewed every word in this lesson.',
   'features.language.noTestableWords': 'None of this lesson\'s words have a translation yet.',
 };

@@ -2,12 +2,13 @@ import { usePersistedString } from '@/app/platform/core/browser/usePersistedStri
 import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import LearnLessonView from './LearnLessonView.tsx';
 import { useLessonPdfDownload } from './useLessonPdfDownload.ts';
 import { useLessonsList } from '../shared/useLessonsList.ts';
+import { useSelectedLesson } from '../shared/useSelectedLesson.ts';
 import LessonList from '../shared/LessonList.tsx';
 import { LEARN_SUB_TAB_STORAGE_KEY, LESSON_SUB_TABS } from '../shared/lessonSubTabs.ts';
 import type { FeatureTabProps } from '../../glue/registry.ts';
@@ -15,7 +16,7 @@ import type { FeatureTabProps } from '../../glue/registry.ts';
 const LearnTab: React.FC<FeatureTabProps> = ({ projectId }) => {
   const { t } = useTranslation();
   const { lessons, error } = useLessonsList(projectId);
-  const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
+  const { selectedLessonId, select: setSelectedLessonId } = useSelectedLesson(projectId, lessons);
   const [subTab, setSubTab] = usePersistedString(LEARN_SUB_TAB_STORAGE_KEY, LESSON_SUB_TABS, 'lesson');
   const lessonTitle = lessons.find((lesson) => lesson.id === selectedLessonId)?.title ?? 'lesson';
   const { download, downloading } = useLessonPdfDownload(selectedLessonId ?? '', lessonTitle);

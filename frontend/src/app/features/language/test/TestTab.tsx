@@ -2,19 +2,20 @@ import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedT
 
 import { useRegisterTabActions } from '@/app/platform/core/layout/useRegisterTabActions.ts';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import TestLessonView from './TestLessonView.tsx';
 import TestLessonScoreBadge from './TestLessonScoreBadge.tsx';
 import { useLessonsList } from '../shared/useLessonsList.ts';
+import { useSelectedLesson } from '../shared/useSelectedLesson.ts';
 import LessonList from '../shared/LessonList.tsx';
 import type { FeatureTabProps } from '../../glue/registry.ts';
 
 const TestTab: React.FC<FeatureTabProps> = ({ projectId }) => {
   const { t } = useTranslation();
   const { lessons, error } = useLessonsList(projectId);
-  const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
+  const { selectedLessonId, select: setSelectedLessonId } = useSelectedLesson(projectId, lessons);
 
   const tabActions = useMemo(
     () => (selectedLessonId

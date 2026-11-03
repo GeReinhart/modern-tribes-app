@@ -16,8 +16,11 @@ import {
 import { themeCodeForLanguage } from '../shared/languageTheme.ts';
 import { Language, LanguageSettings, TranslationCandidate, TranslationInput, WordCreateInput } from '../shared/types.ts';
 
+// The form never gets wider than this, however wide the page is, and is centered when narrower.
+const MAX_FORM_WIDTH = '600px';
+
 interface Props {
-  // The lesson the word is added to, named at the top of the form (the page title lives in the header).
+  // The lesson the word is added to, shown as the form's title like on the other lesson pages.
   lessonTitle: string;
   languageSettings: LanguageSettings;
   languages: Language[];
@@ -85,8 +88,8 @@ const AddWordForm: React.FC<Props> = ({ lessonTitle, languageSettings, languages
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      <ThemedText variant="secondary" size="small">{t('features.language.addingToLesson', { title: lessonTitle })}</ThemedText>
+    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: MAX_FORM_WIDTH, margin: '0 auto' }}>
+      <ThemedText as="h2" size="medium">{lessonTitle}</ThemedText>
       {justAdded && <ThemedText variant="success" size="small">{t('features.language.wordAddedKeepAdding')}</ThemedText>}
       {error && <ThemedText variant="danger" size="small">{error}</ThemedText>}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

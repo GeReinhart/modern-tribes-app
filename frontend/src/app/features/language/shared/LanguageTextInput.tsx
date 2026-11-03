@@ -6,6 +6,12 @@ import React, { useRef } from 'react';
 // Languages that have a character missing from a regular keyboard, with a button to type it.
 const SPECIAL_CHARACTER_BY_LANGUAGE: Record<string, string> = { de: 'ß' };
 
+// Fixed width of the special-character button, so a neighbouring field can reserve the same room.
+const SPECIAL_BUTTON_WIDTH = '2.5rem';
+
+export const hasSpecialCharacter = (language?: string): boolean =>
+  Boolean(language && SPECIAL_CHARACTER_BY_LANGUAGE[language]);
+
 type InputProps = Omit<React.ComponentProps<typeof ThemedInput>, 'onChange' | 'value'>;
 
 interface Props extends InputProps {
@@ -15,11 +21,14 @@ interface Props extends InputProps {
   language?: string;
   // Layout of the whole control (field + button), e.g. `{ flex: 1 }` in a flex row.
   containerStyle?: React.CSSProperties;
+  // Leaves the room of the special-character button empty, so this field is as wide as a
+  // sibling field that has the button (e.g. the declension case next to its form).
+  reserveButtonSpace?: boolean;
 }
 
 // A text field for words in a given language. Use it wherever the user types text in a language
 // -- the shared place for language-specific typing helpers, so every such field gets them.
-const LanguageTextInput: React.FC<Props> = ({ value, onValueChange, language, containerStyle, disabled, ...inputProps }) => {
+const LanguageTextInput: React.FC<Props> = ({ value, onValueChange, language, containerStyle, reserveButtonSpace, disabled, ...inputProps }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const specialCharacter = language ? SPECIAL_CHARACTER_BY_LANGUAGE[language] : undefined;
 
@@ -43,10 +52,14 @@ const LanguageTextInput: React.FC<Props> = ({ value, onValueChange, language, co
         <ThemedInput {...inputProps} value={value} disabled={disabled} onChange={(e) => onValueChange(e.target.value)} />
       </div>
       {specialCharacter && !disabled && (
-        <ThemedButton type="button" variant="secondary" fullWidth={false} title={specialCharacter} onClick={insertSpecialCharacter}>
+        <ThemedButton
+          type="button" variant="secondary" fullWidth={false} title={specialCharacter}
+          style={{ width: SPECIAL_BUTTON_WIDTH, padding: 'var(--btn-pad-v) 0' }} onClick={insertSpecialCharacter}
+        >
           {specialCharacter}
         </ThemedButton>
       )}
+      {reserveButtonSpace && !specialCharacter && <div style={{ width: SPECIAL_BUTTON_WIDTH, flexShrink: 0 }} />}
     </div>
   );
 };

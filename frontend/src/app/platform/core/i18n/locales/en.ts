@@ -59,6 +59,7 @@ const en: Record<string, string> = {
   'auth.requestNewLink': 'Request a new magic link',
   'auth.emailNotFound': 'No account found for this email address.',
   'auth.sessionEndedReason': 'You were signed out: {{reason}}',
+  'auth.sessionEndedTechnical': 'Technical detail: {{detail}}',
 
   'status.active': 'Active',
   'status.pending': 'Pending',

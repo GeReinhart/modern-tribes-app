@@ -23,23 +23,28 @@ const WordDetailFields: React.FC<Props> = ({ value, locked, onChange }) => {
 
   return (
     <>
-      <ThemedSelect
-        label={t('features.language.wordTypeLabel')}
-        options={typeOptions}
-        value={value.wordType}
-        allowEmpty={false}
-        disabled={locked}
-        onChange={(v) => onChange({ ...value, wordType: v as WordType })}
-      />
-      {value.wordType === 'noun' && (
-        <LanguageTextInput
-          label={t('features.language.plural')}
-          value={value.plural}
-          language={value.language}
-          disabled={locked}
-          onValueChange={(plural) => onChange({ ...value, plural })}
-        />
-      )}
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+        <div style={{ flex: 1 }}>
+          <ThemedSelect
+            label={t('features.language.wordTypeLabel')}
+            options={typeOptions}
+            value={value.wordType}
+            allowEmpty={false}
+            disabled={locked}
+            onChange={(v) => onChange({ ...value, wordType: v as WordType })}
+          />
+        </div>
+        {value.wordType === 'noun' && (
+          <LanguageTextInput
+            label={t('features.language.plural')}
+            value={value.plural}
+            language={value.language}
+            disabled={locked}
+            onValueChange={(plural) => onChange({ ...value, plural })}
+            containerStyle={{ flex: 1 }}
+          />
+        )}
+      </div>
       <DeclensionRowsEditor language={value.language} declensions={value.declensions} disabled={locked} onChange={(declensions) => onChange({ ...value, declensions })} />
     </>
   );

@@ -28,6 +28,27 @@ function isTokenExpired(token: string): boolean {
   }
 }
 
+const REFRESH_LOCK = 'auth-token-refresh';
+// An access token with at least this much life left was just refreshed by another tab.
+const FRESH_TOKEN_MIN_MS = 60 * 1000;
+
+function readFreshAccessTokenSince(previous: string | null): string | null {
+  const current = localStorage.getItem('access_token');
+  if (!current || current === previous) return null;
+  const expiresInMs = tokenManager.getTokenExpiresInMs();
+  return expiresInMs !== null && expiresInMs > FRESH_TOKEN_MIN_MS ? current : null;
+}
+
+// Only one tab at a time may use the single-use refresh token. A tab that waited for the lock
+// first checks whether the tab ahead of it already stored a new token, and reuses it.
+async function refreshAcrossTabs(): Promise<string | null> {
+  const tokenBeforeWaiting = localStorage.getItem('access_token');
+  const run = async () =>
+    readFreshAccessTokenSince(tokenBeforeWaiting) ?? (await _refresher!());
+  if (!navigator.locks) return run();
+  return navigator.locks.request(REFRESH_LOCK, run);
+}
+
 export const tokenManager = {
   getAccessToken: (): string | null => {
     const token = localStorage.getItem('access_token');
@@ -76,11 +97,14 @@ export const tokenManager = {
   setRefresher: (fn: Refresher): void => {
     _refresher = fn;
   },
-  // Deduplicates concurrent refresh calls — all callers await the same promise.
+  requestPersistentStorage: (): void => {
+    navigator.storage?.persist?.().catch(() => undefined);
+  },
+  // Deduplicates concurrent refresh calls in this tab, and serializes them across tabs.
   tryRefresh: (): Promise<string | null> => {
     if (!_refresher) return Promise.resolve(null);
     if (_refreshPromise) return _refreshPromise;
-    _refreshPromise = _refresher().finally(() => {
+    _refreshPromise = refreshAcrossTabs().finally(() => {
       _refreshPromise = null;
     });
     return _refreshPromise;

@@ -14,6 +14,8 @@ export const ThemedCard: React.FC<{
     | 'ghost'
     | 'text';
   bordered?: boolean;
+  // Tighter padding and no outer margin, for cards laid out in a grid.
+  compact?: boolean;
   theme?: Theme;
   className?: string;
   onClick?: () => void;
@@ -21,6 +23,7 @@ export const ThemedCard: React.FC<{
   children,
   variant = 'primary',
   bordered = true,
+  compact = false,
   theme: themeOverride,
   className = '',
   onClick,
@@ -34,10 +37,10 @@ export const ThemedCard: React.FC<{
       ? `3px solid ${theme.colors[variant]}`
       : `1px solid ${theme.colors.border}`,
     borderRadius: 'var(--radius-md)',
-    padding: 'var(--card-pad)',
+    padding: compact ? 'var(--space-sm) var(--space-md)' : 'var(--card-pad)',
     background: `linear-gradient(135deg, ${theme.colors.primary}08, ${theme.colors.accent}08)`,
     boxShadow: 'var(--shadow-sm)',
-    margin: 'var(--space-md) 0',
+    margin: compact ? 0 : 'var(--space-md) 0',
     cursor: onClick ? 'pointer' : 'default',
   };
 

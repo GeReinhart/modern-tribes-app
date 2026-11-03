@@ -4,20 +4,31 @@
 // navigation to /auth/login, and is cleared once read so it never resurfaces later.
 const KEY = 'session_end_reason';
 
-export function setSessionEndReason(reason: string, keepExisting = false): void {
+export interface SessionEnd {
+  reason: string;
+  // Raw diagnostics: what failed, with which HTTP status and when.
+  technical: string | null;
+}
+
+export function buildTechnicalDetail(request: string, status: number | undefined, code: string | null): string {
+  const parts = [request, status ? `HTTP ${status}` : null, code, new Date().toISOString()];
+  return parts.filter(Boolean).join(' · ');
+}
+
+export function setSessionEndReason(reason: string, keepExisting = false, technical: string | null = null): void {
   try {
     if (keepExisting && sessionStorage.getItem(KEY)) return;
-    sessionStorage.setItem(KEY, reason);
+    sessionStorage.setItem(KEY, JSON.stringify({ reason, technical }));
   } catch {
     // sessionStorage unavailable (private browsing, etc.) — the reason just won't show.
   }
 }
 
-export function consumeSessionEndReason(): string | null {
+export function consumeSessionEndReason(): SessionEnd | null {
   try {
-    const reason = sessionStorage.getItem(KEY);
+    const raw = sessionStorage.getItem(KEY);
     sessionStorage.removeItem(KEY);
-    return reason;
+    return raw ? (JSON.parse(raw) as SessionEnd) : null;
   } catch {
     return null;
   }

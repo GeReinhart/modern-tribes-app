@@ -28,10 +28,10 @@ const LessonList: React.FC<Props> = ({ lessons, onOpen, renderTrailing }) => {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '8px' }}>
       {lessons.map((lesson) => (
-        <ThemedCard key={lesson.id} onClick={() => onOpen(lesson.id)}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <ThemedCard key={lesson.id} compact onClick={() => onOpen(lesson.id)}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <span style={{ fontWeight: 600, color: theme.colors.text }}>{lesson.title}</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <span style={{ fontSize: 'var(--font-sm)', color: theme.colors.secondary }}>

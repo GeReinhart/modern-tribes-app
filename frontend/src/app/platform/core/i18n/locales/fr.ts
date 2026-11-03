@@ -61,6 +61,7 @@ const fr: Record<string, string> = {
   'auth.requestNewLink': 'Demander un nouveau lien magique',
   'auth.emailNotFound': 'Aucun compte trouvé pour cette adresse e-mail.',
   'auth.sessionEndedReason': 'Vous avez été déconnecté : {{reason}}',
+  'auth.sessionEndedTechnical': 'Détail technique : {{detail}}',
 
   'status.active': 'Actif',
   'status.pending': 'En attente',

@@ -1,6 +1,5 @@
 import DocumentContentEditor from '@/app/platform/functions/documents/editor/DocumentContentEditor.tsx';
 import { ThemedInput } from '@/app/platform/core/layout/themes/components/ThemedInput.tsx';
-import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 
 import React from 'react';
@@ -29,7 +28,6 @@ const LessonDocumentSection: React.FC<Props> = ({
   if (!canEdit) {
     return (
       <div style={{ marginTop: '16px' }}>
-        <ThemedText as="h2" size="medium">{title}</ThemedText>
         <div
           className="prose max-w-none"
           style={{ fontSize: 'var(--font-sm)', color: theme.colors.text }}

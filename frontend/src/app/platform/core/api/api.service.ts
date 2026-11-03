@@ -1,6 +1,7 @@
 import { getAPIBaseUrl } from '@/app/platform/core/env.ts';
 import { tokenManager } from '@/app/platform/core/authentication/tokenManager.ts';
-import { setSessionEndReason } from '@/app/platform/core/authentication/sessionEndReason.ts';
+import { formatApiDetail } from '@/app/platform/core/authentication/apiDetail.ts';
+import { buildTechnicalDetail, setSessionEndReason } from '@/app/platform/core/authentication/sessionEndReason.ts';
 
 class ApiService {
   private getAuthHeaders(): Record<string, string> {
@@ -31,7 +32,7 @@ class ApiService {
       if (response.status === 401) {
         const failureDetail: string | null = await response
           .json()
-          .then((d) => d?.detail ?? null)
+          .then((d) => formatApiDetail(d?.detail))
           .catch(() => null);
 
         if (!isRetry) {
@@ -48,7 +49,11 @@ class ApiService {
           // keepExisting: a refresh attempt just above may already have recorded the more
           // specific reason the *refresh itself* was rejected for (see AuthContext's
           // doRefresh) — this is only the fallback when no refresh was attempted at all.
-          setSessionEndReason(failureDetail || 'Your session is no longer valid.', true);
+          setSessionEndReason(
+            failureDetail || 'Your session is no longer valid.',
+            true,
+            buildTechnicalDetail(`${options?.method ?? 'GET'} ${endpoint}`, 401, null),
+          );
           window.location.replace('/auth/login');
           return new Promise<T>(() => {});
         }
@@ -60,7 +65,7 @@ class ApiService {
           .json()
           .catch(() => ({ detail: 'An error occurred' }));
         const apiError: Error & { status?: number } = new Error(
-          error.detail || `HTTP error! status: ${response.status}`,
+          formatApiDetail(error.detail) || `HTTP error! status: ${response.status}`,
         );
         apiError.status = response.status;
         throw apiError;

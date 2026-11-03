@@ -33,10 +33,10 @@ const LearnLessonView: React.FC<Props> = ({ lessonId, subTab, onSubTabChange }) 
 
   return (
     <div>
+      <ThemedText as="h2" size="medium">{detail.title}</ThemedText>
       <LessonSubTabs active={subTab} onChange={onSubTabChange} />
       {subTab === 'lesson' ? (
         <div style={{ marginTop: '16px' }}>
-          <ThemedText as="h2" size="medium">{detail.title}</ThemedText>
           <div
             className="prose max-w-none"
             style={{ fontSize: 'var(--font-sm)', color: theme.colors.text }}

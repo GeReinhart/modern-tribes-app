@@ -105,8 +105,6 @@ const fr: Record<string, string> = {
   'features.language.scoreExplanationDays': 'Une partie gagne ses points sur 3 jours différents de bonnes réponses : répondre juste plusieurs fois le même jour ne compte qu\'une fois, et une partie ne rapporte jamais plus que son maximum.',
   'features.language.scoreExplanationChoice': 'Choisir la traduction parmi des propositions ne compte que pour un cinquième de journée, bien moins que la saisir. Les réponses sur l\'article et le pluriel comptent pleinement.',
   'features.language.scoreExplanationDecay': 'Un mot que tu n\'as pas testé pendant une semaine entière perd 10 % de sa note, puis encore 10 % par semaine supplémentaire, jusqu\'à ce que tu le retravailles.',
-  'features.language.addingToLesson': 'Ajout dans la leçon : {{title}}',
-  'features.language.editingInLesson': 'Modification depuis la leçon : {{title}}',
   'features.language.reviewComplete': 'Vous avez révisé tous les mots de cette leçon.',
   'features.language.noTestableWords': 'Aucun mot de cette leçon n\'a encore de traduction.',
 };

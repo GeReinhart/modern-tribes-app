@@ -1,6 +1,8 @@
 import { getAPIBaseUrl } from '@/app/platform/core/env.ts';
 import { apiService } from '@/app/platform/core/api/api.service.ts';
 
+import { parseApiDetail } from './apiDetail.ts';
+
 export const authService = {
   sendMagicLink: async (email: string): Promise<void> => {
     const response = await fetch(`${getAPIBaseUrl()}/platform/core/authentication/magic-link`, {
@@ -48,10 +50,12 @@ export const authService = {
 
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
-      const err: Error & { status?: number } = new Error(
-        data.detail || 'Token refresh failed',
+      const parsed = parseApiDetail(data.detail);
+      const err: Error & { status?: number; code?: string | null } = new Error(
+        parsed?.message || 'Token refresh failed',
       );
       err.status = response.status;
+      err.code = parsed?.code ?? null;
       throw err;
     }
 

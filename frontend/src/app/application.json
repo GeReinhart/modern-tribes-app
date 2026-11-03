@@ -31,11 +31,11 @@
         "description": {
           "en": [
             "- sign in with a magic link sent to your email — no password needed",
-            "- your session is kept active automatically so you stay signed in"
+            "- once a device is signed in, it stays signed in as long as it is used at least once a year; if you are ever signed out, the login page shows the reason and technical detail"
           ],
           "fr": [
             "- connectez-vous avec un lien magique envoyé par email — pas de mot de passe",
-            "- votre session est maintenue automatiquement pour rester connecté"
+            "- une fois un appareil connecté, il le reste tant qu'il est utilisé au moins une fois par an ; en cas de déconnexion, la page de connexion affiche la raison et le détail technique"
           ]
         },
         "backend": {
@@ -1056,7 +1056,8 @@
                 "- build its word list by picking a word already in the shared dictionary, or by creating a brand-new one with its translation, type, and — depending on the language — an article, a plural and a declension",
                 "- a word you create becomes available to every project, so it's never retyped or retranslated twice",
                 "- picking a word that already exists in another lesson brings its known translation along, so it is never retyped; the add-word page names the lesson it adds to",
-                "remove a word from a lesson at any time — it only leaves that lesson and stays available everywhere else",
+                "- lessons are listed as compact cards, several per row, and the lesson you opened stays open when you switch between the lesson, learn and test tabs",
+                "- remove a word from a lesson at any time — it only leaves that lesson and stays available everywhere else",
                 "- every field where you type German (words, plurals, declension forms, test answers) has a ß button next to it to insert the character in one click",
                 "- choose a color theme for each language: it colors every word of that language wherever it is shown or edited, in all projects",
                 "- get a suggested translation from the app's built-in dictionary while typing a new word, with its own type and article confirmed as you type and, for German words, plural forms suggested at a click — adjust any of it freely before saving"
@@ -1067,7 +1068,8 @@
                 "- construisez sa liste de mots en piochant un mot déjà présent dans le dictionnaire partagé, ou en créant un nouveau mot avec sa traduction, son type, et selon la langue, un article, un pluriel et une déclinaison",
                 "- un mot que vous créez devient disponible pour tous les projets, il n'est jamais ressaisi ni retraduit deux fois",
                 "- choisir un mot déjà présent dans une autre leçon reprend sa traduction connue, sans la ressaisir ; la page d'ajout d'un mot précise la leçon concernée",
-                "retirez un mot d'une leçon à tout moment — il ne quitte que cette leçon et reste disponible partout ailleurs",
+                "- les leçons sont listées en cartes compactes, plusieurs par ligne, et la leçon ouverte reste ouverte quand vous passez d'un onglet leçon, apprendre ou test à un autre",
+                "- retirez un mot d'une leçon à tout moment — il ne quitte que cette leçon et reste disponible partout ailleurs",
                 "- chaque champ où vous saisissez de l'allemand (mots, pluriels, formes déclinées, réponses aux tests) a un bouton ß à côté pour insérer le caractère en un clic",
                 "- choisissez un thème de couleur pour chaque langue : il colore chaque mot de cette langue partout où il est affiché ou édité, dans tous les projets",
                 "- obtenez une suggestion de traduction du dictionnaire intégré à l'app pendant que vous tapez un nouveau mot, avec son type et son article confirmés au fil de la frappe et, pour les mots allemands, des formes au pluriel suggérées d'un clic — ajustez librement avant d'enregistrer"
@@ -1098,11 +1100,11 @@
             "description": {
               "en": [
                 "- read a lesson in a clean view made for learning, split into two sub-tabs like when writing it: the lesson itself, and its vocabulary as compact cards filterable by word type, each word shown with its translation",
-                "- download the lesson as a printable PDF to study away from a screen, with the words grouped by type in the same compact cards, and the learned language and page numbers in the footer"
+                "- download the lesson as a printable PDF to study away from a screen, with the words grouped by type in the same compact cards, and the learned language, the date and page numbers in the footer"
               ],
               "fr": [
                 "- lisez une leçon dans une vue épurée pensée pour l'apprentissage, découpée en deux sous-onglets comme à la rédaction : la leçon elle-même, et son vocabulaire en cartes compactes filtrables par type, chaque mot avec sa traduction",
-                "- téléchargez la leçon en PDF imprimable pour l'étudier loin d'un écran, avec les mots regroupés par type dans les mêmes cartes compactes, et la langue apprise et le numéro de page en bas de page"
+                "- téléchargez la leçon en PDF imprimable pour l'étudier loin d'un écran, avec les mots regroupés par type dans les mêmes cartes compactes, et la langue apprise, la date et le numéro de page en bas de page"
               ]
             },
             "backend": {

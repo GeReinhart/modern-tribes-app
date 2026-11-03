@@ -10,8 +10,9 @@ import React, {
   useState,
 } from 'react';
 
+import { formatApiDetail } from './apiDetail.ts';
 import { authService } from './authentication-service.ts';
-import { setSessionEndReason } from './sessionEndReason.ts';
+import { buildTechnicalDetail, setSessionEndReason } from './sessionEndReason.ts';
 import { tokenManager } from './tokenManager.ts';
 import { useProactiveTokenRefresh } from './useProactiveTokenRefresh.ts';
 
@@ -61,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (response.status === 401 || response.status === 403) {
           const failureDetail: string | null = await response
             .json()
-            .then((d) => d?.detail ?? null)
+            .then((d) => formatApiDetail(d?.detail))
             .catch(() => null);
           if (allowRefresh) {
             const newToken = await tokenManager.tryRefresh();
@@ -74,7 +75,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // attempt just above may already have recorded the more specific reason the
           // *refresh itself* was rejected for (see doRefresh's catch below); this is only
           // the fallback when no refresh was attempted or available.
-          setSessionEndReason(failureDetail || 'Your session is no longer valid.', true);
+          setSessionEndReason(
+            failureDetail || 'Your session is no longer valid.',
+            true,
+            buildTechnicalDetail('GET /platform/core/authentication/me', response.status, null),
+          );
           tokenManager.clearAll();
           setToken(null);
           return;
@@ -106,10 +111,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Network errors and 5xx are transient — keep tokens so the next attempt can retry.
       const status = (err as Error & { status?: number }).status;
       if (status === 401 || status === 403) {
+        // Another tab may have rotated the refresh token while this request was in flight: its
+        // session is fine, so adopt the tokens it stored instead of ending the session.
+        if (tokenManager.getRefreshToken() !== storedRefresh) return tokenManager.getAccessToken();
         // This is the most specific reason available (the refresh endpoint's own
         // rejection, e.g. "Refresh token expired" / "Refresh token revoked") — it always
         // wins over the plain "session is no longer valid" fallback set elsewhere.
-        setSessionEndReason((err as Error).message || 'Your session is no longer valid.');
+        const code = (err as Error & { code?: string | null }).code ?? null;
+        setSessionEndReason(
+          (err as Error).message || 'Your session is no longer valid.',
+          false,
+          buildTechnicalDetail('POST /platform/core/authentication/refresh', status, code),
+        );
         tokenManager.clearAll();
         setToken(null);
         setUser(null);
@@ -119,6 +132,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useProactiveTokenRefresh(token);
+
+  // Ask the browser not to evict the stored tokens (low disk space, Safari's inactivity purge).
+  useEffect(() => {
+    tokenManager.requestPersistentStorage();
+  }, []);
 
   useEffect(() => {
     tokenManager.setRefresher(doRefresh);
