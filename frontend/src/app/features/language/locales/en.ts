@@ -84,7 +84,6 @@ const en: Record<string, string> = {
   'features.language.overallScorePercent': 'Score: {{percent}}%',
   'features.language.testTabDirection': 'Test {{from}} → {{to}}',
   'features.language.testTabRandom': 'Random test',
-  'features.language.testTabResults': 'Results',
   'features.language.wordCounter': 'Word {{current}} / {{total}}',
   'features.language.restartFullTest': 'Start over',
   'features.language.resultsPerson': 'Person',

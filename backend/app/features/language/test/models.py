@@ -1,10 +1,8 @@
-from datetime import date, datetime
-from typing import List, Literal, Optional
+from typing import Optional
 
 from pydantic import BaseModel, model_validator
 
-Direction = Literal["source_to_target", "target_to_source", "article", "plural"]
-Mode = Literal["free", "choice"]
+from app.features.language.score_models import Direction, Mode
 
 
 class TestAnswerSubmit(BaseModel):
@@ -31,55 +29,3 @@ class TestAnswerResult(BaseModel):
     correct: bool
     correct_answer: str
     word_score: float
-
-
-class WordAttempt(BaseModel):
-    direction: Direction
-    mode: Mode
-    correct: bool
-    created_at: datetime
-
-
-class ScoreHistoryPoint(BaseModel):
-    date: date
-    score: float
-
-
-class ScoreHistoryResponse(BaseModel):
-    points: List[ScoreHistoryPoint]
-
-
-class EffortDay(BaseModel):
-    date: date
-    success: float
-    errors: float
-
-
-class EffortResponse(BaseModel):
-    days: List[EffortDay]
-
-
-class CompetitionMember(BaseModel):
-    user_id: str
-    name: str
-    points: List[ScoreHistoryPoint]
-
-
-class CompetitionResponse(BaseModel):
-    members: List[CompetitionMember]
-
-
-class WordScore(BaseModel):
-    word_id: str
-    score: float
-    attempts: List[WordAttempt] = []
-
-
-class TestMember(BaseModel):
-    user_id: str
-    name: str
-
-
-class LessonScoreResponse(BaseModel):
-    overall_score: float
-    words: List[WordScore]

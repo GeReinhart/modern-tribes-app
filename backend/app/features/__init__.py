@@ -13,3 +13,4 @@ from app.features import meals             # noqa: F401 — triggers self-regist
 from app.features.language import lesson   # noqa: F401 — triggers self-registration
 from app.features.language import learn    # noqa: F401 — triggers self-registration
 from app.features.language import test     # noqa: F401 — triggers self-registration
+from app.features.language import result   # noqa: F401 — triggers self-registration

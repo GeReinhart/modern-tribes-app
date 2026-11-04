@@ -4,10 +4,10 @@ import { ThemedSelect } from '@/app/platform/core/layout/themes/components/Theme
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { TestMember } from './types.ts';
+import { ResultMember } from './types.ts';
 
 interface Props {
-  members: TestMember[];
+  members: ResultMember[];
   selectedUserId?: string;
   onChange: (userId: string | undefined) => void;
 }

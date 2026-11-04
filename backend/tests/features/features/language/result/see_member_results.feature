@@ -63,7 +63,7 @@ Feature: See a lesson's test results for any project member
       | 1001 | 0010     | 0030      | member   | active |
       | 1002 | 0010     | 0031      | member   | active |
       | 1003 | 0011     | 0032      | member   | active |
-    When I GET /api/features/tasks/language/lessons/1500/test/members
+    When I GET /api/features/tasks/language/lessons/1500/result/members
     Then the response status code is 200
     And the response body includes:
       """
@@ -94,7 +94,7 @@ Feature: See a lesson's test results for any project member
       | id   | user_id | word_id | direction        | mode   | correct | created_at          | status |
       | 7001 | 0003    | 2001    | source_to_target | free   | true    | 2026-11-15T10:00:00 | active |
       | 7002 | 0003    | 2001    | target_to_source | choice | false   | 2026-11-15T10:05:00 | active |
-    When I GET /api/features/tasks/language/lessons/1500/test/score?user_id=0003
+    When I GET /api/features/tasks/language/lessons/1500/result/score?user_id=0003
     Then the response status code is 200
     And the response body includes:
       """
@@ -133,7 +133,7 @@ Feature: See a lesson's test results for any project member
     And the language_word_test_attempts table contains:
       | id   | user_id | word_id | direction        | mode | correct | created_at          | status |
       | 7001 | 0003    | 2001    | source_to_target | free | true    | 2026-11-15T10:00:00 | active |
-    When I GET /api/features/tasks/language/lessons/1500/test/score
+    When I GET /api/features/tasks/language/lessons/1500/result/score
     Then the response status code is 200
     And the response body includes:
       """
@@ -157,7 +157,7 @@ Feature: See a lesson's test results for any project member
     And the language_lesson_words table contains:
       | lesson_id | word_id | status |
       | 1500      | 2001    | active |
-    When I GET /api/features/tasks/language/lessons/1500/test/score?user_id=0004
+    When I GET /api/features/tasks/language/lessons/1500/result/score?user_id=0004
     Then the response status code is 404
 
   @error_case
@@ -165,5 +165,5 @@ Feature: See a lesson's test results for any project member
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:
       | id | tribe_id | person_id | position | status |
-    When I GET /api/features/tasks/language/lessons/1500/test/members
+    When I GET /api/features/tasks/language/lessons/1500/result/members
     Then the response status code is 403

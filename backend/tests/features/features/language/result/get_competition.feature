@@ -79,7 +79,7 @@ Feature: Compare the members' scores on a lesson
       | id   | user_id | word_id | direction        | mode | correct | created_at          | status |
       | 7001 | 0003    | 2001    | source_to_target | free | true    | 2026-11-15T10:00:00 | active |
       | 7002 | 0002    | 2001    | source_to_target | free | true    | 2026-11-16T10:00:00 | active |
-    When I GET /api/features/tasks/language/lessons/1500/test/competition
+    When I GET /api/features/tasks/language/lessons/1500/result/competition
     Then the response status code is 200
     And the response body includes:
       """
@@ -107,5 +107,5 @@ Feature: Compare the members' scores on a lesson
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:
       | id | tribe_id | person_id | position | status |
-    When I GET /api/features/tasks/language/lessons/1500/test/competition
+    When I GET /api/features/tasks/language/lessons/1500/result/competition
     Then the response status code is 403

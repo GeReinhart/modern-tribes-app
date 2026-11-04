@@ -1,12 +1,8 @@
-from datetime import date, timedelta
-
 from fastapi import HTTPException
 
-from app.features.language import access, dictionary, lessons
-from app.features.language.test import effort, repository, scoring
-from app.features.language.test.models import (
-    CompetitionMember, CompetitionResponse, EffortDay, EffortResponse, LessonScoreResponse, ScoreHistoryPoint, ScoreHistoryResponse, TestAnswerResult, TestAnswerSubmit, TestMember, WordAttempt, WordScore,
-)
+from app.features.language import dictionary, lesson_score, lessons
+from app.features.language.test import repository
+from app.features.language.test.models import TestAnswerResult, TestAnswerSubmit
 
 
 async def submit_answer(pool, lesson_id: str, data: TestAnswerSubmit, user_id: str) -> TestAnswerResult:
@@ -45,9 +41,7 @@ async def _check_translation_answer(pool, lesson_id: str, word: dict, data: Test
 
 async def _score_after_attempt(pool, lesson_id: str, data: TestAnswerSubmit, user_id: str) -> float:
     scored_word_id = await _word_id_to_score(pool, lesson_id, data)
-    attempts = await repository.get_word_attempts(pool, user_id, scored_word_id)
-    has_article, has_plural = await _noun_facts(pool, await _target_language(pool, lesson_id), scored_word_id)
-    return scoring.word_score(attempts, date.today(), has_article, has_plural)
+    return await lesson_score.current_word_score(pool, lesson_id, scored_word_id, user_id)
 
 
 async def _word_id_to_score(pool, lesson_id: str, data: TestAnswerSubmit) -> str:
@@ -61,22 +55,6 @@ async def _word_id_to_score(pool, lesson_id: str, data: TestAnswerSubmit) -> str
     return data.word_id
 
 
-async def _target_language(pool, lesson_id: str) -> str | None:
-    project_id = await access.get_lesson_project_id(pool, lesson_id)
-    settings = await lessons.get_language_settings(pool, project_id)
-    return settings["target_language"] if settings else None
-
-
-async def _noun_facts(pool, target_language: str | None, lesson_word_id: str) -> tuple[bool, bool]:
-    """Whether the lesson word is also tested on an article and on a plural, i.e. it (or its
-    translation) is a learned-language noun that has one."""
-    if target_language is None:
-        return False, False
-    has_article = await repository.find_noun_entry(pool, lesson_word_id, target_language, "article")
-    has_plural = await repository.find_noun_entry(pool, lesson_word_id, target_language, "plural")
-    return has_article is not None, has_plural is not None
-
-
 async def _check_choice_mode_available(pool, lesson_id: str, word: dict) -> None:
     lesson_words = await lessons.list_lesson_word_ids(pool, lesson_id)
     same_type_count = sum(1 for w in lesson_words if w["word_type"] == word["word_type"])
@@ -85,89 +63,3 @@ async def _check_choice_mode_available(pool, lesson_id: str, word: dict) -> None
             status_code=422,
             detail="At least 4 words of the same type are needed in the lesson for multiple-choice testing.",
         )
-
-
-async def get_lesson_score(pool, lesson_id: str, user_id: str) -> LessonScoreResponse:
-    lesson_words = await lessons.list_lesson_word_ids(pool, lesson_id)
-    today = date.today()
-    target_language = await _target_language(pool, lesson_id)
-    scores = [await _score_for_word(pool, entry["id"], user_id, today, target_language) for entry in lesson_words]
-    overall = round(sum(s.score for s in scores) / len(scores), 4) if scores else 0.0
-    return LessonScoreResponse(overall_score=overall, words=scores)
-
-
-async def _score_for_word(pool, word_id: str, user_id: str, today: date, target_language: str | None) -> WordScore:
-    attempts = await repository.get_word_attempts(pool, user_id, word_id)
-    has_article, has_plural = await _noun_facts(pool, target_language, word_id)
-    return WordScore(
-        word_id=word_id,
-        score=round(scoring.word_score(attempts, today, has_article, has_plural), 4),
-        attempts=[WordAttempt(**a) for a in attempts],
-    )
-
-
-async def list_members(pool, lesson_id: str) -> list[TestMember]:
-    project_id = await access.get_lesson_project_id(pool, lesson_id)
-    return [TestMember(**row) for row in await repository.list_project_members(pool, project_id)]
-
-
-async def resolve_score_user(pool, lesson_id: str, requested_user_id: str | None, current_user_id: str) -> str:
-    """The user whose results are shown: the requested project member, else the signed-in user."""
-    if requested_user_id is None or requested_user_id == current_user_id:
-        return current_user_id
-    members = await list_members(pool, lesson_id)
-    if requested_user_id not in {m.user_id for m in members}:
-        raise HTTPException(status_code=404, detail="Member not found")
-    return requested_user_id
-
-
-async def get_score_history(pool, lesson_id: str, user_id: str) -> ScoreHistoryResponse:
-    """The lesson's overall score at the end of each day, from the first answer until today."""
-    return ScoreHistoryResponse(points=await _history_points(pool, lesson_id, user_id))
-
-
-async def _history_points(pool, lesson_id: str, user_id: str) -> list[ScoreHistoryPoint]:
-    words = await _lesson_history_inputs(pool, lesson_id, user_id)
-    first_day = min((a["created_at"].date() for attempts, _, _ in words for a in attempts), default=None)
-    if first_day is None:
-        return []
-    days = [first_day + timedelta(days=n) for n in range((date.today() - first_day).days + 1)]
-    return [_history_point(words, day) for day in days]
-
-
-async def _lesson_history_inputs(pool, lesson_id: str, user_id: str) -> list:
-    lesson_words = await lessons.list_lesson_word_ids(pool, lesson_id)
-    target_language = await _target_language(pool, lesson_id)
-    return [await _word_history_input(pool, entry["id"], user_id, target_language) for entry in lesson_words]
-
-
-async def get_effort(pool, lesson_id: str, user_id: str) -> EffortResponse:
-    """The weighted successes and errors of each day, from the first answer until today."""
-    words = await _lesson_history_inputs(pool, lesson_id, user_id)
-    attempts = [a for word_attempts, _, _ in words for a in word_attempts]
-    days = effort.daily_effort(attempts, date.today())
-    return EffortResponse(days=[EffortDay(date=day, success=ok, errors=ko) for day, ok, ko in days])
-
-
-async def get_competition(pool, lesson_id: str) -> CompetitionResponse:
-    """The score history of every project member who answered at least once."""
-    members = []
-    for member in await list_members(pool, lesson_id):
-        points = await _history_points(pool, lesson_id, member.user_id)
-        if points:
-            members.append(CompetitionMember(user_id=member.user_id, name=member.name, points=points))
-    return CompetitionResponse(members=members)
-
-
-async def _word_history_input(pool, word_id: str, user_id: str, target_language: str | None):
-    attempts = await repository.get_word_attempts(pool, user_id, word_id)
-    has_article, has_plural = await _noun_facts(pool, target_language, word_id)
-    return attempts, has_article, has_plural
-
-
-def _history_point(words: list, day: date) -> ScoreHistoryPoint:
-    scores = [
-        scoring.word_score([a for a in attempts if a["created_at"].date() <= day], day, has_article, has_plural)
-        for attempts, has_article, has_plural in words
-    ]
-    return ScoreHistoryPoint(date=day, score=round(sum(scores) / len(scores), 4))

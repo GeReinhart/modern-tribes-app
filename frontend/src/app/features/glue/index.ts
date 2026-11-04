@@ -14,3 +14,4 @@ import '../meals';
 import '../language/lesson';
 import '../language/learn';
 import '../language/test';
+import '../language/result';

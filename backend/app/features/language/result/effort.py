@@ -7,7 +7,7 @@ less effort than answering freely. The weight applies to successes and errors al
 """
 from datetime import date, timedelta
 
-from app.features.language.test.scoring import CHOICE_DAY_VALUE, FACT_DIRECTIONS
+from app.features.language.scoring import CHOICE_DAY_VALUE, FACT_DIRECTIONS
 
 
 def answer_weight(attempt: dict) -> float:

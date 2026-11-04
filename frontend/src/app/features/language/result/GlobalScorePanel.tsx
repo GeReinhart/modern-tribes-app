@@ -4,7 +4,7 @@ import React from 'react';
 
 import ScoreChart from './ScoreChart.tsx';
 import ScoreExplanation from './ScoreExplanation.tsx';
-import { useLessonScore } from './useLessonScore.ts';
+import { useMemberScore } from './useMemberScore.ts';
 import { useScoreHistory } from './useScoreHistory.ts';
 
 interface Props {
@@ -17,7 +17,7 @@ const formatOverall = (score: number) => `${(score * 100).toFixed(2)}%`;
 // The "Overall score" results of one person: the big score, how it evolved, and how it is calculated.
 const GlobalScorePanel: React.FC<Props> = ({ lessonId, userId }) => {
   const { theme } = useTheme();
-  const { scoreData } = useLessonScore(lessonId, userId);
+  const scoreData = useMemberScore(lessonId, userId);
   const history = useScoreHistory(lessonId, userId);
 
   return (

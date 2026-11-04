@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { CORRECT_COLOR, WRONG_COLOR } from './attemptColors.ts';
+import { CORRECT_COLOR, WRONG_COLOR } from '../shared/attemptColors.ts';
 import { DiffSegment, diffLetters } from './letterDiff.ts';
 
 interface Props {

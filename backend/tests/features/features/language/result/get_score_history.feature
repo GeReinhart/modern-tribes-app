@@ -72,7 +72,7 @@ Feature: See how a lesson's score evolves over time
       | 7001 | 2001    | source_to_target | free | true    | 2026-11-14T10:00:00 | active |
       | 7002 | 2001    | source_to_target | free | true    | 2026-11-15T10:00:00 | active |
       | 7003 | 2001    | target_to_source | free | true    | 2026-11-15T11:00:00 | active |
-    When I GET /api/features/tasks/language/lessons/1500/test/score/history
+    When I GET /api/features/tasks/language/lessons/1500/result/score/history
     Then the response status code is 200
     And the response body includes:
       """
@@ -109,7 +109,7 @@ Feature: See how a lesson's score evolves over time
       | 7001 | 2001    | source_to_target | free | true    | 2026-11-14T10:00:00 | active |
       | 7002 | 2001    | source_to_target | free | true    | 2026-11-15T10:00:00 | active |
       | 7003 | 2001    | target_to_source | free | true    | 2026-11-15T11:00:00 | active |
-    When I GET /api/features/tasks/language/lessons/1500/test/score/history
+    When I GET /api/features/tasks/language/lessons/1500/result/score/history
     Then the response status code is 200
     And the response body includes:
       """
@@ -139,7 +139,7 @@ Feature: See how a lesson's score evolves over time
       | 1500      | 2001    | active |
     And the language_word_test_attempts table contains:
       | id   | word_id | direction        | mode | correct | created_at          | status |
-    When I GET /api/features/tasks/language/lessons/1500/test/score/history
+    When I GET /api/features/tasks/language/lessons/1500/result/score/history
     Then the response status code is 200
     And the response body includes:
       """
@@ -151,5 +151,5 @@ Feature: See how a lesson's score evolves over time
     Given I am authenticated as a regular user: user.id 0002
     And the positions table contains:
       | id | tribe_id | person_id | position | status |
-    When I GET /api/features/tasks/language/lessons/1500/test/score/history
+    When I GET /api/features/tasks/language/lessons/1500/result/score/history
     Then the response status code is 403

@@ -119,7 +119,7 @@
           "en": [
             "- the app's visual structure: header, navigation menus and breadcrumbs",
             "- shared UI controls used throughout the app: buttons, text fields, modals, tables, icons and calendars",
-            "- an optional icon-only toolbar for the current tab's and page's actions, so they don't require opening the menu; from your profile you can choose to show it in the header, in the footer, or keep it hidden; the tab's actions and the page's actions are separated by a divider, and once there are more than a few actions in total the page's actions tuck into an expandable menu automatically — a \"configure toolbar\" action, available everywhere, lets you decide yourself which actions stay directly visible and which go in that menu, remembered per tab",
+            "- an optional icon-only toolbar for the current tab's and page's actions, so they don't require opening the menu; it shows in the footer by default, and from your profile you can choose to show it in the header instead, or keep it hidden; the tab's actions and the page's actions are separated by a divider, and once there are more than a few actions in total the page's actions tuck into an expandable menu automatically — a \"configure toolbar\" action, available everywhere, lets you decide yourself which actions stay directly visible and which go in that menu, remembered per tab",
             "- a single icon on the footer hides the header, the toolbar and the footer all together, leaving only that icon and a small page title behind to bring them all back — remembered on this device"
           ],
           "fr": [
@@ -1037,12 +1037,12 @@
         "description": {
           "en": [
             "- Learn Language turns a project into a shared knowledge base to learn one language from another — French to English, for example",
-            "- Together, a lesson's three tabs cover the whole learning loop: write the lesson, learn it, then test yourself on it — and they all draw from the exact same lessons and vocabulary, however many of each tab you add",
+            "- Together, a lesson's four tabs cover the whole learning loop: write the lesson, learn it, test yourself on it, then follow your results — and they all draw from the exact same lessons and vocabulary, however many of each tab you add",
             "- an admin manages the list of languages available, and suggested translations while adding a word come from a dictionary built into the app, with nothing to connect or configure"
           ],
           "fr": [
             "- « Apprendre une langue » transforme un projet en base de connaissances partagée pour apprendre une langue à partir d'une autre — du français vers l'anglais, par exemple",
-            "- les trois onglets couvrent ensemble tout le cycle d'apprentissage : rédiger la leçon, l'apprendre, puis se tester dessus — et ils puisent tous dans les mêmes leçons et le même vocabulaire, quel que soit le nombre d'onglets de chaque type",
+            "- les quatre onglets couvrent ensemble tout le cycle d'apprentissage : rédiger la leçon, l'apprendre, se tester dessus, puis suivre ses résultats — et ils puisent tous dans les mêmes leçons et le même vocabulaire, quel que soit le nombre d'onglets de chaque type",
             "- un administrateur gère la liste des langues disponibles, et les suggestions de traduction lors de l'ajout d'un mot proviennent d'un dictionnaire intégré à l'app, sans rien à connecter ni configurer"
           ]
         },
@@ -1122,16 +1122,14 @@
             "package": "test",
             "description": {
               "en": [
-                "- a lesson's test page has six sub-tabs: two full tests, one per direction (e.g. French to German, then German to French), each going through every word once in random order with a word counter, a random test that comes back more often to the words you know least (without forgetting the well-known ones), an article test where you pick the article of a noun (e.g. der, die or das), a plural test where you type the plural of a noun, and your results — you answer either by typing the translation freely or by picking it among several words of the same type from the lesson",
-                "- find out immediately whether your answer was right; when it wasn't, you get a varied, encouraging comment and the correct answer",
-                "- each person's score for each word (including, for a noun with an article, knowing its article) goes from 0 to 1 as you keep answering it correctly in both directions over several different days — picking from choices helps much less than typing freely — and it slowly fades if you stop practicing a word",
-                "- in the results, pick any member of the project (you by default) to see their big overall score, a chart of how it evolved over a duration you can reduce (week, month, 3 months), a collapsible explanation of how it is calculated and, for each word, its score and the history of their answers"
+                "- a lesson's test page has five sub-tabs: two full tests, one per direction (e.g. French to German, then German to French), each going through every word once in random order with a word counter, a random test that comes back more often to the words you know least (without forgetting the well-known ones), an article test where you pick the article of a noun (e.g. der, die or das), and a plural test where you type the plural of a noun — you answer either by typing the translation freely or by picking it among several words of the same type from the lesson",
+                "- right after each answer, you see the word you were asked and your answer — in green when right, in orange when wrong with the solution in bold underneath; when your typed answer was close, its extra letters are struck through and the missing ones shown — plus, when wrong, a varied, encouraging comment",
+                "- each person's score for each word (including, for a noun with an article, knowing its article) goes from 0 to 1 as you keep answering it correctly in both directions over several different days — picking from choices helps much less than typing freely — and it slowly fades if you stop practicing a word"
               ],
               "fr": [
-                "- la page de test d'une leçon a six sous-onglets : deux tests complets, un par sens (par exemple français vers allemand, puis allemand vers français), qui passent chacun chaque mot une fois dans un ordre aléatoire avec un compteur de mots, un test aléatoire qui revient plus souvent sur les mots les moins bien sus (sans oublier les mieux connus), un test des articles où vous choisissez l'article d'un nom (par exemple der, die ou das), un test des pluriels où vous saisissez le pluriel d'un nom, et vos résultats — vous répondez en saisissant librement la traduction ou en la choisissant parmi plusieurs mots du même type de la leçon",
-                "- découvrez immédiatement si votre réponse est juste ; si ce n'est pas le cas, un commentaire varié et encourageant s'affiche avec la bonne réponse",
-                "- la note de chaque personne pour chaque mot (y compris, pour un nom avec article, la connaissance de son article) va de 0 à 1 à mesure que vous répondez juste dans les deux sens sur plusieurs jours différents — choisir parmi plusieurs options aide beaucoup moins que la saisie libre — et elle diminue doucement si vous arrêtez de pratiquer un mot",
-                "- dans les résultats, choisissez n'importe quel membre du projet (vous par défaut) pour voir sa grosse note globale, un graphique de son évolution sur une durée réductible (semaine, mois, 3 mois), une explication repliable de son calcul et, pour chaque mot, sa note et l'historique de ses réponses"
+                "- la page de test d'une leçon a cinq sous-onglets : deux tests complets, un par sens (par exemple français vers allemand, puis allemand vers français), qui passent chacun chaque mot une fois dans un ordre aléatoire avec un compteur de mots, un test aléatoire qui revient plus souvent sur les mots les moins bien sus (sans oublier les mieux connus), un test des articles où vous choisissez l'article d'un nom (par exemple der, die ou das), et un test des pluriels où vous saisissez le pluriel d'un nom — vous répondez en saisissant librement la traduction ou en la choisissant parmi plusieurs mots du même type de la leçon",
+                "- juste après chaque réponse, vous voyez le mot demandé et votre réponse — en vert si elle est juste, en orange si elle est fausse avec la solution en gras dessous ; si votre saisie était proche, ses lettres en trop sont barrées et les lettres manquantes affichées — avec, en cas d'erreur, un commentaire varié et encourageant",
+                "- la note de chaque personne pour chaque mot (y compris, pour un nom avec article, la connaissance de son article) va de 0 à 1 à mesure que vous répondez juste dans les deux sens sur plusieurs jours différents — choisir parmi plusieurs options aide beaucoup moins que la saisie libre — et elle diminue doucement si vous arrêtez de pratiquer un mot"
               ]
             },
             "backend": {
@@ -1145,6 +1143,32 @@
             "frontend": {
               "path": [
                 "frontend/src/app/features/language/test/**"
+              ]
+            }
+          },
+          {
+            "package": "result",
+            "description": {
+              "en": [
+                "- a lesson's results page, opened from a Result tab you add to the project, with four sub-tabs: each word with its score and the history of your answers, the big overall score with a chart of how it evolved and a collapsible explanation of how it is calculated, your daily effort as bars split between right and wrong answers (answers picked from choices weigh less than typed ones), and a competition chart putting every member's score on the same graph",
+                "- the charts can be reduced to a week, a month or 3 months, and you can pick any member of the project (you by default) to see their results"
+              ],
+              "fr": [
+                "- la page de résultats d'une leçon, ouverte depuis un onglet Résultat ajouté au projet, avec quatre sous-onglets : chaque mot avec sa note et l'historique de vos réponses, la grosse note globale avec un graphique de son évolution et une explication repliable de son calcul, votre effort quotidien en barres partagées entre bonnes et mauvaises réponses (les réponses choisies parmi plusieurs options pèsent moins que les réponses saisies), et un graphique de compétition réunissant la note de chaque membre",
+                "- les graphiques se réduisent à une semaine, un mois ou 3 mois, et vous pouvez choisir n'importe quel membre du projet (vous par défaut) pour voir ses résultats"
+              ]
+            },
+            "backend": {
+              "schema": [
+                "language_word_test_attempts"
+              ],
+              "path": [
+                "backend/app/features/language/result/**"
+              ]
+            },
+            "frontend": {
+              "path": [
+                "frontend/src/app/features/language/result/**"
               ]
             }
           }

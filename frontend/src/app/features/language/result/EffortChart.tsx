@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { CORRECT_COLOR, WRONG_COLOR } from './attemptColors.ts';
+import { CORRECT_COLOR, WRONG_COLOR } from '../shared/attemptColors.ts';
 import ChartGrid from './ChartGrid.tsx';
 import { HEIGHT, plotHeight, plotWidth, PAD, WIDTH, xForIndex, yForRatio } from './chartLayout.ts';
 import PeriodChartFrame from './PeriodChartFrame.tsx';

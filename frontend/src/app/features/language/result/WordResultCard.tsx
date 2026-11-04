@@ -4,8 +4,8 @@ import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { CORRECT_COLOR, WRONG_COLOR } from './attemptColors.ts';
-import { WordAttempt, WordScore } from './types.ts';
+import { CORRECT_COLOR, WRONG_COLOR } from '../shared/attemptColors.ts';
+import { WordAttempt, WordScore } from '../shared/scoreTypes.ts';
 import { Language, Word } from '../shared/types.ts';
 import WordCompactCard from '../shared/WordCompactCard.tsx';
 
