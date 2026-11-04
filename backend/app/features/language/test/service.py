@@ -3,9 +3,9 @@ from datetime import date, timedelta
 from fastapi import HTTPException
 
 from app.features.language import access, dictionary, lessons
-from app.features.language.test import repository, scoring
+from app.features.language.test import effort, repository, scoring
 from app.features.language.test.models import (
-    LessonScoreResponse, ScoreHistoryPoint, ScoreHistoryResponse, TestAnswerResult, TestAnswerSubmit, TestMember, WordAttempt, WordScore,
+    CompetitionMember, CompetitionResponse, EffortDay, EffortResponse, LessonScoreResponse, ScoreHistoryPoint, ScoreHistoryResponse, TestAnswerResult, TestAnswerSubmit, TestMember, WordAttempt, WordScore,
 )
 
 
@@ -123,14 +123,40 @@ async def resolve_score_user(pool, lesson_id: str, requested_user_id: str | None
 
 async def get_score_history(pool, lesson_id: str, user_id: str) -> ScoreHistoryResponse:
     """The lesson's overall score at the end of each day, from the first answer until today."""
-    lesson_words = await lessons.list_lesson_word_ids(pool, lesson_id)
-    target_language = await _target_language(pool, lesson_id)
-    words = [await _word_history_input(pool, entry["id"], user_id, target_language) for entry in lesson_words]
+    return ScoreHistoryResponse(points=await _history_points(pool, lesson_id, user_id))
+
+
+async def _history_points(pool, lesson_id: str, user_id: str) -> list[ScoreHistoryPoint]:
+    words = await _lesson_history_inputs(pool, lesson_id, user_id)
     first_day = min((a["created_at"].date() for attempts, _, _ in words for a in attempts), default=None)
     if first_day is None:
-        return ScoreHistoryResponse(points=[])
+        return []
     days = [first_day + timedelta(days=n) for n in range((date.today() - first_day).days + 1)]
-    return ScoreHistoryResponse(points=[_history_point(words, day) for day in days])
+    return [_history_point(words, day) for day in days]
+
+
+async def _lesson_history_inputs(pool, lesson_id: str, user_id: str) -> list:
+    lesson_words = await lessons.list_lesson_word_ids(pool, lesson_id)
+    target_language = await _target_language(pool, lesson_id)
+    return [await _word_history_input(pool, entry["id"], user_id, target_language) for entry in lesson_words]
+
+
+async def get_effort(pool, lesson_id: str, user_id: str) -> EffortResponse:
+    """The weighted successes and errors of each day, from the first answer until today."""
+    words = await _lesson_history_inputs(pool, lesson_id, user_id)
+    attempts = [a for word_attempts, _, _ in words for a in word_attempts]
+    days = effort.daily_effort(attempts, date.today())
+    return EffortResponse(days=[EffortDay(date=day, success=ok, errors=ko) for day, ok, ko in days])
+
+
+async def get_competition(pool, lesson_id: str) -> CompetitionResponse:
+    """The score history of every project member who answered at least once."""
+    members = []
+    for member in await list_members(pool, lesson_id):
+        points = await _history_points(pool, lesson_id, member.user_id)
+        if points:
+            members.append(CompetitionMember(user_id=member.user_id, name=member.name, points=points))
+    return CompetitionResponse(members=members)
 
 
 async def _word_history_input(pool, word_id: str, user_id: str, target_language: str | None):

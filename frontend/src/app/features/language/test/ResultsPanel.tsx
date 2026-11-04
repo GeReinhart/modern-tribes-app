@@ -1,17 +1,16 @@
-import { useAuth } from '@/app/platform/core/authentication/AuthContext.tsx';
-import { ThemedSelect } from '@/app/platform/core/layout/themes/components/ThemedSelect.tsx';
-import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
-import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { usePersistedString } from '@/app/platform/core/browser/usePersistedString.ts';
+import { ThemedTabs } from '@/app/platform/core/layout/themes/components/ThemedTabs.tsx';
 
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import ScoreChart from './ScoreChart.tsx';
-import ScoreExplanation from './ScoreExplanation.tsx';
-import { useLessonScore } from './useLessonScore.ts';
-import { useScoreHistory } from './useScoreHistory.ts';
+import CompetitionPanel from './CompetitionPanel.tsx';
+import EffortPanel from './EffortPanel.tsx';
+import GlobalScorePanel from './GlobalScorePanel.tsx';
+import ResultsPersonSelect from './ResultsPersonSelect.tsx';
+import { RESULTS_SUB_TAB_STORAGE_KEY, RESULTS_SUB_TABS, ResultsSubTab } from './resultsSubTabs.ts';
 import { useTestMembers } from './useTestMembers.ts';
-import WordResultCard from './WordResultCard.tsx';
+import WordResultsPanel from './WordResultsPanel.tsx';
 import { Language, Word } from '../shared/types.ts';
 
 interface Props {
@@ -20,44 +19,34 @@ interface Props {
   languages: Language[];
 }
 
-const formatOverall = (score: number) => `${(score * 100).toFixed(2)}%`;
+const TAB_LABEL_KEYS: Record<ResultsSubTab, string> = {
+  words: 'features.language.resultsTabWords',
+  global: 'features.language.resultsTabGlobal',
+  effort: 'features.language.resultsTabEffort',
+  competition: 'features.language.resultsTabCompetition',
+};
 
-// The "Result" sub-tab: a person selector (the signed-in user by default), the big overall
-// score, then one card per word with its own score and answer history.
+// The "Result" sub-tab, itself split in four: results by word, overall score, effort and competition.
+// The person picked (the signed-in user by default) is shared by every sub-tab but the competition.
 const ResultsPanel: React.FC<Props> = ({ lessonId, words, languages }) => {
   const { t } = useTranslation();
-  const { theme } = useTheme();
-  const { user } = useAuth();
   const members = useTestMembers(lessonId);
   const [selectedUserId, setSelectedUserId] = useState<string | undefined>(undefined);
-  const effectiveUserId = selectedUserId ?? user?.id;
-  const { scoreData } = useLessonScore(lessonId, selectedUserId);
-  const history = useScoreHistory(lessonId, selectedUserId);
-  const scoreByWordId = new Map((scoreData?.words ?? []).map((s) => [s.word_id, s]));
-  const options = members.map((m) => ({ value: m.user_id, label: m.name }));
+  const [subTab, setSubTab] = usePersistedString(RESULTS_SUB_TAB_STORAGE_KEY, RESULTS_SUB_TABS, 'words');
+  const showsPerson = subTab !== 'competition';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-      {options.length > 0 && (
-        <ThemedSelect
-          label={t('features.language.resultsPerson')}
-          options={options}
-          value={effectiveUserId}
-          allowEmpty={false}
-          onChange={(userId) => setSelectedUserId(userId === user?.id ? undefined : userId)}
-        />
-      )}
-      <div style={{ textAlign: 'center', fontSize: '3rem', fontWeight: 700, color: theme.colors.primary }}>
-        {formatOverall(scoreData?.overall_score ?? 0)}
-      </div>
-      <ScoreChart points={history} />
-      <ScoreExplanation />
-      {words.length === 0 && <ThemedText variant="secondary" size="small">{t('features.language.noWords')}</ThemedText>}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        {words.map((word) => (
-          <WordResultCard key={word.id} word={word} languages={languages} score={scoreByWordId.get(word.id)} />
-        ))}
-      </div>
+      <ThemedTabs
+        tabs={RESULTS_SUB_TABS.map((key) => ({ key, label: t(TAB_LABEL_KEYS[key]) }))}
+        activeTab={subTab}
+        onTabChange={(key) => setSubTab(key as ResultsSubTab)}
+      />
+      {showsPerson && <ResultsPersonSelect members={members} selectedUserId={selectedUserId} onChange={setSelectedUserId} />}
+      {subTab === 'words' && <WordResultsPanel lessonId={lessonId} words={words} languages={languages} userId={selectedUserId} />}
+      {subTab === 'global' && <GlobalScorePanel lessonId={lessonId} userId={selectedUserId} />}
+      {subTab === 'effort' && <EffortPanel lessonId={lessonId} userId={selectedUserId} />}
+      {subTab === 'competition' && <CompetitionPanel lessonId={lessonId} />}
     </div>
   );
 };

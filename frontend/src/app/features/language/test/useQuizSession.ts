@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { buildQuizPrompt, pickRandomDirection, pickWeightedWord, QuizPrompt, shuffle } from './quizPicker.ts';
 import { testService } from './service.ts';
-import { Direction, TestAnswerResult, TestMode, WordScore } from './types.ts';
+import { Direction, GivenAnswer, TestAnswerResult, TestMode, WordScore } from './types.ts';
 import { useLessonScore } from './useLessonScore.ts';
 import { Word } from '../shared/types.ts';
 
@@ -43,6 +43,7 @@ export function useQuizSession(lessonId: string, allWords: Word[], fullTest: boo
   const reviewMode = fullTest;
   const [question, setQuestion] = useState<QuizQuestion | null>(null);
   const [result, setResult] = useState<TestAnswerResult | null>(null);
+  const [givenAnswer, setGivenAnswer] = useState<GivenAnswer | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -74,15 +75,16 @@ export function useQuizSession(lessonId: string, allWords: Word[], fullTest: boo
     setRunId((id) => id + 1);
   }, []);
 
-  const submit = useCallback(async (mode: TestMode, answer?: string, chosenWordId?: string) => {
+  const submit = useCallback(async (mode: TestMode, givenText: string, chosenWordId?: string) => {
     if (!question) return;
     setSubmitting(true);
     setError(null);
     try {
       const response = await testService.submitAnswer(lessonId, {
         word_id: question.prompt.testedWordId, direction: question.direction, mode,
-        answer, chosen_word_id: chosenWordId,
+        answer: mode === 'free' ? givenText : undefined, chosen_word_id: chosenWordId,
       });
+      setGivenAnswer({ text: givenText, typed: mode === 'free' });
       setResult(response);
       refetchScore();
     } catch (e: unknown) {
@@ -101,7 +103,7 @@ export function useQuizSession(lessonId: string, allWords: Word[], fullTest: boo
   const reviewFinished = reviewMode && reviewIndex >= words.length;
 
   return {
-    question, result, submitting, error, reviewFinished, restart, submit, continueToNext,
+    question, result, givenAnswer, submitting, error, reviewFinished, restart, submit, continueToNext,
     position: Math.min(reviewIndex + 1, words.length), total: words.length,
   };
 }

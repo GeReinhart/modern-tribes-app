@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { NounCandidate } from './nounQuiz.ts';
 import { pickWeighted, wordWeight } from './quizPicker.ts';
 import { testService } from './service.ts';
-import { TestAnswerResult, TestMode } from './types.ts';
+import { GivenAnswer, TestAnswerResult, TestMode } from './types.ts';
 import { useLessonScore } from './useLessonScore.ts';
 
 // Drives the article and plural tests (`fact`): the next noun is drawn weighted toward the lesson words with the
@@ -14,6 +14,7 @@ export function useNounQuiz(lessonId: string, candidates: NounCandidate[], fact:
   const scoresReady = scoreData !== null || !loading;
   const [current, setCurrent] = useState<NounCandidate | null>(null);
   const [result, setResult] = useState<TestAnswerResult | null>(null);
+  const [givenAnswer, setGivenAnswer] = useState<GivenAnswer | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,9 +37,11 @@ export function useNounQuiz(lessonId: string, candidates: NounCandidate[], fact:
     setSubmitting(true);
     setError(null);
     try {
-      setResult(await testService.submitAnswer(lessonId, {
+      const response = await testService.submitAnswer(lessonId, {
         word_id: current.entryId, direction: fact, mode, answer,
-      }));
+      });
+      setGivenAnswer({ text: answer, typed: mode === 'free' });
+      setResult(response);
       refetchScore();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Error');
@@ -47,5 +50,5 @@ export function useNounQuiz(lessonId: string, candidates: NounCandidate[], fact:
     }
   }, [current, lessonId, mode, fact, refetchScore]);
 
-  return { current, result, submitting, error, submit, continueToNext: pickNext };
+  return { current, result, givenAnswer, submitting, error, submit, continueToNext: pickNext };
 }

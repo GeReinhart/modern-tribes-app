@@ -19,17 +19,17 @@ _DAYS_NEEDED = 3
 _TRANSLATION_POINTS = 6
 _FACT_POINTS = 3
 _TRANSLATION_DIRECTIONS = ("source_to_target", "target_to_source")
-_FACT_DIRECTIONS = ("article", "plural")
-_CHOICE_DAY_VALUE = 0.2
+FACT_DIRECTIONS = ("article", "plural")
+CHOICE_DAY_VALUE = 0.2
 _FREE_DAY_VALUE = 1.0
 _DECAY_PER_WEEK = 0.9
 
 
 def _day_value(attempts_on_day: list[dict]) -> float:
-    if any(a["correct"] and (a["direction"] in _FACT_DIRECTIONS or a["mode"] == "free") for a in attempts_on_day):
+    if any(a["correct"] and (a["direction"] in FACT_DIRECTIONS or a["mode"] == "free") for a in attempts_on_day):
         return _FREE_DAY_VALUE  # an article is picked among few, but 3 distinct days are still needed
     if any(a["mode"] == "choice" and a["correct"] for a in attempts_on_day):
-        return _CHOICE_DAY_VALUE
+        return CHOICE_DAY_VALUE
     return 0.0
 
 

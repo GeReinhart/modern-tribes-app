@@ -23,7 +23,7 @@ interface Props {
 const PluralQuiz: React.FC<Props> = ({ lessonId, words, languages, targetLanguage }) => {
   const { t } = useTranslation();
   const candidates = useMemo(() => buildNounCandidates(words, targetLanguage, 'plural'), [words, targetLanguage]);
-  const { current, result, submitting, error, submit, continueToNext } = useNounQuiz(lessonId, candidates, 'plural');
+  const { current, result, givenAnswer, submitting, error, submit, continueToNext } = useNounQuiz(lessonId, candidates, 'plural');
   const [answer, setAnswer] = useState('');
 
   useEffect(() => setAnswer(''), [current]);
@@ -31,7 +31,16 @@ const PluralQuiz: React.FC<Props> = ({ lessonId, words, languages, targetLanguag
   if (!current) {
     return <ThemedText variant="secondary" size="small">{t('features.language.noPluralWords')}</ThemedText>;
   }
-  if (result) return <QuizResultBanner result={result} onContinue={continueToNext} />;
+  if (result && givenAnswer) {
+    return (
+      <QuizResultBanner
+        result={result}
+        originalWord={current.article ? `${current.article} ${current.text}` : current.text}
+        givenAnswer={givenAnswer}
+        onContinue={continueToNext}
+      />
+    );
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

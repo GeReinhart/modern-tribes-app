@@ -1,6 +1,4 @@
-import { ScoreHistoryPoint } from './types.ts';
-
-// The durations the score chart can be reduced to; `days: null` shows the whole history.
+// The durations the results charts can be reduced to; `days: null` shows the whole history.
 export const CHART_PERIODS = [
   { key: 'week', days: 7 },
   { key: 'month', days: 30 },
@@ -10,10 +8,10 @@ export const CHART_PERIODS = [
 
 export type ChartPeriodKey = (typeof CHART_PERIODS)[number]['key'];
 
-export function pointsInPeriod(points: ScoreHistoryPoint[], days: number | null, today = new Date()): ScoreHistoryPoint[] {
-  if (days === null) return points;
+export function itemsInPeriod<T extends { date: string }>(items: T[], days: number | null, today = new Date()): T[] {
+  if (days === null) return items;
   const from = new Date(today);
   from.setDate(from.getDate() - days);
   const fromIso = from.toISOString().slice(0, 10);
-  return points.filter((point) => point.date >= fromIso);
+  return items.filter((item) => item.date >= fromIso);
 }

@@ -5,7 +5,7 @@ import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedT
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { buildChoiceOptions, QuizPrompt, sameTypeCount } from './quizPicker.ts';
+import { buildChoiceOptions, QuizChoiceOption, QuizPrompt, sameTypeCount } from './quizPicker.ts';
 import { Direction, TestMode } from './types.ts';
 import LanguageTextInput from '../shared/LanguageTextInput.tsx';
 import { themeCodeForLanguage } from '../shared/languageTheme.ts';
@@ -19,7 +19,7 @@ interface Props {
   prompt: QuizPrompt;
   submitting: boolean;
   onSubmitFree: (answer: string) => void;
-  onSubmitChoice: (chosenWordId: string) => void;
+  onSubmitChoice: (option: QuizChoiceOption) => void;
 }
 
 const QuizWordPrompt: React.FC<Props> = ({
@@ -79,7 +79,7 @@ const QuizWordPrompt: React.FC<Props> = ({
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             {choiceOptions.map((option) => (
-              <ThemedButton key={option.id} type="button" variant="secondary" disabled={submitting} onClick={() => onSubmitChoice(option.id)}>
+              <ThemedButton key={option.id} type="button" variant="secondary" disabled={submitting} onClick={() => onSubmitChoice(option)}>
                 {option.text}
               </ThemedButton>
             ))}

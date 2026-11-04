@@ -49,6 +49,26 @@ class ScoreHistoryResponse(BaseModel):
     points: List[ScoreHistoryPoint]
 
 
+class EffortDay(BaseModel):
+    date: date
+    success: float
+    errors: float
+
+
+class EffortResponse(BaseModel):
+    days: List[EffortDay]
+
+
+class CompetitionMember(BaseModel):
+    user_id: str
+    name: str
+    points: List[ScoreHistoryPoint]
+
+
+class CompetitionResponse(BaseModel):
+    members: List[CompetitionMember]
+
+
 class WordScore(BaseModel):
     word_id: str
     score: float

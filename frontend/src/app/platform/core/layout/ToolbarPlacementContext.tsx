@@ -1,4 +1,8 @@
-import { ToolbarPlacement, TOOLBAR_PLACEMENTS } from '@/app/platform/core/layout/toolbar.types.ts';
+import {
+  DEFAULT_TOOLBAR_PLACEMENT,
+  ToolbarPlacement,
+  TOOLBAR_PLACEMENTS,
+} from '@/app/platform/core/layout/toolbar.types.ts';
 
 import React, { createContext, useContext, useState } from 'react';
 
@@ -8,7 +12,7 @@ const loadPlacement = (): ToolbarPlacement => {
   const stored = localStorage.getItem(STORAGE_KEY);
   return TOOLBAR_PLACEMENTS.includes(stored as ToolbarPlacement)
     ? (stored as ToolbarPlacement)
-    : 'off';
+    : DEFAULT_TOOLBAR_PLACEMENT;
 };
 
 interface ToolbarPlacementContextType {
@@ -17,7 +21,7 @@ interface ToolbarPlacementContextType {
 }
 
 const ToolbarPlacementContext = createContext<ToolbarPlacementContextType>({
-  toolbarPlacement: 'off',
+  toolbarPlacement: DEFAULT_TOOLBAR_PLACEMENT,
   setToolbarPlacement: () => {},
 });
 

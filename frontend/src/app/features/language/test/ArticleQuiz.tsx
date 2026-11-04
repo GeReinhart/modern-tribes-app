@@ -23,15 +23,17 @@ const ArticleQuiz: React.FC<Props> = ({ lessonId, words, languages, targetLangua
   const { t } = useTranslation();
   const candidates = useMemo(() => buildNounCandidates(words, targetLanguage, 'article'), [words, targetLanguage]);
   const choices = useMemo(() => articleChoices(candidates, targetLanguage), [candidates, targetLanguage]);
-  const { current, result, submitting, error, submit, continueToNext } = useNounQuiz(lessonId, candidates, 'article');
+  const { current, result, givenAnswer, submitting, error, submit, continueToNext } = useNounQuiz(lessonId, candidates, 'article');
 
   if (!current) {
     return <ThemedText variant="secondary" size="small">{t('features.language.noArticleWords')}</ThemedText>;
   }
-  if (result) {
+  if (result && givenAnswer) {
     return (
       <QuizResultBanner
         result={result}
+        originalWord={current.text}
+        givenAnswer={{ ...givenAnswer, text: `${givenAnswer.text} ${current.text}` }}
         correctAnswerLabel={`${result.correct_answer} ${current.text}`}
         onContinue={continueToNext}
       />

@@ -2,9 +2,11 @@ import { ThemedButton } from '@/app/platform/core/layout/themes/components/Theme
 import { ThemedText } from '@/app/platform/core/layout/themes/components/ThemedText.tsx';
 
 import React from 'react';
+import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 import QuizResultBanner from './QuizResultBanner.tsx';
+import { QuizPrompt } from './quizPicker.ts';
 import QuizWordPrompt from './QuizWordPrompt.tsx';
 import { Direction } from './types.ts';
 import { useQuizSession } from './useQuizSession.ts';
@@ -21,10 +23,13 @@ interface Props {
   direction?: Direction;
 }
 
+const directionLabel = (t: TFunction, prompt: QuizPrompt) =>
+  `${t(`features.language.code.${prompt.promptLanguage}`)} → ${t(`features.language.code.${prompt.answerLanguage}`)}`;
+
 const QuizSession: React.FC<Props> = ({ lessonId, words, languages, fullTest, direction }) => {
   const { t } = useTranslation();
   const {
-    question, result, submitting, error, reviewFinished, restart, submit, continueToNext, position, total,
+    question, result, givenAnswer, submitting, error, reviewFinished, restart, submit, continueToNext, position, total,
   } = useQuizSession(lessonId, words, fullTest, direction);
 
   if (words.length === 0) {
@@ -52,8 +57,14 @@ const QuizSession: React.FC<Props> = ({ lessonId, words, languages, fullTest, di
         </ThemedText>
       )}
       {error && <ThemedText variant="danger" size="small">{error}</ThemedText>}
-      {result ? (
-        <QuizResultBanner result={result} onContinue={continueToNext} />
+      {result && givenAnswer ? (
+        <QuizResultBanner
+          result={result}
+          originalWord={question.prompt.promptText}
+          directionLabel={directionLabel(t, question.prompt)}
+          givenAnswer={givenAnswer}
+          onContinue={continueToNext}
+        />
       ) : (
         <QuizWordPrompt
           lessonWords={words}
@@ -63,7 +74,7 @@ const QuizSession: React.FC<Props> = ({ lessonId, words, languages, fullTest, di
           prompt={question.prompt}
           submitting={submitting}
           onSubmitFree={(answer) => submit('free', answer)}
-          onSubmitChoice={(chosenWordId) => submit('choice', undefined, chosenWordId)}
+          onSubmitChoice={(option) => submit('choice', option.text, option.id)}
         />
       )}
     </div>

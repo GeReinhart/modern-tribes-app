@@ -1,6 +1,6 @@
 import { apiService } from '@/app/platform/core/api/api.service.ts';
 
-import { LessonScoreResponse, ScoreHistory, TestAnswerResult, TestAnswerSubmit, TestMember } from './types.ts';
+import { CompetitionHistory, EffortHistory, LessonScoreResponse, ScoreHistory, TestAnswerResult, TestAnswerSubmit, TestMember } from './types.ts';
 
 const BASE = '/features/tasks/language';
 
@@ -18,6 +18,15 @@ class TestService {
   async getScoreHistory(lessonId: string, userId?: string): Promise<ScoreHistory> {
     const query = userId ? `?user_id=${userId}` : '';
     return apiService.get<ScoreHistory>(`${BASE}/lessons/${lessonId}/test/score/history${query}`);
+  }
+
+  async getEffort(lessonId: string, userId?: string): Promise<EffortHistory> {
+    const query = userId ? `?user_id=${userId}` : '';
+    return apiService.get<EffortHistory>(`${BASE}/lessons/${lessonId}/test/effort${query}`);
+  }
+
+  async getCompetition(lessonId: string): Promise<CompetitionHistory> {
+    return apiService.get<CompetitionHistory>(`${BASE}/lessons/${lessonId}/test/competition`);
   }
 
   async getMembers(lessonId: string): Promise<TestMember[]> {

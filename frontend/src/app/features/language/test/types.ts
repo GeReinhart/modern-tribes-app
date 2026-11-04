@@ -11,6 +11,12 @@ export interface TestAnswerSubmit {
   chosen_word_id?: string;
 }
 
+// The answer the user gave; `typed` is false when it was picked among choices.
+export interface GivenAnswer {
+  text: string;
+  typed: boolean;
+}
+
 export interface TestAnswerResult {
   correct: boolean;
   correct_answer: string;
@@ -37,6 +43,26 @@ export interface ScoreHistoryPoint {
 
 export interface ScoreHistory {
   points: ScoreHistoryPoint[];
+}
+
+export interface EffortDay {
+  date: string;
+  success: number;
+  errors: number;
+}
+
+export interface EffortHistory {
+  days: EffortDay[];
+}
+
+export interface CompetitionMember {
+  user_id: string;
+  name: string;
+  points: ScoreHistoryPoint[];
+}
+
+export interface CompetitionHistory {
+  members: CompetitionMember[];
 }
 
 export interface TestMember {
