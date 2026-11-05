@@ -6,6 +6,7 @@ const en: Record<string, string> = {
   'features.language.wordType.noun': 'Noun',
   'features.language.wordType.adjective': 'Adjective',
   'features.language.wordType.verb': 'Verb',
+  'features.language.wordType.other': 'Other',
 
   'features.language.setupTitle': 'Set up this project\'s language pair',
   'features.language.setupHelp': 'Pick the language you already know and the one you want to learn. This can only be set once.',

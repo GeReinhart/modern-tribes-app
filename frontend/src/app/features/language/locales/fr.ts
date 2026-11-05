@@ -6,6 +6,7 @@ const fr: Record<string, string> = {
   'features.language.wordType.noun': 'Nom',
   'features.language.wordType.adjective': 'Adjectif',
   'features.language.wordType.verb': 'Verbe',
+  'features.language.wordType.other': 'Autre',
 
   'features.language.setupTitle': 'Configurez la paire de langues de ce projet',
   'features.language.setupHelp': 'Choisissez la langue que vous parlez déjà et celle que vous voulez apprendre. Ce choix ne peut être fait qu\'une fois.',

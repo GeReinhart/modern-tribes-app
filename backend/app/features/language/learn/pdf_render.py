@@ -6,11 +6,11 @@ from weasyprint import HTML
 from app.features.language.learn.models import LessonLearnResponse
 from app.features.language.schemas import WordResponse
 
-_WORD_TYPE_ORDER = ("noun", "adjective", "verb")
+_WORD_TYPE_ORDER = ("noun", "adjective", "verb", "other")
 _DEFAULT_LANG = "en"
 _WORD_TYPE_TITLES = {
-    "en": {"noun": "Nouns", "adjective": "Adjectives", "verb": "Verbs"},
-    "fr": {"noun": "Noms", "adjective": "Adjectifs", "verb": "Verbes"},
+    "en": {"noun": "Nouns", "adjective": "Adjectives", "verb": "Verbs", "other": "Others"},
+    "fr": {"noun": "Noms", "adjective": "Adjectifs", "verb": "Verbes", "other": "Autres"},
 }
 
 # Language names in the reader's language; a language missing here falls back to its stored name.

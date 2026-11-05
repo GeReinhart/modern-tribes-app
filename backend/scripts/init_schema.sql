@@ -1231,7 +1231,7 @@ CREATE TABLE IF NOT EXISTS language_words (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     text VARCHAR(255) NOT NULL,
     language VARCHAR(5) NOT NULL REFERENCES languages(code),
-    word_type VARCHAR(20) NOT NULL CHECK (word_type IN ('noun', 'adjective', 'verb')),
+    word_type VARCHAR(20) NOT NULL CHECK (word_type IN ('noun', 'adjective', 'verb', 'other')),
     article VARCHAR(20),
     plural VARCHAR(255),
     status VARCHAR(20) NOT NULL DEFAULT 'active' CHECK (status IN ('pending', 'active', 'archived')),

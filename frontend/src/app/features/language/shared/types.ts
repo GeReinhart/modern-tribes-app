@@ -1,8 +1,8 @@
 // Mirrors the backend's `word_type` string column (see backend/app/features/language/schemas.py).
 // Kept as a small string union rather than a TS enum, matching the convention already used for
 // similar backend-mirrored string sets in this app (see frontend/src/types/groceries.ts).
-export type WordType = 'noun' | 'adjective' | 'verb';
-export const WORD_TYPES: readonly WordType[] = ['noun', 'adjective', 'verb'];
+export type WordType = 'noun' | 'adjective' | 'verb' | 'other';
+export const WORD_TYPES: readonly WordType[] = ['noun', 'adjective', 'verb', 'other'];
 
 export interface Declension {
   case_label: string;

@@ -136,8 +136,12 @@ def _read_archive_text(path: Path) -> str:
 def _word_type_of(raw_type: str) -> Optional[str]:
     """dict.cc's own word-type column applies to the whole entry — the same part of
     speech on both the headword and its translation (a noun translates to a noun) — so,
-    unlike article (gender differs by language), this needs no per-side handling."""
-    return _WORD_TYPES_BY_DICTCC_TYPE.get(raw_type.strip().lower())
+    unlike article (gender differs by language), this needs no per-side handling.
+    Any non-empty type other than noun/verb/adj (adverb, preposition, ...) is "other"."""
+    key = raw_type.strip().lower()
+    if not key:
+        return None
+    return _WORD_TYPES_BY_DICTCC_TYPE.get(key, "other")
 
 
 def _candidate_from_line(

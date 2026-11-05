@@ -160,6 +160,47 @@ Feature: Create a new word for a lesson
     And the language_lesson_words table contains:
       | lesson_id | word_id | status |
 
+  Scenario: POST a new word of type "other" (e.g. an adverb) — it is created with that type, without article or plural, and added to the lesson
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the language_words table contains:
+      | id | text | language | word_type | article | plural | status |
+    And the language_word_translations table contains:
+      | id | word_id_a | word_id_b | status |
+    And the language_lesson_words table contains:
+      | lesson_id | word_id | status |
+    When I POST /api/features/tasks/language/lessons/1500/words with body:
+      """
+      {
+        "text": "vite",
+        "language": "fr",
+        "word_type": "other",
+        "translations": [ { "text": "quickly", "language": "en", "word_type": "other" } ]
+      }
+      """
+    Then the response status code is 201
+    And the response body includes:
+      """
+      {
+        "text": "vite",
+        "language": "fr",
+        "word_type": "other",
+        "translations": [ { "text": "quickly", "language": "en", "word_type": "other" } ]
+      }
+      """
+    And the language_words table contains:
+      | text    | language | word_type | article | plural | status |
+      | vite    | fr       | other     |         |        | active |
+      | quickly | en       | other     |         |        | active |
+    And the language_word_translations table contains:
+      | status |
+      | active |
+    And the language_lesson_words table contains:
+      | lesson_id | status |
+      | 1500      | active |
+
   @error_case
   Scenario: POST a new word as a user without access to the project's tribe — 403 and nothing is created
     Given I am authenticated as a regular user: user.id 0002
