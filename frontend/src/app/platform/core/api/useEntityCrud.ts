@@ -42,7 +42,10 @@ export function createEntityHooks<T, CreateDto, UpdateDto>(
     useEffect(() => {
       if (id) execute(() => service.getById(id));
     }, [id, execute]);
-    return { item, loading, error };
+    const refetch = useCallback(async () => {
+      if (id) await execute(() => service.getById(id));
+    }, [id, execute]);
+    return { item, loading, error, refetch };
   }
 
   function useMutations() {

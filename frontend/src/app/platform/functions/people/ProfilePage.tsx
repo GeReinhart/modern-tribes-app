@@ -11,6 +11,9 @@ import { useCurrentUserProfile } from '@/app/platform/functions/people/users/use
 import { usePerson } from '@/app/platform/functions/people/persons/usePersons.ts';
 import { useRepresentsByUserId } from '@/app/platform/functions/people/represents/useRepresents.ts';
 import { authService } from '@/app/platform/core/authentication/authentication-service.ts';
+import { ThemedAvatar } from '@/app/platform/core/layout/themes/components/ThemedAvatar.tsx';
+import { usePersonPhoto } from '@/app/platform/functions/people/persons/usePersonPhoto.ts';
+import { personInitials } from '@/app/platform/functions/people/personInitials.ts';
 import { ToolbarPlacementControl } from '@/app/platform/functions/people/ToolbarPlacementControl.tsx';
 
 import React from 'react';
@@ -31,7 +34,8 @@ function ProfilePageContent() {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const { theme } = useTheme();
-  const { user, person } = useCurrentUserProfile();
+  const { user, person, refreshPerson } = useCurrentUserProfile();
+  const photo = usePersonPhoto(person?.id, user?.id, refreshPerson);
   const { represents } = useRepresentsByUserId(user?.id ?? null);
 
   const breadcrumbs = [
@@ -46,6 +50,29 @@ function ProfilePageContent() {
       label: t('common.return'),
       onClick: () => navigate(-1),
     },
+    ...(person
+      ? [
+          {
+            id: 'profile.changePhoto',
+            icon: 'camera' as const,
+            label: t('profile.changePhoto'),
+            onClick: photo.openPicker,
+            disabled: photo.busy,
+          },
+        ]
+      : []),
+    ...(person?.photo_url
+      ? [
+          {
+            id: 'profile.removePhoto',
+            icon: 'trash' as const,
+            label: t('profile.removePhoto'),
+            onClick: photo.remove,
+            variant: 'danger' as const,
+            disabled: photo.busy,
+          },
+        ]
+      : []),
   ];
 
   const handleLogout = async () => {
@@ -64,7 +91,7 @@ function ProfilePageContent() {
   };
 
   const initials = person
-    ? `${person.first_name[0]}${person.last_name[0]}`
+    ? personInitials(`${person.first_name} ${person.last_name}`)
     : user?.login.substring(0, 2).toUpperCase();
 
   const currentLang = i18n.language.startsWith('fr') ? 'fr' : 'en';
@@ -96,14 +123,13 @@ function ProfilePageContent() {
       >
         {/* Avatar */}
         <div className="flex flex-col items-center">
-          <div
-            className="w-24 h-24 rounded-full flex items-center justify-center text-white text-3xl font-bold mb-3"
-            style={{
-              background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`,
-            }}
-          >
-            {initials}
+          <div className="mb-3">
+            <ThemedAvatar photoUrl={person?.photo_url} initials={initials ?? ''} size={96} />
           </div>
+          <input ref={photo.inputRef} type="file" accept="image/*" onChange={photo.onFileChosen} className="hidden" />
+          {photo.error && (
+            <ThemedText variant="danger" size="small">{photo.error}</ThemedText>
+          )}
           {person && (
             <ThemedText variant="primary" size="large" as="h2">
               {person.first_name} {person.last_name}

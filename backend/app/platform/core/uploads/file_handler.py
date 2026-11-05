@@ -185,6 +185,19 @@ class FileHandler:
 
         return filename, len(content), mime_type
 
+    async def save_bytes(self, content: bytes, extension: str, mime_type: str, folder: str) -> Tuple[str, str]:
+        """Store already-validated bytes under `folder/` and return (filename, public url)."""
+        filename = self.generate_unique_filename(f"file.{extension}")
+        key = f"{folder}/{filename}"
+        try:
+            if self._use_cellar:
+                await asyncio.to_thread(self._put, key, content, mime_type)
+            else:
+                await asyncio.to_thread(self._save_local, key, content)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to store file: {e}")
+        return filename, self.get_file_url(filename, folder)
+
     def get_file_url(self, filename: str, file_type: str = "images") -> str:
         if self._use_cellar:
             return (

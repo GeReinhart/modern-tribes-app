@@ -92,6 +92,8 @@ const fr: Record<string, string> = {
   'profile.toolbarPlacementHeader': "Dans l'en-tête",
   'profile.toolbarPlacementFooter': 'Dans le pied de page',
   'profile.represents': 'Représentation',
+  'profile.changePhoto': 'Changer ma photo',
+  'profile.removePhoto': 'Supprimer ma photo',
   'profile.representsPerson': 'Personne représentée',
   'profile.representsNone': 'Aucune représentation assignée',
 

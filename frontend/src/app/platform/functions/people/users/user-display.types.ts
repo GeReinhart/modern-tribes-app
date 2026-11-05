@@ -3,4 +3,5 @@ export interface UserDisplayInfo {
   login: string;
   first_name: string | null;
   last_name: string | null;
+  photo_url?: string | null;
 }

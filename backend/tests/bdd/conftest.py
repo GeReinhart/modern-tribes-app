@@ -183,13 +183,14 @@ def given_persons_table(datatable):
             for row in datatable[1:]:
                 rec = {headers[i]: expand_id(row[i]) for i in range(len(headers))}
                 await conn.execute(
-                    """INSERT INTO persons(id, first_name, last_name, gender, status)
-                       VALUES($1, $2, $3, $4, $5)
+                    """INSERT INTO persons(id, first_name, last_name, gender, photo_url, status)
+                       VALUES($1, $2, $3, $4, $5, $6)
                        ON CONFLICT (id) DO NOTHING""",
                     UUID(rec["id"]),
                     rec["first_name"],
                     rec["last_name"],
                     rec.get("gender", "other"),
+                    rec.get("photo_url") or None,
                     rec.get("status", "active"),
                 )
         finally:
@@ -1048,6 +1049,26 @@ def get_resource(context, path):
     context["response"] = context["client"].get(expand_path_ids(path))
 
 
+def _image_bytes(width: int, height: int) -> bytes:
+    from io import BytesIO
+    from PIL import Image
+    out = BytesIO()
+    Image.new("RGB", (width, height), (200, 80, 40)).save(out, format="JPEG")
+    return out.getvalue()
+
+
+@when(parsers.re(r'I PUT (?P<path>\S+) with the image file "(?P<name>[^"]+)" \((?P<w>\d+)x(?P<h>\d+)\)'))
+def put_image_file(context, path, name, w, h):
+    files = {"file": (name, _image_bytes(int(w), int(h)), "image/jpeg")}
+    context["response"] = context["client"].put(expand_path_ids(path), files=files)
+
+
+@when(parsers.re(r'I PUT (?P<path>\S+) with the image file "(?P<name>[^"]+)" \(not an image\)'))
+def put_non_image_file(context, path, name):
+    files = {"file": (name, b"this is not an image", "text/plain")}
+    context["response"] = context["client"].put(expand_path_ids(path), files=files)
+
+
 @when(parsers.re(r"I DELETE (?P<path>\S+) with body:"))
 def delete_with_json_body(context, path, docstring):
     body = expand_json_ids(json.loads(docstring))
@@ -1240,6 +1261,9 @@ def _compare_rows(table: str, headers: list, expected_rows: list, actual_rows: l
             elif isinstance(act_val, int):
                 act_str = str(act_val)
                 exp_val = exp[j]
+            elif exp[j] == "<set>":
+                assert act_val not in (None, ""), f"{table}[{i}].{col}: expected a value, got {act_val!r}"
+                continue
             else:
                 if act_val is None:
                     act_str = ""
@@ -1259,6 +1283,28 @@ def _assert_db(table: str, datatable: list):
     expected_rows = datatable[1:]
     actual_rows = _run(_query_table(table, headers))
     _compare_rows(table, headers, expected_rows, actual_rows)
+
+
+@then(parsers.parse('the response body includes a "{field}"'))
+def response_body_includes_field(context, field):
+    assert context["response"].json().get(field), f"No {field!r} in {context['response'].text}"
+
+
+@then(parsers.parse("the stored photo of person {person_id} is a {size:d}x{size2:d} square image"))
+def stored_photo_is_square(person_id, size, size2):
+    from pathlib import Path
+    from PIL import Image
+    from app.platform.core.config import settings
+
+    async def _photo_url():
+        conn = await _conn()
+        try:
+            return await conn.fetchval("SELECT photo_url FROM persons WHERE id = $1", UUID(expand_id(person_id)))
+        finally:
+            await conn.close()
+
+    path = Path(settings.UPLOAD_DIR) / "avatars" / _run(_photo_url()).rsplit("/", 1)[-1]
+    assert Image.open(path).size == (size, size2)
 
 
 @then("the persons table contains:")

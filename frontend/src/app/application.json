@@ -306,11 +306,13 @@
         "description": {
           "en": [
             "- manage the members of your tribe and their profiles",
-            "- a person can be linked to the account they use to sign in"
+            "- a person can be linked to the account they use to sign in",
+            "- add a photo to your profile: it replaces your initials in a round wherever you are mentioned"
           ],
           "fr": [
             "- gérez les membres de votre tribu et leurs profils",
-            "- une personne peut être liée au compte qu'elle utilise pour se connecter"
+            "- une personne peut être liée au compte qu'elle utilise pour se connecter",
+            "- ajoutez une photo à votre profil : elle remplace vos initiales dans un rond partout où vous êtes mentionné"
           ]
         },
         "backend": {

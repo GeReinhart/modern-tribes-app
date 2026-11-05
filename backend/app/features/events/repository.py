@@ -65,7 +65,8 @@ async def _fetch_participants_map(conn, event_ids: list) -> dict:
     if not event_ids:
         return {}
     rows = await conn.fetch(
-        """SELECT ep.event_id, ep.person_id, p.first_name || ' ' || p.last_name AS person_name
+        """SELECT ep.event_id, ep.person_id, p.first_name || ' ' || p.last_name AS person_name,
+                  p.photo_url AS person_photo_url
            FROM events_participants ep
            JOIN persons p ON p.id = ep.person_id
            WHERE ep.event_id = ANY($1) AND ep.status = 'active'""",
@@ -74,7 +75,7 @@ async def _fetch_participants_map(conn, event_ids: list) -> dict:
     result: dict = {}
     for r in rows:
         eid = str(r["event_id"])
-        result.setdefault(eid, []).append({"person_id": str(r["person_id"]), "person_name": r["person_name"]})
+        result.setdefault(eid, []).append({"person_id": str(r["person_id"]), "person_name": r["person_name"], "person_photo_url": r["person_photo_url"]})
     return result
 
 

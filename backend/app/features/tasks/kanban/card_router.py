@@ -33,6 +33,7 @@ def _card(row: dict) -> KanbanCardResponse:
         title=row["title"],
         assigned_person_id=str(row["assigned_person_id"]) if row.get("assigned_person_id") else None,
         assigned_person_name=row.get("assigned_person_name"),
+        assigned_person_photo_url=row.get("assigned_person_photo_url"),
         document_id=str(row["document_id"]) if row.get("document_id") else None,
         document_content_html=row.get("document_content_html"),
         position=row["position"],

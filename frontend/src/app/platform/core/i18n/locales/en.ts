@@ -90,6 +90,8 @@ const en: Record<string, string> = {
   'profile.toolbarPlacementHeader': 'In the header',
   'profile.toolbarPlacementFooter': 'In the footer',
   'profile.represents': 'Represents',
+  'profile.changePhoto': 'Change my photo',
+  'profile.removePhoto': 'Remove my photo',
   'profile.representsPerson': 'Represented Person',
   'profile.representsNone': 'No representation assigned',
 

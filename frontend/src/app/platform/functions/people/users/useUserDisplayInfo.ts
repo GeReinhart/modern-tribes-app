@@ -5,6 +5,10 @@ import { useEffect, useState } from 'react';
 
 const cache = new Map<string, UserDisplayInfo>();
 
+export function invalidateUserDisplayInfo(userId: string): void {
+  cache.delete(userId);
+}
+
 export function useUserDisplayInfo(userId: string | null): {
   info: UserDisplayInfo | null;
   loading: boolean;

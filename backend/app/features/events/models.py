@@ -32,6 +32,7 @@ class EventUpdate(BaseModel):
 class EventParticipantInfo(BaseModel):
     person_id: str
     person_name: str
+    person_photo_url: Optional[str] = None
 
 
 class EventReminderCreate(BaseModel):

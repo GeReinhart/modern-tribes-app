@@ -1,4 +1,6 @@
+import { ThemedAvatar } from '@/app/platform/core/layout/themes/components/ThemedAvatar.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { personInitials } from '@/app/platform/functions/people/personInitials.ts';
 import { useCurrentUserProfile } from '@/app/platform/functions/people/users/useCurrentUserProfile.ts';
 
 import React from 'react';
@@ -18,13 +20,7 @@ export const UserAvatarIcon: React.FC<UserAvatarIconProps> = ({
   if (isLoading) {
     return (
       <svg width={size} height={size} viewBox="0 0 36 36">
-        <circle
-          cx="18"
-          cy="18"
-          r="18"
-          fill={theme.colors.ghost}
-          opacity="0.4"
-        />
+        <circle cx="18" cy="18" r="18" fill={theme.colors.ghost} opacity="0.4" />
       </svg>
     );
   }
@@ -32,43 +28,16 @@ export const UserAvatarIcon: React.FC<UserAvatarIconProps> = ({
   if (!user) return null;
 
   const initials = person
-    ? `${person.first_name[0]}${person.last_name[0]}`
+    ? personInitials(`${person.first_name} ${person.last_name}`)
     : user.login.substring(0, 2).toUpperCase();
 
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 36 36"
+    <ThemedAvatar
+      photoUrl={person?.photo_url}
+      initials={initials}
+      size={size}
+      ariaLabel="Profile"
       onClick={() => navigate('/app/profile')}
-      style={{ cursor: 'pointer', flexShrink: 0 }}
-      role="button"
-      aria-label="Profile"
-    >
-      <defs>
-        <linearGradient
-          id="user-avatar-grad"
-          x1="0%"
-          y1="0%"
-          x2="100%"
-          y2="100%"
-        >
-          <stop offset="0%" stopColor={theme.colors.primary} />
-          <stop offset="100%" stopColor={theme.colors.secondary} />
-        </linearGradient>
-      </defs>
-      <circle cx="18" cy="18" r="18" fill="url(#user-avatar-grad)" />
-      <text
-        x="18"
-        y="18"
-        textAnchor="middle"
-        dominantBaseline="central"
-        fill="white"
-        fontSize={size * 0.38}
-        fontWeight="bold"
-      >
-        {initials}
-      </text>
-    </svg>
+    />
   );
 };

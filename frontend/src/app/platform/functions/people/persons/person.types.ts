@@ -19,6 +19,7 @@ export interface PersonUpdate {
 
 export interface Person extends PersonBase {
   id: string;
+  photo_url?: string | null;
   status: string;
   created_at: string;
   updated_at: string;

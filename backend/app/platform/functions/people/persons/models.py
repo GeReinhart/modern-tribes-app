@@ -33,6 +33,7 @@ class PersonUpdate(BaseModel):
 
 class Person(PersonBase):
     id: str
+    photo_url: Optional[str] = None
     status: str = "active"
     created_at: datetime
     updated_at: datetime

@@ -18,6 +18,7 @@ export interface TodoItem {
   force_on_dashboard: boolean;
   assigned_person_id: string | null;
   assigned_person_name: string | null;
+  assigned_person_photo_url?: string | null;
   label_ids: string[];
   reminders: TaskReminder[];
   created_at: string;

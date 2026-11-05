@@ -25,6 +25,7 @@ from app.platform.functions.labels import router as labels
 from app.platform.functions.labels import query_router as query_labels
 from app.platform.functions.monitoring import router as query_monitoring
 from app.platform.functions.people.persons import router as persons
+from app.platform.functions.people.persons import photo_router as person_photo
 from app.platform.functions.people.users import router as users
 from app.platform.functions.people.users import query_router as query_users
 from app.platform.functions.people.represents import router as represents
@@ -162,6 +163,7 @@ app.include_router(uploads.router, prefix="/api/platform/core")
 app.include_router(query_users.router, prefix="/api/platform/functions/people")
 app.include_router(users.router, prefix="/api/platform/functions/people")
 app.include_router(persons.router, prefix="/api/platform/functions/people")
+app.include_router(person_photo.router, prefix="/api/platform/functions/people")
 app.include_router(represents.router, prefix="/api/platform/functions/people")
 app.include_router(labels.router, prefix="/api/platform/functions")
 app.include_router(query_labels.router, prefix="/api/platform/functions")

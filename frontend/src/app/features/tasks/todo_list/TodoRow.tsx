@@ -1,4 +1,5 @@
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
+import { AssignedPersonBadge } from '@/app/features/tasks/AssignedPersonBadge.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { PersonOption, fibColor, urgencyColor } from './types.ts';
 
@@ -51,13 +52,6 @@ const TodoRow: React.FC<Props> = ({
   const isDone = item.todo_status === 'done';
   const isArchived = item.status === 'archived';
   const cardLabels = labels.filter((l) => item.label_ids.includes(l.id));
-  const getInitials = (name: string) =>
-    name
-      .split(' ')
-      .slice(0, 2)
-      .map((w) => w[0]?.toUpperCase() ?? '')
-      .join('');
-
   return (
     <div
       style={{
@@ -257,20 +251,11 @@ const TodoRow: React.FC<Props> = ({
           />
         ))}
         {item.assigned_person_name && persons.length > 1 && (
-          <span
-            style={{
-              fontSize: '11px',
-              padding: '2px 6px',
-              borderRadius: '10px',
-              background: theme.colors.accent + '22',
-              color: theme.colors.accent,
-              fontWeight: 600,
-              border: `1px solid ${theme.colors.accent}44`,
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {getInitials(item.assigned_person_name)}
-          </span>
+          <AssignedPersonBadge
+            name={item.assigned_person_name}
+            photoUrl={item.assigned_person_photo_url}
+            color={theme.colors.accent}
+          />
         )}
       </div>
 

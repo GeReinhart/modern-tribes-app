@@ -13,6 +13,7 @@ async def fetch_todo_items(pool, feature_instance_id: str) -> list[dict]:
         rows = await conn.fetch(
             """SELECT t.*, d.content_html AS document_content_html,
                       p.first_name || ' ' || p.last_name AS assigned_person_name,
+                      p.photo_url AS assigned_person_photo_url,
                       ARRAY(
                           SELECT le.label_id::text
                           FROM label_entities le
@@ -40,6 +41,7 @@ async def fetch_todo_item(pool, item_id: str) -> Optional[dict]:
         row = await conn.fetchrow(
             """SELECT t.*, d.content_html AS document_content_html,
                       p.first_name || ' ' || p.last_name AS assigned_person_name,
+                      p.photo_url AS assigned_person_photo_url,
                       ARRAY(
                           SELECT le.label_id::text
                           FROM label_entities le

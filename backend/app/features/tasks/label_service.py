@@ -13,4 +13,4 @@ from app.features.tasks.models import PersonOption
 async def list_persons_for_feature(pool, feature_instance_id: str, user: dict) -> list[PersonOption]:
     await require_feature_access(pool, feature_instance_id, user, "guest")
     rows = await persons_repository.fetch_persons_for_feature(pool, feature_instance_id, str(user["id"]))
-    return [PersonOption(id=str(r["id"]), name=r["name"]) for r in rows]
+    return [PersonOption(id=str(r["id"]), name=r["name"], photo_url=r["photo_url"]) for r in rows]

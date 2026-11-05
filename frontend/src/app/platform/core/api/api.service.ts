@@ -13,6 +13,13 @@ class ApiService {
     return headers;
   }
 
+  // A FormData body needs the browser to set its own multipart Content-Type (with the boundary).
+  private buildHeaders(options?: RequestInit): Record<string, string> {
+    const headers = { ...this.getAuthHeaders(), ...(options?.headers as Record<string, string> | undefined) };
+    if (options?.body instanceof FormData) delete headers['Content-Type'];
+    return headers;
+  }
+
   private async request<T>(
     endpoint: string,
     options?: RequestInit,
@@ -23,10 +30,7 @@ class ApiService {
     try {
       const response = await fetch(url, {
         ...options,
-        headers: {
-          ...this.getAuthHeaders(),
-          ...options?.headers,
-        },
+        headers: this.buildHeaders(options),
       });
 
       if (response.status === 401) {
@@ -108,6 +112,10 @@ class ApiService {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+  }
+
+  async putForm<T>(endpoint: string, formData: FormData): Promise<T> {
+    return this.request<T>(endpoint, { method: 'PUT', body: formData });
   }
 
   async patch<T>(endpoint: string, data?: unknown): Promise<T> {

@@ -1,4 +1,5 @@
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
+import { AssignedPersonBadge } from '@/app/features/tasks/AssignedPersonBadge.tsx';
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,13 +19,6 @@ interface Props {
   accentColor: string;
   expanded: boolean;
 }
-
-const getInitials = (name: string) =>
-  name
-    .split(' ')
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase() ?? '')
-    .join('');
 
 const KanbanCardBadges: React.FC<Props> = ({
   card,
@@ -96,22 +90,12 @@ const KanbanCardBadges: React.FC<Props> = ({
       )}
       {dueDateBadge()}
       {card.assigned_person_name && persons.length > 1 && (
-        <span
-          style={{
-            fontSize: 'var(--font-xs)',
-            padding: 'var(--space-xs) var(--space-sm)',
-            borderRadius: 'var(--radius-lg)',
-            background: accentColor + '22',
-            color: accentColor,
-            fontWeight: 600,
-            border: `1px solid ${accentColor}44`,
-            whiteSpace: 'nowrap',
-          }}
-        >
-          {expanded
-            ? card.assigned_person_name
-            : getInitials(card.assigned_person_name)}
-        </span>
+        <AssignedPersonBadge
+          name={card.assigned_person_name}
+          photoUrl={card.assigned_person_photo_url}
+          color={accentColor}
+          showName={expanded}
+        />
       )}
     </div>
   );

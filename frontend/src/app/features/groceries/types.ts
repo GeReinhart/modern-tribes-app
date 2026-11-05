@@ -3,6 +3,7 @@ import type { GroceriesUnit } from '@/types/groceries.ts';
 export interface PersonOption {
   id: string;
   name: string;
+  photo_url?: string | null;
 }
 
 export interface GroceriesItem {

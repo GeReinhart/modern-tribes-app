@@ -87,7 +87,7 @@ async def get_user_display_info(pool, user_id: str) -> dict | None:
         row = await conn.fetchrow(
             """
             SELECT u.id::text AS user_id, u.login,
-                   p.first_name, p.last_name
+                   p.first_name, p.last_name, p.photo_url
             FROM users u
             LEFT JOIN persons p ON p.id = u.person_id
             WHERE u.id = $1::uuid

@@ -4,6 +4,7 @@ import { DocumentRevision } from '@/app/platform/functions/documents/editor/docu
 export interface PersonOption {
   id: string;
   name: string;
+  photo_url?: string | null;
 }
 
 export const FIBONACCI = [1, 2, 3, 5, 8, 13, 21] as const;

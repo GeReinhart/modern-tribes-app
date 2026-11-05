@@ -39,6 +39,7 @@ def _row_to_todo(row: dict) -> TodoItemResponse:
         force_on_dashboard=row.get("force_on_dashboard", False) or False,
         assigned_person_id=str(row["assigned_person_id"]) if row.get("assigned_person_id") else None,
         assigned_person_name=row.get("assigned_person_name"),
+        assigned_person_photo_url=row.get("assigned_person_photo_url"),
         label_ids=list(row.get("label_ids") or []),
         reminders=[TaskReminderResponse(**r) for r in (row.get("reminders") or [])],
         created_at=row["created_at"],

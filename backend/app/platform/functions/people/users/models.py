@@ -89,3 +89,4 @@ class UserDisplayInfo(BaseModel):
     login: str
     first_name: Optional[str] = None
     last_name: Optional[str] = None
+    photo_url: Optional[str] = None

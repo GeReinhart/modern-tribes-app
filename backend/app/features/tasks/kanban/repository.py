@@ -45,6 +45,7 @@ async def fetch_board(pool, feature_instance_id: str) -> dict:
                       kc.updated_by::text AS updated_by,
                       d.content_html AS document_content_html,
                       p.first_name || ' ' || p.last_name AS assigned_person_name,
+                      p.photo_url AS assigned_person_photo_url,
                       ARRAY(
                           SELECT le.label_id::text
                           FROM label_entities le
@@ -158,6 +159,7 @@ async def fetch_card(pool, card_id: str) -> Optional[dict]:
                       kc.updated_by::text AS updated_by,
                       d.content_html AS document_content_html,
                       p.first_name || ' ' || p.last_name AS assigned_person_name,
+                      p.photo_url AS assigned_person_photo_url,
                       ARRAY(
                           SELECT le.label_id::text
                           FROM label_entities le

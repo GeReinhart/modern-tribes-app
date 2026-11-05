@@ -17,6 +17,7 @@ class MyTaskBase(BaseModel):
     due_date: Optional[date] = None
     assigned_person_id: Optional[str] = None
     assigned_person_name: Optional[str] = None
+    assigned_person_photo_url: Optional[str] = None
     feature_instance_id: str
     feature_instance_name: str
     project_id: str

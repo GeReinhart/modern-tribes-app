@@ -1,4 +1,5 @@
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
+import { AssignedPersonBadge } from '@/app/features/tasks/AssignedPersonBadge.tsx';
 import { ThemedConfirmDialog } from '@/app/platform/core/layout/themes/components/ThemedConfirmDialog.tsx';
 import { buildFeatureInstancePath } from '@/app/platform/core/routing/featureInstancePath.ts';
 import MyTaskEditModal from './MyTaskEditModal.tsx';
@@ -37,13 +38,6 @@ const MyTasksCard: React.FC<Props> = ({ task, persons, onMarkDone, onRefresh }) 
     ...l,
     feature_instance_id: task.feature_instance_id,
   }));
-  const getInitials = (name: string) =>
-    name
-      .split(' ')
-      .slice(0, 2)
-      .map((w) => w[0]?.toUpperCase() ?? '')
-      .join('');
-
   const statusLabel =
     task.source === 'todo' ? t('dashboard.tasks.todoStatus') : task.column_name;
 
@@ -191,20 +185,11 @@ const MyTasksCard: React.FC<Props> = ({ task, persons, onMarkDone, onRefresh }) 
               {task.due_date}
             </span>
             {task.assigned_person_name && persons.length > 1 && (
-              <span
-                style={{
-                  fontSize: 'var(--font-xs)',
-                  padding: 'var(--space-xs) var(--space-sm)',
-                  borderRadius: 'var(--radius-lg)',
-                  background: theme.colors.primary + '22',
-                  color: theme.colors.primary,
-                  fontWeight: 600,
-                  border: `1px solid ${theme.colors.primary}44`,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {getInitials(task.assigned_person_name)}
-              </span>
+              <AssignedPersonBadge
+                name={task.assigned_person_name}
+                photoUrl={task.assigned_person_photo_url}
+                color={theme.colors.primary}
+              />
             )}
           </div>
         </div>

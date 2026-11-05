@@ -6,6 +6,7 @@ from datetime import datetime
 class PersonOption(BaseModel):
     id: str
     name: str
+    photo_url: Optional[str] = None
 
 
 class TaskReminderCreate(BaseModel):

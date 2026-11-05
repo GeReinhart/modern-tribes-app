@@ -14,6 +14,7 @@ export interface KanbanCard {
   title: string;
   assigned_person_id: string | null;
   assigned_person_name: string | null;
+  assigned_person_photo_url?: string | null;
   document_id: string | null;
   document_content_html: string | null;
   position: number;

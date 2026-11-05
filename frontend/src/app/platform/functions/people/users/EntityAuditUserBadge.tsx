@@ -1,3 +1,4 @@
+import { ThemedAvatar } from '@/app/platform/core/layout/themes/components/ThemedAvatar.tsx';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { useUserDisplayInfo } from '@/app/platform/functions/people/users/useUserDisplayInfo.ts';
 import { UserDisplayInfo } from '@/app/platform/functions/people/users/user-display.types.ts';
@@ -38,14 +39,12 @@ interface AvatarProps {
   userId: string;
   buildTooltip: (name: string) => string;
   size: number;
-  gradientId: string;
 }
 
 const UserAvatar: React.FC<AvatarProps> = ({
   userId,
   buildTooltip,
   size,
-  gradientId,
 }) => {
   const { info, loading } = useUserDisplayInfo(userId);
   const { theme } = useTheme();
@@ -60,38 +59,13 @@ const UserAvatar: React.FC<AvatarProps> = ({
 
   if (!info) return null;
 
-  const initials = getInitials(info);
-  const tooltipText = buildTooltip(getDisplayName(info));
-
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 36 36"
-      style={{ flexShrink: 0, cursor: 'default' }}
-      role="img"
-      aria-label={tooltipText}
-    >
-      <title>{tooltipText}</title>
-      <defs>
-        <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={theme.colors.primary} stopOpacity="1" />
-          <stop offset="100%" stopColor={theme.colors.secondary} stopOpacity="0.85" />
-        </linearGradient>
-      </defs>
-      <circle cx="18" cy="18" r="18" fill={`url(#${gradientId})`} filter="drop-shadow(0 1px 3px rgba(0,0,0,0.25))" />
-      <text
-        x="18"
-        y="18"
-        textAnchor="middle"
-        dominantBaseline="central"
-        fill="white"
-        fontSize={size * 0.38}
-        fontWeight="bold"
-      >
-        {initials}
-      </text>
-    </svg>
+    <ThemedAvatar
+      photoUrl={info.photo_url}
+      initials={getInitials(info)}
+      size={size}
+      title={buildTooltip(getDisplayName(info))}
+    />
   );
 };
 
@@ -139,14 +113,12 @@ export const EntityAuditUserBadge: React.FC<EntityAuditBadgeProps> = ({
         userId={createdBy}
         buildTooltip={buildCreatorTooltip}
         size={28}
-        gradientId={`audit-creator-${createdBy}`}
       />
       {showUpdater && updatedBy && (
         <UserAvatar
           userId={updatedBy}
           buildTooltip={buildUpdaterTooltip}
           size={28}
-          gradientId={`audit-updater-${updatedBy}`}
         />
       )}
     </div>

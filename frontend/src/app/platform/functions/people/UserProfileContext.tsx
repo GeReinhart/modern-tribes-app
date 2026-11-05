@@ -9,6 +9,7 @@ interface UserProfileContextType {
   authUser: ReturnType<typeof useAuth>['user'];
   user: UserWithRolesAndPermissions | null | undefined;
   person: ReturnType<typeof usePerson>['person'];
+  refreshPerson: () => Promise<void>;
   isLoading: boolean;
   isAuthenticated: boolean;
   error: string | null;
@@ -33,6 +34,7 @@ export function UserProfileProvider({
     person,
     loading: personLoading,
     error: personError,
+    refetch: refreshPerson,
   } = usePerson(user?.person_id ?? null);
 
   return (
@@ -41,6 +43,7 @@ export function UserProfileProvider({
         authUser,
         user,
         person,
+        refreshPerson,
         isLoading: authLoading || userLoading || personLoading,
         isAuthenticated,
         error: userError || personError,

@@ -1,4 +1,6 @@
 import { ThemedSvgIcon } from '@/app/platform/core/layout/themes/icons/ThemedSvgIcon.tsx';
+import { ThemedAvatar } from '@/app/platform/core/layout/themes/components/ThemedAvatar.tsx';
+import { personInitials } from '@/app/platform/functions/people/personInitials.ts';
 import { useTheme } from '@/app/platform/core/layout/themes/ThemeContext.tsx';
 import { DEFAULT_CALENDAR_ITEM_COLOR } from '@/app/platform/core/layout/themes/components/calendar/types.ts';
 
@@ -15,10 +17,6 @@ interface Props {
   persons: PersonOption[];
   onView: (event: CalendarEvent) => void;
   onEdit?: (event: CalendarEvent) => void;
-}
-
-function initials(name: string): string {
-  return name.split(' ').filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
 }
 
 // Fills the positioned slot the shared calendar timeline grid gives it
@@ -86,9 +84,7 @@ const DayEventCard: React.FC<Props> = ({ event, startLabel, endLabel, heightPx, 
             </span>
           ))}
           {eventPersons.slice(0, 4).map(p => (
-            <span key={p.id} title={p.name} style={{ width: '22px', height: '22px', borderRadius: '50%', backgroundColor: color + '22', border: `1.5px solid ${color}`, color: color, fontSize: '9px', fontWeight: 800, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              {initials(p.name)}
-            </span>
+            <ThemedAvatar key={p.id} photoUrl={p.photo_url} initials={personInitials(p.name)} size={22} title={p.name} variant="soft" color={color} />
           ))}
         </div>
       )}

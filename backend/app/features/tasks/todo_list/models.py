@@ -41,6 +41,7 @@ class TodoItemResponse(BaseModel):
     force_on_dashboard: bool = False
     assigned_person_id: Optional[str] = None
     assigned_person_name: Optional[str] = None
+    assigned_person_photo_url: Optional[str] = None
     label_ids: list[str] = []
     reminders: list[TaskReminderResponse] = []
     created_at: datetime

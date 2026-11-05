@@ -25,6 +25,7 @@ class MealUpdate(BaseModel):
 class MealParticipantInfo(BaseModel):
     person_id: str
     person_name: str
+    person_photo_url: Optional[str] = None
 
 
 class MealResponse(BaseModel):

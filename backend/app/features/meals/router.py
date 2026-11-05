@@ -91,7 +91,7 @@ async def list_persons(feature_instance_id: str, current_user: dict = Depends(ge
     pool = get_database()
     await access.require_feature_access(pool, feature_instance_id, current_user, "guest")
     rows = await persons_repository.fetch_persons_for_feature(pool, feature_instance_id, str(current_user["id"]))
-    return [PersonOption(id=str(r["id"]), name=r["name"]) for r in rows]
+    return [PersonOption(id=str(r["id"]), name=r["name"], photo_url=r["photo_url"]) for r in rows]
 
 
 @router.get("/{meal_id}", response_model=MealResponse)

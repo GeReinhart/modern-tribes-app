@@ -20,6 +20,16 @@ class PersonService {
     return apiService.put<Person>(`${this.endpoint}/${id}`, data);
   }
 
+  async setPhoto(id: string, file: File): Promise<Person> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiService.putForm<Person>(`${this.endpoint}/${id}/photo`, formData);
+  }
+
+  async removePhoto(id: string): Promise<void> {
+    return apiService.delete<void>(`${this.endpoint}/${id}/photo`);
+  }
+
   async delete(id: string): Promise<void> {
     return apiService.delete<void>(`${this.endpoint}/${id}`);
   }

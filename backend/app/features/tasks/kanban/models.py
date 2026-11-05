@@ -19,6 +19,7 @@ class KanbanCardResponse(BaseModel):
     title: str
     assigned_person_id: Optional[str] = None
     assigned_person_name: Optional[str] = None
+    assigned_person_photo_url: Optional[str] = None
     document_id: Optional[str] = None
     document_content_html: Optional[str] = None
     position: int
