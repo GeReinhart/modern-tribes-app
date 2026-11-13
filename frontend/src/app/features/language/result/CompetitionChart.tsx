@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Line, LineChart, ResponsiveContainer } from 'recharts';
 
 import {
-  CHART_HEIGHT, CHART_MARGIN, dayTimestamp, formatPercent, gridElement, timeAxisElement, tooltipElement, valueAxisElement,
+  CHART_HEIGHT, CHART_MARGIN, DAY_KEY, dayAxisElement, formatPercent, gridElement, tooltipElement, valueAxisElement,
 } from './chartCommon.tsx';
 import { memberColor } from './memberColors.ts';
 import PeriodChartFrame from './PeriodChartFrame.tsx';
@@ -29,7 +29,7 @@ const scoreAxisMax = (members: CompetitionMember[], dates: string[]): number => 
 // One row per day, holding each member's score under the member's id (a member without a score that day has no key).
 const rowsForDates = (members: CompetitionMember[], dates: string[]) =>
   dates.map((date) => {
-    const row: Record<string, number> = { t: dayTimestamp(date) };
+    const row: Record<string, number | string> = { [DAY_KEY]: date };
     members.forEach((m) => {
       const point = m.points.find((p) => p.date === date);
       if (point) row[m.user_id] = point.score;
@@ -52,7 +52,7 @@ const CompetitionChart: React.FC<Props> = ({ members }) => {
           <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
             <LineChart data={rowsForDates(members, visible.map((d) => d.date))} margin={CHART_MARGIN}>
               {gridElement(colors)}
-              {timeAxisElement(colors, true)}
+              {dayAxisElement(colors, true)}
               {valueAxisElement(colors, percentTick, [0, scoreAxisMax(members, visible.map((d) => d.date))])}
               {tooltipElement((value, name) => [formatPercent(value), names[name] ?? name])}
               {members.map((member, index) => (

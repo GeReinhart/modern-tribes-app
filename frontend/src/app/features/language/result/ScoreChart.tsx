@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Line, LineChart, ResponsiveContainer } from 'recharts';
 
 import {
-  CHART_HEIGHT, CHART_MARGIN, dayTimestamp, formatPercent, gridElement, timeAxisElement, tooltipElement, valueAxisElement,
+  CHART_HEIGHT, CHART_MARGIN, dayAxisElement, formatPercent, gridElement, tooltipElement, valueAxisElement,
 } from './chartCommon.tsx';
 import PeriodChartFrame from './PeriodChartFrame.tsx';
 import { ScoreHistoryPoint } from './types.ts';
@@ -27,9 +27,9 @@ const ScoreChart: React.FC<Props> = ({ points }) => {
       {(visible) => (
         <div role="img" aria-label={t('features.language.scoreOverTime')}>
           <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-            <LineChart data={visible.map((p) => ({ t: dayTimestamp(p.date), score: p.score }))} margin={CHART_MARGIN}>
+            <LineChart data={visible} margin={CHART_MARGIN}>
               {gridElement(colors)}
-              {timeAxisElement(colors, true)}
+              {dayAxisElement(colors, true)}
               {valueAxisElement(colors, percentTick, [0, 1])}
               {tooltipElement((value) => [formatPercent(value), t('features.language.scoreOverTime')])}
               <Line type="linear" dataKey="score" stroke={colors.primary} strokeWidth={2} dot={{ r: 3, fill: colors.primary }} isAnimationActive={false} />

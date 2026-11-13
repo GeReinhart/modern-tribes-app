@@ -6,7 +6,7 @@ import { Bar, BarChart, ResponsiveContainer } from 'recharts';
 
 import { CORRECT_COLOR, WRONG_COLOR } from '../shared/attemptColors.ts';
 import {
-  CHART_HEIGHT, CHART_MARGIN, dayTimestamp, gridElement, timeAxisElement, tooltipElement, valueAxisElement,
+  CHART_HEIGHT, CHART_MARGIN, dayAxisElement, gridElement, tooltipElement, valueAxisElement,
 } from './chartCommon.tsx';
 import PeriodChartFrame from './PeriodChartFrame.tsx';
 import { EffortDay } from './types.ts';
@@ -30,9 +30,9 @@ const EffortChart: React.FC<Props> = ({ days }) => {
         <>
           <div role="img" aria-label={t('features.language.effortOverTime')}>
             <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-              <BarChart data={visible.map((d) => ({ ...d, t: dayTimestamp(d.date) }))} margin={CHART_MARGIN}>
+              <BarChart data={visible} margin={CHART_MARGIN}>
                 {gridElement(colors)}
-                {timeAxisElement(colors, true)}
+                {dayAxisElement(colors, true)}
                 {valueAxisElement(colors, (v) => String(round(v)))}
                 {tooltipElement((value, name) => [String(round(value)), names[name] ?? name])}
                 <Bar dataKey="success" stackId="effort" fill={CORRECT_COLOR} isAnimationActive={false} />
