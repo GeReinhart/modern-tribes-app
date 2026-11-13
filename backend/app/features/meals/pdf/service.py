@@ -36,6 +36,20 @@ def _group_meals_by_cell(meals: list[dict]) -> tuple[dict, list[str]]:
     return by_cell, visible_slots
 
 
+def _meal_recipe_entries(meals: list[dict], recipes: list[dict]) -> list[dict]:
+    """One entry per (meal, linked recipe), chronologically — a recipe used by several meals is
+    printed once per meal, since each meal has its own headcount to scale the quantities to."""
+    recipe_by_id = {r["id"]: r for r in recipes}
+    entries = []
+    for meal in sorted(meals, key=lambda m: m["start_at"]):
+        slot = _slot_from_start_at(meal["start_at"])
+        entries += [
+            {"meal": meal, "slot": slot, "recipe": recipe_by_id[rid]}
+            for rid in meal["recipe_ids"] if rid in recipe_by_id
+        ]
+    return entries
+
+
 def _date_range(start_date: date, end_date: date) -> list[date]:
     return [start_date + timedelta(days=i) for i in range((end_date - start_date).days + 1)]
 
@@ -43,7 +57,7 @@ def _date_range(start_date: date, end_date: date) -> list[date]:
 async def build_meals_pdf(pool, feature_instance_id: str, start_date: date, end_date: date) -> bytes:
     """Printable export for a date range: a day x slot table on the first page (columns
     limited to the slots actually used in that range, mirroring the web view), then one card
-    per recipe linked to any of those meals on the following pages."""
+    per recipe linked to each of those meals on the following pages, scaled to the meal's headcount."""
     all_meals = await meals_repository.fetch_meals_for_instance(pool, feature_instance_id)
     meals = [m for m in all_meals if start_date <= m["start_at"].date() <= end_date]
     by_cell, visible_slots = _group_meals_by_cell(meals)
@@ -63,6 +77,7 @@ async def build_meals_pdf(pool, feature_instance_id: str, start_date: date, end_
         visible_slots=visible_slots,
         by_cell=by_cell,
         recipes=recipes,
+        recipe_entries=_meal_recipe_entries(meals, recipes),
         ingredients_by_recipe=ingredients_by_recipe,
         components_by_recipe=components_by_recipe,
         label_details=label_details,
