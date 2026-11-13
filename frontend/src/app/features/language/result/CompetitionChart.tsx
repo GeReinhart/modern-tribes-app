@@ -15,7 +15,16 @@ interface Props {
   members: CompetitionMember[];
 }
 
-const percentTick = (ratio: number) => `${Math.round(ratio * 100)}%`;
+const AXIS_STEP = 0.05;
+
+const percentTick = (ratio: number) => `${Number((ratio * 100).toFixed(1))}%`;
+
+// The top of the score axis: just above the best score shown, so low scores are not squeezed at the bottom.
+const scoreAxisMax = (members: CompetitionMember[], dates: string[]): number => {
+  const shown = new Set(dates);
+  const best = Math.max(0, ...members.flatMap((m) => m.points.filter((p) => shown.has(p.date)).map((p) => p.score)));
+  return Math.min(1, Math.max(AXIS_STEP, Math.ceil(best / AXIS_STEP) * AXIS_STEP));
+};
 
 // One row per day, holding each member's score under the member's id (a member without a score that day has no key).
 const rowsForDates = (members: CompetitionMember[], dates: string[]) =>
@@ -44,7 +53,7 @@ const CompetitionChart: React.FC<Props> = ({ members }) => {
             <LineChart data={rowsForDates(members, visible.map((d) => d.date))} margin={CHART_MARGIN}>
               {gridElement(colors)}
               {timeAxisElement(colors, true)}
-              {valueAxisElement(colors, percentTick, [0, 1])}
+              {valueAxisElement(colors, percentTick, [0, scoreAxisMax(members, visible.map((d) => d.date))])}
               {tooltipElement((value, name) => [formatPercent(value), names[name] ?? name])}
               {members.map((member, index) => (
                 <Line
