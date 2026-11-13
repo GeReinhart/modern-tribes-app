@@ -74,9 +74,9 @@ Feature: See a lesson's overall test score
       | 7004 | 2003    | source_to_target | free | true    | 2026-11-13T10:00:00 | active |
       | 7005 | 2003    | source_to_target | free | true    | 2026-11-14T10:00:00 | active |
       | 7006 | 2003    | source_to_target | free | true    | 2026-11-15T10:00:00 | active |
-      | 7007 | 2003    | target_to_source | free | true    | 2026-11-13T10:00:00 | active |
-      | 7008 | 2003    | target_to_source | free | true    | 2026-11-14T10:00:00 | active |
-      | 7009 | 2003    | target_to_source | free | true    | 2026-11-15T10:00:00 | active |
+      | 7007 | 2004    | target_to_source | free | true    | 2026-11-13T10:00:00 | active |
+      | 7008 | 2004    | target_to_source | free | true    | 2026-11-14T10:00:00 | active |
+      | 7009 | 2004    | target_to_source | free | true    | 2026-11-15T10:00:00 | active |
     When I GET /api/features/tasks/language/lessons/1500/test/score
     Then the response status code is 200
     And the response body includes:

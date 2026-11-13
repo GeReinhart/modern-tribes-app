@@ -1,6 +1,7 @@
 import React from 'react';
 
 import EffortChart from './EffortChart.tsx';
+import ResultLoading from './ResultLoading.tsx';
 import { useEffort } from './useEffort.ts';
 
 interface Props {
@@ -9,6 +10,10 @@ interface Props {
 }
 
 // The "Effort" results of one person: how much they answered each day, successes and errors.
-const EffortPanel: React.FC<Props> = ({ lessonId, userId }) => <EffortChart days={useEffort(lessonId, userId)} />;
+const EffortPanel: React.FC<Props> = ({ lessonId, userId }) => {
+  const { data, loading } = useEffort(lessonId, userId);
+
+  return <ResultLoading loading={loading}><EffortChart days={data} /></ResultLoading>;
+};
 
 export default EffortPanel;

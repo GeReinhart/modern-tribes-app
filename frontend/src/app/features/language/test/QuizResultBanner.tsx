@@ -10,9 +10,11 @@ import { GivenAnswer, TestAnswerResult } from './types.ts';
 
 interface Props {
   result: TestAnswerResult;
-  // What was asked: the word to translate (or the noun), with the translation direction when there is one.
+  // What was asked: the word to translate (or the noun), in `promptLanguage`, answered in `answerLanguage`
+  // (the same language for an article or plural test).
   originalWord: string;
-  directionLabel?: string;
+  promptLanguage: string;
+  answerLanguage: string;
   givenAnswer: GivenAnswer;
   // Shown instead of the bare correct answer, e.g. the article together with its noun.
   correctAnswerLabel?: string;
@@ -22,8 +24,22 @@ interface Props {
 // How many different comments a wrong answer can get (keys `features.language.incorrect0..9`).
 const INCORRECT_MESSAGE_COUNT = 10;
 
+// One row of the result table: the title in the first column, its value in the second.
+const ResultRow: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
+  <tr>
+    <th scope="row" style={{ textAlign: 'left', fontWeight: 'normal', paddingRight: '12px', whiteSpace: 'nowrap' }}>
+      <ThemedText variant="secondary" size="small">{label}</ThemedText>
+    </th>
+    <td>{children}</td>
+  </tr>
+);
+
+// "FR->DE" for a translation test, just "DE" when the question and the answer share a language.
+const askedLanguages = (from: string, to: string) =>
+  from === to ? to.toUpperCase() : `${from.toUpperCase()}->${to.toUpperCase()}`;
+
 const QuizResultBanner: React.FC<Props> = ({
-  result, originalWord, directionLabel, givenAnswer, correctAnswerLabel, onContinue,
+  result, originalWord, promptLanguage, answerLanguage, givenAnswer, correctAnswerLabel, onContinue,
 }) => {
   const { t } = useTranslation();
   // Drawn once per result: the banner is mounted anew for each answer, so the comment varies
@@ -36,14 +52,19 @@ const QuizResultBanner: React.FC<Props> = ({
       <ThemedText variant={result.correct ? 'success' : 'danger'} size="medium">
         {result.correct ? t('features.language.correct') : t(`features.language.incorrect${incorrectIndex}`)}
       </ThemedText>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-        {directionLabel && <ThemedText variant="secondary" size="small">{directionLabel}</ThemedText>}
-        <ThemedText size="medium">{originalWord}</ThemedText>
-        <GivenAnswerLine given={givenAnswer.text} solution={solution} correct={result.correct} compareLetters={givenAnswer.typed} />
-        {!result.correct && (
-          <ThemedText size="medium"><strong>{solution}</strong></ThemedText>
-        )}
-      </div>
+      <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+        <tbody>
+          <ResultRow label={t('features.language.askedWord', { languages: askedLanguages(promptLanguage, answerLanguage) })}>
+            <ThemedText size="medium">{originalWord}</ThemedText>
+          </ResultRow>
+          <ResultRow label={t('features.language.yourAnswer')}>
+            <GivenAnswerLine given={givenAnswer.text} solution={solution} correct={result.correct} compareLetters={givenAnswer.typed} />
+          </ResultRow>
+          <ResultRow label={t('features.language.solution', { language: answerLanguage.toUpperCase() })}>
+            <ThemedText size="medium"><strong>{solution}</strong></ThemedText>
+          </ResultRow>
+        </tbody>
+      </table>
       <ThemedText variant="secondary" size="small">
         {t('features.language.wordScorePercent', { percent: Math.round(result.word_score * 100) })}
       </ThemedText>

@@ -3,6 +3,8 @@ each lesson. Shared by the lesson, learn and test sub-packages — a lesson belo
 project, not to one tab instance, so all three read and write the exact same rows."""
 from uuid import UUID
 
+from app.features.language import snapshot_repository
+
 
 async def get_language_settings(pool, project_id: str) -> dict | None:
     async with pool.acquire() as conn:
@@ -101,6 +103,7 @@ async def add_word_to_lesson(pool, lesson_id: str, word_id: str, user_id: str) -
                VALUES ($1, $2, $3, $4, $4)""",
             UUID(lesson_id), UUID(word_id), position, UUID(user_id),
         )
+    await snapshot_repository.delete_for_lesson(pool, lesson_id)
 
 
 async def remove_word_from_lesson(pool, lesson_id: str, word_id: str, user_id: str) -> None:
@@ -111,6 +114,7 @@ async def remove_word_from_lesson(pool, lesson_id: str, word_id: str, user_id: s
                WHERE lesson_id = $1 AND word_id = $2 AND status = 'active'""",
             UUID(lesson_id), UUID(word_id), UUID(user_id),
         )
+    await snapshot_repository.delete_for_lesson(pool, lesson_id)
 
 
 async def count_lesson_words(pool, lesson_id: str) -> int:

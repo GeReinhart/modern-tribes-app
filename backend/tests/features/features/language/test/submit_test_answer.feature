@@ -222,3 +222,81 @@ Feature: Submit a test answer for a word
     Then the response status code is 403
     And the language_word_test_attempts table contains:
       | id | word_id | direction | mode | correct | created_at | status |
+
+  @error_case
+  Scenario: POST a source-to-target answer on a word that is not in the source language — 422 and no attempt is recorded
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the language_words table contains:
+      | id   | text | language | word_type | status |
+      | 2001 | chat | fr       | noun      | active |
+      | 2002 | cat  | en       | noun      | active |
+    And the language_word_translations table contains:
+      | id   | word_id_a | word_id_b | status |
+      | 4001 | 2001      | 2002      | active |
+    And the language_lesson_words table contains:
+      | lesson_id | word_id | status |
+      | 1500      | 2001    | active |
+    And the language_word_test_attempts table contains:
+      | id | word_id | direction | mode | correct | created_at | status |
+    When I POST /api/features/tasks/language/lessons/1500/test/attempts with body:
+      """
+      { "word_id": "2002", "direction": "source_to_target", "mode": "free", "answer": "chat" }
+      """
+    Then the response status code is 422
+    And the language_word_test_attempts table contains:
+      | id | word_id | direction | mode | correct | created_at | status |
+
+  @error_case
+  Scenario: POST a target-to-source answer on a word that is not in the target language — 422 and no attempt is recorded
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the language_words table contains:
+      | id   | text | language | word_type | status |
+      | 2001 | chat | fr       | noun      | active |
+      | 2002 | cat  | en       | noun      | active |
+    And the language_word_translations table contains:
+      | id   | word_id_a | word_id_b | status |
+      | 4001 | 2001      | 2002      | active |
+    And the language_lesson_words table contains:
+      | lesson_id | word_id | status |
+      | 1500      | 2001    | active |
+    And the language_word_test_attempts table contains:
+      | id | word_id | direction | mode | correct | created_at | status |
+    When I POST /api/features/tasks/language/lessons/1500/test/attempts with body:
+      """
+      { "word_id": "2001", "direction": "target_to_source", "mode": "free", "answer": "cat" }
+      """
+    Then the response status code is 422
+    And the language_word_test_attempts table contains:
+      | id | word_id | direction | mode | correct | created_at | status |
+
+  Scenario: POST a correct answer — the day's results are stored for the results pages
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the language_words table contains:
+      | id   | text | language | word_type | status |
+      | 2001 | chat | fr       | noun      | active |
+      | 2002 | cat  | en       | noun      | active |
+    And the language_word_translations table contains:
+      | id   | word_id_a | word_id_b | status |
+      | 4001 | 2001      | 2002      | active |
+    And the language_lesson_words table contains:
+      | lesson_id | word_id | status |
+      | 1500      | 2001    | active |
+    And the language_word_test_attempts table contains:
+      | id | word_id | direction | mode | correct | created_at | status |
+    When I POST /api/features/tasks/language/lessons/1500/test/attempts with body:
+      """
+      { "word_id": "2001", "direction": "source_to_target", "mode": "free", "answer": "cat" }
+      """
+    Then the response status code is 201
+    And the language_result_snapshots table contains:
+      | day   | lesson_id | user_id | score  | success | errors |
+      | <set> | 1500      | 0002    | 0.1667 | 1.0     | 0.0    |

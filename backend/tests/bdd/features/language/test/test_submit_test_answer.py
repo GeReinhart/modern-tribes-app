@@ -60,3 +60,26 @@ def test_submit_choice_answer_not_enough_words():
 )
 def test_submit_answer_forbidden():
     pass
+
+
+@scenario(
+    FEATURE,
+    "POST a source-to-target answer on a word that is not in the source language — "
+    "422 and no attempt is recorded",
+)
+def test_submit_source_to_target_wrong_language():
+    pass
+
+
+@scenario(
+    FEATURE,
+    "POST a target-to-source answer on a word that is not in the target language — "
+    "422 and no attempt is recorded",
+)
+def test_submit_target_to_source_wrong_language():
+    pass
+
+
+@scenario(FEATURE, "POST a correct answer — the day's results are stored for the results pages")
+def test_submit_answer_stores_snapshot():
+    pass

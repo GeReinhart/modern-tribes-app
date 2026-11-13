@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from app.features.language import dictionary, lesson_score, lessons
+from app.features.language import access, dictionary, lesson_score, lessons, snapshots
 from app.features.language.test import repository
 from app.features.language.test.models import TestAnswerResult, TestAnswerSubmit
 
@@ -9,14 +9,28 @@ async def submit_answer(pool, lesson_id: str, data: TestAnswerSubmit, user_id: s
     word = await dictionary.get_word(pool, data.word_id)
     if word is None:
         raise HTTPException(status_code=404, detail="Word not found")
+    await _check_word_language(pool, lesson_id, word, data.direction)
     if data.direction in ("article", "plural"):
         correct, correct_answer = _check_noun_fact_answer(word, data.direction, data.answer)
     else:
         correct, correct_answer = await _check_translation_answer(pool, lesson_id, word, data)
 
     await repository.record_attempt(pool, user_id, data.word_id, data.direction, data.mode, correct)
+    await snapshots.refresh(pool, lesson_id, user_id)
     score = await _score_after_attempt(pool, lesson_id, data, user_id)
     return TestAnswerResult(correct=correct, correct_answer=correct_answer, word_score=round(score, 4))
+
+
+async def _check_word_language(pool, lesson_id: str, word: dict, direction: str) -> None:
+    """The submitted word must be in the language its direction shows: a lesson word (source
+    language) in `source_to_target`, the translation or noun shown (target language) otherwise."""
+    project_id = await access.get_lesson_project_id(pool, lesson_id)
+    settings = await lessons.get_language_settings(pool, project_id)
+    if settings is None:
+        return
+    expected = settings["source_language" if direction == "source_to_target" else "target_language"]
+    if word["language"] != expected:
+        raise HTTPException(status_code=422, detail=f"This word is not in the expected language ({expected}).")
 
 
 def _check_noun_fact_answer(word: dict, fact: str, answer: str) -> tuple[bool, str]:

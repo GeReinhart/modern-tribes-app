@@ -36,6 +36,8 @@ const PluralQuiz: React.FC<Props> = ({ lessonId, words, languages, targetLanguag
       <QuizResultBanner
         result={result}
         originalWord={current.article ? `${current.article} ${current.text}` : current.text}
+        promptLanguage={current.language}
+        answerLanguage={current.language}
         givenAnswer={givenAnswer}
         onContinue={continueToNext}
       />

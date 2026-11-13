@@ -30,3 +30,8 @@ def test_get_competition_members():
 @scenario(FEATURE, "GET the competition as a user without access to the project's tribe — 403")
 def test_get_competition_forbidden():
     pass
+
+
+@scenario(FEATURE, "GET the competition — a user who answered without holding a position on the project's tribe still appears")
+def test_get_competition_user_without_position():
+    pass

@@ -52,7 +52,8 @@ def given_today_is(date_str, monkeypatch):
             return fixed_today
 
     monkeypatch.setattr("app.features.meals.service.date", _FrozenDate)
-    monkeypatch.setattr("app.features.language.test.service.date", _FrozenDate)
+    monkeypatch.setattr("app.features.language.lesson_score.date", _FrozenDate)
+    monkeypatch.setattr("app.features.language.snapshots.date", _FrozenDate)
 
 
 # ── authentication step stubs ──────────────────────────────────────────────────
@@ -2823,6 +2824,33 @@ async def _insert_test_attempt_row(conn, headers, row):
 @then("the language_word_test_attempts table contains:")
 def then_language_word_test_attempts_table(datatable):
     _assert_db("language_word_test_attempts", datatable)
+
+
+@given("the language_result_snapshots table contains:")
+def given_language_result_snapshots_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: row[i] for i in range(len(headers))}
+                if not rec.get("lesson_id"):
+                    continue
+                await conn.execute(
+                    """INSERT INTO language_result_snapshots(lesson_id, user_id, day, score, success, errors)
+                       VALUES($1, $2, $3, $4, $5, $6)""",
+                    UUID(expand_id(rec["lesson_id"])), UUID(expand_id(rec["user_id"])),
+                    date.fromisoformat(rec["day"]), float(rec["score"]),
+                    float(rec.get("success", "0")), float(rec.get("errors", "0")),
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the language_result_snapshots table contains:")
+def then_language_result_snapshots_table(datatable):
+    _assert_db("language_result_snapshots", datatable)
 
 
 @given("the bundled dictionary data directory is empty")

@@ -153,3 +153,44 @@ Feature: See how a lesson's score evolves over time
       | id | tribe_id | person_id | position | status |
     When I GET /api/features/tasks/language/lessons/1500/result/score/history
     Then the response status code is 403
+
+  Scenario: GET the score history with past days already stored — they are served as stored, only today is computed
+    Given I am authenticated as a regular user: user.id 0002
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the language_words table contains:
+      | id   | text  | language | word_type | status |
+      | 2001 | chat  | fr       | noun      | active |
+      | 2002 | cat   | en       | noun      | active |
+    And the language_word_translations table contains:
+      | id   | word_id_a | word_id_b | status |
+      | 4001 | 2001      | 2002      | active |
+    And the language_lesson_words table contains:
+      | lesson_id | word_id | status |
+      | 1500      | 2001    | active |
+    And the language_word_test_attempts table contains:
+      | id   | word_id | direction        | mode | correct | created_at          | status |
+      | 7001 | 2001    | source_to_target | free | true    | 2026-11-14T10:00:00 | active |
+      | 7002 | 2001    | source_to_target | free | true    | 2026-11-16T10:00:00 | active |
+    And the language_result_snapshots table contains:
+      | lesson_id | user_id | day        | score | success | errors |
+      | 1500      | 0002    | 2026-11-14 | 0.9   | 1       | 0      |
+      | 1500      | 0002    | 2026-11-15 | 0.8   | 0       | 0      |
+    When I GET /api/features/tasks/language/lessons/1500/result/score/history
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "points": [
+          { "date": "2026-11-14", "score": 0.9 },
+          { "date": "2026-11-15", "score": 0.8 },
+          { "date": "2026-11-16", "score": 0.3333 }
+        ]
+      }
+      """
+    And the language_result_snapshots table contains:
+      | day        | lesson_id | user_id | score  | success | errors |
+      | 2026-11-14 | 1500      | 0002    | 0.9    | 1.0     | 0.0    |
+      | 2026-11-15 | 1500      | 0002    | 0.8    | 0.0     | 0.0    |
+      | 2026-11-16 | 1500      | 0002    | 0.3333 | 1.0     | 0.0    |

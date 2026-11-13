@@ -1,15 +1,10 @@
-import { useEffect, useState } from 'react';
-
 import { resultService } from './service.ts';
 import { CompetitionMember } from './types.ts';
+import { LoadedResult, useLoadedResult } from './useLoadedResult.ts';
 
-// The overall score history of every project member who answered the lesson's test.
-export function useCompetition(lessonId: string): CompetitionMember[] {
-  const [members, setMembers] = useState<CompetitionMember[]>([]);
+const NO_MEMBERS: CompetitionMember[] = [];
 
-  useEffect(() => {
-    resultService.getCompetition(lessonId).then((result) => setMembers(result.members)).catch(() => setMembers([]));
-  }, [lessonId]);
-
-  return members;
+// The overall score history of everyone who answered the lesson's test.
+export function useCompetition(lessonId: string): LoadedResult<CompetitionMember[]> {
+  return useLoadedResult(() => resultService.getCompetition(lessonId).then((c) => c.members), NO_MEMBERS, [lessonId]);
 }

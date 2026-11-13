@@ -33,6 +33,8 @@ const ArticleQuiz: React.FC<Props> = ({ lessonId, words, languages, targetLangua
       <QuizResultBanner
         result={result}
         originalWord={current.text}
+        promptLanguage={current.language}
+        answerLanguage={current.language}
         givenAnswer={{ ...givenAnswer, text: `${givenAnswer.text} ${current.text}` }}
         correctAnswerLabel={`${result.correct_answer} ${current.text}`}
         onContinue={continueToNext}
