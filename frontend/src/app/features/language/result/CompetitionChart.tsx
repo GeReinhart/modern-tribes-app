@@ -28,7 +28,7 @@ const rowsForDates = (members: CompetitionMember[], dates: string[]) =>
     return row;
   });
 
-// Every member's overall score over time on a single chart, one color per member, with a legend.
+// Every member's overall score over time on a single chart, one color per member.
 const CompetitionChart: React.FC<Props> = ({ members }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -39,49 +39,30 @@ const CompetitionChart: React.FC<Props> = ({ members }) => {
   return (
     <PeriodChartFrame items={dates}>
       {(visible) => (
-        <>
-          <div role="img" aria-label={t('features.language.competitionOverTime')}>
-            <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-              <LineChart data={rowsForDates(members, visible.map((d) => d.date))} margin={CHART_MARGIN}>
-                {gridElement(colors)}
-                {timeAxisElement(colors, true)}
-                {valueAxisElement(colors, percentTick, [0, 1])}
-                {tooltipElement((value, name) => [formatPercent(value), names[name] ?? name])}
-                {members.map((member, index) => (
-                  <Line
-                    key={member.user_id}
-                    type="linear"
-                    dataKey={member.user_id}
-                    stroke={memberColor(index)}
-                    strokeWidth={2}
-                    dot={{ r: 3, fill: memberColor(index) }}
-                    connectNulls
-                    isAnimationActive={false}
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          <MembersLegend members={members} />
-        </>
+        <div role="img" aria-label={t('features.language.competitionOverTime')}>
+          <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+            <LineChart data={rowsForDates(members, visible.map((d) => d.date))} margin={CHART_MARGIN}>
+              {gridElement(colors)}
+              {timeAxisElement(colors, true)}
+              {valueAxisElement(colors, percentTick, [0, 1])}
+              {tooltipElement((value, name) => [formatPercent(value), names[name] ?? name])}
+              {members.map((member, index) => (
+                <Line
+                  key={member.user_id}
+                  type="linear"
+                  dataKey={member.user_id}
+                  stroke={memberColor(index)}
+                  strokeWidth={2}
+                  dot={{ r: 3, fill: memberColor(index) }}
+                  connectNulls
+                  isAnimationActive={false}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       )}
     </PeriodChartFrame>
-  );
-};
-
-const MembersLegend: React.FC<{ members: CompetitionMember[] }> = ({ members }) => {
-  const { theme } = useTheme();
-
-  return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', fontSize: 'var(--font-sm)' }}>
-      {members.map((member, index) => (
-        <span key={member.user_id} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-          <span style={{ width: 10, height: 10, background: memberColor(index), borderRadius: 2 }} />
-          {member.name}
-          <span style={{ color: theme.colors.secondary }}>{formatPercent(member.points[member.points.length - 1].score)}</span>
-        </span>
-      ))}
-    </div>
   );
 };
 

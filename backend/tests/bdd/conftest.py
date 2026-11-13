@@ -2853,6 +2853,29 @@ def then_language_result_snapshots_table(datatable):
     _assert_db("language_result_snapshots", datatable)
 
 
+@given("the language_competition_participation table contains:")
+def given_language_competition_participation_table(datatable):
+    async def _insert():
+        conn = await _conn()
+        try:
+            headers = datatable[0]
+            for row in datatable[1:]:
+                rec = {headers[i]: row[i] for i in range(len(headers))}
+                await conn.execute(
+                    "INSERT INTO language_competition_participation(project_id, user_id, participates) VALUES($1, $2, $3)",
+                    UUID(expand_id(rec["project_id"])), UUID(expand_id(rec["user_id"])),
+                    rec["participates"].lower() == "true",
+                )
+        finally:
+            await conn.close()
+    _run(_insert())
+
+
+@then("the language_competition_participation table contains:")
+def then_language_competition_participation_table(datatable):
+    _assert_db("language_competition_participation", datatable)
+
+
 @given("the bundled dictionary data directory is empty")
 def given_empty_dictionary_data_dir(tmp_path, monkeypatch):
     """Points local_dictionary.DATA_DIR at an empty per-test temp directory, so the

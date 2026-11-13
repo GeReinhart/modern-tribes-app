@@ -35,3 +35,13 @@ def test_get_competition_forbidden():
 @scenario(FEATURE, "GET the competition — a user who answered without holding a position on the project's tribe still appears")
 def test_get_competition_user_without_position():
     pass
+
+
+@scenario(FEATURE, "GET the competition — a member who left the project's competition no longer appears")
+def test_get_competition_left_member():
+    pass
+
+
+@scenario(FEATURE, "GET the competition — a choice made on another project does not hide the member here")
+def test_get_competition_other_project_choice():
+    pass

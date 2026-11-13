@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from app.features.language import access, lesson_score, snapshots
 from app.features.language.result import repository
 from app.features.language.result.models import (
-    CompetitionMember, CompetitionResponse, EffortDay, EffortResponse, ResultMember, ScoreHistoryPoint, ScoreHistoryResponse,
+    CompetitionMember, CompetitionParticipation, CompetitionResponse, EffortDay, EffortResponse, ResultMember, ScoreHistoryPoint, ScoreHistoryResponse,
 )
 from app.features.language.score_models import LessonScoreResponse
 
@@ -51,3 +51,15 @@ async def get_competition(pool, lesson_id: str) -> CompetitionResponse:
         if points:
             members.append(CompetitionMember(user_id=person["user_id"], name=person["name"], points=points))
     return CompetitionResponse(members=members)
+
+
+async def get_participation(pool, lesson_id: str, user_id: str) -> CompetitionParticipation:
+    project_id = await access.get_lesson_project_id(pool, lesson_id)
+    return CompetitionParticipation(participates=await repository.get_participates(pool, project_id, user_id))
+
+
+async def set_participation(pool, lesson_id: str, user_id: str, participates: bool) -> CompetitionParticipation:
+    """Join or leave the competition of the lesson's project (it covers all of the project's lessons)."""
+    project_id = await access.get_lesson_project_id(pool, lesson_id)
+    await repository.set_participates(pool, project_id, user_id, participates)
+    return CompetitionParticipation(participates=participates)

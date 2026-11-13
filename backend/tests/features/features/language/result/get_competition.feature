@@ -144,3 +144,78 @@ Feature: Compare the members' scores on a lesson
         ]
       }
       """
+
+  Scenario: GET the competition — a member who left the project's competition no longer appears
+    Given I am authenticated as a regular user: user.id 0002
+    And the persons table contains:
+      | id   | first_name | last_name | status |
+      | 0031 | Leo        | Learner   | active |
+    And the users table contains:
+      | id   | email        | person_id | status |
+      | 0003 | leo@test.com | 0031      | active |
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+      | 1002 | 0010     | 0031      | member   | active |
+    And the language_words table contains:
+      | id   | text  | language | word_type | status |
+      | 2001 | chat  | fr       | noun      | active |
+      | 2002 | cat   | en       | noun      | active |
+    And the language_word_translations table contains:
+      | id   | word_id_a | word_id_b | status |
+      | 4001 | 2001      | 2002      | active |
+    And the language_lesson_words table contains:
+      | lesson_id | word_id | status |
+      | 1500      | 2001    | active |
+    And the language_word_test_attempts table contains:
+      | id   | user_id | word_id | direction        | mode | correct | created_at          | status |
+      | 7001 | 0003    | 2001    | source_to_target | free | true    | 2026-11-16T10:00:00 | active |
+      | 7002 | 0002    | 2001    | source_to_target | free | true    | 2026-11-16T10:00:00 | active |
+    And the language_competition_participation table contains:
+      | project_id | user_id | participates |
+      | 0020       | 0003    | false        |
+    When I GET /api/features/tasks/language/lessons/1500/result/competition
+    Then the response status code is 200
+    And the response body is:
+      """
+      {
+        "members": [
+          { "user_id": "0002", "name": "Mia Member", "points": [ { "date": "2026-11-16", "score": 0.1667 } ] }
+        ]
+      }
+      """
+
+  Scenario: GET the competition — a choice made on another project does not hide the member here
+    Given I am authenticated as a regular user: user.id 0002
+    And the projects table contains:
+      | id   | name  | status |
+      | 0021 | Other | active |
+    And the positions table contains:
+      | id   | tribe_id | person_id | position | status |
+      | 1001 | 0010     | 0030      | member   | active |
+    And the language_words table contains:
+      | id   | text  | language | word_type | status |
+      | 2001 | chat  | fr       | noun      | active |
+      | 2002 | cat   | en       | noun      | active |
+    And the language_word_translations table contains:
+      | id   | word_id_a | word_id_b | status |
+      | 4001 | 2001      | 2002      | active |
+    And the language_lesson_words table contains:
+      | lesson_id | word_id | status |
+      | 1500      | 2001    | active |
+    And the language_word_test_attempts table contains:
+      | id   | user_id | word_id | direction        | mode | correct | created_at          | status |
+      | 7002 | 0002    | 2001    | source_to_target | free | true    | 2026-11-16T10:00:00 | active |
+    And the language_competition_participation table contains:
+      | project_id | user_id | participates |
+      | 0021       | 0002    | false        |
+    When I GET /api/features/tasks/language/lessons/1500/result/competition
+    Then the response status code is 200
+    And the response body includes:
+      """
+      {
+        "members": [
+          { "user_id": "0002", "name": "Mia Member", "points": [ { "date": "2026-11-16", "score": 0.1667 } ] }
+        ]
+      }
+      """

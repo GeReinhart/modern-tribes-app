@@ -1152,11 +1152,11 @@
             "package": "result",
             "description": {
               "en": [
-                "- a lesson's results page, opened from a Result tab you add to the project, with four sub-tabs: each word with its score and the history of your answers, the big overall score with a chart of how it evolved and a collapsible explanation of how it is calculated, your daily effort as bars split between right and wrong answers (answers picked from choices weigh less than typed ones), and a competition chart putting every member's score on the same graph",
+                "- a lesson's results page, opened from a Result tab you add to the project, with four sub-tabs: each word with its score and the history of your answers, the big overall score with a chart of how it evolved and a collapsible explanation of how it is calculated, your daily effort as bars split between right and wrong answers (answers picked from choices weigh less than typed ones), and a ranking of the members with a competition chart putting their scores on the same graph (everyone can join or leave the competition from the menu)",
                 "- the charts can be reduced to a week, a month or 3 months, and you can pick any member of the project (you by default) to see their results"
               ],
               "fr": [
-                "- la page de résultats d'une leçon, ouverte depuis un onglet Résultat ajouté au projet, avec quatre sous-onglets : chaque mot avec sa note et l'historique de vos réponses, la grosse note globale avec un graphique de son évolution et une explication repliable de son calcul, votre effort quotidien en barres partagées entre bonnes et mauvaises réponses (les réponses choisies parmi plusieurs options pèsent moins que les réponses saisies), et un graphique de compétition réunissant la note de chaque membre",
+                "- la page de résultats d'une leçon, ouverte depuis un onglet Résultat ajouté au projet, avec quatre sous-onglets : chaque mot avec sa note et l'historique de vos réponses, la grosse note globale avec un graphique de son évolution et une explication repliable de son calcul, votre effort quotidien en barres partagées entre bonnes et mauvaises réponses (les réponses choisies parmi plusieurs options pèsent moins que les réponses saisies), et un classement des membres avec un graphique de compétition réunissant leur note (chacun peut rejoindre ou quitter la compétition depuis le menu)",
                 "- les graphiques se réduisent à une semaine, un mois ou 3 mois, et vous pouvez choisir n'importe quel membre du projet (vous par défaut) pour voir ses résultats"
               ]
             },

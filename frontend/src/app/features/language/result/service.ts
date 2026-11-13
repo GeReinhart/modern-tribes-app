@@ -1,6 +1,6 @@
 import { apiService } from '@/app/platform/core/api/api.service.ts';
 
-import { CompetitionHistory, EffortHistory, ResultMember, ScoreHistory } from './types.ts';
+import { CompetitionHistory, CompetitionParticipation, EffortHistory, ResultMember, ScoreHistory } from './types.ts';
 import { LessonScoreResponse } from '../shared/scoreTypes.ts';
 
 const BASE = '/features/tasks/language';
@@ -21,6 +21,14 @@ class ResultService {
 
   async getCompetition(lessonId: string): Promise<CompetitionHistory> {
     return apiService.get<CompetitionHistory>(`${BASE}/lessons/${lessonId}/result/competition`);
+  }
+
+  async getParticipation(lessonId: string): Promise<CompetitionParticipation> {
+    return apiService.get<CompetitionParticipation>(`${BASE}/lessons/${lessonId}/result/competition/participation`);
+  }
+
+  async setParticipation(lessonId: string, participates: boolean): Promise<CompetitionParticipation> {
+    return apiService.put<CompetitionParticipation>(`${BASE}/lessons/${lessonId}/result/competition/participation`, { participates });
   }
 
   async getMembers(lessonId: string): Promise<ResultMember[]> {

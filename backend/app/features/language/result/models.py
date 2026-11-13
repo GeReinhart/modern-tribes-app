@@ -36,3 +36,7 @@ class CompetitionResponse(BaseModel):
 class ResultMember(BaseModel):
     user_id: str
     name: str
+
+
+class CompetitionParticipation(BaseModel):
+    participates: bool

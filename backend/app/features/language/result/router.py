@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from app.features.language import access
 from app.features.language.result import service
 from app.features.language.result.models import (
-    CompetitionResponse, EffortResponse, ResultMember, ScoreHistoryResponse,
+    CompetitionParticipation, CompetitionResponse, EffortResponse, ResultMember, ScoreHistoryResponse,
 )
 from app.features.language.score_models import LessonScoreResponse
 from app.platform.core.authentication.router import get_current_user
@@ -81,6 +81,36 @@ async def get_competition(lesson_id: str, current_user: dict = Depends(get_curre
     pool = get_database()
     await access.check_lesson_access(pool, lesson_id, current_user, "guest")
     return await service.get_competition(pool, lesson_id)
+
+
+@router.get("/lessons/{lesson_id}/result/competition/participation", response_model=CompetitionParticipation)
+@require_any_permission_decorator(*_PERMISSIONS)
+async def get_participation(lesson_id: str, current_user: dict = Depends(get_current_user)):
+    """See whether the signed-in user takes part in the competition of the lesson's project
+    (true until they choose otherwise).
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position >= guest
+    """
+    pool = get_database()
+    await access.check_lesson_access(pool, lesson_id, current_user, "guest")
+    return await service.get_participation(pool, lesson_id, str(current_user["id"]))
+
+
+@router.put("/lessons/{lesson_id}/result/competition/participation", response_model=CompetitionParticipation)
+@require_any_permission_decorator(*_PERMISSIONS)
+async def set_participation(
+    lesson_id: str, data: CompetitionParticipation, current_user: dict = Depends(get_current_user),
+):
+    """Join or leave the competition of the lesson's project; a user who left is no longer
+    listed in the Competition results of any of the project's lessons.
+
+    **Permissions:** admin | can_access_attached_tribes
+    **Feature access:** minimum position >= guest
+    """
+    pool = get_database()
+    await access.check_lesson_access(pool, lesson_id, current_user, "guest")
+    return await service.set_participation(pool, lesson_id, str(current_user["id"]), data.participates)
 
 
 @router.get("/lessons/{lesson_id}/result/members", response_model=List[ResultMember])

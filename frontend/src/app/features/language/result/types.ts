@@ -27,6 +27,10 @@ export interface CompetitionHistory {
   members: CompetitionMember[];
 }
 
+export interface CompetitionParticipation {
+  participates: boolean;
+}
+
 export interface ResultMember {
   user_id: string;
   name: string;
