@@ -6,6 +6,7 @@ from weasyprint import HTML
 from app.features.meals.pdf.ingredient_format import (
     GROUP_LABELS_FR, GROUP_ORDER, ingredient_display_text, ingredient_group,
 )
+from app.features.meals.pdf.scaling import displayed_servings, scale_ingredient, servings_ratio
 from app.platform.core.utils.document_helpers import strip_html
 
 _DAY_NAMES_FR = ("Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche")
@@ -24,6 +25,7 @@ _DOCUMENT_CSS = (
     ".recipe-card { border: 1px solid #ccc; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; "
     "break-inside: avoid; page-break-inside: avoid; }"
     ".recipe-card h2 { font-size: 15px; margin: 0 0 6px; }"
+    ".recipe-meal { color: #555555; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; }"
     ".recipe-meta { color: #555555; font-size: 11px; margin-bottom: 6px; }"
     ".label-chip { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; "
     "margin-right: 4px; margin-bottom: 6px; color: #ffffff; }"
@@ -40,26 +42,24 @@ _DOCUMENT_CSS = (
 
 
 def render_meals_pdf(
-    dates: list[date], visible_slots: list[str], by_cell: dict, recipes: list[dict],
+    dates: list[date], visible_slots: list[str], by_cell: dict, recipes: list[dict], recipe_entries: list[dict],
     ingredients_by_recipe: dict, components_by_recipe: dict, label_details: dict,
 ) -> bytes:
     html_document = _build_html_document(
-        dates, visible_slots, by_cell, recipes, ingredients_by_recipe, components_by_recipe, label_details,
+        dates, visible_slots, by_cell, recipes, recipe_entries,
+        ingredients_by_recipe, components_by_recipe, label_details,
     )
     return HTML(string=html_document).write_pdf()
 
 
 def _build_html_document(
-    dates: list[date], visible_slots: list[str], by_cell: dict, recipes: list[dict],
+    dates: list[date], visible_slots: list[str], by_cell: dict, recipes: list[dict], recipe_entries: list[dict],
     ingredients_by_recipe: dict, components_by_recipe: dict, label_details: dict,
 ) -> str:
     table_html = _render_table_page(dates, visible_slots, by_cell, recipes)
     cards_html = "".join(
-        _render_recipe_card(
-            r, ingredients_by_recipe.get(r["id"], []), components_by_recipe.get(r["id"], []),
-            ingredients_by_recipe, label_details,
-        )
-        for r in recipes
+        _render_recipe_card(e, ingredients_by_recipe, components_by_recipe, label_details)
+        for e in recipe_entries
     )
     recipes_html = f'<div class="recipes-columns">{cards_html}</div>' if cards_html else ""
     footer_css = '@bottom-right { content: counter(page) " / " counter(pages); font-size: 11px; color: #666666; }'
@@ -78,8 +78,12 @@ def _render_table_page(dates: list[date], visible_slots: list[str], by_cell: dic
     return f"<h1>{html.escape(title)}</h1><table><thead><tr><th></th>{header_cells}</tr></thead><tbody>{body_rows}</tbody></table>"
 
 
+def _day_label(day: date) -> str:
+    return f"{_DAY_NAMES_FR[day.weekday()]} {day:%d/%m}"
+
+
 def _render_table_row(day: date, visible_slots: list[str], by_cell: dict, recipe_name_by_id: dict) -> str:
-    day_label = f"{_DAY_NAMES_FR[day.weekday()]} {day:%d/%m}"
+    day_label = _day_label(day)
     cells = "".join(
         f"<td>{_render_cell_meals(by_cell.get((day, slot), []), recipe_name_by_id)}</td>" for slot in visible_slots
     )
@@ -104,8 +108,14 @@ def _render_meal(meal: dict, recipe_name_by_id: dict) -> str:
     return f'<div class="meal">{"".join(parts)}</div>'
 
 
-def _recipe_meta_line(recipe: dict) -> str:
-    parts = [f"{recipe['servings']} pers."]
+def _meal_line(entry: dict) -> str:
+    """Which meal a recipe card was printed for, e.g. "Mardi 24/11 · Midi"."""
+    meal_day = entry["meal"]["start_at"].date()
+    return html.escape(f"{_day_label(meal_day)} · {_SLOT_LABELS_FR[entry['slot']]}")
+
+
+def _recipe_meta_line(recipe: dict, headcount: int | None) -> str:
+    parts = [f"{displayed_servings(headcount, recipe['servings'])} pers."]
     if recipe.get("difficulty") is not None:
         parts.append(f"Difficulté {recipe['difficulty']}/5")
     if recipe.get("prep_time_minutes") is not None:
@@ -137,14 +147,14 @@ def _render_ingredients(ingredients: list[dict]) -> str:
     return "".join(_render_ingredient_group(ingredients, key) for key in GROUP_ORDER)
 
 
-def _scale_ingredient(ingredient: dict, multiplier: float) -> dict:
-    return {**ingredient, "quantity": float(ingredient["quantity"]) * multiplier}
+def _scale_ingredients(ingredients: list[dict], ratio: float) -> list[dict]:
+    return [scale_ingredient(i, ratio) for i in ingredients]
 
 
-def _render_component_block(component: dict, ingredients_by_recipe: dict) -> str:
+def _render_component_block(component: dict, ingredients_by_recipe: dict, ratio: float) -> str:
     ingredients = ingredients_by_recipe.get(component["component_recipe_id"], [])
-    scaled = [_scale_ingredient(i, component["multiplier"]) for i in ingredients]
-    multiplier = component["multiplier"]
+    multiplier = float(component["multiplier"])
+    scaled = _scale_ingredients(ingredients, multiplier * ratio)
     multiplier_label = str(int(multiplier)) if multiplier == int(multiplier) else str(multiplier)
     title = f"{component['component_recipe_name']} ×{multiplier_label}"
     body = component.get("document_content_html") or ""
@@ -158,14 +168,20 @@ def _render_component_block(component: dict, ingredients_by_recipe: dict) -> str
 
 
 def _render_recipe_card(
-    recipe: dict, ingredients: list[dict], components: list[dict], ingredients_by_recipe: dict, label_details: dict,
+    entry: dict, ingredients_by_recipe: dict, components_by_recipe: dict, label_details: dict,
 ) -> str:
+    recipe, headcount = entry["recipe"], entry["meal"]["headcount"]
+    ratio = servings_ratio(headcount, recipe["servings"])
+    ingredients = _scale_ingredients(ingredients_by_recipe.get(recipe["id"], []), ratio)
+    components_html = "".join(
+        _render_component_block(c, ingredients_by_recipe, ratio) for c in components_by_recipe.get(recipe["id"], [])
+    )
     body = recipe.get("document_content_html") or ""
-    components_html = "".join(_render_component_block(c, ingredients_by_recipe) for c in components)
     return (
         '<div class="recipe-card">'
+        f'<div class="recipe-meal">{_meal_line(entry)}</div>'
         f"<h2>{html.escape(recipe['name'])}</h2>"
-        f'<div class="recipe-meta">{_recipe_meta_line(recipe)}</div>'
+        f'<div class="recipe-meta">{_recipe_meta_line(recipe, headcount)}</div>'
         f"{_render_labels(recipe, label_details)}"
         f"{components_html}"
         f'<div class="ingredients-columns">{_render_ingredients(ingredients)}</div>'
